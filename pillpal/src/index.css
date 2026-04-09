@@ -1,0 +1,136 @@
+@import "tailwindcss";
+
+@theme {
+  /* Pro Mode - Cyberpunk palette */
+  --color-neon-green: #39ff14;
+  --color-neon-cyan: #22d3ee;
+  --color-neon-orange: #ff6b35;
+  --color-neon-pink: #ff2d78;
+  --color-neon-purple: #a855f7;
+  --color-dark-bg: #0a0a0a;
+  --color-dark-card: #141414;
+  --color-dark-surface: #1e1e1e;
+  --color-dark-border: #2a2a2a;
+
+  /* Care Mode - Warm palette */
+  --color-warm-bg: #fdf6e3;
+  --color-warm-card: #ffffff;
+  --color-warm-surface: #fff8ee;
+  --color-warm-orange: #f97316;
+  --color-warm-amber: #f59e0b;
+  --color-warm-text: #44403c;
+  --color-warm-muted: #78716c;
+  --color-warm-border: #e7e0d5;
+
+  /* Shared accent */
+  --color-success: #10b981;
+  --color-warning: #eab308;
+  --color-danger: #ef4444;
+}
+
+/* Global resets */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar for dark mode */
+.theme-pro ::-webkit-scrollbar {
+  width: 4px;
+}
+.theme-pro ::-webkit-scrollbar-track {
+  background: #141414;
+}
+.theme-pro ::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 2px;
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px currentColor; }
+  50% { box-shadow: 0 0 20px currentColor, 0 0 40px currentColor; }
+}
+
+@keyframes pop-in {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes confetti-fall {
+  0% { transform: translateY(-100%) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
+}
+
+@keyframes slide-up {
+  0% { transform: translateY(100%); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.animate-float { animation: float 3s ease-in-out infinite; }
+.animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+.animate-pop-in { animation: pop-in 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+.animate-wiggle { animation: wiggle 0.5s ease-in-out; }
+.animate-slide-up { animation: slide-up 0.3s ease-out; }
+
+/* Safe area insets for notched phones */
+.pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
+}
+
+/* Gradient text */
+.gradient-text-pro {
+  background: linear-gradient(135deg, #39ff14, #22d3ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-care {
+  background: linear-gradient(135deg, #f97316, #f59e0b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glass effect */
+.glass-pro {
+  background: rgba(20, 20, 20, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.glass-care {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
