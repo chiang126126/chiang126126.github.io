@@ -25,11 +25,11 @@ struct MoodAvatar: View {
     }
 
     private var mood: (emoji: String, label: LocalizedStringKey, color: Color) {
-        if adherence >= 100 { return ("😎", "mood_perfect", Color(hex: "#10B981")) }
-        if adherence >= 80 { return ("😊", "mood_great", Color(hex: "#22D3EE")) }
-        if adherence >= 50 { return ("😐", "mood_ok", Color(hex: "#EAB308")) }
-        if adherence >= 20 { return ("😤", "mood_come_on", Color(hex: "#F97316")) }
-        return ("🙄", "mood_really", Color(hex: "#EF4444"))
+        if adherence >= 100 { return (Emoji.cool, "mood_perfect", Color(hex: "#10B981")) }
+        if adherence >= 80 { return (Emoji.smile, "mood_great", Color(hex: "#22D3EE")) }
+        if adherence >= 50 { return (Emoji.neutral, "mood_ok", Color(hex: "#EAB308")) }
+        if adherence >= 20 { return (Emoji.angry, "mood_come_on", Color(hex: "#F97316")) }
+        return (Emoji.eyeroll, "mood_really", Color(hex: "#EF4444"))
     }
 
     var body: some View {
@@ -42,9 +42,7 @@ struct MoodAvatar: View {
                         .fill(
                             RadialGradient(
                                 colors: [mood.color.opacity(theme.isPro ? 0.15 : 0.2), .clear],
-                                center: .center,
-                                startRadius: 0,
-                                endRadius: size.dimension / 2
+                                center: .center, startRadius: 0, endRadius: size.dimension / 2
                             )
                         )
                         .shadow(color: theme.isPro ? mood.color.opacity(0.2) : .clear, radius: 10)
@@ -55,7 +53,7 @@ struct MoodAvatar: View {
 
             if size != .small {
                 Text(mood.label)
-                    .font(.system(size: theme.captionSize, weight: .medium))
+                    .font(.system(size: theme.captionSize, weight: .medium, design: .rounded))
                     .foregroundColor(theme.mutedColor)
             }
         }

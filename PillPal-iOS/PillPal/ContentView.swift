@@ -5,14 +5,31 @@ struct ContentView: View {
     @Environment(ThemeManager.self) private var theme
 
     var body: some View {
-        Group {
-            if !store.onboardingDone {
-                OnboardingView()
-            } else {
-                MainTabView()
+        ZStack {
+            Group {
+                if !store.onboardingDone {
+                    OnboardingView()
+                } else {
+                    MainTabView()
+                }
+            }
+            .preferredColorScheme(theme.isPro ? .dark : .light)
+
+            // Level Up Overlay
+            if store.showLevelUp {
+                LevelUpOverlay(level: store.levelUpTo) {
+                    withAnimation(.spring(response: 0.4)) {
+                        store.showLevelUp = false
+                    }
+                }
+                .transition(.scale.combined(with: .opacity))
+                .zIndex(100)
             }
         }
-        .preferredColorScheme(theme.isPro ? .dark : .light)
+        .animation(.spring(response: 0.3), value: store.showLevelUp)
+        .onAppear {
+            store.performDailyCheckIn()
+        }
     }
 }
 
@@ -35,10 +52,8 @@ struct MainTabView: View {
                     .tag(4)
             }
             .tabViewStyle(.automatic)
-            // Hide default tab bar
             .toolbar(.hidden, for: .tabBar)
 
-            // Custom bottom nav bar
             CustomTabBar(selectedTab: $selectedTab)
         }
         .ignoresSafeArea(.keyboard)
@@ -62,9 +77,9 @@ struct CustomTabBar: View {
         HStack(spacing: 0) {
             ForEach(0..<tabs.count, id: \.self) { index in
                 if index == 2 {
-                    // Center scan button
+                    // Center scan button - playful floating style
                     Button {
-                        withAnimation(.spring(response: 0.3)) {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
                             selectedTab = index
                         }
                         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
@@ -72,39 +87,42 @@ struct CustomTabBar: View {
                         ZStack {
                             Circle()
                                 .fill(theme.accentGradient)
-                                .frame(width: 56, height: 56)
-                                .shadow(color: theme.accentColor.opacity(0.4), radius: 8, y: 4)
+                                .frame(width: 60, height: 60)
+                                .shadow(color: theme.accentColor.opacity(0.5), radius: 12, y: 4)
 
                             Image(systemName: tabs[index].icon)
-                                .font(.system(size: 22, weight: .bold))
+                                .font(.system(size: 24, weight: .bold))
                                 .foregroundColor(theme.isPro ? .black : .white)
+                                .symbolEffect(.bounce, options: .repeat(.periodic(delay: 4.0)), isActive: selectedTab != 2)
                         }
-                        .offset(y: -16)
+                        .offset(y: -20)
                     }
                     .frame(maxWidth: .infinity)
                 } else {
                     Button {
-                        withAnimation(.spring(response: 0.3)) {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                             selectedTab = index
                         }
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     } label: {
                         VStack(spacing: 3) {
                             Image(systemName: tabs[index].icon)
-                                .font(.system(size: theme.isCare ? 22 : 19))
+                                .font(.system(size: theme.isCare ? 22 : 20))
                                 .foregroundColor(selectedTab == index ? theme.accentColor : theme.mutedColor)
+                                .scaleEffect(selectedTab == index ? 1.15 : 1.0)
 
                             Text(tabs[index].label)
-                                .font(.system(size: theme.isCare ? 11 : 9))
+                                .font(.system(size: theme.isCare ? 11 : 9, weight: selectedTab == index ? .bold : .regular))
                                 .foregroundColor(selectedTab == index ? theme.accentColor : theme.mutedColor)
 
                             if selectedTab == index {
                                 Circle()
                                     .fill(theme.accentColor)
-                                    .frame(width: 4, height: 4)
-                                    .transition(.scale)
+                                    .frame(width: 5, height: 5)
+                                    .transition(.scale.combined(with: .opacity))
                             }
                         }
+                        .animation(.spring(response: 0.3), value: selectedTab)
                     }
                     .frame(maxWidth: .infinity)
                 }

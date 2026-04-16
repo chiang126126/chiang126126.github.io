@@ -234,7 +234,7 @@ struct MedicationsListView: View {
     // MARK: - Empty State
     private var emptyState: some View {
         VStack(spacing: 12) {
-            Text("💊")
+            Text(Emoji.pill)
                 .font(.system(size: 56))
                 .phaseAnimator([false, true]) { content, phase in
                     content.rotationEffect(.degrees(phase ? 10 : -10))

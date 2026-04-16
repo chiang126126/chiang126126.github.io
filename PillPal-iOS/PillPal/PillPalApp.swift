@@ -10,6 +10,7 @@ struct PillPalApp: App {
             ContentView()
                 .environment(store)
                 .environment(themeManager)
+                .environment(\.locale, Locale(identifier: store.appLanguage))
         }
     }
 }

@@ -10,7 +10,16 @@ final class MedicationStore {
     var bestStreak: Int = 0
     var achievements: [Achievement] = []
     var onboardingDone: Bool = false
-    var reminderStyle: String = "sassy" // "sassy" | "gentle" | "neutral"
+    var reminderStyle: String = "sassy"
+    var totalXP: Int = 0
+    var lastCheckInDate: String = ""
+    var appLanguage: String = "en"
+
+    // MARK: - Transient UI State
+    var showLevelUp: Bool = false
+    var levelUpTo: Int = 0
+    var recentXPGain: Int = 0
+    var showXPPopup: Bool = false
 
     private let medsKey = "pillpal-medications"
     private let logsKey = "pillpal-logs"
@@ -38,6 +47,9 @@ final class MedicationStore {
             achievements = meta.achievements
             onboardingDone = meta.onboardingDone
             reminderStyle = meta.reminderStyle
+            totalXP = meta.totalXP ?? 0
+            lastCheckInDate = meta.lastCheckInDate ?? ""
+            appLanguage = meta.appLanguage ?? "en"
         }
     }
 
@@ -51,11 +63,82 @@ final class MedicationStore {
         let meta = StoreMeta(
             streak: streak, bestStreak: bestStreak,
             achievements: achievements, onboardingDone: onboardingDone,
-            reminderStyle: reminderStyle
+            reminderStyle: reminderStyle,
+            totalXP: totalXP, lastCheckInDate: lastCheckInDate,
+            appLanguage: appLanguage
         )
         if let data = try? JSONEncoder().encode(meta) {
             UserDefaults.standard.set(data, forKey: metaKey)
         }
+    }
+
+    // MARK: - XP & Leveling
+    var currentLevel: GameLevel { GameLevel.forXP(totalXP) }
+
+    var nextLevel: GameLevel? { GameLevel.nextAfter(currentLevel) }
+
+    var xpProgress: Double {
+        guard let next = nextLevel else { return 1.0 }
+        let current = currentLevel
+        let xpInLevel = totalXP - current.xpRequired
+        let xpNeeded = next.xpRequired - current.xpRequired
+        return Double(xpInLevel) / Double(xpNeeded)
+    }
+
+    var xpToNext: Int {
+        guard let next = nextLevel else { return 0 }
+        return next.xpRequired - totalXP
+    }
+
+    func awardXP(_ amount: Int) {
+        let oldLevel = currentLevel
+        totalXP += amount
+        let newLevel = currentLevel
+
+        recentXPGain = amount
+        showXPPopup = true
+
+        if newLevel.level > oldLevel.level {
+            levelUpTo = newLevel.level
+            showLevelUp = true
+            checkLevelAchievements()
+        }
+
+        checkDoseAchievements()
+        save()
+    }
+
+    // MARK: - Daily Check-In
+    var hasCheckedInToday: Bool {
+        lastCheckInDate == todayString()
+    }
+
+    func performDailyCheckIn() {
+        guard !hasCheckedInToday else { return }
+        lastCheckInDate = todayString()
+        awardXP(XPReward.dailyCheckIn)
+        save()
+    }
+
+    // MARK: - Daily Missions
+    func dailyMissions() -> [DailyMission] {
+        let schedule = todaySchedule()
+        let morningMeds = schedule.filter { $0.timeOfDay == .morning }
+        let allMorningTaken = !morningMeds.isEmpty && morningMeds.allSatisfy { isTakenToday($0.id) }
+        let anyTaken = schedule.contains { isTakenToday($0.id) }
+        let allTaken = !schedule.isEmpty && schedule.allSatisfy { isTakenToday($0.id) }
+        let noSkips = anyTaken && !schedule.contains { isSkippedToday($0.id) }
+
+        return [
+            DailyMission(id: "checkin", titleKey: "mission_checkin", icon: "hand.wave.fill", xpReward: XPReward.dailyCheckIn, isCompleted: hasCheckedInToday),
+            DailyMission(id: "morning", titleKey: "mission_morning", icon: "sunrise.fill", xpReward: 20, isCompleted: allMorningTaken),
+            DailyMission(id: "no_skip", titleKey: "mission_no_skip", icon: "shield.fill", xpReward: 30, isCompleted: noSkips),
+            DailyMission(id: "all_done", titleKey: "mission_all_done", icon: "checkmark.seal.fill", xpReward: XPReward.completeAllDaily, isCompleted: allTaken),
+        ]
+    }
+
+    var completedMissionsCount: Int {
+        dailyMissions().filter(\.isCompleted).count
     }
 
     // MARK: - Medication CRUD
@@ -64,9 +147,10 @@ final class MedicationStore {
         newMed.createdAt = Date()
         medications.append(newMed)
 
-        if achievements.isEmpty || (!achievements.contains(.firstPill) && medications.count == 1) {
-            achievements.append(.firstPill)
+        if !achievements.contains(.firstPill) {
+            unlockAchievement(.firstPill)
         }
+        awardXP(XPReward.addMedication)
         save()
     }
 
@@ -94,7 +178,19 @@ final class MedicationStore {
     func logDose(_ medicationId: UUID, status: DoseStatus) {
         let log = DoseLog(medicationId: medicationId, status: status, timestamp: Date())
         logs.append(log)
+
+        if status == .taken {
+            awardXP(XPReward.takeDose)
+        }
+
         recalculateStreak()
+
+        // Check if all daily done
+        let schedule = todaySchedule()
+        if !schedule.isEmpty && schedule.allSatisfy({ isTakenToday($0.id) }) {
+            awardXP(XPReward.completeAllDaily)
+        }
+
         save()
     }
 
@@ -144,11 +240,43 @@ final class MedicationStore {
             bestStreak = max(streak, bestStreak)
 
             if streak >= 7 && !achievements.contains(.weekStreak) {
-                achievements.append(.weekStreak)
+                unlockAchievement(.weekStreak)
+                awardXP(XPReward.streak7)
             }
             if streak >= 30 && !achievements.contains(.monthStreak) {
-                achievements.append(.monthStreak)
+                unlockAchievement(.monthStreak)
+                awardXP(XPReward.streak30)
             }
+        }
+    }
+
+    // MARK: - Achievements
+    private func unlockAchievement(_ achievement: Achievement) {
+        guard !achievements.contains(achievement) else { return }
+        achievements.append(achievement)
+        save()
+    }
+
+    private func checkDoseAchievements() {
+        let taken = totalTaken
+        if taken >= 10 && !achievements.contains(.tenDoses) {
+            unlockAchievement(.tenDoses)
+        }
+        if taken >= 50 && !achievements.contains(.fiftyDoses) {
+            unlockAchievement(.fiftyDoses)
+        }
+        if taken >= 100 && !achievements.contains(.hundredDoses) {
+            unlockAchievement(.hundredDoses)
+        }
+    }
+
+    private func checkLevelAchievements() {
+        let lvl = currentLevel.level
+        if lvl >= 5 && !achievements.contains(.level5) {
+            unlockAchievement(.level5)
+        }
+        if lvl >= 10 && !achievements.contains(.level10) {
+            unlockAchievement(.level10)
         }
     }
 
@@ -166,10 +294,9 @@ final class MedicationStore {
             let dateStr = f.string(from: date)
             let taken = logs.filter { $0.dateString == dateStr && $0.status == .taken }.count
 
-            let dayLabel: String
             let shortF = DateFormatter()
             shortF.dateFormat = "EEE"
-            dayLabel = shortF.string(from: date)
+            let dayLabel = shortF.string(from: date)
 
             return DayStat(date: date, dayLabel: dayLabel, taken: taken, total: total)
         }
@@ -197,12 +324,21 @@ final class MedicationStore {
         save()
     }
 
+    func setAppLanguage(_ lang: String) {
+        appLanguage = lang
+        UserDefaults.standard.set([lang], forKey: "AppleLanguages")
+        UserDefaults.standard.synchronize()
+        save()
+    }
+
     func clearAllData() {
         medications = []
         logs = []
         streak = 0
         bestStreak = 0
         achievements = []
+        totalXP = 0
+        lastCheckInDate = ""
         reminderStyle = "sassy"
         save()
     }
@@ -222,4 +358,7 @@ private struct StoreMeta: Codable {
     let achievements: [Achievement]
     let onboardingDone: Bool
     let reminderStyle: String
+    var totalXP: Int?
+    var lastCheckInDate: String?
+    var appLanguage: String?
 }

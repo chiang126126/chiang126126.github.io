@@ -8,10 +8,19 @@ struct StreakCounter: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            Image(systemName: "flame.fill")
-                .font(.system(size: theme.isCare ? 24 : 18))
-                .foregroundColor(isOnFire ? theme.neonOrange : theme.mutedColor)
-                .symbolEffect(.bounce, options: .repeat(.periodic(delay: 2.0)), isActive: isOnFire)
+            ZStack {
+                if isOnFire {
+                    Text(Emoji.fire)
+                        .font(.system(size: theme.isCare ? 22 : 18))
+                        .phaseAnimator([false, true]) { content, phase in
+                            content.scaleEffect(phase ? 1.2 : 1)
+                        } animation: { _ in .easeInOut(duration: 0.8).repeatForever(autoreverses: true) }
+                } else {
+                    Image(systemName: "flame.fill")
+                        .font(.system(size: theme.isCare ? 22 : 18))
+                        .foregroundColor(theme.mutedColor)
+                }
+            }
 
             VStack(alignment: .leading, spacing: 0) {
                 Text("\(streak)")
@@ -20,7 +29,7 @@ struct StreakCounter: View {
                     .contentTransition(.numericText())
 
                 Text("streak_days")
-                    .font(.system(size: theme.captionSize))
+                    .font(.system(size: theme.captionSize, design: .rounded))
                     .foregroundColor(theme.mutedColor)
             }
         }
@@ -31,8 +40,9 @@ struct StreakCounter: View {
                 .fill(theme.cardColor)
                 .overlay {
                     RoundedRectangle(cornerRadius: 16)
-                        .stroke(theme.borderColor, lineWidth: 1)
+                        .stroke(isOnFire ? theme.neonOrange.opacity(0.3) : theme.borderColor, lineWidth: 1)
                 }
+                .shadow(color: isOnFire ? theme.neonOrange.opacity(0.15) : .clear, radius: 8)
         }
     }
 }

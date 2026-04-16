@@ -1,6 +1,55 @@
 import Foundation
 import SwiftUI
 
+// MARK: - Emoji Constants (Unicode escapes for reliable rendering)
+enum Emoji {
+    static let pill       = "\u{1F48A}"  // 💊
+    static let camera     = "\u{1F4F8}"  // 📸
+    static let fire       = "\u{1F525}"  // 🔥
+    static let trophy     = "\u{1F3C6}"  // 🏆
+    static let wave       = "\u{1F44B}"  // 👋
+    static let cool       = "\u{1F60E}"  // 😎
+    static let smile      = "\u{1F60A}"  // 😊
+    static let neutral    = "\u{1F610}"  // 😐
+    static let angry      = "\u{1F624}"  // 😤
+    static let eyeroll    = "\u{1F644}"  // 🙄
+    static let sparkles   = "\u{2728}"   // ✨
+    static let seedling   = "\u{1F331}"  // 🌱
+    static let herb       = "\u{1F33F}"  // 🌿
+    static let sunflower  = "\u{1F33B}"  // 🌻
+    static let star       = "\u{2B50}"   // ⭐
+    static let gem        = "\u{1F48E}"  // 💎
+    static let crown      = "\u{1F451}"  // 👑
+    static let superhero  = "\u{1F9B8}"  // 🦸
+    static let rainbow    = "\u{1F308}"  // 🌈
+    static let party      = "\u{1F389}"  // 🎉
+    static let rocket     = "\u{1F680}"  // 🚀
+    static let muscle     = "\u{1F4AA}"  // 💪
+    static let target     = "\u{1F3AF}"  // 🎯
+    static let medal      = "\u{1F3C5}"  // 🏅
+    static let shield     = "\u{1F6E1}"  // 🛡
+    static let lightning   = "\u{26A1}"   // ⚡
+    static let gift       = "\u{1F381}"  // 🎁
+    static let bell       = "\u{1F514}"  // 🔔
+    static let heart      = "\u{2764}\u{FE0F}" // ❤️
+    static let check      = "\u{2705}"   // ✅
+    static let clap       = "\u{1F44F}"  // 👏
+    static let brain      = "\u{1F9E0}"  // 🧠
+    static let droplet    = "\u{1F4A7}"  // 💧
+    static let leaf       = "\u{1F343}"  // 🍃
+    static let sun        = "\u{2600}\u{FE0F}" // ☀️
+    static let moon       = "\u{1F319}"  // 🌙
+    static let thumbsUp   = "\u{1F44D}"  // 👍
+    static let hundredPts = "\u{1F4AF}"  // 💯
+    static let gamepad    = "\u{1F3AE}"  // 🎮
+    static let scroll     = "\u{1F4DC}"  // 📜
+    static let boom       = "\u{1F4A5}"  // 💥
+    static let confetti   = "\u{1F38A}"  // 🎊
+    static let cherryBlossom = "\u{1F338}" // 🌸
+    static let pill2      = "\u{1F489}"  // 💉 (syringe for variety)
+    static let heartPulse = "\u{1F493}"  // 💓
+}
+
 // MARK: - Medication Model
 struct Medication: Identifiable, Codable, Equatable {
     var id = UUID()
@@ -14,7 +63,7 @@ struct Medication: Identifiable, Codable, Equatable {
     var iconName: String
     var isActive: Bool
     var createdAt: Date
-    var weekDay: Int? // 0=Sun, for weekly frequency
+    var weekDay: Int?
 
     init(
         name: String,
@@ -41,9 +90,7 @@ struct Medication: Identifiable, Codable, Equatable {
         self.weekDay = weekDay
     }
 
-    var color: Color {
-        Color(hex: colorHex)
-    }
+    var color: Color { Color(hex: colorHex) }
 }
 
 // MARK: - Enums
@@ -66,9 +113,7 @@ enum Frequency: String, Codable, CaseIterable {
 enum TimeOfDay: String, Codable, CaseIterable {
     case morning, afternoon, evening, bedtime
 
-    var localizationKey: String {
-        "time_\(rawValue)"
-    }
+    var localizationKey: String { "time_\(rawValue)" }
 
     var icon: String {
         switch self {
@@ -85,9 +130,7 @@ enum FoodRelation: String, Codable, CaseIterable {
     case beforeFood = "before_food"
     case afterFood = "after_food"
 
-    var localizationKey: String {
-        "food_\(rawValue)"
-    }
+    var localizationKey: String { "food_\(rawValue)" }
 }
 
 // MARK: - Dose Log
@@ -107,13 +150,82 @@ enum DoseStatus: String, Codable {
     case taken, skipped
 }
 
-// MARK: - Achievement
+// MARK: - XP Rewards
+enum XPReward {
+    static let takeDose = 10
+    static let completeAllDaily = 50
+    static let dailyCheckIn = 5
+    static let firstScan = 25
+    static let perfectWeek = 100
+    static let streak7 = 70
+    static let streak30 = 300
+    static let addMedication = 15
+}
+
+// MARK: - Game Level
+struct GameLevel: Equatable {
+    let level: Int
+    let titleKey: String
+    let emoji: String
+    let xpRequired: Int
+    let color: Color
+
+    static func == (lhs: GameLevel, rhs: GameLevel) -> Bool {
+        lhs.level == rhs.level
+    }
+
+    static let all: [GameLevel] = [
+        GameLevel(level: 1, titleKey: "level_1", emoji: Emoji.seedling, xpRequired: 0, color: Color(hex: "#10B981")),
+        GameLevel(level: 2, titleKey: "level_2", emoji: Emoji.herb, xpRequired: 100, color: Color(hex: "#22D3EE")),
+        GameLevel(level: 3, titleKey: "level_3", emoji: Emoji.sunflower, xpRequired: 300, color: Color(hex: "#3B82F6")),
+        GameLevel(level: 4, titleKey: "level_4", emoji: Emoji.star, xpRequired: 600, color: Color(hex: "#A855F7")),
+        GameLevel(level: 5, titleKey: "level_5", emoji: Emoji.fire, xpRequired: 1000, color: Color(hex: "#F97316")),
+        GameLevel(level: 6, titleKey: "level_6", emoji: Emoji.gem, xpRequired: 1500, color: Color(hex: "#EC4899")),
+        GameLevel(level: 7, titleKey: "level_7", emoji: Emoji.trophy, xpRequired: 2200, color: Color(hex: "#EAB308")),
+        GameLevel(level: 8, titleKey: "level_8", emoji: Emoji.crown, xpRequired: 3000, color: Color(hex: "#F59E0B")),
+        GameLevel(level: 9, titleKey: "level_9", emoji: Emoji.superhero, xpRequired: 4000, color: Color(hex: "#EF4444")),
+        GameLevel(level: 10, titleKey: "level_10", emoji: Emoji.rainbow, xpRequired: 5500, color: Color(hex: "#8B5CF6")),
+    ]
+
+    static func forXP(_ xp: Int) -> GameLevel {
+        all.last(where: { $0.xpRequired <= xp }) ?? all[0]
+    }
+
+    static func nextAfter(_ current: GameLevel) -> GameLevel? {
+        guard current.level < all.count else { return nil }
+        return all[current.level]
+    }
+
+    var localizedTitle: String {
+        NSLocalizedString(titleKey, comment: "")
+    }
+}
+
+// MARK: - Daily Mission
+struct DailyMission: Identifiable {
+    let id: String
+    let titleKey: String
+    let icon: String
+    let xpReward: Int
+    let isCompleted: Bool
+
+    var localizedTitle: String {
+        NSLocalizedString(titleKey, comment: "")
+    }
+}
+
+// MARK: - Achievement (expanded)
 enum Achievement: String, CaseIterable, Codable {
     case firstPill = "first_pill"
     case weekStreak = "week_streak"
     case monthStreak = "month_streak"
     case perfectWeek = "perfect_week"
     case scanner = "scanner"
+    case level5 = "level_5_reached"
+    case level10 = "level_10_reached"
+    case tenDoses = "ten_doses"
+    case fiftyDoses = "fifty_doses"
+    case hundredDoses = "hundred_doses"
 
     var icon: String {
         switch self {
@@ -122,16 +234,69 @@ enum Achievement: String, CaseIterable, Codable {
         case .monthStreak: return "crown.fill"
         case .perfectWeek: return "trophy.fill"
         case .scanner: return "camera.viewfinder"
+        case .level5: return "bolt.fill"
+        case .level10: return "sparkles"
+        case .tenDoses: return "heart.fill"
+        case .fiftyDoses: return "shield.fill"
+        case .hundredDoses: return "star.circle.fill"
         }
     }
 
     var color: Color {
         switch self {
-        case .firstPill: return .blue
-        case .weekStreak: return .orange
-        case .monthStreak: return .yellow
-        case .perfectWeek: return .green
-        case .scanner: return .purple
+        case .firstPill: return Color(hex: "#3B82F6")
+        case .weekStreak: return Color(hex: "#F97316")
+        case .monthStreak: return Color(hex: "#EAB308")
+        case .perfectWeek: return Color(hex: "#10B981")
+        case .scanner: return Color(hex: "#A855F7")
+        case .level5: return Color(hex: "#F97316")
+        case .level10: return Color(hex: "#8B5CF6")
+        case .tenDoses: return Color(hex: "#EC4899")
+        case .fiftyDoses: return Color(hex: "#22D3EE")
+        case .hundredDoses: return Color(hex: "#EF4444")
+        }
+    }
+
+    var localizedName: String {
+        NSLocalizedString("achv_\(rawValue)", comment: "")
+    }
+
+    var localizedDesc: String {
+        NSLocalizedString("achv_\(rawValue)_desc", comment: "")
+    }
+
+    var xpReward: Int {
+        switch self {
+        case .firstPill: return 25
+        case .weekStreak: return 70
+        case .monthStreak: return 300
+        case .perfectWeek: return 100
+        case .scanner: return 25
+        case .level5: return 50
+        case .level10: return 100
+        case .tenDoses: return 30
+        case .fiftyDoses: return 75
+        case .hundredDoses: return 150
+        }
+    }
+
+    var tier: AchievementTier {
+        switch self {
+        case .firstPill, .scanner, .tenDoses: return .bronze
+        case .weekStreak, .perfectWeek, .fiftyDoses, .level5: return .silver
+        case .monthStreak, .hundredDoses, .level10: return .gold
+        }
+    }
+}
+
+enum AchievementTier: String {
+    case bronze, silver, gold
+
+    var borderGradient: LinearGradient {
+        switch self {
+        case .bronze: return LinearGradient(colors: [Color(hex: "#CD7F32"), Color(hex: "#B87333")], startPoint: .top, endPoint: .bottom)
+        case .silver: return LinearGradient(colors: [Color(hex: "#C0C0C0"), Color(hex: "#A8A9AD")], startPoint: .top, endPoint: .bottom)
+        case .gold: return LinearGradient(colors: [Color(hex: "#FFD700"), Color(hex: "#FFA500")], startPoint: .top, endPoint: .bottom)
         }
     }
 }
@@ -159,7 +324,6 @@ struct PillOptions {
         "star.fill", "bolt.fill"
     ]
 
-    // Demo scan results
     static let demoScans: [(name: String, dosage: String, frequency: Frequency, time: TimeOfDay, food: FoodRelation)] = [
         ("Vitamin D3", "2000 IU", .daily, .morning, .withFood),
         ("Omega-3 Fish Oil", "1000 mg", .daily, .morning, .withFood),

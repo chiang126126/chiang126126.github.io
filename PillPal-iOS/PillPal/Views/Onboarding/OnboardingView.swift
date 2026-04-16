@@ -3,12 +3,15 @@ import SwiftUI
 struct OnboardingView: View {
     @Environment(MedicationStore.self) private var store
     @Environment(ThemeManager.self) private var theme
-    @State private var step = -1 // -1 = welcome
+    @State private var step = -1
 
-    private let steps: [(emoji: String, titleKey: String, descKey: String, color: Color)] = [
-        ("📸", "onboard_step1_title", "onboard_step1_desc", Color(hex: "#22D3EE")),
-        ("🔥", "onboard_step2_title", "onboard_step2_desc", Color(hex: "#FF6B35")),
-        ("🏆", "onboard_step3_title", "onboard_step3_desc", Color(hex: "#10B981")),
+    private let steps: [(icon: String, color: Color, titleKey: String, descKey: String, emojis: [String])] = [
+        ("camera.viewfinder", Color(hex: "#22D3EE"), "onboard_step1_title", "onboard_step1_desc",
+         [Emoji.camera, Emoji.sparkles]),
+        ("bell.badge.fill", Color(hex: "#FF6B35"), "onboard_step2_title", "onboard_step2_desc",
+         [Emoji.bell, Emoji.fire]),
+        ("trophy.fill", Color(hex: "#10B981"), "onboard_step3_title", "onboard_step3_desc",
+         [Emoji.trophy, Emoji.star, Emoji.rocket]),
     ]
 
     var body: some View {
@@ -35,33 +38,44 @@ struct OnboardingView: View {
 
     // MARK: - Welcome
     private var welcomeView: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 28) {
             Spacer()
 
-            // Animated pill icon
-            Text("💊")
-                .font(.system(size: 80))
-                .padding(24)
-                .background {
-                    RoundedRectangle(cornerRadius: 32)
-                        .fill(theme.accentGradient)
-                        .shadow(color: theme.accentColor.opacity(0.3), radius: 20, y: 10)
-                }
-                .phaseAnimator([false, true]) { content, phase in
-                    content
-                        .rotationEffect(.degrees(phase ? 5 : -5))
-                        .scaleEffect(phase ? 1.05 : 1)
-                } animation: { _ in .easeInOut(duration: 2).repeatForever(autoreverses: true) }
+            ZStack {
+                Circle()
+                    .fill(theme.accentGradient)
+                    .frame(width: 140, height: 140)
+                    .shadow(color: theme.accentColor.opacity(0.4), radius: 24, y: 8)
 
-            VStack(spacing: 8) {
+                Image(systemName: "pill.fill")
+                    .font(.system(size: 56, weight: .bold))
+                    .foregroundColor(theme.isPro ? .black : .white)
+                    .rotationEffect(.degrees(-30))
+            }
+            .phaseAnimator([false, true]) { content, phase in
+                content
+                    .scaleEffect(phase ? 1.08 : 1)
+                    .rotationEffect(.degrees(phase ? 3 : -3))
+            } animation: { _ in .easeInOut(duration: 2).repeatForever(autoreverses: true) }
+
+            VStack(spacing: 10) {
                 Text("onboard_welcome")
-                    .font(.system(size: theme.titleSize + 4, weight: .bold))
+                    .font(.system(size: theme.titleSize + 6, weight: .bold, design: .rounded))
                     .foregroundStyle(theme.accentGradient)
 
                 Text("onboard_welcome_sub")
-                    .font(.system(size: theme.bodySize))
+                    .font(.system(size: theme.bodySize, design: .rounded))
                     .foregroundColor(theme.mutedColor)
                     .multilineTextAlignment(.center)
+
+                HStack(spacing: 12) {
+                    Text(Emoji.muscle).font(.system(size: 24))
+                    Text(Emoji.pill).font(.system(size: 24))
+                    Text(Emoji.fire).font(.system(size: 24))
+                    Text(Emoji.trophy).font(.system(size: 24))
+                    Text(Emoji.sparkles).font(.system(size: 24))
+                }
+                .padding(.top, 4)
             }
 
             Spacer()
@@ -70,20 +84,22 @@ struct OnboardingView: View {
                 withAnimation { step = 0 }
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             } label: {
-                Text("onboard_get_started")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(theme.isPro ? .black : .white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(theme.accentGradient, in: RoundedRectangle(cornerRadius: 16))
-                    .shadow(color: theme.accentColor.opacity(0.3), radius: 10, y: 5)
+                HStack(spacing: 8) {
+                    Text("onboard_get_started")
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                    Image(systemName: "arrow.right")
+                        .font(.system(size: 16, weight: .bold))
+                }
+                .foregroundColor(theme.isPro ? .black : .white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 18)
+                .background(theme.accentGradient, in: RoundedRectangle(cornerRadius: 20))
+                .shadow(color: theme.accentColor.opacity(0.3), radius: 12, y: 6)
             }
 
-            Button("onboard_skip") {
-                store.completeOnboarding()
-            }
-            .font(.system(size: 14))
-            .foregroundColor(theme.mutedColor)
+            Button("onboard_skip") { store.completeOnboarding() }
+                .font(.system(size: 14, design: .rounded))
+                .foregroundColor(theme.mutedColor)
         }
         .padding(32)
     }
@@ -91,29 +107,47 @@ struct OnboardingView: View {
     // MARK: - Step View
     private func stepView(_ index: Int) -> some View {
         let s = steps[index]
-        return VStack(spacing: 24) {
+        return VStack(spacing: 28) {
             Spacer()
 
-            // Illustration circle
-            Text(s.emoji)
-                .font(.system(size: 72))
-                .frame(width: 160, height: 160)
-                .background {
-                    Circle()
-                        .fill(s.color.opacity(0.1))
-                        .overlay(Circle().stroke(s.color.opacity(0.2), lineWidth: 2))
+            ZStack {
+                Circle()
+                    .stroke(s.color.opacity(0.2), lineWidth: 3)
+                    .frame(width: 180, height: 180)
+                    .phaseAnimator([false, true]) { content, phase in
+                        content.scaleEffect(phase ? 1.08 : 1)
+                    } animation: { _ in .easeInOut(duration: 2).repeatForever(autoreverses: true) }
+
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [s.color.opacity(0.25), s.color.opacity(0.05)],
+                            center: .center, startRadius: 0, endRadius: 80
+                        )
+                    )
+                    .frame(width: 160, height: 160)
+
+                Image(systemName: s.icon)
+                    .font(.system(size: 56, weight: .semibold))
+                    .foregroundStyle(
+                        LinearGradient(colors: [s.color, s.color.opacity(0.7)], startPoint: .top, endPoint: .bottom)
+                    )
+                    .symbolEffect(.bounce, options: .repeat(.periodic(delay: 3.0)))
+            }
+
+            HStack(spacing: 8) {
+                ForEach(s.emojis, id: \.self) { e in
+                    Text(e).font(.system(size: 28))
                 }
-                .phaseAnimator([false, true]) { content, phase in
-                    content.scaleEffect(phase ? 1.08 : 1)
-                } animation: { _ in .easeInOut(duration: 2).repeatForever(autoreverses: true) }
+            }
 
             VStack(spacing: 8) {
                 Text(LocalizedStringKey(s.titleKey))
-                    .font(.system(size: theme.titleSize, weight: .bold))
+                    .font(.system(size: theme.titleSize + 2, weight: .bold, design: .rounded))
                     .foregroundColor(theme.textColor)
 
                 Text(LocalizedStringKey(s.descKey))
-                    .font(.system(size: theme.bodySize))
+                    .font(.system(size: theme.bodySize, design: .rounded))
                     .foregroundColor(theme.mutedColor)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
@@ -121,16 +155,15 @@ struct OnboardingView: View {
 
             Spacer()
 
-            // Step indicators
-            HStack(spacing: 6) {
+            HStack(spacing: 8) {
                 ForEach(0..<steps.count, id: \.self) { i in
                     Capsule()
-                        .fill(i == index ? theme.accentColor : theme.borderColor)
-                        .frame(width: i == index ? 28 : 12, height: 5)
-                        .animation(.spring, value: index)
+                        .fill(i == index ? s.color : theme.borderColor)
+                        .frame(width: i == index ? 32 : 12, height: 6)
+                        .animation(.spring(response: 0.3), value: index)
                 }
             }
-            .padding(.bottom, 16)
+            .padding(.bottom, 12)
 
             Button {
                 if index < steps.count - 1 {
@@ -140,23 +173,25 @@ struct OnboardingView: View {
                 }
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             } label: {
-                HStack {
+                HStack(spacing: 8) {
                     Text(index == steps.count - 1 ? "onboard_get_started" : "onboard_next")
-                        .font(.system(size: 18, weight: .semibold))
-                    Image(systemName: "chevron.right")
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                    Image(systemName: index == steps.count - 1 ? "sparkles" : "chevron.right")
                         .font(.system(size: 14, weight: .bold))
                 }
                 .foregroundColor(theme.isPro ? .black : .white)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(theme.accentGradient, in: RoundedRectangle(cornerRadius: 16))
+                .padding(.vertical, 18)
+                .background(
+                    LinearGradient(colors: [s.color, s.color.opacity(0.8)], startPoint: .leading, endPoint: .trailing),
+                    in: RoundedRectangle(cornerRadius: 20)
+                )
+                .shadow(color: s.color.opacity(0.3), radius: 12, y: 6)
             }
 
-            Button("onboard_skip") {
-                store.completeOnboarding()
-            }
-            .font(.system(size: 14))
-            .foregroundColor(theme.mutedColor)
+            Button("onboard_skip") { store.completeOnboarding() }
+                .font(.system(size: 14, design: .rounded))
+                .foregroundColor(theme.mutedColor)
         }
         .padding(32)
     }
