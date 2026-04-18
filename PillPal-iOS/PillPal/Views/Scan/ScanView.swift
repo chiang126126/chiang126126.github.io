@@ -42,7 +42,7 @@ struct ScanView: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 100)
         }
-        .background(theme.bgColor.ignoresSafeArea())
+        .background(theme.bgGradient.ignoresSafeArea())
         .sheet(isPresented: $showAddSheet) {
             AddMedicationView()
         }

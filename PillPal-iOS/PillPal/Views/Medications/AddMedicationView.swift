@@ -38,7 +38,7 @@ struct AddMedicationView: View {
                 .foregroundColor(theme.textColor)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(theme.bgColor)
+        .background(theme.bgGradient)
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { dismiss() }
         }
@@ -184,7 +184,7 @@ struct AddMedicationView: View {
             .padding(20)
             .padding(.bottom, 40)
         }
-        .background(theme.bgColor)
+        .background(theme.bgGradient)
         .navigationTitle("add_title")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

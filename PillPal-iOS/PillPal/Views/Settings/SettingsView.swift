@@ -8,9 +8,9 @@ struct SettingsView: View {
     @State private var showRestartHint = false
 
     private let languages: [(code: String, label: String, flag: String)] = [
-        ("en", "English", "\u{1F1FA}\u{1F1F8}"),
-        ("zh-Hans", "\u{4E2D}\u{6587}", "\u{1F1E8}\u{1F1F3}"),
-        ("fr", "Fran\u{00E7}ais", "\u{1F1EB}\u{1F1F7}"),
+        ("en", "English", "EN"),
+        ("zh-Hans", "\u{4E2D}\u{6587}", "CN"),
+        ("fr", "Fran\u{00E7}ais", "FR"),
     ]
 
     private var currentLangLabel: String {
@@ -18,7 +18,7 @@ struct SettingsView: View {
     }
 
     private var currentFlag: String {
-        languages.first(where: { $0.code == store.appLanguage })?.flag ?? "\u{1F1FA}\u{1F1F8}"
+        languages.first(where: { $0.code == store.appLanguage })?.flag ?? "EN"
     }
 
     var body: some View {
@@ -55,7 +55,11 @@ struct SettingsView: View {
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 3) { showRestartHint = false }
                                 } label: {
                                     HStack(spacing: 10) {
-                                        Text(lang.flag).font(.system(size: 20))
+                                        Text(lang.flag)
+                                            .font(.system(size: 11, weight: .heavy, design: .rounded))
+                                            .foregroundColor(.white)
+                                            .frame(width: 30, height: 22)
+                                            .background(theme.accentGradient, in: RoundedRectangle(cornerRadius: 5))
                                         Text(lang.label)
                                             .font(.system(size: theme.bodySize, weight: .medium, design: .rounded))
                                             .foregroundColor(theme.textColor)
@@ -141,7 +145,7 @@ struct SettingsView: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 100)
         }
-        .background(theme.bgColor.ignoresSafeArea())
+        .background(theme.bgGradient.ignoresSafeArea())
     }
 
     // MARK: - Premium Banner (7-day free trial)
@@ -213,26 +217,32 @@ struct SettingsView: View {
     private func modeCard(_ m: AppMode) -> some View {
         let isSelected = theme.mode == m
         let isPro = m == .pro
+        let previewBg = isPro ? Color(hex: "#110A1F") : Color(hex: "#FFF7F2")
+        let previewAccent = isPro ? Color(hex: "#A78BFA") : Color(hex: "#8B5CF6")
+        let previewLabel = isPro ? Color.white : Color(hex: "#3B2A4F")
         return Button {
             withAnimation(.spring(response: 0.3)) { theme.mode = m }
             UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         } label: {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 6) {
-                    Image(systemName: isPro ? "moon.fill" : "sun.max.fill")
-                        .font(.system(size: 14))
-                        .foregroundColor(isSelected ? (isPro ? Color(hex: "#22D3EE") : Color(hex: "#F97316")) : .gray)
+                    Image(systemName: isPro ? "moon.stars.fill" : "sun.max.fill")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(isSelected ? previewAccent : .gray)
                     Text(isPro ? "mode_pro" : "mode_care")
                         .font(.system(size: 13, weight: .semibold, design: .rounded))
-                        .foregroundColor(isSelected ? (isPro ? .white : Color(hex: "#44403C")) : .gray)
+                        .foregroundColor(isSelected ? previewLabel : .gray)
                 }
                 Text(isPro ? "mode_pro_desc" : "mode_care_desc")
                     .font(.system(size: 9, design: .rounded))
                     .foregroundColor(.gray)
                 HStack(spacing: 3) {
-                    let colors = isPro ? ["#22D3EE", "#39FF14", "#FF6B35"] : ["#F97316", "#F59E0B", "#FBBF24"]
+                    let colors = isPro
+                        ? ["#A78BFA", "#F472B6", "#3B2A5E"]
+                        : ["#E9D5FF", "#FBCFE8", "#FEF3C7"]
                     ForEach(colors, id: \.self) { c in
                         Circle().fill(Color(hex: c)).frame(width: 12, height: 12)
+                            .overlay { Circle().stroke(Color.white.opacity(0.3), lineWidth: 0.5) }
                     }
                 }
                 .padding(.top, 2)
@@ -240,12 +250,13 @@ struct SettingsView: View {
             .padding(10)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(isPro ? Color(hex: "#0A0A0A") : Color(hex: "#FDF6E3"))
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(previewBg)
                     .overlay {
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(isSelected ? (isPro ? Color(hex: "#22D3EE") : Color(hex: "#F97316")) : .clear, lineWidth: 2)
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .stroke(isSelected ? previewAccent : .clear, lineWidth: 2.5)
                     }
+                    .shadow(color: isSelected ? previewAccent.opacity(0.25) : .clear, radius: 8, y: 2)
             }
         }
         .buttonStyle(.plain)

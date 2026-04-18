@@ -16,7 +16,7 @@ struct OnboardingView: View {
 
     var body: some View {
         ZStack {
-            theme.bgColor.ignoresSafeArea()
+            theme.bgGradient.ignoresSafeArea()
 
             if step == -1 {
                 welcomeView
