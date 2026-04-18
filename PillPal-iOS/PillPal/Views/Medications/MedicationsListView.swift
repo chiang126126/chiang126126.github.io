@@ -29,7 +29,7 @@ struct MedicationsListView: View {
                             Text("add_new")
                                 .font(.system(size: 13, weight: .semibold))
                         }
-                        .foregroundColor(theme.isPro ? .black : .white)
+                        .foregroundColor(.white)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 8)
                         .background(theme.accentGradient, in: RoundedRectangle(cornerRadius: 12))
@@ -234,11 +234,7 @@ struct MedicationsListView: View {
     // MARK: - Empty State
     private var emptyState: some View {
         VStack(spacing: 12) {
-            Text(Emoji.pill)
-                .font(.system(size: 56))
-                .phaseAnimator([false, true]) { content, phase in
-                    content.rotationEffect(.degrees(phase ? 10 : -10))
-                } animation: { _ in .easeInOut(duration: 1.5).repeatForever(autoreverses: true) }
+            MascotView(mood: .sleepy, size: 96)
 
             Text("no_meds")
                 .font(.system(size: theme.bodySize, weight: .semibold))
@@ -257,7 +253,7 @@ struct MedicationsListView: View {
                     Text("add_new")
                 }
                 .font(.system(size: 15, weight: .semibold))
-                .foregroundColor(theme.isPro ? .black : .white)
+                .foregroundColor(.white)
                 .padding(.horizontal, 24)
                 .padding(.vertical, 12)
                 .background(theme.accentGradient, in: RoundedRectangle(cornerRadius: 16))

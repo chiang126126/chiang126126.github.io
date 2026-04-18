@@ -5,13 +5,13 @@ struct OnboardingView: View {
     @Environment(ThemeManager.self) private var theme
     @State private var step = -1
 
-    private let steps: [(icon: String, color: Color, titleKey: String, descKey: String, emojis: [String])] = [
-        ("camera.viewfinder", Color(hex: "#22D3EE"), "onboard_step1_title", "onboard_step1_desc",
-         [Emoji.camera, Emoji.sparkles]),
-        ("bell.badge.fill", Color(hex: "#FF6B35"), "onboard_step2_title", "onboard_step2_desc",
-         [Emoji.bell, Emoji.fire]),
+    private let steps: [(icon: String, color: Color, titleKey: String, descKey: String, accents: [String])] = [
+        ("camera.viewfinder", Color(hex: "#A855F7"), "onboard_step1_title", "onboard_step1_desc",
+         ["camera.fill", "sparkles"]),
+        ("bell.badge.fill", Color(hex: "#F472B6"), "onboard_step2_title", "onboard_step2_desc",
+         ["bell.fill", "heart.fill"]),
         ("trophy.fill", Color(hex: "#10B981"), "onboard_step3_title", "onboard_step3_desc",
-         [Emoji.trophy, Emoji.star, Emoji.rocket]),
+         ["trophy.fill", "star.fill", "bolt.fill"]),
     ]
 
     var body: some View {
@@ -41,22 +41,7 @@ struct OnboardingView: View {
         VStack(spacing: 28) {
             Spacer()
 
-            ZStack {
-                Circle()
-                    .fill(theme.accentGradient)
-                    .frame(width: 140, height: 140)
-                    .shadow(color: theme.accentColor.opacity(0.4), radius: 24, y: 8)
-
-                Image(systemName: "pill.fill")
-                    .font(.system(size: 56, weight: .bold))
-                    .foregroundColor(theme.isPro ? .black : .white)
-                    .rotationEffect(.degrees(-30))
-            }
-            .phaseAnimator([false, true]) { content, phase in
-                content
-                    .scaleEffect(phase ? 1.08 : 1)
-                    .rotationEffect(.degrees(phase ? 3 : -3))
-            } animation: { _ in .easeInOut(duration: 2).repeatForever(autoreverses: true) }
+            MascotView(mood: .celebrating, size: 160)
 
             VStack(spacing: 10) {
                 Text("onboard_welcome")
@@ -68,12 +53,12 @@ struct OnboardingView: View {
                     .foregroundColor(theme.mutedColor)
                     .multilineTextAlignment(.center)
 
-                HStack(spacing: 12) {
-                    Text(Emoji.muscle).font(.system(size: 24))
-                    Text(Emoji.pill).font(.system(size: 24))
-                    Text(Emoji.fire).font(.system(size: 24))
-                    Text(Emoji.trophy).font(.system(size: 24))
-                    Text(Emoji.sparkles).font(.system(size: 24))
+                HStack(spacing: 14) {
+                    ForEach(["figure.strengthtraining.traditional", "pills.fill", "flame.fill", "trophy.fill", "sparkles"], id: \.self) { sym in
+                        Image(systemName: sym)
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundStyle(theme.accentGradient)
+                    }
                 }
                 .padding(.top, 4)
             }
@@ -90,7 +75,7 @@ struct OnboardingView: View {
                     Image(systemName: "arrow.right")
                         .font(.system(size: 16, weight: .bold))
                 }
-                .foregroundColor(theme.isPro ? .black : .white)
+                .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 18)
                 .background(theme.accentGradient, in: RoundedRectangle(cornerRadius: 20))
@@ -135,9 +120,11 @@ struct OnboardingView: View {
                     .symbolEffect(.bounce, options: .repeat(.periodic(delay: 3.0)))
             }
 
-            HStack(spacing: 8) {
-                ForEach(s.emojis, id: \.self) { e in
-                    Text(e).font(.system(size: 28))
+            HStack(spacing: 14) {
+                ForEach(s.accents, id: \.self) { sym in
+                    Image(systemName: sym)
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundColor(s.color)
                 }
             }
 
@@ -179,7 +166,7 @@ struct OnboardingView: View {
                     Image(systemName: index == steps.count - 1 ? "sparkles" : "chevron.right")
                         .font(.system(size: 14, weight: .bold))
                 }
-                .foregroundColor(theme.isPro ? .black : .white)
+                .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 18)
                 .background(

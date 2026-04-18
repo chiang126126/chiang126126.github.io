@@ -166,7 +166,8 @@ enum XPReward {
 struct GameLevel: Equatable {
     let level: Int
     let titleKey: String
-    let emoji: String
+    let emoji: String         // kept for backward compat, no longer rendered directly
+    let sfSymbol: String      // primary visual — always renders
     let xpRequired: Int
     let color: Color
 
@@ -175,16 +176,16 @@ struct GameLevel: Equatable {
     }
 
     static let all: [GameLevel] = [
-        GameLevel(level: 1, titleKey: "level_1", emoji: Emoji.seedling, xpRequired: 0, color: Color(hex: "#10B981")),
-        GameLevel(level: 2, titleKey: "level_2", emoji: Emoji.herb, xpRequired: 100, color: Color(hex: "#22D3EE")),
-        GameLevel(level: 3, titleKey: "level_3", emoji: Emoji.sunflower, xpRequired: 300, color: Color(hex: "#3B82F6")),
-        GameLevel(level: 4, titleKey: "level_4", emoji: Emoji.star, xpRequired: 600, color: Color(hex: "#A855F7")),
-        GameLevel(level: 5, titleKey: "level_5", emoji: Emoji.fire, xpRequired: 1000, color: Color(hex: "#F97316")),
-        GameLevel(level: 6, titleKey: "level_6", emoji: Emoji.gem, xpRequired: 1500, color: Color(hex: "#EC4899")),
-        GameLevel(level: 7, titleKey: "level_7", emoji: Emoji.trophy, xpRequired: 2200, color: Color(hex: "#EAB308")),
-        GameLevel(level: 8, titleKey: "level_8", emoji: Emoji.crown, xpRequired: 3000, color: Color(hex: "#F59E0B")),
-        GameLevel(level: 9, titleKey: "level_9", emoji: Emoji.superhero, xpRequired: 4000, color: Color(hex: "#EF4444")),
-        GameLevel(level: 10, titleKey: "level_10", emoji: Emoji.rainbow, xpRequired: 5500, color: Color(hex: "#8B5CF6")),
+        GameLevel(level: 1, titleKey: "level_1", emoji: Emoji.seedling, sfSymbol: "leaf.fill", xpRequired: 0, color: Color(hex: "#10B981")),
+        GameLevel(level: 2, titleKey: "level_2", emoji: Emoji.herb, sfSymbol: "leaf.circle.fill", xpRequired: 100, color: Color(hex: "#22D3EE")),
+        GameLevel(level: 3, titleKey: "level_3", emoji: Emoji.sunflower, sfSymbol: "camera.macro", xpRequired: 300, color: Color(hex: "#3B82F6")),
+        GameLevel(level: 4, titleKey: "level_4", emoji: Emoji.star, sfSymbol: "star.fill", xpRequired: 600, color: Color(hex: "#A855F7")),
+        GameLevel(level: 5, titleKey: "level_5", emoji: Emoji.fire, sfSymbol: "flame.fill", xpRequired: 1000, color: Color(hex: "#F97316")),
+        GameLevel(level: 6, titleKey: "level_6", emoji: Emoji.gem, sfSymbol: "diamond.fill", xpRequired: 1500, color: Color(hex: "#EC4899")),
+        GameLevel(level: 7, titleKey: "level_7", emoji: Emoji.trophy, sfSymbol: "trophy.fill", xpRequired: 2200, color: Color(hex: "#EAB308")),
+        GameLevel(level: 8, titleKey: "level_8", emoji: Emoji.crown, sfSymbol: "crown.fill", xpRequired: 3000, color: Color(hex: "#F59E0B")),
+        GameLevel(level: 9, titleKey: "level_9", emoji: Emoji.superhero, sfSymbol: "bolt.heart.fill", xpRequired: 4000, color: Color(hex: "#EF4444")),
+        GameLevel(level: 10, titleKey: "level_10", emoji: Emoji.rainbow, sfSymbol: "sparkles", xpRequired: 5500, color: Color(hex: "#8B5CF6")),
     ]
 
     static func forXP(_ xp: Int) -> GameLevel {

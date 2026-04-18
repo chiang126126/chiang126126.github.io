@@ -97,9 +97,9 @@ struct SettingsView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
 
                         HStack(spacing: 8) {
-                            reminderChip(Emoji.fire, "style_sassy", "sassy")
-                            reminderChip(Emoji.cherryBlossom, "style_gentle", "gentle")
-                            reminderChip(Emoji.scroll, "style_neutral", "neutral")
+                            reminderChip("flame.fill", "style_sassy", "sassy")
+                            reminderChip("heart.fill", "style_gentle", "gentle")
+                            reminderChip("bell.fill", "style_neutral", "neutral")
                         }
                     }
                     .padding(14)
@@ -187,7 +187,9 @@ struct SettingsView: View {
                     .padding(.vertical, 5)
                     .background(theme.accentColor.opacity(0.1), in: Capsule())
 
-                Text(Emoji.sparkles)
+                Image(systemName: "sparkles")
+                    .font(.system(size: 12))
+                    .foregroundColor(theme.accentColor)
             }
         }
         .padding(16)
@@ -250,13 +252,14 @@ struct SettingsView: View {
     }
 
     // MARK: - Reminder Chip
-    private func reminderChip(_ emoji: String, _ key: LocalizedStringKey, _ style: String) -> some View {
+    private func reminderChip(_ sfSymbol: String, _ key: LocalizedStringKey, _ style: String) -> some View {
         Button {
             store.setReminderStyle(style)
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
         } label: {
-            VStack(spacing: 2) {
-                Text(emoji)
+            VStack(spacing: 4) {
+                Image(systemName: sfSymbol)
+                    .font(.system(size: 16, weight: .semibold))
                 Text(key).font(.system(size: 10, weight: .medium, design: .rounded))
             }
             .foregroundColor(store.reminderStyle == style ? theme.accentColor : theme.mutedColor)

@@ -101,8 +101,20 @@ struct StatsView: View {
         let level = store.currentLevel
         return VStack(spacing: 12) {
             HStack(spacing: 10) {
-                Text(level.emoji)
-                    .font(.system(size: 36))
+                ZStack {
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                colors: [level.color, level.color.opacity(0.6)],
+                                startPoint: .topLeading, endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 50, height: 50)
+                        .shadow(color: level.color.opacity(0.4), radius: 6)
+                    Image(systemName: level.sfSymbol)
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundColor(.white)
+                }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Lv.\(level.level)")
@@ -149,11 +161,11 @@ struct StatsView: View {
     // MARK: - XP Stats
     private var xpStatsCard: some View {
         HStack(spacing: 0) {
-            xpStatItem(Emoji.target, "xp_per_dose", "+\(XPReward.takeDose)")
+            xpStatItem("target", "xp_per_dose", "+\(XPReward.takeDose)", Color(hex: "#A855F7"))
             Divider().frame(height: 30).overlay(theme.borderColor)
-            xpStatItem(Emoji.star, "xp_daily_bonus", "+\(XPReward.completeAllDaily)")
+            xpStatItem("star.fill", "xp_daily_bonus", "+\(XPReward.completeAllDaily)", Color(hex: "#F59E0B"))
             Divider().frame(height: 30).overlay(theme.borderColor)
-            xpStatItem(Emoji.fire, "xp_streak_7", "+\(XPReward.streak7)")
+            xpStatItem("flame.fill", "xp_streak_7", "+\(XPReward.streak7)", Color(hex: "#FB923C"))
         }
         .padding(12)
         .background {
@@ -163,9 +175,11 @@ struct StatsView: View {
         }
     }
 
-    private func xpStatItem(_ emoji: String, _ key: LocalizedStringKey, _ value: String) -> some View {
+    private func xpStatItem(_ sfSymbol: String, _ key: LocalizedStringKey, _ value: String, _ color: Color) -> some View {
         VStack(spacing: 4) {
-            Text(emoji).font(.system(size: 18))
+            Image(systemName: sfSymbol)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundColor(color)
             Text(key)
                 .font(.system(size: 9, design: .rounded))
                 .foregroundColor(theme.mutedColor)

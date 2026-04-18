@@ -235,7 +235,7 @@ struct ScanView: View {
                     } label: {
                         Text("scan_confirm")
                             .font(.system(size: 15, weight: .semibold))
-                            .foregroundColor(theme.isPro ? .black : .white)
+                            .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 14)
                             .background(theme.accentGradient, in: RoundedRectangle(cornerRadius: 16))

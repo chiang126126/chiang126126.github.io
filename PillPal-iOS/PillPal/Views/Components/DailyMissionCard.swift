@@ -13,8 +13,14 @@ struct DailyMissionCard: View {
         VStack(alignment: .leading, spacing: 12) {
             // Header
             HStack {
-                Text(Emoji.scroll)
-                    .font(.system(size: theme.isCare ? 22 : 18))
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(theme.accentColor.opacity(0.15))
+                        .frame(width: 34, height: 34)
+                    Image(systemName: "checklist")
+                        .font(.system(size: theme.isCare ? 18 : 16, weight: .bold))
+                        .foregroundColor(theme.accentColor)
+                }
 
                 Text(LocalizedStringKey("daily_quests"))
                     .font(.system(size: theme.bodySize, weight: .bold, design: .rounded))

@@ -19,9 +19,15 @@ struct XPProgressView: View {
             // Top row: level badge, progress bar, XP text
             HStack(spacing: 12) {
                 // Level badge
-                HStack(spacing: 4) {
-                    Text(currentLevel.emoji)
-                        .font(.system(size: theme.isCare ? 22 : 18))
+                HStack(spacing: 6) {
+                    ZStack {
+                        Circle()
+                            .fill(currentLevel.color.opacity(0.18))
+                            .frame(width: theme.isCare ? 32 : 26, height: theme.isCare ? 32 : 26)
+                        Image(systemName: currentLevel.sfSymbol)
+                            .font(.system(size: theme.isCare ? 15 : 12, weight: .bold))
+                            .foregroundColor(currentLevel.color)
+                    }
                     Text("Lv.\(currentLevel.level)")
                         .font(.system(size: theme.bodySize, weight: .bold, design: .rounded))
                         .foregroundColor(currentLevel.color)
@@ -70,8 +76,9 @@ struct XPProgressView: View {
                     Text("next:")
                         .font(.system(size: theme.captionSize))
                         .foregroundColor(theme.mutedColor)
-                    Text(next.emoji)
-                        .font(.system(size: theme.captionSize))
+                    Image(systemName: next.sfSymbol)
+                        .font(.system(size: theme.captionSize, weight: .semibold))
+                        .foregroundColor(next.color)
                     Text(next.localizedTitle)
                         .font(.system(size: theme.captionSize, weight: .medium))
                         .foregroundColor(next.color)

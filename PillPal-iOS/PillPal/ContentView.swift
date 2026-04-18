@@ -92,7 +92,7 @@ struct CustomTabBar: View {
 
                             Image(systemName: tabs[index].icon)
                                 .font(.system(size: 24, weight: .bold))
-                                .foregroundColor(theme.isPro ? .black : .white)
+                                .foregroundColor(.white)
                                 .symbolEffect(.bounce, options: .repeat(.periodic(delay: 4.0)), isActive: selectedTab != 2)
                         }
                         .offset(y: -20)

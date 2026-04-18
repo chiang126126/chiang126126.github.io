@@ -33,11 +33,25 @@ struct LevelUpOverlay: View {
             VStack(spacing: 20) {
                 Spacer()
 
-                // Large level emoji with bounce
-                Text(gameLevel.emoji)
-                    .font(.system(size: 80))
-                    .scaleEffect(emojiScale)
-                    .shadow(color: gameLevel.color.opacity(0.6), radius: 20)
+                // Large medal-style badge with bounce
+                ZStack {
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                colors: [gameLevel.color, gameLevel.color.opacity(0.6)],
+                                startPoint: .topLeading, endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 140, height: 140)
+                        .shadow(color: gameLevel.color.opacity(0.7), radius: 30)
+                    Circle()
+                        .strokeBorder(Color.white.opacity(0.45), lineWidth: 4)
+                        .frame(width: 130, height: 130)
+                    Image(systemName: gameLevel.sfSymbol)
+                        .font(.system(size: 60, weight: .bold))
+                        .foregroundColor(.white)
+                }
+                .scaleEffect(emojiScale)
 
                 // "LEVEL UP!" text with gradient
                 Text(NSLocalizedString("level_up_title", comment: ""))
@@ -72,9 +86,12 @@ struct LevelUpOverlay: View {
                 Button {
                     dismiss()
                 } label: {
-                    Text(Emoji.party + " " + NSLocalizedString("level_up_dismiss", comment: ""))
+                    HStack(spacing: 8) {
+                        Image(systemName: "sparkles")
+                        Text(NSLocalizedString("level_up_dismiss", comment: ""))
+                    }
                         .font(.system(size: theme.bodySize, weight: .bold, design: .rounded))
-                        .foregroundColor(theme.isPro ? .black : .white)
+                        .foregroundColor(.white)
                         .frame(maxWidth: 220)
                         .padding(.vertical, 14)
                         .background {

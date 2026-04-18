@@ -1,5 +1,7 @@
 import SwiftUI
 
+/// Displays the mascot (吞吞) at a mood derived from today's adherence.
+/// Replaces the old Unicode-emoji avatar to guarantee consistent rendering.
 struct MoodAvatar: View {
     let adherence: Double
     var size: MoodSize = .medium
@@ -10,50 +12,34 @@ struct MoodAvatar: View {
         case small, medium, large
         var dimension: CGFloat {
             switch self {
-            case .small: return 40
-            case .medium: return 64
-            case .large: return 96
-            }
-        }
-        var fontSize: CGFloat {
-            switch self {
-            case .small: return 24
-            case .medium: return 36
-            case .large: return 56
+            case .small: return 48
+            case .medium: return 88
+            case .large: return 140
             }
         }
     }
 
-    private var mood: (emoji: String, label: LocalizedStringKey, color: Color) {
-        if adherence >= 100 { return (Emoji.cool, "mood_perfect", Color(hex: "#10B981")) }
-        if adherence >= 80 { return (Emoji.smile, "mood_great", Color(hex: "#22D3EE")) }
-        if adherence >= 50 { return (Emoji.neutral, "mood_ok", Color(hex: "#EAB308")) }
-        if adherence >= 20 { return (Emoji.angry, "mood_come_on", Color(hex: "#F97316")) }
-        return (Emoji.eyeroll, "mood_really", Color(hex: "#EF4444"))
+    private var mood: MascotMood { MascotMood.forAdherence(adherence) }
+
+    private var label: LocalizedStringKey {
+        switch mood {
+        case .perfect:     return "mood_perfect"
+        case .happy:       return "mood_great"
+        case .celebrating: return "mood_perfect"
+        case .neutral:     return "mood_ok"
+        case .sad:         return "mood_come_on"
+        case .grumpy:      return "mood_really"
+        case .sleepy:      return "mood_ok"
+        }
     }
 
     var body: some View {
-        VStack(spacing: 4) {
-            Text(mood.emoji)
-                .font(.system(size: size.fontSize))
-                .frame(width: size.dimension, height: size.dimension)
-                .background {
-                    Circle()
-                        .fill(
-                            RadialGradient(
-                                colors: [mood.color.opacity(theme.isPro ? 0.15 : 0.2), .clear],
-                                center: .center, startRadius: 0, endRadius: size.dimension / 2
-                            )
-                        )
-                        .shadow(color: theme.isPro ? mood.color.opacity(0.2) : .clear, radius: 10)
-                }
-                .phaseAnimator(adherence < 20 ? [false, true] : [false]) { content, phase in
-                    content.rotationEffect(.degrees(phase ? 5 : -5))
-                } animation: { _ in .easeInOut(duration: 0.3).repeatCount(3) }
+        VStack(spacing: 6) {
+            MascotView(mood: mood, size: size.dimension, showBackground: size != .small)
 
             if size != .small {
-                Text(mood.label)
-                    .font(.system(size: theme.captionSize, weight: .medium, design: .rounded))
+                Text(label)
+                    .font(.system(size: theme.captionSize, weight: .semibold, design: .rounded))
                     .foregroundColor(theme.mutedColor)
             }
         }
