@@ -57,27 +57,27 @@ struct BubblePopButton: View {
                 .background {
                     Circle()
                         .fill(
-                            done
-                            ? theme.surfaceColor
-                            : LinearGradient(
-                                colors: [medication.color.opacity(0.18), medication.color.opacity(0.08)],
+                            LinearGradient(
+                                colors: done
+                                    ? [theme.surfaceColor, theme.surfaceColor]
+                                    : [medication.color.opacity(0.18), medication.color.opacity(0.08)],
                                 startPoint: .topLeading, endPoint: .bottomTrailing
-                              )
+                            )
                         )
                         .overlay {
                             Circle()
                                 .stroke(
-                                    done
-                                    ? theme.borderColor
-                                    : LinearGradient(
-                                        colors: [medication.color, medication.color.opacity(0.5)],
+                                    LinearGradient(
+                                        colors: done
+                                            ? [theme.borderColor, theme.borderColor]
+                                            : [medication.color, medication.color.opacity(0.5)],
                                         startPoint: .topLeading, endPoint: .bottomTrailing
-                                      ),
+                                    ),
                                     lineWidth: 2.5
                                 )
                         }
                         .shadow(
-                            color: (!done) ? medication.color.opacity(0.3) : .clear,
+                            color: done ? .clear : medication.color.opacity(0.3),
                             radius: 10, y: 3
                         )
                 }
