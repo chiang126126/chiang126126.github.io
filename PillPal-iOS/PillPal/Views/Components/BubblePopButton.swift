@@ -12,6 +12,8 @@ struct BubblePopButton: View {
     @State private var isPopping = false
     @State private var showXPBadge = false
     @State private var xpOffset: CGFloat = 0
+    @State private var gulpPhase = false
+    @State private var pillFlying = false
 
     private var done: Bool { isTaken || isSkipped }
     private var size: CGFloat { theme.isCare ? 60 : 48 }
@@ -51,6 +53,8 @@ struct BubblePopButton: View {
                             .font(.system(size: theme.isCare ? 24 : 18))
                             .foregroundColor(medication.color)
                             .symbolEffect(.wiggle, options: .repeat(.periodic(delay: 3.0)))
+                            .scaleEffect(pillFlying ? 0.3 : 1)
+                            .opacity(pillFlying ? 0 : 1)
                     }
                 }
                 .frame(width: size, height: size)
@@ -81,7 +85,7 @@ struct BubblePopButton: View {
                             radius: 10, y: 3
                         )
                 }
-                .scaleEffect(isPopping ? 0.75 : 1)
+                .scaleEffect(isPopping ? 0.7 : (gulpPhase ? 1.12 : 1))
                 .opacity(done ? 0.55 : 1)
             }
             .buttonStyle(.plain)
@@ -92,18 +96,22 @@ struct BubblePopButton: View {
                         onSkip()
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     } label: {
-                        Label("skip_dose", systemImage: "forward.fill")
+                        Label("feed_skip", systemImage: "forward.fill")
                     }
                 }
             }
 
             if showXPBadge {
-                Text("+\(XPReward.takeDose) XP")
-                    .font(.system(size: 13, weight: .heavy, design: .rounded))
-                    .foregroundColor(Color(hex: "#FBBF24"))
-                    .shadow(color: Color(hex: "#FBBF24").opacity(0.6), radius: 4)
-                    .offset(y: -size / 2 - 12 + xpOffset)
-                    .transition(.scale.combined(with: .opacity))
+                HStack(spacing: 2) {
+                    Image(systemName: "bolt.fill")
+                        .font(.system(size: 10))
+                    Text("+\(XPReward.takeDose)")
+                }
+                .font(.system(size: 13, weight: .heavy, design: .rounded))
+                .foregroundColor(Color(hex: "#FBBF24"))
+                .shadow(color: Color(hex: "#FBBF24").opacity(0.6), radius: 4)
+                .offset(y: -size / 2 - 12 + xpOffset)
+                .transition(.scale.combined(with: .opacity))
             }
         }
         .animation(.spring(response: 0.35, dampingFraction: 0.55), value: isTaken)
@@ -111,57 +119,78 @@ struct BubblePopButton: View {
     }
 
     private func pop() {
-        isPopping = true
-
-        UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
-
-        let count = 12
-        particles = (0..<count).map { i in
-            let angle = Double(i) * (360.0 / Double(count)) * .pi / 180
-            let distance = CGFloat.random(in: 35...60)
-            return ParticleData(
-                targetX: cos(angle) * distance,
-                targetY: sin(angle) * distance,
-                color: confettiColors[i % confettiColors.count],
-                shapeSize: CGFloat.random(in: 5...9),
-                rotation: Double.random(in: 0...360)
-            )
+        // Phase 1: pill shrinks (being "eaten")
+        withAnimation(.easeIn(duration: 0.15)) {
+            pillFlying = true
         }
 
-        withAnimation(.easeOut(duration: 0.55)) {
-            particles = particles.map { p in
-                var q = p
-                q.offsetX = q.targetX
-                q.offsetY = q.targetY
-                q.opacity = 0
-                q.rotation += Double.random(in: 90...270)
-                return q
+        // Phase 2: gulp swell
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            withAnimation(.spring(response: 0.2, dampingFraction: 0.4)) {
+                gulpPhase = true
             }
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-            onTake()
-            UINotificationFeedbackGenerator().notificationOccurred(.success)
+        // Phase 3: pop burst
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            isPopping = true
+            gulpPhase = false
+            UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+
+            let count = 14
+            particles = (0..<count).map { i in
+                let angle = Double(i) * (360.0 / Double(count)) * .pi / 180
+                let distance = CGFloat.random(in: 35...65)
+                return ParticleData(
+                    targetX: cos(angle) * distance,
+                    targetY: sin(angle) * distance,
+                    color: confettiColors[i % confettiColors.count],
+                    shapeSize: CGFloat.random(in: 4...9),
+                    rotation: Double.random(in: 0...360)
+                )
+            }
+
+            withAnimation(.easeOut(duration: 0.55)) {
+                particles = particles.map { p in
+                    var q = p
+                    q.offsetX = q.targetX
+                    q.offsetY = q.targetY
+                    q.opacity = 0
+                    q.rotation += Double.random(in: 90...270)
+                    return q
+                }
+            }
         }
 
-        withAnimation(.spring(response: 0.3)) {
-            showXPBadge = true
-            xpOffset = 0
+        // Phase 4: take dose + success haptic
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+            onTake()
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+            pillFlying = false
         }
-        withAnimation(.easeOut(duration: 0.8).delay(0.1)) {
-            xpOffset = -28
+
+        // XP badge
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            withAnimation(.spring(response: 0.3)) {
+                showXPBadge = true
+                xpOffset = 0
+            }
+            withAnimation(.easeOut(duration: 0.8).delay(0.1)) {
+                xpOffset = -28
+            }
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
             withAnimation(.easeOut(duration: 0.3)) {
                 showXPBadge = false
                 xpOffset = 0
             }
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
             isPopping = false
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
             particles = []
         }
     }

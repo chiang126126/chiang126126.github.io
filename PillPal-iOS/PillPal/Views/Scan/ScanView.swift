@@ -25,7 +25,7 @@ struct ScanView: View {
         ScrollView {
             VStack(spacing: 20) {
                 Text("add_title")
-                    .font(.system(size: theme.titleSize, weight: .bold))
+                    .font(.system(size: theme.titleSize, weight: .bold, design: .rounded))
                     .foregroundColor(theme.textColor)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.top, 8)
@@ -50,90 +50,117 @@ struct ScanView: View {
 
     // MARK: - Choose
     private var chooseView: some View {
-        VStack(spacing: 12) {
-            // Scan option
+        VStack(spacing: 16) {
+            // Mascot with scanning eyes
+            VStack(spacing: 8) {
+                MascotView(mood: .happy, size: 110, showBackground: true)
+
+                Text("scan_desc")
+                    .font(.system(size: theme.captionSize, weight: .medium, design: .rounded))
+                    .foregroundColor(theme.mutedColor)
+                    .multilineTextAlignment(.center)
+            }
+            .padding(.vertical, 8)
+
+            // Scan button
             Button {
                 startScan()
             } label: {
-                VStack(spacing: 16) {
-                    Image(systemName: "camera.fill")
-                        .font(.system(size: 36))
-                        .foregroundColor(theme.accentColor)
-                        .frame(width: 80, height: 80)
-                        .background(theme.accentColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 20))
-                        .phaseAnimator([false, true]) { content, phase in
-                            content.scaleEffect(phase ? 1.05 : 1)
-                        } animation: { _ in .easeInOut(duration: 2).repeatForever(autoreverses: true) }
+                HStack(spacing: 12) {
+                    ZStack {
+                        Circle()
+                            .fill(theme.accentColor.opacity(0.15))
+                            .frame(width: 52, height: 52)
+                        Image(systemName: "camera.fill")
+                            .font(.system(size: 24))
+                            .foregroundColor(theme.accentColor)
+                    }
+                    .phaseAnimator([false, true]) { content, phase in
+                        content.scaleEffect(phase ? 1.06 : 1)
+                    } animation: { _ in .easeInOut(duration: 2).repeatForever(autoreverses: true) }
 
-                    VStack(spacing: 4) {
+                    VStack(alignment: .leading, spacing: 2) {
                         Text("scan_button")
-                            .font(.system(size: theme.bodySize + 1, weight: .semibold))
+                            .font(.system(size: theme.bodySize, weight: .bold, design: .rounded))
                             .foregroundColor(theme.textColor)
-                        Text("scan_desc")
-                            .font(.system(size: theme.captionSize))
+                        Text("scan_demo_note")
+                            .font(.system(size: 11, design: .rounded))
                             .foregroundColor(theme.mutedColor)
                     }
+
+                    Spacer()
+
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(theme.mutedColor)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 32)
+                .padding(16)
                 .background {
-                    RoundedRectangle(cornerRadius: 24)
-                        .strokeBorder(
-                            theme.accentColor.opacity(0.3),
-                            style: StrokeStyle(lineWidth: 2, dash: [10])
-                        )
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .fill(theme.cardColor)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                .stroke(theme.accentColor.opacity(0.3), style: StrokeStyle(lineWidth: 1.5, dash: [8]))
+                        }
+                        .shadow(color: theme.accentColor.opacity(0.08), radius: 12, y: 4)
                 }
             }
             .buttonStyle(.plain)
 
-            // Manual option
+            // Manual add button
             Button {
                 showAddSheet = true
             } label: {
                 HStack(spacing: 12) {
-                    Image(systemName: "keyboard")
-                        .font(.system(size: 22))
-                        .foregroundColor(theme.mutedColor)
-                        .frame(width: 48, height: 48)
-                        .background(theme.surfaceColor, in: RoundedRectangle(cornerRadius: 12))
+                    ZStack {
+                        Circle()
+                            .fill(theme.surfaceColor)
+                            .frame(width: 44, height: 44)
+                        Image(systemName: "keyboard")
+                            .font(.system(size: 18))
+                            .foregroundColor(theme.mutedColor)
+                    }
 
                     Text("manual_button")
-                        .font(.system(size: theme.bodySize, weight: .semibold))
+                        .font(.system(size: theme.bodySize, weight: .semibold, design: .rounded))
                         .foregroundColor(theme.textColor)
 
                     Spacer()
+
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(theme.mutedColor)
                 }
-                .padding(16)
+                .padding(14)
                 .background {
-                    RoundedRectangle(cornerRadius: 16)
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
                         .fill(theme.cardColor)
-                        .overlay { RoundedRectangle(cornerRadius: 16).stroke(theme.borderColor, lineWidth: 1) }
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                .stroke(theme.borderColor, lineWidth: 1)
+                        }
                 }
             }
             .buttonStyle(.plain)
-
-            Text("scan_demo_note")
-                .font(.system(size: 11))
-                .foregroundColor(theme.mutedColor)
-                .padding(.top, 8)
         }
     }
 
-    // MARK: - Scanning Animation
+    // MARK: - Scanning Animation (吞吞 reading the label)
     private var scanningAnimation: some View {
-        VStack(spacing: 24) {
-            // Scan frame
+        VStack(spacing: 20) {
+            // Scan frame with 吞吞 peeking
             ZStack {
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(theme.isPro
-                          ? LinearGradient(colors: [Color(hex: "#1A1A1A"), Color(hex: "#0A0A0A")], startPoint: .topLeading, endPoint: .bottomTrailing)
-                          : LinearGradient(colors: [Color(hex: "#FFF8EE"), Color(hex: "#FDF6E3")], startPoint: .topLeading, endPoint: .bottomTrailing)
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .fill(
+                        theme.isPro
+                        ? LinearGradient(colors: [Color(hex: "#1A1A1A"), Color(hex: "#0A0A0A")], startPoint: .topLeading, endPoint: .bottomTrailing)
+                        : LinearGradient(colors: [Color(hex: "#FFF8EE"), Color(hex: "#FDF6E3")], startPoint: .topLeading, endPoint: .bottomTrailing)
                     )
                     .overlay {
-                        RoundedRectangle(cornerRadius: 24)
-                            .stroke(theme.accentColor, lineWidth: 2)
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .stroke(theme.accentColor.opacity(0.6), lineWidth: 2)
                     }
-                    .frame(width: 260, height: 260)
+                    .frame(width: 240, height: 240)
 
                 // Scan line
                 Rectangle()
@@ -143,57 +170,64 @@ struct ScanView: View {
                             startPoint: .leading, endPoint: .trailing
                         )
                     )
-                    .frame(width: 220, height: 2)
+                    .frame(width: 200, height: 2)
                     .shadow(color: theme.accentColor, radius: 8)
                     .phaseAnimator([false, true]) { content, phase in
-                        content.offset(y: phase ? 100 : -100)
+                        content.offset(y: phase ? 90 : -90)
                     } animation: { _ in .easeInOut(duration: 1.5).repeatForever(autoreverses: true) }
 
                 // Corner brackets
                 ForEach(0..<4, id: \.self) { corner in
-                    let x: CGFloat = corner % 2 == 0 ? -100 : 100
-                    let y: CGFloat = corner < 2 ? -100 : 100
+                    let x: CGFloat = corner % 2 == 0 ? -90 : 90
+                    let y: CGFloat = corner < 2 ? -90 : 90
                     CornerBracket(corner: corner)
-                        .stroke(theme.accentColor.opacity(0.6), lineWidth: 2)
-                        .frame(width: 24, height: 24)
+                        .stroke(theme.accentColor.opacity(0.5), lineWidth: 2)
+                        .frame(width: 20, height: 20)
                         .offset(x: x, y: y)
                 }
 
-                // Center icon
-                Image(systemName: "viewfinder")
-                    .font(.system(size: 44))
-                    .foregroundColor(theme.accentColor)
-                    .opacity(0.6)
+                // Pill icon in center
+                Image(systemName: "pill.fill")
+                    .font(.system(size: 40))
+                    .foregroundColor(theme.accentColor.opacity(0.3))
+                    .rotationEffect(.degrees(45))
                     .phaseAnimator([false, true]) { content, phase in
-                        content.opacity(phase ? 0.3 : 0.8)
+                        content.opacity(phase ? 0.15 : 0.4)
                     } animation: { _ in .easeInOut(duration: 1.2).repeatForever(autoreverses: true) }
             }
 
-            Text("scan_processing")
-                .font(.system(size: theme.bodySize, weight: .semibold))
-                .foregroundColor(theme.textColor)
-                .phaseAnimator([false, true]) { content, phase in
-                    content.opacity(phase ? 0.5 : 1)
-                } animation: { _ in .easeInOut(duration: 1.2).repeatForever(autoreverses: true) }
+            // 吞吞 below the scan frame, "reading" the label
+            VStack(spacing: 6) {
+                MascotView(mood: .perfect, size: 80, showBackground: false)
+
+                Text("scan_processing")
+                    .font(.system(size: theme.bodySize, weight: .semibold, design: .rounded))
+                    .foregroundColor(theme.textColor)
+                    .phaseAnimator([false, true]) { content, phase in
+                        content.opacity(phase ? 0.5 : 1)
+                    } animation: { _ in .easeInOut(duration: 1).repeatForever(autoreverses: true) }
+            }
         }
-        .padding(.vertical, 40)
+        .padding(.vertical, 20)
     }
 
     // MARK: - Result
     private var resultView: some View {
         VStack(spacing: 16) {
             if let result = scanResult {
-                // Success banner
-                HStack(spacing: 8) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(theme.successColor)
-                    Text("scan_found")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(theme.successColor)
+                // 吞吞 happy with success
+                VStack(spacing: 6) {
+                    MascotView(mood: .celebrating, size: 90, showBackground: true)
+
+                    HStack(spacing: 6) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(theme.successColor)
+                        Text("scan_found")
+                            .font(.system(size: theme.bodySize, weight: .semibold, design: .rounded))
+                            .foregroundColor(theme.successColor)
+                    }
                 }
-                .padding(12)
-                .frame(maxWidth: .infinity)
-                .background(theme.successColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
+                .padding(.bottom, 4)
 
                 // Result card
                 VStack(alignment: .leading, spacing: 12) {
@@ -205,9 +239,12 @@ struct ScanView: View {
                 }
                 .padding(16)
                 .background {
-                    RoundedRectangle(cornerRadius: 16)
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
                         .fill(theme.cardColor)
-                        .overlay { RoundedRectangle(cornerRadius: 16).stroke(theme.borderColor, lineWidth: 1) }
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                .stroke(theme.borderColor, lineWidth: 1)
+                        }
                 }
 
                 // Actions
@@ -219,26 +256,32 @@ struct ScanView: View {
                             Image(systemName: "arrow.counterclockwise")
                             Text("scan_retry")
                         }
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.system(size: 15, weight: .semibold, design: .rounded))
                         .foregroundColor(theme.textColor)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
                         .background {
-                            RoundedRectangle(cornerRadius: 16)
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
                                 .fill(theme.surfaceColor)
-                                .overlay { RoundedRectangle(cornerRadius: 16).stroke(theme.borderColor, lineWidth: 1) }
+                                .overlay {
+                                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                        .stroke(theme.borderColor, lineWidth: 1)
+                                }
                         }
                     }
 
                     Button {
                         confirmScan()
                     } label: {
-                        Text("scan_confirm")
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 14)
-                            .background(theme.accentGradient, in: RoundedRectangle(cornerRadius: 16))
+                        HStack(spacing: 6) {
+                            Image(systemName: "sparkles")
+                            Text("scan_confirm")
+                        }
+                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(theme.accentGradient, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                     }
                 }
             }
@@ -248,11 +291,11 @@ struct ScanView: View {
     private func resultRow(_ key: LocalizedStringKey, value: String) -> some View {
         HStack {
             Text(key)
-                .font(.system(size: theme.captionSize))
+                .font(.system(size: theme.captionSize, design: .rounded))
                 .foregroundColor(theme.mutedColor)
                 .frame(width: 80, alignment: .leading)
             Text(value)
-                .font(.system(size: theme.bodySize, weight: .medium))
+                .font(.system(size: theme.bodySize, weight: .medium, design: .rounded))
                 .foregroundColor(theme.textColor)
         }
     }
@@ -260,11 +303,11 @@ struct ScanView: View {
     private func resultRow(_ key: LocalizedStringKey, value: LocalizedStringKey) -> some View {
         HStack {
             Text(key)
-                .font(.system(size: theme.captionSize))
+                .font(.system(size: theme.captionSize, design: .rounded))
                 .foregroundColor(theme.mutedColor)
                 .frame(width: 80, alignment: .leading)
             Text(value)
-                .font(.system(size: theme.bodySize, weight: .medium))
+                .font(.system(size: theme.bodySize, weight: .medium, design: .rounded))
                 .foregroundColor(theme.textColor)
         }
     }
@@ -274,7 +317,6 @@ struct ScanView: View {
         mode = .scanning
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
 
-        // Simulate AI scan
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
             let demo = PillOptions.demoScans.randomElement()!
             scanResult = ScanResult(
@@ -312,7 +354,7 @@ struct ScanView: View {
 
 // MARK: - Corner Bracket Shape
 struct CornerBracket: Shape {
-    let corner: Int // 0=TL, 1=TR, 2=BL, 3=BR
+    let corner: Int
 
     func path(in rect: CGRect) -> Path {
         var path = Path()
