@@ -1,34 +1,36 @@
 import SwiftUI
 
-// MARK: - Mascot "吞吞" / "Tunny"
-// Custom SwiftUI-drawn character so the UI never depends on Unicode emoji
-// rendering (which can show as "?" on some devices/sims).
-enum MascotMood {
-    case perfect, happy, neutral, sad, grumpy, sleepy, celebrating
+// MARK: - Mascot Mood
+enum MascotMood: String {
+    case perfect, happy, neutral, celebrating
+    case eyeroll, deflated, eating
+    case sleepy, grumpy, sad
 
     static func forAdherence(_ pct: Double) -> MascotMood {
         if pct >= 100 { return .perfect }
-        if pct >= 80 { return .happy }
-        if pct >= 50 { return .neutral }
-        if pct >= 20 { return .sad }
-        return .grumpy
+        if pct >= 75  { return .happy }
+        if pct >= 50  { return .neutral }
+        if pct >= 25  { return .eyeroll }
+        if pct > 0    { return .deflated }
+        return .sleepy
     }
 
     var bodyColor: Color {
         switch self {
-        case .perfect:     return Color(hex: "#C4B5FD") // soft lavender
-        case .happy:       return Color(hex: "#BFDBFE") // baby blue
-        case .celebrating: return Color(hex: "#FDE68A") // butter yellow
-        case .neutral:     return Color(hex: "#E9D5FF") // pale violet
-        case .sad:         return Color(hex: "#FBCFE8") // dusty pink
-        case .grumpy:      return Color(hex: "#FECACA") // peach red
-        case .sleepy:      return Color(hex: "#DDD6FE") // pastel purple
+        case .perfect:     return Color(hex: "#C4B5FD")
+        case .happy:       return Color(hex: "#BFDBFE")
+        case .celebrating: return Color(hex: "#FDE68A")
+        case .neutral:     return Color(hex: "#E9D5FF")
+        case .eyeroll:     return Color(hex: "#FECDD3")
+        case .deflated:    return Color(hex: "#E2E8F0")
+        case .eating:      return Color(hex: "#FEF3C7")
+        case .sad:         return Color(hex: "#FBCFE8")
+        case .grumpy:      return Color(hex: "#FECACA")
+        case .sleepy:      return Color(hex: "#DDD6FE")
         }
     }
 
-    var cheekColor: Color {
-        Color(hex: "#FCA5A5").opacity(0.75)
-    }
+    var cheekColor: Color { Color(hex: "#FCA5A5").opacity(0.75) }
 
     var accentColor: Color {
         switch self {
@@ -36,25 +38,42 @@ enum MascotMood {
         case .happy:       return Color(hex: "#60A5FA")
         case .celebrating: return Color(hex: "#F59E0B")
         case .neutral:     return Color(hex: "#A78BFA")
+        case .eyeroll:     return Color(hex: "#F43F5E")
+        case .deflated:    return Color(hex: "#94A3B8")
+        case .eating:      return Color(hex: "#F59E0B")
         case .sad:         return Color(hex: "#F472B6")
         case .grumpy:      return Color(hex: "#EF4444")
         case .sleepy:      return Color(hex: "#818CF8")
         }
     }
+
+    var statusKey: String {
+        switch self {
+        case .perfect, .celebrating: return "tunny_status_perfect"
+        case .happy:       return "tunny_status_happy"
+        case .neutral:     return "tunny_status_neutral"
+        case .eyeroll, .grumpy: return "tunny_status_eyeroll"
+        case .deflated, .sad:   return "tunny_status_deflated"
+        case .sleepy:      return "tunny_status_sleepy"
+        case .eating:      return "tunny_status_happy"
+        }
+    }
 }
 
+// MARK: - Mascot View
 struct MascotView: View {
     var mood: MascotMood = .happy
     var size: CGFloat = 120
     var showBackground: Bool = true
 
-    @State private var bounce: Bool = false
-    @State private var blink: Bool = false
+    @State private var bounce = false
+    @State private var blink = false
+
+    private var isDeflated: Bool { mood == .deflated }
 
     var body: some View {
         ZStack {
             if showBackground {
-                // Soft halo
                 Circle()
                     .fill(
                         RadialGradient(
@@ -67,14 +86,14 @@ struct MascotView: View {
             }
 
             ZStack {
-                // Body shadow
                 Ellipse()
                     .fill(Color.black.opacity(0.08))
-                    .frame(width: size * 0.7, height: size * 0.1)
-                    .offset(y: size * 0.48)
+                    .frame(width: size * (isDeflated ? 0.85 : 0.7), height: size * 0.1)
+                    .offset(y: size * (isDeflated ? 0.32 : 0.48))
                     .blur(radius: 3)
 
-                // Pill body (capsule)
+                if size >= 50 { armsLayer }
+
                 Capsule()
                     .fill(
                         LinearGradient(
@@ -83,18 +102,13 @@ struct MascotView: View {
                         )
                     )
                     .frame(width: size * 0.78, height: size * 0.92)
+                    .overlay(Capsule().stroke(mood.accentColor.opacity(0.45), lineWidth: 2))
                     .overlay(
-                        Capsule()
-                            .stroke(mood.accentColor.opacity(0.45), lineWidth: 2)
-                    )
-                    .overlay(
-                        // Subtle inner split line
                         Rectangle()
                             .fill(Color.white.opacity(0.5))
                             .frame(width: size * 0.78, height: 1.2)
                     )
                     .overlay(
-                        // Glossy highlight
                         Capsule()
                             .fill(Color.white.opacity(0.45))
                             .frame(width: size * 0.2, height: size * 0.4)
@@ -102,37 +116,98 @@ struct MascotView: View {
                             .blur(radius: 2)
                     )
 
-                // Cheeks
                 HStack(spacing: size * 0.35) {
                     Circle().fill(mood.cheekColor).frame(width: size * 0.12, height: size * 0.09)
                     Circle().fill(mood.cheekColor).frame(width: size * 0.12, height: size * 0.09)
                 }
                 .offset(y: size * 0.05)
+                .opacity(isDeflated ? 0.35 : 1)
 
-                // Eyes & mouth (per mood)
-                faceLayer
-                    .offset(y: -size * 0.05)
-
-                // Mood accessories
-                accessoryLayer
+                faceLayer.offset(y: -size * 0.05)
             }
-            .scaleEffect(bounce ? 1.04 : 1.0)
+            .scaleEffect(
+                x: isDeflated ? 1.2 : 1.0,
+                y: isDeflated ? 0.65 : 1.0
+            )
+            .scaleEffect(bounce ? bounceScale : 1.0)
             .rotationEffect(.degrees(rotationForMood))
-            .animation(.easeInOut(duration: 1.6).repeatForever(autoreverses: true), value: bounce)
+            .animation(bounceAnimation, value: bounce)
+
+            accessoryLayer
         }
-        .frame(width: size * 1.2, height: size * 1.2)
-        .onAppear {
-            bounce = true
-            blink = true
+        .frame(width: size * 1.3, height: size * 1.3)
+        .onAppear { bounce = true; blink = true }
+    }
+
+    private var bounceScale: CGFloat {
+        switch mood {
+        case .perfect, .celebrating, .eating: return 1.08
+        case .happy: return 1.04
+        case .deflated, .sleepy: return 1.01
+        default: return 1.03
+        }
+    }
+
+    private var bounceAnimation: Animation {
+        switch mood {
+        case .perfect, .celebrating:
+            return .easeInOut(duration: 0.8).repeatForever(autoreverses: true)
+        case .eating:
+            return .easeInOut(duration: 0.5).repeatForever(autoreverses: true)
+        default:
+            return .easeInOut(duration: 1.6).repeatForever(autoreverses: true)
         }
     }
 
     private var rotationForMood: Double {
         switch mood {
-        case .grumpy: return -4
+        case .grumpy, .eyeroll: return -4
         case .sad: return -2
         case .celebrating: return 3
+        case .eating: return 2
         default: return 0
+        }
+    }
+
+    // MARK: - Arms
+    @ViewBuilder
+    private var armsLayer: some View {
+        Capsule()
+            .fill(mood.bodyColor.opacity(0.9))
+            .frame(width: size * 0.09, height: size * 0.22)
+            .overlay(Capsule().stroke(mood.accentColor.opacity(0.3), lineWidth: 1))
+            .rotationEffect(.degrees(leftArmAngle), anchor: .top)
+            .offset(x: -size * 0.42, y: size * 0.05)
+
+        Capsule()
+            .fill(mood.bodyColor.opacity(0.9))
+            .frame(width: size * 0.09, height: size * 0.22)
+            .overlay(Capsule().stroke(mood.accentColor.opacity(0.3), lineWidth: 1))
+            .rotationEffect(.degrees(rightArmAngle), anchor: .top)
+            .offset(x: size * 0.42, y: size * 0.05)
+    }
+
+    private var leftArmAngle: Double {
+        switch mood {
+        case .celebrating, .perfect: return -45
+        case .happy: return -20
+        case .grumpy, .eyeroll: return 30
+        case .eating: return -30
+        case .deflated: return -5
+        case .sleepy: return 5
+        default: return -10
+        }
+    }
+
+    private var rightArmAngle: Double {
+        switch mood {
+        case .celebrating, .perfect: return 45
+        case .happy: return 20
+        case .grumpy, .eyeroll: return -30
+        case .eating: return 30
+        case .deflated: return 5
+        case .sleepy: return -5
+        default: return 10
         }
     }
 
@@ -152,12 +227,10 @@ struct MascotView: View {
     private func eye(side: Side) -> some View {
         switch mood {
         case .perfect:
-            // Star eyes
             Image(systemName: "star.fill")
                 .font(.system(size: size * 0.14))
                 .foregroundColor(mood.accentColor)
         case .celebrating:
-            // Closed happy eye ^
             HappyArc()
                 .stroke(Color(hex: "#4B2A2A"), style: StrokeStyle(lineWidth: 2.2, lineCap: .round))
                 .frame(width: size * 0.13, height: size * 0.07)
@@ -166,11 +239,29 @@ struct MascotView: View {
                 .fill(Color(hex: "#4B2A2A"))
                 .frame(width: size * 0.13, height: size * 0.025)
         case .grumpy:
-            // Angry slanted eye
             Capsule()
                 .fill(Color(hex: "#1F2937"))
                 .frame(width: size * 0.1, height: size * 0.06)
                 .rotationEffect(.degrees(side == .left ? 15 : -15))
+        case .eyeroll:
+            ZStack {
+                Circle()
+                    .fill(Color.white)
+                    .frame(width: size * 0.12, height: size * 0.12)
+                    .overlay(Circle().stroke(Color(hex: "#4B2A2A"), lineWidth: 1.5))
+                Circle()
+                    .fill(Color(hex: "#1F2937"))
+                    .frame(width: size * 0.06, height: size * 0.06)
+                    .offset(y: -size * 0.03)
+            }
+        case .deflated:
+            Capsule()
+                .fill(Color(hex: "#4B2A2A").opacity(0.6))
+                .frame(width: size * 0.12, height: size * 0.025)
+        case .eating:
+            Image(systemName: "sparkle")
+                .font(.system(size: size * 0.13, weight: .bold))
+                .foregroundColor(Color(hex: "#F59E0B"))
         case .sad:
             Circle()
                 .fill(Color(hex: "#1F2937"))
@@ -182,7 +273,6 @@ struct MascotView: View {
                         .offset(y: size * 0.1)
                 }
         default:
-            // Neutral/happy dot eyes with a shine
             ZStack {
                 Circle()
                     .fill(Color(hex: "#1F2937"))
@@ -212,6 +302,26 @@ struct MascotView: View {
             Capsule()
                 .fill(Color(hex: "#4B2A2A"))
                 .frame(width: size * 0.14, height: size * 0.018)
+        case .eyeroll:
+            SmileShape()
+                .stroke(Color(hex: "#4B2A2A"), style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                .frame(width: size * 0.14, height: size * 0.05)
+                .rotationEffect(.degrees(180))
+        case .eating:
+            ZStack {
+                Ellipse()
+                    .fill(Color(hex: "#4B2A2A"))
+                    .frame(width: size * 0.16, height: size * 0.14)
+                Ellipse()
+                    .fill(Color(hex: "#F87171"))
+                    .frame(width: size * 0.12, height: size * 0.08)
+                    .offset(y: size * 0.01)
+            }
+        case .deflated:
+            Capsule()
+                .fill(Color(hex: "#4B2A2A").opacity(0.5))
+                .frame(width: size * 0.08, height: size * 0.014)
+                .rotationEffect(.degrees(-5))
         case .sad, .grumpy:
             SmileShape()
                 .stroke(Color(hex: "#4B2A2A"), style: StrokeStyle(lineWidth: 2.2, lineCap: .round))
@@ -229,11 +339,10 @@ struct MascotView: View {
     private var accessoryLayer: some View {
         switch mood {
         case .celebrating:
-            // Confetti dots
             ZStack {
                 ForEach(0..<6, id: \.self) { i in
                     Circle()
-                        .fill([Color(hex: "#F472B6"), Color(hex: "#60A5FA"), Color(hex: "#FBBF24"), Color(hex: "#34D399")].randomElement() ?? .pink)
+                        .fill([Color(hex: "#F472B6"), Color(hex: "#60A5FA"), Color(hex: "#FBBF24"), Color(hex: "#34D399")][i % 4])
                         .frame(width: size * 0.05, height: size * 0.05)
                         .offset(
                             x: size * [-0.5, -0.3, 0.3, 0.5, -0.4, 0.4][i],
@@ -242,22 +351,46 @@ struct MascotView: View {
                 }
             }
         case .sleepy:
-            Text("z")
-                .font(.system(size: size * 0.2, weight: .bold, design: .rounded))
-                .foregroundColor(mood.accentColor)
-                .offset(x: size * 0.35, y: -size * 0.35)
-        case .grumpy:
-            // Angry vein-like symbol using SF
+            VStack(spacing: size * 0.02) {
+                Text("z")
+                    .font(.system(size: size * 0.14, weight: .bold, design: .rounded))
+                Text("Z")
+                    .font(.system(size: size * 0.2, weight: .bold, design: .rounded))
+            }
+            .foregroundColor(mood.accentColor.opacity(0.7))
+            .offset(x: size * 0.4, y: -size * 0.3)
+        case .grumpy, .eyeroll:
             Image(systemName: "bolt.fill")
                 .font(.system(size: size * 0.14))
                 .foregroundColor(Color(hex: "#EF4444"))
-                .offset(x: size * 0.32, y: -size * 0.38)
+                .offset(x: size * 0.35, y: -size * 0.38)
         case .perfect:
-            // Sparkle
-            Image(systemName: "sparkles")
-                .font(.system(size: size * 0.16))
-                .foregroundColor(Color(hex: "#F59E0B"))
-                .offset(x: size * 0.38, y: -size * 0.38)
+            ZStack {
+                Image(systemName: "sparkles")
+                    .font(.system(size: size * 0.16))
+                    .foregroundColor(Color(hex: "#F59E0B"))
+                    .offset(x: size * 0.38, y: -size * 0.38)
+                Image(systemName: "sparkle")
+                    .font(.system(size: size * 0.1))
+                    .foregroundColor(Color(hex: "#A78BFA"))
+                    .offset(x: -size * 0.4, y: -size * 0.3)
+            }
+        case .eating:
+            ZStack {
+                Image(systemName: "sparkle")
+                    .font(.system(size: size * 0.1, weight: .bold))
+                    .foregroundColor(Color(hex: "#FBBF24"))
+                    .offset(x: size * 0.35, y: -size * 0.35)
+                Image(systemName: "sparkle")
+                    .font(.system(size: size * 0.08, weight: .bold))
+                    .foregroundColor(Color(hex: "#F472B6"))
+                    .offset(x: -size * 0.38, y: -size * 0.3)
+            }
+        case .deflated:
+            Image(systemName: "leaf.fill")
+                .font(.system(size: size * 0.12))
+                .foregroundColor(Color(hex: "#86EFAC").opacity(0.7))
+                .offset(x: size * 0.35, y: -size * 0.25)
         default:
             EmptyView()
         }
@@ -312,6 +445,18 @@ struct TearShape: Shape {
     }
 }
 
+// MARK: - Speech Bubble Tail
+struct BubbleTail: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.minX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
+        path.closeSubpath()
+        return path
+    }
+}
+
 #Preview {
     VStack(spacing: 20) {
         HStack {
@@ -320,9 +465,9 @@ struct TearShape: Shape {
             MascotView(mood: .celebrating, size: 80)
         }
         HStack {
-            MascotView(mood: .neutral, size: 80)
-            MascotView(mood: .sad, size: 80)
-            MascotView(mood: .grumpy, size: 80)
+            MascotView(mood: .eyeroll, size: 80)
+            MascotView(mood: .deflated, size: 80)
+            MascotView(mood: .eating, size: 80)
         }
         MascotView(mood: .sleepy, size: 100)
     }

@@ -1,5 +1,5 @@
 /* ============================================
-   PillPal - 中文本地化
+   PillPal - 中文本地化 (搭子风格)
    ============================================ */
 
 // MARK: - App
@@ -25,9 +25,25 @@
 "status_taken" = "已服用";
 "status_skipped" = "已跳过";
 "skip_dose" = "跳过本次";
-"no_meds" = "还没有添加药物";
-"add_first" = "扫描药瓶或手动添加你的第一个补剂";
+"no_meds" = "吞吞还没有食谱";
+"add_first" = "扫描药瓶或手动添加，给吞吞安排第一顿";
 "weekly_progress" = "本周进度";
+
+// MARK: - Dashboard Buddy Language
+"feed_list" = "今日投喂清单";
+"feed_now" = "快来喂我！";
+"status_fed" = "已投喂";
+"feed_skip" = "跳过这顿";
+"tummy_full" = "吞吞饱啦！";
+"feed_remaining %lld" = "还有 %lld 份等你投喂";
+
+// MARK: - Tunny Status
+"tunny_status_perfect" = "圆润发光中";
+"tunny_status_happy" = "Q弹满满";
+"tunny_status_neutral" = "元气一般";
+"tunny_status_eyeroll" = "微微不满";
+"tunny_status_deflated" = "扁扁待机中...";
+"tunny_status_sleepy" = "盖被睡觉中...";
 
 // MARK: - Medications
 "my_medications" = "我的药物";
@@ -74,9 +90,9 @@
 
 // MARK: - Scan
 "scan_button" = "拍照扫描";
-"scan_desc" = "将手机摄像头对准药物标签";
-"scan_processing" = "AI 正在识别标签...";
-"scan_found" = "已识别药物信息！";
+"scan_desc" = "吞吞正在用卡姿兰大眼睛扫描成分";
+"scan_processing" = "吞吞正在分析标签...";
+"scan_found" = "吞吞已帮你安排明白了！";
 "scan_confirm" = "确认添加";
 "scan_retry" = "重新扫描";
 "scan_demo_note" = "演示：点击模拟扫描";
@@ -84,37 +100,35 @@
 
 // MARK: - Stats
 "stats_title" = "统计数据";
-"stat_adherence" = "服药率";
+"stat_adherence" = "投喂率";
 "stat_current_streak" = "当前连续";
 "stat_best_streak" = "最佳连续";
 "stat_days" = "天";
-"stat_total_taken" = "累计服用";
+"stat_total_taken" = "累计投喂";
 "this_week" = "本周";
-"achievements_title" = "成就";
+"achievements_title" = "成就徽章";
 
-// MARK: - Achievements (original)
-"achv_first_pill" = "第一步";
-"achv_first_pill_desc" = "记录了第一个药物";
-"achv_week_streak" = "周冠军";
-"achv_week_streak_desc" = "达成7天连续打卡！";
-"achv_month_streak" = "月度大师";
-"achv_month_streak_desc" = "30天连续打卡，太厉害了！";
-"achv_perfect_week" = "完美一周";
-"achv_perfect_week_desc" = "整周零漏服";
-"achv_scanner" = "扫描达人";
-"achv_scanner_desc" = "成功扫描了第一个药瓶";
-
-// MARK: - Achievements (new)
-"achv_level_5_reached" = "火力全开！";
-"achv_level_5_reached_desc" = "达到等级 5";
-"achv_level_10_reached" = "健康传奇";
-"achv_level_10_reached_desc" = "达到等级 10";
-"achv_ten_doses" = "初露锋芒";
-"achv_ten_doses_desc" = "累计服药 10 次";
-"achv_fifty_doses" = "坚持不懈";
-"achv_fifty_doses_desc" = "累计服药 50 次";
-"achv_hundred_doses" = "百战百胜";
-"achv_hundred_doses_desc" = "累计服药 100 次";
+// MARK: - Achievements (Meme Style)
+"achv_first_pill" = "初来乍到";
+"achv_first_pill_desc" = "吞吞的第一口！欢迎加入投喂大军";
+"achv_week_streak" = "铁打的习惯";
+"achv_week_streak_desc" = "连续投喂7天，吞吞认定你了";
+"achv_month_streak" = "肝帝本帝";
+"achv_month_streak_desc" = "连续30天！吞吞已经胖了一圈";
+"achv_perfect_week" = "完美主义の胜利";
+"achv_perfect_week_desc" = "一周全勤，强迫症狂喜";
+"achv_scanner" = "卡姿兰大眼睛";
+"achv_scanner_desc" = "解锁吞吞的扫描大法！滴滴滴~";
+"achv_level_5_reached" = "修炼有成";
+"achv_level_5_reached_desc" = "吞吞进化了！开始发光发热";
+"achv_level_10_reached" = "渡劫成功";
+"achv_level_10_reached_desc" = "吞吞成仙了！养生界的王者就是你";
+"achv_ten_doses" = "小试牛刀";
+"achv_ten_doses_desc" = "投喂10次，吞吞开始认你了";
+"achv_fifty_doses" = "投喂达人";
+"achv_fifty_doses_desc" = "50次！吞吞已经离不开你了";
+"achv_hundred_doses" = "百喂不厌";
+"achv_hundred_doses_desc" = "100次！传说中的养生达人就是你";
 
 // MARK: - Mood
 "mood_perfect" = "完美！";
@@ -123,34 +137,34 @@
 "mood_come_on" = "加油！";
 "mood_really" = "真的吗？";
 
-// MARK: - Game Levels
-"level_1" = "小苗苗";
-"level_2" = "成长中";
-"level_3" = "开花啦";
-"level_4" = "新星";
-"level_5" = "火力全开";
-"level_6" = "钻石";
-"level_7" = "冠军";
-"level_8" = "皇冠";
-"level_9" = "超级英雄";
-"level_10" = "健康大师";
+// MARK: - Game Levels (吞吞进化阶段)
+"level_1" = "刚孵化";
+"level_2" = "小奶团";
+"level_3" = "开始Q弹";
+"level_4" = "元气初现";
+"level_5" = "活力满满";
+"level_6" = "闪闪发光";
+"level_7" = "圆润大师";
+"level_8" = "Q弹至尊";
+"level_9" = "养生大佬";
+"level_10" = "吞吞の巅峰";
 
-// MARK: - Daily Missions
-"daily_quests" = "每日任务";
-"mission_checkin" = "每日签到";
-"mission_morning" = "早起吃药";
-"mission_no_skip" = "零跳过";
-"mission_all_done" = "全部完成";
+// MARK: - Daily Missions (搭子日常)
+"daily_quests" = "今日投喂日常";
+"mission_checkin" = "跟吞吞打招呼";
+"mission_morning" = "投喂早餐";
+"mission_no_skip" = "不让吞吞饿肚子";
+"mission_all_done" = "喂饱吞吞";
 
 // MARK: - XP
-"xp_label" = "经验值";
-"level_label" = "等级";
+"xp_label" = "能量值";
+"level_label" = "状态";
 "xp_to_next" = "距下一级";
-"xp_per_dose" = "每次服药";
+"xp_per_dose" = "每次投喂";
 "xp_daily_bonus" = "每日奖励";
 "xp_streak_7" = "7天连续";
-"level_up_title" = "升级啦！";
-"level_up_dismiss" = "太棒了！";
+"level_up_title" = "吞吞进化了！";
+"level_up_dismiss" = "太Q了！";
 
 // MARK: - Settings
 "settings_title" = "设置";
@@ -162,7 +176,7 @@
 "language_title" = "语言";
 "lang_restart_hint" = "重启应用以完全切换语言";
 "notifications_title" = "通知";
-"reminder_style" = "提醒风格";
+"reminder_style" = "吞吞的语气";
 "style_sassy" = "毒舌";
 "style_gentle" = "温柔";
 "style_neutral" = "中性";
@@ -182,33 +196,33 @@
 
 // MARK: - Onboarding
 "onboard_welcome" = "欢迎来到药搭子";
-"onboard_welcome_sub" = "有趣的药物与补剂追踪器";
-"onboard_step1_title" = "拍照即入库";
-"onboard_step1_desc" = "对准药瓶标签拍一下，AI 帮你搞定一切。";
-"onboard_step2_title" = "有趣的提醒";
-"onboard_step2_desc" = "告别无聊通知，选择毒舌或温柔风格。";
-"onboard_step3_title" = "升级打怪！";
-"onboard_step3_desc" = "赚经验值、解锁成就、让你的健康等级一路飙升！";
-"onboard_get_started" = "开始使用";
+"onboard_welcome_sub" = "认识吞吞，你的养生小搭子";
+"onboard_step1_title" = "对准药瓶，吞吞搞定";
+"onboard_step1_desc" = "吞吞用卡姿兰大眼睛扫描成分，自动安排你的投喂计划";
+"onboard_step2_title" = "吞吞敲碗提醒你";
+"onboard_step2_desc" = "告别无聊通知，选择毒舌or温柔的吞吞来催你吃药";
+"onboard_step3_title" = "和吞吞一起进化";
+"onboard_step3_desc" = "每天投喂吞吞，看它从小奶团变成圆润大师！";
+"onboard_get_started" = "开始投喂";
 "onboard_next" = "下一步";
 "onboard_skip" = "跳过";
 
-// MARK: - Sassy Reminders
-"sassy_1" = "你的肝在抗议了，快把护肝片吃了！";
-"sassy_2" = "药不会自己跳进嘴里的，快行动！";
-"sassy_3" = "又想跳过？你对得起那瓶不便宜的维生素吗？";
-"sassy_4" = "未来的你打来电话：给我把药吃了！";
-"sassy_5" = "剧透：药吃了才有效果哦。";
-"sassy_6" = "你的补剂在药瓶里哭泣，快给它自由。";
-"sassy_7" = "突发新闻：某人又双叒叕忘吃药了。";
-"sassy_8" = "药瓶正在用眼神杀看着你呢。";
+// MARK: - Sassy Reminders (网络流行语风格)
+"sassy_1" = "药都不吃，你是在修仙渡劫吗？";
+"sassy_2" = "吞吞举着空碗看你——你的良心不会痛吗？";
+"sassy_3" = "再不投喂，吞吞就要靠光合作用了";
+"sassy_4" = "你的药瓶发来消息：已读不回算什么意思？";
+"sassy_5" = "吞吞的胃在咕噜叫了，快来投喂！";
+"sassy_6" = "今日份养生KPI还没完成哦，打工人";
+"sassy_7" = "吞吞正在用卡姿兰大眼睛死盯你的药瓶";
+"sassy_8" = "别刷手机了！你的补剂比短视频更需要你！";
 
 // MARK: - Gentle Reminders
-"gentle_1" = "健康小时刻到啦，记得服药哦~";
-"gentle_2" = "温馨提醒：别忘了照顾自己~";
-"gentle_3" = "身体会感谢你的，记得吃补剂！";
-"gentle_4" = "小小一步，大大健康。该吃药啦~";
-"gentle_5" = "你做得很棒！别忘了今天的健康日常~";
+"gentle_1" = "吞吞轻声提醒你：该补充能量了哦~";
+"gentle_2" = "慢慢来，一颗一颗地，吞吞陪着你";
+"gentle_3" = "今天也要好好照顾自己呀，吞吞等你投喂";
+"gentle_4" = "健康是最温柔的自律，吞吞相信你";
+"gentle_5" = "小小一颗药，大大的爱，别忘了哦~";
 
 // MARK: - Neutral Reminders
-"neutral_1" = "该吃药了。";
+"neutral_1" = "投喂时间到~";

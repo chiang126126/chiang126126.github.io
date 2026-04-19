@@ -4,6 +4,10 @@ struct DashboardView: View {
     @Environment(MedicationStore.self) private var store
     @Environment(ThemeManager.self) private var theme
 
+    @State private var messageKey: String = "neutral_1"
+    @State private var messageId = UUID()
+    @State private var feedingAnimation = false
+
     private var greeting: LocalizedStringKey {
         let h = Calendar.current.component(.hour, from: Date())
         if h < 12 { return "greeting_morning" }
@@ -11,36 +15,40 @@ struct DashboardView: View {
         return "greeting_evening"
     }
 
+    private var currentMood: MascotMood {
+        if feedingAnimation { return .eating }
+        return MascotMood.forAdherence(store.todayAdherence)
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
                 headerSection
+
+                mascotHeroCard
 
                 HStack(spacing: 10) {
                     todayProgressCard
                     StreakCounter(streak: store.streak)
                 }
 
-                if store.todayRemaining > 0 {
-                    ReminderCard()
-                }
-
                 if store.todaySchedule().isEmpty {
                     emptyState
                 } else {
-                    todayMedsList
+                    todayFeedList
                 }
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 100)
         }
         .background(theme.bgGradient.ignoresSafeArea())
+        .onAppear { refreshMessage() }
     }
 
     // MARK: - Header
     private var headerSection: some View {
         HStack(alignment: .center) {
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
                     Image(systemName: "hand.wave.fill")
                         .font(.system(size: theme.captionSize))
@@ -56,14 +64,82 @@ struct DashboardView: View {
             }
 
             Spacer()
-
-            MascotView(
-                mood: MascotMood.forAdherence(store.todayAdherence),
-                size: 60,
-                showBackground: false
-            )
         }
         .padding(.top, 8)
+    }
+
+    // MARK: - Mascot Hero Card
+    private var mascotHeroCard: some View {
+        VStack(spacing: 8) {
+            // Speech bubble
+            VStack(spacing: 0) {
+                HStack {
+                    (Text("\u{201C} ") + Text(LocalizedStringKey(messageKey)) + Text(" \u{201D}"))
+                        .font(.system(size: theme.bodySize - 1, weight: .medium, design: .rounded))
+                        .foregroundColor(theme.textColor)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(3)
+                        .id(messageId)
+                        .transition(.opacity.combined(with: .scale(scale: 0.95)))
+
+                    Button {
+                        withAnimation(.spring(response: 0.3)) { refreshMessage() }
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    } label: {
+                        Image(systemName: "arrow.clockwise")
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundColor(theme.mutedColor)
+                            .padding(5)
+                            .background(theme.surfaceColor.opacity(0.6), in: Circle())
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background {
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(theme.cardColor)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .stroke(theme.borderColor, lineWidth: 1)
+                        }
+                }
+
+                BubbleTail()
+                    .fill(theme.cardColor)
+                    .frame(width: 14, height: 8)
+                    .overlay {
+                        BubbleTail()
+                            .stroke(theme.borderColor, lineWidth: 1)
+                    }
+            }
+
+            // Mascot
+            MascotView(
+                mood: currentMood,
+                size: 130,
+                showBackground: true
+            )
+            .animation(.spring(response: 0.4), value: feedingAnimation)
+
+            // Status line
+            HStack(spacing: 8) {
+                Image(systemName: "bolt.fill")
+                    .font(.system(size: 10))
+                    .foregroundColor(currentMood.accentColor)
+                Text("\(store.totalXP)")
+                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                    .foregroundColor(theme.textColor)
+                Text("\u{00B7}")
+                    .foregroundColor(theme.mutedColor)
+                Text(LocalizedStringKey(currentMood.statusKey))
+                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .foregroundColor(currentMood.accentColor)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 6)
+            .background(theme.surfaceColor.opacity(0.6), in: Capsule())
+        }
+        .padding(.vertical, 8)
     }
 
     // MARK: - Today Progress
@@ -95,14 +171,14 @@ struct DashboardView: View {
                     .foregroundColor(theme.mutedColor)
                 if done == schedule.count && schedule.count > 0 {
                     HStack(spacing: 4) {
-                        Text("all_done")
+                        Text("tummy_full")
                         Image(systemName: "sparkles")
                             .foregroundColor(theme.accentSecondary)
                     }
                     .font(.system(size: theme.bodySize, weight: .bold, design: .rounded))
                     .foregroundColor(theme.successColor)
                 } else {
-                    Text("remaining \(store.todayRemaining)")
+                    Text("feed_remaining \(store.todayRemaining)")
                         .font(.system(size: theme.bodySize, weight: .bold, design: .rounded))
                         .foregroundColor(theme.textColor)
                 }
@@ -117,13 +193,13 @@ struct DashboardView: View {
         }
     }
 
-    // MARK: - Today's Meds
-    private var todayMedsList: some View {
+    // MARK: - Feed List
+    private var todayFeedList: some View {
         VStack(spacing: 10) {
             HStack(spacing: 6) {
                 Image(systemName: "list.bullet.clipboard.fill")
                     .foregroundColor(theme.accentColor)
-                Text("today_schedule")
+                Text("feed_list")
                     .font(.system(size: theme.bodySize, weight: .bold, design: .rounded))
                     .foregroundColor(theme.textColor)
                 Spacer()
@@ -139,7 +215,10 @@ struct DashboardView: View {
                         medication: med,
                         isTaken: taken,
                         isSkipped: skipped,
-                        onTake: { store.logDose(med.id, status: .taken) },
+                        onTake: {
+                            store.logDose(med.id, status: .taken)
+                            triggerFeedingAnimation()
+                        },
                         onSkip: { store.logDose(med.id, status: .skipped) }
                     )
 
@@ -166,7 +245,7 @@ struct DashboardView: View {
                         HStack(spacing: 3) {
                             Image(systemName: "checkmark.circle.fill")
                                 .font(.system(size: 12))
-                            Text("status_taken")
+                            Text("status_fed")
                         }
                         .font(.system(size: 11, weight: .semibold, design: .rounded))
                         .foregroundColor(theme.successColor)
@@ -175,7 +254,7 @@ struct DashboardView: View {
                         .background(theme.successColor.opacity(0.14), in: Capsule())
                         .transition(.scale.combined(with: .opacity))
                     } else if skipped {
-                        Text("status_skipped")
+                        Text("feed_skip")
                             .font(.system(size: 11, weight: .medium, design: .rounded))
                             .foregroundColor(theme.mutedColor)
                             .padding(.horizontal, 10)
@@ -185,7 +264,7 @@ struct DashboardView: View {
                         HStack(spacing: 3) {
                             Image(systemName: "hand.tap.fill")
                                 .font(.system(size: 10))
-                            Text("take_now")
+                            Text("feed_now")
                         }
                         .font(.system(size: 11, weight: .semibold, design: .rounded))
                         .foregroundColor(theme.accentColor)
@@ -228,6 +307,28 @@ struct DashboardView: View {
                     RoundedRectangle(cornerRadius: 24, style: .continuous)
                         .strokeBorder(theme.borderColor, style: StrokeStyle(lineWidth: 1.5, dash: [8]))
                 }
+        }
+    }
+
+    // MARK: - Helpers
+    private func refreshMessage() {
+        let keys = reminderKeys(style: store.reminderStyle)
+        messageKey = keys.randomElement() ?? "neutral_1"
+        messageId = UUID()
+    }
+
+    private func reminderKeys(style: String) -> [String] {
+        switch style {
+        case "sassy": return (1...8).map { "sassy_\($0)" }
+        case "gentle": return (1...5).map { "gentle_\($0)" }
+        default: return ["neutral_1"]
+        }
+    }
+
+    private func triggerFeedingAnimation() {
+        withAnimation(.spring(response: 0.3)) { feedingAnimation = true }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+            withAnimation(.spring(response: 0.4)) { feedingAnimation = false }
         }
     }
 }
