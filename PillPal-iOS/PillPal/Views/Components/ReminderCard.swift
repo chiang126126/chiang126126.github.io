@@ -3,7 +3,7 @@ import SwiftUI
 struct ReminderCard: View {
     @Environment(MedicationStore.self) private var store
     @Environment(ThemeManager.self) private var theme
-    @State private var message: String = ""
+    @State private var messageKey: String = "neutral_1"
     @State private var messageId = UUID()
 
     private var dayNumber: String {
@@ -44,16 +44,18 @@ struct ReminderCard: View {
 
             // Message bubble with mascot
             VStack(alignment: .leading, spacing: 6) {
-                Text("\"\(message)\"")
-                    .font(.system(size: theme.bodySize - 1, weight: .medium, design: .rounded))
-                    .foregroundColor(theme.textColor)
-                    .lineSpacing(3)
-                    .id(messageId)
-                    .transition(.asymmetric(
-                        insertion: .move(edge: .trailing).combined(with: .opacity),
-                        removal: .move(edge: .leading).combined(with: .opacity)
-                    ))
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                Group {
+                    (Text("\u{201C} ") + Text(LocalizedStringKey(messageKey)) + Text(" \u{201D}"))
+                        .font(.system(size: theme.bodySize - 1, weight: .medium, design: .rounded))
+                        .foregroundColor(theme.textColor)
+                        .lineSpacing(3)
+                }
+                .id(messageId)
+                .transition(.asymmetric(
+                    insertion: .move(edge: .trailing).combined(with: .opacity),
+                    removal: .move(edge: .leading).combined(with: .opacity)
+                ))
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
 
             VStack(spacing: 6) {
@@ -91,19 +93,19 @@ struct ReminderCard: View {
     }
 
     private func refreshMessage() {
-        let messages = reminderMessages(style: store.reminderStyle)
-        message = messages.randomElement() ?? ""
+        let keys = reminderKeys(style: store.reminderStyle)
+        messageKey = keys.randomElement() ?? "neutral_1"
         messageId = UUID()
     }
 
-    private func reminderMessages(style: String) -> [String] {
+    private func reminderKeys(style: String) -> [String] {
         switch style {
         case "sassy":
-            return (1...8).map { NSLocalizedString("sassy_\($0)", comment: "") }
+            return (1...8).map { "sassy_\($0)" }
         case "gentle":
-            return (1...5).map { NSLocalizedString("gentle_\($0)", comment: "") }
+            return (1...5).map { "gentle_\($0)" }
         default:
-            return [NSLocalizedString("neutral_1", comment: "")]
+            return ["neutral_1"]
         }
     }
 }

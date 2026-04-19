@@ -14,21 +14,12 @@ struct DashboardView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                heroSection
-
-                XPProgressView(
-                    currentXP: store.totalXP,
-                    currentLevel: store.currentLevel,
-                    progress: store.xpProgress,
-                    xpToNext: store.xpToNext
-                )
+                headerSection
 
                 HStack(spacing: 10) {
+                    todayProgressCard
                     StreakCounter(streak: store.streak)
-                    statusCard
                 }
-
-                DailyMissionCard(missions: store.dailyMissions())
 
                 if store.todayRemaining > 0 {
                     ReminderCard()
@@ -39,10 +30,6 @@ struct DashboardView: View {
                 } else {
                     todayMedsList
                 }
-
-                if !store.todaySchedule().isEmpty {
-                    weeklySection
-                }
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 100)
@@ -50,90 +37,76 @@ struct DashboardView: View {
         .background(theme.bgGradient.ignoresSafeArea())
     }
 
-    // MARK: - Hero
-    private var heroSection: some View {
-        ZStack(alignment: .topLeading) {
-            // Pastel blob background
-            RoundedRectangle(cornerRadius: 32, style: .continuous)
-                .fill(theme.heroGradient)
-                .overlay(alignment: .topTrailing) {
-                    Circle()
-                        .fill(theme.pastelPink.opacity(0.6))
-                        .frame(width: 120, height: 120)
-                        .blur(radius: 18)
-                        .offset(x: 30, y: -30)
-                }
-                .overlay(alignment: .bottomLeading) {
-                    Circle()
-                        .fill(theme.pastelSky.opacity(0.7))
-                        .frame(width: 90, height: 90)
-                        .blur(radius: 16)
-                        .offset(x: -20, y: 20)
-                }
-                .overlay {
-                    RoundedRectangle(cornerRadius: 32, style: .continuous)
-                        .stroke(Color.white.opacity(theme.isPro ? 0.08 : 0.6), lineWidth: 1)
+    // MARK: - Header
+    private var headerSection: some View {
+        HStack(alignment: .center) {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 6) {
+                    Image(systemName: "hand.wave.fill")
+                        .font(.system(size: theme.captionSize))
+                        .foregroundColor(theme.accentColor)
+                    Text(greeting)
+                        .font(.system(size: theme.captionSize, weight: .medium, design: .rounded))
+                        .foregroundColor(theme.mutedColor)
                 }
 
-            HStack(alignment: .top, spacing: 12) {
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "hand.wave.fill")
-                            .font(.system(size: theme.bodySize - 1))
-                            .foregroundColor(theme.accentColor)
-                        Text(greeting)
-                            .font(.system(size: theme.bodySize, weight: .medium, design: .rounded))
-                            .foregroundColor(theme.textColor.opacity(0.7))
-                    }
-
-                    Text("app_name")
-                        .font(.system(size: theme.titleSize + 2, weight: .heavy, design: .rounded))
-                        .foregroundStyle(theme.accentGradient)
-
-                    Text("app_tagline")
-                        .font(.system(size: theme.captionSize + 1, weight: .medium, design: .rounded))
-                        .foregroundColor(theme.textColor.opacity(0.65))
-                        .lineLimit(2)
-                }
-
-                Spacer(minLength: 0)
-
-                MascotView(
-                    mood: MascotMood.forAdherence(store.todayAdherence),
-                    size: 84,
-                    showBackground: true
-                )
+                Text("app_name")
+                    .font(.system(size: theme.titleSize, weight: .heavy, design: .rounded))
+                    .foregroundStyle(theme.accentGradient)
             }
-            .padding(20)
+
+            Spacer()
+
+            MascotView(
+                mood: MascotMood.forAdherence(store.todayAdherence),
+                size: 60,
+                showBackground: false
+            )
         }
-        .padding(.top, 4)
+        .padding(.top, 8)
     }
 
-    // MARK: - Status Card
-    private var statusCard: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 4) {
-                Image(systemName: "calendar")
-                    .font(.system(size: theme.captionSize))
-                    .foregroundColor(theme.accentColor)
+    // MARK: - Today Progress
+    private var todayProgressCard: some View {
+        let schedule = store.todaySchedule()
+        let done = schedule.filter { store.isTakenToday($0.id) || store.isSkippedToday($0.id) }.count
+        let total = max(schedule.count, 1)
+        let progress = Double(done) / Double(total)
+
+        return HStack(spacing: 12) {
+            ZStack {
+                Circle()
+                    .stroke(theme.borderColor, lineWidth: 4)
+                    .frame(width: 44, height: 44)
+                Circle()
+                    .trim(from: 0, to: progress)
+                    .stroke(theme.accentColor, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                    .frame(width: 44, height: 44)
+                    .rotationEffect(.degrees(-90))
+                    .animation(.spring(response: 0.6), value: progress)
+                Text("\(done)/\(schedule.count)")
+                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .foregroundColor(theme.textColor)
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
                 Text("today_schedule")
                     .font(.system(size: theme.captionSize, weight: .medium, design: .rounded))
                     .foregroundColor(theme.mutedColor)
-            }
-
-            Group {
-                if store.todayRemaining == 0 {
+                if done == schedule.count && schedule.count > 0 {
                     HStack(spacing: 4) {
                         Text("all_done")
                         Image(systemName: "sparkles")
                             .foregroundColor(theme.accentSecondary)
                     }
+                    .font(.system(size: theme.bodySize, weight: .bold, design: .rounded))
+                    .foregroundColor(theme.successColor)
                 } else {
                     Text("remaining \(store.todayRemaining)")
+                        .font(.system(size: theme.bodySize, weight: .bold, design: .rounded))
+                        .foregroundColor(theme.textColor)
                 }
             }
-            .font(.system(size: theme.bodySize, weight: .bold, design: .rounded))
-            .foregroundColor(theme.textColor)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
@@ -141,7 +114,6 @@ struct DashboardView: View {
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .fill(theme.cardColor)
                 .overlay { RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(theme.borderColor, lineWidth: 1) }
-                .shadow(color: Color.black.opacity(0.05), radius: 10, y: 4)
         }
     }
 
@@ -256,27 +228,6 @@ struct DashboardView: View {
                     RoundedRectangle(cornerRadius: 24, style: .continuous)
                         .strokeBorder(theme.borderColor, style: StrokeStyle(lineWidth: 1.5, dash: [8]))
                 }
-        }
-    }
-
-    // MARK: - Weekly Chart
-    private var weeklySection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 6) {
-                Image(systemName: "chart.bar.fill")
-                    .foregroundColor(theme.accentColor)
-                Text("weekly_progress")
-                    .font(.system(size: theme.bodySize, weight: .bold, design: .rounded))
-                    .foregroundColor(theme.textColor)
-            }
-            WeeklyChartView(data: store.weeklyStats())
-        }
-        .padding(16)
-        .background {
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(theme.cardColor)
-                .overlay { RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(theme.borderColor, lineWidth: 1) }
-                .shadow(color: Color.black.opacity(0.05), radius: 10, y: 4)
         }
     }
 }

@@ -315,14 +315,13 @@ struct DayStat: Identifiable {
 // MARK: - Pill colors & icons
 struct PillOptions {
     static let colors: [String] = [
-        "#22D3EE", "#39FF14", "#FF6B35", "#A855F7", "#FF2D78",
-        "#EAB308", "#10B981", "#3B82F6", "#F43F5E", "#8B5CF6"
+        "#C4B5FD", "#F9A8D4", "#93C5FD", "#86EFAC",
+        "#FDE68A", "#FDBA74", "#FCA5A5", "#A7F3D0"
     ]
 
     static let icons: [String] = [
-        "pill.fill", "capsule.fill", "circle.fill", "drop.fill",
-        "heart.fill", "leaf.fill", "sun.max.fill", "moon.fill",
-        "star.fill", "bolt.fill"
+        "pill.fill", "capsule.fill", "cross.vial.fill", "drop.fill",
+        "syringe", "stethoscope", "leaf.fill", "heart.fill"
     ]
 
     static let demoScans: [(name: String, dosage: String, frequency: Frequency, time: TimeOfDay, food: FoodRelation)] = [

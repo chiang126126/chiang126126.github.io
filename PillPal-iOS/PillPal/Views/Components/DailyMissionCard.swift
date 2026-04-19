@@ -87,7 +87,7 @@ private struct MissionRow: View {
                 }
 
             // Mission name
-            Text(mission.localizedTitle)
+            Text(LocalizedStringKey(mission.titleKey))
                 .font(.system(size: theme.bodySize, weight: .medium))
                 .foregroundColor(mission.isCompleted ? theme.mutedColor : theme.textColor)
                 .strikethrough(mission.isCompleted, color: theme.mutedColor)

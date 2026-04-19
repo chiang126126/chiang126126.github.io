@@ -120,7 +120,7 @@ struct StatsView: View {
                     Text("Lv.\(level.level)")
                         .font(.system(size: 14, weight: .bold, design: .rounded))
                         .foregroundColor(level.color)
-                    Text(level.localizedTitle)
+                    Text(LocalizedStringKey(level.titleKey))
                         .font(.system(size: theme.bodySize, weight: .semibold, design: .rounded))
                         .foregroundColor(theme.textColor)
                 }

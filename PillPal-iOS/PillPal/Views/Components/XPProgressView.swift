@@ -79,7 +79,7 @@ struct XPProgressView: View {
                     Image(systemName: next.sfSymbol)
                         .font(.system(size: theme.captionSize, weight: .semibold))
                         .foregroundColor(next.color)
-                    Text(next.localizedTitle)
+                    Text(LocalizedStringKey(next.titleKey))
                         .font(.system(size: theme.captionSize, weight: .medium))
                         .foregroundColor(next.color)
                 }

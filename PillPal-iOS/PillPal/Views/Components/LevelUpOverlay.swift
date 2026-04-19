@@ -54,7 +54,7 @@ struct LevelUpOverlay: View {
                 .scaleEffect(emojiScale)
 
                 // "LEVEL UP!" text with gradient
-                Text(NSLocalizedString("level_up_title", comment: ""))
+                Text("level_up_title")
                     .font(.system(size: theme.titleSize + 8, weight: .black, design: .rounded))
                     .foregroundStyle(
                         LinearGradient(
@@ -73,7 +73,7 @@ struct LevelUpOverlay: View {
                         .font(.system(size: theme.titleSize, weight: .bold, design: .rounded))
                         .foregroundColor(.white)
 
-                    Text(gameLevel.localizedTitle)
+                    Text(LocalizedStringKey(gameLevel.titleKey))
                         .font(.system(size: theme.bodySize, weight: .medium))
                         .foregroundColor(.white.opacity(0.75))
                 }
@@ -88,7 +88,7 @@ struct LevelUpOverlay: View {
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: "sparkles")
-                        Text(NSLocalizedString("level_up_dismiss", comment: ""))
+                        Text("level_up_dismiss")
                     }
                         .font(.system(size: theme.bodySize, weight: .bold, design: .rounded))
                         .foregroundColor(.white)

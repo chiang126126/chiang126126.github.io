@@ -10,63 +10,68 @@ struct AchievementBadgeView: View {
     var body: some View {
         VStack(spacing: 6) {
             ZStack {
-                // Outer medal ring with tier gradient
-                Circle()
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
                     .fill(
                         unlocked
                             ? LinearGradient(
-                                colors: tierRingColors,
+                                colors: [achievement.color.opacity(0.22), achievement.color.opacity(0.06)],
                                 startPoint: .topLeading, endPoint: .bottomTrailing
                               )
-                            : LinearGradient(colors: [theme.surfaceColor], startPoint: .top, endPoint: .bottom)
+                            : LinearGradient(
+                                colors: [theme.surfaceColor, theme.surfaceColor],
+                                startPoint: .top, endPoint: .bottom
+                              )
                     )
-                    .frame(width: 64, height: 64)
+                    .frame(width: 68, height: 68)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 20, style: .continuous)
+                            .stroke(
+                                unlocked
+                                    ? achievement.color.opacity(0.35)
+                                    : theme.borderColor,
+                                lineWidth: unlocked ? 2 : 1
+                            )
+                    }
 
-                // Inner circle (cut-out look)
-                Circle()
-                    .fill(
-                        unlocked
-                            ? achievement.color.opacity(0.15)
-                            : theme.surfaceColor
-                    )
-                    .frame(width: 54, height: 54)
-
-                // Glossy highlight on medal rim
                 if unlocked {
-                    Circle()
-                        .fill(Color.white.opacity(0.35))
-                        .frame(width: 16, height: 8)
-                        .offset(x: -14, y: -22)
-                        .blur(radius: 2)
+                    Image(systemName: "sparkle")
+                        .font(.system(size: 8, weight: .bold))
+                        .foregroundColor(achievement.color.opacity(0.7))
+                        .offset(x: -24, y: -24)
+                    Image(systemName: "sparkle")
+                        .font(.system(size: 6, weight: .bold))
+                        .foregroundColor(achievement.color.opacity(0.5))
+                        .offset(x: 26, y: -20)
+                    Image(systemName: "sparkle")
+                        .font(.system(size: 7, weight: .bold))
+                        .foregroundColor(achievement.color.opacity(0.4))
+                        .offset(x: -20, y: 24)
                 }
 
-                // Achievement icon
                 Image(systemName: achievement.icon)
-                    .font(.system(size: 24, weight: .semibold))
-                    .foregroundColor(unlocked ? achievement.color : theme.mutedColor.opacity(0.35))
+                    .font(.system(size: 28, weight: .semibold))
+                    .foregroundColor(unlocked ? achievement.color : theme.mutedColor.opacity(0.25))
 
-                // Tier seal
-                if unlocked {
-                    Image(systemName: "checkmark.seal.fill")
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(tierSealColor)
-                        .background(Circle().fill(theme.cardColor).padding(-3))
-                        .offset(x: 22, y: -22)
-                        .transition(.scale.combined(with: .opacity))
+                if !unlocked {
+                    Image(systemName: "lock.fill")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(theme.mutedColor.opacity(0.45))
+                        .padding(4)
+                        .background(theme.cardColor.opacity(0.9), in: Circle())
+                        .offset(x: 22, y: 22)
                 }
             }
-            .opacity(unlocked ? 1 : 0.35)
-            .grayscale(unlocked ? 0 : 1)
-            .shadow(color: unlocked ? achievement.color.opacity(0.3) : .clear, radius: 8, y: 3)
+            .opacity(unlocked ? 1 : 0.4)
+            .shadow(color: unlocked ? achievement.color.opacity(0.2) : .clear, radius: 10, y: 4)
 
             if showLabel {
                 VStack(spacing: 2) {
-                    Text(achievement.localizedName)
+                    Text(LocalizedStringKey("achv_\(achievement.rawValue)"))
                         .font(.system(size: 11, weight: .bold, design: .rounded))
-                        .foregroundColor(theme.textColor)
+                        .foregroundColor(unlocked ? theme.textColor : theme.mutedColor)
                         .lineLimit(1)
 
-                    Text(achievement.localizedDesc)
+                    Text(LocalizedStringKey("achv_\(achievement.rawValue)_desc"))
                         .font(.system(size: 9, design: .rounded))
                         .foregroundColor(theme.mutedColor)
                         .lineLimit(2)
@@ -79,22 +84,6 @@ struct AchievementBadgeView: View {
                     }
                 }
             }
-        }
-    }
-
-    private var tierRingColors: [Color] {
-        switch achievement.tier {
-        case .gold:   return [Color(hex: "#FFD700"), Color(hex: "#FFA500"), Color(hex: "#FFD700")]
-        case .silver: return [Color(hex: "#E0E0E0"), Color(hex: "#A8A8A8"), Color(hex: "#E0E0E0")]
-        case .bronze: return [Color(hex: "#CD7F32"), Color(hex: "#A0522D"), Color(hex: "#CD7F32")]
-        }
-    }
-
-    private var tierSealColor: Color {
-        switch achievement.tier {
-        case .gold:   return Color(hex: "#FFD700")
-        case .silver: return Color(hex: "#C0C0C0")
-        case .bronze: return Color(hex: "#CD7F32")
         }
     }
 }
