@@ -115,7 +115,7 @@ struct SettingsView: View {
                         exportData()
                     }
                     Divider().overlay(theme.borderColor)
-                    settingsRow(icon: "trash", title: showClearConfirm ? "clear_confirm" : "clear_data", danger: true) {
+                    settingsRow(icon: "trash", title: LocalizedStringKey(showClearConfirm ? "clear_confirm" : "clear_data"), danger: true) {
                         if showClearConfirm {
                             store.clearAllData()
                             showClearConfirm = false
@@ -229,11 +229,11 @@ struct SettingsView: View {
                     Image(systemName: isPro ? "moon.stars.fill" : "sun.max.fill")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundColor(isSelected ? previewAccent : .gray)
-                    Text(isPro ? "mode_pro" : "mode_care")
+                    Text(LocalizedStringKey(isPro ? "mode_pro" : "mode_care"))
                         .font(.system(size: 13, weight: .semibold, design: .rounded))
                         .foregroundColor(isSelected ? previewLabel : .gray)
                 }
-                Text(isPro ? "mode_pro_desc" : "mode_care_desc")
+                Text(LocalizedStringKey(isPro ? "mode_pro_desc" : "mode_care_desc"))
                     .font(.system(size: 9, design: .rounded))
                     .foregroundColor(.gray)
                 HStack(spacing: 3) {

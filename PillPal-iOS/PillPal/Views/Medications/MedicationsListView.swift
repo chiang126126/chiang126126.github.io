@@ -167,7 +167,7 @@ struct MedicationsListView: View {
                             HStack(spacing: 4) {
                                 Image(systemName: med.isActive ? "pause.fill" : "play.fill")
                                     .font(.system(size: 12))
-                                Text(med.isActive ? "pause_med" : "resume_med")
+                                Text(LocalizedStringKey(med.isActive ? "pause_med" : "resume_med"))
                                     .font(.system(size: 13, weight: .medium))
                             }
                             .foregroundColor(theme.textColor)
