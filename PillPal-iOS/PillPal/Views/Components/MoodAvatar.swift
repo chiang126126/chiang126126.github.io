@@ -23,13 +23,11 @@ struct MoodAvatar: View {
 
     private var label: LocalizedStringKey {
         switch mood {
-        case .perfect:     return "mood_perfect"
-        case .happy:       return "mood_great"
-        case .celebrating: return "mood_perfect"
-        case .neutral:     return "mood_ok"
-        case .sad:         return "mood_come_on"
-        case .grumpy:      return "mood_really"
-        case .sleepy:      return "mood_ok"
+        case .perfect, .celebrating: return "mood_perfect"
+        case .happy, .eating:        return "mood_great"
+        case .neutral, .sleepy:      return "mood_ok"
+        case .eyeroll, .grumpy:      return "mood_really"
+        case .sad, .deflated:        return "mood_come_on"
         }
     }
 
