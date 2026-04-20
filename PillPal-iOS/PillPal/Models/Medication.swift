@@ -215,77 +215,115 @@ struct DailyMission: Identifiable {
     }
 }
 
-// MARK: - Achievement (expanded)
+// MARK: - Achievement (expanded with meme badges)
 enum Achievement: String, CaseIterable, Codable {
+    // Chapter 1: Getting Started
     case firstPill = "first_pill"
-    case weekStreak = "week_streak"
-    case monthStreak = "month_streak"
-    case perfectWeek = "perfect_week"
     case scanner = "scanner"
-    case level5 = "level_5_reached"
-    case level10 = "level_10_reached"
+
+    // Chapter 2: Dose Milestones
     case tenDoses = "ten_doses"
     case fiftyDoses = "fifty_doses"
     case hundredDoses = "hundred_doses"
+    case fiveHundredDoses = "five_hundred_doses"
+
+    // Chapter 3: Streak Champions
+    case weekStreak = "week_streak"
+    case monthStreak = "month_streak"
+    case quarterStreak = "quarter_streak"
+    case perfectWeek = "perfect_week"
+
+    // Chapter 4: Lifestyle
+    case morningPerson = "morning_person"
+    case nightOwl = "night_owl"
+    case pillCollector = "pill_collector"
+
+    // Chapter 5: Leveling Up
+    case level5 = "level_5_reached"
+    case level10 = "level_10_reached"
+
+    // Chapter 6: Anti-shame (Buddhist)
+    case yoloCasual = "yolo_casual"
+    case comebackKid = "comeback_kid"
+    case weekendWarrior = "weekend_warrior"
 
     var icon: String {
         switch self {
-        case .firstPill: return "star.fill"
-        case .weekStreak: return "flame.fill"
-        case .monthStreak: return "crown.fill"
-        case .perfectWeek: return "trophy.fill"
-        case .scanner: return "camera.viewfinder"
-        case .level5: return "bolt.fill"
-        case .level10: return "sparkles"
-        case .tenDoses: return "heart.fill"
-        case .fiftyDoses: return "shield.fill"
-        case .hundredDoses: return "star.circle.fill"
+        case .firstPill:        return "star.fill"
+        case .scanner:          return "eye.fill"
+        case .tenDoses:         return "leaf.fill"
+        case .fiftyDoses:       return "bolt.fill"
+        case .hundredDoses:     return "shield.fill"
+        case .fiveHundredDoses: return "sparkles"
+        case .weekStreak:       return "flame.fill"
+        case .monthStreak:      return "crown.fill"
+        case .quarterStreak:    return "flag.fill"
+        case .perfectWeek:      return "trophy.fill"
+        case .morningPerson:    return "sunrise.fill"
+        case .nightOwl:         return "moon.stars.fill"
+        case .pillCollector:    return "square.stack.3d.up.fill"
+        case .level5:           return "arrow.up.circle.fill"
+        case .level10:          return "star.circle.fill"
+        case .yoloCasual:       return "figure.mind.and.body"
+        case .comebackKid:      return "arrow.counterclockwise.circle.fill"
+        case .weekendWarrior:   return "cup.and.saucer.fill"
         }
     }
 
     var color: Color {
         switch self {
-        case .firstPill: return Color(hex: "#3B82F6")
-        case .weekStreak: return Color(hex: "#F97316")
-        case .monthStreak: return Color(hex: "#EAB308")
-        case .perfectWeek: return Color(hex: "#10B981")
-        case .scanner: return Color(hex: "#A855F7")
-        case .level5: return Color(hex: "#F97316")
-        case .level10: return Color(hex: "#8B5CF6")
-        case .tenDoses: return Color(hex: "#EC4899")
-        case .fiftyDoses: return Color(hex: "#22D3EE")
-        case .hundredDoses: return Color(hex: "#EF4444")
+        case .firstPill:        return Color(hex: "#4ADE80")
+        case .scanner:          return Color(hex: "#A855F7")
+        case .tenDoses:         return Color(hex: "#34D399")
+        case .fiftyDoses:       return Color(hex: "#F97316")
+        case .hundredDoses:     return Color(hex: "#EF4444")
+        case .fiveHundredDoses: return Color(hex: "#8B5CF6")
+        case .weekStreak:       return Color(hex: "#F97316")
+        case .monthStreak:      return Color(hex: "#EAB308")
+        case .quarterStreak:    return Color(hex: "#EC4899")
+        case .perfectWeek:      return Color(hex: "#10B981")
+        case .morningPerson:    return Color(hex: "#FB923C")
+        case .nightOwl:         return Color(hex: "#818CF8")
+        case .pillCollector:    return Color(hex: "#22D3EE")
+        case .level5:           return Color(hex: "#F97316")
+        case .level10:          return Color(hex: "#8B5CF6")
+        case .yoloCasual:       return Color(hex: "#6EE7B7")
+        case .comebackKid:      return Color(hex: "#F472B6")
+        case .weekendWarrior:   return Color(hex: "#FBBF24")
         }
-    }
-
-    var localizedName: String {
-        NSLocalizedString("achv_\(rawValue)", comment: "")
-    }
-
-    var localizedDesc: String {
-        NSLocalizedString("achv_\(rawValue)_desc", comment: "")
     }
 
     var xpReward: Int {
         switch self {
-        case .firstPill: return 25
-        case .weekStreak: return 70
-        case .monthStreak: return 300
-        case .perfectWeek: return 100
-        case .scanner: return 25
-        case .level5: return 50
-        case .level10: return 100
-        case .tenDoses: return 30
-        case .fiftyDoses: return 75
-        case .hundredDoses: return 150
+        case .firstPill:        return 25
+        case .scanner:          return 25
+        case .tenDoses:         return 30
+        case .fiftyDoses:       return 75
+        case .hundredDoses:     return 150
+        case .fiveHundredDoses: return 500
+        case .weekStreak:       return 70
+        case .monthStreak:      return 300
+        case .quarterStreak:    return 500
+        case .perfectWeek:      return 100
+        case .morningPerson:    return 50
+        case .nightOwl:         return 50
+        case .pillCollector:    return 40
+        case .level5:           return 50
+        case .level10:          return 100
+        case .yoloCasual:       return 20
+        case .comebackKid:      return 30
+        case .weekendWarrior:   return 15
         }
     }
 
     var tier: AchievementTier {
         switch self {
-        case .firstPill, .scanner, .tenDoses: return .bronze
-        case .weekStreak, .perfectWeek, .fiftyDoses, .level5: return .silver
-        case .monthStreak, .hundredDoses, .level10: return .gold
+        case .firstPill, .scanner, .tenDoses, .weekendWarrior:
+            return .bronze
+        case .weekStreak, .perfectWeek, .fiftyDoses, .level5, .morningPerson, .nightOwl, .yoloCasual, .comebackKid, .pillCollector:
+            return .silver
+        case .monthStreak, .quarterStreak, .hundredDoses, .fiveHundredDoses, .level10:
+            return .gold
         }
     }
 }

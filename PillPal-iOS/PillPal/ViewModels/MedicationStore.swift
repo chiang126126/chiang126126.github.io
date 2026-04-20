@@ -150,6 +150,9 @@ final class MedicationStore {
         if !achievements.contains(.firstPill) {
             unlockAchievement(.firstPill)
         }
+        if !achievements.contains(.pillCollector) && medications.filter(\.isActive).count >= 5 {
+            unlockAchievement(.pillCollector)
+        }
         awardXP(XPReward.addMedication)
         save()
     }
@@ -184,6 +187,7 @@ final class MedicationStore {
         }
 
         recalculateStreak()
+        checkLifestyleAchievements()
 
         // Check if all daily done
         let schedule = todaySchedule()
@@ -247,6 +251,9 @@ final class MedicationStore {
                 unlockAchievement(.monthStreak)
                 awardXP(XPReward.streak30)
             }
+            if streak >= 90 && !achievements.contains(.quarterStreak) {
+                unlockAchievement(.quarterStreak)
+            }
         }
     }
 
@@ -268,6 +275,9 @@ final class MedicationStore {
         if taken >= 100 && !achievements.contains(.hundredDoses) {
             unlockAchievement(.hundredDoses)
         }
+        if taken >= 500 && !achievements.contains(.fiveHundredDoses) {
+            unlockAchievement(.fiveHundredDoses)
+        }
     }
 
     private func checkLevelAchievements() {
@@ -277,6 +287,70 @@ final class MedicationStore {
         }
         if lvl >= 10 && !achievements.contains(.level10) {
             unlockAchievement(.level10)
+        }
+    }
+
+    private func checkLifestyleAchievements() {
+        // Morning Person: taken morning meds on 7+ different days
+        if !achievements.contains(.morningPerson) {
+            let morningMedIds = Set(medications.filter { $0.timeOfDay == .morning && $0.isActive }.map(\.id))
+            if !morningMedIds.isEmpty {
+                let morningLogs = logs.filter { morningMedIds.contains($0.medicationId) && $0.status == .taken }
+                let uniqueDays = Set(morningLogs.map(\.dateString))
+                if uniqueDays.count >= 7 { unlockAchievement(.morningPerson) }
+            }
+        }
+
+        // Night Owl: taken bedtime meds on 7+ different days
+        if !achievements.contains(.nightOwl) {
+            let bedtimeMedIds = Set(medications.filter { $0.timeOfDay == .bedtime && $0.isActive }.map(\.id))
+            if !bedtimeMedIds.isEmpty {
+                let bedtimeLogs = logs.filter { bedtimeMedIds.contains($0.medicationId) && $0.status == .taken }
+                let uniqueDays = Set(bedtimeLogs.map(\.dateString))
+                if uniqueDays.count >= 7 { unlockAchievement(.nightOwl) }
+            }
+        }
+
+        // Pill Collector: 5+ active medications
+        if !achievements.contains(.pillCollector) {
+            if medications.filter(\.isActive).count >= 5 {
+                unlockAchievement(.pillCollector)
+            }
+        }
+
+        // Weekend Warrior: taken meds on a weekend day
+        if !achievements.contains(.weekendWarrior) {
+            let weekday = Calendar.current.component(.weekday, from: Date())
+            if (weekday == 1 || weekday == 7) && logs.contains(where: { $0.dateString == todayString() && $0.status == .taken }) {
+                unlockAchievement(.weekendWarrior)
+            }
+        }
+
+        // YOLO Casual: 30%+ skip rate over 30+ logged doses (anti-shame badge)
+        if !achievements.contains(.yoloCasual) {
+            if logs.count >= 30 {
+                let skipped = logs.filter { $0.status == .skipped }.count
+                if Double(skipped) / Double(logs.count) >= 0.3 {
+                    unlockAchievement(.yoloCasual)
+                }
+            }
+        }
+
+        // Comeback Kid: logged a dose after 3+ day gap
+        if !achievements.contains(.comebackKid) {
+            let takenDates = Set(logs.filter { $0.status == .taken }.map(\.dateString)).sorted()
+            if takenDates.count >= 2 {
+                let df = DateFormatter()
+                df.dateFormat = "yyyy-MM-dd"
+                for i in 1..<takenDates.count {
+                    if let d1 = df.date(from: takenDates[i - 1]),
+                       let d2 = df.date(from: takenDates[i]),
+                       Calendar.current.dateComponents([.day], from: d1, to: d2).day ?? 0 >= 3 {
+                        unlockAchievement(.comebackKid)
+                        break
+                    }
+                }
+            }
         }
     }
 
