@@ -61,11 +61,7 @@ struct StatsView: View {
                         }
                         .padding(14)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background {
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(theme.cardColor)
-                                .overlay { RoundedRectangle(cornerRadius: 16).stroke(theme.borderColor, lineWidth: 1) }
-                        }
+                        .card3D(theme, radius: 16)
                         .gridCellColumns(index == 0 ? 2 : 1)
                     }
                 }
@@ -81,11 +77,7 @@ struct StatsView: View {
                     WeeklyChartView(data: store.weeklyStats())
                 }
                 .padding(16)
-                .background {
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(theme.cardColor)
-                        .overlay { RoundedRectangle(cornerRadius: 16).stroke(theme.borderColor, lineWidth: 1) }
-                }
+                .card3D(theme, radius: 16)
 
                 // Achievements
                 achievementsSection
@@ -148,13 +140,22 @@ struct StatsView: View {
         }
         .padding(16)
         .background {
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .fill(theme.cardColor)
-                .overlay {
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(level.color.opacity(0.3), lineWidth: 1.5)
-                }
-                .shadow(color: level.color.opacity(0.1), radius: 8)
+                .shadow(color: Color.black.opacity(0.04), radius: 1, y: 1)
+                .shadow(color: level.color.opacity(0.12), radius: 8, y: 4)
+                .shadow(color: level.color.opacity(0.06), radius: 20, y: 8)
+        }
+        .overlay {
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(
+                    LinearGradient(
+                        colors: [level.color.opacity(0.4), level.color.opacity(0.15)],
+                        startPoint: .topLeading, endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1.5
+                )
+                .allowsHitTesting(false)
         }
     }
 
@@ -168,11 +169,7 @@ struct StatsView: View {
             xpStatItem("flame.fill", "xp_streak_7", "+\(XPReward.streak7)", Color(hex: "#FB923C"))
         }
         .padding(12)
-        .background {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(theme.cardColor)
-                .overlay { RoundedRectangle(cornerRadius: 16).stroke(theme.borderColor, lineWidth: 1) }
-        }
+        .card3D(theme, radius: 16)
     }
 
     private func xpStatItem(_ sfSymbol: String, _ key: LocalizedStringKey, _ value: String, _ color: Color) -> some View {
@@ -215,10 +212,6 @@ struct StatsView: View {
             }
         }
         .padding(16)
-        .background {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(theme.cardColor)
-                .overlay { RoundedRectangle(cornerRadius: 16).stroke(theme.borderColor, lineWidth: 1) }
-        }
+        .card3D(theme, radius: 16)
     }
 }

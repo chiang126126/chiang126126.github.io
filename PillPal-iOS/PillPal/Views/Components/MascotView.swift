@@ -91,12 +91,17 @@ struct MascotView: View {
             }
 
             ZStack {
-                // Shadow
+                // Ground shadow — 3D contact
                 Ellipse()
-                    .fill(Color.black.opacity(0.08))
-                    .frame(width: bodyWidth * (isDeflated ? 1.1 : 0.8), height: size * 0.06)
+                    .fill(
+                        RadialGradient(
+                            colors: [Color.black.opacity(0.15), Color.black.opacity(0.04), Color.clear],
+                            center: .center, startRadius: 0, endRadius: bodyWidth * 0.5
+                        )
+                    )
+                    .frame(width: bodyWidth * (isDeflated ? 1.2 : 1.0), height: size * 0.1)
                     .offset(y: bodyHeight * 0.52)
-                    .blur(radius: 3)
+                    .blur(radius: 4)
 
                 // Capsule body
                 capsuleBody
@@ -127,25 +132,25 @@ struct MascotView: View {
         .onAppear { breathe = true; blink = true }
     }
 
-    // MARK: - Capsule Body (Two-tone gummy)
+    // MARK: - Capsule Body (2.5D gummy)
     private var capsuleBody: some View {
         ZStack {
-            // Bottom half (warm peach)
+            // Bottom half — 3D shaded
             Capsule()
                 .fill(
                     LinearGradient(
-                        colors: [mood.bottomColor, mood.bottomColor.opacity(0.85)],
-                        startPoint: .leading, endPoint: .trailing
+                        colors: [mood.bottomColor, mood.bottomColor.opacity(0.82)],
+                        startPoint: .topLeading, endPoint: .bottomTrailing
                     )
                 )
                 .frame(width: bodyWidth, height: bodyHeight)
 
-            // Top half (vibrant green, masked)
+            // Top half (masked) — lighter leading edge
             Capsule()
                 .fill(
                     LinearGradient(
-                        colors: [mood.topColor.opacity(0.95), mood.topColor],
-                        startPoint: .top, endPoint: .bottom
+                        colors: [mood.topColor, mood.topColor.opacity(0.88)],
+                        startPoint: .topLeading, endPoint: .bottomTrailing
                     )
                 )
                 .frame(width: bodyWidth, height: bodyHeight)
@@ -156,30 +161,54 @@ struct MascotView: View {
                     }
                 }
 
-            // Capsule outline
+            // Ambient occlusion (bottom edge darkening)
             Capsule()
-                .stroke(mood.topColor.opacity(0.4), lineWidth: 1.5)
+                .fill(
+                    LinearGradient(
+                        colors: [Color.clear, Color.clear, Color.black.opacity(0.06)],
+                        startPoint: .top, endPoint: .bottom
+                    )
+                )
                 .frame(width: bodyWidth, height: bodyHeight)
 
-            // Seam line at midpoint
+            // 3D rim — gradient stroke
             Capsule()
-                .fill(mood.topColor.opacity(0.2))
-                .frame(width: bodyWidth * 0.88, height: 1.2)
+                .stroke(
+                    LinearGradient(
+                        colors: [Color.white.opacity(0.6), mood.bottomColor.opacity(0.25)],
+                        startPoint: .topLeading, endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1.5
+                )
+                .frame(width: bodyWidth, height: bodyHeight)
 
-            // Gummy highlight (top-left shine)
+            // Seam line
             Capsule()
-                .fill(Color.white.opacity(0.4))
-                .frame(width: bodyWidth * 0.2, height: bodyHeight * 0.35)
-                .offset(x: -bodyWidth * 0.18, y: -bodyHeight * 0.2)
+                .fill(mood.bottomColor.opacity(0.25))
+                .frame(width: bodyWidth * 0.88, height: 1.5)
+
+            // Main specular highlight (top-left gloss)
+            Ellipse()
+                .fill(
+                    RadialGradient(
+                        colors: [Color.white.opacity(0.65), Color.white.opacity(0.1), Color.clear],
+                        center: UnitPoint(x: 0.35, y: 0.25),
+                        startRadius: 0,
+                        endRadius: bodyWidth * 0.45
+                    )
+                )
+                .frame(width: bodyWidth * 0.75, height: bodyHeight * 0.55)
+                .offset(x: -bodyWidth * 0.08, y: -bodyHeight * 0.15)
+
+            // Rim light (right edge depth)
+            Capsule()
+                .fill(Color.white.opacity(0.18))
+                .frame(width: bodyWidth * 0.1, height: bodyHeight * 0.2)
+                .offset(x: bodyWidth * 0.22, y: -bodyHeight * 0.06)
                 .blur(radius: 2)
-
-            // Secondary highlight (subtle right)
-            Capsule()
-                .fill(Color.white.opacity(0.12))
-                .frame(width: bodyWidth * 0.08, height: bodyHeight * 0.12)
-                .offset(x: bodyWidth * 0.2, y: -bodyHeight * 0.08)
-                .blur(radius: 1)
         }
+        .shadow(color: mood.bottomColor.opacity(0.3), radius: 8, y: 5)
+        .shadow(color: Color.black.opacity(0.08), radius: 16, y: 10)
     }
 
     // MARK: - Breathing Animation
@@ -505,5 +534,5 @@ struct BubbleTail: Shape {
         MascotView(mood: .sleepy, size: 100)
     }
     .padding()
-    .background(Color(hex: "#FDF2F8"))
+    .background(Color(hex: "#EFF4FB"))
 }

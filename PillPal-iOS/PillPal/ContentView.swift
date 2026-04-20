@@ -133,9 +133,8 @@ struct CustomTabBar: View {
         .background {
             Rectangle()
                 .fill(theme.cardColor.opacity(0.95))
-                .overlay(alignment: .top) {
-                    Divider().opacity(0.3)
-                }
+                .shadow(color: Color.black.opacity(0.06), radius: 8, y: -3)
+                .shadow(color: Color.black.opacity(0.03), radius: 20, y: -6)
                 .background(.ultraThinMaterial)
                 .ignoresSafeArea()
         }

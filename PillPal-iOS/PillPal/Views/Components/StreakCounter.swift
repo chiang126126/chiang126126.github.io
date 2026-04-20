@@ -46,14 +46,7 @@ struct StreakCounter: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background {
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(theme.cardColor)
-                .overlay {
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .stroke(theme.borderColor, lineWidth: 1)
-                }
-                .shadow(color: isOnFire ? Color(hex: "#FB923C").opacity(0.18) : Color.black.opacity(0.05), radius: 12, y: 4)
-        }
+        .card3D(theme)
+        .shadow(color: isOnFire ? Color(hex: "#FB923C").opacity(0.18) : .clear, radius: 12, y: 4)
     }
 }

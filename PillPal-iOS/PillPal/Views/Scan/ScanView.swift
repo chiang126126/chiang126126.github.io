@@ -132,14 +132,7 @@ struct ScanView: View {
                         .foregroundColor(theme.mutedColor)
                 }
                 .padding(14)
-                .background {
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .fill(theme.cardColor)
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                .stroke(theme.borderColor, lineWidth: 1)
-                        }
-                }
+                .card3D(theme)
             }
             .buttonStyle(.plain)
         }
@@ -154,7 +147,7 @@ struct ScanView: View {
                     .fill(
                         theme.isPro
                         ? LinearGradient(colors: [Color(hex: "#1A1A1A"), Color(hex: "#0A0A0A")], startPoint: .topLeading, endPoint: .bottomTrailing)
-                        : LinearGradient(colors: [Color(hex: "#FFF8EE"), Color(hex: "#FDF6E3")], startPoint: .topLeading, endPoint: .bottomTrailing)
+                        : LinearGradient(colors: [Color(hex: "#EDF2FA"), Color(hex: "#E4EBFA")], startPoint: .topLeading, endPoint: .bottomTrailing)
                     )
                     .overlay {
                         RoundedRectangle(cornerRadius: 24, style: .continuous)
@@ -238,14 +231,7 @@ struct ScanView: View {
                     resultRow("food_label_short", value: LocalizedStringKey(result.foodRelation.localizationKey))
                 }
                 .padding(16)
-                .background {
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .fill(theme.cardColor)
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                .stroke(theme.borderColor, lineWidth: 1)
-                        }
-                }
+                .card3D(theme)
 
                 // Actions
                 HStack(spacing: 12) {

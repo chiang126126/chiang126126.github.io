@@ -95,14 +95,7 @@ struct DashboardView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
-                .background {
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .fill(theme.cardColor)
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .stroke(theme.borderColor, lineWidth: 1)
-                        }
-                }
+                .card3D(theme, radius: 16)
 
                 BubbleTail()
                     .fill(theme.cardColor)
@@ -186,11 +179,7 @@ struct DashboardView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
-        .background {
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(theme.cardColor)
-                .overlay { RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(theme.borderColor, lineWidth: 1) }
-        }
+        .card3D(theme)
     }
 
     // MARK: - Feed List
@@ -271,12 +260,7 @@ struct DashboardView: View {
                     }
                 }
                 .padding(14)
-                .background {
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .fill(theme.cardColor)
-                        .overlay { RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(theme.borderColor, lineWidth: 1) }
-                        .shadow(color: Color.black.opacity(0.04), radius: 8, y: 3)
-                }
+                .card3D(theme)
                 .opacity(taken ? 0.7 : 1)
                 .animation(.spring(response: 0.3), value: taken)
             }

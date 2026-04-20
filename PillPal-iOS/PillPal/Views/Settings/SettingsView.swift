@@ -199,17 +199,26 @@ struct SettingsView: View {
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background {
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(
                     LinearGradient(
                         colors: [theme.accentColor.opacity(0.08), theme.neonPurple.opacity(0.08)],
                         startPoint: .topLeading, endPoint: .bottomTrailing
                     )
                 )
-                .overlay {
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(theme.accentColor.opacity(0.2), lineWidth: 1)
-                }
+                .shadow(color: Color.black.opacity(0.04), radius: 1, y: 1)
+                .shadow(color: theme.accentColor.opacity(0.08), radius: 8, y: 4)
+        }
+        .overlay {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(
+                    LinearGradient(
+                        colors: [Color.white.opacity(0.5), theme.accentColor.opacity(0.15)],
+                        startPoint: .topLeading, endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+                .allowsHitTesting(false)
         }
     }
 
@@ -217,9 +226,9 @@ struct SettingsView: View {
     private func modeCard(_ m: AppMode) -> some View {
         let isSelected = theme.mode == m
         let isPro = m == .pro
-        let previewBg = isPro ? Color(hex: "#110A1F") : Color(hex: "#FFFDF8")
+        let previewBg = isPro ? Color(hex: "#110A1F") : Color(hex: "#EFF4FB")
         let previewAccent = isPro ? Color(hex: "#A78BFA") : Color(hex: "#D4962E")
-        let previewLabel = isPro ? Color.white : Color(hex: "#4F4B47")
+        let previewLabel = isPro ? Color.white : Color(hex: "#3A4856")
         return Button {
             withAnimation(.spring(response: 0.3)) { theme.mode = m }
             UIImpactFeedbackGenerator(style: .medium).impactOccurred()
@@ -297,11 +306,7 @@ struct SettingsView: View {
                 .foregroundColor(theme.mutedColor)
                 .padding(.leading, 4)
             VStack(spacing: 0) { content() }
-            .background {
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(theme.cardColor)
-                    .overlay { RoundedRectangle(cornerRadius: 16).stroke(theme.borderColor, lineWidth: 1) }
-            }
+            .card3D(theme, radius: 16)
         }
     }
 

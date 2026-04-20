@@ -64,26 +64,37 @@ struct BubblePopButton: View {
                             LinearGradient(
                                 colors: done
                                     ? [theme.surfaceColor, theme.surfaceColor]
-                                    : [medication.color.opacity(0.18), medication.color.opacity(0.08)],
+                                    : [medication.color.opacity(0.2), medication.color.opacity(0.06)],
                                 startPoint: .topLeading, endPoint: .bottomTrailing
                             )
                         )
+                        .overlay {
+                            Circle()
+                                .fill(
+                                    RadialGradient(
+                                        colors: done
+                                            ? [Color.clear]
+                                            : [Color.white.opacity(0.35), Color.clear],
+                                        center: UnitPoint(x: 0.35, y: 0.3),
+                                        startRadius: 0,
+                                        endRadius: size * 0.4
+                                    )
+                                )
+                        }
                         .overlay {
                             Circle()
                                 .stroke(
                                     LinearGradient(
                                         colors: done
                                             ? [theme.borderColor, theme.borderColor]
-                                            : [medication.color, medication.color.opacity(0.5)],
+                                            : [Color.white.opacity(0.6), medication.color.opacity(0.35)],
                                         startPoint: .topLeading, endPoint: .bottomTrailing
                                     ),
                                     lineWidth: 2.5
                                 )
                         }
-                        .shadow(
-                            color: done ? .clear : medication.color.opacity(0.3),
-                            radius: 10, y: 3
-                        )
+                        .shadow(color: done ? .clear : medication.color.opacity(0.15), radius: 2, y: 1)
+                        .shadow(color: done ? .clear : medication.color.opacity(0.25), radius: 10, y: 4)
                 }
                 .scaleEffect(isPopping ? 0.7 : (gulpPhase ? 1.12 : 1))
                 .opacity(done ? 0.55 : 1)

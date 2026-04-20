@@ -210,11 +210,7 @@ struct MedicationsListView: View {
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
-        .background {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(theme.cardColor)
-                .overlay { RoundedRectangle(cornerRadius: 16).stroke(theme.borderColor, lineWidth: 1) }
-        }
+        .card3D(theme, radius: 16)
         .opacity(med.isActive ? 1 : 0.6)
         .animation(.spring(response: 0.3), value: isExpanded)
     }
