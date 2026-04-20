@@ -217,9 +217,9 @@ struct SettingsView: View {
     private func modeCard(_ m: AppMode) -> some View {
         let isSelected = theme.mode == m
         let isPro = m == .pro
-        let previewBg = isPro ? Color(hex: "#110A1F") : Color(hex: "#FFF7F2")
-        let previewAccent = isPro ? Color(hex: "#A78BFA") : Color(hex: "#8B5CF6")
-        let previewLabel = isPro ? Color.white : Color(hex: "#3B2A4F")
+        let previewBg = isPro ? Color(hex: "#110A1F") : Color(hex: "#FFFDF8")
+        let previewAccent = isPro ? Color(hex: "#A78BFA") : Color(hex: "#D4962E")
+        let previewLabel = isPro ? Color.white : Color(hex: "#4F4B47")
         return Button {
             withAnimation(.spring(response: 0.3)) { theme.mode = m }
             UIImpactFeedbackGenerator(style: .medium).impactOccurred()
@@ -239,7 +239,7 @@ struct SettingsView: View {
                 HStack(spacing: 3) {
                     let colors = isPro
                         ? ["#A78BFA", "#F472B6", "#3B2A5E"]
-                        : ["#E9D5FF", "#FBCFE8", "#FEF3C7"]
+                        : ["#FFD76A", "#BFE8D2", "#FFB89A"]
                     ForEach(colors, id: \.self) { c in
                         Circle().fill(Color(hex: c)).frame(width: 12, height: 12)
                             .overlay { Circle().stroke(Color.white.opacity(0.3), lineWidth: 0.5) }

@@ -15,38 +15,38 @@ enum MascotMood: String {
         return .sleepy
     }
 
-    // Capsule top half (head) color
+    // Capsule top half (head) — cream body, paler when low energy
     var topColor: Color {
         switch self {
-        case .deflated:    return Color(hex: "#9CC5A0")
-        case .sleepy:      return Color(hex: "#A3C9AE")
-        default:           return Color(hex: "#4ADE80")
+        case .deflated:    return Color(hex: "#F0EDE7")
+        case .sleepy:      return Color(hex: "#EDE9E3")
+        default:           return Color(hex: "#FFF7EC")
         }
     }
 
-    // Capsule bottom half (body) color
+    // Capsule bottom half (body) — slightly warmer than top
     var bottomColor: Color {
         switch self {
-        case .deflated:    return Color(hex: "#D4B89C")
-        case .sleepy:      return Color(hex: "#D8C4B0")
-        default:           return Color(hex: "#FDBA74")
+        case .deflated:    return Color(hex: "#E8E3DC")
+        case .sleepy:      return Color(hex: "#E5E1DB")
+        default:           return Color(hex: "#FFF0E0")
         }
     }
 
-    var cheekColor: Color { Color(hex: "#FCA5A5").opacity(0.55) }
+    var cheekColor: Color { Color(hex: "#FFCCB6").opacity(0.7) }
 
     var accentColor: Color {
         switch self {
-        case .perfect:     return Color(hex: "#22C55E")
-        case .happy:       return Color(hex: "#4ADE80")
-        case .celebrating: return Color(hex: "#F59E0B")
-        case .neutral:     return Color(hex: "#6EE7B7")
-        case .eyeroll:     return Color(hex: "#F43F5E")
-        case .deflated:    return Color(hex: "#94A3B8")
-        case .eating:      return Color(hex: "#F59E0B")
-        case .sad:         return Color(hex: "#F472B6")
-        case .grumpy:      return Color(hex: "#EF4444")
-        case .sleepy:      return Color(hex: "#818CF8")
+        case .perfect:     return Color(hex: "#F6C85F")
+        case .happy:       return Color(hex: "#7BC5A0")
+        case .celebrating: return Color(hex: "#F6C85F")
+        case .neutral:     return Color(hex: "#BFE8D2")
+        case .eyeroll:     return Color(hex: "#FFB89A")
+        case .deflated:    return Color(hex: "#8F8A84")
+        case .eating:      return Color(hex: "#F6C85F")
+        case .sad:         return Color(hex: "#FFCCB6")
+        case .grumpy:      return Color(hex: "#FFB89A")
+        case .sleepy:      return Color(hex: "#BFE8D2")
         }
     }
 
@@ -226,18 +226,18 @@ struct MascotView: View {
         case .perfect:
             Image(systemName: "star.fill")
                 .font(.system(size: size * 0.12))
-                .foregroundColor(Color(hex: "#F59E0B"))
+                .foregroundColor(Color(hex: "#FFD76A"))
         case .celebrating:
             HappyArc()
-                .stroke(Color(hex: "#2D3A2D"), style: StrokeStyle(lineWidth: 2.2, lineCap: .round))
+                .stroke(Color(hex: "#5D5A57"), style: StrokeStyle(lineWidth: 2.2, lineCap: .round))
                 .frame(width: size * 0.12, height: size * 0.06)
         case .sleepy:
             Capsule()
-                .fill(Color(hex: "#2D3A2D"))
+                .fill(Color(hex: "#5D5A57"))
                 .frame(width: size * 0.12, height: size * 0.02)
         case .grumpy:
             Capsule()
-                .fill(Color(hex: "#1F2937"))
+                .fill(Color(hex: "#5D5A57"))
                 .frame(width: size * 0.1, height: size * 0.055)
                 .rotationEffect(.degrees(side == .left ? 12 : -12))
         case .eyeroll:
@@ -245,23 +245,23 @@ struct MascotView: View {
                 Circle()
                     .fill(Color.white)
                     .frame(width: size * 0.11, height: size * 0.11)
-                    .overlay(Circle().stroke(Color(hex: "#2D3A2D"), lineWidth: 1.5))
+                    .overlay(Circle().stroke(Color(hex: "#5D5A57"), lineWidth: 1.5))
                 Circle()
-                    .fill(Color(hex: "#1F2937"))
+                    .fill(Color(hex: "#5D5A57"))
                     .frame(width: size * 0.05, height: size * 0.05)
                     .offset(y: -size * 0.025)
             }
         case .deflated:
             Capsule()
-                .fill(Color(hex: "#2D3A2D").opacity(0.5))
+                .fill(Color(hex: "#5D5A57").opacity(0.5))
                 .frame(width: size * 0.11, height: size * 0.02)
         case .eating:
             HappyArc()
-                .stroke(Color(hex: "#2D3A2D"), style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                .stroke(Color(hex: "#5D5A57"), style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
                 .frame(width: size * 0.13, height: size * 0.07)
         case .sad:
             Circle()
-                .fill(Color(hex: "#1F2937"))
+                .fill(Color(hex: "#5D5A57"))
                 .frame(width: size * 0.065, height: size * 0.065)
                 .overlay(alignment: .bottom) {
                     TearShape()
@@ -272,7 +272,7 @@ struct MascotView: View {
         default:
             ZStack {
                 Circle()
-                    .fill(Color(hex: "#1F2937"))
+                    .fill(Color(hex: "#5D5A57"))
                     .frame(width: size * 0.09, height: size * 0.09)
                 Circle()
                     .fill(Color.white)
@@ -289,24 +289,24 @@ struct MascotView: View {
         switch mood {
         case .perfect, .celebrating:
             SmileShape()
-                .stroke(Color(hex: "#2D3A2D"), style: StrokeStyle(lineWidth: 2.4, lineCap: .round))
+                .stroke(Color(hex: "#5D5A57"), style: StrokeStyle(lineWidth: 2.4, lineCap: .round))
                 .frame(width: size * 0.2, height: size * 0.1)
         case .happy:
             CatMouth()
-                .stroke(Color(hex: "#2D3A2D"), style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                .stroke(Color(hex: "#5D5A57"), style: StrokeStyle(lineWidth: 2, lineCap: .round))
                 .frame(width: size * 0.14, height: size * 0.06)
         case .neutral:
             CatMouth()
-                .stroke(Color(hex: "#2D3A2D"), style: StrokeStyle(lineWidth: 1.8, lineCap: .round))
+                .stroke(Color(hex: "#5D5A57"), style: StrokeStyle(lineWidth: 1.8, lineCap: .round))
                 .frame(width: size * 0.1, height: size * 0.04)
         case .eyeroll:
             WavyMouth()
-                .stroke(Color(hex: "#2D3A2D"), style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                .stroke(Color(hex: "#5D5A57"), style: StrokeStyle(lineWidth: 2, lineCap: .round))
                 .frame(width: size * 0.14, height: size * 0.04)
         case .eating:
             ZStack {
                 Ellipse()
-                    .fill(Color(hex: "#1F2937"))
+                    .fill(Color(hex: "#5D5A57"))
                     .frame(width: size * 0.22, height: size * 0.2)
                 Ellipse()
                     .fill(Color(hex: "#F87171"))
@@ -315,16 +315,16 @@ struct MascotView: View {
             }
         case .deflated:
             Circle()
-                .stroke(Color(hex: "#2D3A2D").opacity(0.5), lineWidth: 1.5)
+                .stroke(Color(hex: "#5D5A57").opacity(0.5), lineWidth: 1.5)
                 .frame(width: size * 0.04, height: size * 0.04)
         case .grumpy, .sad:
             SmileShape()
-                .stroke(Color(hex: "#2D3A2D"), style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                .stroke(Color(hex: "#5D5A57"), style: StrokeStyle(lineWidth: 2, lineCap: .round))
                 .frame(width: size * 0.14, height: size * 0.05)
                 .rotationEffect(.degrees(180))
         case .sleepy:
             Circle()
-                .stroke(Color(hex: "#2D3A2D"), lineWidth: 1.5)
+                .stroke(Color(hex: "#5D5A57"), lineWidth: 1.5)
                 .frame(width: size * 0.04, height: size * 0.04)
         }
     }
@@ -336,7 +336,7 @@ struct MascotView: View {
         case .celebrating:
             ForEach(0..<6, id: \.self) { i in
                 Circle()
-                    .fill([Color(hex: "#F472B6"), Color(hex: "#60A5FA"), Color(hex: "#FBBF24"), Color(hex: "#34D399")][i % 4])
+                    .fill([Color(hex: "#FFD76A"), Color(hex: "#FFB89A"), Color(hex: "#BFE8D2"), Color(hex: "#FFCCB6")][i % 4])
                     .frame(width: size * 0.04, height: size * 0.04)
                     .offset(
                         x: size * [-0.4, -0.25, 0.25, 0.4, -0.35, 0.35][i],
@@ -355,34 +355,34 @@ struct MascotView: View {
         case .grumpy, .eyeroll:
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: size * 0.12))
-                .foregroundColor(Color(hex: "#EF4444").opacity(0.8))
+                .foregroundColor(Color(hex: "#FFB89A").opacity(0.9))
                 .offset(x: size * 0.32, y: -size * 0.35)
         case .perfect:
             ZStack {
                 Image(systemName: "sparkles")
                     .font(.system(size: size * 0.14))
-                    .foregroundColor(Color(hex: "#F59E0B"))
+                    .foregroundColor(Color(hex: "#FFD76A"))
                     .offset(x: size * 0.35, y: -size * 0.35)
                 Image(systemName: "sparkle")
                     .font(.system(size: size * 0.08))
-                    .foregroundColor(Color(hex: "#4ADE80"))
+                    .foregroundColor(Color(hex: "#BFE8D2"))
                     .offset(x: -size * 0.38, y: -size * 0.28)
             }
         case .eating:
             ZStack {
                 Image(systemName: "sparkle")
                     .font(.system(size: size * 0.09, weight: .bold))
-                    .foregroundColor(Color(hex: "#FBBF24"))
+                    .foregroundColor(Color(hex: "#FFD76A"))
                     .offset(x: size * 0.32, y: -size * 0.32)
                 Image(systemName: "sparkle")
                     .font(.system(size: size * 0.07, weight: .bold))
-                    .foregroundColor(Color(hex: "#4ADE80"))
+                    .foregroundColor(Color(hex: "#BFE8D2"))
                     .offset(x: -size * 0.35, y: -size * 0.28)
             }
         case .deflated:
             Image(systemName: "leaf.fill")
                 .font(.system(size: size * 0.1))
-                .foregroundColor(Color(hex: "#86EFAC").opacity(0.6))
+                .foregroundColor(Color(hex: "#BFE8D2").opacity(0.6))
                 .offset(x: size * 0.3, y: -size * 0.22)
         default:
             EmptyView()

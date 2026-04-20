@@ -16,8 +16,8 @@ struct LevelUpOverlay: View {
     }
 
     private let rainbowColors: [Color] = [
-        Color(hex: "#F472B6"), Color(hex: "#FB923C"), Color(hex: "#FBBF24"),
-        Color(hex: "#34D399"), Color(hex: "#60A5FA"), Color(hex: "#A78BFA")
+        Color(hex: "#FFD76A"), Color(hex: "#FFB89A"), Color(hex: "#FFCCB6"),
+        Color(hex: "#BFE8D2"), Color(hex: "#7BC5A0"), Color(hex: "#F6C85F")
     ]
 
     var body: some View {

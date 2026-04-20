@@ -19,8 +19,8 @@ struct BubblePopButton: View {
     private var size: CGFloat { theme.isCare ? 60 : 48 }
 
     private let confettiColors: [Color] = [
-        Color(hex: "#A78BFA"), Color(hex: "#F472B6"), Color(hex: "#FBBF24"),
-        Color(hex: "#34D399"), Color(hex: "#60A5FA"), Color(hex: "#FB923C")
+        Color(hex: "#FFD76A"), Color(hex: "#FFB89A"), Color(hex: "#BFE8D2"),
+        Color(hex: "#FFCCB6"), Color(hex: "#7BC5A0"), Color(hex: "#F6C85F")
     ]
 
     var body: some View {
@@ -108,8 +108,8 @@ struct BubblePopButton: View {
                     Text("+\(XPReward.takeDose)")
                 }
                 .font(.system(size: 13, weight: .heavy, design: .rounded))
-                .foregroundColor(Color(hex: "#FBBF24"))
-                .shadow(color: Color(hex: "#FBBF24").opacity(0.6), radius: 4)
+                .foregroundColor(Color(hex: "#F6C85F"))
+                .shadow(color: Color(hex: "#F6C85F").opacity(0.6), radius: 4)
                 .offset(y: -size / 2 - 12 + xpOffset)
                 .transition(.scale.combined(with: .opacity))
             }
