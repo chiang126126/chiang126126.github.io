@@ -226,9 +226,9 @@ struct SettingsView: View {
     private func modeCard(_ m: AppMode) -> some View {
         let isSelected = theme.mode == m
         let isPro = m == .pro
-        let previewBg = isPro ? Color(hex: "#110A1F") : Color(hex: "#EFF4FB")
+        let previewBg = isPro ? Color(hex: "#110A1F") : Color(hex: "#F5FAFF")
         let previewAccent = isPro ? Color(hex: "#A78BFA") : Color(hex: "#D4962E")
-        let previewLabel = isPro ? Color.white : Color(hex: "#3A4856")
+        let previewLabel = isPro ? Color.white : Color(hex: "#2D4356")
         return Button {
             withAnimation(.spring(response: 0.3)) { theme.mode = m }
             UIImpactFeedbackGenerator(style: .medium).impactOccurred()

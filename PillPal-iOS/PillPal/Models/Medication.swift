@@ -249,23 +249,23 @@ enum Achievement: String, CaseIterable, Codable {
 
     var icon: String {
         switch self {
-        case .firstPill:        return "star.fill"
-        case .scanner:          return "eye.fill"
-        case .tenDoses:         return "leaf.fill"
-        case .fiftyDoses:       return "bolt.fill"
-        case .hundredDoses:     return "shield.fill"
+        case .firstPill:        return "wand.and.stars"
+        case .scanner:          return "qrcode.viewfinder"
+        case .tenDoses:         return "heart.fill"
+        case .fiftyDoses:       return "bolt.circle.fill"
+        case .hundredDoses:     return "checkmark.seal.fill"
         case .fiveHundredDoses: return "sparkles"
         case .weekStreak:       return "flame.fill"
         case .monthStreak:      return "crown.fill"
-        case .quarterStreak:    return "flag.fill"
+        case .quarterStreak:    return "medal.fill"
         case .perfectWeek:      return "trophy.fill"
         case .morningPerson:    return "sunrise.fill"
         case .nightOwl:         return "moon.stars.fill"
-        case .pillCollector:    return "square.stack.3d.up.fill"
-        case .level5:           return "arrow.up.circle.fill"
-        case .level10:          return "star.circle.fill"
+        case .pillCollector:    return "cross.case.fill"
+        case .level5:           return "sun.max.fill"
+        case .level10:          return "star.fill"
         case .yoloCasual:       return "figure.mind.and.body"
-        case .comebackKid:      return "arrow.counterclockwise.circle.fill"
+        case .comebackKid:      return "arrow.triangle.2.circlepath"
         case .weekendWarrior:   return "cup.and.saucer.fill"
         }
     }
