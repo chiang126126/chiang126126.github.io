@@ -6,11 +6,11 @@ struct OnboardingView: View {
     @State private var step = -1
 
     private let steps: [(icon: String, color: Color, titleKey: String, descKey: String, accents: [String])] = [
-        ("camera.viewfinder", Color(hex: "#A855F7"), "onboard_step1_title", "onboard_step1_desc",
+        ("camera.viewfinder", Color(hex: "#C868A0"), "onboard_step1_title", "onboard_step1_desc",
          ["camera.fill", "sparkles"]),
-        ("bell.badge.fill", Color(hex: "#F472B6"), "onboard_step2_title", "onboard_step2_desc",
+        ("bell.badge.fill", Color(hex: "#7AA030"), "onboard_step2_title", "onboard_step2_desc",
          ["bell.fill", "heart.fill"]),
-        ("trophy.fill", Color(hex: "#10B981"), "onboard_step3_title", "onboard_step3_desc",
+        ("trophy.fill", Color(hex: "#C88018"), "onboard_step3_title", "onboard_step3_desc",
          ["trophy.fill", "star.fill", "bolt.fill"]),
     ]
 

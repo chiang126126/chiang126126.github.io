@@ -15,37 +15,37 @@ enum MascotMood: String {
         return .sleepy
     }
 
-    // Capsule top half (head) — cream body, paler when low energy
+    // Capsule top half (head) — golden cream body, paler when low energy
     var topColor: Color {
         switch self {
-        case .deflated:    return Color(hex: "#F0EDE7")
-        case .sleepy:      return Color(hex: "#EDE9E3")
-        default:           return Color(hex: "#FFF7EC")
+        case .deflated:    return Color(hex: "#F0E8D8")
+        case .sleepy:      return Color(hex: "#EDE5D5")
+        default:           return Color(hex: "#FFF0D0")
         }
     }
 
-    // Capsule bottom half (body) — slightly warmer than top
+    // Capsule bottom half (body) — warm peach-cream
     var bottomColor: Color {
         switch self {
-        case .deflated:    return Color(hex: "#E8E3DC")
-        case .sleepy:      return Color(hex: "#E5E1DB")
-        default:           return Color(hex: "#FFF0E0")
+        case .deflated:    return Color(hex: "#E8DCC8")
+        case .sleepy:      return Color(hex: "#E5DDC8")
+        default:           return Color(hex: "#FFE8B8")
         }
     }
 
-    var cheekColor: Color { Color(hex: "#FFCCB6").opacity(0.7) }
+    var cheekColor: Color { Color(hex: "#FFAA90").opacity(0.8) }
 
     var accentColor: Color {
         switch self {
-        case .perfect:     return Color(hex: "#F6C85F")
+        case .perfect:     return Color(hex: "#FFD040")
         case .happy:       return Color(hex: "#7BC5A0")
-        case .celebrating: return Color(hex: "#F6C85F")
+        case .celebrating: return Color(hex: "#FFD040")
         case .neutral:     return Color(hex: "#BFE8D2")
-        case .eyeroll:     return Color(hex: "#FFB89A")
-        case .deflated:    return Color(hex: "#8F8A84")
-        case .eating:      return Color(hex: "#F6C85F")
-        case .sad:         return Color(hex: "#FFCCB6")
-        case .grumpy:      return Color(hex: "#FFB89A")
+        case .eyeroll:     return Color(hex: "#FF9A78")
+        case .deflated:    return Color(hex: "#A09888")
+        case .eating:      return Color(hex: "#FFD040")
+        case .sad:         return Color(hex: "#FFB098")
+        case .grumpy:      return Color(hex: "#FF9A78")
         case .sleepy:      return Color(hex: "#BFE8D2")
         }
     }
@@ -534,5 +534,5 @@ struct BubbleTail: Shape {
         MascotView(mood: .sleepy, size: 100)
     }
     .padding()
-    .background(Color(hex: "#EFF4FB"))
+    .background(Color(hex: "#F4F2E7"))
 }
