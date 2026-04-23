@@ -80,7 +80,7 @@ struct AchievementBadgeView: View {
                     if unlocked {
                         Text("+\(achievement.xpReward) XP")
                             .font(.system(size: 8, weight: .heavy, design: .rounded))
-                            .foregroundColor(Color(hex: "#F6C85F"))
+                            .foregroundColor(Color(hex: "#D4A030"))
                     }
                 }
             }

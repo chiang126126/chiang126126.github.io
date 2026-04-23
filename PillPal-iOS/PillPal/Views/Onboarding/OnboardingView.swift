@@ -6,11 +6,11 @@ struct OnboardingView: View {
     @State private var step = -1
 
     private let steps: [(icon: String, color: Color, titleKey: String, descKey: String, accents: [String])] = [
-        ("camera.viewfinder", Color(hex: "#E8A8F0"), "onboard_step1_title", "onboard_step1_desc",
+        ("camera.viewfinder", Color(hex: "#E8B0E0"), "onboard_step1_title", "onboard_step1_desc",
          ["camera.fill", "sparkles"]),
-        ("bell.badge.fill", Color(hex: "#C8E040"), "onboard_step2_title", "onboard_step2_desc",
+        ("bell.badge.fill", Color(hex: "#C0D840"), "onboard_step2_title", "onboard_step2_desc",
          ["bell.fill", "heart.fill"]),
-        ("trophy.fill", Color(hex: "#A0D8FF"), "onboard_step3_title", "onboard_step3_desc",
+        ("trophy.fill", Color(hex: "#C0E8FF"), "onboard_step3_title", "onboard_step3_desc",
          ["trophy.fill", "star.fill", "bolt.fill"]),
     ]
 
@@ -46,7 +46,7 @@ struct OnboardingView: View {
             VStack(spacing: 10) {
                 Text("onboard_welcome")
                     .font(.system(size: theme.titleSize + 6, weight: .bold, design: .rounded))
-                    .foregroundStyle(theme.accentGradient)
+                    .foregroundColor(theme.accentColor)
 
                 Text("onboard_welcome_sub")
                     .font(.system(size: theme.bodySize, design: .rounded))
@@ -57,7 +57,7 @@ struct OnboardingView: View {
                     ForEach(["figure.strengthtraining.traditional", "pills.fill", "flame.fill", "trophy.fill", "sparkles"], id: \.self) { sym in
                         Image(systemName: sym)
                             .font(.system(size: 20, weight: .semibold))
-                            .foregroundStyle(theme.accentGradient)
+                            .foregroundColor(theme.accentColor)
                     }
                 }
                 .padding(.top, 4)
@@ -78,7 +78,7 @@ struct OnboardingView: View {
                 .foregroundColor(theme.textColor)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 18)
-                .background(theme.accentGradient, in: RoundedRectangle(cornerRadius: 20))
+                .background(theme.buttonGradient, in: RoundedRectangle(cornerRadius: 20))
                 .shadow(color: theme.accentColor.opacity(0.3), radius: 12, y: 6)
             }
 

@@ -147,7 +147,7 @@ struct ScanView: View {
                     .fill(
                         theme.isPro
                         ? LinearGradient(colors: [Color(hex: "#1A1A1A"), Color(hex: "#0A0A0A")], startPoint: .topLeading, endPoint: .bottomTrailing)
-                        : LinearGradient(colors: [Color(hex: "#FBF5FF"), Color(hex: "#F0E8FF")], startPoint: .topLeading, endPoint: .bottomTrailing)
+                        : LinearGradient(colors: [Color(hex: "#F5F0F5"), Color(hex: "#EDE6ED")], startPoint: .topLeading, endPoint: .bottomTrailing)
                     )
                     .overlay {
                         RoundedRectangle(cornerRadius: 24, style: .continuous)
@@ -264,10 +264,10 @@ struct ScanView: View {
                             Text("scan_confirm")
                         }
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
-                        .foregroundColor(.white)
+                        .foregroundColor(theme.textColor)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
-                        .background(theme.accentGradient, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .background(theme.buttonGradient, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                     }
                 }
             }

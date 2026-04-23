@@ -365,7 +365,7 @@ struct MascotView: View {
         case .celebrating:
             ForEach(0..<6, id: \.self) { i in
                 Circle()
-                    .fill([Color(hex: "#FFE066"), Color(hex: "#E8A8F0"), Color(hex: "#A8F0C8"), Color(hex: "#C8E040")][i % 4])
+                    .fill([Color(hex: "#FFE066"), Color(hex: "#E8B0E0"), Color(hex: "#D0F0D8"), Color(hex: "#C0D840")][i % 4])
                     .frame(width: size * 0.04, height: size * 0.04)
                     .offset(
                         x: size * [-0.4, -0.25, 0.25, 0.4, -0.35, 0.35][i],
@@ -384,7 +384,7 @@ struct MascotView: View {
         case .grumpy, .eyeroll:
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: size * 0.12))
-                .foregroundColor(Color(hex: "#FFB0C8").opacity(0.9))
+                .foregroundColor(Color(hex: "#F8D0E8").opacity(0.9))
                 .offset(x: size * 0.32, y: -size * 0.35)
         case .perfect:
             ZStack {
@@ -394,7 +394,7 @@ struct MascotView: View {
                     .offset(x: size * 0.35, y: -size * 0.35)
                 Image(systemName: "sparkle")
                     .font(.system(size: size * 0.08))
-                    .foregroundColor(Color(hex: "#A8F0C8"))
+                    .foregroundColor(Color(hex: "#D0F0D8"))
                     .offset(x: -size * 0.38, y: -size * 0.28)
             }
         case .eating:
@@ -405,13 +405,13 @@ struct MascotView: View {
                     .offset(x: size * 0.32, y: -size * 0.32)
                 Image(systemName: "sparkle")
                     .font(.system(size: size * 0.07, weight: .bold))
-                    .foregroundColor(Color(hex: "#A8F0C8"))
+                    .foregroundColor(Color(hex: "#D0F0D8"))
                     .offset(x: -size * 0.35, y: -size * 0.28)
             }
         case .deflated:
             Image(systemName: "leaf.fill")
                 .font(.system(size: size * 0.1))
-                .foregroundColor(Color(hex: "#A8F0C8").opacity(0.6))
+                .foregroundColor(Color(hex: "#D0F0D8").opacity(0.6))
                 .offset(x: size * 0.3, y: -size * 0.22)
         default:
             EmptyView()
@@ -534,5 +534,5 @@ struct BubbleTail: Shape {
         MascotView(mood: .sleepy, size: 100)
     }
     .padding()
-    .background(Color.white)
+    .background(Color(hex: "#F3ECF3"))
 }

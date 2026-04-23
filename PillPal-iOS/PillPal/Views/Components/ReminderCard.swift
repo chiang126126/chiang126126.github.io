@@ -22,10 +22,10 @@ struct ReminderCard: View {
             VStack(spacing: 0) {
                 Text(weekday)
                     .font(.system(size: 9, weight: .heavy, design: .rounded))
-                    .foregroundColor(.white)
+                    .foregroundColor(theme.textColor)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 4)
-                    .background(theme.accentGradient)
+                    .background(theme.accentColor.opacity(0.15))
 
                 Text(dayNumber)
                     .font(.system(size: 22, weight: .heavy, design: .rounded))

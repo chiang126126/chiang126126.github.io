@@ -32,7 +32,7 @@ struct MedicationsListView: View {
                         .foregroundColor(theme.textColor)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 8)
-                        .background(theme.accentGradient, in: RoundedRectangle(cornerRadius: 12))
+                        .background(theme.buttonGradient, in: RoundedRectangle(cornerRadius: 12))
                     }
                 }
                 .padding(.top, 8)
@@ -252,7 +252,7 @@ struct MedicationsListView: View {
                 .foregroundColor(theme.textColor)
                 .padding(.horizontal, 24)
                 .padding(.vertical, 12)
-                .background(theme.accentGradient, in: RoundedRectangle(cornerRadius: 16))
+                .background(theme.buttonGradient, in: RoundedRectangle(cornerRadius: 16))
             }
             .padding(.top, 8)
         }

@@ -40,7 +40,7 @@ struct WeeklyChartView: View {
                         if day.pct >= 100 {
                             Image(systemName: "sparkle")
                                 .font(.system(size: 10, weight: .bold))
-                                .foregroundColor(.white)
+                                .foregroundColor(theme.textColor)
                                 .offset(y: -4)
                                 .transition(.scale)
                         }

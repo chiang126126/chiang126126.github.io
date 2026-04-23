@@ -86,7 +86,7 @@ struct CustomTabBar: View {
                     } label: {
                         ZStack {
                             Circle()
-                                .fill(theme.accentGradient)
+                                .fill(theme.buttonGradient)
                                 .frame(width: 60, height: 60)
                                 .shadow(color: theme.accentColor.opacity(0.5), radius: 12, y: 4)
 

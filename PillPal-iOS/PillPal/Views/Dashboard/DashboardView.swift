@@ -60,7 +60,7 @@ struct DashboardView: View {
 
                 Text("app_name")
                     .font(.system(size: theme.titleSize, weight: .heavy, design: .rounded))
-                    .foregroundStyle(theme.accentGradient)
+                    .foregroundColor(theme.accentColor)
             }
 
             Spacer()

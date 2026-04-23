@@ -176,7 +176,7 @@ struct AddMedicationView: View {
                         .foregroundColor(theme.textColor)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
-                        .background(theme.accentGradient, in: RoundedRectangle(cornerRadius: 16))
+                        .background(theme.buttonGradient, in: RoundedRectangle(cornerRadius: 16))
                 }
                 .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
                 .opacity(name.trimmingCharacters(in: .whitespaces).isEmpty ? 0.4 : 1)

@@ -6,10 +6,10 @@ struct StatsView: View {
 
     private var stats: [(icon: String, key: LocalizedStringKey, value: String, sub: LocalizedStringKey?, color: Color)] {
         [
-            ("chart.line.uptrend.xyaxis", "stat_adherence", "\(store.overallAdherence)%", nil, Color(hex: "#5EAA3A")),
-            ("flame.fill", "stat_current_streak", "\(store.streak)", "stat_days", Color(hex: "#FF8870")),
-            ("trophy.fill", "stat_best_streak", "\(store.bestStreak)", "stat_days", Color(hex: "#FFD040")),
-            ("checkmark.circle.fill", "stat_total_taken", "\(store.totalTaken)", nil, Color(hex: "#E8A8F0")),
+            ("chart.line.uptrend.xyaxis", "stat_adherence", "\(store.overallAdherence)%", nil, Color(hex: "#8AAD28")),
+            ("flame.fill", "stat_current_streak", "\(store.streak)", "stat_days", Color(hex: "#E8B0E0")),
+            ("trophy.fill", "stat_best_streak", "\(store.bestStreak)", "stat_days", Color(hex: "#FFE066")),
+            ("checkmark.circle.fill", "stat_total_taken", "\(store.totalTaken)", nil, Color(hex: "#C0E8FF")),
         ]
     }
 
@@ -122,7 +122,7 @@ struct StatsView: View {
                 VStack(alignment: .trailing, spacing: 2) {
                     Text("\(store.totalXP) XP")
                         .font(.system(size: 18, weight: .bold, design: .rounded))
-                        .foregroundStyle(theme.accentGradient)
+                        .foregroundColor(theme.accentColor)
                     if store.xpToNext > 0 {
                         Text("\(store.xpToNext) XP to next")
                             .font(.system(size: 10, design: .rounded))
@@ -139,34 +139,17 @@ struct StatsView: View {
             )
         }
         .padding(16)
-        .background {
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(theme.cardColor)
-                .shadow(color: Color.black.opacity(0.04), radius: 1, y: 1)
-                .shadow(color: level.color.opacity(0.12), radius: 8, y: 4)
-                .shadow(color: level.color.opacity(0.06), radius: 20, y: 8)
-        }
-        .overlay {
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(
-                    LinearGradient(
-                        colors: [level.color.opacity(0.4), level.color.opacity(0.15)],
-                        startPoint: .topLeading, endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 1.5
-                )
-                .allowsHitTesting(false)
-        }
+        .card3D(theme, radius: 20)
     }
 
     // MARK: - XP Stats
     private var xpStatsCard: some View {
         HStack(spacing: 0) {
-            xpStatItem("target", "xp_per_dose", "+\(XPReward.takeDose)", Color(hex: "#E8A8F0"))
+            xpStatItem("target", "xp_per_dose", "+\(XPReward.takeDose)", Color(hex: "#E8B0E0"))
             Divider().frame(height: 30).overlay(theme.borderColor)
-            xpStatItem("star.fill", "xp_daily_bonus", "+\(XPReward.completeAllDaily)", Color(hex: "#FFD040"))
+            xpStatItem("star.fill", "xp_daily_bonus", "+\(XPReward.completeAllDaily)", Color(hex: "#FFE066"))
             Divider().frame(height: 30).overlay(theme.borderColor)
-            xpStatItem("flame.fill", "xp_streak_7", "+\(XPReward.streak7)", Color(hex: "#FF8870"))
+            xpStatItem("flame.fill", "xp_streak_7", "+\(XPReward.streak7)", Color(hex: "#C0D840"))
         }
         .padding(12)
         .card3D(theme, radius: 16)

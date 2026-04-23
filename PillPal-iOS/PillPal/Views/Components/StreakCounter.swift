@@ -14,15 +14,15 @@ struct StreakCounter: View {
                     .fill(
                         LinearGradient(
                             colors: isOnFire
-                                ? [Color(hex: "#FF8870"), Color(hex: "#E8A8F0")]
+                                ? [Color(hex: "#E8B0E0"), Color(hex: "#F8D0E8")]
                                 : isHot
-                                    ? [Color(hex: "#FFD040"), Color(hex: "#FF8870")]
+                                    ? [Color(hex: "#FFE066"), Color(hex: "#E8B0E0")]
                                     : [theme.pastelLavender, theme.pastelPink],
                             startPoint: .top, endPoint: .bottom
                         )
                     )
                     .frame(width: 40, height: 40)
-                    .shadow(color: isOnFire ? Color(hex: "#FF8870").opacity(0.4) : .clear, radius: 8)
+                    .shadow(color: isOnFire ? Color(hex: "#E8B0E0").opacity(0.4) : .clear, radius: 8)
 
                 Image(systemName: isOnFire ? "flame.fill" : "flame")
                     .font(.system(size: 20, weight: .bold))
@@ -47,6 +47,6 @@ struct StreakCounter: View {
         .padding(.vertical, 10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .card3D(theme)
-        .shadow(color: isOnFire ? Color(hex: "#FF8870").opacity(0.18) : .clear, radius: 12, y: 4)
+        .shadow(color: isOnFire ? Color(hex: "#E8B0E0").opacity(0.18) : .clear, radius: 12, y: 4)
     }
 }

@@ -57,9 +57,9 @@ struct SettingsView: View {
                                     HStack(spacing: 10) {
                                         Text(lang.flag)
                                             .font(.system(size: 11, weight: .heavy, design: .rounded))
-                                            .foregroundColor(.white)
+                                            .foregroundColor(theme.textColor)
                                             .frame(width: 30, height: 22)
-                                            .background(theme.accentGradient, in: RoundedRectangle(cornerRadius: 5))
+                                            .background(theme.accentColor.opacity(0.15), in: RoundedRectangle(cornerRadius: 5))
                                         Text(lang.label)
                                             .font(.system(size: theme.bodySize, weight: .medium, design: .rounded))
                                             .foregroundColor(theme.textColor)
@@ -198,37 +198,16 @@ struct SettingsView: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background {
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [theme.accentColor.opacity(0.08), theme.neonPurple.opacity(0.08)],
-                        startPoint: .topLeading, endPoint: .bottomTrailing
-                    )
-                )
-                .shadow(color: Color.black.opacity(0.04), radius: 1, y: 1)
-                .shadow(color: theme.accentColor.opacity(0.08), radius: 8, y: 4)
-        }
-        .overlay {
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(
-                    LinearGradient(
-                        colors: [Color.white.opacity(0.5), theme.accentColor.opacity(0.15)],
-                        startPoint: .topLeading, endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 1
-                )
-                .allowsHitTesting(false)
-        }
+        .card3D(theme, radius: 16)
     }
 
     // MARK: - Mode Card
     private func modeCard(_ m: AppMode) -> some View {
         let isSelected = theme.mode == m
         let isPro = m == .pro
-        let previewBg = isPro ? Color(hex: "#110A1F") : Color.white
-        let previewAccent = isPro ? Color(hex: "#A78BFA") : Color(hex: "#5EAA3A")
-        let previewLabel = isPro ? Color.white : Color(hex: "#1A1A1A")
+        let previewBg = isPro ? Color(hex: "#110A1F") : Color(hex: "#F3ECF3")
+        let previewAccent = isPro ? Color(hex: "#A78BFA") : Color(hex: "#8AAD28")
+        let previewLabel = isPro ? Color.white : Color(hex: "#222222")
         return Button {
             withAnimation(.spring(response: 0.3)) { theme.mode = m }
             UIImpactFeedbackGenerator(style: .medium).impactOccurred()
@@ -248,7 +227,7 @@ struct SettingsView: View {
                 HStack(spacing: 3) {
                     let colors = isPro
                         ? ["#A78BFA", "#F472B6", "#3B2A5E"]
-                        : ["#C8E040", "#E8A8F0", "#A0D8FF"]
+                        : ["#C0D840", "#E8B0E0", "#C0E8FF"]
                     ForEach(colors, id: \.self) { c in
                         Circle().fill(Color(hex: c)).frame(width: 12, height: 12)
                             .overlay { Circle().stroke(Color.white.opacity(0.3), lineWidth: 0.5) }
