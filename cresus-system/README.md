@@ -48,6 +48,7 @@ Crésus
 3. [docs/02-setup-binance-api.md](docs/02-setup-binance-api.md) — 建币安只读 API（免费，立刻做）
 4. [docs/03-setup-okx-api.md](docs/03-setup-okx-api.md) — 建 OKX 只读 API（免费，立刻做）
 5. [docs/06-private-repo-setup.md](docs/06-private-repo-setup.md) — 建 private repo 放 bot 代码
-6. [docs/05-grok-distillation-guide.md](docs/05-grok-distillation-guide.md) — 启动 KOL 蒸馏
-7. [docs/04-setup-deepseek-api.md](docs/04-setup-deepseek-api.md) — 建 DeepSeek（P3 前）
-8. [docs/07-vps-hosting.md](docs/07-vps-hosting.md) — 决定部署位置（P5 前）
+6. [docs/08-bootstrap-cresus-bot.md](docs/08-bootstrap-cresus-bot.md) — 初始化 cresus-bot 目录结构 + 烟雾测试
+7. [docs/05-grok-distillation-guide.md](docs/05-grok-distillation-guide.md) — 启动 KOL 蒸馏
+8. [docs/04-setup-deepseek-api.md](docs/04-setup-deepseek-api.md) — 建 DeepSeek（P3 前）
+9. [docs/07-vps-hosting.md](docs/07-vps-hosting.md) — 决定部署位置（P5 前）
