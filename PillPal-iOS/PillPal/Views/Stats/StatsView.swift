@@ -6,10 +6,10 @@ struct StatsView: View {
 
     private var stats: [(icon: String, key: LocalizedStringKey, value: String, sub: LocalizedStringKey?, color: Color)] {
         [
-            ("chart.line.uptrend.xyaxis", "stat_adherence", "\(store.overallAdherence)%", nil, Color(hex: "#7AA030")),
-            ("flame.fill", "stat_current_streak", "\(store.streak)", "stat_days", Color(hex: "#E88C50")),
-            ("trophy.fill", "stat_best_streak", "\(store.bestStreak)", "stat_days", Color(hex: "#C88018")),
-            ("checkmark.circle.fill", "stat_total_taken", "\(store.totalTaken)", nil, Color(hex: "#C868A0")),
+            ("chart.line.uptrend.xyaxis", "stat_adherence", "\(store.overallAdherence)%", nil, Color(hex: "#5EAA3A")),
+            ("flame.fill", "stat_current_streak", "\(store.streak)", "stat_days", Color(hex: "#FF8870")),
+            ("trophy.fill", "stat_best_streak", "\(store.bestStreak)", "stat_days", Color(hex: "#FFD040")),
+            ("checkmark.circle.fill", "stat_total_taken", "\(store.totalTaken)", nil, Color(hex: "#E8A8F0")),
         ]
     }
 
@@ -162,11 +162,11 @@ struct StatsView: View {
     // MARK: - XP Stats
     private var xpStatsCard: some View {
         HStack(spacing: 0) {
-            xpStatItem("target", "xp_per_dose", "+\(XPReward.takeDose)", Color(hex: "#C868A0"))
+            xpStatItem("target", "xp_per_dose", "+\(XPReward.takeDose)", Color(hex: "#E8A8F0"))
             Divider().frame(height: 30).overlay(theme.borderColor)
-            xpStatItem("star.fill", "xp_daily_bonus", "+\(XPReward.completeAllDaily)", Color(hex: "#C88018"))
+            xpStatItem("star.fill", "xp_daily_bonus", "+\(XPReward.completeAllDaily)", Color(hex: "#FFD040"))
             Divider().frame(height: 30).overlay(theme.borderColor)
-            xpStatItem("flame.fill", "xp_streak_7", "+\(XPReward.streak7)", Color(hex: "#E88C50"))
+            xpStatItem("flame.fill", "xp_streak_7", "+\(XPReward.streak7)", Color(hex: "#FF8870"))
         }
         .padding(12)
         .card3D(theme, radius: 16)

@@ -6,11 +6,11 @@ struct OnboardingView: View {
     @State private var step = -1
 
     private let steps: [(icon: String, color: Color, titleKey: String, descKey: String, accents: [String])] = [
-        ("camera.viewfinder", Color(hex: "#C868A0"), "onboard_step1_title", "onboard_step1_desc",
+        ("camera.viewfinder", Color(hex: "#E8A8F0"), "onboard_step1_title", "onboard_step1_desc",
          ["camera.fill", "sparkles"]),
-        ("bell.badge.fill", Color(hex: "#7AA030"), "onboard_step2_title", "onboard_step2_desc",
+        ("bell.badge.fill", Color(hex: "#C8E040"), "onboard_step2_title", "onboard_step2_desc",
          ["bell.fill", "heart.fill"]),
-        ("trophy.fill", Color(hex: "#C88018"), "onboard_step3_title", "onboard_step3_desc",
+        ("trophy.fill", Color(hex: "#A0D8FF"), "onboard_step3_title", "onboard_step3_desc",
          ["trophy.fill", "star.fill", "bolt.fill"]),
     ]
 
@@ -75,7 +75,7 @@ struct OnboardingView: View {
                     Image(systemName: "arrow.right")
                         .font(.system(size: 16, weight: .bold))
                 }
-                .foregroundColor(.white)
+                .foregroundColor(theme.textColor)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 18)
                 .background(theme.accentGradient, in: RoundedRectangle(cornerRadius: 20))
@@ -166,7 +166,7 @@ struct OnboardingView: View {
                     Image(systemName: index == steps.count - 1 ? "sparkles" : "chevron.right")
                         .font(.system(size: 14, weight: .bold))
                 }
-                .foregroundColor(.white)
+                .foregroundColor(theme.textColor)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 18)
                 .background(

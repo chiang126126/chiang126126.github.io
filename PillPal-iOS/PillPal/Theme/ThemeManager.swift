@@ -33,42 +33,42 @@ final class ThemeManager {
     }
 
     // MARK: - Colors
-    // Care: warm sage cream + olive-lime/lavender — playful, hopeful, vibrant
+    // Care: dopamine pastels — bright lime, lavender pink, pure white bg
     // Pro: deep plum + neon — cyberpunk but still playful
-    var accentColor: Color { isPro ? Color(hex: "#A78BFA") : Color(hex: "#7AA030") }
-    var accentSecondary: Color { isPro ? Color(hex: "#F472B6") : Color(hex: "#DDA8E0") }
-    var bgColor: Color { isPro ? Color(hex: "#110A1F") : Color(hex: "#F4F2E7") }
-    var bgSecondary: Color { isPro ? Color(hex: "#1B0F2E") : Color(hex: "#EFEDE2") }
+    var accentColor: Color { isPro ? Color(hex: "#A78BFA") : Color(hex: "#5EAA3A") }
+    var accentSecondary: Color { isPro ? Color(hex: "#F472B6") : Color(hex: "#E8A8F0") }
+    var bgColor: Color { isPro ? Color(hex: "#110A1F") : .white }
+    var bgSecondary: Color { isPro ? Color(hex: "#1B0F2E") : Color(hex: "#FBF5FF") }
     var cardColor: Color { isPro ? Color(hex: "#1E1533") : .white }
-    var surfaceColor: Color { isPro ? Color(hex: "#2A1F44") : Color(hex: "#F0EEE3") }
-    var borderColor: Color { isPro ? Color(hex: "#3B2A5E") : Color(hex: "#E5E2D3") }
-    var textColor: Color { isPro ? .white : Color(hex: "#2B2B2E") }
-    var mutedColor: Color { isPro ? Color(hex: "#A78BFA").opacity(0.7) : Color(hex: "#8E8B78") }
+    var surfaceColor: Color { isPro ? Color(hex: "#2A1F44") : Color(hex: "#F8F4FF") }
+    var borderColor: Color { isPro ? Color(hex: "#3B2A5E") : Color(hex: "#EEEAF5") }
+    var textColor: Color { isPro ? .white : Color(hex: "#1A1A1A") }
+    var mutedColor: Color { isPro ? Color(hex: "#A78BFA").opacity(0.7) : Color(hex: "#9B95A8") }
 
-    var warmYellow: Color { Color(hex: "#FFD76A") }
+    var warmYellow: Color { Color(hex: "#FFE066") }
     var warmPeach: Color { Color(hex: "#FFB89A") }
-    var warmMint: Color { Color(hex: "#BFE8D2") }
+    var warmMint: Color { Color(hex: "#A8F0C8") }
 
     // Legacy aliases for Pro mode components
     var neonOrange: Color { isPro ? Color(hex: "#FB923C") : Color(hex: "#FFB89A") }
-    var neonPink: Color { isPro ? Color(hex: "#F472B6") : Color(hex: "#DDA8E0") }
-    var neonPurple: Color { isPro ? Color(hex: "#A855F7") : Color(hex: "#7AA030") }
+    var neonPink: Color { isPro ? Color(hex: "#F472B6") : Color(hex: "#E8A8F0") }
+    var neonPurple: Color { isPro ? Color(hex: "#A855F7") : Color(hex: "#5EAA3A") }
 
-    var successColor: Color { isPro ? Color(hex: "#10B981") : Color(hex: "#7BC5A0") }
+    var successColor: Color { isPro ? Color(hex: "#10B981") : Color(hex: "#5EAA3A") }
     var dangerColor: Color { Color(hex: "#EF4444") }
 
-    // Pastels for cards / chips
-    var pastelLavender: Color { isPro ? Color(hex: "#E9D5FF") : Color(hex: "#F5E0F5") }
-    var pastelPink: Color { isPro ? Color(hex: "#FBCFE8") : Color(hex: "#FFD6EC") }
+    // Pastels for cards / chips — bright dopamine candy colors
+    var pastelLavender: Color { isPro ? Color(hex: "#E9D5FF") : Color(hex: "#F0D8FF") }
+    var pastelPink: Color { isPro ? Color(hex: "#FBCFE8") : Color(hex: "#FFD0F0") }
     var pastelCream: Color { Color(hex: "#FFF7EC") }
-    var pastelMint: Color { Color(hex: "#D5F0DC") }
-    var pastelSky: Color { isPro ? Color(hex: "#DBEAFE") : Color(hex: "#E0EEFF") }
+    var pastelMint: Color { Color(hex: "#C8FFD8") }
+    var pastelSky: Color { isPro ? Color(hex: "#DBEAFE") : Color(hex: "#C8EEFF") }
 
     // MARK: - Gradients
     var accentGradient: LinearGradient {
         isPro
             ? LinearGradient(colors: [Color(hex: "#A78BFA"), Color(hex: "#F472B6")], startPoint: .topLeading, endPoint: .bottomTrailing)
-            : LinearGradient(colors: [Color(hex: "#C868A0"), Color(hex: "#78A028")], startPoint: .topLeading, endPoint: .bottomTrailing)
+            : LinearGradient(colors: [Color(hex: "#F0B0E0"), Color(hex: "#C8E040")], startPoint: .leading, endPoint: .trailing)
     }
 
     var heroGradient: LinearGradient {
@@ -78,7 +78,7 @@ final class ThemeManager {
                 startPoint: .topLeading, endPoint: .bottomTrailing
               )
             : LinearGradient(
-                colors: [Color(hex: "#F4F2E7"), Color(hex: "#EFEDE2"), Color(hex: "#FFF7EC")],
+                colors: [.white, Color(hex: "#FBF5FF"), Color(hex: "#FFFBF0")],
                 startPoint: .topLeading, endPoint: .bottomTrailing
               )
     }
@@ -86,7 +86,7 @@ final class ThemeManager {
     var bgGradient: LinearGradient {
         isPro
             ? LinearGradient(colors: [Color(hex: "#110A1F"), Color(hex: "#1B0F2E")], startPoint: .top, endPoint: .bottom)
-            : LinearGradient(colors: [Color(hex: "#F4F2E7"), Color(hex: "#EFEDE2"), Color(hex: "#FFF7EC")], startPoint: .top, endPoint: .bottom)
+            : LinearGradient(colors: [.white, Color(hex: "#FBF5FF"), Color(hex: "#FFFBF0")], startPoint: .top, endPoint: .bottom)
     }
 
     // MARK: - Font sizes (Care mode uses larger)
@@ -97,7 +97,7 @@ final class ThemeManager {
 
     // MARK: - Shadows
     func softShadow(color: Color? = nil, radius: CGFloat = 10, y: CGFloat = 4) -> (Color, CGFloat, CGFloat, CGFloat) {
-        let c = color ?? (isPro ? Color.black.opacity(0.4) : Color(hex: "#B8B4A0").opacity(0.12))
+        let c = color ?? (isPro ? Color.black.opacity(0.4) : Color(hex: "#C8C0D8").opacity(0.15))
         return (c, radius, 0, y)
     }
 }
@@ -112,13 +112,13 @@ extension View {
                         LinearGradient(
                             colors: theme.isPro
                                 ? [theme.cardColor, theme.cardColor]
-                                : [.white, Color(hex: "#FAFAF4")],
+                                : [.white, Color(hex: "#FEFCFF")],
                             startPoint: .top, endPoint: .bottom
                         )
                     )
-                    .shadow(color: Color(hex: "#B8B4A0").opacity(theme.isPro ? 0 : 0.08), radius: 0.5, y: 0.5)
-                    .shadow(color: Color(hex: "#B8B4A0").opacity(theme.isPro ? 0.25 : 0.15), radius: 10, y: 5)
-                    .shadow(color: Color(hex: "#B8B4A0").opacity(theme.isPro ? 0.12 : 0.06), radius: 24, y: 12)
+                    .shadow(color: Color(hex: "#C8C0D8").opacity(theme.isPro ? 0 : 0.10), radius: 1, y: 0.5)
+                    .shadow(color: Color(hex: "#C8C0D8").opacity(theme.isPro ? 0.25 : 0.14), radius: 12, y: 6)
+                    .shadow(color: Color(hex: "#C8C0D8").opacity(theme.isPro ? 0.12 : 0.06), radius: 28, y: 14)
             }
             .overlay {
                 RoundedRectangle(cornerRadius: radius, style: .continuous)
@@ -126,7 +126,7 @@ extension View {
                         LinearGradient(
                             colors: theme.isPro
                                 ? [Color.clear, Color.clear, Color.clear]
-                                : [Color.white.opacity(0.6), Color.clear, Color.clear],
+                                : [Color.white.opacity(0.7), Color.clear, Color.clear],
                             startPoint: .top, endPoint: .bottom
                         )
                     )
@@ -138,7 +138,7 @@ extension View {
                         LinearGradient(
                             colors: theme.isPro
                                 ? [theme.borderColor, theme.borderColor]
-                                : [Color.white, Color(hex: "#DDD9C8").opacity(0.5)],
+                                : [Color.white, Color(hex: "#E8E0F0").opacity(0.5)],
                             startPoint: .top, endPoint: .bottom
                         ),
                         lineWidth: theme.isPro ? 1 : 1.5
