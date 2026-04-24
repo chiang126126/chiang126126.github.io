@@ -12,15 +12,10 @@ struct PillPalApp: App {
                 .environment(themeManager)
                 .environment(\.locale, Locale(identifier: store.appLanguage))
                 .task {
-                    let granted = await NotificationManager.shared.requestPermission()
-                    if granted {
-                        NotificationManager.shared.rescheduleAll(
-                            medications: store.medications,
-                            style: store.reminderStyle,
-                            language: store.appLanguage,
-                            customTime: { $0.reminderTime }
-                        )
-                    }
+                    // iOS retains scheduled local notifications across launches.
+                    // We just need to ensure permission; individual meds are (re)scheduled
+                    // by MedicationStore when the user adds/updates/toggles them.
+                    _ = await NotificationManager.shared.requestPermission()
                 }
         }
     }
