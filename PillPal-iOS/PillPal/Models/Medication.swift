@@ -64,6 +64,8 @@ struct Medication: Identifiable, Codable, Equatable {
     var isActive: Bool
     var createdAt: Date
     var weekDay: Int?
+    /// User-chosen specific reminder time. Stores only the hour/minute components.
+    var reminderTime: Date?
 
     init(
         name: String,
@@ -75,7 +77,8 @@ struct Medication: Identifiable, Codable, Equatable {
         colorHex: String = "#22D3EE",
         iconName: String = "pill.fill",
         isActive: Bool = true,
-        weekDay: Int? = nil
+        weekDay: Int? = nil,
+        reminderTime: Date? = nil
     ) {
         self.name = name
         self.dosage = dosage
@@ -88,9 +91,15 @@ struct Medication: Identifiable, Codable, Equatable {
         self.isActive = isActive
         self.createdAt = Date()
         self.weekDay = weekDay
+        self.reminderTime = reminderTime
     }
 
     var color: Color { Color(hex: colorHex) }
+
+    /// Returns the explicit reminderTime if set, otherwise the TimeOfDay default.
+    var effectiveReminderTime: Date {
+        reminderTime ?? timeOfDay.defaultReminderTime
+    }
 }
 
 // MARK: - Enums
@@ -122,6 +131,18 @@ enum TimeOfDay: String, Codable, CaseIterable {
         case .evening: return "sunset.fill"
         case .bedtime: return "moon.stars.fill"
         }
+    }
+
+    /// Default hour for notification scheduling when user hasn't set a custom time.
+    var defaultReminderTime: Date {
+        let hour: Int
+        switch self {
+        case .morning:   hour = 8
+        case .afternoon: hour = 13
+        case .evening:   hour = 19
+        case .bedtime:   hour = 22
+        }
+        return Calendar.current.date(bySettingHour: hour, minute: 0, second: 0, of: Date()) ?? Date()
     }
 }
 

@@ -11,6 +11,16 @@ struct PillPalApp: App {
                 .environment(store)
                 .environment(themeManager)
                 .environment(\.locale, Locale(identifier: store.appLanguage))
+                .task {
+                    let granted = await NotificationManager.shared.requestPermission()
+                    if granted {
+                        NotificationManager.shared.rescheduleAll(
+                            medications: store.medications,
+                            style: store.reminderStyle,
+                            language: store.appLanguage
+                        )
+                    }
+                }
         }
     }
 }

@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import UserNotifications
 
 @Observable
 final class MedicationStore {
@@ -154,17 +155,23 @@ final class MedicationStore {
             unlockAchievement(.pillCollector)
         }
         awardXP(XPReward.addMedication)
+        NotificationManager.shared.schedule(for: newMed, style: reminderStyle, language: appLanguage)
         save()
     }
 
     func updateMedication(_ id: UUID, with changes: (inout Medication) -> Void) {
         if let idx = medications.firstIndex(where: { $0.id == id }) {
             changes(&medications[idx])
+            NotificationManager.shared.cancelPending(for: id)
+            if medications[idx].isActive {
+                NotificationManager.shared.schedule(for: medications[idx], style: reminderStyle, language: appLanguage)
+            }
             save()
         }
     }
 
     func deleteMedication(_ id: UUID) {
+        NotificationManager.shared.cancelPending(for: id)
         medications.removeAll { $0.id == id }
         logs.removeAll { $0.medicationId == id }
         save()
@@ -173,6 +180,11 @@ final class MedicationStore {
     func toggleActive(_ id: UUID) {
         if let idx = medications.firstIndex(where: { $0.id == id }) {
             medications[idx].isActive.toggle()
+            if medications[idx].isActive {
+                NotificationManager.shared.schedule(for: medications[idx], style: reminderStyle, language: appLanguage)
+            } else {
+                NotificationManager.shared.cancelPending(for: id)
+            }
             save()
         }
     }
@@ -184,6 +196,7 @@ final class MedicationStore {
 
         if status == .taken {
             awardXP(XPReward.takeDose)
+            NotificationManager.shared.removeDelivered(for: medicationId)
         }
 
         recalculateStreak()
@@ -395,6 +408,7 @@ final class MedicationStore {
     // MARK: - Settings
     func setReminderStyle(_ style: String) {
         reminderStyle = style
+        NotificationManager.shared.rescheduleAll(medications: medications, style: style, language: appLanguage)
         save()
     }
 
@@ -402,6 +416,7 @@ final class MedicationStore {
         appLanguage = lang
         UserDefaults.standard.set([lang], forKey: "AppleLanguages")
         UserDefaults.standard.synchronize()
+        NotificationManager.shared.rescheduleAll(medications: medications, style: reminderStyle, language: lang)
         save()
     }
 

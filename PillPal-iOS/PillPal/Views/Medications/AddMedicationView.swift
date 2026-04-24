@@ -9,6 +9,7 @@ struct AddMedicationView: View {
     @State private var dosage = ""
     @State private var frequency: Frequency = .daily
     @State private var timeOfDay: TimeOfDay = .morning
+    @State private var reminderTime: Date = TimeOfDay.morning.defaultReminderTime
     @State private var foodRelation: FoodRelation = .withFood
     @State private var notes = ""
     @State private var colorHex = PillOptions.colors[0]
@@ -93,8 +94,34 @@ struct AddMedicationView: View {
                             chipButton(
                                 LocalizedStringKey(time.localizationKey),
                                 isSelected: timeOfDay == time
-                            ) { timeOfDay = time }
+                            ) {
+                                timeOfDay = time
+                                reminderTime = time.defaultReminderTime
+                            }
                         }
+                    }
+                }
+
+                // Reminder Time
+                field("reminder_time_label") {
+                    HStack {
+                        Image(systemName: "bell.fill")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(theme.accentColor)
+                        DatePicker("", selection: $reminderTime, displayedComponents: .hourAndMinute)
+                            .labelsHidden()
+                            .tint(theme.accentColor)
+                        Spacer()
+                        Text("reminder_time_hint")
+                            .font(.system(size: 11, design: .rounded))
+                            .foregroundColor(theme.mutedColor)
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(theme.surfaceColor)
+                            .overlay { RoundedRectangle(cornerRadius: 12).stroke(theme.borderColor, lineWidth: 1) }
                     }
                 }
 
@@ -235,7 +262,8 @@ struct AddMedicationView: View {
             foodRelation: foodRelation,
             notes: notes.trimmingCharacters(in: .whitespaces),
             colorHex: colorHex,
-            iconName: iconName
+            iconName: iconName,
+            reminderTime: reminderTime
         )
         store.addMedication(med)
         UINotificationFeedbackGenerator().notificationOccurred(.success)
