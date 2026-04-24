@@ -29,7 +29,7 @@ struct MedicationsListView: View {
                             Text("add_new")
                                 .font(.system(size: 13, weight: .semibold))
                         }
-                        .foregroundColor(theme.textColor)
+                        .foregroundColor(.white)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 8)
                         .background(theme.buttonGradient, in: RoundedRectangle(cornerRadius: 12))
@@ -249,7 +249,7 @@ struct MedicationsListView: View {
                     Text("add_new")
                 }
                 .font(.system(size: 15, weight: .semibold))
-                .foregroundColor(theme.textColor)
+                .foregroundColor(.white)
                 .padding(.horizontal, 24)
                 .padding(.vertical, 12)
                 .background(theme.buttonGradient, in: RoundedRectangle(cornerRadius: 16))

@@ -173,7 +173,7 @@ struct AddMedicationView: View {
                 } label: {
                     Text("save_med")
                         .font(.system(size: 17, weight: .semibold))
-                        .foregroundColor(theme.textColor)
+                        .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
                         .background(theme.buttonGradient, in: RoundedRectangle(cornerRadius: 16))

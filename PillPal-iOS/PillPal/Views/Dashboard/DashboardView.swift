@@ -22,56 +22,93 @@ struct DashboardView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
-                headerSection
+            VStack(spacing: 0) {
+                // Purple hero section (header + mascot + status)
+                heroSection
+                    .padding(.horizontal, 16)
+                    .padding(.top, 8)
+                    .padding(.bottom, 40)
+                    .background(theme.heroGradient)
 
-                mascotHeroCard
+                // White content sheet
+                VStack(spacing: 14) {
+                    HStack(spacing: 10) {
+                        todayProgressCard
+                        StreakCounter(streak: store.streak)
+                    }
 
-                HStack(spacing: 10) {
-                    todayProgressCard
-                    StreakCounter(streak: store.streak)
+                    if store.todaySchedule().isEmpty {
+                        emptyState
+                    } else {
+                        todayFeedList
+                    }
                 }
-
-                if store.todaySchedule().isEmpty {
-                    emptyState
-                } else {
-                    todayFeedList
-                }
+                .padding(.horizontal, 16)
+                .padding(.top, 20)
+                .padding(.bottom, 100)
+                .frame(maxWidth: .infinity)
+                .background(
+                    UnevenRoundedRectangle(
+                        topLeadingRadius: 28,
+                        bottomLeadingRadius: 0,
+                        bottomTrailingRadius: 0,
+                        topTrailingRadius: 28,
+                        style: .continuous
+                    )
+                    .fill(theme.bgColor)
+                    .offset(y: -20)
+                )
+                .offset(y: -20)
             }
-            .padding(.horizontal, 16)
-            .padding(.bottom, 100)
         }
-        .background(theme.bgGradient.ignoresSafeArea())
+        .background(theme.heroColor.ignoresSafeArea(edges: .top))
+        .background(theme.bgColor.ignoresSafeArea(edges: .bottom))
         .onAppear { refreshMessage() }
     }
 
-    // MARK: - Header
-    private var headerSection: some View {
-        HStack(alignment: .center) {
-            VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: 6) {
-                    Image(systemName: "hand.wave.fill")
-                        .font(.system(size: theme.captionSize))
-                        .foregroundColor(theme.accentColor)
-                    Text(greeting)
-                        .font(.system(size: theme.captionSize, weight: .medium, design: .rounded))
-                        .foregroundColor(theme.mutedColor)
+    // MARK: - Hero Section (purple top)
+    private var heroSection: some View {
+        VStack(spacing: 12) {
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "hand.wave.fill")
+                            .font(.system(size: theme.captionSize))
+                            .foregroundColor(theme.warmYellow)
+                        Text(greeting)
+                            .font(.system(size: theme.captionSize, weight: .medium, design: .rounded))
+                            .foregroundColor(.white.opacity(0.8))
+                    }
+
+                    Text("app_name")
+                        .font(.system(size: theme.titleSize, weight: .heavy, design: .rounded))
+                        .foregroundColor(.white)
                 }
 
-                Text("app_name")
-                    .font(.system(size: theme.titleSize, weight: .heavy, design: .rounded))
-                    .foregroundColor(theme.accentColor)
+                Spacer()
+
+                // XP badge
+                HStack(spacing: 6) {
+                    Image(systemName: "bolt.fill")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(theme.warmYellow)
+                    Text("\(store.totalXP)")
+                        .font(.system(size: 13, weight: .heavy, design: .rounded))
+                        .foregroundColor(.white)
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(Color.white.opacity(0.2), in: Capsule())
             }
 
-            Spacer()
+            mascotHeroCard
         }
-        .padding(.top, 8)
     }
 
     // MARK: - Mascot Hero Card
     private var mascotHeroCard: some View {
         VStack(spacing: 8) {
-            // Speech bubble
+            // Speech bubble — white on purple hero
             VStack(spacing: 0) {
                 HStack {
                     (Text("\u{201C} ") + Text(LocalizedStringKey(messageKey)) + Text(" \u{201D}"))
@@ -90,20 +127,20 @@ struct DashboardView: View {
                             .font(.system(size: 11, weight: .semibold))
                             .foregroundColor(theme.mutedColor)
                             .padding(5)
-                            .background(theme.surfaceColor.opacity(0.6), in: Circle())
+                            .background(theme.surfaceColor, in: Circle())
                     }
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
-                .card3D(theme, radius: 16)
+                .background {
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(Color.white)
+                        .shadow(color: Color.black.opacity(0.08), radius: 8, y: 3)
+                }
 
                 BubbleTail()
-                    .fill(theme.cardColor)
+                    .fill(Color.white)
                     .frame(width: 14, height: 8)
-                    .overlay {
-                        BubbleTail()
-                            .stroke(theme.borderColor, lineWidth: 1)
-                    }
             }
 
             // Mascot
@@ -114,25 +151,20 @@ struct DashboardView: View {
             )
             .animation(.spring(response: 0.4), value: feedingAnimation)
 
-            // Status line
+            // Status line — yellow pill on purple
             HStack(spacing: 8) {
-                Image(systemName: "bolt.fill")
-                    .font(.system(size: 10))
-                    .foregroundColor(currentMood.accentColor)
-                Text("\(store.totalXP)")
-                    .font(.system(size: 13, weight: .bold, design: .rounded))
-                    .foregroundColor(theme.textColor)
-                Text("\u{00B7}")
-                    .foregroundColor(theme.mutedColor)
+                Image(systemName: "sparkles")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(Color(hex: "#222222"))
                 Text(LocalizedStringKey(currentMood.statusKey))
-                    .font(.system(size: 13, weight: .medium, design: .rounded))
-                    .foregroundColor(currentMood.accentColor)
+                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                    .foregroundColor(Color(hex: "#222222"))
             }
             .padding(.horizontal, 14)
-            .padding(.vertical, 6)
-            .background(theme.surfaceColor.opacity(0.6), in: Capsule())
+            .padding(.vertical, 7)
+            .background(theme.warmYellow, in: Capsule())
+            .shadow(color: theme.warmYellow.opacity(0.4), radius: 8, y: 2)
         }
-        .padding(.vertical, 8)
     }
 
     // MARK: - Today Progress
@@ -179,7 +211,7 @@ struct DashboardView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
-        .card3D(theme)
+        .pastelCard(theme, tint: theme.pastelMint, radius: 20)
     }
 
     // MARK: - Feed List

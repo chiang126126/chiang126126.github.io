@@ -11,22 +11,13 @@ struct StreakCounter: View {
         HStack(spacing: 10) {
             ZStack {
                 Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: isOnFire
-                                ? [Color(hex: "#E8B0E0"), Color(hex: "#F8D0E8")]
-                                : isHot
-                                    ? [Color(hex: "#FFE066"), Color(hex: "#E8B0E0")]
-                                    : [theme.pastelLavender, theme.pastelPink],
-                            startPoint: .top, endPoint: .bottom
-                        )
-                    )
+                    .fill(Color.white)
                     .frame(width: 40, height: 40)
-                    .shadow(color: isOnFire ? Color(hex: "#E8B0E0").opacity(0.4) : .clear, radius: 8)
+                    .shadow(color: Color.black.opacity(0.06), radius: 4, y: 2)
 
                 Image(systemName: isOnFire ? "flame.fill" : "flame")
                     .font(.system(size: 20, weight: .bold))
-                    .foregroundColor(.white)
+                    .foregroundColor(isOnFire ? theme.neonOrange : (isHot ? theme.neonPink : theme.mutedColor))
                     .phaseAnimator([false, true]) { content, phase in
                         content.scaleEffect(phase ? 1.12 : 1)
                     } animation: { _ in .easeInOut(duration: 0.9).repeatForever(autoreverses: true) }
@@ -46,7 +37,6 @@ struct StreakCounter: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .card3D(theme)
-        .shadow(color: isOnFire ? Color(hex: "#E8B0E0").opacity(0.18) : .clear, radius: 12, y: 4)
+        .pastelCard(theme, tint: theme.pastelCoral, radius: 20)
     }
 }

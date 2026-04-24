@@ -255,7 +255,7 @@ struct MascotView: View {
         case .perfect:
             Image(systemName: "star.fill")
                 .font(.system(size: size * 0.12))
-                .foregroundColor(Color(hex: "#FFE066"))
+                .foregroundColor(Color(hex: "#FFD83A"))
         case .celebrating:
             HappyArc()
                 .stroke(Color(hex: "#5D5A57"), style: StrokeStyle(lineWidth: 2.2, lineCap: .round))
@@ -365,7 +365,7 @@ struct MascotView: View {
         case .celebrating:
             ForEach(0..<6, id: \.self) { i in
                 Circle()
-                    .fill([Color(hex: "#FFE066"), Color(hex: "#E8B0E0"), Color(hex: "#D0F0D8"), Color(hex: "#C0D840")][i % 4])
+                    .fill([Color(hex: "#FFD83A"), Color(hex: "#A78BFA"), Color(hex: "#5BC47E"), Color(hex: "#FF9F70")][i % 4])
                     .frame(width: size * 0.04, height: size * 0.04)
                     .offset(
                         x: size * [-0.4, -0.25, 0.25, 0.4, -0.35, 0.35][i],
@@ -384,34 +384,34 @@ struct MascotView: View {
         case .grumpy, .eyeroll:
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: size * 0.12))
-                .foregroundColor(Color(hex: "#F8D0E8").opacity(0.9))
+                .foregroundColor(Color(hex: "#FF7A8C").opacity(0.9))
                 .offset(x: size * 0.32, y: -size * 0.35)
         case .perfect:
             ZStack {
                 Image(systemName: "sparkles")
                     .font(.system(size: size * 0.14))
-                    .foregroundColor(Color(hex: "#FFE066"))
+                    .foregroundColor(Color(hex: "#FFD83A"))
                     .offset(x: size * 0.35, y: -size * 0.35)
                 Image(systemName: "sparkle")
                     .font(.system(size: size * 0.08))
-                    .foregroundColor(Color(hex: "#D0F0D8"))
+                    .foregroundColor(Color(hex: "#5BC47E"))
                     .offset(x: -size * 0.38, y: -size * 0.28)
             }
         case .eating:
             ZStack {
                 Image(systemName: "sparkle")
                     .font(.system(size: size * 0.09, weight: .bold))
-                    .foregroundColor(Color(hex: "#FFE066"))
+                    .foregroundColor(Color(hex: "#FFD83A"))
                     .offset(x: size * 0.32, y: -size * 0.32)
                 Image(systemName: "sparkle")
                     .font(.system(size: size * 0.07, weight: .bold))
-                    .foregroundColor(Color(hex: "#D0F0D8"))
+                    .foregroundColor(Color(hex: "#5BC47E"))
                     .offset(x: -size * 0.35, y: -size * 0.28)
             }
         case .deflated:
             Image(systemName: "leaf.fill")
                 .font(.system(size: size * 0.1))
-                .foregroundColor(Color(hex: "#D0F0D8").opacity(0.6))
+                .foregroundColor(Color(hex: "#5BC47E").opacity(0.6))
                 .offset(x: size * 0.3, y: -size * 0.22)
         default:
             EmptyView()
@@ -534,5 +534,5 @@ struct BubbleTail: Shape {
         MascotView(mood: .sleepy, size: 100)
     }
     .padding()
-    .background(Color(hex: "#F3ECF3"))
+    .background(Color(hex: "#6B4EE6"))
 }
