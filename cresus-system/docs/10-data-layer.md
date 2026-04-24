@@ -1054,12 +1054,9 @@ STABLEUSDT 完整评分推理：`base 40 +10 OI +10 funding +10 L/S ratio +10 ta
 
 ## 下一步：P4 Discord 通知层
 
-P4 文档（`11-discord-notifier.md`）将覆盖：
+P4 已完成，详见 **[11-discord-notifier.md](./11-discord-notifier.md)**：
 
-- Discord Bot Token + Channel ID 配置
-- `src/notifier/discord_client.py`：发送 Embed 消息
-- `src/execution/signal_router.py`：按信心度路由
-  - ≥70 → `#high-confidence` 频道
-  - 50–69 → `#watch-list` 频道
-  - 每次扫描摘要 → `#scan-log` 频道
-- `scripts/main_loop.py`：5 分钟定时扫描 + 路由 + 通知完整闭环
+- 中文 Embed 信号卡片（方向/结构类型/入场价/止损/止盈）
+- 按信心度路由：≥70 → `#high-confidence`，50–69 → `#watch-list`
+- 每次扫描摘要 → `#scan-log`
+- `scripts/main_loop.py` 完整闭环（已实测端到端 LABUSDT/ENJUSDT）
