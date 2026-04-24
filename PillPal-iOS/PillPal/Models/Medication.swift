@@ -77,8 +77,7 @@ struct Medication: Identifiable, Codable, Equatable {
         colorHex: String = "#22D3EE",
         iconName: String = "pill.fill",
         isActive: Bool = true,
-        weekDay: Int? = nil,
-        reminderTime: Date? = nil
+        weekDay: Int? = nil
     ) {
         self.name = name
         self.dosage = dosage
@@ -91,7 +90,6 @@ struct Medication: Identifiable, Codable, Equatable {
         self.isActive = isActive
         self.createdAt = Date()
         self.weekDay = weekDay
-        self.reminderTime = reminderTime
     }
 
     var color: Color { Color(hex: colorHex) }

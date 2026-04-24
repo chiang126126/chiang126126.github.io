@@ -143,9 +143,10 @@ final class MedicationStore {
     }
 
     // MARK: - Medication CRUD
-    func addMedication(_ med: Medication) {
+    func addMedication(_ med: Medication, reminderTime: Date? = nil) {
         var newMed = med
         newMed.createdAt = Date()
+        newMed.reminderTime = reminderTime
         medications.append(newMed)
 
         if !achievements.contains(.firstPill) {

@@ -9,7 +9,7 @@ struct AddMedicationView: View {
     @State private var dosage = ""
     @State private var frequency: Frequency = .daily
     @State private var timeOfDay: TimeOfDay = .morning
-    @State private var reminderTime: Date = TimeOfDay.morning.defaultReminderTime
+    @State private var reminderTime: Date = Calendar.current.date(bySettingHour: 8, minute: 0, second: 0, of: Date()) ?? Date()
     @State private var foodRelation: FoodRelation = .withFood
     @State private var notes = ""
     @State private var colorHex = PillOptions.colors[0]
@@ -93,7 +93,14 @@ struct AddMedicationView: View {
                             isSelected: timeOfDay == time
                         ) {
                             timeOfDay = time
-                            reminderTime = time.defaultReminderTime
+                            let hour: Int
+                            switch time {
+                            case .morning:   hour = 8
+                            case .afternoon: hour = 13
+                            case .evening:   hour = 19
+                            case .bedtime:   hour = 22
+                            }
+                            reminderTime = Calendar.current.date(bySettingHour: hour, minute: 0, second: 0, of: Date()) ?? Date()
                         }
                     }
                 }
@@ -262,10 +269,9 @@ struct AddMedicationView: View {
             foodRelation: foodRelation,
             notes: notes.trimmingCharacters(in: .whitespaces),
             colorHex: colorHex,
-            iconName: iconName,
-            reminderTime: reminderTime
+            iconName: iconName
         )
-        store.addMedication(med)
+        store.addMedication(med, reminderTime: reminderTime)
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         withAnimation { saved = true }
     }
