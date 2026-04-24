@@ -65,13 +65,15 @@ struct AchievementBadgeView: View {
             .shadow(color: unlocked ? achievement.color.opacity(0.2) : .clear, radius: 10, y: 4)
 
             if showLabel {
+                let nameKey = "achv_" + achievement.rawValue
+                let descKey = "achv_" + achievement.rawValue + "_desc"
                 VStack(spacing: 2) {
-                    Text(LocalizedStringKey("achv_\(achievement.rawValue)"))
+                    Text(LocalizedStringKey(nameKey))
                         .font(.system(size: 11, weight: .bold, design: .rounded))
                         .foregroundColor(unlocked ? theme.textColor : theme.mutedColor)
                         .lineLimit(1)
 
-                    Text(LocalizedStringKey("achv_\(achievement.rawValue)_desc"))
+                    Text(LocalizedStringKey(descKey))
                         .font(.system(size: 9, design: .rounded))
                         .foregroundColor(theme.mutedColor)
                         .lineLimit(2)

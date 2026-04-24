@@ -41,7 +41,7 @@ final class ThemeManager {
     var surfaceColor: Color { Color(hex: "#F0EDFA") }
     var borderColor: Color { Color(hex: "#EEEAF5") }
     var textColor: Color { Color(hex: "#1A1A2E") }
-    var mutedColor: Color { Color(hex: "#8E8EA0") }
+    var mutedColor: Color { Color(hex: "#6E6E82") }
 
     var heroColor: Color { Color(hex: "#7B61FF") }
     var heroTextColor: Color { .white }

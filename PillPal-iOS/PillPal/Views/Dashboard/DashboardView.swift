@@ -27,7 +27,7 @@ struct DashboardView: View {
                 heroSection
                     .padding(.horizontal, 16)
                     .padding(.top, 8)
-                    .padding(.bottom, 40)
+                    .padding(.bottom, 56)
                     .background {
                         ZStack {
                             theme.heroGradient
@@ -216,7 +216,7 @@ struct DashboardView: View {
         }
     }
 
-    // MARK: - Today Progress (mint green card)
+    // MARK: - Today Progress
     private var todayProgressCard: some View {
         let schedule = store.todaySchedule()
         let done = schedule.filter { store.isTakenToday($0.id) || store.isSkippedToday($0.id) }.count
@@ -226,7 +226,7 @@ struct DashboardView: View {
         return HStack(spacing: 12) {
             ZStack {
                 Circle()
-                    .stroke(theme.successColor.opacity(0.2), lineWidth: 4)
+                    .stroke(theme.accentColor.opacity(0.15), lineWidth: 4)
                     .frame(width: 44, height: 44)
                 Circle()
                     .trim(from: 0, to: progress)
@@ -260,7 +260,7 @@ struct DashboardView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
-        .pastelCard(theme, tint: theme.cardMint, radius: 24)
+        .pastelCard(theme, tint: theme.cardSky, radius: 24)
     }
 
     // MARK: - Feed List (status-colored cards)
@@ -279,7 +279,7 @@ struct DashboardView: View {
             ForEach(Array(store.todaySchedule().enumerated()), id: \.element.id) { _, med in
                 let taken = store.isTakenToday(med.id)
                 let skipped = store.isSkippedToday(med.id)
-                let cardBg = taken ? theme.cardMint : (skipped ? theme.cardPeach : theme.cardLavender)
+                let cardBg = taken ? theme.cardMint : (skipped ? Color(hex: "#F5F3F8") : .white)
 
                 HStack(spacing: 14) {
                     BubblePopButton(
