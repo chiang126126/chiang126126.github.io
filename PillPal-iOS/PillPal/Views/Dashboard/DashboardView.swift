@@ -22,84 +22,152 @@ struct DashboardView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
-                headerRow
+            VStack(spacing: 0) {
+                // Purple hero section with decorations
+                heroSection
+                    .padding(.horizontal, 16)
                     .padding(.top, 8)
+                    .padding(.bottom, 40)
+                    .background {
+                        ZStack {
+                            theme.heroGradient
+                            // Floating decorative circles
+                            Circle()
+                                .fill(Color.white.opacity(0.07))
+                                .frame(width: 140, height: 140)
+                                .offset(x: -120, y: -20)
+                            Circle()
+                                .fill(Color.white.opacity(0.05))
+                                .frame(width: 200, height: 200)
+                                .offset(x: 140, y: 80)
+                            Circle()
+                                .fill(Color.white.opacity(0.06))
+                                .frame(width: 80, height: 80)
+                                .offset(x: 60, y: -50)
+                            Circle()
+                                .fill(Color.white.opacity(0.04))
+                                .frame(width: 60, height: 60)
+                                .offset(x: -60, y: 100)
+                            // Floating pill shapes
+                            Capsule()
+                                .fill(Color.white.opacity(0.05))
+                                .frame(width: 40, height: 18)
+                                .rotationEffect(.degrees(30))
+                                .offset(x: -130, y: 60)
+                            Capsule()
+                                .fill(Color.white.opacity(0.04))
+                                .frame(width: 30, height: 14)
+                                .rotationEffect(.degrees(-25))
+                                .offset(x: 120, y: -30)
+                            // Star sparkles
+                            Image(systemName: "sparkle")
+                                .font(.system(size: 14))
+                                .foregroundColor(Color.white.opacity(0.15))
+                                .offset(x: -80, y: -40)
+                            Image(systemName: "sparkle")
+                                .font(.system(size: 10))
+                                .foregroundColor(Color.white.opacity(0.12))
+                                .offset(x: 100, y: 20)
+                        }
+                    }
 
-                statusBanner
+                // Content sheet
+                VStack(spacing: 14) {
+                    HStack(spacing: 10) {
+                        todayProgressCard
+                        StreakCounter(streak: store.streak)
+                    }
 
-                HStack(spacing: 12) {
-                    todayProgressCard
-                    StreakCounter(streak: store.streak)
+                    if store.todaySchedule().isEmpty {
+                        emptyState
+                    } else {
+                        todayFeedList
+                    }
                 }
-
-                if store.todaySchedule().isEmpty {
-                    emptyState
-                } else {
-                    todayFeedList
-                }
+                .padding(.horizontal, 16)
+                .padding(.top, 24)
+                .padding(.bottom, 100)
+                .frame(maxWidth: .infinity)
+                .background(
+                    UnevenRoundedRectangle(
+                        topLeadingRadius: 32,
+                        bottomLeadingRadius: 0,
+                        bottomTrailingRadius: 0,
+                        topTrailingRadius: 32,
+                        style: .continuous
+                    )
+                    .fill(theme.bgColor)
+                    .offset(y: -24)
+                )
+                .offset(y: -24)
             }
-            .padding(.horizontal, 16)
-            .padding(.bottom, 100)
         }
-        .background(theme.bgGradient.ignoresSafeArea())
+        .background(theme.heroColor.ignoresSafeArea(edges: .top))
+        .background(theme.bgColor.ignoresSafeArea(edges: .bottom))
         .onAppear { refreshMessage() }
     }
 
-    // MARK: - Header
-    private var headerRow: some View {
-        HStack(alignment: .center) {
-            VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: 6) {
-                    Image(systemName: "hand.wave.fill")
-                        .font(.system(size: theme.captionSize))
-                        .foregroundColor(theme.warmYellow)
-                    Text(greeting)
-                        .font(.system(size: theme.captionSize, weight: .medium, design: .rounded))
-                        .foregroundColor(theme.mutedColor)
+    // MARK: - Hero Section
+    private var heroSection: some View {
+        VStack(spacing: 12) {
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "hand.wave.fill")
+                            .font(.system(size: theme.captionSize))
+                            .foregroundColor(theme.warmYellow)
+                        Text(greeting)
+                            .font(.system(size: theme.captionSize, weight: .medium, design: .rounded))
+                            .foregroundColor(.white.opacity(0.8))
+                    }
+                    Text("app_name")
+                        .font(.system(size: theme.titleSize, weight: .heavy, design: .rounded))
+                        .foregroundColor(.white)
                 }
 
-                Text("app_name")
-                    .font(.system(size: theme.titleSize, weight: .heavy, design: .rounded))
-                    .foregroundColor(theme.textColor)
+                Spacer()
+
+                // Level badge (yellow)
+                HStack(spacing: 4) {
+                    Image(systemName: "star.fill")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(Color(hex: "#8B6914"))
+                    Text("Lv.\(store.currentLevel.level)")
+                        .font(.system(size: 13, weight: .heavy, design: .rounded))
+                        .foregroundColor(Color(hex: "#8B6914"))
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(theme.warmYellow, in: Capsule())
+
+                // XP badge
+                HStack(spacing: 4) {
+                    Image(systemName: "bolt.fill")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(theme.warmYellow)
+                    Text("\(store.totalXP)")
+                        .font(.system(size: 13, weight: .heavy, design: .rounded))
+                        .foregroundColor(.white)
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(Color.white.opacity(0.2), in: Capsule())
             }
 
-            Spacer()
-
-            HStack(spacing: 4) {
-                Image(systemName: "star.fill")
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundColor(Color(hex: "#8B6914"))
-                Text("Lv.\(store.currentLevel.level)")
-                    .font(.system(size: 13, weight: .heavy, design: .rounded))
-                    .foregroundColor(Color(hex: "#8B6914"))
-            }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(theme.warmYellow, in: Capsule())
-
-            HStack(spacing: 4) {
-                Image(systemName: "bolt.fill")
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundColor(theme.accentColor)
-                Text("\(store.totalXP)")
-                    .font(.system(size: 13, weight: .heavy, design: .rounded))
-                    .foregroundColor(theme.accentColor)
-            }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(theme.accentColor.opacity(0.1), in: Capsule())
+            mascotHeroCard
         }
     }
 
-    // MARK: - Purple Status Banner
-    private var statusBanner: some View {
-        HStack(alignment: .center, spacing: 8) {
-            VStack(alignment: .leading, spacing: 10) {
-                HStack(spacing: 8) {
-                    (Text("\u{201C}") + Text(LocalizedStringKey(messageKey)) + Text("\u{201D}"))
+    // MARK: - Mascot Hero Card
+    private var mascotHeroCard: some View {
+        VStack(spacing: 8) {
+            // Speech bubble
+            VStack(spacing: 0) {
+                HStack {
+                    (Text("\u{201C} ") + Text(LocalizedStringKey(messageKey)) + Text(" \u{201D}"))
                         .font(.system(size: theme.bodySize - 1, weight: .medium, design: .rounded))
-                        .foregroundColor(.white)
+                        .foregroundColor(theme.textColor)
+                        .multilineTextAlignment(.center)
                         .lineSpacing(3)
                         .id(messageId)
                         .transition(.opacity.combined(with: .scale(scale: 0.95)))
@@ -110,54 +178,45 @@ struct DashboardView: View {
                     } label: {
                         Image(systemName: "arrow.clockwise")
                             .font(.system(size: 11, weight: .semibold))
-                            .foregroundColor(.white.opacity(0.7))
-                            .padding(6)
-                            .background(Color.white.opacity(0.2), in: Circle())
+                            .foregroundColor(theme.mutedColor)
+                            .padding(5)
+                            .background(theme.surfaceColor, in: Circle())
                     }
                 }
-
-                HStack(spacing: 6) {
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 10, weight: .bold))
-                    Text(LocalizedStringKey(currentMood.statusKey))
-                        .font(.system(size: 12, weight: .bold, design: .rounded))
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background {
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .fill(Color.white)
+                        .shadow(color: Color.black.opacity(0.08), radius: 8, y: 3)
                 }
-                .foregroundColor(Color(hex: "#1A1A2E"))
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(theme.warmYellow, in: Capsule())
+
+                BubbleTail()
+                    .fill(Color.white)
+                    .frame(width: 14, height: 8)
             }
 
-            MascotView(mood: currentMood, size: 90, showBackground: false)
+            // Mascot
+            MascotView(mood: currentMood, size: 130, showBackground: true)
                 .animation(.spring(response: 0.4), value: feedingAnimation)
-        }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 16)
-        .background {
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .fill(theme.bannerGradient)
-                .overlay {
-                    ZStack {
-                        Circle()
-                            .fill(Color.white.opacity(0.08))
-                            .frame(width: 100, height: 100)
-                            .offset(x: 120, y: -20)
-                        Circle()
-                            .fill(Color.white.opacity(0.05))
-                            .frame(width: 140, height: 140)
-                            .offset(x: -110, y: 40)
-                        Circle()
-                            .fill(Color.white.opacity(0.06))
-                            .frame(width: 70, height: 70)
-                            .offset(x: 60, y: 50)
-                    }
-                    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                }
-                .shadow(color: theme.accentColor.opacity(0.2), radius: 16, y: 8)
+
+            // Status capsule (yellow)
+            HStack(spacing: 8) {
+                Image(systemName: "sparkles")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(Color(hex: "#222222"))
+                Text(LocalizedStringKey(currentMood.statusKey))
+                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                    .foregroundColor(Color(hex: "#222222"))
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 7)
+            .background(theme.warmYellow, in: Capsule())
+            .shadow(color: theme.warmYellow.opacity(0.4), radius: 8, y: 2)
         }
     }
 
-    // MARK: - Today Progress
+    // MARK: - Today Progress (mint green card)
     private var todayProgressCard: some View {
         let schedule = store.todaySchedule()
         let done = schedule.filter { store.isTakenToday($0.id) || store.isSkippedToday($0.id) }.count
@@ -167,7 +226,7 @@ struct DashboardView: View {
         return HStack(spacing: 12) {
             ZStack {
                 Circle()
-                    .stroke(theme.surfaceColor, lineWidth: 4)
+                    .stroke(theme.successColor.opacity(0.2), lineWidth: 4)
                     .frame(width: 44, height: 44)
                 Circle()
                     .trim(from: 0, to: progress)
@@ -201,10 +260,10 @@ struct DashboardView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
-        .card3D(theme, radius: 20)
+        .pastelCard(theme, tint: theme.cardMint, radius: 24)
     }
 
-    // MARK: - Feed List
+    // MARK: - Feed List (status-colored cards)
     private var todayFeedList: some View {
         VStack(spacing: 10) {
             HStack(spacing: 6) {
@@ -220,6 +279,7 @@ struct DashboardView: View {
             ForEach(Array(store.todaySchedule().enumerated()), id: \.element.id) { _, med in
                 let taken = store.isTakenToday(med.id)
                 let skipped = store.isSkippedToday(med.id)
+                let cardBg = taken ? theme.cardMint : (skipped ? theme.cardPeach : theme.cardLavender)
 
                 HStack(spacing: 14) {
                     BubblePopButton(
@@ -262,7 +322,7 @@ struct DashboardView: View {
                         .foregroundColor(theme.successColor)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 5)
-                        .background(theme.successColor.opacity(0.14), in: Capsule())
+                        .background(theme.successColor.opacity(0.2), in: Capsule())
                         .transition(.scale.combined(with: .opacity))
                     } else if skipped {
                         Text("feed_skip")
@@ -270,20 +330,24 @@ struct DashboardView: View {
                             .foregroundColor(theme.mutedColor)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
-                            .background(theme.mutedColor.opacity(0.12), in: Capsule())
+                            .background(theme.mutedColor.opacity(0.15), in: Capsule())
                     } else {
                         HStack(spacing: 3) {
                             Image(systemName: "hand.tap.fill")
                                 .font(.system(size: 10))
                             Text("feed_now")
                         }
-                        .font(.system(size: 11, weight: .semibold, design: .rounded))
-                        .foregroundColor(theme.accentColor)
+                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(theme.buttonGradient, in: Capsule())
+                        .shadow(color: theme.accentColor.opacity(0.3), radius: 6, y: 2)
                     }
                 }
                 .padding(14)
-                .card3D(theme)
-                .opacity(taken ? 0.7 : 1)
+                .pastelCard(theme, tint: cardBg, radius: 24)
+                .opacity(taken ? 0.75 : 1)
                 .animation(.spring(response: 0.3), value: taken)
             }
         }
@@ -307,11 +371,11 @@ struct DashboardView: View {
         .padding(.vertical, 40)
         .frame(maxWidth: .infinity)
         .background {
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .fill(theme.cardColor)
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .fill(theme.cardLavender.opacity(0.5))
                 .overlay {
-                    RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .strokeBorder(theme.borderColor, style: StrokeStyle(lineWidth: 1.5, dash: [8]))
+                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        .strokeBorder(theme.accentColor.opacity(0.2), style: StrokeStyle(lineWidth: 1.5, dash: [8]))
                 }
         }
     }

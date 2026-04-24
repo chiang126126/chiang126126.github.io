@@ -4,19 +4,18 @@ struct StatsView: View {
     @Environment(MedicationStore.self) private var store
     @Environment(ThemeManager.self) private var theme
 
-    private var stats: [(icon: String, key: LocalizedStringKey, value: String, sub: LocalizedStringKey?, color: Color)] {
+    private var stats: [(icon: String, key: LocalizedStringKey, value: String, sub: LocalizedStringKey?, color: Color, bgTint: Color)] {
         [
-            ("chart.line.uptrend.xyaxis", "stat_adherence", "\(store.overallAdherence)%", nil, Color(hex: "#34D399")),
-            ("flame.fill", "stat_current_streak", "\(store.streak)", "stat_days", Color(hex: "#FF9F70")),
-            ("trophy.fill", "stat_best_streak", "\(store.bestStreak)", "stat_days", Color(hex: "#FFD83A")),
-            ("checkmark.circle.fill", "stat_total_taken", "\(store.totalTaken)", nil, Color(hex: "#6B4EE6")),
+            ("chart.line.uptrend.xyaxis", "stat_adherence", "\(store.overallAdherence)%", nil, Color(hex: "#34D399"), Color(hex: "#DDF8E8")),
+            ("flame.fill", "stat_current_streak", "\(store.streak)", "stat_days", Color(hex: "#FF9F70"), Color(hex: "#FFE2D2")),
+            ("trophy.fill", "stat_best_streak", "\(store.bestStreak)", "stat_days", Color(hex: "#FFD83A"), Color(hex: "#FFF1A8")),
+            ("checkmark.circle.fill", "stat_total_taken", "\(store.totalTaken)", nil, Color(hex: "#7B61FF"), Color(hex: "#EEE8FF")),
         ]
     }
 
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                // Header
                 HStack {
                     Text("stats_title")
                         .font(.system(size: theme.titleSize, weight: .bold, design: .rounded))
@@ -26,10 +25,8 @@ struct StatsView: View {
                 }
                 .padding(.top, 8)
 
-                // Level Progress Card
                 levelCard
 
-                // Stats grid
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                     ForEach(Array(stats.enumerated()), id: \.offset) { index, stat in
                         VStack(alignment: .leading, spacing: 8) {
@@ -38,7 +35,7 @@ struct StatsView: View {
                                     .font(.system(size: 14))
                                     .foregroundColor(stat.color)
                                     .frame(width: 28, height: 28)
-                                    .background(stat.color.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
+                                    .background(stat.color.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))
 
                                 Text(stat.key)
                                     .font(.system(size: theme.captionSize, design: .rounded))
@@ -61,15 +58,13 @@ struct StatsView: View {
                         }
                         .padding(14)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .card3D(theme, radius: 16)
+                        .pastelCard(theme, tint: stat.bgTint, radius: 20)
                         .gridCellColumns(index == 0 ? 2 : 1)
                     }
                 }
 
-                // XP stats
                 xpStatsCard
 
-                // Weekly chart
                 VStack(alignment: .leading, spacing: 10) {
                     Text("this_week")
                         .font(.system(size: theme.bodySize, weight: .semibold, design: .rounded))
@@ -77,9 +72,8 @@ struct StatsView: View {
                     WeeklyChartView(data: store.weeklyStats())
                 }
                 .padding(16)
-                .card3D(theme, radius: 16)
+                .pastelCard(theme, tint: theme.cardLavender, radius: 24)
 
-                // Achievements
                 achievementsSection
             }
             .padding(.horizontal, 16)
@@ -88,7 +82,7 @@ struct StatsView: View {
         .background(theme.bgGradient.ignoresSafeArea())
     }
 
-    // MARK: - Level Card
+    // MARK: - Level Card (purple gradient with decorations)
     private var levelCard: some View {
         let level = store.currentLevel
         return VStack(spacing: 14) {
@@ -138,36 +132,49 @@ struct StatsView: View {
         }
         .padding(16)
         .background {
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .fill(theme.bannerGradient)
                 .overlay {
                     ZStack {
                         Circle()
                             .fill(Color.white.opacity(0.07))
-                            .frame(width: 90, height: 90)
+                            .frame(width: 100, height: 100)
                             .offset(x: 130, y: -15)
                         Circle()
                             .fill(Color.white.opacity(0.04))
-                            .frame(width: 120, height: 120)
+                            .frame(width: 130, height: 130)
                             .offset(x: -100, y: 30)
+                        Capsule()
+                            .fill(Color.white.opacity(0.04))
+                            .frame(width: 40, height: 18)
+                            .rotationEffect(.degrees(25))
+                            .offset(x: 80, y: 40)
+                        Image(systemName: "sparkle")
+                            .font(.system(size: 12))
+                            .foregroundColor(Color.white.opacity(0.12))
+                            .offset(x: -60, y: -25)
+                        Image(systemName: "star.fill")
+                            .font(.system(size: 8))
+                            .foregroundColor(Color.white.opacity(0.1))
+                            .offset(x: 100, y: -30)
                     }
-                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
                 }
-                .shadow(color: theme.accentColor.opacity(0.2), radius: 16, y: 8)
+                .shadow(color: theme.accentColor.opacity(0.25), radius: 16, y: 8)
         }
     }
 
-    // MARK: - XP Stats
+    // MARK: - XP Stats (game-like reward card)
     private var xpStatsCard: some View {
         HStack(spacing: 0) {
-            xpStatItem("target", "xp_per_dose", "+\(XPReward.takeDose)", Color(hex: "#6B4EE6"))
+            xpStatItem("target", "xp_per_dose", "+\(XPReward.takeDose)", Color(hex: "#7B61FF"))
             Divider().frame(height: 30).overlay(theme.borderColor)
             xpStatItem("star.fill", "xp_daily_bonus", "+\(XPReward.completeAllDaily)", Color(hex: "#FFD83A"))
             Divider().frame(height: 30).overlay(theme.borderColor)
             xpStatItem("flame.fill", "xp_streak_7", "+\(XPReward.streak7)", Color(hex: "#FF9F70"))
         }
         .padding(12)
-        .card3D(theme, radius: 16)
+        .pastelCard(theme, tint: Color(hex: "#FFF8E0"), radius: 24)
     }
 
     private func xpStatItem(_ sfSymbol: String, _ key: LocalizedStringKey, _ value: String, _ color: Color) -> some View {
@@ -210,6 +217,6 @@ struct StatsView: View {
             }
         }
         .padding(16)
-        .card3D(theme, radius: 16)
+        .pastelCard(theme, tint: theme.cardLavender.opacity(0.5), radius: 24)
     }
 }

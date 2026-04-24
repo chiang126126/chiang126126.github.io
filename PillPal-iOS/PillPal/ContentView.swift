@@ -13,7 +13,7 @@ struct ContentView: View {
                     MainTabView()
                 }
             }
-            .preferredColorScheme(theme.isPro ? .dark : .light)
+            .preferredColorScheme(.light)
 
             // Level Up Overlay
             if store.showLevelUp {

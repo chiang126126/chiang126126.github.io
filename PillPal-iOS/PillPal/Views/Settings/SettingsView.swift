@@ -36,7 +36,7 @@ struct SettingsView: View {
                 // Appearance
                 settingsSection("appearance_title") {
                     HStack(spacing: 10) {
-                        modeCard(.pro)
+                        modeCard(.normal)
                         modeCard(.care)
                     }
                     .padding(14)
@@ -220,29 +220,29 @@ struct SettingsView: View {
     // MARK: - Mode Card
     private func modeCard(_ m: AppMode) -> some View {
         let isSelected = theme.mode == m
-        let isPro = m == .pro
-        let previewBg = isPro ? Color(hex: "#110A1F") : Color(hex: "#6B4EE6")
-        let previewAccent = isPro ? Color(hex: "#A78BFA") : Color(hex: "#FFD83A")
-        let previewLabel = isPro ? Color.white : Color.white
+        let isNormalMode = m == .normal
+        let previewBg = isNormalMode ? Color(hex: "#7B61FF") : Color(hex: "#F8F5FF")
+        let previewAccent = isNormalMode ? Color(hex: "#FFD83A") : Color(hex: "#7B61FF")
+        let previewLabel = isNormalMode ? Color.white : Color(hex: "#1A1A2E")
         return Button {
             withAnimation(.spring(response: 0.3)) { theme.mode = m }
             UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         } label: {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 6) {
-                    Image(systemName: isPro ? "moon.stars.fill" : "sun.max.fill")
+                    Image(systemName: isNormalMode ? "sparkles" : "heart.fill")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundColor(isSelected ? previewAccent : .gray)
-                    Text(LocalizedStringKey(isPro ? "mode_pro" : "mode_care"))
+                    Text(LocalizedStringKey(isNormalMode ? "mode_normal" : "mode_care"))
                         .font(.system(size: 13, weight: .semibold, design: .rounded))
                         .foregroundColor(isSelected ? previewLabel : .gray)
                 }
-                Text(LocalizedStringKey(isPro ? "mode_pro_desc" : "mode_care_desc"))
+                Text(LocalizedStringKey(isNormalMode ? "mode_normal_desc" : "mode_care_desc"))
                     .font(.system(size: 9, design: .rounded))
                     .foregroundColor(.gray)
                 HStack(spacing: 3) {
-                    let colors = isPro
-                        ? ["#A78BFA", "#F472B6", "#3B2A5E"]
+                    let colors = isNormalMode
+                        ? ["#7B61FF", "#FFD83A", "#34D399"]
                         : ["#FFD83A", "#5BC47E", "#FF9F70"]
                     ForEach(colors, id: \.self) { c in
                         Circle().fill(Color(hex: c)).frame(width: 12, height: 12)
