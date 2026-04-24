@@ -767,23 +767,207 @@ git push
 
 ---
 
-## ✅ P2 完成检查清单
+## ✅ Sprint 1 完成检查清单
 
-- [ ] `uv sync` 无报错（tenacity 等依赖已装）
-- [ ] `scripts/test_data_layer.py` 运行完成，无未处理异常
-- [ ] 控制台能看到 anomaly 币（或至少看到正常扫描输出）
-- [ ] 22 维 assemble 返回 `klines_1d: 7 bars`、`klines_4h: 6 bars`
-- [ ] `git push` 成功，GitHub 私有仓库能看到 `src/data_layer/` 文件夹
-- [ ] GitHub 仓库**没有** `.env`
+- [x] `uv sync` 无报错（tenacity 等依赖已装）
+- [x] `scripts/test_data_layer.py` 运行完成，无未处理异常
+- [x] 控制台能看到 anomaly 币（或至少看到正常扫描输出）
+- [x] 22 维 assemble 返回 29 个字段
+- [x] `git push` 成功，GitHub 私有仓库能看到 `src/data_layer/` 文件夹
+- [x] GitHub 仓库**没有** `.env`
 
-全部打勾 = P2 数据层完成，可以进入 **P3 AI 判断层**（DeepSeek prompt 工程）。
+---
+
+## Sprint 2 · Master Framework v0.7 新信号接入
+
+> Commit: `a214867` — 2026-04-24
+>
+> 新增信号：V4A-Flash 做空信号、跨交易所 OI 集中度、期货/现货成交量比、北京峰值时段标记
+
+### 新增文件
+
+**`src/data_layer/signals.py`**
+
+```python
+"""Sprint 2 derived signals."""
+from datetime import datetime, timezone
+
+import httpx
+from loguru import logger
+
+from data_layer.binance_client import get_spot_ticker_24h
+
+_NO_SPOT_SYMBOLS: set[str] = {
+    "XAUUSDT", "XAGUSDT", "XPTUSDT", "XPDUSDT",
+    "CLUSDT", "NGUSDT", "HGUSDT",
+    "USTCUSDT",
+}
+
+
+def is_beijing_peak_hour() -> bool:
+    """True when UTC is 21:00–00:59 (= Beijing 05:00–08:59)."""
+    h = datetime.now(timezone.utc).hour
+    return h >= 21 or h == 0
+
+
+def detect_v4a_flash(klines_4h: list[dict], klines_1h: list[dict]) -> dict:
+    """V4A-Flash: 4H upper shadow (>40% of range) + 1H retracement (>0.3%) → SHORT.
+
+    Uses second-to-last 4H candle (completed) and latest 1H candle.
+    """
+    empty = {"signal": False, "upper_shadow_pct": 0.0, "retracement_pct": 0.0, "direction": None}
+    if len(klines_4h) < 2 or len(klines_1h) < 1:
+        return empty
+
+    k = klines_4h[-2]
+    o, h, l, c = float(k["o"]), float(k["h"]), float(k["l"]), float(k["c"])
+    candle_range = h - l
+    if candle_range < 1e-10:
+        return empty
+
+    upper_shadow = h - max(o, c)
+    upper_shadow_pct = upper_shadow / candle_range
+    has_upper_shadow = upper_shadow_pct > 0.4 and (upper_shadow / c) > 0.005
+
+    h1_close = float(klines_1h[-1]["c"])
+    retracement_pct = (c - h1_close) / c * 100
+    has_retracement = retracement_pct > 0.3
+
+    signal = has_upper_shadow and has_retracement
+    return {
+        "signal": signal,
+        "upper_shadow_pct": round(upper_shadow_pct, 3),
+        "retracement_pct": round(retracement_pct, 3),
+        "direction": "SHORT" if signal else None,
+    }
+
+
+def calc_spot_futures_vol_ratio(symbol: str, futures_vol_usd: float) -> float:
+    """futures_vol / spot_vol。> 20x = 极端杠杆。商品币跳过。"""
+    if symbol in _NO_SPOT_SYMBOLS:
+        return 0.0
+    try:
+        spot = get_spot_ticker_24h(symbol)
+        spot_vol = float(spot.get("quoteVolume", 0))
+        if spot_vol == 0:
+            return 0.0
+        return round(futures_vol_usd / spot_vol, 2)
+    except httpx.HTTPStatusError:
+        _NO_SPOT_SYMBOLS.add(symbol)
+        return 0.0
+    except Exception as e:
+        logger.debug(f"{symbol} spot vol: {e}")
+        return 0.0
+```
+
+### 修改文件
+
+**`src/data_layer/binance_client.py`** — 追加函数：
+
+```python
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=8))
+def get_spot_ticker_24h(symbol: str) -> dict:
+    """现货 24h 统计（含 quoteVolume），用于计算期货/现货成交量比。"""
+    with _client() as c:
+        return (
+            c.get(f"{_BASE_SPOT}/api/v3/ticker/24hr", params={"symbol": symbol})
+            .raise_for_status()
+            .json()
+        )
+```
+
+**`src/data_layer/okx_client.py`** — 追加函数：
+
+```python
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=8))
+def get_open_interest(instId: str) -> dict:
+    """OKX 单币合约 OI（instId='BTC-USDT-SWAP'），oi 单位为币数（oiCcy）。"""
+    with _client() as c:
+        return (
+            c.get(
+                f"{_BASE}/api/v5/public/open-interest",
+                params={"instType": "SWAP", "instId": instId},
+            )
+            .raise_for_status()
+            .json()
+        )
+```
+
+**`src/data_layer/scanner.py`** — `CoinSnapshot` 新增字段：
+
+```python
+spot_futures_vol_ratio: float = 0.0   # Sprint 2: futures/spot vol ratio
+is_beijing_peak: bool = False          # Sprint 2: Beijing 05:00–08:59
+```
+
+异常原因追加规则（阈值 20x，正常基线 5–15x）：
+
+```python
+if sf_ratio > 20:
+    reasons.append(f"fut/spot vol {sf_ratio:.1f}x")
+```
+
+**`src/data_layer/assembler.py`** — 新增字段：
+
+```python
+# V4A-Flash (需要 klines_4h / klines_1h 先组装完成)
+data["v4a_flash"] = detect_v4a_flash(klines_4h, klines_1h)
+
+# OKX OI（注意用 oiCcy 而不是 oi，oi 是合约张数）
+okx_oi_coins = float(okx_oi_raw["data"][0]["oiCcy"])
+okx_oi_usd = okx_oi_coins * snap.price
+data["oi_usd_okx"] = okx_oi_usd
+total_oi = snap.oi_usd + okx_oi_usd
+data["oi_concentration_binance_pct"] = round(snap.oi_usd / total_oi * 100, 1)
+```
+
+### Sprint 2 验证输出
+
+```
+INFO  | === Sprint 2 Smoke Test ===
+INFO  | Beijing peak hour: False
+INFO  | Scan complete: 9 passed hard filter, 1 anomalies
+INFO  | [ANOMALY]  CLUSDT  OI_chg=+40.3%  reasons=['OI 24h +40.3%']
+INFO  | V4A-Flash:             {'signal': False, 'upper_shadow_pct': 0.522, ...}
+INFO  | OI Binance:            $77,471,138
+INFO  | OI OKX:                $13,340,488
+INFO  | OI concentration (BN): 85.3%
+INFO  | Total fields:          34
+SUCCESS | Sprint 2 smoke test PASSED.
+```
+
+> **CLUSDT 信号解读**：OI +40.3% + Binance 集中度 85.3% → Pattern A（OI 积累）；V4A-Flash 4H 上影 52% 但 1H 未回调，暂无做空确认。DeepSeek P3 判断：Watch List。
+
+### ⚠️ OKX OI 注意事项
+
+OKX `/api/v5/public/open-interest` 返回：
+- `oi`：合约张数（**不能**直接 × price，单位错误）
+- `oiCcy`：币数（**正确**，× price = USD）
+- `oiUsd`：直接 USD（如可用也可用这个字段）
+
+---
+
+## ✅ P2 完成检查清单（Sprint 1 + Sprint 2）
+
+- [x] `uv sync` 无报错
+- [x] Sprint 1：`scripts/test_data_layer.py` PASSED，22 维 29 字段
+- [x] Sprint 2：`scripts/test_sprint2.py` PASSED，34 字段
+- [x] H1 硬过滤生效（KATUSDT vol/OI=31x 被过滤）
+- [x] 跨交易所 OI 集中度正确（Binance vs OKX 同量级）
+- [x] V4A-Flash 检测逻辑正确（上影 + 回撤双条件）
+- [x] Beijing 峰值时段标记
+- [x] 商品币（XAU/XAG/CL）无 RetryError 噪音
+- [x] `git push` 成功（Sprint 1: `32c6dfb`，Sprint 2: `a214867`）
+- [x] GitHub 仓库无 `.env`
+
+全部打勾 = P2 数据层完成，进入 **P3 AI 判断层**。
 
 ---
 
 ## 下一步：P3 AI 判断层
 
-P3 文档（`10-ai-layer.md`）将覆盖：
-- `src/ai_layer/prompt_builder.py`：把 22 维数据格式化成 DeepSeek prompt
-- `src/ai_layer/judge.py`：调用 DeepSeek API，解析结构化输出
-- 信心度评分逻辑
+P3 文档（`11-ai-layer.md`）将覆盖：
+- `src/ai_layer/prompt_builder.py`：把 34 维数据格式化成 DeepSeek prompt
+- `src/ai_layer/judge.py`：调用 DeepSeek API，解析结构化 JSON 输出
+- 信心度评分逻辑（0–100，Master Framework 权重）
 - 烟雾测试：对真实异常币跑一次完整判断
