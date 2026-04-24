@@ -75,7 +75,7 @@ final class NotificationManager {
     }
 
     private func reminderTimes(for med: Medication) -> [Date] {
-        let primary = med.effectiveReminderTime
+        let primary = med.reminderTime ?? med.timeOfDay.defaultReminderTime
         if med.frequency == .twiceDaily {
             let second = Calendar.current.date(byAdding: .hour, value: 8, to: primary) ?? primary
             return [primary, second]
