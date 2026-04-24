@@ -6,7 +6,7 @@ struct StatsView: View {
 
     private var stats: [(icon: String, key: LocalizedStringKey, value: String, sub: LocalizedStringKey?, color: Color)] {
         [
-            ("chart.line.uptrend.xyaxis", "stat_adherence", "\(store.overallAdherence)%", nil, Color(hex: "#5BC47E")),
+            ("chart.line.uptrend.xyaxis", "stat_adherence", "\(store.overallAdherence)%", nil, Color(hex: "#34D399")),
             ("flame.fill", "stat_current_streak", "\(store.streak)", "stat_days", Color(hex: "#FF9F70")),
             ("trophy.fill", "stat_best_streak", "\(store.bestStreak)", "stat_days", Color(hex: "#FFD83A")),
             ("checkmark.circle.fill", "stat_total_taken", "\(store.totalTaken)", nil, Color(hex: "#6B4EE6")),
@@ -91,30 +91,28 @@ struct StatsView: View {
     // MARK: - Level Card
     private var levelCard: some View {
         let level = store.currentLevel
-        return VStack(spacing: 12) {
+        return VStack(spacing: 14) {
             HStack(spacing: 10) {
                 ZStack {
                     Circle()
-                        .fill(
-                            LinearGradient(
-                                colors: [level.color, level.color.opacity(0.6)],
-                                startPoint: .topLeading, endPoint: .bottomTrailing
-                            )
-                        )
+                        .fill(Color.white.opacity(0.2))
                         .frame(width: 50, height: 50)
-                        .shadow(color: level.color.opacity(0.4), radius: 6)
                     Image(systemName: level.sfSymbol)
                         .font(.system(size: 22, weight: .bold))
                         .foregroundColor(.white)
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Lv.\(level.level)")
-                        .font(.system(size: 14, weight: .bold, design: .rounded))
-                        .foregroundColor(level.color)
+                    HStack(spacing: 4) {
+                        Image(systemName: "star.fill")
+                            .font(.system(size: 10, weight: .bold))
+                        Text("Lv.\(level.level)")
+                            .font(.system(size: 14, weight: .bold, design: .rounded))
+                    }
+                    .foregroundColor(theme.warmYellow)
                     Text(LocalizedStringKey(level.titleKey))
                         .font(.system(size: theme.bodySize, weight: .semibold, design: .rounded))
-                        .foregroundColor(theme.textColor)
+                        .foregroundColor(.white)
                 }
 
                 Spacer()
@@ -122,11 +120,11 @@ struct StatsView: View {
                 VStack(alignment: .trailing, spacing: 2) {
                     Text("\(store.totalXP) XP")
                         .font(.system(size: 18, weight: .bold, design: .rounded))
-                        .foregroundColor(theme.accentColor)
+                        .foregroundColor(.white)
                     if store.xpToNext > 0 {
                         Text("\(store.xpToNext) XP to next")
                             .font(.system(size: 10, design: .rounded))
-                            .foregroundColor(theme.mutedColor)
+                            .foregroundColor(.white.opacity(0.7))
                     }
                 }
             }
@@ -139,7 +137,24 @@ struct StatsView: View {
             )
         }
         .padding(16)
-        .card3D(theme, radius: 20)
+        .background {
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(theme.bannerGradient)
+                .overlay {
+                    ZStack {
+                        Circle()
+                            .fill(Color.white.opacity(0.07))
+                            .frame(width: 90, height: 90)
+                            .offset(x: 130, y: -15)
+                        Circle()
+                            .fill(Color.white.opacity(0.04))
+                            .frame(width: 120, height: 120)
+                            .offset(x: -100, y: 30)
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                }
+                .shadow(color: theme.accentColor.opacity(0.2), radius: 16, y: 8)
+        }
     }
 
     // MARK: - XP Stats

@@ -51,14 +51,7 @@ struct DailyMissionCard: View {
             }
         }
         .padding(16)
-        .background {
-            RoundedRectangle(cornerRadius: 20)
-                .fill(theme.cardColor)
-                .overlay {
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(theme.borderColor, lineWidth: 1)
-                }
-        }
+        .card3D(theme, radius: 20)
     }
 }
 

@@ -88,7 +88,7 @@ struct CustomTabBar: View {
                             Circle()
                                 .fill(theme.buttonGradient)
                                 .frame(width: 60, height: 60)
-                                .shadow(color: theme.accentColor.opacity(0.5), radius: 12, y: 4)
+                                .shadow(color: theme.accentColor.opacity(0.35), radius: 12, y: 4)
 
                             Image(systemName: tabs[index].icon)
                                 .font(.system(size: 24, weight: .bold))
@@ -132,10 +132,8 @@ struct CustomTabBar: View {
         .padding(.bottom, 6)
         .background {
             Rectangle()
-                .fill(theme.cardColor.opacity(0.95))
-                .shadow(color: Color.black.opacity(0.06), radius: 8, y: -3)
-                .shadow(color: Color.black.opacity(0.03), radius: 20, y: -6)
-                .background(.ultraThinMaterial)
+                .fill(theme.cardColor)
+                .shadow(color: Color.black.opacity(0.05), radius: 12, y: -4)
                 .ignoresSafeArea()
         }
     }

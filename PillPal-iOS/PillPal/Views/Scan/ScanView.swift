@@ -147,7 +147,7 @@ struct ScanView: View {
                     .fill(
                         theme.isPro
                         ? LinearGradient(colors: [Color(hex: "#1A1A1A"), Color(hex: "#0A0A0A")], startPoint: .topLeading, endPoint: .bottomTrailing)
-                        : LinearGradient(colors: [Color(hex: "#F5F2FA"), Color(hex: "#EDE7F8")], startPoint: .topLeading, endPoint: .bottomTrailing)
+                        : LinearGradient(colors: [Color(hex: "#F0EDFA"), Color(hex: "#E8E3F5")], startPoint: .topLeading, endPoint: .bottomTrailing)
                     )
                     .overlay {
                         RoundedRectangle(cornerRadius: 24, style: .continuous)

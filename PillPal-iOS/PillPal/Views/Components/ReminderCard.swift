@@ -80,15 +80,7 @@ struct ReminderCard: View {
             }
         }
         .padding(14)
-        .background {
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(theme.cardColor)
-                .overlay {
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .stroke(theme.borderColor, lineWidth: 1)
-                }
-                .shadow(color: Color.black.opacity(0.05), radius: 10, y: 4)
-        }
+        .card3D(theme, radius: 20)
         .onAppear { refreshMessage() }
     }
 

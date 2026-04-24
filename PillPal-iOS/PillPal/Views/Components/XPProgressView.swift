@@ -88,14 +88,7 @@ struct XPProgressView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .background {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(theme.cardColor)
-                .overlay {
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(theme.borderColor, lineWidth: 1)
-                }
-        }
+        .card3D(theme, radius: 16)
         .onAppear {
             // Animate the bar filling
             withAnimation(.spring(response: 0.8, dampingFraction: 0.7)) {

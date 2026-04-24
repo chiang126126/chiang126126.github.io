@@ -153,25 +153,24 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 10) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 14)
-                        .fill(theme.isPro ? theme.neonPurple.opacity(0.15) : Color(hex: "#F59E0B").opacity(0.15))
+                    Circle()
+                        .fill(Color.white.opacity(0.2))
                         .frame(width: 48, height: 48)
                     Image(systemName: "crown.fill")
                         .font(.system(size: 22))
-                        .foregroundColor(theme.isPro ? theme.neonPurple : Color(hex: "#F59E0B"))
+                        .foregroundColor(theme.warmYellow)
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("upgrade_title")
                         .font(.system(size: theme.bodySize, weight: .bold, design: .rounded))
-                        .foregroundColor(theme.textColor)
+                        .foregroundColor(.white)
                     Text("upgrade_desc")
                         .font(.system(size: theme.captionSize, design: .rounded))
-                        .foregroundColor(theme.mutedColor)
+                        .foregroundColor(.white.opacity(0.7))
                 }
             }
 
-            // 7-day free trial + pricing
             HStack(spacing: 8) {
                 HStack(spacing: 4) {
                     Image(systemName: "gift.fill")
@@ -179,26 +178,43 @@ struct SettingsView: View {
                     Text("free_trial_badge")
                 }
                 .font(.system(size: 11, weight: .bold, design: .rounded))
-                .foregroundColor(.white)
+                .foregroundColor(Color(hex: "#1A1A2E"))
                 .padding(.horizontal, 10)
                 .padding(.vertical, 5)
-                .background(theme.successColor, in: Capsule())
+                .background(theme.warmYellow, in: Capsule())
 
                 Text("price_yearly")
                     .font(.system(size: 11, weight: .medium, design: .rounded))
-                    .foregroundColor(theme.accentColor)
+                    .foregroundColor(.white)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 5)
-                    .background(theme.accentColor.opacity(0.1), in: Capsule())
+                    .background(Color.white.opacity(0.2), in: Capsule())
 
                 Image(systemName: "sparkles")
                     .font(.system(size: 12))
-                    .foregroundColor(theme.accentColor)
+                    .foregroundColor(theme.warmYellow)
             }
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .card3D(theme, radius: 16)
+        .background {
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(theme.bannerGradient)
+                .overlay {
+                    ZStack {
+                        Circle()
+                            .fill(Color.white.opacity(0.07))
+                            .frame(width: 80, height: 80)
+                            .offset(x: 140, y: -10)
+                        Circle()
+                            .fill(Color.white.opacity(0.04))
+                            .frame(width: 100, height: 100)
+                            .offset(x: -80, y: 30)
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                }
+                .shadow(color: theme.accentColor.opacity(0.2), radius: 12, y: 6)
+        }
     }
 
     // MARK: - Mode Card
