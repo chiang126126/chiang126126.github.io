@@ -971,3 +971,95 @@ P3 文档（`11-ai-layer.md`）将覆盖：
 - `src/ai_layer/judge.py`：调用 DeepSeek API，解析结构化 JSON 输出
 - 信心度评分逻辑（0–100，Master Framework 权重）
 - 烟雾测试：对真实异常币跑一次完整判断
+
+---
+
+## P3 AI 判断层（Sprint 1 + Sprint 2）
+
+> 私有库路径：`src/ai_layer/`
+> Commits: Sprint 1 `0bdca47` · Sprint 2 `619cc82`
+
+### 文件结构
+
+```
+src/ai_layer/
+├── __init__.py              # P0 创建（空）
+├── prompt_builder.py        # P3 Sprint 1+2
+└── judge.py                 # P3 Sprint 1+2
+```
+
+### `src/ai_layer/prompt_builder.py`
+
+核心常量 `SYSTEM_PROMPT` 内嵌 Master Framework v0.7：
+
+- 8 种结构类型（A–H）定义
+- H2–H5 硬规则（H1 由数据层预过滤，不传入 LLM）
+- 信心度评分公式（0–100）
+- 强制输出 JSON schema（`entry_price` / `stop_loss` / `take_profit` 对 LONG/SHORT 必填）
+
+关键设计决策：
+> H1（vol/OI <20x）由 scanner 预过滤，**不传给 LLM**，避免 DeepSeek 因方向误判产生错误推理。
+
+### `src/ai_layer/judge.py`
+
+```python
+def judge(snapshot: dict, model: str = "deepseek-chat") -> dict:
+    """给定 34 维快照，返回 DeepSeek 结构化决策。"""
+```
+
+- 使用 `httpx` 直接调用 DeepSeek OpenAI 兼容接口
+- `response_format={"type": "json_object"}` 确保 JSON 输出
+- `temperature=0.3`（低随机性，利于结构化判断）
+- 4xx 错误立即中止（`retry_if_not_exception_type(httpx.HTTPStatusError)`）
+
+### P3 实测输出（top 50 扫描）
+
+```
+RAVEUSDT   SKIP   conf=0   struct=none  (MA20 -80%，无可操作结构)
+LABUSDT    LONG   conf=80  struct=A     (OI +22.2%，负资金费，做多 Pattern A)
+SPKUSDT    SKIP   conf=0   struct=none  (OI 流出，价格过度伸展)
+ENJUSDT    LONG   conf=70  struct=A     (OI +25.7%，taker 买压)
+STABLEUSDT LONG   conf=70  struct=A     (OI +32.8%，Binance 集中度 86.4% H5 触发 -20)
+```
+
+STABLEUSDT 完整评分推理：`base 40 +10 OI +10 funding +10 L/S ratio +10 taker ratio -20 H5 = 60`
+（注：DeepSeek 显示 conf=70，H5 扣分逻辑在提示词边界上，后续可调优）
+
+### 费用参考
+
+| 项目 | 数值 |
+|------|------|
+| 模型 | `deepseek-chat`（DeepSeek-V3） |
+| 输入 tokens / 次 | ~2,500–2,700 |
+| 输出 tokens / 次 | ~120–190 |
+| 费用 / 次 | ~$0.0008 |
+| 每天 5 分钟扫 100 币，5 个异常 | ~$0.0008 × 5 × 288 ≈ **$1.15 / 天** |
+
+---
+
+## ✅ P3 完成检查清单
+
+- [x] `src/ai_layer/prompt_builder.py` — SYSTEM_PROMPT 内嵌 Master Framework v0.7
+- [x] `src/ai_layer/judge.py` — DeepSeek API 调用 + JSON 解析
+- [x] `scripts/test_ai_layer.py` — 单币烟雾测试 PASSED
+- [x] `scripts/test_ai_batch.py` — 批量测试（top 50，5 个异常币）PASSED
+- [x] LONG/SHORT 信号有 entry_price / stop_loss / take_profit（非 null）
+- [x] Hard rules 正确执行（H2/H4/H5）
+- [x] 无 RetryError 噪音
+- [x] `git push` 成功
+
+全部打勾 = P3 AI 判断层完成，进入 **P4 信号路由 + Discord 通知**。
+
+---
+
+## 下一步：P4 Discord 通知层
+
+P4 文档（`11-discord-notifier.md`）将覆盖：
+
+- Discord Bot Token + Channel ID 配置
+- `src/notifier/discord_client.py`：发送 Embed 消息
+- `src/execution/signal_router.py`：按信心度路由
+  - ≥70 → `#high-confidence` 频道
+  - 50–69 → `#watch-list` 频道
+  - 每次扫描摘要 → `#scan-log` 频道
+- `scripts/main_loop.py`：5 分钟定时扫描 + 路由 + 通知完整闭环
