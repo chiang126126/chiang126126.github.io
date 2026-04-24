@@ -49,164 +49,8 @@ struct AddMedicationView: View {
     private var formContent: some View {
         ScrollView {
             VStack(spacing: 20) {
-                // Name
-                field("name_label") {
-                    TextField("name_placeholder", text: $name)
-                        .font(.system(size: theme.bodySize))
-                        .foregroundColor(theme.textColor)
-                        .padding(14)
-                        .background {
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(theme.surfaceColor)
-                                .overlay { RoundedRectangle(cornerRadius: 12).stroke(theme.borderColor, lineWidth: 1) }
-                        }
-                }
-
-                // Dosage
-                field("dosage_label") {
-                    TextField("dosage_placeholder", text: $dosage)
-                        .font(.system(size: theme.bodySize))
-                        .foregroundColor(theme.textColor)
-                        .padding(14)
-                        .background {
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(theme.surfaceColor)
-                                .overlay { RoundedRectangle(cornerRadius: 12).stroke(theme.borderColor, lineWidth: 1) }
-                        }
-                }
-
-                // Frequency
-                field("freq_label") {
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
-                        ForEach(Frequency.allCases, id: \.self) { freq in
-                            chipButton(
-                                LocalizedStringKey(freq.localizationKey),
-                                isSelected: frequency == freq
-                            ) { frequency = freq }
-                        }
-                    }
-                }
-
-                // Time of Day
-                field("time_label") {
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 8) {
-                        ForEach(TimeOfDay.allCases, id: \.self) { time in
-                            chipButton(
-                                LocalizedStringKey(time.localizationKey),
-                                isSelected: timeOfDay == time
-                            ) {
-                                timeOfDay = time
-                                reminderTime = time.defaultReminderTime
-                            }
-                        }
-                    }
-                }
-
-                // Reminder Time
-                field("reminder_time_label") {
-                    HStack {
-                        Image(systemName: "bell.fill")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(theme.accentColor)
-                        DatePicker("", selection: $reminderTime, displayedComponents: .hourAndMinute)
-                            .labelsHidden()
-                            .tint(theme.accentColor)
-                        Spacer()
-                        Text("reminder_time_hint")
-                            .font(.system(size: 11, design: .rounded))
-                            .foregroundColor(theme.mutedColor)
-                    }
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
-                    .background {
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(theme.surfaceColor)
-                            .overlay { RoundedRectangle(cornerRadius: 12).stroke(theme.borderColor, lineWidth: 1) }
-                    }
-                }
-
-                // Food Relation
-                field("food_label_short") {
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 8) {
-                        ForEach(FoodRelation.allCases, id: \.self) { food in
-                            chipButton(
-                                LocalizedStringKey(food.localizationKey),
-                                isSelected: foodRelation == food
-                            ) { foodRelation = food }
-                        }
-                    }
-                }
-
-                // Color Picker
-                field("color_label") {
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 5), spacing: 10) {
-                        ForEach(PillOptions.colors, id: \.self) { hex in
-                            Circle()
-                                .fill(Color(hex: hex))
-                                .frame(width: 36, height: 36)
-                                .overlay {
-                                    Circle().stroke(.white, lineWidth: colorHex == hex ? 3 : 0)
-                                }
-                                .scaleEffect(colorHex == hex ? 1.15 : 1)
-                                .onTapGesture {
-                                    withAnimation(.spring(response: 0.2)) { colorHex = hex }
-                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                }
-                        }
-                    }
-                }
-
-                // Icon Picker
-                field("icon_label") {
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 5), spacing: 10) {
-                        ForEach(PillOptions.icons, id: \.self) { icon in
-                            Image(systemName: icon)
-                                .font(.system(size: 18))
-                                .foregroundColor(iconName == icon ? Color(hex: colorHex) : theme.mutedColor)
-                                .frame(width: 40, height: 40)
-                                .background {
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .fill(iconName == icon ? Color(hex: colorHex).opacity(0.12) : theme.surfaceColor)
-                                        .overlay {
-                                            RoundedRectangle(cornerRadius: 10)
-                                                .stroke(iconName == icon ? Color(hex: colorHex) : theme.borderColor, lineWidth: 1)
-                                        }
-                                }
-                                .onTapGesture {
-                                    withAnimation(.spring(response: 0.2)) { iconName = icon }
-                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                }
-                        }
-                    }
-                }
-
-                // Notes
-                field("notes_label_opt") {
-                    TextField("notes_placeholder", text: $notes, axis: .vertical)
-                        .font(.system(size: theme.bodySize))
-                        .foregroundColor(theme.textColor)
-                        .lineLimit(2...4)
-                        .padding(14)
-                        .background {
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(theme.surfaceColor)
-                                .overlay { RoundedRectangle(cornerRadius: 12).stroke(theme.borderColor, lineWidth: 1) }
-                        }
-                }
-
-                // Save button
-                Button {
-                    saveMedication()
-                } label: {
-                    Text("save_med")
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(theme.buttonGradient, in: RoundedRectangle(cornerRadius: 16))
-                }
-                .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
-                .opacity(name.trimmingCharacters(in: .whitespaces).isEmpty ? 0.4 : 1)
+                formTopSection
+                formBottomSection
             }
             .padding(20)
             .padding(.bottom, 40)
@@ -222,13 +66,169 @@ struct AddMedicationView: View {
         }
     }
 
+    // MARK: - Form Top (Name / Dosage / Frequency / Time / Reminder)
+    private var formTopSection: some View {
+        Group {
+            field("name_label") {
+                textField("name_placeholder", text: $name)
+            }
+            field("dosage_label") {
+                textField("dosage_placeholder", text: $dosage)
+            }
+            field("freq_label") {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+                    ForEach(Frequency.allCases, id: \.self) { freq in
+                        chipButton(
+                            LocalizedStringKey(freq.localizationKey),
+                            isSelected: frequency == freq
+                        ) { frequency = freq }
+                    }
+                }
+            }
+            field("time_label") {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 8) {
+                    ForEach(TimeOfDay.allCases, id: \.self) { time in
+                        chipButton(
+                            LocalizedStringKey(time.localizationKey),
+                            isSelected: timeOfDay == time
+                        ) {
+                            timeOfDay = time
+                            reminderTime = time.defaultReminderTime
+                        }
+                    }
+                }
+            }
+            reminderTimeRow
+            field("food_label_short") {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 8) {
+                    ForEach(FoodRelation.allCases, id: \.self) { food in
+                        chipButton(
+                            LocalizedStringKey(food.localizationKey),
+                            isSelected: foodRelation == food
+                        ) { foodRelation = food }
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Reminder Time Row
+    private var reminderTimeRow: some View {
+        field("reminder_time_label") {
+            HStack {
+                Image(systemName: "bell.fill")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(theme.accentColor)
+                DatePicker("", selection: $reminderTime, displayedComponents: .hourAndMinute)
+                    .labelsHidden()
+                    .tint(theme.accentColor)
+                Spacer()
+                Text("reminder_time_hint")
+                    .font(.system(size: 11, design: .rounded))
+                    .foregroundColor(theme.mutedColor)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .background {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(theme.surfaceColor)
+                    .overlay { RoundedRectangle(cornerRadius: 12).stroke(theme.borderColor, lineWidth: 1) }
+            }
+        }
+    }
+
+    // MARK: - Form Bottom (Color / Icon / Notes / Save)
+    private var formBottomSection: some View {
+        Group {
+            field("color_label") {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 5), spacing: 10) {
+                    ForEach(PillOptions.colors, id: \.self) { hex in
+                        Circle()
+                            .fill(Color(hex: hex))
+                            .frame(width: 36, height: 36)
+                            .overlay {
+                                Circle().stroke(.white, lineWidth: colorHex == hex ? 3 : 0)
+                            }
+                            .scaleEffect(colorHex == hex ? 1.15 : 1)
+                            .onTapGesture {
+                                withAnimation(.spring(response: 0.2)) { colorHex = hex }
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            }
+                    }
+                }
+            }
+            field("icon_label") {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 5), spacing: 10) {
+                    ForEach(PillOptions.icons, id: \.self) { icon in
+                        Image(systemName: icon)
+                            .font(.system(size: 18))
+                            .foregroundColor(iconName == icon ? Color(hex: colorHex) : theme.mutedColor)
+                            .frame(width: 40, height: 40)
+                            .background {
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(iconName == icon ? Color(hex: colorHex).opacity(0.12) : theme.surfaceColor)
+                                    .overlay {
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .stroke(iconName == icon ? Color(hex: colorHex) : theme.borderColor, lineWidth: 1)
+                                    }
+                            }
+                            .onTapGesture {
+                                withAnimation(.spring(response: 0.2)) { iconName = icon }
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            }
+                    }
+                }
+            }
+            field("notes_label_opt") {
+                textField("notes_placeholder", text: $notes, axis: true)
+            }
+            saveButton
+        }
+    }
+
+    // MARK: - Save Button
+    private var saveButton: some View {
+        Button {
+            saveMedication()
+        } label: {
+            Text("save_med")
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(theme.buttonGradient, in: RoundedRectangle(cornerRadius: 16))
+        }
+        .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
+        .opacity(name.trimmingCharacters(in: .whitespaces).isEmpty ? 0.4 : 1)
+    }
+
     // MARK: - Helpers
+
     private func field(_ titleKey: LocalizedStringKey, @ViewBuilder content: () -> some View) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(titleKey)
                 .font(.system(size: 13, weight: .medium))
                 .foregroundColor(theme.textColor)
             content()
+        }
+    }
+
+    private func textField(_ placeholder: LocalizedStringKey, text: Binding<String>, axis: Bool = false) -> some View {
+        Group {
+            if axis {
+                TextField(placeholder, text: text, axis: .vertical)
+                    .lineLimit(2...4)
+            } else {
+                TextField(placeholder, text: text)
+            }
+        }
+        .font(.system(size: theme.bodySize))
+        .foregroundColor(theme.textColor)
+        .padding(14)
+        .background {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(theme.surfaceColor)
+                .overlay { RoundedRectangle(cornerRadius: 12).stroke(theme.borderColor, lineWidth: 1) }
         }
     }
 
