@@ -408,7 +408,10 @@ final class MedicationStore {
     // MARK: - Settings
     func setReminderStyle(_ style: String) {
         reminderStyle = style
-        NotificationManager.shared.rescheduleAll(medications: medications, style: style, language: appLanguage, customTime: { $0.reminderTime })
+        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+        for med in medications where med.isActive && med.frequency != .asNeeded {
+            NotificationManager.shared.schedule(for: med, at: med.reminderTime, style: style, language: appLanguage)
+        }
         save()
     }
 
@@ -416,7 +419,10 @@ final class MedicationStore {
         appLanguage = lang
         UserDefaults.standard.set([lang], forKey: "AppleLanguages")
         UserDefaults.standard.synchronize()
-        NotificationManager.shared.rescheduleAll(medications: medications, style: reminderStyle, language: lang, customTime: { $0.reminderTime })
+        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+        for med in medications where med.isActive && med.frequency != .asNeeded {
+            NotificationManager.shared.schedule(for: med, at: med.reminderTime, style: reminderStyle, language: lang)
+        }
         save()
     }
 

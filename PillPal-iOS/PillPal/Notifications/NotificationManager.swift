@@ -21,18 +21,11 @@ final class NotificationManager {
 
     // MARK: - Schedule All
 
-    /// Cancels every pending notification and re-schedules from scratch.
-    /// Call this when reminder style or language changes.
-    /// `customTime` closure lets the caller provide an explicit hour/minute per medication.
-    func rescheduleAll(
-        medications: [Medication],
-        style: String,
-        language: String,
-        customTime: (Medication) -> Date? = { _ in nil }
-    ) {
+    /// Cancels every pending notification and re-schedules using fallback times.
+    func rescheduleAll(medications: [Medication], style: String, language: String) {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
         for med in medications where med.isActive && med.frequency != .asNeeded {
-            schedule(for: med, at: customTime(med), style: style, language: language)
+            schedule(for: med, at: nil, style: style, language: language)
         }
     }
 
