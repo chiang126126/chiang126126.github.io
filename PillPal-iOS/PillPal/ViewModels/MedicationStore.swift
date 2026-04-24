@@ -155,7 +155,7 @@ final class MedicationStore {
             unlockAchievement(.pillCollector)
         }
         awardXP(XPReward.addMedication)
-        NotificationManager.shared.schedule(for: newMed, style: reminderStyle, language: appLanguage)
+        NotificationManager.shared.schedule(for: newMed, at: newMed.reminderTime, style: reminderStyle, language: appLanguage)
         save()
     }
 
@@ -164,7 +164,7 @@ final class MedicationStore {
             changes(&medications[idx])
             NotificationManager.shared.cancelPending(for: id)
             if medications[idx].isActive {
-                NotificationManager.shared.schedule(for: medications[idx], style: reminderStyle, language: appLanguage)
+                NotificationManager.shared.schedule(for: medications[idx], at: medications[idx].reminderTime, style: reminderStyle, language: appLanguage)
             }
             save()
         }
@@ -181,7 +181,7 @@ final class MedicationStore {
         if let idx = medications.firstIndex(where: { $0.id == id }) {
             medications[idx].isActive.toggle()
             if medications[idx].isActive {
-                NotificationManager.shared.schedule(for: medications[idx], style: reminderStyle, language: appLanguage)
+                NotificationManager.shared.schedule(for: medications[idx], at: medications[idx].reminderTime, style: reminderStyle, language: appLanguage)
             } else {
                 NotificationManager.shared.cancelPending(for: id)
             }
@@ -408,7 +408,7 @@ final class MedicationStore {
     // MARK: - Settings
     func setReminderStyle(_ style: String) {
         reminderStyle = style
-        NotificationManager.shared.rescheduleAll(medications: medications, style: style, language: appLanguage)
+        NotificationManager.shared.rescheduleAll(medications: medications, style: style, language: appLanguage, customTime: { $0.reminderTime })
         save()
     }
 
@@ -416,7 +416,7 @@ final class MedicationStore {
         appLanguage = lang
         UserDefaults.standard.set([lang], forKey: "AppleLanguages")
         UserDefaults.standard.synchronize()
-        NotificationManager.shared.rescheduleAll(medications: medications, style: reminderStyle, language: lang)
+        NotificationManager.shared.rescheduleAll(medications: medications, style: reminderStyle, language: lang, customTime: { $0.reminderTime })
         save()
     }
 

@@ -23,19 +23,27 @@ final class NotificationManager {
 
     /// Cancels every pending notification and re-schedules from scratch.
     /// Call this when reminder style or language changes.
-    func rescheduleAll(medications: [Medication], style: String, language: String) {
+    /// `customTime` closure lets the caller provide an explicit hour/minute per medication.
+    func rescheduleAll(
+        medications: [Medication],
+        style: String,
+        language: String,
+        customTime: (Medication) -> Date? = { _ in nil }
+    ) {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
         for med in medications where med.isActive && med.frequency != .asNeeded {
-            schedule(for: med, style: style, language: language)
+            schedule(for: med, at: customTime(med), style: style, language: language)
         }
     }
 
     // MARK: - Schedule Single
 
-    func schedule(for medication: Medication, style: String, language: String) {
+    func schedule(for medication: Medication, at customTime: Date?, style: String, language: String) {
         guard medication.isActive, medication.frequency != .asNeeded else { return }
 
-        let times = reminderTimes(for: medication)
+        let primary = customTime ?? fallbackTime(for: medication.timeOfDay)
+        let times = reminderTimes(primary: primary, frequency: medication.frequency)
+
         for (index, time) in times.enumerated() {
             let content = UNMutableNotificationContent()
             content.title = appDisplayName(language: language)
@@ -74,13 +82,24 @@ final class NotificationManager {
         "\(medicationId.uuidString)-\(index)"
     }
 
-    private func reminderTimes(for med: Medication) -> [Date] {
-        let primary = med.reminderTime ?? med.timeOfDay.defaultReminderTime
-        if med.frequency == .twiceDaily {
+    private func reminderTimes(primary: Date, frequency: Frequency) -> [Date] {
+        if frequency == .twiceDaily {
             let second = Calendar.current.date(byAdding: .hour, value: 8, to: primary) ?? primary
             return [primary, second]
         }
         return [primary]
+    }
+
+    /// Local fallback so NotificationManager doesn't need to reach into Medication's extended properties.
+    private func fallbackTime(for timeOfDay: TimeOfDay) -> Date {
+        let hour: Int
+        switch timeOfDay {
+        case .morning:   hour = 8
+        case .afternoon: hour = 13
+        case .evening:   hour = 19
+        case .bedtime:   hour = 22
+        }
+        return Calendar.current.date(bySettingHour: hour, minute: 0, second: 0, of: Date()) ?? Date()
     }
 
     private func appDisplayName(language: String) -> String {

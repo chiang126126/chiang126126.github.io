@@ -17,7 +17,8 @@ struct PillPalApp: App {
                         NotificationManager.shared.rescheduleAll(
                             medications: store.medications,
                             style: store.reminderStyle,
-                            language: store.appLanguage
+                            language: store.appLanguage,
+                            customTime: { $0.reminderTime }
                         )
                     }
                 }
