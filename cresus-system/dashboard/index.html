@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Crésus 信号看板</title>
+<style>
+  :root {
+    --bg: #0b0f17;
+    --panel: #131a26;
+    --panel-2: #1a2332;
+    --border: #243047;
+    --text: #e6edf6;
+    --text-dim: #8a96aa;
+    --green: #00c853;
+    --red: #ff1744;
+    --yellow: #ffd600;
+    --blue: #2196f3;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  header {
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  header h1 { margin: 0; font-size: 22px; font-weight: 600; }
+  header .meta { color: var(--text-dim); font-size: 13px; }
+  main { padding: 24px 32px 64px; max-width: 1280px; margin: 0 auto; }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .stat {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .stat .label { color: var(--text-dim); font-size: 12px; margin-bottom: 6px; }
+  .stat .value { font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .stat.long  .value { color: var(--green); }
+  .stat.short .value { color: var(--red); }
+  .stat.watch .value { color: var(--yellow); }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .panel h2 {
+    margin: 0;
+    padding: 16px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel-2);
+  }
+  .panel-body { padding: 16px 20px; }
+
+  /* histogram */
+  .histogram {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 120px;
+    padding: 8px 0;
+  }
+  .bar {
+    flex: 1;
+    background: var(--blue);
+    border-radius: 3px 3px 0 0;
+    min-height: 2px;
+    position: relative;
+    cursor: default;
+  }
+  .bar:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #000;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    margin-bottom: 4px;
+  }
+  .axis {
+    display: flex;
+    gap: 4px;
+    margin-top: 6px;
+    color: var(--text-dim);
+    font-size: 10px;
+  }
+  .axis span { flex: 1; text-align: center; overflow: hidden; }
+
+  /* table */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-variant-numeric: tabular-nums;
+  }
+  th {
+    background: var(--panel-2);
+    color: var(--text-dim);
+    font-weight: 500;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: sticky;
+    top: 0;
+  }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge.LONG  { background: rgba(0,200,83,0.15);  color: var(--green); }
+  .badge.SHORT { background: rgba(255,23,68,0.15); color: var(--red); }
+  .badge.WATCH { background: rgba(255,214,0,0.15); color: var(--yellow); }
+
+  .conf {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(33,150,243,0.15);
+    color: var(--blue);
+    font-weight: 600;
+  }
+
+  .filters { display: flex; gap: 8px; padding: 12px 20px; background: var(--panel-2); border-bottom: 1px solid var(--border); }
+  .filters button {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 4px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+  }
+  .filters button.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .filters input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    margin-left: auto;
+    min-width: 160px;
+  }
+
+  .empty, .error { padding: 40px; text-align: center; color: var(--text-dim); }
+  .error { color: var(--red); }
+  code { background: var(--panel-2); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🤖 Crésus 信号看板</h1>
+  <div class="meta">
+    数据：<code>signals.jsonl</code>
+    · 最后更新：<span id="last-updated">—</span>
+  </div>
+</header>
+
+<main>
+  <div class="stats" id="stats"></div>
+
+  <div class="panel">
+    <h2>📊 每日信号数量</h2>
+    <div class="panel-body">
+      <div class="histogram" id="histogram"></div>
+      <div class="axis" id="axis"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>📋 最近信号</h2>
+    <div class="filters">
+      <button data-filter="ALL" class="active">全部</button>
+      <button data-filter="LONG">做多</button>
+      <button data-filter="SHORT">做空</button>
+      <button data-filter="WATCH">观察</button>
+      <button data-filter="HIGH">≥70</button>
+      <input id="search" placeholder="搜索 symbol..." />
+    </div>
+    <div id="table-wrap">
+      <div class="empty">加载中…</div>
+    </div>
+  </div>
+</main>
+
+<script>
+const DIR_CN = { LONG: "做多", SHORT: "做空", WATCH: "观察", SKIP: "跳过" };
+
+let allSignals = [];
+let activeFilter = "ALL";
+let searchTerm = "";
+
+async function loadSignals() {
+  try {
+    const res = await fetch("./signals.jsonl?_=" + Date.now());
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const text = await res.text();
+    const lines = text.trim().split("\n").filter(Boolean);
+    allSignals = lines.map(l => {
+      try { return JSON.parse(l); } catch { return null; }
+    }).filter(Boolean);
+
+    if (allSignals.length === 0) {
+      document.getElementById("table-wrap").innerHTML =
+        '<div class="empty">还没有信号。等待 bot 触发第一个 ≥50 信心度的信号。</div>';
+      return;
+    }
+
+    renderStats();
+    renderHistogram();
+    renderTable();
+    document.getElementById("last-updated").textContent =
+      new Date().toLocaleString("zh-CN", { hour12: false });
+  } catch (e) {
+    document.getElementById("table-wrap").innerHTML =
+      `<div class="error">加载失败：${e.message}<br>请确认 <code>signals.jsonl</code> 已同步到此目录。</div>`;
+  }
+}
+
+function renderStats() {
+  const total = allSignals.length;
+  const longs  = allSignals.filter(s => s.direction === "LONG").length;
+  const shorts = allSignals.filter(s => s.direction === "SHORT").length;
+  const watch  = allSignals.filter(s => s.direction === "WATCH").length;
+  const high   = allSignals.filter(s => s.confidence >= 70).length;
+  const avgConf = total
+    ? (allSignals.reduce((a, s) => a + (s.confidence || 0), 0) / total).toFixed(1)
+    : "—";
+
+  const html = [
+    { label: "总信号", value: total, cls: "" },
+    { label: "做多", value: longs, cls: "long" },
+    { label: "做空", value: shorts, cls: "short" },
+    { label: "观察", value: watch, cls: "watch" },
+    { label: "高信心 (≥70)", value: high, cls: "" },
+    { label: "平均信心度", value: avgConf, cls: "" },
+  ].map(s => `
+    <div class="stat ${s.cls}">
+      <div class="label">${s.label}</div>
+      <div class="value">${s.value}</div>
+    </div>
+  `).join("");
+  document.getElementById("stats").innerHTML = html;
+}
+
+function renderHistogram() {
+  const buckets = {};
+  for (const s of allSignals) {
+    const day = (s.ts || "").slice(0, 10);
+    if (!day) continue;
+    buckets[day] = (buckets[day] || 0) + 1;
+  }
+  const days = Object.keys(buckets).sort().slice(-30);
+  if (days.length === 0) return;
+  const max = Math.max(...days.map(d => buckets[d]));
+
+  const bars = days.map(d => {
+    const h = (buckets[d] / max * 100).toFixed(1);
+    return `<div class="bar" style="height:${h}%" data-tip="${d} · ${buckets[d]} 条"></div>`;
+  }).join("");
+  document.getElementById("histogram").innerHTML = bars;
+
+  const stride = Math.ceil(days.length / 6);
+  const labels = days.map((d, i) =>
+    `<span>${i % stride === 0 ? d.slice(5) : ""}</span>`
+  ).join("");
+  document.getElementById("axis").innerHTML = labels;
+}
+
+function renderTable() {
+  let rows = allSignals.slice().reverse();
+
+  if (activeFilter === "LONG")  rows = rows.filter(s => s.direction === "LONG");
+  if (activeFilter === "SHORT") rows = rows.filter(s => s.direction === "SHORT");
+  if (activeFilter === "WATCH") rows = rows.filter(s => s.direction === "WATCH");
+  if (activeFilter === "HIGH")  rows = rows.filter(s => (s.confidence || 0) >= 70);
+  if (searchTerm) {
+    const q = searchTerm.toUpperCase();
+    rows = rows.filter(s => (s.symbol || "").toUpperCase().includes(q));
+  }
+
+  rows = rows.slice(0, 200);
+
+  if (rows.length === 0) {
+    document.getElementById("table-wrap").innerHTML =
+      '<div class="empty">没有匹配的信号</div>';
+    return;
+  }
+
+  const html = `
+    <table>
+      <thead>
+        <tr>
+          <th>时间</th>
+          <th>Symbol</th>
+          <th>方向</th>
+          <th>信心度</th>
+          <th>杠杆</th>
+          <th>入场</th>
+          <th>止损</th>
+          <th>止盈</th>
+          <th>结构</th>
+          <th>路由</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(s => `
+          <tr>
+            <td>${formatTime(s.ts)}</td>
+            <td><strong>${s.symbol || "—"}</strong></td>
+            <td><span class="badge ${s.direction}">${DIR_CN[s.direction] || s.direction}</span></td>
+            <td><span class="conf">${s.confidence || "—"}</span></td>
+            <td>${s.leverage ? s.leverage + "×" : "—"}</td>
+            <td>${formatPrice(s.entry_price)}</td>
+            <td>${formatPrice(s.stop_loss)}</td>
+            <td>${formatTP(s.take_profit)}</td>
+            <td>${s.structure || "—"}</td>
+            <td>${s.routed_to || "—"}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+  document.getElementById("table-wrap").innerHTML = html;
+}
+
+function formatTime(ts) {
+  if (!ts) return "—";
+  const d = new Date(ts);
+  return d.toLocaleString("zh-CN", { hour12: false, month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+}
+function formatPrice(p) {
+  if (p == null || p === "") return "—";
+  const n = Number(p);
+  if (isNaN(n)) return p;
+  if (n < 1) return n.toPrecision(4);
+  if (n < 100) return n.toFixed(4);
+  return n.toFixed(2);
+}
+function formatTP(tp) {
+  if (!tp) return "—";
+  if (Array.isArray(tp)) return tp.map(formatPrice).join(" / ");
+  return formatPrice(tp);
+}
+
+document.querySelectorAll(".filters button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".filters button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    activeFilter = btn.dataset.filter;
+    renderTable();
+  });
+});
+document.getElementById("search").addEventListener("input", e => {
+  searchTerm = e.target.value;
+  renderTable();
+});
+
+loadSignals();
+setInterval(loadSignals, 60_000);
+</script>
+</body>
+</html>
