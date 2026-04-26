@@ -177,6 +177,31 @@
   .empty, .error { padding: 40px; text-align: center; color: var(--text-dim); }
   .error { color: var(--red); }
   code { background: var(--panel-2); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+
+  .pnl-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+  }
+  .pnl-card {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .pnl-card .label { color: var(--text-dim); font-size: 12px; margin-bottom: 6px; }
+  .pnl-card .value {
+    font-size: 22px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .pnl-card .sub { color: var(--text-dim); font-size: 11px; margin-top: 4px; }
+  .pnl-positive { color: var(--green); }
+  .pnl-negative { color: var(--red); }
+
+  .meta-inline { font-size: 12px; color: var(--text-dim); font-weight: normal; margin-left: 8px; }
+
+  .pnl-cell { font-variant-numeric: tabular-nums; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -190,6 +215,25 @@
 
 <main>
   <div class="stats" id="stats"></div>
+
+  <div class="panel">
+    <h2>💰 P&amp;L 追踪 <span class="meta-inline" id="pnl-updated">数据加载中…</span></h2>
+    <div class="panel-body">
+      <div class="pnl-stats" id="pnl-stats">
+        <div class="empty">等待 pnl.json 同步…</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="positions-panel" style="display:none">
+    <h2>📈 当前持仓 <span class="meta-inline" id="positions-count"></span></h2>
+    <div id="positions-table"></div>
+  </div>
+
+  <div class="panel" id="closed-panel" style="display:none">
+    <h2>🔒 最近平仓 <span class="meta-inline" id="closed-count"></span></h2>
+    <div id="closed-table"></div>
+  </div>
 
   <div class="panel">
     <h2>📊 每日信号数量</h2>
@@ -388,8 +432,163 @@ document.getElementById("search").addEventListener("input", e => {
   renderTable();
 });
 
+async function loadPnL() {
+  try {
+    const res = await fetch("./pnl.json?_=" + Date.now());
+    if (!res.ok) {
+      document.getElementById("pnl-updated").textContent = "未配置（pnl.json 不存在）";
+      return;
+    }
+    const data = await res.json();
+    renderPnLStats(data.summary, data.updated_at);
+    renderPositions(data.positions || []);
+    renderClosed(data.closed_recent || []);
+  } catch (e) {
+    document.getElementById("pnl-updated").textContent = "加载失败：" + e.message;
+  }
+}
+
+function renderPnLStats(s, updatedAt) {
+  if (!s) return;
+  const updated = updatedAt ? new Date(updatedAt).toLocaleString("zh-CN", { hour12: false }) : "—";
+  document.getElementById("pnl-updated").textContent = "更新于 " + updated;
+
+  const upl = s.total_unrealized_pnl || 0;
+  const today = s.today_realized_pnl || 0;
+  const total = s.total_realized_pnl || 0;
+  const winRate = (s.win_rate || 0) * 100;
+
+  const cards = [
+    {
+      label: "当前持仓",
+      value: s.open_positions || 0,
+      sub: s.open_positions > 0 ? "笔" : "",
+    },
+    {
+      label: "浮动盈亏",
+      value: formatPnl(upl),
+      cls: pnlClass(upl),
+      sub: "未实现",
+    },
+    {
+      label: "今日已实现",
+      value: formatPnl(today),
+      cls: pnlClass(today),
+      sub: `${s.today_closed || 0} 笔平仓`,
+    },
+    {
+      label: "今日胜率",
+      value: s.today_closed ? winRate.toFixed(0) + "%" : "—",
+      sub: s.today_closed ? `${s.today_wins}胜 / ${s.today_losses}负` : "",
+    },
+    {
+      label: "累计已实现",
+      value: formatPnl(total),
+      cls: pnlClass(total),
+      sub: "USDT",
+    },
+  ];
+
+  document.getElementById("pnl-stats").innerHTML = cards.map(c => `
+    <div class="pnl-card">
+      <div class="label">${c.label}</div>
+      <div class="value ${c.cls || ""}">${c.value}</div>
+      ${c.sub ? `<div class="sub">${c.sub}</div>` : ""}
+    </div>
+  `).join("");
+}
+
+function renderPositions(positions) {
+  const panel = document.getElementById("positions-panel");
+  if (!positions.length) { panel.style.display = "none"; return; }
+  panel.style.display = "";
+  document.getElementById("positions-count").textContent = `${positions.length} 笔`;
+
+  const html = `
+    <table>
+      <thead>
+        <tr>
+          <th>合约</th>
+          <th>方向</th>
+          <th>数量</th>
+          <th>开仓价</th>
+          <th>标记价</th>
+          <th>浮盈</th>
+          <th>盈亏率</th>
+          <th>杠杆</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${positions.map(p => `
+          <tr>
+            <td><strong>${p.symbol}</strong></td>
+            <td><span class="badge ${p.side === 'long' ? 'LONG' : 'SHORT'}">${p.side === 'long' ? '做多' : '做空'}</span></td>
+            <td>${p.size}</td>
+            <td>${formatPrice(p.entry)}</td>
+            <td>${formatPrice(p.mark)}</td>
+            <td class="pnl-cell ${pnlClass(p.upl)}">${formatPnl(p.upl)}</td>
+            <td class="pnl-cell ${pnlClass(p.upl_ratio)}">${(p.upl_ratio * 100).toFixed(2)}%</td>
+            <td>${p.lever}×</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+  document.getElementById("positions-table").innerHTML = html;
+}
+
+function renderClosed(closes) {
+  const panel = document.getElementById("closed-panel");
+  if (!closes.length) { panel.style.display = "none"; return; }
+  panel.style.display = "";
+  document.getElementById("closed-count").textContent = `最近 ${closes.length} 笔`;
+
+  const html = `
+    <table>
+      <thead>
+        <tr>
+          <th>时间</th>
+          <th>合约</th>
+          <th>方向</th>
+          <th>盈亏</th>
+          <th>手续费</th>
+          <th>净收益</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${closes.slice(0, 30).map(c => `
+          <tr>
+            <td>${formatTime(c.ts)}</td>
+            <td><strong>${c.symbol}</strong></td>
+            <td><span class="badge ${c.side === 'long' ? 'LONG' : 'SHORT'}">${c.side === 'long' ? '平多' : '平空'}</span></td>
+            <td class="pnl-cell ${pnlClass(c.pnl)}">${formatPnl(c.pnl)}</td>
+            <td>${c.fee.toFixed(4)}</td>
+            <td class="pnl-cell ${pnlClass(c.net)}">${formatPnl(c.net)}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+  document.getElementById("closed-table").innerHTML = html;
+}
+
+function formatPnl(v) {
+  if (v == null || isNaN(v)) return "—";
+  const n = Number(v);
+  const sign = n > 0 ? "+" : "";
+  return sign + n.toFixed(2);
+}
+
+function pnlClass(v) {
+  const n = Number(v);
+  if (isNaN(n) || n === 0) return "";
+  return n > 0 ? "pnl-positive" : "pnl-negative";
+}
+
 loadSignals();
+loadPnL();
 setInterval(loadSignals, 60_000);
+setInterval(loadPnL, 60_000);
 </script>
 </body>
 </html>
