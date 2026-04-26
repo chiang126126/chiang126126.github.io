@@ -263,11 +263,30 @@
 const DIR_CN = { LONG: "做多", SHORT: "做空", WATCH: "观察", SKIP: "跳过" };
 
 let allSignals = [];
+let analysesMap = {};
 let activeFilter = "ALL";
 let searchTerm = "";
 
+async function loadAnalyses() {
+  try {
+    const res = await fetch("./analyses.jsonl?_=" + Date.now());
+    if (!res.ok) return;
+    const text = await res.text();
+    const lines = text.trim().split("\n").filter(Boolean);
+    const map = {};
+    for (const l of lines) {
+      try {
+        const a = JSON.parse(l);
+        if (a.ts) map[a.ts] = a;
+      } catch {}
+    }
+    analysesMap = map;
+  } catch {}
+}
+
 async function loadSignals() {
   try {
+    await loadAnalyses();
     const res = await fetch("./signals.jsonl?_=" + Date.now());
     if (!res.ok) throw new Error("HTTP " + res.status);
     const text = await res.text();
@@ -371,6 +390,9 @@ function renderTable() {
           <th>Symbol</th>
           <th>方向</th>
           <th>信心度</th>
+          <th>推荐</th>
+          <th>风险</th>
+          <th>结构匹配</th>
           <th>杠杆</th>
           <th>入场</th>
           <th>止损</th>
@@ -380,20 +402,25 @@ function renderTable() {
         </tr>
       </thead>
       <tbody>
-        ${rows.map(s => `
+        ${rows.map(s => {
+          const a = analysesMap[s.ts] || {};
+          return `
           <tr>
             <td>${formatTime(s.ts)}</td>
             <td><strong>${s.symbol || "—"}</strong></td>
             <td><span class="badge ${s.direction}">${DIR_CN[s.direction] || s.direction}</span></td>
             <td><span class="conf">${s.confidence || "—"}</span></td>
+            <td>${recBadge(a.recommendation)}</td>
+            <td>${riskBadge(a.risk_level)}</td>
+            <td>${matchBadge(a.structure_match)}</td>
             <td>${s.leverage ? s.leverage + "×" : "—"}</td>
             <td>${formatPrice(s.entry_price)}</td>
             <td>${formatPrice(s.stop_loss)}</td>
             <td>${formatTP(s.take_profit)}</td>
-            <td>${s.structure || "—"}</td>
+            <td>${s.structure || a.structure_judge || "—"}</td>
             <td>${s.routed_to || "—"}</td>
           </tr>
-        `).join("")}
+        `;}).join("")}
       </tbody>
     </table>
   `;
@@ -404,6 +431,23 @@ function formatTime(ts) {
   if (!ts) return "—";
   const d = new Date(ts);
   return d.toLocaleString("zh-CN", { hour12: false, month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+}
+function recBadge(rec) {
+  if (!rec) return "—";
+  const map = { "跟": ["#00c853", "rgba(0,200,83,0.15)"], "观察": ["#ffd600", "rgba(255,214,0,0.15)"], "不跟": ["#ff1744", "rgba(255,23,68,0.15)"] };
+  const [c, bg] = map[rec] || ["#8a96aa", "rgba(138,150,170,0.15)"];
+  return `<span class="badge" style="color:${c};background:${bg};">${rec}</span>`;
+}
+function riskBadge(r) {
+  if (!r) return "—";
+  const map = { "低": ["#00c853", "rgba(0,200,83,0.15)"], "中": ["#ffd600", "rgba(255,214,0,0.15)"], "高": ["#ff1744", "rgba(255,23,68,0.15)"] };
+  const [c, bg] = map[r] || ["#8a96aa", "rgba(138,150,170,0.15)"];
+  return `<span class="badge" style="color:${c};background:${bg};">${r}</span>`;
+}
+function matchBadge(m) {
+  if (!m) return "—";
+  const map = { "高": "#00c853", "中": "#ffd600", "低": "#ff1744" };
+  return `<span style="color:${map[m] || '#8a96aa'};font-weight:600;">${m}</span>`;
 }
 function formatPrice(p) {
   if (p == null || p === "") return "—";
