@@ -519,18 +519,23 @@ function renderPositions(positions) {
         </tr>
       </thead>
       <tbody>
-        ${positions.map(p => `
+        ${positions.map(p => {
+          const isLong = p.side === 'long' || (p.side === 'net' && p.size > 0);
+          const isShort = p.side === 'short' || (p.side === 'net' && p.size < 0);
+          const dirCn = isLong ? '做多' : (isShort ? '做空' : '—');
+          const dirCls = isLong ? 'LONG' : (isShort ? 'SHORT' : '');
+          return `
           <tr>
             <td><strong>${p.symbol}</strong></td>
-            <td><span class="badge ${p.side === 'long' ? 'LONG' : 'SHORT'}">${p.side === 'long' ? '做多' : '做空'}</span></td>
-            <td>${p.size}</td>
+            <td><span class="badge ${dirCls}">${dirCn}</span></td>
+            <td>${Math.abs(p.size)}</td>
             <td>${formatPrice(p.entry)}</td>
             <td>${formatPrice(p.mark)}</td>
             <td class="pnl-cell ${pnlClass(p.upl)}">${formatPnl(p.upl)}</td>
             <td class="pnl-cell ${pnlClass(p.upl_ratio)}">${(p.upl_ratio * 100).toFixed(2)}%</td>
             <td>${p.lever}×</td>
           </tr>
-        `).join("")}
+        `;}).join("")}
       </tbody>
     </table>
   `;
