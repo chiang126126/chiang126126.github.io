@@ -188,6 +188,27 @@
   }
   .filters button.active { background: var(--blue); color: #fff; border-color: var(--blue); }
   .filter-sep { color: var(--text-dim); padding: 0 4px; align-self: center; }
+
+  .refresh-btn {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    margin-left: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, transform 0.15s;
+    line-height: 1;
+  }
+  .refresh-btn:hover { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .refresh-btn:active { transform: scale(0.92); }
+  .refresh-btn.spinning { animation: spin 0.8s linear infinite; pointer-events: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
   .filters input {
     background: var(--bg);
     border: 1px solid var(--border);
@@ -305,6 +326,7 @@
   <div class="meta">
     数据：<code>signals.jsonl</code>
     · 最后更新：<span id="last-updated">—</span>
+    <button id="refresh-btn" class="refresh-btn" title="手动刷新">⟳</button>
   </div>
 </header>
 
@@ -810,6 +832,18 @@ function pnlClass(v) {
   if (isNaN(n) || n === 0) return "";
   return n > 0 ? "pnl-positive" : "pnl-negative";
 }
+
+async function manualRefresh() {
+  const btn = document.getElementById("refresh-btn");
+  btn.classList.add("spinning");
+  try {
+    await Promise.all([loadSignals(), loadPnL()]);
+  } finally {
+    setTimeout(() => btn.classList.remove("spinning"), 300);
+  }
+}
+
+document.getElementById("refresh-btn").addEventListener("click", manualRefresh);
 
 loadSignals();
 loadPnL();
