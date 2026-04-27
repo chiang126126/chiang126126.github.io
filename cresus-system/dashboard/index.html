@@ -113,7 +113,7 @@
   .axis span { flex: 1; text-align: center; overflow: hidden; }
 
   /* table */
-  #table-wrap, #positions-table, #closed-table { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  #table-wrap, #positions-table, #history-table { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 760px; }
   th, td {
     padding: 10px 12px;
@@ -124,20 +124,20 @@
   }
   /* sticky time + symbol on signals/closed tables */
   #table-wrap table td:nth-child(1),
-  #closed-table table td:nth-child(1) {
+  #history-table table td:nth-child(1) {
     position: sticky; left: 0; background: var(--panel); z-index: 1;
     min-width: 90px;
   }
   #table-wrap table td:nth-child(2),
-  #closed-table table td:nth-child(2) {
+  #history-table table td:nth-child(2) {
     position: sticky; left: 90px; background: var(--panel); z-index: 1;
     border-right: 1px solid var(--border);
     min-width: 100px;
   }
   #table-wrap table th:nth-child(1),
-  #closed-table table th:nth-child(1) { position: sticky; left: 0; z-index: 3; }
+  #history-table table th:nth-child(1) { position: sticky; left: 0; z-index: 3; }
   #table-wrap table th:nth-child(2),
-  #closed-table table th:nth-child(2) { position: sticky; left: 90px; z-index: 3; border-right: 1px solid var(--border); }
+  #history-table table th:nth-child(2) { position: sticky; left: 90px; z-index: 3; border-right: 1px solid var(--border); }
   /* sticky symbol on positions table */
   #positions-table table td:nth-child(1) {
     position: sticky; left: 0; background: var(--panel); z-index: 1;
@@ -347,9 +347,9 @@
     <div id="positions-table"></div>
   </div>
 
-  <div class="panel" id="closed-panel" style="display:none">
-    <h2>🔒 最近平仓 <span class="meta-inline" id="closed-count"></span></h2>
-    <div id="closed-table"></div>
+  <div class="panel" id="history-panel" style="display:none">
+    <h2>📜 仓位历史 <span class="meta-inline" id="history-summary">—</span></h2>
+    <div id="history-table"></div>
   </div>
 
   <div class="panel">
@@ -685,7 +685,7 @@ async function loadPnL() {
     const data = await res.json();
     renderPnLStats(data.summary, data.updated_at);
     renderPositions(data.positions || []);
-    renderClosed(data.closed_recent || []);
+    renderHistory(data.summary, data.closed_recent || []);
   } catch (e) {
     document.getElementById("pnl-updated").textContent = "加载失败：" + e.message;
   }
@@ -785,39 +785,69 @@ function renderPositions(positions) {
   document.getElementById("positions-table").innerHTML = html;
 }
 
-function renderClosed(closes) {
-  const panel = document.getElementById("closed-panel");
-  if (!closes.length) { panel.style.display = "none"; return; }
+function renderHistory(summary, closes) {
+  const panel = document.getElementById("history-panel");
+  if (!closes.length && !(summary?.today_opened)) { panel.style.display = "none"; return; }
   panel.style.display = "";
-  document.getElementById("closed-count").textContent = `最近 ${closes.length} 笔`;
+
+  const opened   = summary?.today_opened || 0;
+  const closed   = summary?.today_closed || 0;
+  const liq      = summary?.today_liquidated || 0;
+  const realized = summary?.today_realized_pnl || 0;
+  const fees     = summary?.today_fees || 0;
+  const net      = realized + fees;
+  const sumLine =
+    `今日 <strong>${opened}</strong> 开 · <strong>${closed}</strong> 平` +
+    (liq > 0 ? ` · <span class="pnl-negative"><strong>${liq}</strong> 爆仓</span>` : "") +
+    ` · 已实现 <span class="${pnlClass(realized)}">${formatPnl(realized)}</span>` +
+    ` · 手续费 <span style="color:var(--text-dim)">${fees.toFixed(2)}</span>` +
+    ` · 净 <span class="${pnlClass(net)}" style="font-weight:700">${formatPnl(net)} USDT</span>`;
+  document.getElementById("history-summary").innerHTML = sumLine;
+
+  if (!closes.length) {
+    document.getElementById("history-table").innerHTML = '<div class="empty">今天还没有平仓记录</div>';
+    return;
+  }
 
   const html = `
     <table>
       <thead>
         <tr>
           <th>时间</th>
-          <th>合约</th>
+          <th>Symbol</th>
           <th>方向</th>
+          <th>入场</th>
+          <th>出场</th>
           <th>盈亏</th>
           <th>手续费</th>
-          <th>净收益</th>
+          <th>净</th>
+          <th>类型</th>
         </tr>
       </thead>
       <tbody>
-        ${closes.slice(0, 30).map(c => `
+        ${closes.slice(0, 50).map(c => {
+          const dirCn = c.side === 'long' ? '平多' : '平空';
+          const dirCls = c.side === 'long' ? 'LONG' : 'SHORT';
+          const tag = c.liquidated
+            ? '<span class="badge" style="color:var(--red);background:rgba(255,23,68,0.15)">爆仓</span>'
+            : '<span style="color:var(--text-dim);font-size:11px">正常</span>';
+          return `
           <tr>
             <td>${formatTime(c.ts)}</td>
             <td><strong>${c.symbol}</strong></td>
-            <td><span class="badge ${c.side === 'long' ? 'LONG' : 'SHORT'}">${c.side === 'long' ? '平多' : '平空'}</span></td>
+            <td><span class="badge ${dirCls}">${dirCn}</span></td>
+            <td>${formatPrice(c.open_px)}</td>
+            <td>${formatPrice(c.close_px)}</td>
             <td class="pnl-cell ${pnlClass(c.pnl)}">${formatPnl(c.pnl)}</td>
-            <td>${c.fee.toFixed(4)}</td>
+            <td style="color:var(--text-dim)">${(c.fee || 0).toFixed(4)}</td>
             <td class="pnl-cell ${pnlClass(c.net)}">${formatPnl(c.net)}</td>
+            <td>${tag}</td>
           </tr>
-        `).join("")}
+        `;}).join("")}
       </tbody>
     </table>
   `;
-  document.getElementById("closed-table").innerHTML = html;
+  document.getElementById("history-table").innerHTML = html;
 }
 
 function formatPnl(v) {
