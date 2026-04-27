@@ -187,6 +187,7 @@
     font-size: 12px;
   }
   .filters button.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .filter-sep { color: var(--text-dim); padding: 0 4px; align-self: center; }
   .filters input {
     background: var(--bg);
     border: 1px solid var(--border);
@@ -347,12 +348,13 @@
   <div class="panel">
     <h2>📋 最近信号</h2>
     <div class="filters">
-      <button data-filter="ALL" class="active">全部</button>
-      <button data-filter="LONG">做多</button>
-      <button data-filter="SHORT">做空</button>
-      <button data-filter="WATCH">观察</button>
-      <button data-filter="HIGH">≥70</button>
-      <button data-filter="FOLLOW">🟢 跟</button>
+      <button data-dir="ALL" class="active">全部</button>
+      <button data-dir="LONG">做多</button>
+      <button data-dir="SHORT">做空</button>
+      <button data-dir="WATCH">观察</button>
+      <span class="filter-sep">·</span>
+      <button data-mod="HIGH">≥70</button>
+      <button data-mod="FOLLOW">🟢 跟</button>
       <input id="search" placeholder="搜索 symbol..." />
     </div>
     <div id="table-wrap">
@@ -366,7 +368,8 @@ const DIR_CN = { LONG: "做多", SHORT: "做空", WATCH: "观察", SKIP: "跳过
 
 let allSignals = [];
 let analysesMap = {};
-let activeFilter = "ALL";
+let activeDir = "ALL";
+let activeMods = new Set();
 let searchTerm = "";
 
 async function loadAnalyses() {
@@ -525,11 +528,11 @@ function renderHistogram() {
 function renderTable() {
   let rows = allSignals.slice().reverse();
 
-  if (activeFilter === "LONG")   rows = rows.filter(s => s.direction === "LONG");
-  if (activeFilter === "SHORT")  rows = rows.filter(s => s.direction === "SHORT");
-  if (activeFilter === "WATCH")  rows = rows.filter(s => s.direction === "WATCH");
-  if (activeFilter === "HIGH")   rows = rows.filter(s => (s.confidence || 0) >= 70);
-  if (activeFilter === "FOLLOW") rows = rows.filter(s => (analysesMap[s.ts] || {}).recommendation === "跟");
+  if (activeDir === "LONG")    rows = rows.filter(s => s.direction === "LONG");
+  if (activeDir === "SHORT")   rows = rows.filter(s => s.direction === "SHORT");
+  if (activeDir === "WATCH")   rows = rows.filter(s => s.direction === "WATCH");
+  if (activeMods.has("HIGH"))   rows = rows.filter(s => (s.confidence || 0) >= 70);
+  if (activeMods.has("FOLLOW")) rows = rows.filter(s => (analysesMap[s.ts] || {}).recommendation === "跟");
   if (searchTerm) {
     const q = searchTerm.toUpperCase();
     rows = rows.filter(s => (s.symbol || "").toUpperCase().includes(q));
@@ -624,11 +627,24 @@ function formatTP(tp) {
   return formatPrice(tp);
 }
 
-document.querySelectorAll(".filters button").forEach(btn => {
+document.querySelectorAll(".filters button[data-dir]").forEach(btn => {
   btn.addEventListener("click", () => {
-    document.querySelectorAll(".filters button").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".filters button[data-dir]").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
-    activeFilter = btn.dataset.filter;
+    activeDir = btn.dataset.dir;
+    renderTable();
+  });
+});
+document.querySelectorAll(".filters button[data-mod]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const mod = btn.dataset.mod;
+    if (activeMods.has(mod)) {
+      activeMods.delete(mod);
+      btn.classList.remove("active");
+    } else {
+      activeMods.add(mod);
+      btn.classList.add("active");
+    }
     renderTable();
   });
 });
