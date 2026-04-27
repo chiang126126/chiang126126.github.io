@@ -122,6 +122,28 @@
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
+  /* sticky time + symbol on signals/closed tables */
+  #table-wrap table td:nth-child(1),
+  #closed-table table td:nth-child(1) {
+    position: sticky; left: 0; background: var(--panel); z-index: 1;
+    min-width: 90px;
+  }
+  #table-wrap table td:nth-child(2),
+  #closed-table table td:nth-child(2) {
+    position: sticky; left: 90px; background: var(--panel); z-index: 1;
+    border-right: 1px solid var(--border);
+    min-width: 100px;
+  }
+  #table-wrap table th:nth-child(1),
+  #closed-table table th:nth-child(1) { position: sticky; left: 0; z-index: 3; }
+  #table-wrap table th:nth-child(2),
+  #closed-table table th:nth-child(2) { position: sticky; left: 90px; z-index: 3; border-right: 1px solid var(--border); }
+  /* sticky symbol on positions table */
+  #positions-table table td:nth-child(1) {
+    position: sticky; left: 0; background: var(--panel); z-index: 1;
+    border-right: 1px solid var(--border); min-width: 100px;
+  }
+  #positions-table table th:nth-child(1) { position: sticky; left: 0; z-index: 3; border-right: 1px solid var(--border); }
   th {
     background: var(--panel-2);
     color: var(--text-dim);
@@ -330,6 +352,7 @@
       <button data-filter="SHORT">做空</button>
       <button data-filter="WATCH">观察</button>
       <button data-filter="HIGH">≥70</button>
+      <button data-filter="FOLLOW">🟢 跟</button>
       <input id="search" placeholder="搜索 symbol..." />
     </div>
     <div id="table-wrap">
@@ -502,10 +525,11 @@ function renderHistogram() {
 function renderTable() {
   let rows = allSignals.slice().reverse();
 
-  if (activeFilter === "LONG")  rows = rows.filter(s => s.direction === "LONG");
-  if (activeFilter === "SHORT") rows = rows.filter(s => s.direction === "SHORT");
-  if (activeFilter === "WATCH") rows = rows.filter(s => s.direction === "WATCH");
-  if (activeFilter === "HIGH")  rows = rows.filter(s => (s.confidence || 0) >= 70);
+  if (activeFilter === "LONG")   rows = rows.filter(s => s.direction === "LONG");
+  if (activeFilter === "SHORT")  rows = rows.filter(s => s.direction === "SHORT");
+  if (activeFilter === "WATCH")  rows = rows.filter(s => s.direction === "WATCH");
+  if (activeFilter === "HIGH")   rows = rows.filter(s => (s.confidence || 0) >= 70);
+  if (activeFilter === "FOLLOW") rows = rows.filter(s => (analysesMap[s.ts] || {}).recommendation === "跟");
   if (searchTerm) {
     const q = searchTerm.toUpperCase();
     rows = rows.filter(s => (s.symbol || "").toUpperCase().includes(q));
