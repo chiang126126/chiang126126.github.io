@@ -714,13 +714,13 @@ function renderPnLStats(s, updatedAt) {
       sub: "未实现",
     },
     {
-      label: "今日已实现",
+      label: "24h 已实现",
       value: formatPnl(today),
       cls: pnlClass(today),
       sub: `${s.today_closed || 0} 笔平仓`,
     },
     {
-      label: "今日胜率",
+      label: "24h 胜率",
       value: s.today_closed ? winRate.toFixed(0) + "%" : "—",
       sub: s.today_closed ? `${s.today_wins}胜 / ${s.today_losses}负` : "",
     },
@@ -797,7 +797,7 @@ function renderHistory(summary, closes) {
   const fees     = summary?.today_fees || 0;
   const net      = realized + fees;
   const sumLine =
-    `今日 <strong>${opened}</strong> 开 · <strong>${closed}</strong> 平` +
+    `过去 24h: <strong>${opened}</strong> 开 · <strong>${closed}</strong> 平` +
     (liq > 0 ? ` · <span class="pnl-negative"><strong>${liq}</strong> 爆仓</span>` : "") +
     ` · 已实现 <span class="${pnlClass(realized)}">${formatPnl(realized)}</span>` +
     ` · 手续费 <span style="color:var(--text-dim)">${fees.toFixed(2)}</span>` +
