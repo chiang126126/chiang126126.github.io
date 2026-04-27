@@ -189,6 +189,18 @@
   .filters button.active { background: var(--blue); color: #fff; border-color: var(--blue); }
   .filter-sep { color: var(--text-dim); padding: 0 4px; align-self: center; }
 
+  .history-toggle {
+    text-align: center;
+    padding: 14px;
+    color: var(--blue);
+    cursor: pointer;
+    font-size: 13px;
+    border-top: 1px solid var(--border);
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .history-toggle:hover { background: var(--panel-2); }
+
   .refresh-btn {
     background: var(--panel-2);
     border: 1px solid var(--border);
@@ -393,6 +405,7 @@ let analysesMap = {};
 let activeDir = "ALL";
 let activeMods = new Set();
 let searchTerm = "";
+let historyExpanded = false;
 
 async function loadAnalyses() {
   try {
@@ -805,9 +818,13 @@ function renderHistory(summary, closes) {
   document.getElementById("history-summary").innerHTML = sumLine;
 
   if (!closes.length) {
-    document.getElementById("history-table").innerHTML = '<div class="empty">今天还没有平仓记录</div>';
+    document.getElementById("history-table").innerHTML = '<div class="empty">过去 24 小时还没有平仓记录</div>';
     return;
   }
+
+  const COLLAPSED_LIMIT = 10;
+  const visibleCloses = historyExpanded ? closes : closes.slice(0, COLLAPSED_LIMIT);
+  const hasMore = closes.length > COLLAPSED_LIMIT;
 
   const html = `
     <table>
@@ -825,7 +842,7 @@ function renderHistory(summary, closes) {
         </tr>
       </thead>
       <tbody>
-        ${closes.slice(0, 50).map(c => {
+        ${visibleCloses.map(c => {
           const dirCn = c.side === 'long' ? '平多' : '平空';
           const dirCls = c.side === 'long' ? 'LONG' : 'SHORT';
           const tag = c.liquidated
@@ -846,8 +863,23 @@ function renderHistory(summary, closes) {
         `;}).join("")}
       </tbody>
     </table>
+    ${hasMore ? `
+      <div class="history-toggle" id="history-toggle">
+        ${historyExpanded
+          ? `▲ 收起（仅显示最近 ${COLLAPSED_LIMIT} 笔）`
+          : `▼ 展开全部 ${closes.length} 笔（含历史）`}
+      </div>
+    ` : ""}
   `;
   document.getElementById("history-table").innerHTML = html;
+
+  const toggleBtn = document.getElementById("history-toggle");
+  if (toggleBtn) {
+    toggleBtn.addEventListener("click", () => {
+      historyExpanded = !historyExpanded;
+      renderHistory(summary, closes);
+    });
+  }
 }
 
 function formatPnl(v) {
