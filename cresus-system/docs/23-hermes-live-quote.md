@@ -544,16 +544,70 @@ git push
 
 ---
 
-## ✅ P17 完成检查清单
+## ✅ P17 完成检查清单（2026-04-28 全部 PASS）
 
-- [ ] `scripts/quote.py` 写入 + `chmod +x`
-- [ ] `quote.py BTC full` 本地输出干净 markdown
-- [ ] Hermes runtime 类型确认（A bash / B MCP / C tools.toml）并完成对应注册
-- [ ] `prompts/hermes_analyst.txt` 追加"强制规则"段落
-- [ ] Telegram bot 重启
-- [ ] `@cresus_h_bot` 回复 BTC 行情问题不再报"验证/同意页"
-- [ ] 日志可见 `quote.py` 被调用
-- [ ] 私有 repo `git push` 成功
+- [x] `scripts/quote.py` 写入 + `chmod +x`（`-rwxr-xr-x  6744 bytes`）
+- [x] `quote.py BTC full` 本地输出干净 markdown（含 MA20/RSI/资金费/多空比/4H 蜡烛）
+- [x] Hermes runtime 确认：**HermesAgent**（`~/.local/bin/hermes`），走**路径 B（MCP）**
+- [x] `scripts/quote_mcp.py` FastMCP 包装 + `uv pip install mcp`（mcp==1.27.0）
+- [x] `hermes mcp add crypto-quote` 注册成功，`hermes mcp test` 1164ms 握手通过
+- [x] `hermes tools --summary` 显示 CLI 平台已自动启用 `crypto-quote`
+- [x] `--source tool` 经 `hermes chat --help` 确认只是 session 标签、不影响工具可见性 → telegram_bot.py 无需任何改动
+- [x] CLI 模拟 Telegram 调用：`hermes chat -Q --source tool --max-turns 3 -t "" -q "现在 BTC 适合做空还是做多？"` 触发 `Processing request of type CallToolRequest`，Hermes 拿到真实数据后给出框架级判断
+- [x] 真 Telegram `@cresus_h_bot` 回复包含具体数字（现价 75993 / RSI 37.9 / 大户多空比 0.84），**没有** "Reached maximum iterations" 也**没有** "公开站点有验证/同意页"
+- [x] 私有 repo commit `a776078` push 成功
+
+---
+
+## 📌 实测验证（2026-04-28）
+
+### CLI 测试 session
+
+- session ID：`20260428_171806_4e14c6`
+- query：`现在 BTC 适合做空还是做多？请用 get_live_quote 工具查实时数据再判断。`
+- Hermes 行为：自动调用 `get_live_quote(symbol="BTC", mode="full")`，返回 markdown blob
+- 输出关键数据：现价 75,949.9 / 1H MA20 76,687.7 / 4H MA20 77,460.0 / 1H RSI 37.7 / 4H RSI 36.3 / 全账户多空比 0.9585 / 大户多空比 0.8445
+- 框架判断：**短线偏空，不建议追空，等反弹做空或破位跟空**
+
+### Telegram 真实回复样本
+
+`@cresus_h_bot` 收到 `现在 BTC 适合做空还是做多`（无任何额外提示），回复：
+
+```
+**偏空，短线更适合轻仓做空 / 等反弹空。**
+
+理由：
+- 现价 **75993**，低于 **1H/4H MA20**
+- **1H RSI 37.9 / 4H RSI 36.4**，弱势未修复
+- 大户多空比 **0.84**，偏空
+- 资金费率小幅为正，说明多头还在付费，易被继续压制
+
+策略：
+- 激进：反弹到 **76600-77400** 区间找空
+- 保守：跌破 **75600** 再跟空
+
+若强势站回 **76688** 上方，再考虑转多。
+*仅供参考，不构成投资建议。*
+```
+
+### 私有 repo 落盘
+
+```
+commit a776078 (HEAD -> main, origin/main)
+P17: live quote MCP tool for Hermes (绕开 Cloudflare/同意页)
+
+ pyproject.toml         | +1 line  (mcp dep)
+ uv.lock                | +N lines
+ scripts/quote.py       | +149 lines (new, executable)
+ scripts/quote_mcp.py   | +47 lines  (new, executable)
+```
+
+### 一行复盘
+
+> WebFetch 抓前端 → Cloudflare 同意页 ❌
+> Binance public REST API → 干净 JSON ✅
+>
+> 治本方案：给 Hermes 一个 MCP 工具直连交易所公共 API，绕过整个网页层。Hermes 看 docstring 里 `USE THIS INSTEAD OF web search/fetch when the user asks about current price...` 自动选对工具，无需改 prompt 或 SOUL.md。
 
 ---
 
