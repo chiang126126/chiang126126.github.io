@@ -201,6 +201,19 @@
   }
   .history-toggle:hover { background: var(--panel-2); }
 
+  tr.outside-24h td { opacity: 0.55; background: rgba(0,0,0,0.15); }
+  tr.outside-24h td:first-child::before { content: "↥ "; color: var(--text-dim); }
+
+  .history-recap {
+    padding: 12px 14px;
+    background: var(--panel-2);
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-dim);
+    text-align: center;
+  }
+  .history-recap strong { color: var(--text); font-variant-numeric: tabular-nums; }
+
   .refresh-btn {
     background: var(--panel-2);
     border: 1px solid var(--border);
@@ -826,6 +839,21 @@ function renderHistory(summary, closes) {
   const visibleCloses = historyExpanded ? closes : closes.slice(0, COLLAPSED_LIMIT);
   const hasMore = closes.length > COLLAPSED_LIMIT;
 
+  const recap = visibleCloses.reduce((a, c) => {
+    a.wins   += c.net > 0 ? 1 : 0;
+    a.losses += c.net < 0 ? 1 : 0;
+    a.netSum += (c.net || 0);
+    if (c.open_ts && c.ts) {
+      const ms = new Date(c.ts).getTime() - new Date(c.open_ts).getTime();
+      if (ms > 0) { a.durSum += ms; a.durCount += 1; }
+    }
+    return a;
+  }, {wins:0, losses:0, netSum:0, durSum:0, durCount:0});
+  const avgDurMs = recap.durCount ? Math.floor(recap.durSum / recap.durCount) : 0;
+  const avgDurMin = Math.floor(avgDurMs / 60000);
+  const avgDurStr = avgDurMin < 60 ? `${avgDurMin}m` : `${Math.floor(avgDurMin/60)}h${avgDurMin%60}m`;
+  const recapNetCls = recap.netSum > 0 ? "pnl-positive" : (recap.netSum < 0 ? "pnl-negative" : "");
+
   const html = `
     <table>
       <thead>
@@ -833,6 +861,7 @@ function renderHistory(summary, closes) {
           <th>时间</th>
           <th>Symbol</th>
           <th>方向</th>
+          <th>持仓</th>
           <th>入场</th>
           <th>出场</th>
           <th>盈亏</th>
@@ -848,11 +877,13 @@ function renderHistory(summary, closes) {
           const tag = c.liquidated
             ? '<span class="badge" style="color:var(--red);background:rgba(255,23,68,0.15)">爆仓</span>'
             : '<span style="color:var(--text-dim);font-size:11px">正常</span>';
+          const outsideClass = isWithin24h(c.ts) ? "" : " class=\"outside-24h\"";
           return `
-          <tr>
+          <tr${outsideClass}>
             <td>${formatTime(c.ts)}</td>
             <td><strong>${c.symbol}</strong></td>
             <td><span class="badge ${dirCls}">${dirCn}</span></td>
+            <td style="color:var(--text-dim)">${formatDuration(c.open_ts, c.ts)}</td>
             <td>${formatPrice(c.open_px)}</td>
             <td>${formatPrice(c.close_px)}</td>
             <td class="pnl-cell ${pnlClass(c.pnl)}">${formatPnl(c.pnl)}</td>
@@ -863,11 +894,18 @@ function renderHistory(summary, closes) {
         `;}).join("")}
       </tbody>
     </table>
+    <div class="history-recap">
+      当前列表 <strong>${visibleCloses.length}</strong> 笔: 
+      <strong style="color:var(--green)">${recap.wins}</strong> 胜 / 
+      <strong style="color:var(--red)">${recap.losses}</strong> 负 · 
+      净 <strong class="${recapNetCls}">${formatPnl(recap.netSum)} USDT</strong>
+      ${recap.durCount ? ` · 平均持仓 <strong>${avgDurStr}</strong>` : ""}
+    </div>
     ${hasMore ? `
       <div class="history-toggle" id="history-toggle">
         ${historyExpanded
           ? `▲ 收起（仅显示最近 ${COLLAPSED_LIMIT} 笔）`
-          : `▼ 展开全部 ${closes.length} 笔（含历史）`}
+          : `▼ 展开全部 ${closes.length} 笔（24h 之前的行已变暗）`}
       </div>
     ` : ""}
   `;
@@ -880,6 +918,26 @@ function renderHistory(summary, closes) {
       renderHistory(summary, closes);
     });
   }
+}
+
+function isWithin24h(iso) {
+  if (!iso) return false;
+  const t = new Date(iso).getTime();
+  return (Date.now() - t) < 86400000;
+}
+
+function formatDuration(openIso, closeIso) {
+  if (!openIso || !closeIso) return "—";
+  const ms = new Date(closeIso).getTime() - new Date(openIso).getTime();
+  if (ms < 0) return "—";
+  const m = Math.floor(ms / 60000);
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(m / 60);
+  const mm = m % 60;
+  if (h < 24) return mm > 0 ? `${h}h${mm}m` : `${h}h`;
+  const d = Math.floor(h / 24);
+  const hh = h % 24;
+  return hh > 0 ? `${d}d${hh}h` : `${d}d`;
 }
 
 function formatPnl(v) {
