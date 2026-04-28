@@ -274,6 +274,18 @@
 
   .pnl-cell { font-variant-numeric: tabular-nums; font-weight: 600; }
 
+  /* P19 信号状态机 + 距现价% */
+  .dist-pct {
+    font-size: 11px;
+    font-weight: 500;
+    margin-left: 3px;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.85;
+  }
+  .dist-pos { color: var(--green); }
+  .dist-neg { color: var(--red); }
+  .dist-warn { color: var(--yellow); }
+
   .struct-row {
     display: grid;
     grid-template-columns: 28px 110px 1fr 60px 50px 140px 90px;
@@ -402,6 +414,7 @@
       <span class="filter-sep">·</span>
       <button data-mod="HIGH">≥70</button>
       <button data-mod="FOLLOW">🟢 跟</button>
+      <button data-mod="ACTIVE">🎯 只看活跃</button>
       <input id="search" placeholder="搜索 symbol..." />
     </div>
     <div id="table-wrap">
@@ -419,6 +432,132 @@ let activeDir = "ALL";
 let activeMods = new Set();
 let searchTerm = "";
 let historyExpanded = false;
+
+// ==================== P19 信号状态机 + 实时现价 ====================
+let currentPrices = {};         // symbol → 现价（USDT）
+let pricesLastUpdated = null;   // 最近一次成功 fetch 的 epoch ms
+
+const SIGNAL_TTL_HOURS    = 6;    // 信号年龄 >6h → 已过期
+const ENTRY_TOLERANCE_PCT = 0.5;  // 现价距 entry <0.5% → 可入场
+const NEAR_SL_PCT         = 0.5;  // 现价距 SL <0.5% → 临近止损
+
+const STATE_META = {
+  WAITING: { tag: "⏳ 待触发",  color: "#8a96aa", bg: "rgba(138,150,170,0.15)" },
+  ENTRY:   { tag: "✅ 可入场",  color: "#00c853", bg: "rgba(0,200,83,0.18)" },
+  ACTIVE:  { tag: "🔥 已激活",  color: "#2196f3", bg: "rgba(33,150,243,0.18)" },
+  NEAR_SL: { tag: "⚠️ 临近止损", color: "#ff9800", bg: "rgba(255,152,0,0.18)" },
+  STOPPED: { tag: "❌ 已止损",  color: "#ff1744", bg: "rgba(255,23,68,0.18)" },
+  HIT_TP:  { tag: "✅ 已止盈",  color: "#00c853", bg: "rgba(0,200,83,0.20)" },
+  EXPIRED: { tag: "⏰ 已过期",  color: "#5a6478", bg: "rgba(90,100,120,0.12)" },
+  WATCH:   { tag: "👀 观察",    color: "#ffd600", bg: "rgba(255,214,0,0.12)" },
+  SKIP:    { tag: "—",          color: "#5a6478", bg: "transparent"          },
+  NO_DATA: { tag: "— 缺数据",   color: "#5a6478", bg: "transparent"          },
+  LOADING: { tag: "⏳ 加载中",   color: "#5a6478", bg: "transparent"          },
+};
+
+async function loadPrices() {
+  try {
+    const res = await fetch("https://fapi.binance.com/fapi/v1/ticker/price");
+    if (!res.ok) return;
+    const arr = await res.json();
+    const map = {};
+    for (const t of arr) map[t.symbol] = parseFloat(t.price);
+    currentPrices = map;
+    pricesLastUpdated = Date.now();
+    if (allSignals.length > 0) renderTable();
+  } catch (e) {
+    console.warn("[prices] load failed:", e);
+  }
+}
+
+/**
+ * 计算单条信号的当前状态。
+ * @returns {{ state: string, distEntry: number|null, distSL: number|null, distTP: number|null }}
+ *
+ * dist% 约定：(current - target) / target * 100，带符号
+ *   - 正 = 现价高于该 level
+ *   - 负 = 现价低于该 level
+ * 用户可结合方向自行解读；状态徽章已给出"是否触发"的客观结论。
+ */
+function computeSignalState(signal, currentPrice, nowMs) {
+  if (signal.direction === "SKIP")
+    return { state: "SKIP",  distEntry: null, distSL: null, distTP: null };
+  if (signal.direction === "WATCH")
+    return { state: "WATCH", distEntry: null, distSL: null, distTP: null };
+
+  const e   = Number(signal.entry_price);
+  const sl  = Number(signal.stop_loss);
+  const tps = Array.isArray(signal.take_profit)
+    ? signal.take_profit
+    : (signal.take_profit != null ? [signal.take_profit] : []);
+  const tp1 = tps.length > 0 ? Number(tps[0]) : null;
+
+  if (!e || !sl || isNaN(e) || isNaN(sl))
+    return { state: "NO_DATA", distEntry: null, distSL: null, distTP: null };
+
+  const ageHours = (nowMs - new Date(signal.ts).getTime()) / 3.6e6;
+  if (ageHours > SIGNAL_TTL_HOURS)
+    return { state: "EXPIRED", distEntry: null, distSL: null, distTP: null };
+
+  if (!currentPrice || isNaN(currentPrice))
+    return { state: "LOADING", distEntry: null, distSL: null, distTP: null };
+
+  const isLong = signal.direction === "LONG";
+  const distEntry = (currentPrice - e) / e * 100;
+  const distSL    = (currentPrice - sl) / sl * 100;
+  const distTP    = tp1 ? (currentPrice - tp1) / tp1 * 100 : null;
+
+  // 已触止盈（TP1）
+  if (tp1) {
+    if ( isLong && currentPrice >= tp1) return { state: "HIT_TP", distEntry, distSL, distTP };
+    if (!isLong && currentPrice <= tp1) return { state: "HIT_TP", distEntry, distSL, distTP };
+  }
+  // 已触止损
+  if ( isLong && currentPrice <= sl) return { state: "STOPPED", distEntry, distSL, distTP };
+  if (!isLong && currentPrice >= sl) return { state: "STOPPED", distEntry, distSL, distTP };
+  // 临近止损（无方向区分，<0.5% 阈值）
+  if (Math.abs(distSL) < NEAR_SL_PCT) return { state: "NEAR_SL", distEntry, distSL, distTP };
+  // 已激活（穿越 entry，方向一致）
+  if ( isLong && currentPrice > e) return { state: "ACTIVE", distEntry, distSL, distTP };
+  if (!isLong && currentPrice < e) return { state: "ACTIVE", distEntry, distSL, distTP };
+  // 可入场区
+  if (Math.abs(distEntry) < ENTRY_TOLERANCE_PCT) return { state: "ENTRY", distEntry, distSL, distTP };
+  // 默认：还没到入场点
+  return { state: "WAITING", distEntry, distSL, distTP };
+}
+
+function stateBadge(stateObj) {
+  const meta = STATE_META[stateObj.state] || STATE_META.LOADING;
+  return `<span class="badge" style="color:${meta.color};background:${meta.bg};white-space:nowrap;">${meta.tag}</span>`;
+}
+
+function formatDist(pct) {
+  if (pct == null || isNaN(pct)) return "";
+  const sign = pct >= 0 ? "+" : "";
+  const abs = Math.abs(pct);
+  let cls = pct >= 0 ? "dist-pos" : "dist-neg";
+  if (abs < 0.5) cls = "dist-warn";   // 接近 level 时改黄色提示
+  return ` <span class="dist-pct ${cls}">(${sign}${pct.toFixed(2)}%)</span>`;
+}
+
+function priceWithDist(price, distPct) {
+  if (price == null || price === "") return "—";
+  return formatPrice(price) + formatDist(distPct);
+}
+
+function formatTPWithDist(tp, distTP) {
+  if (!tp) return "—";
+  if (Array.isArray(tp)) {
+    if (tp.length === 0) return "—";
+    let out = formatPrice(tp[0]) + formatDist(distTP);
+    if (tp.length > 1) {
+      out += " / " + tp.slice(1).map(formatPrice).join(" / ");
+    }
+    return out;
+  }
+  return formatPrice(tp) + formatDist(distTP);
+}
+// ==================== P19 end ====================
 
 async function loadAnalyses() {
   try {
@@ -586,15 +725,35 @@ function renderTable() {
     rows = rows.filter(s => (s.symbol || "").toUpperCase().includes(q));
   }
 
-  rows = rows.slice(0, 200);
+  // 预先计算每行 state（FOLLOW/ACTIVE 过滤都要用）
+  const nowMs = Date.now();
+  const rowsWithState = rows.map(s => ({
+    s,
+    a: analysesMap[s.ts] || {},
+    state: computeSignalState(s, currentPrices[s.symbol], nowMs),
+  }));
 
-  if (rows.length === 0) {
+  // "🎯 只看活跃"：仅保留可入场 / 已激活 / 临近止损 三种"现在该看一眼"的状态
+  let filtered = rowsWithState;
+  if (activeMods.has("ACTIVE")) {
+    filtered = filtered.filter(r => ["ENTRY", "ACTIVE", "NEAR_SL"].includes(r.state.state));
+  }
+
+  filtered = filtered.slice(0, 200);
+
+  if (filtered.length === 0) {
     document.getElementById("table-wrap").innerHTML =
       '<div class="empty">没有匹配的信号</div>';
     return;
   }
 
+  const priceAge = pricesLastUpdated ? Math.round((Date.now() - pricesLastUpdated) / 1000) : null;
+  const priceMeta = priceAge != null
+    ? `<span style="color:var(--text-dim);font-size:11px;margin-left:8px;">现价更新 ${priceAge}s 前</span>`
+    : `<span style="color:var(--text-dim);font-size:11px;margin-left:8px;">现价加载中…</span>`;
+
   const html = `
+    <div style="padding:0 0 8px 4px;">${priceMeta}</div>
     <table>
       <thead>
         <tr>
@@ -602,6 +761,7 @@ function renderTable() {
           <th>Symbol</th>
           <th>方向</th>
           <th>信心度</th>
+          <th>状态</th>
           <th>推荐</th>
           <th>风险</th>
           <th>结构匹配</th>
@@ -614,25 +774,24 @@ function renderTable() {
         </tr>
       </thead>
       <tbody>
-        ${rows.map(s => {
-          const a = analysesMap[s.ts] || {};
-          return `
+        ${filtered.map(({ s, a, state }) => `
           <tr>
             <td>${formatTime(s.ts)}</td>
             <td><strong>${s.symbol || "—"}</strong></td>
             <td><span class="badge ${s.direction}">${DIR_CN[s.direction] || s.direction}</span></td>
             <td><span class="conf">${s.confidence || "—"}</span></td>
+            <td>${stateBadge(state)}</td>
             <td>${recBadge(a.recommendation)}</td>
             <td>${riskBadge(a.risk_level)}</td>
             <td>${matchBadge(a.structure_match)}</td>
             <td>${s.leverage ? s.leverage + "×" : "—"}</td>
-            <td>${formatPrice(s.entry_price)}</td>
-            <td>${formatPrice(s.stop_loss)}</td>
-            <td>${formatTP(s.take_profit)}</td>
+            <td>${priceWithDist(s.entry_price, state.distEntry)}</td>
+            <td>${priceWithDist(s.stop_loss, state.distSL)}</td>
+            <td>${formatTPWithDist(s.take_profit, state.distTP)}</td>
             <td>${s.structure || a.structure_judge || "—"}</td>
             <td>${s.routed_to || "—"}</td>
           </tr>
-        `;}).join("")}
+        `).join("")}
       </tbody>
     </table>
   `;
@@ -957,7 +1116,7 @@ async function manualRefresh() {
   const btn = document.getElementById("refresh-btn");
   btn.classList.add("spinning");
   try {
-    await Promise.all([loadSignals(), loadPnL()]);
+    await Promise.all([loadSignals(), loadPnL(), loadPrices()]);
   } finally {
     setTimeout(() => btn.classList.remove("spinning"), 300);
   }
@@ -967,8 +1126,10 @@ document.getElementById("refresh-btn").addEventListener("click", manualRefresh);
 
 loadSignals();
 loadPnL();
+loadPrices();
 setInterval(loadSignals, 60_000);
 setInterval(loadPnL, 60_000);
+setInterval(loadPrices, 60_000);
 </script>
 </body>
 </html>
