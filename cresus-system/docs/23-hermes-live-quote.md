@@ -640,6 +640,55 @@ P17: live quote MCP tool for Hermes (绕开 Cloudflare/同意页)
 
 ---
 
+## 附录 C：机器迁移 / Hermes 重装恢复流程
+
+> 关键洞察：`hermes mcp add` 把 server 配置写到 `~/.hermes/config.yaml`——**这个文件不在 cresus-bot repo 里**。机器换了 / Hermes 重装 / 配置目录损坏，crypto-quote 工具就没了。
+>
+> 解决：cresus-bot 私有 repo 里加了一个幂等脚本 `scripts/setup_hermes.sh`（commit `b59d399`），一行恢复。
+
+### 新机器从零恢复
+
+```bash
+# 1. clone 私有 repo
+git clone git@github.com:chiang126126/cresus-bot.git
+cd cresus-bot
+
+# 2. 装 Python 依赖（含 mcp）
+uv sync
+
+# 3. 装 Hermes Agent（如果新机器还没装）
+#    https://hermesagent.ai
+hermes login
+
+# 4. 一行恢复 crypto-quote MCP server
+./scripts/setup_hermes.sh
+```
+
+### `setup_hermes.sh` 做什么
+
+1. **Prereq 检查**：`hermes` CLI 在 PATH、`.venv/bin/python` 存在、`scripts/quote_mcp.py` 在
+2. **幂等注册**：`hermes mcp list` 已含 `crypto-quote` 就跳过，否则 `hermes mcp add ...`
+3. **打印验证命令**
+
+### 验证恢复成功
+
+```bash
+hermes mcp list                    # 应该看到 crypto-quote ✓ enabled
+hermes tools --summary             # CLI 平台有 ✓ crypto-quote
+hermes mcp test crypto-quote       # ✓ Connected. 1 tool: get_live_quote
+```
+
+### 没覆盖到的（有意为之）
+
+`setup_hermes.sh` **不**做：
+- Hermes login / API key 配置（用户敏感）
+- launchd plist 注册（macOS 特定，每台机不同）
+- `.env` 文件部署（含密钥，必须 scp 单独传）
+
+那些保持手动 / scp，避免脚本误改用户私密配置。
+
+---
+
 ## 下一步（可选）
 
 | 阶段 | 内容 |
