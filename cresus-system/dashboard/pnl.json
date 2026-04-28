@@ -1,38 +1,27 @@
 {
-  "updated_at": "2026-04-28T20:18:03.527064+00:00",
+  "updated_at": "2026-04-28T20:28:06.505638+00:00",
   "summary": {
-    "open_positions": 3,
-    "total_unrealized_pnl": 13.085,
+    "open_positions": 2,
+    "total_unrealized_pnl": 0.005,
     "today_opened": 5,
     "today_closed": 4,
     "today_liquidated": 0,
-    "today_realized_pnl": -20.4042,
-    "today_fees": -0.3455,
-    "today_wins": 1,
-    "today_losses": 3,
-    "win_rate": 0.25,
-    "total_realized_pnl": -20.7497
+    "today_realized_pnl": -3.9449,
+    "today_fees": -0.45,
+    "today_wins": 2,
+    "today_losses": 2,
+    "win_rate": 0.5,
+    "total_realized_pnl": -4.3949
   },
   "positions": [
-    {
-      "symbol": "BIO-USDT-SWAP",
-      "side": "net",
-      "size": 60.0,
-      "entry": 0.03287,
-      "mark": 0.03505,
-      "upl": 13.079999999999966,
-      "upl_ratio": 0.331609370246424,
-      "lever": 5,
-      "ctime": "1777389154937"
-    },
     {
       "symbol": "XAU-USDT-SWAP",
       "side": "net",
       "size": 1.0,
       "entry": 4615.5,
-      "mark": 4597.5,
-      "upl": -0.018,
-      "upl_ratio": -0.0116997075073123,
+      "mark": 4594.5,
+      "upl": -0.021,
+      "upl_ratio": -0.0136496587585311,
       "lever": 3,
       "ctime": "1777372611273"
     },
@@ -41,14 +30,28 @@
       "side": "net",
       "size": -1.0,
       "entry": 0.0983,
-      "mark": 0.096,
-      "upl": 0.023,
-      "upl_ratio": 0.0701932858596133,
+      "mark": 0.0957,
+      "upl": 0.0260000000000001,
+      "upl_ratio": 0.0793489318413024,
       "lever": 3,
       "ctime": "1777271777727"
     }
   ],
   "closed_recent": [
+    {
+      "symbol": "BIO-USDT-SWAP",
+      "side": "long",
+      "open_px": 0.03287,
+      "open_ts": "2026-04-28T15:12:34.937000+00:00",
+      "close_px": 0.03561,
+      "size": 60.0,
+      "pnl": 16.44,
+      "fee": -0.10683,
+      "net": 16.33317,
+      "ts": "2026-04-28T20:23:21.382000+00:00",
+      "bill_id": "3520041157130969089",
+      "liquidated": false
+    },
     {
       "symbol": "AXS-USDT-SWAP",
       "side": "short",
@@ -89,20 +92,6 @@
       "net": -0.03617,
       "ts": "2026-04-28T12:35:55.979000+00:00",
       "bill_id": "3519100109563092992",
-      "liquidated": false
-    },
-    {
-      "symbol": "XAU-USDT-SWAP",
-      "side": "long",
-      "open_px": 4615.5,
-      "open_ts": null,
-      "close_px": 4659.6,
-      "size": 1.0,
-      "pnl": -0.0193,
-      "fee": -0.00233,
-      "net": -0.02163,
-      "ts": "2026-04-28T05:06:20.922000+00:00",
-      "bill_id": "3518194976847290368",
       "liquidated": false
     }
   ]
