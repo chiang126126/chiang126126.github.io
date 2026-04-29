@@ -896,14 +896,23 @@ function renderPnLStats(s, updatedAt, closes) {
   const total = s.total_realized_pnl || 0;
   const winRate = (s.win_rate || 0) * 100;
 
-  // 累计胜率：从 closed_recent 数组实时算（净盈亏 net 正负判断；net=0 不计）
-  let allWins = 0, allLosses = 0;
-  for (const c of (closes || [])) {
-    if ((c.net || 0) > 0) allWins++;
-    else if ((c.net || 0) < 0) allLosses++;
+  // 累计胜率：优先用后端 all_time_* 字段（fetch_pnl.py 写入 closes_all.jsonl 持久化），
+  // 后端未升级时回退到从 closed_recent 现算（受 OKX bills API 时间窗限制，可能不全）
+  let allWins, allLosses, allClosed, allWinRate;
+  if (s.all_time_closed != null) {
+    allWins   = s.all_time_wins   || 0;
+    allLosses = s.all_time_losses || 0;
+    allClosed = s.all_time_closed || 0;
+    allWinRate = (s.all_time_win_rate || 0) * 100;
+  } else {
+    allWins = 0; allLosses = 0;
+    for (const c of (closes || [])) {
+      if ((c.net || 0) > 0) allWins++;
+      else if ((c.net || 0) < 0) allLosses++;
+    }
+    allClosed = allWins + allLosses;
+    allWinRate = allClosed > 0 ? (allWins / allClosed * 100) : 0;
   }
-  const allTotal = allWins + allLosses;
-  const allWinRate = allTotal > 0 ? (allWins / allTotal * 100) : 0;
 
   const cards = [
     {
@@ -930,8 +939,8 @@ function renderPnLStats(s, updatedAt, closes) {
     },
     {
       label: "累计胜率",
-      value: allTotal > 0 ? allWinRate.toFixed(0) + "%" : "—",
-      sub: allTotal > 0 ? `${allWins}胜 / ${allLosses}负 · ${allTotal}笔` : "",
+      value: allClosed > 0 ? allWinRate.toFixed(0) + "%" : "—",
+      sub: allClosed > 0 ? `${allWins}胜 / ${allLosses}负 · ${allClosed}笔` : "",
     },
     {
       label: "累计已实现",
