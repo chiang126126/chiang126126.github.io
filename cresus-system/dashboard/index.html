@@ -386,6 +386,9 @@
 
   <div class="panel" id="history-panel" style="display:none">
     <h2>📜 仓位历史 <span class="meta-inline" id="history-summary">—</span></h2>
+    <div class="filters" style="padding: 0 20px 8px;">
+      <input id="history-search" placeholder="搜索 symbol（留空看全部）..." />
+    </div>
     <div id="history-table"></div>
   </div>
 
@@ -432,6 +435,11 @@ let activeDir = "ALL";
 let activeMods = new Set();
 let searchTerm = "";
 let historyExpanded = false;
+
+// 仓位历史 panel：symbol search + cached pnl data
+let historySearchTerm = "";
+let pnlSummaryCache = null;
+let pnlClosesCache = [];
 
 // ==================== P19 信号状态机 + 实时现价 ====================
 let currentPrices = {};         // symbol → 现价（USDT）
@@ -868,15 +876,17 @@ async function loadPnL() {
       return;
     }
     const data = await res.json();
-    renderPnLStats(data.summary, data.updated_at);
+    pnlSummaryCache = data.summary || null;
+    pnlClosesCache = data.closed_recent || [];
+    renderPnLStats(data.summary, data.updated_at, pnlClosesCache);
     renderPositions(data.positions || []);
-    renderHistory(data.summary, data.closed_recent || []);
+    renderHistory(data.summary, pnlClosesCache);
   } catch (e) {
     document.getElementById("pnl-updated").textContent = "加载失败：" + e.message;
   }
 }
 
-function renderPnLStats(s, updatedAt) {
+function renderPnLStats(s, updatedAt, closes) {
   if (!s) return;
   const updated = updatedAt ? new Date(updatedAt).toLocaleString("zh-CN", { hour12: false }) : "—";
   document.getElementById("pnl-updated").textContent = "更新于 " + updated;
@@ -885,6 +895,15 @@ function renderPnLStats(s, updatedAt) {
   const today = s.today_realized_pnl || 0;
   const total = s.total_realized_pnl || 0;
   const winRate = (s.win_rate || 0) * 100;
+
+  // 累计胜率：从 closed_recent 数组实时算（净盈亏 net 正负判断；net=0 不计）
+  let allWins = 0, allLosses = 0;
+  for (const c of (closes || [])) {
+    if ((c.net || 0) > 0) allWins++;
+    else if ((c.net || 0) < 0) allLosses++;
+  }
+  const allTotal = allWins + allLosses;
+  const allWinRate = allTotal > 0 ? (allWins / allTotal * 100) : 0;
 
   const cards = [
     {
@@ -908,6 +927,11 @@ function renderPnLStats(s, updatedAt) {
       label: "24h 胜率",
       value: s.today_closed ? winRate.toFixed(0) + "%" : "—",
       sub: s.today_closed ? `${s.today_wins}胜 / ${s.today_losses}负` : "",
+    },
+    {
+      label: "累计胜率",
+      value: allTotal > 0 ? allWinRate.toFixed(0) + "%" : "—",
+      sub: allTotal > 0 ? `${allWins}胜 / ${allLosses}负 · ${allTotal}笔` : "",
     },
     {
       label: "累计已实现",
@@ -990,13 +1014,27 @@ function renderHistory(summary, closes) {
   document.getElementById("history-summary").innerHTML = sumLine;
 
   if (!closes.length) {
-    document.getElementById("history-table").innerHTML = '<div class="empty">过去 24 小时还没有平仓记录</div>';
+    document.getElementById("history-table").innerHTML = '<div class="empty">还没有平仓记录</div>';
+    return;
+  }
+
+  // symbol 过滤（搜索 active 时跳过 collapse 限制，看全部匹配）
+  let filtered = closes;
+  if (historySearchTerm) {
+    const q = historySearchTerm.toUpperCase();
+    filtered = filtered.filter(c => (c.symbol || "").toUpperCase().includes(q));
+  }
+  const isFiltering = historySearchTerm.length > 0;
+
+  if (isFiltering && !filtered.length) {
+    document.getElementById("history-table").innerHTML =
+      `<div class="empty">没有匹配 "${historySearchTerm}" 的平仓记录</div>`;
     return;
   }
 
   const COLLAPSED_LIMIT = 10;
-  const visibleCloses = historyExpanded ? closes : closes.slice(0, COLLAPSED_LIMIT);
-  const hasMore = closes.length > COLLAPSED_LIMIT;
+  const visibleCloses = (historyExpanded || isFiltering) ? filtered : filtered.slice(0, COLLAPSED_LIMIT);
+  const hasMore = !isFiltering && filtered.length > COLLAPSED_LIMIT;
 
   const recap = visibleCloses.reduce((a, c) => {
     a.wins   += c.net > 0 ? 1 : 0;
@@ -1123,6 +1161,14 @@ async function manualRefresh() {
 }
 
 document.getElementById("refresh-btn").addEventListener("click", manualRefresh);
+
+// 仓位历史 symbol 搜索：input 在 panel 里常驻，只更新 #history-table 内容
+document.getElementById("history-search").addEventListener("input", e => {
+  historySearchTerm = e.target.value;
+  if (pnlClosesCache.length || pnlSummaryCache) {
+    renderHistory(pnlSummaryCache, pnlClosesCache);
+  }
+});
 
 loadSignals();
 loadPnL();
