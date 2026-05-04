@@ -274,6 +274,99 @@
 
   .pnl-cell { font-variant-numeric: tabular-nums; font-weight: 600; }
 
+  /* P20 V3 Regime panel */
+  .regime-panel {
+    background: linear-gradient(180deg, #0d1420 0%, #0a0f1a 100%);
+    border: 1px solid #1f2a3d;
+  }
+  .regime-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px 22px; border-bottom: 1px solid var(--border);
+    background: var(--panel-2);
+  }
+  .regime-title-row { display: flex; align-items: center; gap: 12px; }
+  .regime-brand {
+    font-weight: 700; font-size: 15px;
+    color: #d0d6e0; letter-spacing: 0.5px;
+  }
+  .regime-badge {
+    padding: 4px 12px; border-radius: 18px; font-size: 13px; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .regime-badge::before {
+    content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor;
+  }
+  .regime-badge.alt-season   { color:#00c853; background:rgba(0,200,83,0.15); }
+  .regime-badge.btc-dominant { color:#2196f3; background:rgba(33,150,243,0.15); }
+  .regime-badge.risk-off     { color:#ff1744; background:rgba(255,23,68,0.15); }
+  .regime-badge.pump-dump    { color:#ff9800; background:rgba(255,152,0,0.15); }
+  .regime-badge.range-boring { color:#9aa3b3; background:rgba(154,163,179,0.15); }
+  .regime-meta { color: var(--text-dim); font-size: 12px; }
+  .regime-update { color: var(--text-dim); font-size: 12px; }
+
+  .regime-body { padding: 18px 22px; }
+  .regime-section-label {
+    font-size: 11px; color: var(--text-dim); text-transform: uppercase;
+    letter-spacing: 0.5px; margin-bottom: 6px;
+  }
+  .regime-judgment-block {
+    background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px; margin-bottom: 16px;
+  }
+  .regime-judgment {
+    font-size: 14px; line-height: 1.7; color: var(--text);
+  }
+  .regime-evidence-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;
+  }
+  .regime-support, .regime-challenge {
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .regime-support  { background: rgba(0,200,83,0.04); border-color: rgba(0,200,83,0.25); }
+  .regime-challenge { background: rgba(255,152,0,0.04); border-color: rgba(255,152,0,0.25); }
+  .regime-support ul, .regime-challenge ul {
+    margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.7;
+  }
+  .regime-support li, .regime-challenge li { margin-bottom: 4px; }
+
+  .regime-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .regime-tag {
+    background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 4px; padding: 3px 8px; font-size: 11px;
+    color: var(--text-dim); font-family: monospace;
+  }
+  .regime-timeline-block { margin-top: 14px; }
+  .regime-timeline-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px; font-size: 12px; color: var(--text-dim);
+  }
+  .regime-timeline {
+    display: grid; grid-template-columns: repeat(24, 1fr); gap: 2px;
+    height: 28px; margin-bottom: 8px;
+  }
+  .regime-tl-cell {
+    border-radius: 3px; cursor: default; transition: opacity 0.15s;
+    position: relative;
+  }
+  .regime-tl-cell:hover { opacity: 0.7; }
+  .regime-tl-cell:hover::after {
+    content: attr(data-tip);
+    position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+    background: #000; color: #fff; padding: 4px 8px; border-radius: 4px;
+    font-size: 11px; white-space: nowrap; z-index: 10; margin-bottom: 4px;
+  }
+  .regime-legend {
+    display: flex; flex-wrap: wrap; gap: 14px; margin-top: 6px;
+    font-size: 11px; color: var(--text-dim);
+  }
+  .legend-item { display: inline-flex; align-items: center; gap: 5px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  @media (max-width: 720px) {
+    .regime-evidence-grid { grid-template-columns: 1fr; }
+    .regime-timeline { grid-template-columns: repeat(12, 1fr); }
+  }
+
   /* P19 信号状态机 + 距现价% */
   .dist-pct {
     font-size: 11px;
@@ -368,6 +461,49 @@
 </header>
 
 <main>
+  <!-- P20: V3 Cresus Regime panel (顶部宏观市场体制) -->
+  <div class="panel regime-panel" id="regime-panel" style="display:none">
+    <div class="regime-header">
+      <div class="regime-title-row">
+        <span class="regime-brand">V3 AI Regime</span>
+        <span class="regime-badge" id="regime-badge">—</span>
+        <span class="regime-meta" id="regime-meta">—</span>
+      </div>
+      <span class="regime-update" id="regime-update">—</span>
+    </div>
+    <div class="regime-body">
+      <div class="regime-judgment-block">
+        <div class="regime-section-label">判断</div>
+        <div id="regime-judgment" class="regime-judgment">—</div>
+      </div>
+      <div class="regime-evidence-grid">
+        <div class="regime-support">
+          <div class="regime-section-label">✓ 支持证据</div>
+          <ul id="regime-support-list"></ul>
+        </div>
+        <div class="regime-challenge">
+          <div class="regime-section-label">⚠ 反面证据</div>
+          <ul id="regime-challenge-list"></ul>
+        </div>
+      </div>
+      <div class="regime-tags" id="regime-tags"></div>
+      <div class="regime-timeline-block">
+        <div class="regime-timeline-header">
+          <span>24H REGIME 时间线</span>
+          <span class="regime-timeline-count" id="regime-timeline-count">— 个快照</span>
+        </div>
+        <div class="regime-timeline" id="regime-timeline"></div>
+        <div class="regime-legend">
+          <span class="legend-item"><span class="legend-dot" style="background:#00c853"></span>山寨行情</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#2196f3"></span>BTC 主导</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#ff1744"></span>风险释放</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#ff9800"></span>拉砸风险</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#5a6478"></span>盘整死水</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="stats" id="stats"></div>
 
   <div class="panel">
@@ -443,6 +579,96 @@ let activeDir = "ALL";
 let activeMods = new Set();
 let searchTerm = "";
 let historyExpanded = false;
+
+// P20 V3 Regime panel
+let regimeData = null;
+let regimeHistory = [];
+
+const REGIME_META = {
+  ALT_SEASON_RUNNING: { zh: "山寨行情", color: "#00c853", cls: "alt-season"   },
+  BTC_DOMINATING:     { zh: "BTC 主导", color: "#2196f3", cls: "btc-dominant" },
+  RISK_OFF:           { zh: "风险释放", color: "#ff1744", cls: "risk-off"     },
+  PUMP_AND_DUMP_RISK: { zh: "拉砸风险", color: "#ff9800", cls: "pump-dump"    },
+  RANGE_BORING:       { zh: "盘整死水", color: "#5a6478", cls: "range-boring" },
+};
+
+async function loadRegime() {
+  try {
+    const res = await fetch("./regime.json?_=" + Date.now());
+    if (!res.ok) return;
+    regimeData = await res.json();
+    renderRegimeCard();
+  } catch (e) {
+    console.warn("[regime] load failed:", e);
+  }
+}
+
+async function loadRegimeHistory() {
+  try {
+    const res = await fetch("./regime_history.jsonl?_=" + Date.now());
+    if (!res.ok) return;
+    const text = await res.text();
+    regimeHistory = text.trim().split("\n").filter(Boolean).map(l => {
+      try { return JSON.parse(l); } catch { return null; }
+    }).filter(Boolean);
+    renderRegimeTimeline();
+  } catch (e) {
+    console.warn("[regime-history] load failed:", e);
+  }
+}
+
+function renderRegimeCard() {
+  if (!regimeData) return;
+  const meta = REGIME_META[regimeData.regime] || REGIME_META.RANGE_BORING;
+  document.getElementById("regime-panel").style.display = "";
+
+  const badge = document.getElementById("regime-badge");
+  badge.className = "regime-badge " + meta.cls;
+  badge.textContent = `${meta.zh} · ${regimeData.regime} · conf ${regimeData.confidence}`;
+
+  document.getElementById("regime-meta").textContent = "纯统计版（v1）";
+  const updTs = new Date(regimeData.ts);
+  const ageMin = Math.floor((Date.now() - updTs.getTime()) / 60000);
+  document.getElementById("regime-update").textContent =
+    `更新于 ${updTs.toLocaleString("zh-CN", {hour12:false})} · ${ageMin}m 前`;
+
+  document.getElementById("regime-judgment").textContent = regimeData.judgment;
+
+  const supList = document.getElementById("regime-support-list");
+  supList.innerHTML = (regimeData.support || []).map(s => `<li>${escapeHtml(s)}</li>`).join("");
+  const chList = document.getElementById("regime-challenge-list");
+  chList.innerHTML = (regimeData.challenge || []).map(s => `<li>${escapeHtml(s)}</li>`).join("");
+
+  const tagsBox = document.getElementById("regime-tags");
+  tagsBox.innerHTML = (regimeData.tags || []).map(t => `<span class="regime-tag">${escapeHtml(t)}</span>`).join("");
+}
+
+function renderRegimeTimeline() {
+  const tl = document.getElementById("regime-timeline");
+  const cnt = document.getElementById("regime-timeline-count");
+  if (!regimeHistory.length) {
+    tl.innerHTML = '<div style="color:var(--text-dim);font-size:11px;grid-column:1/-1;text-align:center;padding:8px">还没有历史快照（需要至少 1 小时积累）</div>';
+    cnt.textContent = "0 个快照";
+    return;
+  }
+  // 取最近 24 个快照（按时间降序后倒回，让最早的在最左）
+  const sorted = [...regimeHistory].sort((a,b) => new Date(a.ts) - new Date(b.ts));
+  const last24 = sorted.slice(-24);
+  cnt.textContent = `${regimeHistory.length} 个快照（显示最近 24 个）`;
+
+  tl.innerHTML = last24.map(h => {
+    const m = REGIME_META[h.regime] || REGIME_META.RANGE_BORING;
+    const t = new Date(h.ts).toLocaleString("zh-CN", {hour12:false, month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit"});
+    const tip = `${t}\n${m.zh} (conf ${h.confidence})\n广度 ${(h.metrics?.rising_pct*100 || 0).toFixed(0)}% / 中位 ${(h.metrics?.median_change_pct || 0).toFixed(2)}%`;
+    return `<div class="regime-tl-cell" style="background:${m.color}" data-tip="${escapeHtml(tip)}"></div>`;
+  }).join("");
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
 
 // 仓位历史 panel：symbol search + cached pnl data
 let historySearchTerm = "";
@@ -1317,7 +1543,7 @@ async function manualRefresh() {
   const btn = document.getElementById("refresh-btn");
   btn.classList.add("spinning");
   try {
-    await Promise.all([loadSignals(), loadPnL(), loadPrices()]);
+    await Promise.all([loadSignals(), loadPnL(), loadPrices(), loadRegime(), loadRegimeHistory()]);
   } finally {
     setTimeout(() => btn.classList.remove("spinning"), 300);
   }
@@ -1336,9 +1562,13 @@ document.getElementById("history-search").addEventListener("input", e => {
 loadSignals();
 loadPnL();
 loadPrices();
+loadRegime();
+loadRegimeHistory();
 setInterval(loadSignals, 60_000);
 setInterval(loadPnL, 60_000);
 setInterval(loadPrices, 60_000);
+setInterval(loadRegime, 5 * 60_000);          // P20: regime 1h 才更新一次，5 分钟拉够新鲜
+setInterval(loadRegimeHistory, 5 * 60_000);
 </script>
 </body>
 </html>
