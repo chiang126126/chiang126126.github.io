@@ -286,6 +286,66 @@
   .dist-neg { color: var(--red); }
   .dist-warn { color: var(--yellow); }
 
+  /* 决策信号 v2 — card grid */
+  .d-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 14px;
+  }
+  .d-card {
+    background: rgba(10,15,26,0.7);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: box-shadow 0.2s;
+  }
+  .d-card:hover { box-shadow: 0 2px 16px rgba(0,0,0,0.35); }
+  .d-card-header { display: flex; justify-content: space-between; align-items: center; }
+  .d-symbol { font-size: 15px; font-weight: 700; letter-spacing: 0.3px; }
+  .d-verdict {
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 0.3px;
+  }
+  .d-conf-row { display: flex; align-items: center; gap: 8px; }
+  .d-conf-label { font-size: 11px; color: var(--text-dim); min-width: 36px; }
+  .d-conf-bar-wrap { flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .d-conf-bar { height: 100%; border-radius: 3px; }
+  .d-conf-num { font-size: 13px; font-weight: 700; min-width: 26px; text-align: right; font-variant-numeric: tabular-nums; }
+  .d-levels {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background: rgba(0,0,0,0.25);
+    border-radius: 8px;
+    padding: 9px 11px;
+  }
+  .d-level-row { display: flex; align-items: center; gap: 6px; font-size: 12px; font-variant-numeric: tabular-nums; }
+  .d-level-label { font-size: 10px; font-weight: 700; min-width: 28px; text-transform: uppercase; letter-spacing: 0.6px; opacity: 0.75; }
+  .d-level-price { font-weight: 600; color: var(--text); }
+  .d-card-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding-top: 6px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+  }
+  .d-regime-tag { margin-left: auto; font-weight: 600; font-size: 10px; }
+  @media (max-width: 720px) {
+    .d-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  }
+  @media (max-width: 420px) {
+    .d-grid { grid-template-columns: 1fr; }
+  }
+
   .struct-row {
     display: grid;
     grid-template-columns: 28px 110px 1fr 60px 50px 140px 90px;
@@ -408,7 +468,7 @@
   </div>
 
   <div class="panel">
-    <h2>🎯 决策视图 <span class="meta-inline" id="decision-meta">—</span></h2>
+    <h2>🎯 决策信号 <span class="meta-inline" id="decision-meta">—</span></h2>
     <div class="panel-body">
       <div id="decision-table"><div class="empty">加载中…</div></div>
     </div>
@@ -489,8 +549,45 @@ async function loadPrices() {
   }
 }
 
-// ============================ 决策视图（P19b） ============================
-// 把 24h 内的 LONG/SHORT 信号按 symbol 去重聚合，给一张"现在该考虑哪几个"表
+// ============================ 决策视图 v2（card-based） ============================
+// 把 24h 内的 LONG/SHORT 信号按 symbol 去重聚合，给卡片式决策面板
+
+// 综合判断：单一入场建议（state + conf → verdict），取代旧的"状态+推荐"双列矛盾
+function unifiedVerdict(state, conf) {
+  const s = state.state;
+  if (s === "NEAR_SL")
+    return { label: "⚠️ 临近止损·警戒", priority: 0, color: "#ff9800", bg: "rgba(255,152,0,0.13)", border: "rgba(255,152,0,0.55)" };
+  if (s === "ENTRY") {
+    if (conf >= 70) return { label: "✅ 立即入场",     priority: 1, color: "#00e676", bg: "rgba(0,230,118,0.13)", border: "rgba(0,230,118,0.55)" };
+    if (conf >= 60) return { label: "⚡ 可考虑入场",   priority: 2, color: "#69f0ae", bg: "rgba(105,240,174,0.10)", border: "rgba(105,240,174,0.40)" };
+                    return { label: "⚠️ 低信心·谨慎", priority: 3, color: "#ffd600", bg: "rgba(255,214,0,0.10)", border: "rgba(255,214,0,0.35)" };
+  }
+  if (s === "ACTIVE")
+    return { label: "🔥 已激活·持续关注", priority: 4, color: "#42a5f5", bg: "rgba(33,150,243,0.10)", border: "rgba(33,150,243,0.40)" };
+  if (s === "WAITING") {
+    if (conf >= 70) return { label: "⏳ 高信心·等待入场点", priority: 5, color: "#b0bec5", bg: "rgba(176,190,197,0.08)", border: "rgba(90,100,120,0.45)" };
+                    return { label: "⏳ 等待触发",           priority: 6, color: "#5a6478", bg: "rgba(90,100,120,0.06)", border: "rgba(58,65,85,0.60)" };
+  }
+  if (s === "WATCH")
+    return { label: "👀 观察中",  priority: 7, color: "#ffd600", bg: "rgba(255,214,0,0.08)", border: "rgba(90,100,120,0.40)" };
+              return { label: "— 无状态",   priority: 8, color: "#5a6478", bg: "transparent",         border: "rgba(58,65,85,0.50)" };
+}
+
+// 行情与信号方向匹配度（结合 V3 Regime）
+function regimeMatch(direction) {
+  if (!regimeData) return null;
+  const r = regimeData.regime;
+  if (direction === "LONG") {
+    if (r === "ALT_SEASON_RUNNING") return { label: "行情顺风", color: "#00c853" };
+    if (r === "RISK_OFF")           return { label: "行情逆风", color: "#ff5252" };
+    if (r === "BTC_DOMINATING")     return { label: "BTC主导·留意", color: "#ffd600" };
+  } else if (direction === "SHORT") {
+    if (r === "RISK_OFF")           return { label: "行情顺风", color: "#00c853" };
+    if (r === "ALT_SEASON_RUNNING") return { label: "行情逆风", color: "#ff5252" };
+  }
+  return null;
+}
+
 function buildDecisionView(signals, currentPrices, nowMs) {
   const TWENTY_FOUR_H = 24 * 3600 * 1000;
   const cutoff = nowMs - TWENTY_FOUR_H;
@@ -538,8 +635,17 @@ function renderDecisionView() {
   const nowMs = Date.now();
   const rows = buildDecisionView(allSignals, currentPrices, nowMs);
 
+  // 重新排序：按综合判断优先级 → 信心度降序
+  rows.sort((a, b) => {
+    const va = unifiedVerdict(a.state, a.maxConf);
+    const vb = unifiedVerdict(b.state, b.maxConf);
+    if (va.priority !== vb.priority) return va.priority - vb.priority;
+    return b.maxConf - a.maxConf;
+  });
+
+  const actionable = rows.filter(r => unifiedVerdict(r.state, r.maxConf).priority <= 4);
   document.getElementById("decision-meta").textContent =
-    `${rows.length} 个候选 · 24h 内 LONG/SHORT 去重聚合 · 按状态/首发/信心度排序`;
+    `${actionable.length} 个活跃 · ${rows.length} 个候选 · 24h 聚合`;
 
   if (rows.length === 0) {
     document.getElementById("decision-table").innerHTML =
@@ -547,48 +653,73 @@ function renderDecisionView() {
     return;
   }
 
-  const html = `
-    <table>
-      <thead>
-        <tr>
-          <th>Symbol</th>
-          <th>方向</th>
-          <th>次数</th>
-          <th>首现</th>
-          <th>最高信心</th>
-          <th>当前状态</th>
-          <th>推荐</th>
-          <th>距 entry</th>
-          <th>距 SL</th>
-          <th>距 TP</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rows.map(r => {
-          const a = analysesMap[r.latest.ts] || {};
-          const occBadge = r.count === 1
-            ? '<span style="color:var(--green);font-weight:600">🆕 首发</span>'
-            : `<span style="color:var(--text-dim)">🔁 ${r.count}</span>`;
-          return `
-          <tr>
-            <td><strong>${r.symbol}</strong></td>
-            <td><span class="badge ${r.latest.direction}">${DIR_CN[r.latest.direction]}</span></td>
-            <td>${occBadge}</td>
-            <td style="color:var(--text-dim);font-size:12px">${formatTime(r.firstTs)}</td>
-            <td><span class="conf">${r.maxConf}</span></td>
-            <td>${stateBadge(r.state)}</td>
-            <td>${recBadge(a.recommendation)}</td>
-            <td>${formatDistOnly(r.state.distEntry)}</td>
-            <td>${formatDistOnly(r.state.distSL)}</td>
-            <td>${formatDistOnly(r.state.distTP)}</td>
-          </tr>
-        `;}).join("")}
-      </tbody>
-    </table>
-  `;
-  document.getElementById("decision-table").innerHTML = html;
+  const cards = rows.map(r => {
+    const v  = unifiedVerdict(r.state, r.maxConf);
+    const rm = regimeMatch(r.latest.direction);
+    const dir = r.latest.direction;
+    const dirCls = dir === "LONG" ? "LONG" : "SHORT";
+    const dirLabel = DIR_CN[dir] || dir;
+
+    const confPct   = Math.min(100, r.maxConf);
+    const confColor = r.maxConf >= 70 ? "#00e676" : r.maxConf >= 60 ? "#ffd600" : "#ff8a65";
+
+    const e   = r.latest.entry_price;
+    const sl  = r.latest.stop_loss;
+    const tps = Array.isArray(r.latest.take_profit)
+      ? r.latest.take_profit
+      : (r.latest.take_profit != null ? [r.latest.take_profit] : []);
+
+    const distBadge = (pct) => {
+      if (pct == null || isNaN(pct)) return "";
+      const sign = pct >= 0 ? "+" : "";
+      const abs  = Math.abs(pct);
+      const cls  = abs < 0.5 ? "dist-warn" : pct >= 0 ? "dist-pos" : "dist-neg";
+      return `<span class="dist-pct ${cls}">${sign}${pct.toFixed(2)}%</span>`;
+    };
+
+    const levelHtml = (label, price, dist, labelColor) => {
+      if (price == null || price === "") return "";
+      return `<div class="d-level-row">
+        <span class="d-level-label" style="color:${labelColor}">${label}</span>
+        <span class="d-level-price">${formatPrice(price)}</span>
+        ${distBadge(dist)}
+      </div>`;
+    };
+
+    const msAgo = nowMs - new Date(r.firstTs).getTime();
+    const h = Math.floor(msAgo / 3.6e6), m = Math.floor((msAgo % 3.6e6) / 60000);
+    const agoStr = h > 0 ? `${h}h${m}m前` : `${m}m前`;
+    const countBadge = r.count === 1
+      ? `<span style="color:var(--green);font-weight:700">🆕 首发</span>`
+      : `<span style="color:var(--text-dim)">🔁 ${r.count}次</span>`;
+
+    return `<div class="d-card" style="border-color:${v.border}">
+      <div class="d-card-header">
+        <span class="d-symbol">${r.symbol}</span>
+        <span class="badge ${dirCls}">${dirLabel}</span>
+      </div>
+      <div class="d-verdict" style="color:${v.color};background:${v.bg}">${v.label}</div>
+      <div class="d-conf-row">
+        <span class="d-conf-label">信心值</span>
+        <div class="d-conf-bar-wrap"><div class="d-conf-bar" style="width:${confPct}%;background:${confColor}"></div></div>
+        <span class="d-conf-num" style="color:${confColor}">${r.maxConf}</span>
+      </div>
+      <div class="d-levels">
+        ${levelHtml("入场", e,      r.state.distEntry, "#cfd8dc")}
+        ${levelHtml("止损", sl,     r.state.distSL,    "#ef9a9a")}
+        ${tps[0] != null ? levelHtml("止盈", tps[0], r.state.distTP, "#a5d6a7") : ""}
+      </div>
+      <div class="d-card-footer">
+        ${countBadge}
+        <span style="color:var(--text-dim)">${agoStr}</span>
+        ${rm ? `<span class="d-regime-tag" style="color:${rm.color}">${rm.label}</span>` : ""}
+      </div>
+    </div>`;
+  }).join("");
+
+  document.getElementById("decision-table").innerHTML = `<div class="d-grid">${cards}</div>`;
 }
-// ============================ 决策视图 end ============================
+// ============================ 决策视图 v2 end ============================
 
 /**
  * 计算单条信号的当前状态。
