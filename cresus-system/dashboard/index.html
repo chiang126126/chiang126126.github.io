@@ -619,7 +619,6 @@
       <button data-dir="WATCH">观察</button>
       <span class="filter-sep">·</span>
       <button data-mod="HIGH">≥70</button>
-      <button data-mod="FOLLOW">🟢 跟</button>
       <button data-mod="ACTIVE">🎯 只看活跃</button>
       <button data-mod="FIRST">🆕 只看首发</button>
       <input id="search" placeholder="搜索 symbol..." />
@@ -1233,7 +1232,6 @@ function renderTable() {
   if (activeDir === "SHORT")   rows = rows.filter(s => s.direction === "SHORT");
   if (activeDir === "WATCH")   rows = rows.filter(s => s.direction === "WATCH");
   if (activeMods.has("HIGH"))   rows = rows.filter(s => (s.confidence || 0) >= 70);
-  if (activeMods.has("FOLLOW")) rows = rows.filter(s => (analysesMap[s.ts] || {}).recommendation === "跟");
   if (searchTerm) {
     const q = searchTerm.toUpperCase();
     rows = rows.filter(s => (s.symbol || "").toUpperCase().includes(q));
@@ -1281,7 +1279,6 @@ function renderTable() {
           <th>方向</th>
           <th>信心度</th>
           <th>状态</th>
-          <th>推荐</th>
           <th>风险</th>
           <th>结构匹配</th>
           <th>杠杆</th>
@@ -1300,7 +1297,6 @@ function renderTable() {
             <td><span class="badge ${s.direction}">${DIR_CN[s.direction] || s.direction}</span></td>
             <td><span class="conf">${s.confidence || "—"}</span></td>
             <td>${stateBadge(state)}</td>
-            <td>${recBadge(a.recommendation)}</td>
             <td>${riskBadge(a.risk_level)}</td>
             <td>${matchBadge(a.structure_match)}</td>
             <td>${s.leverage ? s.leverage + "×" : "—"}</td>
