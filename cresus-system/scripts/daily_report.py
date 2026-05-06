@@ -105,12 +105,19 @@ def main():
             add(f"\n**今日最佳**：`{best['symbol']}` {best.get('side','?')} {fmt_usdt(best.get('net'))}")
             add(f"**今日最差**：`{worst['symbol']}` {worst.get('side','?')} {fmt_usdt(worst.get('net'))}")
 
-        # 当前持仓
+        # 当前持仓 — net 模式下方向看 size 正负
         positions = pnl.get("positions", [])
         if positions:
             add(f"\n**当前持仓（{len(positions)} 个）**")
+            add(f"| Symbol | 方向 | 数量 | 入场 | 现价 | 未实现 PnL | 收益率 |")
+            add(f"|--------|------|-----:|-----:|-----:|-----------:|-------:|")
             for p in positions:
-                add(f"- `{p.get('symbol','?')}` {p.get('side','?')} × {p.get('size','?')}  未实现 {fmt_usdt(p.get('unrealized_pnl'))}")
+                size = p.get("size", 0) or 0
+                direction = "LONG" if size >= 0 else "SHORT"
+                upl = p.get("upl")
+                upl_ratio = p.get("upl_ratio")
+                ratio_str = f"{upl_ratio*100:+.2f}%" if upl_ratio is not None else "—"
+                add(f"| `{p.get('symbol','?')}` | {direction} | {abs(size):.0f} | {p.get('entry','—')} | {p.get('mark','—')} | {fmt_usdt(upl)} | {ratio_str} |")
         else:
             add("\n当前持仓：无")
         add("")
@@ -135,25 +142,72 @@ def main():
         add(f"路由分布：{route_parts}")
     add("")
 
-    # 高信心信号
+    # 高信心信号 — 按 symbol 去重，只看每个标的最佳一条
     high = [s for s in today_sigs if (s.get("confidence") or 0) >= 70]
     if high:
-        add("### ⭐ 高信心信号（≥70）")
-        for s in sorted(high, key=lambda x: x.get("confidence",0), reverse=True):
-            tp = s.get("take_profit", "—")
+        by_sym = {}  # symbol → {best_conf, count, latest_signal}
+        for s in high:
+            sym = s.get("symbol", "?")
+            entry = by_sym.get(sym)
+            if not entry:
+                by_sym[sym] = {"best_conf": s.get("confidence", 0), "count": 1, "latest": s, "best": s, "directions": {s.get("direction"): 1}}
+            else:
+                entry["count"] += 1
+                entry["directions"][s.get("direction")] = entry["directions"].get(s.get("direction"), 0) + 1
+                if (s.get("confidence", 0)) > entry["best_conf"]:
+                    entry["best_conf"] = s.get("confidence", 0)
+                    entry["best"] = s
+                if (s.get("ts") or "") > (entry["latest"].get("ts") or ""):
+                    entry["latest"] = s
+
+        unique = sorted(by_sym.items(), key=lambda kv: (-kv[1]["best_conf"], -kv[1]["count"]))
+        add(f"### ⭐ 高信心标的（≥70，共 {len(unique)} 个独特标的 / {len(high)} 条信号）")
+        add(f"| Symbol | 最高信心 | 触发次数 | 主方向 | 最新入场 | 止损 | 止盈 | 路由 |")
+        add(f"|--------|---------:|---------:|--------|---------:|-----:|------|------|")
+        for sym, info in unique[:20]:
+            best = info["best"]
+            latest = info["latest"]
+            tp = latest.get("take_profit", "—")
             if isinstance(tp, list):
-                tp = " / ".join(str(x) for x in tp)
-            route = s.get("routed_to") or "—"
-            add(f"- `{s['symbol']}` **{s.get('direction')}** conf={s.get('confidence')}  结构{s.get('structure','?')}  [{route}]")
-            add(f"  入场 {s.get('entry_price','?')}  止损 {s.get('stop_loss','?')}  止盈 {tp}")
+                tp = " / ".join(str(x) for x in tp[:2])
+            main_dir = max(info["directions"].items(), key=lambda x: x[1])[0]
+            route = latest.get("routed_to") or "—"
+            add(f"| `{sym}` | {info['best_conf']} | {info['count']} | {main_dir} | {latest.get('entry_price','—')} | {latest.get('stop_loss','—')} | {tp} | {route} |")
+        if len(unique) > 20:
+            add(f"\n_…另有 {len(unique)-20} 个标的省略_")
         add("")
 
-    # 被阻断信号
+    # 被阻断信号 — 按原因类型分组聚合
     blocked = [s for s in today_sigs if s.get("block_reason")]
     if blocked:
-        add(f"### 🚫 被阻断信号（{len(blocked)} 条）")
+        # 按原因类别分组
+        cat_cnt = defaultdict(int)
+        sym_cat = defaultdict(lambda: defaultdict(int))  # symbol → cat → count
         for s in blocked:
-            add(f"- `{s['symbol']}` {s.get('direction')} conf={s.get('confidence')}  原因：{s.get('block_reason')}")
+            reason = s.get("block_reason", "")
+            cat = "其他"
+            if "7d-loser" in reason:        cat = "7天败者锁定 (24h)"
+            elif "post-win-cooldown" in reason:  cat = "盈后冷却 (1h)"
+            elif "post-loss-cooldown" in reason: cat = "亏后冷却 (6h)"
+            elif "blacklist" in reason:     cat = "黑名单"
+            elif "regime" in reason:        cat = "行情过滤"
+            cat_cnt[cat] += 1
+            sym_cat[s.get("symbol","?")][cat] += 1
+
+        add(f"### 🚫 被阻断信号（{len(blocked)} 条）")
+        add(f"| 阻断原因 | 次数 |")
+        add(f"|----------|-----:|")
+        for cat, n in sorted(cat_cnt.items(), key=lambda x: -x[1]):
+            add(f"| {cat} | {n} |")
+
+        # Top 5 最常被阻断的标的
+        sym_total = sorted(sym_cat.items(), key=lambda kv: -sum(kv[1].values()))[:5]
+        if sym_total:
+            add(f"\n**最常被阻断的标的（Top 5）**：")
+            for sym, cats in sym_total:
+                total = sum(cats.values())
+                cat_str = ", ".join(f"{c}×{n}" for c,n in sorted(cats.items(), key=lambda x:-x[1]))
+                add(f"- `{sym}` 共 {total} 次（{cat_str}）")
         add("")
 
     # ── 错误日志摘要 ──────────────────────────────────────────────────────────
