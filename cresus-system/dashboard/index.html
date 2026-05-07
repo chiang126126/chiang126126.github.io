@@ -576,9 +576,12 @@
   .macro-tier-CORE    { color: #ff1744; background: rgba(255,23,68,0.14); }
   .macro-tier-OBSERVE { color: #ff9800; background: rgba(255,152,0,0.14); }
   .macro-tier-INFO    { color: #8a96aa; background: rgba(138,150,170,0.10); }
-  .macro-event-title  { font-weight: 500; color: var(--text); }
+  .macro-event-title  { font-weight: 600; color: var(--text); }
+  .macro-event-title-en { font-size: 10px; color: var(--text-dim); margin-top: 2px; font-style: italic; }
   .macro-event-country { font-size: 10px; color: var(--text-dim); font-family: monospace; }
   .macro-event-time   { font-size: 11px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+  .macro-active-title-en { font-size: 11px; color: var(--text-dim); font-style: italic; margin-top: 2px; }
+  .macro-stat-value-en { font-size: 10px; color: var(--text-dim); font-style: italic; margin-top: 1px; }
 
   @media (max-width: 720px) {
     .macro-event-row { grid-template-columns: 50px 1fr auto; gap: 8px; padding: 8px; }
@@ -857,12 +860,18 @@ function renderMacroPanel() {
   // ── 当前活跃黑名单卡片 ──
   const activeBox = document.getElementById("macro-active-container");
   if (blackout) {
+    // blackout 的 title 是英文原名(reason 已含中文/原名)，找原事件取 title_zh
+    const blackoutEvent = events.find(e => e.title === blackout.title && e.ts === blackout.event_ts);
+    const zh = blackoutEvent?.title_zh || null;
+    const displayTitle = zh || blackout.title;
+    const enLine = zh ? `<div class="macro-active-title-en">${escapeHtml(blackout.title)}</div>` : "";
     activeBox.innerHTML = `
       <div class="macro-active-block tier-${blackout.tier}">
         <div class="macro-active-title">
           ${blackout.tier === "CORE" ? "🚫 禁止开仓" : "⚠️ 入场门槛 +10"}
-          · ${escapeHtml(blackout.title)} (${escapeHtml(blackout.country)})
+          · ${escapeHtml(displayTitle)} (${escapeHtml(blackout.country)})
         </div>
+        ${enLine}
         <div class="macro-active-reason">${escapeHtml(blackout.reason)}</div>
         <div class="macro-active-countdown">
           事件时间: ${fmtMacroTime(blackout.event_ts)}
@@ -883,7 +892,8 @@ function renderMacroPanel() {
     const m = Math.floor((Date.parse(nextCore.ts) - nowMs) / 60_000);
     stats.push({
       label: "下个核心事件",
-      value: nextCore.title,
+      value: nextCore.title_zh || nextCore.title,
+      value_en: nextCore.title_zh ? nextCore.title : null,
       sub: `${nextCore.country} · ${fmtMacroTime(nextCore.ts)} · ${fmtCountdown(m)}`,
       color: "#ff1744",
     });
@@ -892,7 +902,8 @@ function renderMacroPanel() {
     const m = Math.floor((Date.parse(nextObserve.ts) - nowMs) / 60_000);
     stats.push({
       label: "下个观察事件",
-      value: nextObserve.title,
+      value: nextObserve.title_zh || nextObserve.title,
+      value_en: nextObserve.title_zh ? nextObserve.title : null,
       sub: `${nextObserve.country} · ${fmtMacroTime(nextObserve.ts)} · ${fmtCountdown(m)}`,
       color: "#ff9800",
     });
@@ -900,6 +911,7 @@ function renderMacroPanel() {
   stats.push({
     label: "本周事件",
     value: `${future.length} 个未来事件`,
+    value_en: null,
     sub: `已过期 ${events.length - future.length} 个`,
     color: "#8a96aa",
   });
@@ -908,6 +920,7 @@ function renderMacroPanel() {
     <div class="macro-stat-card">
       <div class="macro-stat-label">${escapeHtml(s.label)}</div>
       <div class="macro-stat-value" style="color:${s.color}">${escapeHtml(s.value || "—")}</div>
+      ${s.value_en ? `<div class="macro-stat-value-en">${escapeHtml(s.value_en)}</div>` : ""}
       <div class="macro-stat-sub">${escapeHtml(s.sub || "")}</div>
     </div>
   `).join("");
@@ -923,9 +936,14 @@ function renderMacroPanel() {
     listBox.innerHTML = upcoming.map(e => {
       const m = Math.floor((Date.parse(e.ts) - nowMs) / 60_000);
       const meta = MACRO_TIER_ZH[e.tier] || MACRO_TIER_ZH.INFO;
+      const titleZh = e.title_zh || e.title;
+      const enLine = e.title_zh ? `<div class="macro-event-title-en">${escapeHtml(e.title)}</div>` : "";
       return `<div class="macro-event-row ${meta.cls}">
         <span class="macro-tier-badge macro-tier-${e.tier}">${meta.label}</span>
-        <span class="macro-event-title">${escapeHtml(e.title)}</span>
+        <div>
+          <div class="macro-event-title">${escapeHtml(titleZh)}</div>
+          ${enLine}
+        </div>
         <span class="macro-event-country">${escapeHtml(e.country)}</span>
         <span class="macro-event-time">${fmtMacroTime(e.ts)} · ${fmtCountdown(m)}</span>
       </div>`;
