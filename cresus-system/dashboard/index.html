@@ -508,6 +508,82 @@
     .histogram { height: 80px; }
     header .meta { font-size: 11px; }
   }
+
+  /* ========== 宏观事件窗口 panel ========== */
+  .macro-panel { background: linear-gradient(180deg, #14110b 0%, #0d0a07 100%); border: 1px solid #2a2418; }
+  .macro-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 22px; border-bottom: 1px solid var(--border);
+    background: rgba(255,193,7,0.04);
+  }
+  .macro-title-row { display: flex; align-items: center; gap: 10px; }
+  .macro-brand { font-weight: 700; font-size: 15px; color: #ffd54f; letter-spacing: 0.4px; }
+  .macro-status-badge {
+    padding: 4px 12px; border-radius: 18px; font-size: 12px; font-weight: 700;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .macro-status-badge::before {
+    content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor;
+  }
+  .macro-status-clear   { color: #00c853; background: rgba(0,200,83,0.12); }
+  .macro-status-observe { color: #ff9800; background: rgba(255,152,0,0.14); }
+  .macro-status-blocked { color: #ff1744; background: rgba(255,23,68,0.16); }
+  .macro-meta { color: var(--text-dim); font-size: 11px; }
+
+  .macro-body { padding: 16px 22px; }
+
+  .macro-active-block {
+    border: 1px solid; border-radius: 10px; padding: 12px 14px; margin-bottom: 14px;
+    background: rgba(255,255,255,0.02);
+  }
+  .macro-active-block.tier-CORE    { border-color: rgba(255,23,68,0.45);   background: rgba(255,23,68,0.06); }
+  .macro-active-block.tier-OBSERVE { border-color: rgba(255,152,0,0.40);   background: rgba(255,152,0,0.05); }
+  .macro-active-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .macro-active-reason { font-size: 12px; color: var(--text-dim); }
+  .macro-active-countdown { font-size: 12px; margin-top: 6px; font-variant-numeric: tabular-nums; }
+
+  .macro-stats-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px; margin-bottom: 14px;
+  }
+  .macro-stat-card {
+    background: rgba(0,0,0,0.25); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px;
+  }
+  .macro-stat-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px; }
+  .macro-stat-value { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .macro-stat-sub   { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
+  .macro-section-label {
+    font-size: 11px; color: var(--text-dim); text-transform: uppercase;
+    letter-spacing: 0.6px; margin: 8px 0 8px 0;
+  }
+  .macro-event-list { display: flex; flex-direction: column; gap: 6px; }
+  .macro-event-row {
+    display: grid; grid-template-columns: 60px 1fr auto auto;
+    gap: 10px; align-items: center;
+    padding: 8px 10px; border-radius: 6px; background: rgba(255,255,255,0.02);
+    border-left: 3px solid transparent;
+    font-size: 12px;
+  }
+  .macro-event-row.tier-CORE    { border-left-color: #ff1744; }
+  .macro-event-row.tier-OBSERVE { border-left-color: #ff9800; }
+  .macro-event-row.tier-INFO    { border-left-color: #5a6478; }
+  .macro-tier-badge {
+    font-size: 10px; font-weight: 700; padding: 2px 6px;
+    border-radius: 4px; text-align: center; letter-spacing: 0.3px;
+  }
+  .macro-tier-CORE    { color: #ff1744; background: rgba(255,23,68,0.14); }
+  .macro-tier-OBSERVE { color: #ff9800; background: rgba(255,152,0,0.14); }
+  .macro-tier-INFO    { color: #8a96aa; background: rgba(138,150,170,0.10); }
+  .macro-event-title  { font-weight: 500; color: var(--text); }
+  .macro-event-country { font-size: 10px; color: var(--text-dim); font-family: monospace; }
+  .macro-event-time   { font-size: 11px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+
+  @media (max-width: 720px) {
+    .macro-event-row { grid-template-columns: 50px 1fr auto; gap: 8px; padding: 8px; }
+    .macro-event-row > :nth-child(4) { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -521,6 +597,25 @@
 </header>
 
 <main>
+  <!-- P21: 宏观事件窗口 panel (FOMC / CPI 类事件黑名单) -->
+  <div class="panel macro-panel" id="macro-panel" style="display:none">
+    <div class="macro-header">
+      <div class="macro-title-row">
+        <span class="macro-brand">📅 宏观事件窗口</span>
+        <span class="macro-status-badge" id="macro-status-badge">—</span>
+      </div>
+      <span class="macro-meta" id="macro-meta">—</span>
+    </div>
+    <div class="macro-body">
+      <div id="macro-active-container"><!-- 当前活跃黑名单 --></div>
+
+      <div class="macro-stats-grid" id="macro-stats-grid"></div>
+
+      <div class="macro-section-label">即将发生的高影响事件</div>
+      <div class="macro-event-list" id="macro-upcoming-list"></div>
+    </div>
+  </div>
+
   <!-- P20: V3 Cresus Regime panel (顶部宏观市场体制) -->
   <div class="panel regime-panel" id="regime-panel" style="display:none">
     <div class="regime-header">
@@ -661,6 +756,183 @@ async function loadRegime() {
     console.warn("[regime] load failed:", e);
   }
 }
+
+// ==================== P21: 宏观事件窗口 ====================
+let macroEventsData = null;
+
+const MACRO_WINDOWS = {
+  CORE:    { before_min: 60, after_min: 120 },
+  OBSERVE: { before_min: 30, after_min: 60  },
+};
+
+const MACRO_TIER_ZH = {
+  CORE:    { label: "核心",  cls: "tier-CORE",    color: "#ff1744" },
+  OBSERVE: { label: "观察",  cls: "tier-OBSERVE", color: "#ff9800" },
+  INFO:    { label: "提示",  cls: "tier-INFO",    color: "#8a96aa" },
+};
+
+async function loadMacroEvents() {
+  try {
+    const res = await fetch("./macro_events.json?_=" + Date.now());
+    if (!res.ok) return;
+    macroEventsData = await res.json();
+    renderMacroPanel();
+  } catch (e) {
+    console.warn("[macro] load failed:", e);
+  }
+}
+
+// Pure-JS port of Python compute_blackout()
+function macroComputeBlackout(events, nowMs) {
+  const candidates = [];
+  for (const ev of events || []) {
+    const win = MACRO_WINDOWS[ev.tier];
+    if (!win) continue;
+    const evMs = Date.parse(ev.ts);
+    if (isNaN(evMs)) continue;
+    const winStart = evMs - win.before_min * 60_000;
+    const winEnd   = evMs + win.after_min  * 60_000;
+    if (nowMs < winStart || nowMs > winEnd) continue;
+    const minsTo   = Math.floor((evMs - nowMs) / 60_000);
+    const minsLeft = Math.floor((winEnd - nowMs) / 60_000);
+    const priority = ev.tier === "CORE" ? 0 : 1;
+    candidates.push({ priority, distance: Math.abs(minsTo), ev, minsTo, minsLeft });
+  }
+  if (candidates.length === 0) return null;
+  candidates.sort((a, b) => a.priority - b.priority || a.distance - b.distance);
+  const c = candidates[0];
+  const when = c.minsTo > 0 ? "事件前" : "事件后";
+  const label = c.ev.tier === "CORE" ? "核心事件" : "观察事件";
+  return {
+    tier: c.ev.tier,
+    title: c.ev.title,
+    country: c.ev.country,
+    event_ts: c.ev.ts,
+    minutes_to_event: c.minsTo,
+    minutes_until_clear: c.minsLeft,
+    reason: `${label}[${c.ev.title}]: ${when} ${Math.abs(c.minsTo)}min, 窗口剩余 ${c.minsLeft}min`,
+  };
+}
+
+function fmtMacroTime(ts) {
+  const d = new Date(ts);
+  if (isNaN(d.getTime())) return "—";
+  return d.toLocaleString("zh-CN", { hour12: false, month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+}
+
+function fmtCountdown(mins) {
+  const sign = mins < 0 ? "-" : "+";
+  const abs = Math.abs(mins);
+  const h = Math.floor(abs / 60), m = abs % 60;
+  return h > 0 ? `${sign}${h}h${String(m).padStart(2,"0")}m` : `${sign}${m}m`;
+}
+
+function renderMacroPanel() {
+  if (!macroEventsData) return;
+  document.getElementById("macro-panel").style.display = "";
+
+  const events = macroEventsData.events || [];
+  const nowMs = Date.now();
+  const blackout = macroComputeBlackout(events, nowMs);
+
+  // ── 状态徽章 + meta ──
+  const badge = document.getElementById("macro-status-badge");
+  if (blackout?.tier === "CORE") {
+    badge.className = "macro-status-badge macro-status-blocked";
+    badge.textContent = "🚫 禁止开仓";
+  } else if (blackout?.tier === "OBSERVE") {
+    badge.className = "macro-status-badge macro-status-observe";
+    badge.textContent = "⚠️ 提高门槛";
+  } else {
+    badge.className = "macro-status-badge macro-status-clear";
+    badge.textContent = "✅ 正常";
+  }
+
+  const upd = new Date(macroEventsData.updated_at);
+  const ageMin = Math.floor((nowMs - upd.getTime()) / 60_000);
+  const tc = macroEventsData.tier_counts || {};
+  document.getElementById("macro-meta").textContent =
+    `源: ${macroEventsData.source} · ${ageMin}m 前刷新 · CORE ${tc.CORE||0} / OBSERVE ${tc.OBSERVE||0} / INFO ${tc.INFO||0}`;
+
+  // ── 当前活跃黑名单卡片 ──
+  const activeBox = document.getElementById("macro-active-container");
+  if (blackout) {
+    activeBox.innerHTML = `
+      <div class="macro-active-block tier-${blackout.tier}">
+        <div class="macro-active-title">
+          ${blackout.tier === "CORE" ? "🚫 禁止开仓" : "⚠️ 入场门槛 +10"}
+          · ${escapeHtml(blackout.title)} (${escapeHtml(blackout.country)})
+        </div>
+        <div class="macro-active-reason">${escapeHtml(blackout.reason)}</div>
+        <div class="macro-active-countdown">
+          事件时间: ${fmtMacroTime(blackout.event_ts)}
+          · 窗口剩余 <strong>${blackout.minutes_until_clear}</strong> 分钟
+        </div>
+      </div>`;
+  } else {
+    activeBox.innerHTML = "";
+  }
+
+  // ── 下个 CORE / OBSERVE / INFO 事件统计卡片 ──
+  const future = events.filter(e => Date.parse(e.ts) > nowMs);
+  const nextCore    = future.find(e => e.tier === "CORE");
+  const nextObserve = future.find(e => e.tier === "OBSERVE");
+  const stats = [];
+
+  if (nextCore) {
+    const m = Math.floor((Date.parse(nextCore.ts) - nowMs) / 60_000);
+    stats.push({
+      label: "下个核心事件",
+      value: nextCore.title,
+      sub: `${nextCore.country} · ${fmtMacroTime(nextCore.ts)} · ${fmtCountdown(m)}`,
+      color: "#ff1744",
+    });
+  }
+  if (nextObserve) {
+    const m = Math.floor((Date.parse(nextObserve.ts) - nowMs) / 60_000);
+    stats.push({
+      label: "下个观察事件",
+      value: nextObserve.title,
+      sub: `${nextObserve.country} · ${fmtMacroTime(nextObserve.ts)} · ${fmtCountdown(m)}`,
+      color: "#ff9800",
+    });
+  }
+  stats.push({
+    label: "本周事件",
+    value: `${future.length} 个未来事件`,
+    sub: `已过期 ${events.length - future.length} 个`,
+    color: "#8a96aa",
+  });
+
+  document.getElementById("macro-stats-grid").innerHTML = stats.map(s => `
+    <div class="macro-stat-card">
+      <div class="macro-stat-label">${escapeHtml(s.label)}</div>
+      <div class="macro-stat-value" style="color:${s.color}">${escapeHtml(s.value || "—")}</div>
+      <div class="macro-stat-sub">${escapeHtml(s.sub || "")}</div>
+    </div>
+  `).join("");
+
+  // ── 即将发生的事件列表（CORE+OBSERVE 优先，最多 8 个） ──
+  const upcoming = future
+    .filter(e => e.tier === "CORE" || e.tier === "OBSERVE")
+    .slice(0, 8);
+  const listBox = document.getElementById("macro-upcoming-list");
+  if (upcoming.length === 0) {
+    listBox.innerHTML = '<div style="color:var(--text-dim);font-size:12px;padding:8px">未来一周无核心 / 观察事件</div>';
+  } else {
+    listBox.innerHTML = upcoming.map(e => {
+      const m = Math.floor((Date.parse(e.ts) - nowMs) / 60_000);
+      const meta = MACRO_TIER_ZH[e.tier] || MACRO_TIER_ZH.INFO;
+      return `<div class="macro-event-row ${meta.cls}">
+        <span class="macro-tier-badge macro-tier-${e.tier}">${meta.label}</span>
+        <span class="macro-event-title">${escapeHtml(e.title)}</span>
+        <span class="macro-event-country">${escapeHtml(e.country)}</span>
+        <span class="macro-event-time">${fmtMacroTime(e.ts)} · ${fmtCountdown(m)}</span>
+      </div>`;
+    }).join("");
+  }
+}
+// ==================== P21 end ====================
 
 async function loadRegimeHistory() {
   try {
@@ -1670,7 +1942,7 @@ async function manualRefresh() {
   const btn = document.getElementById("refresh-btn");
   btn.classList.add("spinning");
   try {
-    await Promise.all([loadSignals(), loadPnL(), loadPrices(), loadRegime(), loadRegimeHistory()]);
+    await Promise.all([loadSignals(), loadPnL(), loadPrices(), loadRegime(), loadRegimeHistory(), loadMacroEvents()]);
   } finally {
     setTimeout(() => btn.classList.remove("spinning"), 300);
   }
@@ -1691,11 +1963,14 @@ loadPnL();
 loadPrices();
 loadRegime();
 loadRegimeHistory();
+loadMacroEvents();
 setInterval(loadSignals, 60_000);
 setInterval(loadPnL, 60_000);
 setInterval(loadPrices, 60_000);
 setInterval(loadRegime, 5 * 60_000);          // P20: regime 1h 才更新一次，5 分钟拉够新鲜
 setInterval(loadRegimeHistory, 5 * 60_000);
+setInterval(loadMacroEvents, 60_000);          // P21: 每分钟重渲染（事件本身每小时刷新一次）
+setInterval(renderMacroPanel, 30_000);         // P21: 倒计时仅本地重算，30s 一次
 </script>
 </body>
 </html>
