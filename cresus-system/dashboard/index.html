@@ -785,6 +785,151 @@
     .spike-hero-change { font-size: 26px; }
     .spike-tabs { flex-wrap: wrap; }
   }
+
+  /* ========== 🔮 预兆雷达 panel (P23) ========== */
+  .precog-panel {
+    background: linear-gradient(135deg, #0a1428 0%, #07101e 100%);
+    border: 1px solid #1a3060;
+    overflow: hidden; position: relative;
+  }
+  .precog-panel::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 50%;
+    background: radial-gradient(ellipse at top, rgba(64,169,255,0.10) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .precog-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px 22px; border-bottom: 1px solid #1a2a4a;
+    background: linear-gradient(90deg, rgba(64,169,255,0.08) 0%, transparent 100%);
+    position: relative; z-index: 1;
+  }
+  .precog-title-row { display: flex; align-items: center; gap: 12px; }
+  .precog-brand {
+    font-weight: 800; font-size: 16px; letter-spacing: 0.4px;
+    background: linear-gradient(90deg, #40a9ff, #b37feb);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .precog-stat-pill {
+    padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 700;
+    background: rgba(64,169,255,0.14); color: #91d5ff;
+  }
+  .precog-meta { color: #6c7a99; font-size: 11px; }
+  .precog-body { padding: 18px 22px; position: relative; z-index: 1; }
+
+  .precog-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  .precog-col-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 12px; margin-bottom: 8px;
+    border-radius: 8px;
+    font-size: 13px; font-weight: 700;
+  }
+  .precog-col-header.long  { background: rgba(0,200,83,0.10); color: #00e676; border-left: 3px solid #00c853; }
+  .precog-col-header.short { background: rgba(255,82,82,0.10); color: #ff5252; border-left: 3px solid #ff1744; }
+  .precog-col-count { font-size: 11px; padding: 2px 8px; border-radius: 8px; background: rgba(255,255,255,0.08); color: var(--text-dim); }
+
+  .precog-card {
+    background: linear-gradient(140deg, #142848 0%, #0c1a30 100%);
+    border: 1px solid #243860;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .precog-card.long:hover  { border-color: #00c853; box-shadow: 0 0 16px rgba(0,200,83,0.18); }
+  .precog-card.short:hover { border-color: #ff1744; box-shadow: 0 0 16px rgba(255,23,68,0.18); }
+  .precog-card.long  { border-left: 3px solid #00c853; }
+  .precog-card.short { border-left: 3px solid #ff1744; }
+
+  .precog-card-row1 {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .precog-card-symbol-block { display: flex; align-items: center; gap: 8px; }
+  .precog-rank {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: rgba(255,255,255,0.08); color: var(--text-dim);
+    font-size: 11px; font-weight: 700;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .precog-rank.top1 { background: linear-gradient(135deg,#ffd700,#ff9800); color:#000; }
+  .precog-symbol { font-size: 15px; font-weight: 800; color: var(--text); }
+  .precog-tradable {
+    font-size: 10px; padding: 2px 7px; border-radius: 4px; font-weight: 700;
+  }
+  .precog-tradable.okx     { background: rgba(0,200,83,0.18);  color: #00e676; }
+  .precog-tradable.binance { background: rgba(255,152,0,0.18); color: #ffab40; }
+
+  .precog-kind-tag {
+    font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  .precog-kind-ignition { background: rgba(255,87,34,0.18);  color: #ff7043; }
+  .precog-kind-setup    { background: rgba(106,90,205,0.18); color: #b39ddb; }
+
+  .precog-card-row2 {
+    display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px;
+    font-variant-numeric: tabular-nums;
+  }
+  .precog-conf-num {
+    font-size: 22px; font-weight: 800;
+    background: linear-gradient(180deg, #4fc3f7, #1e88e5);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .precog-card.long .precog-conf-num  { background: linear-gradient(180deg, #69f0ae, #00c853); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .precog-card.short .precog-conf-num { background: linear-gradient(180deg, #ff8a80, #d32f2f); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .precog-conf-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+  .precog-move {
+    margin-left: auto; font-size: 12px; font-weight: 700; color: var(--text-dim);
+    padding: 3px 8px; border-radius: 4px; background: rgba(255,255,255,0.04);
+  }
+  .precog-window {
+    font-size: 11px; color: var(--text-dim);
+  }
+
+  .precog-evidence {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding-top: 8px; margin-top: 6px;
+  }
+  .precog-evidence-label {
+    font-size: 10px; color: var(--text-dim); text-transform: uppercase;
+    letter-spacing: 0.6px; margin-bottom: 4px;
+  }
+  .precog-evidence ul {
+    margin: 0; padding-left: 16px;
+    font-size: 11px; line-height: 1.6;
+    color: #c5cad6;
+  }
+  .precog-risk { color: #ffab91; font-size: 10.5px; margin-top: 3px; padding-left: 16px; }
+  .precog-risk strong { color: #ff8a65; }
+
+  .precog-meta-row {
+    display: flex; gap: 10px; font-size: 10px; color: var(--text-dim);
+    flex-wrap: wrap; margin-top: 6px;
+  }
+  .precog-meta-row span strong { color: var(--text); }
+
+  .precog-empty {
+    padding: 24px; text-align: center; color: var(--text-dim);
+    font-size: 13px;
+    background: rgba(255,255,255,0.02); border-radius: 8px;
+    border: 1px dashed rgba(255,255,255,0.08);
+  }
+
+  .precog-degraded-note {
+    margin-top: 14px; padding: 10px 12px;
+    background: rgba(255,193,7,0.06); border: 1px solid rgba(255,193,7,0.25);
+    border-radius: 8px; font-size: 12px; color: #ffd180;
+  }
+
+  @media (max-width: 720px) {
+    .precog-grid { grid-template-columns: 1fr; }
+    .precog-conf-num { font-size: 20px; }
+  }
 </style>
 </head>
 <body>
@@ -836,6 +981,36 @@
       </div>
 
       <div class="spike-list" id="spike-list"></div>
+    </div>
+  </div>
+
+  <!-- P23: 🔮 预兆雷达 panel — AI-powered breakout predictor -->
+  <div class="panel precog-panel" id="precog-panel" style="display:none">
+    <div class="precog-header">
+      <div class="precog-title-row">
+        <span class="precog-brand">🔮 预兆雷达</span>
+        <span class="precog-stat-pill" id="precog-stat-pill">—</span>
+      </div>
+      <span class="precog-meta" id="precog-meta">—</span>
+    </div>
+    <div class="precog-body">
+      <div class="precog-grid">
+        <div>
+          <div class="precog-col-header long">
+            <span>📈 即将大涨 (Top 5 LONG)</span>
+            <span class="precog-col-count" id="precog-long-count">0</span>
+          </div>
+          <div id="precog-long-list"></div>
+        </div>
+        <div>
+          <div class="precog-col-header short">
+            <span>📉 即将大跌 (Top 5 SHORT)</span>
+            <span class="precog-col-count" id="precog-short-count">0</span>
+          </div>
+          <div id="precog-short-list"></div>
+        </div>
+      </div>
+      <div id="precog-degraded-note" style="display:none"></div>
     </div>
   </div>
 
@@ -1323,6 +1498,111 @@ document.addEventListener("click", (ev) => {
   renderSpikePanel();
 });
 // ==================== P22 end ====================
+
+// ==================== P23: 🔮 预兆雷达 ====================
+let precogData = null;
+
+async function loadPrecogRadar() {
+  try {
+    const res = await fetch("./precog_radar.json?_=" + Date.now());
+    if (!res.ok) return;
+    precogData = await res.json();
+    renderPrecogPanel();
+  } catch (e) {
+    console.warn("[precog] load failed:", e);
+  }
+}
+
+function renderPrecogCard(c, rank, isLong) {
+  const cls = isLong ? "long" : "short";
+  const tradable = c.tradable_okx ? "okx" : "binance";
+  const tradableLabel = c.tradable_okx ? "✅ OKX 可交易" : "🟡 仅 Binance";
+  const isIgnition = (c.ignition_score || 0) > (c.setup_score || 0);
+  const kindCls   = isIgnition ? "precog-kind-ignition" : "precog-kind-setup";
+  const kindLabel = isIgnition ? "🚀 启动" : "📦 蓄势";
+  const conf = c.ai_confidence;
+  const confDisplay = conf != null ? conf : "—";
+  const confLabel = conf != null ? "AI 置信度" : "量化推断";
+  const move = c.expected_move || "—";
+  const window = c.expected_window ? `· 时窗 ${c.expected_window}` : "";
+  const evidence = c.key_evidence && c.key_evidence.length > 0 ? c.key_evidence : (c.direction_reasons || []);
+  const risks = c.key_risks || [];
+  const rankCls = rank === 1 ? "precog-rank top1" : "precog-rank";
+
+  return `
+    <div class="precog-card ${cls}">
+      <div class="precog-card-row1">
+        <div class="precog-card-symbol-block">
+          <span class="${rankCls}">${rank}</span>
+          <span class="precog-symbol">${escapeHtml(c.symbol)}</span>
+          <span class="precog-tradable ${tradable}">${tradableLabel}</span>
+          <span class="precog-kind-tag ${kindCls}">${kindLabel}</span>
+        </div>
+      </div>
+      <div class="precog-card-row2">
+        <span class="precog-conf-num">${confDisplay}</span>
+        <span class="precog-conf-label">${confLabel}</span>
+        <span class="precog-move">预期 ${escapeHtml(move)} ${escapeHtml(window)}</span>
+      </div>
+      <div class="precog-meta-row">
+        <span>价 <strong>${c.price.toPrecision(4)}</strong></span>
+        <span>24h <strong>${(c.price_change_24h_pct >= 0 ? "+" : "") + c.price_change_24h_pct.toFixed(2)}%</strong></span>
+        <span>蓄势 <strong>${(c.setup_score*100).toFixed(0)}%</strong></span>
+        <span>启动 <strong>${(c.ignition_score*100).toFixed(0)}%</strong></span>
+        <span>距 24h 高 <strong>${c.dist_24h_high_pct.toFixed(2)}%</strong></span>
+      </div>
+      ${evidence.length > 0 ? `
+      <div class="precog-evidence">
+        <div class="precog-evidence-label">关键证据</div>
+        <ul>${evidence.slice(0,3).map(e => `<li>${escapeHtml(e)}</li>`).join("")}</ul>
+        ${risks.length > 0 ? `<div class="precog-risk"><strong>⚠ 风险:</strong> ${risks.slice(0,2).map(escapeHtml).join("; ")}</div>` : ""}
+      </div>` : ""}
+    </div>`;
+}
+
+function renderPrecogPanel() {
+  if (!precogData) return;
+  document.getElementById("precog-panel").style.display = "";
+
+  const stats = precogData.stats || {};
+  const updTs = new Date(precogData.updated_at);
+  const ageMin = Math.floor((Date.now() - updTs.getTime()) / 60_000);
+  const aiUsed = stats.ai_used;
+
+  document.getElementById("precog-stat-pill").textContent =
+    aiUsed ? "AI 深度推理" : "量化方向推断 (无 AI)";
+  document.getElementById("precog-meta").textContent =
+    `${ageMin}m 前更新 · 扫描 ${stats.universe||0} 个标的 · 候选 ${stats.phase_a_passed||0}`;
+
+  const longs  = precogData.longs  || [];
+  const shorts = precogData.shorts || [];
+  document.getElementById("precog-long-count").textContent  = longs.length;
+  document.getElementById("precog-short-count").textContent = shorts.length;
+
+  const longBox = document.getElementById("precog-long-list");
+  if (longs.length === 0) {
+    longBox.innerHTML = '<div class="precog-empty">当前无符合条件的 LONG 候选<br/><span style="font-size:11px">市场可能在震荡或下跌阶段</span></div>';
+  } else {
+    longBox.innerHTML = longs.map((c, i) => renderPrecogCard(c, i+1, true)).join("");
+  }
+
+  const shortBox = document.getElementById("precog-short-list");
+  if (shorts.length === 0) {
+    shortBox.innerHTML = '<div class="precog-empty">当前无符合条件的 SHORT 候选<br/><span style="font-size:11px">市场可能在震荡或上涨阶段</span></div>';
+  } else {
+    shortBox.innerHTML = shorts.map((c, i) => renderPrecogCard(c, i+1, false)).join("");
+  }
+
+  const degraded = document.getElementById("precog-degraded-note");
+  if (!aiUsed) {
+    degraded.className = "precog-degraded-note";
+    degraded.style.display = "";
+    degraded.innerHTML = `⚠️ <strong>AI 推理未启用</strong> — 当前显示的是量化阶段方向推断。设置 <code>DEEPSEEK_API_KEY</code> 环境变量后可启用 DeepSeek 深度分析,显著提升预测准确度。`;
+  } else {
+    degraded.style.display = "none";
+  }
+}
+// ==================== P23 end ====================
 
 async function loadRegimeHistory() {
   try {
@@ -2332,7 +2612,7 @@ async function manualRefresh() {
   const btn = document.getElementById("refresh-btn");
   btn.classList.add("spinning");
   try {
-    await Promise.all([loadSignals(), loadPnL(), loadPrices(), loadRegime(), loadRegimeHistory(), loadMacroEvents(), loadSpikeRadar()]);
+    await Promise.all([loadSignals(), loadPnL(), loadPrices(), loadRegime(), loadRegimeHistory(), loadMacroEvents(), loadSpikeRadar(), loadPrecogRadar()]);
   } finally {
     setTimeout(() => btn.classList.remove("spinning"), 300);
   }
@@ -2363,6 +2643,8 @@ setInterval(loadRegimeHistory, 5 * 60_000);
 setInterval(loadMacroEvents, 60_000);          // P21: 每分钟重渲染（事件本身每小时刷新一次）
 setInterval(renderMacroPanel, 30_000);         // P21: 倒计时仅本地重算，30s 一次
 setInterval(loadSpikeRadar, 5 * 60_000);       // P22: 妖币雷达 5min 刷新一次
+loadPrecogRadar();
+setInterval(loadPrecogRadar, 5 * 60_000);      // P23: 预兆雷达 5min 刷新
 </script>
 </body>
 </html>
