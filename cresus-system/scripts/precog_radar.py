@@ -207,6 +207,7 @@ class JsonCache:
     def set(self, category: str, key: str, value: object) -> None:
         p = self._path(category, key)
         try:
+            p.parent.mkdir(parents=True, exist_ok=True)
             tmp = p.with_suffix(".tmp")
             tmp.write_text(json.dumps(value))
             tmp.replace(p)
@@ -956,6 +957,20 @@ def run_pipeline(
 
     # ---- Phase B: AI analysis ----
     api_key = os.environ.get("DEEPSEEK_API_KEY", "").strip()
+    if not api_key:
+        # Fallback: try ~/cresus-bot/.env
+        env_file = Path.home() / "cresus-bot" / ".env"
+        if env_file.exists():
+            try:
+                for line in env_file.read_text().splitlines():
+                    line = line.strip()
+                    if line.startswith("DEEPSEEK_API_KEY="):
+                        api_key = line.split("=", 1)[1].strip().strip('"').strip("'")
+                        if api_key:
+                            print(f"[precog] Loaded DEEPSEEK_API_KEY from {env_file}", file=sys.stderr)
+                        break
+            except Exception:
+                pass
     ai_used = False
     if use_ai and api_key:
         if verbose: print(f"[precog] [3/5] Calling DeepSeek for {len(candidates)} candidates...", file=sys.stderr)
