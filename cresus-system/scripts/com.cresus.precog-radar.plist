@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.cresus.precog-radar</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/mangzi/cresus-bot/.venv/bin/python3</string>
+        <string>/Users/mangzi/cresus-bot/scripts/precog_radar.py</string>
+        <string>run</string>
+        <string>--quiet</string>
+    </array>
+
+    <!-- 每 10 分钟扫描一次 (AI 调用约 1-2 分钟,留余量) -->
+    <key>StartInterval</key>
+    <integer>600</integer>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!-- 注入 DeepSeek API key (用户填) -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>DEEPSEEK_API_KEY</key>
+        <string>YOUR_DEEPSEEK_API_KEY_HERE</string>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/mangzi/cresus-bot/logs/precog_radar.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/mangzi/cresus-bot/logs/precog_radar.log</string>
+</dict>
+</plist>
