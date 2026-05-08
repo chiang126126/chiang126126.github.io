@@ -232,6 +232,8 @@ def fetch_top_symbols(cache: JsonCache, top_n: int = SCAN_TOP_N_SYMBOLS) -> List
     pairs = []
     for t in data:
         sym = t.get("symbol", "")
+        if not sym or not sym.isascii():    # 过滤非 ASCII (如 '币安人生USDT' 这类奇葩)
+            continue
         if not sym.endswith("USDT"):
             continue
         if any(p in sym for p in EXCLUDE_PATTERNS):
@@ -296,6 +298,8 @@ def fetch_okx_swap_set() -> set:
     out = set()
     for t in data.get("data", []):
         inst = t.get("instId", "")
+        if not inst or not inst.isascii():
+            continue
         if inst.endswith("-USDT-SWAP"):
             out.add(inst.replace("-USDT-SWAP", "").upper())
     return out
@@ -836,6 +840,8 @@ def analyze_candidate(c: Candidate, klines: list, api_key: str) -> Optional[Cand
 # ============================================================================
 
 def is_excluded(symbol: str) -> bool:
+    if not symbol or not symbol.isascii():
+        return True
     if not symbol.endswith("USDT"):
         return True
     base = symbol[:-4]
