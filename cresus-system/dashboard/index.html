@@ -363,8 +363,32 @@
   .legend-item { display: inline-flex; align-items: center; gap: 5px; }
   .legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
   @media (max-width: 720px) {
-    .regime-evidence-grid { grid-template-columns: 1fr; }
-    .regime-timeline { grid-template-columns: repeat(12, 1fr); }
+    .regime-evidence-grid { grid-template-columns: 1fr; gap: 8px; }
+    .regime-timeline { grid-template-columns: repeat(12, 1fr); height: 22px; gap: 1px; }
+    .regime-header { padding: 12px 14px; flex-wrap: wrap; gap: 6px; }
+    .regime-body { padding: 12px 14px; }
+    .regime-judgment-block { padding: 10px 12px; margin-bottom: 10px; }
+    .regime-judgment {
+      font-size: 12px; line-height: 1.5;
+      max-height: 3.6em; overflow: hidden; position: relative;
+      transition: max-height 0.3s;
+    }
+    .regime-judgment.expanded { max-height: 100em; }
+    .regime-judgment-toggle {
+      display: inline-block; margin-top: 4px; font-size: 11px; color: var(--blue);
+      cursor: pointer; user-select: none;
+    }
+    .regime-support, .regime-challenge { padding: 8px 10px; }
+    .regime-support ul, .regime-challenge ul { font-size: 12px; line-height: 1.5; padding-left: 16px; }
+    .regime-tags { gap: 4px; margin-bottom: 8px; }
+    .regime-tag { font-size: 10px; padding: 2px 6px; }
+    .regime-section-label { font-size: 10px; }
+    .regime-brand { font-size: 13px; }
+    .regime-badge { font-size: 11px; padding: 3px 9px; }
+    .regime-meta, .regime-update { font-size: 10px; }
+    .regime-timeline-block { margin-top: 8px; }
+    .regime-timeline-header { font-size: 10px; margin-bottom: 4px; }
+    .regime-legend { gap: 8px; font-size: 9px; }
   }
 
   /* P19 信号状态机 + 距现价% */
@@ -584,8 +608,33 @@
   .macro-stat-value-en { font-size: 10px; color: var(--text-dim); font-style: italic; margin-top: 1px; }
 
   @media (max-width: 720px) {
-    .macro-event-row { grid-template-columns: 50px 1fr auto; gap: 8px; padding: 8px; }
-    .macro-event-row > :nth-child(4) { display: none; }
+    .macro-header { padding: 12px 14px; flex-wrap: wrap; gap: 6px; }
+    .macro-body { padding: 12px 14px; }
+    .macro-brand { font-size: 13px; }
+    .macro-status-badge { font-size: 11px; padding: 3px 9px; }
+    .macro-meta { font-size: 10px; }
+    .macro-active-block { padding: 9px 11px; margin-bottom: 10px; }
+    .macro-active-title { font-size: 13px; }
+    .macro-active-reason { font-size: 11px; }
+    .macro-active-countdown { font-size: 11px; }
+    .macro-active-title-en { font-size: 10px; }
+    /* 手机端 stats 改单卡 (只保留下个核心事件) */
+    .macro-stats-grid { grid-template-columns: 1fr; gap: 6px; margin-bottom: 10px; }
+    .macro-stat-card { padding: 8px 10px; }
+    .macro-stat-card.mobile-hide { display: none; }
+    .macro-stat-label { font-size: 9px; }
+    .macro-stat-value { font-size: 13px; }
+    .macro-stat-sub { font-size: 10px; }
+    .macro-stat-value-en { font-size: 9px; }
+    .macro-section-label { font-size: 10px; margin: 6px 0; }
+    .macro-event-row { grid-template-columns: 38px 1fr auto; gap: 6px; padding: 6px 8px; font-size: 11px; }
+    .macro-event-row > :nth-child(4) { display: none; }       /* 隐藏国家代码 */
+    .macro-tier-badge { font-size: 9px; padding: 1px 4px; }
+    .macro-event-title { font-size: 12px; }
+    .macro-event-title-en { font-size: 9px; }
+    .macro-event-time { font-size: 10px; }
+    /* INFO 级在手机端隐藏 (只看 CORE/OBSERVE 才有行动价值) */
+    .macro-event-row.tier-INFO { display: none; }
   }
 
   /* ========== 🔮 预兆雷达 panel (P23) ========== */
@@ -728,9 +777,66 @@
     border-radius: 8px; font-size: 12px; color: #ffd180;
   }
 
+  /* 手机端 LONG/SHORT 切换 Tab */
+  .precog-mobile-tabs { display: none; }
+
   @media (max-width: 720px) {
-    .precog-grid { grid-template-columns: 1fr; }
-    .precog-conf-num { font-size: 20px; }
+    .precog-header { padding: 12px 14px; flex-wrap: wrap; gap: 6px; }
+    .precog-body { padding: 12px 14px; }
+    .precog-brand { font-size: 13px; }
+    .precog-stat-pill { font-size: 10px; padding: 2px 8px; }
+    .precog-meta { font-size: 10px; }
+
+    /* 显示 Tab,默认只渲染选中那一边 */
+    .precog-mobile-tabs {
+      display: flex; gap: 4px; margin-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .precog-mobile-tab {
+      flex: 1; background: transparent; border: none;
+      border-bottom: 2px solid transparent;
+      padding: 8px 0; font-size: 13px; font-weight: 700; cursor: pointer;
+      color: var(--text-dim); transition: color 0.15s, border-color 0.15s;
+    }
+    .precog-mobile-tab.active.long  { color: #00e676; border-bottom-color: #00c853; }
+    .precog-mobile-tab.active.short { color: #ff5252; border-bottom-color: #ff1744; }
+    .precog-mobile-tab .count {
+      font-size: 10px; margin-left: 4px; color: var(--text-dim);
+      padding: 1px 6px; background: rgba(255,255,255,0.06); border-radius: 6px;
+    }
+
+    .precog-grid { grid-template-columns: 1fr; gap: 0; }
+    /* 默认隐藏所有列, 由 active class 控制显示 */
+    .precog-grid.show-long  > div:nth-child(2) { display: none; }
+    .precog-grid.show-short > div:nth-child(1) { display: none; }
+    /* 列内的 col-header 隐藏 (因为 tab 已经替代了) */
+    .precog-col-header { display: none; }
+
+    .precog-card { padding: 10px 12px; margin-bottom: 8px; }
+    .precog-card-row1 { margin-bottom: 4px; }
+    .precog-symbol { font-size: 14px; }
+    .precog-rank { width: 20px; height: 20px; font-size: 10px; }
+    .precog-tradable { font-size: 9px; padding: 1px 5px; }
+    .precog-kind-tag { font-size: 9px; padding: 1px 4px; }
+    .precog-conf-num { font-size: 22px; }
+    .precog-conf-label { font-size: 9px; }
+    .precog-move { font-size: 11px; padding: 2px 6px; }
+
+    .precog-meta-row { font-size: 9.5px; gap: 6px; margin-top: 4px; }
+    /* 默认折叠证据,点击 symbol 区域展开 */
+    .precog-evidence {
+      max-height: 0; overflow: hidden; padding-top: 0; margin-top: 0;
+      transition: max-height 0.25s, padding-top 0.25s, margin-top 0.25s;
+      border-top-width: 0;
+    }
+    .precog-card.expanded .precog-evidence {
+      max-height: 280px; padding-top: 6px; margin-top: 4px; border-top-width: 1px;
+    }
+    .precog-card { cursor: pointer; }
+    .precog-evidence-label { font-size: 9px; }
+    .precog-evidence ul { font-size: 10.5px; line-height: 1.45; }
+    .precog-risk { font-size: 10px; }
+    .precog-degraded-note { font-size: 10.5px; padding: 8px 10px; margin-top: 10px; }
   }
 </style>
 </head>
@@ -774,7 +880,17 @@
       <span class="precog-meta" id="precog-meta">—</span>
     </div>
     <div class="precog-body">
-      <div class="precog-grid">
+      <!-- 手机端 LONG/SHORT 切换 (桌面端 CSS 隐藏) -->
+      <div class="precog-mobile-tabs">
+        <button class="precog-mobile-tab long active" data-precog-tab="long" onclick="switchPrecogTab('long')">
+          📈 即将大涨 <span class="count" id="precog-mtab-long-count">0</span>
+        </button>
+        <button class="precog-mobile-tab short" data-precog-tab="short" onclick="switchPrecogTab('short')">
+          📉 即将大跌 <span class="count" id="precog-mtab-short-count">0</span>
+        </button>
+      </div>
+
+      <div class="precog-grid show-long" id="precog-grid">
         <div>
           <div class="precog-col-header long">
             <span>📈 即将大涨 (Top 5 LONG)</span>
@@ -808,6 +924,7 @@
       <div class="regime-judgment-block">
         <div class="regime-section-label">判断</div>
         <div id="regime-judgment" class="regime-judgment">—</div>
+        <span class="regime-judgment-toggle" id="regime-judgment-toggle" style="display:none" onclick="toggleRegimeJudgment()">展开 ▼</span>
       </div>
       <div class="regime-evidence-grid">
         <div class="regime-support">
@@ -1089,10 +1206,11 @@ function renderMacroPanel() {
     value_en: null,
     sub: `已过期 ${events.length - future.length} 个`,
     color: "#8a96aa",
+    mobile_hide: true,    // 手机端隐藏(信息密度低)
   });
 
   document.getElementById("macro-stats-grid").innerHTML = stats.map(s => `
-    <div class="macro-stat-card">
+    <div class="macro-stat-card${s.mobile_hide ? ' mobile-hide' : ''}">
       <div class="macro-stat-label">${escapeHtml(s.label)}</div>
       <div class="macro-stat-value" style="color:${s.color}">${escapeHtml(s.value || "—")}</div>
       ${s.value_en ? `<div class="macro-stat-value-en">${escapeHtml(s.value_en)}</div>` : ""}
@@ -1100,10 +1218,10 @@ function renderMacroPanel() {
     </div>
   `).join("");
 
-  // ── 即将发生的事件列表（CORE+OBSERVE 优先，最多 8 个） ──
+  // ── 即将发生的事件列表（CORE+OBSERVE 优先，最多 5 个） ──
   const upcoming = future
     .filter(e => e.tier === "CORE" || e.tier === "OBSERVE")
-    .slice(0, 8);
+    .slice(0, 5);
   const listBox = document.getElementById("macro-upcoming-list");
   if (upcoming.length === 0) {
     listBox.innerHTML = '<div style="color:var(--text-dim);font-size:12px;padding:8px">未来一周无核心 / 观察事件</div>';
@@ -1129,6 +1247,16 @@ function renderMacroPanel() {
 
 // ==================== P23: 🔮 预兆雷达 ====================
 let precogData = null;
+
+// 手机端 LONG/SHORT Tab 切换
+function switchPrecogTab(side) {
+  const grid = document.getElementById("precog-grid");
+  if (!grid) return;
+  grid.classList.remove("show-long", "show-short");
+  grid.classList.add(side === "short" ? "show-short" : "show-long");
+  document.querySelectorAll(".precog-mobile-tab").forEach(t => t.classList.remove("active"));
+  document.querySelector(`.precog-mobile-tab[data-precog-tab="${side}"]`)?.classList.add("active");
+}
 
 async function loadPrecogRadar() {
   try {
@@ -1158,7 +1286,7 @@ function renderPrecogCard(c, rank, isLong) {
   const rankCls = rank === 1 ? "precog-rank top1" : "precog-rank";
 
   return `
-    <div class="precog-card ${cls}">
+    <div class="precog-card ${cls}" onclick="this.classList.toggle('expanded')">
       <div class="precog-card-row1">
         <div class="precog-card-symbol-block">
           <span class="${rankCls}">${rank}</span>
@@ -1206,6 +1334,11 @@ function renderPrecogPanel() {
   const shorts = precogData.shorts || [];
   document.getElementById("precog-long-count").textContent  = longs.length;
   document.getElementById("precog-short-count").textContent = shorts.length;
+  // 同步移动端 Tab 计数
+  const ml = document.getElementById("precog-mtab-long-count");
+  const ms = document.getElementById("precog-mtab-short-count");
+  if (ml) ml.textContent = longs.length;
+  if (ms) ms.textContent = shorts.length;
 
   const longBox = document.getElementById("precog-long-list");
   if (longs.length === 0) {
@@ -1246,6 +1379,18 @@ async function loadRegimeHistory() {
   }
 }
 
+function toggleRegimeJudgment() {
+  const j = document.getElementById("regime-judgment");
+  const t = document.getElementById("regime-judgment-toggle");
+  if (j.classList.contains("expanded")) {
+    j.classList.remove("expanded");
+    t.textContent = "展开 ▼";
+  } else {
+    j.classList.add("expanded");
+    t.textContent = "收起 ▲";
+  }
+}
+
 function renderRegimeCard() {
   if (!regimeData) return;
   const meta = REGIME_META[regimeData.regime] || REGIME_META.RANGE_BORING;
@@ -1262,6 +1407,10 @@ function renderRegimeCard() {
     `更新于 ${updTs.toLocaleString("zh-CN", {hour12:false})} · ${ageMin}m 前`;
 
   document.getElementById("regime-judgment").textContent = regimeData.judgment;
+  // 手机端: 文字超过~3行时显示展开按钮
+  const isMobile = window.matchMedia("(max-width: 720px)").matches;
+  const toggle = document.getElementById("regime-judgment-toggle");
+  if (toggle) toggle.style.display = (isMobile && (regimeData.judgment || "").length > 60) ? "" : "none";
 
   const supList = document.getElementById("regime-support-list");
   supList.innerHTML = (regimeData.support || []).map(s => `<li>${escapeHtml(s)}</li>`).join("");
