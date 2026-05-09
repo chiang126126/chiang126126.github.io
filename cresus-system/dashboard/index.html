@@ -1459,9 +1459,9 @@ function renderRegimeCard() {
 
   const badge = document.getElementById("regime-badge");
   badge.className = "regime-badge " + meta.cls;
-  badge.textContent = `${meta.zh} · ${regimeData.regime} · conf ${regimeData.confidence}`;
+  badge.textContent = `${meta.zh} · conf ${regimeData.confidence}`;
 
-  document.getElementById("regime-meta").textContent = "纯统计版（v1）";
+  document.getElementById("regime-meta").textContent = "";
   const updTs = new Date(regimeData.ts);
   const ageMin = Math.floor((Date.now() - updTs.getTime()) / 60000);
   document.getElementById("regime-update").textContent =
