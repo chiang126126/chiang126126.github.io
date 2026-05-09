@@ -456,11 +456,72 @@
     font-size: 11px;
   }
   .d-regime-tag { margin-left: auto; font-weight: 600; font-size: 10px; }
+
+  /* 手机端: 1 列 + 紧凑 + levels 单行 */
   @media (max-width: 720px) {
-    .d-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .d-grid { grid-template-columns: 1fr; gap: 8px; }
+    .d-card {
+      padding: 10px 12px;
+      gap: 6px;
+      border-radius: 10px;
+    }
+    .d-card-header { gap: 8px; }
+    .d-symbol { font-size: 14px; letter-spacing: 0.2px; }
+    .d-card-header .badge { font-size: 10px; padding: 2px 6px; }
+    .d-verdict { padding: 5px 10px; font-size: 12px; }
+    .d-conf-row { gap: 6px; }
+    .d-conf-label { font-size: 10px; min-width: 30px; }
+    .d-conf-bar-wrap { height: 4px; }
+    .d-conf-num { font-size: 12px; min-width: 22px; }
+
+    /* levels 改横向单行,各占 1/3 */
+    .d-levels {
+      flex-direction: row !important;
+      gap: 0 !important;
+      padding: 6px 8px;
+      border-radius: 6px;
+    }
+    .d-level-row {
+      flex: 1; flex-direction: column; align-items: flex-start;
+      gap: 1px; font-size: 11px;
+      padding: 0 4px;
+      border-right: 1px solid rgba(255,255,255,0.06);
+    }
+    .d-level-row:last-child { border-right: none; }
+    .d-level-label {
+      font-size: 9px; min-width: 0; opacity: 0.55;
+      letter-spacing: 0.4px;
+    }
+    .d-level-price { font-size: 11px; font-weight: 600; }
+    .d-level-row .dist-pct { font-size: 9.5px; margin-left: 0; }
+
+    .d-card-footer {
+      padding-top: 4px;
+      gap: 6px;
+      font-size: 10px;
+    }
+    .d-regime-tag { font-size: 9px; }
   }
   @media (max-width: 420px) {
-    .d-grid { grid-template-columns: 1fr; }
+    .d-symbol { font-size: 13px; }
+    .d-verdict { font-size: 11px; }
+  }
+
+  /* 决策卡 "查看全部" 按钮 */
+  .d-show-more {
+    display: none;
+    margin-top: 10px; padding: 10px;
+    text-align: center; cursor: pointer;
+    color: var(--blue); font-size: 12px; font-weight: 600;
+    border: 1px dashed var(--border); border-radius: 8px;
+    background: rgba(33,150,243,0.04);
+    transition: background 0.15s;
+  }
+  .d-show-more:hover { background: rgba(33,150,243,0.10); }
+  @media (max-width: 720px) {
+    .d-show-more { display: block; }
+    .d-grid.collapsed > .d-card:nth-child(n+7) { display: none; }
+    .d-grid.expanded ~ .d-show-more { display: none; }
   }
 
   .struct-row {
@@ -1661,7 +1722,13 @@ function renderDecisionView() {
     </div>`;
   }).join("");
 
-  document.getElementById("decision-table").innerHTML = `<div class="d-grid">${cards}</div>`;
+  // 手机端: 默认折叠,只显示前 6 张. 点击"查看全部"展开
+  const totalCount = rows.length;
+  const showMoreHtml = totalCount > 6
+    ? `<div class="d-show-more" onclick="this.previousElementSibling.classList.remove('collapsed'); this.previousElementSibling.classList.add('expanded'); this.style.display='none';">查看全部 ${totalCount} 条 ▼</div>`
+    : "";
+  document.getElementById("decision-table").innerHTML =
+    `<div class="d-grid collapsed">${cards}</div>${showMoreHtml}`;
 }
 // ============================ 决策视图 v2 end ============================
 
