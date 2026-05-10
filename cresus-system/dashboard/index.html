@@ -811,12 +811,31 @@
   .velocity-meta { color: #a8957a; font-size: 11px; }
   .velocity-body { padding: 14px 20px; position: relative; z-index: 1; }
 
+  /* 市场级事件横幅 (单独类,跨列时占满) */
+  .velocity-market-banner {
+    padding: 10px; margin-bottom: 10px;
+    border-radius: 8px; font-weight: 700; font-size: 12px;
+    text-align: center; border: 1px dashed;
+  }
+  .velocity-market-banner.crash {
+    color: #ff5252; background: rgba(255,23,68,0.08); border-color: rgba(255,23,68,0.30);
+  }
+  .velocity-market-banner.pump {
+    color: #00e676; background: rgba(0,200,83,0.08); border-color: rgba(0,200,83,0.30);
+  }
+
+  /* 桌面默认: 2 列排行, 减少滑动 */
+  .velocity-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 12px;
+  }
   .velocity-row {
     display: grid;
-    grid-template-columns: 32px 1fr 90px 90px 100px 110px;
-    gap: 10px; align-items: center;
-    padding: 8px 12px; margin-bottom: 6px;
-    border-radius: 8px;
+    grid-template-columns: 30px 90px 70px 70px 78px 60px;
+    gap: 8px; align-items: center;
+    padding: 7px 10px;
+    border-radius: 7px;
     background: rgba(255,255,255,0.02);
     border-left: 3px solid;
     font-size: 12px;
@@ -868,13 +887,30 @@
   }
 
   @media (max-width: 720px) {
-    .velocity-row {
-      grid-template-columns: 24px 1fr 70px 80px;
-      gap: 6px; padding: 6px 8px; font-size: 11px;
-    }
-    .velocity-row > :nth-child(5),
-    .velocity-row > :nth-child(6) { display: none; }
+    .velocity-body { padding: 10px 12px; }
+    .velocity-header { padding: 12px 14px; flex-wrap: wrap; gap: 4px; }
     .velocity-brand { font-size: 13px; }
+    .velocity-stat-pill { font-size: 10px; padding: 2px 8px; }
+    .velocity-meta { font-size: 10px; }
+    .velocity-market-banner { font-size: 11px; padding: 8px; }
+
+    /* 手机端: 单列 + 水平滚动看全部字段 */
+    .velocity-list {
+      grid-template-columns: 1fr;
+      gap: 4px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .velocity-row {
+      grid-template-columns: 28px 100px 78px 70px 80px 60px;
+      gap: 8px; padding: 6px 10px; font-size: 11px;
+      min-width: 440px;    /* 确保所有列都显示,溢出可滑动 */
+    }
+    .velocity-rank { font-size: 10px; padding: 1px 4px !important; }
+    .velocity-rank.rank-1, .velocity-rank.rank-2, .velocity-rank.rank-3 {
+      padding: 1px 4px;
+    }
+    .velocity-when { font-size: 9px; }
   }
 
   /* ========== 🔮 预兆雷达 panel (P23) — 深紫夜空风 ========== */
@@ -1530,14 +1566,15 @@ function renderVelocityPanel() {
   const upd = new Date(velocityData.updated_at);
   const ageMin = Math.floor((Date.now() - upd.getTime()) / 60_000);
 
-  const showCount = Math.min(15, alerts.length);
   document.getElementById("velocity-stat-pill").textContent =
     alerts.length > 15
-      ? `🏆 Top ${showCount} / 共 ${alerts.length} 个共振`
-      : `${alerts.length} 个共振 · 近 60min`;
+      ? `Top ${showCount} / ${alerts.length} 共振`
+      : `${alerts.length} 个共振`;
   const t = velocityData.thresholds || {};
-  document.getElementById("velocity-meta").textContent =
-    `${ageMin}m 前 · 按强度×幅度降序 · 触发: 1m 量≥${t.volume_burst_ratio || 8}x + 价≥${(t.price_move_pct||0.8).toFixed(1)}%`;
+  // 标题文案精简: 桌面 + 移动端共用,详细阈值改为 tooltip
+  const metaEl = document.getElementById("velocity-meta");
+  metaEl.textContent = `${ageMin}m 前 · 强度降序`;
+  metaEl.title = `触发: 1m 量≥${t.volume_burst_ratio || 8}x · 价≥${(t.price_move_pct||0.8).toFixed(1)}%`;
 
   const body = document.getElementById("velocity-body");
   if (alerts.length === 0) {
@@ -1550,9 +1587,9 @@ function renderVelocityPanel() {
   const shortN = alerts.filter(a => a.direction === "SHORT").length;
   let marketBanner = "";
   if (shortN >= 30) {
-    marketBanner = `<div class="velocity-empty" style="color:#ff5252;background:rgba(255,23,68,0.08);border:1px dashed rgba(255,23,68,0.3);border-radius:8px;margin-bottom:10px;padding:10px;font-weight:700">🌊 全市场下跌事件 (${shortN} 个 SHORT 报警) — 市场级,非个股 alpha,谨慎做多</div>`;
+    marketBanner = `<div class="velocity-market-banner crash">🌊 全市场下跌事件 (${shortN} 个 SHORT) — 市场级,非个股 alpha,谨慎做多</div>`;
   } else if (longN >= 30) {
-    marketBanner = `<div class="velocity-empty" style="color:#00e676;background:rgba(0,200,83,0.08);border:1px dashed rgba(0,200,83,0.3);border-radius:8px;margin-bottom:10px;padding:10px;font-weight:700">🌊 全市场上涨事件 (${longN} 个 LONG 报警) — 市场级,非个股 alpha,可顺势但不追高</div>`;
+    marketBanner = `<div class="velocity-market-banner pump">🌊 全市场上涨事件 (${longN} 个 LONG) — 市场级,非个股 alpha,可顺势但不追高</div>`;
   }
 
   // 按 intensity × |price_change| 降序,优先显示最强的
@@ -1561,7 +1598,7 @@ function renderVelocityPanel() {
     (a.intensity * Math.abs(a.price_change_1m_pct))
   );
 
-  body.innerHTML = marketBanner + sorted.slice(0, 15).map((a, i) => {
+  const rowsHtml = sorted.slice(0, 15).map((a, i) => {
     const dir = a.direction;
     const isUp = dir === "LONG";
     const cls = isUp ? "up" : "down";
@@ -1583,6 +1620,7 @@ function renderVelocityPanel() {
       <span class="velocity-when">${whenStr}</span>
     </div>`;
   }).join("");
+  body.innerHTML = marketBanner + `<div class="velocity-list">${rowsHtml}</div>`;
 }
 // ==================== P27-X end ====================
 
