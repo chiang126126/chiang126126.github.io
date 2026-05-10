@@ -977,6 +977,25 @@
   .velocity-market-banner.pump {
     color: #00e676; background: rgba(0,200,83,0.08); border-color: rgba(0,200,83,0.30);
   }
+  .velocity-market-banner.silent {
+    color: #8a96aa; background: rgba(138,150,170,0.08); border-color: rgba(138,150,170,0.28);
+  }
+  .velocity-market-banner.sparse {
+    color: #ffb74d; background: rgba(255,152,0,0.10); border-color: rgba(255,152,0,0.35);
+    font-size: 13px;
+  }
+  .velocity-market-banner.tilted-long {
+    color: #80d8ff; background: rgba(0,176,255,0.08); border-color: rgba(0,176,255,0.30);
+  }
+  .velocity-market-banner.tilted-short {
+    color: #ff8a65; background: rgba(255,87,34,0.10); border-color: rgba(255,87,34,0.32);
+  }
+  .velocity-stale {
+    display: inline-block; margin-left: 8px;
+    padding: 2px 8px; border-radius: 8px;
+    background: rgba(255,82,82,0.14); color: #ff8a80;
+    font-size: 10px; font-weight: 700;
+  }
 
   /* 手机端 LONG/SHORT 切换 Tab (桌面端隐藏) */
   .velocity-mobile-tabs { display: none; }
@@ -1782,32 +1801,44 @@ function renderVelocityPanel() {
   const alerts = velocityData.alerts || [];
   const upd = new Date(velocityData.updated_at);
   const ageMin = Math.floor((Date.now() - upd.getTime()) / 60_000);
-  const showCount = Math.min(15, alerts.length);
-
-  document.getElementById("velocity-stat-pill").textContent =
-    alerts.length > 15
-      ? `Top ${showCount} / ${alerts.length} 共振`
-      : `${alerts.length} 个共振`;
-  const t = velocityData.thresholds || {};
-  // 标题文案精简: 桌面 + 移动端共用,详细阈值改为 tooltip
-  const metaEl = document.getElementById("velocity-meta");
-  metaEl.textContent = `${ageMin}m 前 · 强度降序`;
-  metaEl.title = `触发: 1m 量≥${t.volume_burst_ratio || 8}x · 价≥${(t.price_move_pct||0.8).toFixed(1)}%`;
-
-  const body = document.getElementById("velocity-body");
-  if (alerts.length === 0) {
-    body.innerHTML = '<div class="velocity-empty">最近 60min 无量价共振信号</div>';
-    return;
-  }
-
-  // 检测全市场事件
+  const universe = velocityData.scan_universe || 200;
   const longN  = alerts.filter(a => a.direction === "LONG").length;
   const shortN = alerts.filter(a => a.direction === "SHORT").length;
+
+  // 富 stat pill: 共振 + 多/空 + 扫描覆盖
+  document.getElementById("velocity-stat-pill").innerHTML =
+    `${alerts.length} 共振 · <span style="color:#00e676">${longN}↑</span> <span style="color:#ff5252">${shortN}↓</span> · 扫描 ${universe}`;
+
+  const t = velocityData.thresholds || {};
+  const metaEl = document.getElementById("velocity-meta");
+  const stalePill = ageMin >= 5
+    ? ` <span class="velocity-stale" title="数据 ${ageMin}min 未更新,Mac 端同步可能滞后">⏱ 数据 ${ageMin}m 旧</span>`
+    : "";
+  metaEl.innerHTML = `${ageMin}m 前刷新 · 强度降序${stalePill}`;
+  metaEl.title = `触发: 1m 量≥${t.volume_burst_ratio || 5}x · 价≥${(t.price_move_pct||0.5).toFixed(1)}%`;
+
+  const body = document.getElementById("velocity-body");
+
+  // 分级警告横幅 — 任何状态都给清晰提示
   let marketBanner = "";
-  if (shortN >= 30) {
+  const total = alerts.length;
+  if (total === 0) {
+    marketBanner = `<div class="velocity-market-banner silent">💤 市场静寂期 — 60min 内无量价共振,大多数标的不适宜做多做空</div>`;
+  } else if (total <= 4) {
+    marketBanner = `<div class="velocity-market-banner sparse">⚠️ 信号稀少 (${total} 个 / 扫描 ${universe}) — 大多数标的不适宜做多做空,等更明确的爆发</div>`;
+  } else if (shortN >= 15) {
     marketBanner = `<div class="velocity-market-banner crash">🌊 全市场下跌事件 (${shortN} 个 SHORT) — 市场级,非个股 alpha,谨慎做多</div>`;
-  } else if (longN >= 30) {
+  } else if (longN >= 15) {
     marketBanner = `<div class="velocity-market-banner pump">🌊 全市场上涨事件 (${longN} 个 LONG) — 市场级,非个股 alpha,可顺势但不追高</div>`;
+  } else if (total >= 5 && shortN / total >= 0.75) {
+    marketBanner = `<div class="velocity-market-banner tilted-short">📉 偏空倾向 (${shortN}/${total} SHORT ≥75%) — 单边场,做多需谨慎</div>`;
+  } else if (total >= 5 && longN / total >= 0.75) {
+    marketBanner = `<div class="velocity-market-banner tilted-long">📈 偏多倾向 (${longN}/${total} LONG ≥75%) — 单边场,做空需谨慎</div>`;
+  }
+
+  if (alerts.length === 0) {
+    body.innerHTML = marketBanner;
+    return;
   }
 
   // 按 intensity × |price_change| 降序,各方向独立排序

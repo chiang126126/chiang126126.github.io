@@ -51,8 +51,8 @@ HTTP_TIMEOUT = 12
 
 SCAN_TOP_N             = 200      # 24h 成交额 Top N 标的
 KLINE_LIMIT            = 30       # 1m 数据条数 (30min 窗口)
-VOLUME_BURST_RATIO     = 8.0      # 1m 量 > 30m 均 × 此倍数 → 量能爆发 (上调减噪)
-PRICE_MOVE_THRESHOLD   = 0.008    # 1m 价格变化 ≥ 0.8% → 价格响应 (上调减噪)
+VOLUME_BURST_RATIO     = 5.0      # 1m 量 > 30m 均 × 此倍数 → 量能爆发 (基线 — 噪音由看板分级提醒消化)
+PRICE_MOVE_THRESHOLD   = 0.005    # 1m 价格变化 ≥ 0.5% → 价格响应
 DEDUP_WINDOW_MIN       = 30       # 同标的去重窗口 (分钟)
 KEEP_ALERT_WINDOW_MIN  = 60       # 输出 JSON 保留最近 X 分钟内的报警
 
