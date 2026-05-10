@@ -884,18 +884,48 @@
     color: #00e676; background: rgba(0,200,83,0.08); border-color: rgba(0,200,83,0.30);
   }
 
-  /* 桌面默认: 2 列排行, 减少滑动 */
-  .velocity-list {
+  /* 手机端 LONG/SHORT 切换 Tab (桌面端隐藏) */
+  .velocity-mobile-tabs { display: none; }
+  .velocity-mobile-tab {
+    flex: 1; background: transparent; border: none;
+    border-bottom: 2px solid transparent;
+    padding: 8px 0; font-size: 13px; font-weight: 700; cursor: pointer;
+    color: var(--text-dim); transition: color 0.15s, border-color 0.15s;
+  }
+  .velocity-mobile-tab.active.long  { color: #00e676; border-bottom-color: #00c853; }
+  .velocity-mobile-tab.active.short { color: #ff5252; border-bottom-color: #ff1744; }
+  .vtab-count {
+    font-size: 10px; margin-left: 4px; color: var(--text-dim);
+    padding: 1px 6px; background: rgba(255,255,255,0.06); border-radius: 6px;
+  }
+
+  /* 桌面默认: LONG/SHORT 双列并排 */
+  .velocity-cols {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 6px 12px;
+    gap: 14px;
+  }
+  .velocity-col-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 7px 12px; margin-bottom: 6px;
+    border-radius: 7px;
+    font-size: 12px; font-weight: 700;
+  }
+  .velocity-col-header.long  { background: rgba(0,200,83,0.10);  color: #00e676; border-left: 3px solid #00c853; }
+  .velocity-col-header.short { background: rgba(255,82,82,0.10); color: #ff5252; border-left: 3px solid #ff1744; }
+  .velocity-col-count {
+    font-size: 10px; padding: 1px 7px; border-radius: 8px;
+    background: rgba(255,255,255,0.08); color: var(--text-dim);
+  }
+  .velocity-list {
+    display: flex; flex-direction: column; gap: 4px;
   }
   .velocity-row {
     display: grid;
-    grid-template-columns: 30px 90px 70px 70px 78px 60px;
+    grid-template-columns: 28px 1fr 64px 50px 50px;
     gap: 8px; align-items: center;
-    padding: 7px 10px;
-    border-radius: 7px;
+    padding: 6px 9px;
+    border-radius: 6px;
     background: rgba(255,255,255,0.02);
     border-left: 3px solid;
     font-size: 12px;
@@ -954,22 +984,25 @@
     .velocity-meta { font-size: 10px; }
     .velocity-market-banner { font-size: 11px; padding: 8px; }
 
-    /* 手机端: 单列 + 水平滚动看全部字段 */
-    .velocity-list {
+    /* 手机端: 显示 Tab,默认只显一边 */
+    .velocity-mobile-tabs {
+      display: flex; gap: 4px; margin-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .velocity-cols {
       grid-template-columns: 1fr;
-      gap: 4px;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
+      gap: 0;
     }
+    .velocity-cols.show-long  > .velocity-col.short { display: none; }
+    .velocity-cols.show-short > .velocity-col.long  { display: none; }
+    /* 手机端列内 header 隐藏,因为 Tab 已替代 */
+    .velocity-col-header { display: none; }
+
     .velocity-row {
-      grid-template-columns: 28px 100px 78px 70px 80px 60px;
-      gap: 8px; padding: 6px 10px; font-size: 11px;
-      min-width: 440px;    /* 确保所有列都显示,溢出可滑动 */
+      grid-template-columns: 26px 1fr 64px 48px 50px;
+      gap: 6px; padding: 6px 9px; font-size: 11px;
     }
-    .velocity-rank { font-size: 10px; padding: 1px 4px !important; }
-    .velocity-rank.rank-1, .velocity-rank.rank-2, .velocity-rank.rank-3 {
-      padding: 1px 4px;
-    }
+    .velocity-rank { font-size: 10px; }
     .velocity-when { font-size: 9px; }
   }
 
@@ -1658,35 +1691,73 @@ function renderVelocityPanel() {
     marketBanner = `<div class="velocity-market-banner pump">🌊 全市场上涨事件 (${longN} 个 LONG) — 市场级,非个股 alpha,可顺势但不追高</div>`;
   }
 
-  // 按 intensity × |price_change| 降序,优先显示最强的
-  const sorted = alerts.slice().sort((a, b) =>
-    (b.intensity * Math.abs(b.price_change_1m_pct)) -
-    (a.intensity * Math.abs(a.price_change_1m_pct))
-  );
+  // 按 intensity × |price_change| 降序,各方向独立排序
+  const scoreOf = a => a.intensity * Math.abs(a.price_change_1m_pct);
+  const longs  = alerts.filter(a => a.direction === "LONG" ).sort((a,b) => scoreOf(b) - scoreOf(a));
+  const shorts = alerts.filter(a => a.direction === "SHORT").sort((a,b) => scoreOf(b) - scoreOf(a));
+  const TOP_N_PER_COL = 10;
 
-  const rowsHtml = sorted.slice(0, 15).map((a, i) => {
-    const dir = a.direction;
-    const isUp = dir === "LONG";
+  const renderRow = (a, i) => {
+    const isUp = a.direction === "LONG";
     const cls = isUp ? "up" : "down";
     const detected = new Date(a.detected_at);
     const ageM = Math.floor((Date.now() - detected.getTime()) / 60_000);
     const whenStr = ageM < 1 ? "刚刚" : `${ageM}m前`;
-    // 排名样式: #1 金色, #2 银色, #3 铜色, 其他灰色
     const rank = i + 1;
     let rankCls = "rank-other";
     if (rank === 1) rankCls = "rank-1";
     else if (rank === 2) rankCls = "rank-2";
     else if (rank === 3) rankCls = "rank-3";
-    return `<div class="velocity-row dir-${dir}">
+    return `<div class="velocity-row dir-${a.direction}">
       <span class="velocity-rank ${rankCls}">#${rank}</span>
       <span class="velocity-symbol">${escapeHtml(a.symbol)}</span>
-      <span class="velocity-dir-badge ${dir}">${isUp ? "做多机会" : "做空机会"}</span>
       <span class="velocity-pct ${cls}">${a.price_change_1m_pct.toFixed(2)}%</span>
-      <span class="velocity-vol-ratio">${a.volume_ratio.toFixed(1)}x 量</span>
+      <span class="velocity-vol-ratio">${a.volume_ratio.toFixed(1)}x</span>
       <span class="velocity-when">${whenStr}</span>
     </div>`;
-  }).join("");
-  body.innerHTML = marketBanner + `<div class="velocity-list">${rowsHtml}</div>`;
+  };
+
+  const longRows  = longs .slice(0, TOP_N_PER_COL).map(renderRow).join("") ||
+                    '<div class="velocity-empty">暂无做多机会</div>';
+  const shortRows = shorts.slice(0, TOP_N_PER_COL).map(renderRow).join("") ||
+                    '<div class="velocity-empty">暂无做空机会</div>';
+
+  body.innerHTML = marketBanner + `
+    <!-- 手机端 LONG/SHORT Tab 切换 (桌面 CSS 隐藏) -->
+    <div class="velocity-mobile-tabs">
+      <button class="velocity-mobile-tab long active" onclick="switchVelocityTab('long')">
+        📈 做多机会 <span class="vtab-count">${longs.length}</span>
+      </button>
+      <button class="velocity-mobile-tab short" onclick="switchVelocityTab('short')">
+        📉 做空机会 <span class="vtab-count">${shorts.length}</span>
+      </button>
+    </div>
+    <div class="velocity-cols show-long" id="velocity-cols">
+      <div class="velocity-col long">
+        <div class="velocity-col-header long">
+          <span>📈 做多机会</span>
+          <span class="velocity-col-count">${longs.length}</span>
+        </div>
+        <div class="velocity-list">${longRows}</div>
+      </div>
+      <div class="velocity-col short">
+        <div class="velocity-col-header short">
+          <span>📉 做空机会</span>
+          <span class="velocity-col-count">${shorts.length}</span>
+        </div>
+        <div class="velocity-list">${shortRows}</div>
+      </div>
+    </div>
+  `;
+}
+
+function switchVelocityTab(side) {
+  const grid = document.getElementById("velocity-cols");
+  if (!grid) return;
+  grid.classList.remove("show-long", "show-short");
+  grid.classList.add(side === "short" ? "show-short" : "show-long");
+  document.querySelectorAll(".velocity-mobile-tab").forEach(t => t.classList.remove("active"));
+  document.querySelector(`.velocity-mobile-tab.${side}`)?.classList.add("active");
 }
 // ==================== P27-X end ====================
 
