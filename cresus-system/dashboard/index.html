@@ -2675,13 +2675,36 @@ function renderHistory(summary, closes) {
             ? '<span class="badge" style="color:var(--red);background:rgba(255,23,68,0.15)">爆仓</span>'
             : '<span style="color:var(--text-dim);font-size:11px">正常</span>';
           const outsideClass = isWithin24h(c.ts) ? "" : " class=\"outside-24h\"";
+
+          // P26-Q4: bot 未记录 open_px 时,从 pnl + size + close_px 倒推开仓价
+          let inferredOpenPx = c.open_px;
+          let openIsInferred = false;
+          if ((inferredOpenPx == null || inferredOpenPx === "") && c.size && c.close_px != null) {
+            const sz = Math.abs(parseFloat(c.size));
+            const pnl = parseFloat(c.pnl || 0);
+            const close = parseFloat(c.close_px);
+            if (sz > 0 && !isNaN(pnl) && !isNaN(close)) {
+              inferredOpenPx = c.side === 'long' ? close - pnl / sz : close + pnl / sz;
+              openIsInferred = true;
+            }
+          }
+          const openPxHtml = inferredOpenPx != null
+            ? (openIsInferred
+                ? `<span title="bot 未记录开仓价,这是从盈亏倒推的估算值">≈${formatPrice(inferredOpenPx)}</span>`
+                : formatPrice(inferredOpenPx))
+            : "—";
+          // 持仓时长: open_ts 缺失时显示 "—" 而非 "0s"
+          const durHtml = c.open_ts
+            ? formatDuration(c.open_ts, c.ts)
+            : '<span title="bot 未记录开仓时间">—</span>';
+
           return `
           <tr${outsideClass}>
             <td>${formatTime(c.ts)}</td>
             <td><strong>${c.symbol}</strong></td>
             <td><span class="badge ${dirCls}">${dirCn}</span></td>
-            <td style="color:var(--text-dim)">${formatDuration(c.open_ts, c.ts)}</td>
-            <td>${formatPrice(c.open_px)}</td>
+            <td style="color:var(--text-dim)">${durHtml}</td>
+            <td>${openPxHtml}</td>
             <td>${formatPrice(c.close_px)}</td>
             <td class="pnl-cell ${pnlClass(c.pnl)}">${formatPnl(c.pnl)}</td>
             <td style="color:var(--text-dim)">${(c.fee || 0).toFixed(4)}</td>
