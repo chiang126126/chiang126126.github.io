@@ -1,11 +1,36 @@
 {
-  "updated_at": "2026-05-10T20:23:43.326551+00:00",
+  "updated_at": "2026-05-10T20:32:16.850429+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
     "price_move_pct": 0.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 0,
-  "alerts": []
+  "alerts_count": 2,
+  "alerts": [
+    {
+      "symbol": "CATIUSDT",
+      "base": "CATI",
+      "direction": "SHORT",
+      "price": 0.07032,
+      "price_change_1m_pct": -0.65,
+      "volume_1m_usdt": 41352.0,
+      "volume_30m_avg_usdt": 2897.0,
+      "volume_ratio": 14.27,
+      "detected_at": "2026-05-10T20:32:16.347754+00:00",
+      "intensity": 1
+    },
+    {
+      "symbol": "FHEUSDT",
+      "base": "FHE",
+      "direction": "SHORT",
+      "price": 0.04,
+      "price_change_1m_pct": -1.696,
+      "volume_1m_usdt": 188732.0,
+      "volume_30m_avg_usdt": 21604.0,
+      "volume_ratio": 8.74,
+      "detected_at": "2026-05-10T20:25:10.801687+00:00",
+      "intensity": 2
+    }
+  ]
 }
