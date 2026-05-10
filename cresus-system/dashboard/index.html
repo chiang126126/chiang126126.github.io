@@ -131,6 +131,50 @@
     .section-title-sub { font-size: 11px; }
   }
 
+  /* P30 电梯导航 — 右侧悬浮 */
+  html { scroll-behavior: smooth; }
+  .section-elevator {
+    position: fixed;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex; flex-direction: column;
+    gap: 10px;
+    z-index: 100;
+    /* 防 print/移动端可能挡内容 */
+    pointer-events: auto;
+  }
+  .elevator-btn {
+    width: 46px; height: 46px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    border-radius: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    border: 2px solid;
+    background: var(--panel);
+    transition: transform 0.15s ease, box-shadow 0.18s, background 0.2s;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.30);
+  }
+  .elevator-btn:hover {
+    transform: scale(1.10);
+  }
+  /* 默认描边色 = 文字色 */
+  .elevator-btn.macro       { border-color: #40a9ff; color: #40a9ff; }
+  .elevator-btn.opportunity { border-color: #b37feb; color: #b37feb; }
+  .elevator-btn.my-trades   { border-color: #00c853; color: #00c853; }
+  /* 滚动到对应分区时高亮 */
+  .elevator-btn.macro.active       { background: linear-gradient(135deg,#40a9ff,#1890ff); color: #fff; box-shadow: 0 0 16px rgba(64,169,255,0.55); }
+  .elevator-btn.opportunity.active { background: linear-gradient(135deg,#b37feb,#9254de); color: #fff; box-shadow: 0 0 16px rgba(179,127,235,0.55); }
+  .elevator-btn.my-trades.active   { background: linear-gradient(135deg,#00e676,#00c853); color: #003a16; box-shadow: 0 0 16px rgba(0,200,83,0.55); }
+  /* 锚点跳转时给顶部留余量,避免被 header 挡 */
+  .section-marker { scroll-margin-top: 12px; }
+  @media (max-width: 720px) {
+    .section-elevator { right: 8px; gap: 6px; }
+    .elevator-btn { width: 38px; height: 38px; font-size: 13px; border-radius: 10px; }
+  }
+
   .stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -1280,23 +1324,30 @@
   </div>
 </header>
 
+<!-- P30 电梯导航 — 右侧悬浮快速跳转 -->
+<nav class="section-elevator" aria-label="分区快速导航">
+  <a href="#section-macro"       class="elevator-btn macro"       title="01 宏观环境">01</a>
+  <a href="#section-opportunity" class="elevator-btn opportunity" title="02 交易机会">02</a>
+  <a href="#section-my-trades"   class="elevator-btn my-trades"   title="03 我的交易">03</a>
+</nav>
+
 <main>
   <!-- P30 三层信息架构 (CSS order 重排到对应 panel 前) -->
-  <div class="section-marker macro">
+  <div class="section-marker macro" id="section-macro">
     <span class="section-number">01</span>
     <div class="section-title">
       <span class="section-title-main">🌍 宏观环境</span>
       <span class="section-title-sub">看市场,识风险</span>
     </div>
   </div>
-  <div class="section-marker opportunity">
+  <div class="section-marker opportunity" id="section-opportunity">
     <span class="section-number">02</span>
     <div class="section-title">
       <span class="section-title-main">💡 交易机会</span>
       <span class="section-title-sub">AI 选标的,辅助决策</span>
     </div>
   </div>
-  <div class="section-marker my-trades">
+  <div class="section-marker my-trades" id="section-my-trades">
     <span class="section-number">03</span>
     <div class="section-title">
       <span class="section-title-main">📊 我的交易</span>
@@ -3275,6 +3326,43 @@ setInterval(renderMacroPanel, 30_000);         // P21: 倒计时仅本地重算�
 setInterval(loadPrecogRadar, 5 * 60_000);      // P23: 预兆雷达 5min 刷新
 loadVelocityRadar();
 setInterval(loadVelocityRadar, 60_000);        // P27-X: 量能加速度 1min 刷新 (高时效)
+
+// P30: 电梯导航 active 状态跟随滚动
+(function setupElevator() {
+  const sections = [
+    { id: "section-macro",       cls: "macro" },
+    { id: "section-opportunity", cls: "opportunity" },
+    { id: "section-my-trades",   cls: "my-trades" },
+  ];
+  const buttons = {};
+  sections.forEach(s => {
+    buttons[s.cls] = document.querySelector(`.elevator-btn.${s.cls}`);
+  });
+
+  function updateActive() {
+    const probe = window.scrollY + 160;
+    let activeCls = sections[0].cls;
+    for (const s of sections) {
+      const el = document.getElementById(s.id);
+      if (!el) continue;
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      if (top <= probe) activeCls = s.cls;
+    }
+    // 滚到底部时强制最后一段高亮
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 4) {
+      activeCls = sections[sections.length - 1].cls;
+    }
+    for (const cls in buttons) {
+      const b = buttons[cls];
+      if (!b) continue;
+      b.classList.toggle("active", cls === activeCls);
+    }
+  }
+
+  window.addEventListener("scroll", updateActive, { passive: true });
+  window.addEventListener("resize", updateActive, { passive: true });
+  updateActive();
+})();
 </script>
 </body>
 </html>
