@@ -730,34 +730,35 @@
     .macro-event-row.tier-INFO { display: none; }
   }
 
-  /* ========== 🔮 预兆雷达 panel (P23) ========== */
+  /* ========== 🔮 预兆雷达 panel (P23) — 深紫夜空风 ========== */
   .precog-panel {
-    background: linear-gradient(135deg, #0a1428 0%, #07101e 100%);
-    border: 1px solid #1a3060;
+    background: linear-gradient(135deg, #15102b 0%, #0c081f 100%);
+    border: 1px solid rgba(155,109,255,0.20);
     overflow: hidden; position: relative;
   }
   .precog-panel::before {
-    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 50%;
-    background: radial-gradient(ellipse at top, rgba(64,169,255,0.10) 0%, transparent 70%);
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 60%;
+    background: radial-gradient(ellipse at top, rgba(155,109,255,0.13) 0%, transparent 70%);
     pointer-events: none;
   }
   .precog-header {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 18px 22px; border-bottom: 1px solid #1a2a4a;
-    background: linear-gradient(90deg, rgba(64,169,255,0.08) 0%, transparent 100%);
+    padding: 18px 22px; border-bottom: 1px solid rgba(155,109,255,0.15);
+    background: linear-gradient(90deg, rgba(155,109,255,0.10) 0%, transparent 100%);
     position: relative; z-index: 1;
   }
   .precog-title-row { display: flex; align-items: center; gap: 12px; }
   .precog-brand {
     font-weight: 800; font-size: 16px; letter-spacing: 0.4px;
-    background: linear-gradient(90deg, #40a9ff, #b37feb);
+    background: linear-gradient(90deg, #7dd3fc, #c4b5fd 50%, #d8b4fe);
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
   .precog-stat-pill {
     padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 700;
-    background: rgba(64,169,255,0.14); color: #91d5ff;
+    background: rgba(155,109,255,0.16); color: #d8b4fe;
+    border: 1px solid rgba(155,109,255,0.25);
   }
-  .precog-meta { color: #6c7a99; font-size: 11px; }
+  .precog-meta { color: #8a82a8; font-size: 11px; }
   .precog-body { padding: 18px 22px; position: relative; z-index: 1; }
 
   .precog-grid {
@@ -777,15 +778,15 @@
   .precog-col-count { font-size: 11px; padding: 2px 8px; border-radius: 8px; background: rgba(255,255,255,0.08); color: var(--text-dim); }
 
   .precog-card {
-    background: linear-gradient(140deg, #142848 0%, #0c1a30 100%);
-    border: 1px solid #243860;
+    background: linear-gradient(140deg, #1a1233 0%, #100a22 100%);
+    border: 1px solid rgba(155,109,255,0.18);
     border-radius: 10px;
     padding: 12px 14px;
     margin-bottom: 10px;
     transition: border-color 0.15s, box-shadow 0.15s;
   }
-  .precog-card.long:hover  { border-color: #00c853; box-shadow: 0 0 16px rgba(0,200,83,0.18); }
-  .precog-card.short:hover { border-color: #ff1744; box-shadow: 0 0 16px rgba(255,23,68,0.18); }
+  .precog-card.long:hover  { border-color: rgba(0,200,83,0.45); box-shadow: 0 0 18px rgba(0,200,83,0.20); }
+  .precog-card.short:hover { border-color: rgba(255,23,68,0.45); box-shadow: 0 0 18px rgba(255,23,68,0.20); }
   .precog-card.long  { border-left: 3px solid #00c853; }
   .precog-card.short { border-left: 3px solid #ff1744; }
 
@@ -796,11 +797,21 @@
   .precog-card-symbol-block { display: flex; align-items: center; gap: 8px; }
   .precog-rank {
     width: 22px; height: 22px; border-radius: 50%;
-    background: rgba(255,255,255,0.08); color: var(--text-dim);
+    background: rgba(155,109,255,0.16); color: #c4b5fd;
     font-size: 11px; font-weight: 700;
     display: inline-flex; align-items: center; justify-content: center;
   }
-  .precog-rank.top1 { background: linear-gradient(135deg,#ffd700,#ff9800); color:#000; }
+  .precog-rank.top1 {
+    background: linear-gradient(135deg,#fbbf24,#f59e0b); color:#1a0f00;
+    box-shadow: 0 0 10px rgba(251,191,36,0.40);
+  }
+  .precog-top-badge {
+    font-size: 10px; font-weight: 700; padding: 2px 7px;
+    border-radius: 10px; letter-spacing: 0.3px;
+    background: linear-gradient(135deg, rgba(251,191,36,0.18), rgba(245,158,11,0.14));
+    color: #fcd34d;
+    border: 1px solid rgba(251,191,36,0.30);
+  }
   .precog-symbol { font-size: 15px; font-weight: 800; color: var(--text); }
   .precog-tradable {
     font-size: 10px; padding: 2px 7px; border-radius: 4px; font-weight: 700;
@@ -860,8 +871,8 @@
   .precog-empty {
     padding: 24px; text-align: center; color: var(--text-dim);
     font-size: 13px;
-    background: rgba(255,255,255,0.02); border-radius: 8px;
-    border: 1px dashed rgba(255,255,255,0.08);
+    background: rgba(155,109,255,0.04); border-radius: 8px;
+    border: 1px dashed rgba(155,109,255,0.18);
   }
 
   .precog-degraded-note {
@@ -1351,6 +1362,19 @@ function switchPrecogTab(side) {
   document.querySelector(`.precog-mobile-tab[data-precog-tab="${side}"]`)?.classList.add("active");
 }
 
+// 计算优先级分数 — 智能排序的核心
+// priority = ai_conf × breakout × ignition_bonus × tradable_bonus × exhaustion_penalty
+function computePrecogPriority(c) {
+  const aiConf      = c.ai_confidence != null ? c.ai_confidence : 55;  // 无 AI 时给中性分
+  const breakout    = c.breakout_score || 0;
+  const isIgnition  = (c.ignition_score || 0) > (c.setup_score || 0);
+  const ignBonus    = isIgnition ? 1.25 : 1.0;
+  const tradeBonus  = c.tradable_okx ? 1.15 : 1.0;
+  // 已涨/跌 >25% 视为高位/低位,优先级降权(防追高)
+  const exhaustion  = Math.abs(c.price_change_24h_pct || 0) > 25 ? 0.7 : 1.0;
+  return aiConf * breakout * ignBonus * tradeBonus * exhaustion;
+}
+
 async function loadPrecogRadar() {
   try {
     const res = await fetch("./precog_radar.json?_=" + Date.now());
@@ -1377,6 +1401,7 @@ function renderPrecogCard(c, rank, isLong) {
   const evidence = c.key_evidence && c.key_evidence.length > 0 ? c.key_evidence : (c.direction_reasons || []);
   const risks = c.key_risks || [];
   const rankCls = rank === 1 ? "precog-rank top1" : "precog-rank";
+  const topBadge = rank === 1 ? `<span class="precog-top-badge">🌟 优先</span>` : "";
 
   return `
     <div class="precog-card ${cls}" onclick="this.classList.toggle('expanded')">
@@ -1384,6 +1409,7 @@ function renderPrecogCard(c, rank, isLong) {
         <div class="precog-card-symbol-block">
           <span class="${rankCls}">${rank}</span>
           <span class="precog-symbol">${escapeHtml(c.symbol)}</span>
+          ${topBadge}
           <span class="precog-tradable ${tradable}">${tradableLabel}</span>
           <span class="precog-kind-tag ${kindCls}">${kindLabel}</span>
         </div>
@@ -1423,8 +1449,8 @@ function renderPrecogPanel() {
   document.getElementById("precog-meta").textContent =
     `${ageMin}m 前更新 · 扫描 ${stats.universe||0} 个标的 · 候选 ${stats.phase_a_passed||0}`;
 
-  const longs  = precogData.longs  || [];
-  const shorts = precogData.shorts || [];
+  const longs  = (precogData.longs  || []).slice().sort((a,b) => computePrecogPriority(b) - computePrecogPriority(a));
+  const shorts = (precogData.shorts || []).slice().sort((a,b) => computePrecogPriority(b) - computePrecogPriority(a));
   document.getElementById("precog-long-count").textContent  = longs.length;
   document.getElementById("precog-short-count").textContent = shorts.length;
   // 同步移动端 Tab 计数
