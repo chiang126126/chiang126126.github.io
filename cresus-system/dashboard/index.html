@@ -1565,6 +1565,7 @@ function renderVelocityPanel() {
   const alerts = velocityData.alerts || [];
   const upd = new Date(velocityData.updated_at);
   const ageMin = Math.floor((Date.now() - upd.getTime()) / 60_000);
+  const showCount = Math.min(15, alerts.length);
 
   document.getElementById("velocity-stat-pill").textContent =
     alerts.length > 15
