@@ -403,13 +403,21 @@
   .dist-neg { color: var(--red); }
   .dist-warn { color: var(--yellow); }
 
-  /* P26: 卡死/连败 警示徽章 */
+  /* P26: 卡死(红)/高频(黄)/连败(橙) 警示徽章 */
   .stuck-badge {
     display: inline-block; margin-left: 4px;
     padding: 1px 6px; border-radius: 4px;
     font-size: 9.5px; font-weight: 700;
     background: rgba(213,0,0,0.20); color: #ff5252;
     border: 1px solid rgba(213,0,0,0.40);
+    letter-spacing: 0.2px;
+  }
+  .freq-badge {
+    display: inline-block; margin-left: 4px;
+    padding: 1px 6px; border-radius: 4px;
+    font-size: 9.5px; font-weight: 700;
+    background: rgba(255,214,0,0.14); color: #ffd54f;
+    border: 1px solid rgba(255,214,0,0.30);
     letter-spacing: 0.2px;
   }
   .loser-badge {
@@ -439,6 +447,10 @@
   .d-warning-banner.divergent {
     background: rgba(255,87,34,0.18); color: #ff7043;
     border-color: rgba(255,87,34,0.40);
+  }
+  .d-warning-banner.highfreq {
+    background: rgba(255,214,0,0.12); color: #ffd54f;
+    border: 1px solid rgba(255,214,0,0.30);
   }
 
   /* 决策信号 v2 — card grid */
@@ -1797,18 +1809,24 @@ function renderDecisionView() {
   if (allSignals.length === 0) return;
   const nowMs = Date.now();
   const rows = buildDecisionView(allSignals, currentPrices, nowMs);
-  // P26-B: 24h 内同 symbol+方向 计数 (用于检测卡死)
+  // P26-B (FIXED): 真卡死 = 高频 + 24h 趋势反向; 仅高频但中性 = 高频提示, 不拦截
   const symDirCount = computeSymbolDirCount24h(allSignals, nowMs);
-  // 给每个 row 计算 occN24h + isStuck + isDivergent + symStats
   for (const r of rows) {
     const key = `${r.symbol}|${r.latest.direction}`;
     r.occN24h = symDirCount.get(key) || r.count;
-    r.isStuck = r.occN24h >= STUCK_24H_THRESHOLD;
+    const ch24 = priceChange24h[r.symbol];
+    const isLong = r.latest.direction === "LONG";
+    const trendAgainst = ch24 !== undefined && ch24 !== null && (
+      (isLong && ch24 <= -TREND_DIV_PCT) || (!isLong && ch24 >= TREND_DIV_PCT)
+    );
+    r.change24h = ch24;
+    r.isStuck = r.occN24h >= STUCK_THRESHOLD && trendAgainst;          // 真卡死 (双条件)
+    r.isHighFreq = r.occN24h >= STUCK_24H_THRESHOLD && !r.isStuck;      // 高频但中性 (软提示)
     r.isDivergent = r.state && r.state.state === "TREND_DIV";
     r.symStats = computeSymbolStats(r.symbol);
   }
 
-  // P26-E: 重新排序 — STUCK / DIVERGENT / 连败标的 直接降到末尾,绝不冒充候选
+  // P26-E: 排序 — 真卡死/趋势分歧/连败 → 高危末尾;高频但中性 → 不影响排序
   rows.sort((a, b) => {
     const aRisk = (a.isStuck ? 100 : 0) + (a.isDivergent ? 50 : 0) + (a.symStats?.isLoser ? 30 : 0);
     const bRisk = (b.isStuck ? 100 : 0) + (b.isDivergent ? 50 : 0) + (b.symStats?.isLoser ? 30 : 0);
@@ -1878,15 +1896,18 @@ function renderDecisionView() {
     // P26-C: 信心度胜率提示
     const winRateHint = confToWinRate(r.maxConf);
 
-    // P26-E: 高危卡片样式 + 警告横幅
+    // P26-E (FIXED): 真卡死/趋势分歧/连败 = 红橙横幅; 高频但中性 = 黄色软提示
     const cardCls = "d-card" + (r.isStuck ? " stuck" : "") + (r.isDivergent ? " divergent" : "");
-    const warningBanner = r.isStuck
-      ? `<div class="d-warning-banner">🚫 信号卡死: 24h 同向 ${r.occN24h} 次 — 模型反复判断错误,不建议入场</div>`
-      : (r.isDivergent
-          ? `<div class="d-warning-banner divergent">⚠️ 趋势分歧: bot 喊${dirLabel}但价格 ${r.state.change24h?.toFixed(2)}% — 不建议入场</div>`
-          : (r.symStats?.isLoser
-              ? `<div class="d-warning-banner divergent">⚠️ 7d 连败: ${r.symStats.wins}胜${r.symStats.losses}负 (${(r.symStats.winRate*100).toFixed(0)}%胜率) — 该标的近期模型不准</div>`
-              : ""));
+    let warningBanner = "";
+    if (r.isStuck) {
+      warningBanner = `<div class="d-warning-banner">🚫 信号卡死: 24h 同向 ${r.occN24h} 次 + 价格 ${r.change24h?.toFixed(2)}% 反向 — 模型方向错误,不建议入场</div>`;
+    } else if (r.isDivergent) {
+      warningBanner = `<div class="d-warning-banner divergent">⚠️ 趋势分歧: bot 喊${dirLabel}但价格 ${r.state.change24h?.toFixed(2)}% — 不建议入场</div>`;
+    } else if (r.symStats?.isLoser) {
+      warningBanner = `<div class="d-warning-banner divergent">⚠️ 7d 连败: ${r.symStats.wins}胜${r.symStats.losses}负 (${(r.symStats.winRate*100).toFixed(0)}%胜率) — 该标的近期模型不准</div>`;
+    } else if (r.isHighFreq) {
+      warningBanner = `<div class="d-warning-banner highfreq">🔁 高频信号: 24h 同向 ${r.occN24h} 次 (区间震荡) — 价格未明显反向,可视为合理 setup,但仓位建议减半</div>`;
+    }
 
     return `<div class="${cardCls}" style="border-color:${v.border}">
       <div class="d-card-header">
@@ -1992,15 +2013,22 @@ function computeSignalState(signal, currentPrice, nowMs) {
   return { state: "WAITING", distEntry, distSL, distTP };
 }
 
-// P26-B: 应用 STUCK 覆盖 — 当同标的同向重复 ≥ 阈值时,无论原 state 是什么都视为卡死
-function applyStuckOverride(state, occN) {
+// P26-B (FIXED): 真卡死 = 高频同向 + 24h 趋势反向 ≥3%
+// 高频但趋势中性 = 区间震荡的合理高频 setup,不应当卡死
+function applyStuckOverride(state, occN, change24h, direction) {
   if (!state) return state;
   const stuckTerminal = ["STOPPED", "HIT_TP", "EXPIRED"];
-  if (stuckTerminal.includes(state.state)) return state;  // 已结束的不覆盖
-  if (occN >= STUCK_THRESHOLD) {
-    return { ...state, state: "STUCK", stuckCount: occN };
+  if (stuckTerminal.includes(state.state)) return state;
+
+  if (occN >= STUCK_THRESHOLD && change24h !== undefined && change24h !== null) {
+    const isLong = direction === "LONG";
+    const trendAgainst = (isLong && change24h <= -TREND_DIV_PCT) ||
+                         (!isLong && change24h >= TREND_DIV_PCT);
+    if (trendAgainst) {
+      return { ...state, state: "STUCK", stuckCount: occN, change24h };
+    }
   }
-  return state;
+  return state;  // 高频但趋势顺/中性 → 不覆盖,保留原始 state
 }
 
 function stateBadge(stateObj) {
@@ -2272,10 +2300,11 @@ function renderTable() {
   const rowsWithState = rows.map(s => {
     const rawState = computeSignalState(s, currentPrices[s.symbol], nowMs);
     const occN24h = symDirCount.get(`${s.symbol}|${s.direction}`) || 0;
+    const ch24 = priceChange24h[s.symbol];
     return {
       s,
       a: analysesMap[s.ts] || {},
-      state: applyStuckOverride(rawState, occN24h),
+      state: applyStuckOverride(rawState, occN24h, ch24, s.direction),
       occN: occurrenceMapCache.get(s.ts) || 1,
       occN24h,
     };
@@ -2328,9 +2357,18 @@ function renderTable() {
         ${filtered.map(({ s, a, state, occN, occN24h }) => {
           const symStats = computeSymbolStats(s.symbol);
           const winRateHint = confToWinRate(s.confidence);
-          const stuckBadge = occN24h >= STUCK_24H_THRESHOLD
-            ? `<span class="stuck-badge" title="24h 内同向出现 ${occN24h} 次,模型可能卡死">🚫 卡死×${occN24h}</span>`
-            : "";
+          // P26-B (FIXED): 真卡死 = 高频 + 趋势反向; 仅高频但中性 = 黄色提示, 不阻止
+          const ch24 = priceChange24h[s.symbol];
+          const isLong = s.direction === "LONG";
+          const trendAgainst = ch24 !== undefined && ch24 !== null && (
+            (isLong && ch24 <= -TREND_DIV_PCT) || (!isLong && ch24 >= TREND_DIV_PCT)
+          );
+          let stuckBadge = "";
+          if (occN24h >= STUCK_THRESHOLD && trendAgainst) {
+            stuckBadge = `<span class="stuck-badge" title="同向${occN24h}次 + 24h ${ch24.toFixed(2)}% 反向 → 模型方向错误">🚫 卡死×${occN24h}</span>`;
+          } else if (occN24h >= STUCK_24H_THRESHOLD) {
+            stuckBadge = `<span class="freq-badge" title="24h 同向 ${occN24h} 次 (区间震荡的合理高频信号)">🔁 高频×${occN24h}</span>`;
+          }
           const loserBadge = symStats?.isLoser
             ? `<span class="loser-badge" title="近7d ${symStats.wins}胜${symStats.losses}负 (${(symStats.winRate*100).toFixed(0)}%胜率)">⚠️ 7d连败</span>`
             : "";
