@@ -1,13 +1,49 @@
 {
-  "updated_at": "2026-05-10T23:17:03.052290+00:00",
+  "updated_at": "2026-05-10T23:25:26.857944+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
     "price_move_pct": 0.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 5,
+  "alerts_count": 7,
   "alerts": [
+    {
+      "symbol": "WLDUSDT",
+      "base": "WLD",
+      "direction": "LONG",
+      "price": 0.2844,
+      "price_change_1m_pct": 0.887,
+      "volume_1m_usdt": 1174192.0,
+      "volume_30m_avg_usdt": 119327.0,
+      "volume_ratio": 9.84,
+      "detected_at": "2026-05-10T23:22:23.593911+00:00",
+      "intensity": 2
+    },
+    {
+      "symbol": "MUSDT",
+      "base": "M",
+      "direction": "SHORT",
+      "price": 3.2938,
+      "price_change_1m_pct": -0.917,
+      "volume_1m_usdt": 108619.0,
+      "volume_30m_avg_usdt": 4519.0,
+      "volume_ratio": 24.04,
+      "detected_at": "2026-05-10T23:20:44.522541+00:00",
+      "intensity": 2
+    },
+    {
+      "symbol": "VIRTUALUSDT",
+      "base": "VIRTUAL",
+      "direction": "SHORT",
+      "price": 0.9032,
+      "price_change_1m_pct": -1.019,
+      "volume_1m_usdt": 1847677.0,
+      "volume_30m_avg_usdt": 79588.0,
+      "volume_ratio": 23.22,
+      "detected_at": "2026-05-10T23:18:25.296625+00:00",
+      "intensity": 3
+    },
     {
       "symbol": "IOUSDT",
       "base": "IO",
@@ -54,18 +90,6 @@
       "volume_30m_avg_usdt": 19576.0,
       "volume_ratio": 12.24,
       "detected_at": "2026-05-10T22:35:10.386962+00:00",
-      "intensity": 3
-    },
-    {
-      "symbol": "SIRENUSDT",
-      "base": "SIREN",
-      "direction": "LONG",
-      "price": 1.1618,
-      "price_change_1m_pct": 1.591,
-      "volume_1m_usdt": 213621.0,
-      "volume_30m_avg_usdt": 17966.0,
-      "volume_ratio": 11.89,
-      "detected_at": "2026-05-10T22:24:55.898525+00:00",
       "intensity": 3
     }
   ]
