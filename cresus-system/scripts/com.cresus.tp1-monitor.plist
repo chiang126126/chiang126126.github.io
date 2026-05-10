@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.cresus.tp1-monitor</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/mangzi/cresus-bot/.venv/bin/python3</string>
+        <string>/Users/mangzi/cresus-bot/scripts/tp1_breakeven_monitor.py</string>
+    </array>
+
+    <key>StartInterval</key>
+    <integer>60</integer>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/mangzi/cresus-bot/logs/tp1_monitor.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/mangzi/cresus-bot/logs/tp1_monitor.log</string>
+</dict>
+</plist>

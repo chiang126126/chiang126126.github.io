@@ -416,6 +416,18 @@
   .sig-badge.loser { background: rgba(255,152,0,0.18); color: #ff9800; border-color: rgba(255,152,0,0.35); }
   .sig-badge.freq  { background: rgba(255,214,0,0.14); color: #ffd54f; border-color: rgba(255,214,0,0.30); }
   .sig-badge.first { background: rgba(0,200,83,0.16);  color: #00e676; border-color: rgba(0,200,83,0.32); }
+
+  /* P29 共振强度 — 强共振绿色, 弱共振警告 */
+  .conf-badge {
+    display: inline-block; margin-left: 5px;
+    padding: 1px 6px; border-radius: 4px;
+    font-size: 9.5px; font-weight: 700;
+    letter-spacing: 0.2px;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+  .conf-badge.strong { background: rgba(0,200,83,0.16);  color: #00e676; border-color: rgba(0,200,83,0.32); }
+  .conf-badge.weak   { background: rgba(255,152,0,0.18); color: #ff9800; border-color: rgba(255,152,0,0.40); }
   /* P26-E: 决策卡 高危样式 */
   .d-card.divergent {
     border-color: #ff5722 !important;
@@ -768,6 +780,86 @@
     .macro-event-row.tier-INFO { display: none; }
   }
 
+  /* ========== ⚡ 量能加速度雷达 panel (P27-X) — 闪电黄+暗背景 ========== */
+  .velocity-panel {
+    background: linear-gradient(135deg, #1f1808 0%, #0a0805 100%);
+    border: 1px solid rgba(255,193,7,0.22);
+    overflow: hidden; position: relative;
+  }
+  .velocity-panel::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 50%;
+    background: radial-gradient(ellipse at top, rgba(255,193,7,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .velocity-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 20px; border-bottom: 1px solid rgba(255,193,7,0.18);
+    background: linear-gradient(90deg, rgba(255,193,7,0.10) 0%, transparent 100%);
+    position: relative; z-index: 1;
+  }
+  .velocity-title-row { display: flex; align-items: center; gap: 10px; }
+  .velocity-brand {
+    font-weight: 800; font-size: 15px; letter-spacing: 0.4px;
+    background: linear-gradient(90deg, #ffd54f, #ff9800);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .velocity-stat-pill {
+    padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 700;
+    background: rgba(255,193,7,0.18); color: #ffd54f;
+    border: 1px solid rgba(255,193,7,0.28);
+  }
+  .velocity-meta { color: #a8957a; font-size: 11px; }
+  .velocity-body { padding: 14px 20px; position: relative; z-index: 1; }
+
+  .velocity-row {
+    display: grid;
+    grid-template-columns: 32px 1fr 90px 90px 100px 110px;
+    gap: 10px; align-items: center;
+    padding: 8px 12px; margin-bottom: 6px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.02);
+    border-left: 3px solid;
+    font-size: 12px;
+  }
+  .velocity-row.dir-LONG  { border-left-color: #00c853; }
+  .velocity-row.dir-SHORT { border-left-color: #ff1744; }
+  .velocity-rank {
+    text-align: center; font-size: 14px;
+    filter: drop-shadow(0 0 4px rgba(255,193,7,0.6));
+  }
+  .velocity-symbol { font-weight: 700; color: var(--text); }
+  .velocity-dir-badge {
+    font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 700;
+    text-align: center;
+  }
+  .velocity-dir-badge.LONG  { background: rgba(0,200,83,0.16); color: #00e676; }
+  .velocity-dir-badge.SHORT { background: rgba(255,23,68,0.16); color: #ff5252; }
+  .velocity-pct {
+    font-weight: 700; font-variant-numeric: tabular-nums; text-align: right;
+  }
+  .velocity-pct.up   { color: #00e676; }
+  .velocity-pct.down { color: #ff5252; }
+  .velocity-vol-ratio {
+    font-weight: 700; color: #ffd54f;
+    font-variant-numeric: tabular-nums; text-align: right;
+  }
+  .velocity-when { font-size: 10px; color: var(--text-dim); text-align: right; }
+
+  .velocity-empty {
+    padding: 24px; text-align: center; color: var(--text-dim);
+    font-size: 12px;
+  }
+
+  @media (max-width: 720px) {
+    .velocity-row {
+      grid-template-columns: 24px 1fr 70px 80px;
+      gap: 6px; padding: 6px 8px; font-size: 11px;
+    }
+    .velocity-row > :nth-child(5),
+    .velocity-row > :nth-child(6) { display: none; }
+    .velocity-brand { font-size: 13px; }
+  }
+
   /* ========== 🔮 预兆雷达 panel (P23) — 深紫夜空风 ========== */
   .precog-panel {
     background: linear-gradient(135deg, #15102b 0%, #0c081f 100%);
@@ -1010,6 +1102,18 @@
       <div class="macro-section-label">即将发生的高影响事件</div>
       <div class="macro-event-list" id="macro-upcoming-list"></div>
     </div>
+  </div>
+
+  <!-- P27-X: ⚡ 量能加速度雷达 panel — 早期信号 (1m 量爆 + 价动) -->
+  <div class="panel velocity-panel" id="velocity-panel" style="display:none">
+    <div class="velocity-header">
+      <div class="velocity-title-row">
+        <span class="velocity-brand">⚡ 量能加速度雷达</span>
+        <span class="velocity-stat-pill" id="velocity-stat-pill">—</span>
+      </div>
+      <span class="velocity-meta" id="velocity-meta">—</span>
+    </div>
+    <div class="velocity-body" id="velocity-body"></div>
   </div>
 
   <!-- P23: 🔮 预兆雷达 panel — AI-powered breakout predictor -->
@@ -1386,6 +1490,61 @@ function renderMacroPanel() {
   }
 }
 // ==================== P21 end ====================
+
+// ==================== P27-X: ⚡ 量能加速度雷达 ====================
+let velocityData = null;
+
+async function loadVelocityRadar() {
+  try {
+    const res = await fetch("./volume_velocity_alerts.json?_=" + Date.now());
+    if (!res.ok) return;
+    velocityData = await res.json();
+    renderVelocityPanel();
+  } catch (e) {
+    console.warn("[velocity] load failed:", e);
+  }
+}
+
+function renderVelocityPanel() {
+  if (!velocityData) return;
+  document.getElementById("velocity-panel").style.display = "";
+
+  const alerts = velocityData.alerts || [];
+  const upd = new Date(velocityData.updated_at);
+  const ageMin = Math.floor((Date.now() - upd.getTime()) / 60_000);
+
+  document.getElementById("velocity-stat-pill").textContent =
+    `${alerts.length} 个量价共振 · 近 60min`;
+  const t = velocityData.thresholds || {};
+  document.getElementById("velocity-meta").textContent =
+    `${ageMin}m 前刷新 · 触发: 1m 量 ≥${t.volume_burst_ratio || 5}x均 + 价 ≥${(t.price_move_pct||0.5).toFixed(1)}%`;
+
+  const body = document.getElementById("velocity-body");
+  if (alerts.length === 0) {
+    body.innerHTML = '<div class="velocity-empty">最近 60min 无量价共振信号</div>';
+    return;
+  }
+
+  const fireFor = (n) => "⚡".repeat(Math.max(1, n));
+  body.innerHTML = alerts.slice(0, 15).map(a => {
+    const dir = a.direction;
+    const isUp = dir === "LONG";
+    const cls = isUp ? "up" : "down";
+    const pctSign = a.price_change_1m_pct >= 0 ? "+" : "";
+    const detected = new Date(a.detected_at);
+    const ageM = Math.floor((Date.now() - detected.getTime()) / 60_000);
+    const whenStr = ageM < 1 ? "刚刚" : `${ageM}m前`;
+    return `<div class="velocity-row dir-${dir}">
+      <span class="velocity-rank">${fireFor(a.intensity || 1)}</span>
+      <span class="velocity-symbol">${escapeHtml(a.symbol)}</span>
+      <span class="velocity-dir-badge ${dir}">${isUp ? "做多机会" : "做空机会"}</span>
+      <span class="velocity-pct ${cls}">${pctSign}${a.price_change_1m_pct.toFixed(2)}%</span>
+      <span class="velocity-vol-ratio">${a.volume_ratio.toFixed(1)}x 量</span>
+      <span class="velocity-when">${whenStr}</span>
+    </div>`;
+  }).join("");
+}
+// ==================== P27-X end ====================
 
 // ==================== P23: 🔮 预兆雷达 ====================
 let precogData = null;
@@ -2138,6 +2297,27 @@ function signalQualityBadge(symbol, direction, ts, occN24h, change24h, symStats)
   // 普通: 无标签
   return "";
 }
+
+// P29: 共振强度徽章 — 用 anomaly 数组长度作为"独立指标共振数"代理
+// 高 conf 但只有 1-2 个指标支撑 = 危险信号 (典型 FILUSDT 类陷阱)
+function confluenceBadge(signal) {
+  const anomalies = signal.anomaly || [];
+  const n = anomalies.length;
+  const conf = signal.confidence || 0;
+  if (n === 0) return "";
+  // 危险: 高 conf 但弱支撑
+  if (conf >= 70 && n <= 1) {
+    const tip = `⚠️ 高 conf=${conf} 但仅 ${n} 个指标支撑: ${anomalies.join(', ')}`;
+    return `<span class="conf-badge weak" title="${escapeHtml(tip)}">⚠️ 弱共振×${n}</span>`;
+  }
+  // 强: 4+ 个独立指标
+  if (n >= 4) {
+    const tip = `${n} 个独立指标共振: ${anomalies.join(', ')}`;
+    return `<span class="conf-badge strong" title="${escapeHtml(tip)}">🎯 强共振×${n}</span>`;
+  }
+  // 中等: 2-3 个指标 (默认不显示徽章, 干净)
+  return "";
+}
 // ==================== P19 end ====================
 
 async function loadAnalyses() {
@@ -2377,7 +2557,7 @@ function renderTable() {
           return `
           <tr>
             <td>${formatTime(s.ts)}</td>
-            <td><strong>${s.symbol || "—"}</strong>${qualityBadge}</td>
+            <td><strong>${s.symbol || "—"}</strong>${qualityBadge}${confluenceBadge(s)}</td>
             <td><span class="badge ${s.direction}">${DIR_CN[s.direction] || s.direction}</span></td>
             <td><span class="conf" title="${winRateHint || ''}">${s.confidence || "—"}</span></td>
             <td>${stateBadge(state)}</td>
@@ -2777,7 +2957,7 @@ async function manualRefresh() {
   const btn = document.getElementById("refresh-btn");
   btn.classList.add("spinning");
   try {
-    await Promise.all([loadSignals(), loadPnL(), loadPrices(), loadPriceChange24h(), loadRegime(), loadRegimeHistory(), loadMacroEvents(), loadPrecogRadar()]);
+    await Promise.all([loadSignals(), loadPnL(), loadPrices(), loadPriceChange24h(), loadRegime(), loadRegimeHistory(), loadMacroEvents(), loadPrecogRadar(), loadVelocityRadar()]);
   } finally {
     setTimeout(() => btn.classList.remove("spinning"), 300);
   }
@@ -2810,6 +2990,8 @@ setInterval(loadRegimeHistory, 5 * 60_000);
 setInterval(loadMacroEvents, 60_000);          // P21: 每分钟重渲染（事件本身每小时刷新一次）
 setInterval(renderMacroPanel, 30_000);         // P21: 倒计时仅本地重算，30s 一次
 setInterval(loadPrecogRadar, 5 * 60_000);      // P23: 预兆雷达 5min 刷新
+loadVelocityRadar();
+setInterval(loadVelocityRadar, 60_000);        // P27-X: 量能加速度 1min 刷新 (高时效)
 </script>
 </body>
 </html>
