@@ -57,28 +57,78 @@
   #history-panel         { order: 33; }
   #struct-dist-panel     { order: 34; }
   #histogram-panel       { order: 35; }
-  /* 三个分区标记 (会被 order 重排到对应 panel 前) */
+  /* P30 分区标题卡片 — 醒目大字号 + 编号方块 + 强色彩 */
   .section-marker {
-    margin: 14px 0 4px;
-    padding: 8px 14px;
-    border-radius: 8px;
-    font-size: 13px; font-weight: 700;
-    color: var(--text);
-    letter-spacing: 0.6px;
-    background: linear-gradient(90deg, rgba(155,109,255,0.10), transparent 60%);
-    border-left: 3px solid;
+    margin: 26px 0 14px;
+    padding: 18px 22px;
+    border-radius: 14px;
+    display: flex; align-items: center; gap: 16px;
+    border-left: 5px solid;
+    position: relative;
+    box-shadow: 0 2px 18px rgba(0,0,0,0.18);
   }
-  .section-marker .marker-sub {
-    font-weight: 400; font-size: 11px;
-    color: var(--text-dim); margin-left: 6px;
-    letter-spacing: 0.3px;
+  .section-number {
+    flex-shrink: 0;
+    width: 48px; height: 48px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 800;
+    border-radius: 12px;
+    color: #fff;
+    letter-spacing: 0;
+    font-variant-numeric: tabular-nums;
   }
-  .section-marker.macro       { order: 9;  border-left-color: #40a9ff; }   /* 🌍 宏观 → blue */
-  .section-marker.opportunity { order: 19; border-left-color: #b37feb; }   /* 💡 机会 → purple */
-  .section-marker.my-trades   { order: 29; border-left-color: #00c853; }   /* 📊 我的 → green */
+  .section-title { display: flex; flex-direction: column; gap: 2px; }
+  .section-title-main {
+    font-size: 19px; font-weight: 800;
+    letter-spacing: 0.6px; line-height: 1.2;
+  }
+  .section-title-sub {
+    font-size: 12.5px; color: var(--text-dim);
+    font-weight: 500; letter-spacing: 0.3px;
+  }
+
+  /* 🌍 宏观 — 冰蓝 */
+  .section-marker.macro {
+    order: 9;
+    background: linear-gradient(135deg, rgba(64,169,255,0.18) 0%, rgba(64,169,255,0.04) 100%);
+    border-left-color: #40a9ff;
+  }
+  .section-marker.macro .section-number {
+    background: linear-gradient(135deg, #40a9ff, #1890ff);
+    box-shadow: 0 0 14px rgba(64,169,255,0.40);
+  }
+  .section-marker.macro .section-title-main { color: #bae0ff; }
+
+  /* 💡 机会 — 紫罗兰 */
+  .section-marker.opportunity {
+    order: 19;
+    background: linear-gradient(135deg, rgba(179,127,235,0.18) 0%, rgba(179,127,235,0.04) 100%);
+    border-left-color: #b37feb;
+  }
+  .section-marker.opportunity .section-number {
+    background: linear-gradient(135deg, #b37feb, #9254de);
+    box-shadow: 0 0 14px rgba(179,127,235,0.40);
+  }
+  .section-marker.opportunity .section-title-main { color: #efdbff; }
+
+  /* 📊 我的 — 翠绿 */
+  .section-marker.my-trades {
+    order: 29;
+    background: linear-gradient(135deg, rgba(0,200,83,0.18) 0%, rgba(0,200,83,0.04) 100%);
+    border-left-color: #00c853;
+  }
+  .section-marker.my-trades .section-number {
+    background: linear-gradient(135deg, #00e676, #00c853);
+    box-shadow: 0 0 14px rgba(0,200,83,0.40);
+    color: #003a16;
+  }
+  .section-marker.my-trades .section-title-main { color: #b7eb8f; }
+
   @media (max-width: 720px) {
-    .section-marker { font-size: 12px; padding: 6px 12px; margin: 10px 0 2px; }
-    .section-marker .marker-sub { display: block; margin-left: 0; margin-top: 2px; font-size: 10px; }
+    .section-marker { padding: 12px 14px; gap: 12px; margin: 18px 0 8px; border-radius: 12px; }
+    .section-number { width: 38px; height: 38px; font-size: 16px; border-radius: 10px; }
+    .section-title-main { font-size: 15px; letter-spacing: 0.4px; }
+    .section-title-sub { font-size: 11px; }
   }
 
   .stats {
@@ -1231,10 +1281,28 @@
 </header>
 
 <main>
-  <!-- P30 三层信息架构标记 (用 CSS order 重排到对应 panel 前) -->
-  <div class="section-marker macro">🌍 宏观环境<span class="marker-sub">看市场,识风险</span></div>
-  <div class="section-marker opportunity">💡 交易机会<span class="marker-sub">AI 选标的,辅助决策</span></div>
-  <div class="section-marker my-trades">📊 我的交易<span class="marker-sub">绩效,持仓,信号源</span></div>
+  <!-- P30 三层信息架构 (CSS order 重排到对应 panel 前) -->
+  <div class="section-marker macro">
+    <span class="section-number">01</span>
+    <div class="section-title">
+      <span class="section-title-main">🌍 宏观环境</span>
+      <span class="section-title-sub">看市场,识风险</span>
+    </div>
+  </div>
+  <div class="section-marker opportunity">
+    <span class="section-number">02</span>
+    <div class="section-title">
+      <span class="section-title-main">💡 交易机会</span>
+      <span class="section-title-sub">AI 选标的,辅助决策</span>
+    </div>
+  </div>
+  <div class="section-marker my-trades">
+    <span class="section-number">03</span>
+    <div class="section-title">
+      <span class="section-title-main">📊 我的交易</span>
+      <span class="section-title-sub">绩效,持仓,信号源</span>
+    </div>
+  </div>
 
   <!-- P21: 宏观事件窗口 panel (FOMC / CPI 类事件黑名单) -->
   <div class="panel macro-panel" id="macro-panel" style="display:none">
