@@ -590,11 +590,14 @@
     border: 1px solid rgba(255,214,0,0.30);
   }
 
-  /* 决策信号 v2 — card grid */
+  /* 决策信号 v2 — card grid: 桌面强制每行 5 个 */
   .d-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    grid-template-columns: repeat(5, 1fr);
     gap: 14px;
+  }
+  @media (max-width: 1080px) {
+    .d-grid { grid-template-columns: repeat(3, 1fr); }
   }
   .d-card {
     background: rgba(10,15,26,0.7);
@@ -705,10 +708,17 @@
     transition: background 0.15s;
   }
   .d-show-more:hover { background: rgba(33,150,243,0.10); }
+  /* 桌面: 默认折叠 11 张以后,2 行 ×5 已够看 */
+  .d-grid.collapsed > .d-card:nth-child(n+11) { display: none; }
+  .d-grid.collapsed ~ .d-show-more { display: block; }
+  .d-grid.expanded  ~ .d-show-more { display: none; }
+  /* 桌面 ≤10 张时不需要按钮 */
+  @media (min-width: 721px) {
+    .d-grid:not(:has(.d-card:nth-child(11))) ~ .d-show-more { display: none; }
+  }
+  /* 手机端折叠仍然 6 张 */
   @media (max-width: 720px) {
-    .d-show-more { display: block; }
     .d-grid.collapsed > .d-card:nth-child(n+7) { display: none; }
-    .d-grid.expanded ~ .d-show-more { display: none; }
   }
 
   .struct-row {
@@ -2320,7 +2330,7 @@ function buildDecisionView(signals, currentPrices, nowMs) {
 function renderDecisionView() {
   if (allSignals.length === 0) return;
   const nowMs = Date.now();
-  const rows = buildDecisionView(allSignals, currentPrices, nowMs);
+  let rows = buildDecisionView(allSignals, currentPrices, nowMs);
   // P26-B (FIXED): 真卡死 = 高频 + 24h 趋势反向; 仅高频但中性 = 高频提示, 不拦截
   const symDirCount = computeSymbolDirCount24h(allSignals, nowMs);
   for (const r of rows) {
@@ -2336,24 +2346,27 @@ function renderDecisionView() {
     r.isHighFreq = r.occN24h >= STUCK_24H_THRESHOLD && !r.isStuck;      // 高频但中性 (软提示)
     r.isDivergent = r.state && r.state.state === "TREND_DIV";
     r.symStats = computeSymbolStats(r.symbol);
+    r.verdict   = unifiedVerdict(r.state, r.maxConf);
   }
 
-  // P26-E: 排序 — 真卡死/趋势分歧/连败 → 高危末尾;高频但中性 → 不影响排序
+  // 隐藏: 1) 该标的近期模型不准 (7d 连败) 2) "— 无状态" 卡片 (priority 8)
+  const hiddenCount = rows.filter(r => r.symStats?.isLoser || r.verdict.priority === 8).length;
+  rows = rows.filter(r => !r.symStats?.isLoser && r.verdict.priority !== 8);
+
+  // P26-E: 排序 — 真卡死/趋势分歧 → 高危末尾;高频但中性 → 不影响排序
   rows.sort((a, b) => {
-    const aRisk = (a.isStuck ? 100 : 0) + (a.isDivergent ? 50 : 0) + (a.symStats?.isLoser ? 30 : 0);
-    const bRisk = (b.isStuck ? 100 : 0) + (b.isDivergent ? 50 : 0) + (b.symStats?.isLoser ? 30 : 0);
+    const aRisk = (a.isStuck ? 100 : 0) + (a.isDivergent ? 50 : 0);
+    const bRisk = (b.isStuck ? 100 : 0) + (b.isDivergent ? 50 : 0);
     if (aRisk !== bRisk) return aRisk - bRisk;
-    const va = unifiedVerdict(a.state, a.maxConf);
-    const vb = unifiedVerdict(b.state, b.maxConf);
-    if (va.priority !== vb.priority) return va.priority - vb.priority;
+    if (a.verdict.priority !== b.verdict.priority) return a.verdict.priority - b.verdict.priority;
     return b.maxConf - a.maxConf;
   });
 
-  const actionable = rows.filter(r => !r.isStuck && !r.isDivergent && !r.symStats?.isLoser
-    && unifiedVerdict(r.state, r.maxConf).priority <= 4);
-  const blocked = rows.filter(r => r.isStuck || r.isDivergent || r.symStats?.isLoser);
+  const actionable = rows.filter(r => !r.isStuck && !r.isDivergent && r.verdict.priority <= 4);
+  const blocked = rows.filter(r => r.isStuck || r.isDivergent);
+  const hiddenNote = hiddenCount > 0 ? ` · 已隐藏 ${hiddenCount} 个 (连败/无状态)` : "";
   document.getElementById("decision-meta").textContent =
-    `${actionable.length} 个活跃 · ${blocked.length} 个高危拦截 · ${rows.length} 个候选 · 24h 聚合`;
+    `${actionable.length} 个活跃 · ${blocked.length} 个高危拦截 · ${rows.length} 个候选${hiddenNote} · 24h 聚合`;
 
   if (rows.length === 0) {
     document.getElementById("decision-table").innerHTML =
@@ -2887,6 +2900,12 @@ function renderTable() {
     return;
   }
 
+  // 默认只展开最近 6h,更老的折叠
+  const RECENT_WINDOW_H = 6;
+  const cutoff = nowMs - RECENT_WINDOW_H * 3600_000;
+  const recentRows = filtered.filter(r => new Date(r.s.ts).getTime() >= cutoff);
+  const olderRows  = filtered.filter(r => new Date(r.s.ts).getTime() <  cutoff);
+
   const priceAge = pricesLastUpdated ? Math.round((Date.now() - pricesLastUpdated) / 1000) : null;
   const priceMeta = priceAge != null
     ? `<span style="color:var(--text-dim);font-size:11px;margin-left:8px;">现价更新 ${priceAge}s 前</span>`
@@ -2913,33 +2932,59 @@ function renderTable() {
         </tr>
       </thead>
       <tbody>
-        ${filtered.map(({ s, a, state, occN, occN24h }) => {
-          const symStats = computeSymbolStats(s.symbol);
-          const winRateHint = confToWinRate(s.confidence);
-          const ch24 = priceChange24h[s.symbol];
-          // P26 (统一版): 单徽章决策, 替代之前的 3 个独立徽章
-          const qualityBadge = signalQualityBadge(s.symbol, s.direction, s.ts, occN24h, ch24, symStats);
-          return `
-          <tr>
-            <td>${formatTime(s.ts)}</td>
-            <td><strong>${s.symbol || "—"}</strong>${qualityBadge}${confluenceBadge(s)}</td>
-            <td><span class="badge ${s.direction}">${DIR_CN[s.direction] || s.direction}</span></td>
-            <td><span class="conf" title="${winRateHint || ''}">${s.confidence || "—"}</span></td>
-            <td>${stateBadge(state)}</td>
-            <td>${riskBadge(a.risk_level)}</td>
-            <td>${matchBadge(a.structure_match)}</td>
-            <td>${s.leverage ? s.leverage + "×" : "—"}</td>
-            <td>${priceWithDist(s.entry_price, state.distEntry)}</td>
-            <td>${priceWithDist(s.stop_loss, state.distSL)}</td>
-            <td>${formatTPWithDist(s.take_profit, state.distTP)}</td>
-            <td>${s.structure || a.structure_judge || "—"}</td>
-            <td>${s.routed_to || "—"}</td>
-          </tr>`;
-        }).join("")}
+        ${recentRows.length > 0
+          ? recentRows.map(rowHtmlForSignal).join("")
+          : `<tr><td colspan="13" style="text-align:center;color:var(--text-dim);padding:18px">最近 ${RECENT_WINDOW_H}h 暂无信号</td></tr>`}
       </tbody>
+      ${olderRows.length > 0 ? `
+        <tbody id="signals-older" style="display:none">
+          ${olderRows.map(rowHtmlForSignal).join("")}
+        </tbody>
+      ` : ""}
     </table>
+    ${olderRows.length > 0 ? `
+      <div class="history-toggle" id="signals-older-toggle">
+        ▼ 展开 6h 之前的 ${olderRows.length} 条
+      </div>
+    ` : ""}
   `;
   document.getElementById("table-wrap").innerHTML = html;
+
+  const olderToggle = document.getElementById("signals-older-toggle");
+  if (olderToggle) {
+    olderToggle.addEventListener("click", () => {
+      const older = document.getElementById("signals-older");
+      const isHidden = older.style.display === "none";
+      older.style.display = isHidden ? "" : "none";
+      olderToggle.innerHTML = isHidden
+        ? `▲ 收起 (仅显示最近 ${RECENT_WINDOW_H}h)`
+        : `▼ 展开 6h 之前的 ${olderRows.length} 条`;
+    });
+  }
+}
+
+function rowHtmlForSignal({ s, a, state, occN, occN24h }) {
+  const symStats = computeSymbolStats(s.symbol);
+  const winRateHint = confToWinRate(s.confidence);
+  const ch24 = priceChange24h[s.symbol];
+  // P26 (统一版): 单徽章决策, 替代之前的 3 个独立徽章
+  const qualityBadge = signalQualityBadge(s.symbol, s.direction, s.ts, occN24h, ch24, symStats);
+  return `
+    <tr>
+      <td>${formatTime(s.ts)}</td>
+      <td><strong>${s.symbol || "—"}</strong>${qualityBadge}${confluenceBadge(s)}</td>
+      <td><span class="badge ${s.direction}">${DIR_CN[s.direction] || s.direction}</span></td>
+      <td><span class="conf" title="${winRateHint || ''}">${s.confidence || "—"}</span></td>
+      <td>${stateBadge(state)}</td>
+      <td>${riskBadge(a.risk_level)}</td>
+      <td>${matchBadge(a.structure_match)}</td>
+      <td>${s.leverage ? s.leverage + "×" : "—"}</td>
+      <td>${priceWithDist(s.entry_price, state.distEntry)}</td>
+      <td>${priceWithDist(s.stop_loss, state.distSL)}</td>
+      <td>${formatTPWithDist(s.take_profit, state.distTP)}</td>
+      <td>${s.structure || a.structure_judge || "—"}</td>
+      <td>${s.routed_to || "—"}</td>
+    </tr>`;
 }
 
 function formatTime(ts) {
