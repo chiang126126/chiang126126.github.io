@@ -1525,8 +1525,24 @@ function renderVelocityPanel() {
     return;
   }
 
+  // 检测全市场事件
+  const longN  = alerts.filter(a => a.direction === "LONG").length;
+  const shortN = alerts.filter(a => a.direction === "SHORT").length;
+  let marketBanner = "";
+  if (shortN >= 30) {
+    marketBanner = `<div class="velocity-empty" style="color:#ff5252;background:rgba(255,23,68,0.08);border:1px dashed rgba(255,23,68,0.3);border-radius:8px;margin-bottom:10px;padding:10px;font-weight:700">🌊 全市场下跌事件 (${shortN} 个 SHORT 报警) — 市场级,非个股 alpha,谨慎做多</div>`;
+  } else if (longN >= 30) {
+    marketBanner = `<div class="velocity-empty" style="color:#00e676;background:rgba(0,200,83,0.08);border:1px dashed rgba(0,200,83,0.3);border-radius:8px;margin-bottom:10px;padding:10px;font-weight:700">🌊 全市场上涨事件 (${longN} 个 LONG 报警) — 市场级,非个股 alpha,可顺势但不追高</div>`;
+  }
+
+  // 按 intensity × |price_change| 降序,优先显示最强的
+  const sorted = alerts.slice().sort((a, b) =>
+    (b.intensity * Math.abs(b.price_change_1m_pct)) -
+    (a.intensity * Math.abs(a.price_change_1m_pct))
+  );
+
   const fireFor = (n) => "⚡".repeat(Math.max(1, n));
-  body.innerHTML = alerts.slice(0, 15).map(a => {
+  body.innerHTML = marketBanner + sorted.slice(0, 15).map(a => {
     const dir = a.direction;
     const isUp = dir === "LONG";
     const cls = isUp ? "up" : "down";
