@@ -36,7 +36,50 @@
   }
   header h1 { margin: 0; font-size: 22px; font-weight: 600; }
   header .meta { color: var(--text-dim); font-size: 13px; }
-  main { padding: 24px 32px 64px; max-width: 1280px; margin: 0 auto; }
+  main {
+    padding: 24px 32px 64px; max-width: 1280px; margin: 0 auto;
+    display: flex; flex-direction: column;
+  }
+
+  /* P30 看板信息架构 — 三层结构: 宏观 → 机会 → 我的交易 */
+  /* 第 1 层 (宏观环境): 现在什么市场? 有大事件吗? 市场刚发生什么? */
+  #regime-panel          { order: 10; }
+  #macro-panel           { order: 11; }
+  #velocity-panel        { order: 12; }
+  /* 第 2 层 (交易机会): AI 推荐谁? 24h 谁该考虑? 详细信号? */
+  #precog-panel          { order: 20; }
+  #decision-panel        { order: 21; }
+  #recent-signals-panel  { order: 22; }
+  /* 第 3 层 (我的交易): 我赚多少? 持仓状态? 信号结构分布? */
+  #stats                 { order: 30; }
+  #pnl-panel             { order: 31; }
+  #positions-panel       { order: 32; }
+  #history-panel         { order: 33; }
+  #struct-dist-panel     { order: 34; }
+  #histogram-panel       { order: 35; }
+  /* 三个分区标记 (会被 order 重排到对应 panel 前) */
+  .section-marker {
+    margin: 14px 0 4px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px; font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.6px;
+    background: linear-gradient(90deg, rgba(155,109,255,0.10), transparent 60%);
+    border-left: 3px solid;
+  }
+  .section-marker .marker-sub {
+    font-weight: 400; font-size: 11px;
+    color: var(--text-dim); margin-left: 6px;
+    letter-spacing: 0.3px;
+  }
+  .section-marker.macro       { order: 9;  border-left-color: #40a9ff; }   /* 🌍 宏观 → blue */
+  .section-marker.opportunity { order: 19; border-left-color: #b37feb; }   /* 💡 机会 → purple */
+  .section-marker.my-trades   { order: 29; border-left-color: #00c853; }   /* 📊 我的 → green */
+  @media (max-width: 720px) {
+    .section-marker { font-size: 12px; padding: 6px 12px; margin: 10px 0 2px; }
+    .section-marker .marker-sub { display: block; margin-left: 0; margin-top: 2px; font-size: 10px; }
+  }
 
   .stats {
     display: grid;
@@ -649,6 +692,23 @@
     th, td { padding: 8px 10px; font-size: 12px; }
     table { min-width: 720px; }
 
+    /* P29 fix: 手机端 symbol 单元格让徽章换行,防止列被撑爆遮挡其他列 */
+    #table-wrap table td:nth-child(2) {
+      min-width: 110px !important;
+      max-width: 130px;
+      white-space: normal !important;
+      line-height: 1.3;
+    }
+    #table-wrap table td:nth-child(2) strong { display: block; }
+    #table-wrap table td:nth-child(2) .sig-badge,
+    #table-wrap table td:nth-child(2) .conf-badge {
+      display: inline-block;
+      margin-top: 3px;
+      margin-left: 0;
+      font-size: 9px;
+      padding: 1px 4px;
+    }
+
     /* === 结构分布: 2 行紧凑布局, 隐藏次要列 === */
     .struct-row {
       grid-template-columns: 26px 1fr 50px;
@@ -771,7 +831,7 @@
     .macro-stat-value-en { font-size: 9px; }
     .macro-section-label { font-size: 10px; margin: 6px 0; }
     .macro-event-row { grid-template-columns: 38px 1fr auto; gap: 6px; padding: 6px 8px; font-size: 11px; }
-    .macro-event-row > :nth-child(4) { display: none; }       /* 隐藏国家代码 */
+    .macro-event-row > :nth-child(3) { display: none; }       /* 隐藏国家代码,保留时间 (重要) */
     .macro-tier-badge { font-size: 9px; padding: 1px 4px; }
     .macro-event-title { font-size: 12px; }
     .macro-event-title-en { font-size: 9px; }
@@ -1138,6 +1198,11 @@
 </header>
 
 <main>
+  <!-- P30 三层信息架构标记 (用 CSS order 重排到对应 panel 前) -->
+  <div class="section-marker macro">🌍 宏观环境<span class="marker-sub">看市场,识风险</span></div>
+  <div class="section-marker opportunity">💡 交易机会<span class="marker-sub">AI 选标的,辅助决策</span></div>
+  <div class="section-marker my-trades">📊 我的交易<span class="marker-sub">绩效,持仓,信号源</span></div>
+
   <!-- P21: 宏观事件窗口 panel (FOMC / CPI 类事件黑名单) -->
   <div class="panel macro-panel" id="macro-panel" style="display:none">
     <div class="macro-header">
@@ -1255,7 +1320,7 @@
 
   <div class="stats" id="stats"></div>
 
-  <div class="panel">
+  <div class="panel" id="pnl-panel">
     <h2>💰 P&amp;L 追踪 <span class="meta-inline" id="pnl-updated">数据加载中…</span></h2>
     <div class="panel-body">
       <div class="pnl-stats" id="pnl-stats">
@@ -1277,14 +1342,14 @@
     <div id="history-table"></div>
   </div>
 
-  <div class="panel">
+  <div class="panel" id="struct-dist-panel">
     <h2>🗂 结构分布 <span class="meta-inline">A·OI 积累多 / B·资金费反转空 / C·V4A-Flash 空 / D·分布出货空 / E·强控盘 / F·财库 BTC / G·盘前套利 / H·新闻</span></h2>
     <div class="panel-body">
       <div id="structure-grid"></div>
     </div>
   </div>
 
-  <div class="panel">
+  <div class="panel" id="histogram-panel">
     <h2>📊 每日信号数量</h2>
     <div class="panel-body">
       <div class="histogram" id="histogram"></div>
@@ -1292,14 +1357,14 @@
     </div>
   </div>
 
-  <div class="panel">
+  <div class="panel" id="decision-panel">
     <h2>🎯 决策信号 <span class="meta-inline" id="decision-meta">—</span></h2>
     <div class="panel-body">
       <div id="decision-table"><div class="empty">加载中…</div></div>
     </div>
   </div>
 
-  <div class="panel">
+  <div class="panel" id="recent-signals-panel">
     <h2>📋 最近信号</h2>
     <div class="filters">
       <button data-dir="ALL" class="active">全部</button>
