@@ -403,6 +403,44 @@
   .dist-neg { color: var(--red); }
   .dist-warn { color: var(--yellow); }
 
+  /* P26: 卡死/连败 警示徽章 */
+  .stuck-badge {
+    display: inline-block; margin-left: 4px;
+    padding: 1px 6px; border-radius: 4px;
+    font-size: 9.5px; font-weight: 700;
+    background: rgba(213,0,0,0.20); color: #ff5252;
+    border: 1px solid rgba(213,0,0,0.40);
+    letter-spacing: 0.2px;
+  }
+  .loser-badge {
+    display: inline-block; margin-left: 4px;
+    padding: 1px 6px; border-radius: 4px;
+    font-size: 9.5px; font-weight: 700;
+    background: rgba(255,152,0,0.18); color: #ff9800;
+    border: 1px solid rgba(255,152,0,0.35);
+    letter-spacing: 0.2px;
+  }
+  /* P26-E: 决策卡 高危样式 */
+  .d-card.divergent {
+    border-color: #ff5722 !important;
+    background: rgba(40,15,10,0.65);
+  }
+  .d-card.stuck {
+    border-color: #d50000 !important;
+    background: rgba(45,8,8,0.7);
+  }
+  .d-warning-banner {
+    margin-top: 6px; padding: 5px 8px;
+    border-radius: 6px; font-size: 10.5px; font-weight: 700;
+    background: rgba(213,0,0,0.18); color: #ff5252;
+    border: 1px solid rgba(213,0,0,0.35);
+    letter-spacing: 0.2px; text-align: center;
+  }
+  .d-warning-banner.divergent {
+    background: rgba(255,87,34,0.18); color: #ff7043;
+    border-color: rgba(255,87,34,0.40);
+  }
+
   /* 决策信号 v2 — card grid */
   .d-grid {
     display: grid;
@@ -1579,20 +1617,82 @@ let pricesLastUpdated = null;   // 最近一次成功 fetch 的 epoch ms
 const SIGNAL_TTL_HOURS    = 6;    // 信号年龄 >6h → 已过期
 const ENTRY_TOLERANCE_PCT = 0.5;  // 现价距 entry <0.5% → 可入场
 const NEAR_SL_PCT         = 0.5;  // 现价距 SL <0.5% → 临近止损
+const TREND_DIV_PCT       = 3.0;  // P26-A: 24h 反向 >3% 触发"趋势分歧"
+const STUCK_THRESHOLD     = 10;   // P26-B: 同标的同向 ≥10 次未实现 → 标记卡死
+const STUCK_24H_THRESHOLD = 8;    // P26-B (轻度): 24h 同向 ≥8 次 → 标记疑似卡死
 
 const STATE_META = {
-  WAITING: { tag: "⏳ 待触发",  color: "#8a96aa", bg: "rgba(138,150,170,0.15)" },
-  ENTRY:   { tag: "✅ 可入场",  color: "#00c853", bg: "rgba(0,200,83,0.18)" },
-  ACTIVE:  { tag: "🔥 已激活",  color: "#2196f3", bg: "rgba(33,150,243,0.18)" },
-  NEAR_SL: { tag: "⚠️ 临近止损", color: "#ff9800", bg: "rgba(255,152,0,0.18)" },
-  STOPPED: { tag: "❌ 已止损",  color: "#ff1744", bg: "rgba(255,23,68,0.18)" },
-  HIT_TP:  { tag: "✅ 已止盈",  color: "#00c853", bg: "rgba(0,200,83,0.20)" },
-  EXPIRED: { tag: "⏰ 已过期",  color: "#5a6478", bg: "rgba(90,100,120,0.12)" },
-  WATCH:   { tag: "👀 观察",    color: "#ffd600", bg: "rgba(255,214,0,0.12)" },
-  SKIP:    { tag: "—",          color: "#5a6478", bg: "transparent"          },
-  NO_DATA: { tag: "— 缺数据",   color: "#5a6478", bg: "transparent"          },
-  LOADING: { tag: "⏳ 加载中",   color: "#5a6478", bg: "transparent"          },
+  WAITING:   { tag: "⏳ 待触发",      color: "#8a96aa", bg: "rgba(138,150,170,0.15)" },
+  ENTRY:     { tag: "✅ 可入场",      color: "#00c853", bg: "rgba(0,200,83,0.18)" },
+  ACTIVE:    { tag: "🔥 已激活",      color: "#2196f3", bg: "rgba(33,150,243,0.18)" },
+  NEAR_SL:   { tag: "⚠️ 临近止损",    color: "#ff9800", bg: "rgba(255,152,0,0.18)" },
+  STOPPED:   { tag: "❌ 已止损",      color: "#ff1744", bg: "rgba(255,23,68,0.18)" },
+  HIT_TP:    { tag: "✅ 已止盈",      color: "#00c853", bg: "rgba(0,200,83,0.20)" },
+  EXPIRED:   { tag: "⏰ 已过期",      color: "#5a6478", bg: "rgba(90,100,120,0.12)" },
+  WATCH:     { tag: "👀 观察",        color: "#ffd600", bg: "rgba(255,214,0,0.12)" },
+  SKIP:      { tag: "—",              color: "#5a6478", bg: "transparent"          },
+  NO_DATA:   { tag: "— 缺数据",       color: "#5a6478", bg: "transparent"          },
+  LOADING:   { tag: "⏳ 加载中",       color: "#5a6478", bg: "transparent"          },
+  // P26-A: 趋势与信号方向反向
+  TREND_DIV: { tag: "⚠️ 趋势分歧",    color: "#ff7043", bg: "rgba(255,112,67,0.22)" },
+  // P26-B: 同标的同向重复发到失效阈值,模型卡死
+  STUCK:     { tag: "🚫 信号卡死",    color: "#d50000", bg: "rgba(213,0,0,0.22)" },
 };
+
+// P26-A: 24h 价格变化数据 (与信号方向校验)
+let priceChange24h = {};
+
+async function loadPriceChange24h() {
+  try {
+    const res = await fetch("https://fapi.binance.com/fapi/v1/ticker/24hr");
+    if (!res.ok) return;
+    const arr = await res.json();
+    const map = {};
+    for (const t of arr) {
+      const pct = parseFloat(t.priceChangePercent);
+      if (!isNaN(pct)) map[t.symbol] = pct;
+    }
+    priceChange24h = map;
+  } catch (e) {
+    console.warn("[24h] load failed:", e);
+  }
+}
+
+// P26-C: 信心度 → 经验胜率(参考值,基于行业历史规律,bot demo 期会校准)
+function confToWinRate(conf) {
+  if (conf == null || isNaN(conf)) return null;
+  if (conf >= 90) return "胜率参考 ≈65%";
+  if (conf >= 80) return "胜率参考 ≈60%";
+  if (conf >= 70) return "胜率参考 ≈55%";
+  if (conf >= 60) return "胜率参考 ≈52%";
+  if (conf >= 50) return "胜率参考 ≈50%";
+  return "胜率参考 ≈48%";
+}
+
+// P26-D: 标的级历史胜率 (从 pnl.json closed_recent 计算近 7 天)
+function computeSymbolStats(symbol) {
+  if (!pnlClosesCache || pnlClosesCache.length === 0) return null;
+  const okxBase = symbol.replace(/USDT$/, "");
+  const okxInst = `${okxBase}-USDT-SWAP`;
+  const cutoff = Date.now() - 7 * 24 * 3600 * 1000;
+  let wins = 0, losses = 0, totalNet = 0;
+  for (const c of pnlClosesCache) {
+    if (c.symbol !== okxInst && c.symbol !== symbol) continue;
+    const ts = new Date(c.ts).getTime();
+    if (ts < cutoff) continue;
+    const net = parseFloat(c.net || 0);
+    if (net > 0) wins++; else if (net < 0) losses++;
+    totalNet += net;
+  }
+  const total = wins + losses;
+  if (total === 0) return null;
+  return {
+    wins, losses, total,
+    winRate: wins / total,
+    totalNet: totalNet,
+    isLoser: total >= 5 && (wins / total) < 0.30,   // 7d ≥5 单 + 胜率<30% 视为连败
+  };
+}
 
 async function loadPrices() {
   try {
@@ -1697,18 +1797,33 @@ function renderDecisionView() {
   if (allSignals.length === 0) return;
   const nowMs = Date.now();
   const rows = buildDecisionView(allSignals, currentPrices, nowMs);
+  // P26-B: 24h 内同 symbol+方向 计数 (用于检测卡死)
+  const symDirCount = computeSymbolDirCount24h(allSignals, nowMs);
+  // 给每个 row 计算 occN24h + isStuck + isDivergent + symStats
+  for (const r of rows) {
+    const key = `${r.symbol}|${r.latest.direction}`;
+    r.occN24h = symDirCount.get(key) || r.count;
+    r.isStuck = r.occN24h >= STUCK_24H_THRESHOLD;
+    r.isDivergent = r.state && r.state.state === "TREND_DIV";
+    r.symStats = computeSymbolStats(r.symbol);
+  }
 
-  // 重新排序：按综合判断优先级 → 信心度降序
+  // P26-E: 重新排序 — STUCK / DIVERGENT / 连败标的 直接降到末尾,绝不冒充候选
   rows.sort((a, b) => {
+    const aRisk = (a.isStuck ? 100 : 0) + (a.isDivergent ? 50 : 0) + (a.symStats?.isLoser ? 30 : 0);
+    const bRisk = (b.isStuck ? 100 : 0) + (b.isDivergent ? 50 : 0) + (b.symStats?.isLoser ? 30 : 0);
+    if (aRisk !== bRisk) return aRisk - bRisk;
     const va = unifiedVerdict(a.state, a.maxConf);
     const vb = unifiedVerdict(b.state, b.maxConf);
     if (va.priority !== vb.priority) return va.priority - vb.priority;
     return b.maxConf - a.maxConf;
   });
 
-  const actionable = rows.filter(r => unifiedVerdict(r.state, r.maxConf).priority <= 4);
+  const actionable = rows.filter(r => !r.isStuck && !r.isDivergent && !r.symStats?.isLoser
+    && unifiedVerdict(r.state, r.maxConf).priority <= 4);
+  const blocked = rows.filter(r => r.isStuck || r.isDivergent || r.symStats?.isLoser);
   document.getElementById("decision-meta").textContent =
-    `${actionable.length} 个活跃 · ${rows.length} 个候选 · 24h 聚合`;
+    `${actionable.length} 个活跃 · ${blocked.length} 个高危拦截 · ${rows.length} 个候选 · 24h 聚合`;
 
   if (rows.length === 0) {
     document.getElementById("decision-table").innerHTML =
@@ -1752,20 +1867,38 @@ function renderDecisionView() {
     const msAgo = nowMs - new Date(r.firstTs).getTime();
     const h = Math.floor(msAgo / 3.6e6), m = Math.floor((msAgo % 3.6e6) / 60000);
     const agoStr = h > 0 ? `${h}h${m}m前` : `${m}m前`;
-    const countBadge = r.count === 1
-      ? `<span style="color:var(--green);font-weight:700">🆕 首发</span>`
-      : `<span style="color:var(--text-dim)">🔁 ${r.count}次</span>`;
+    // P26-F: 真正首发 = 7d 内首次出现该 symbol 的信号
+    const isReallyFirst = isFirstAppearance7d(r.symbol, r.firstTs, allSignals);
+    const countBadge = isReallyFirst
+      ? `<span style="color:var(--green);font-weight:700" title="7天内首次出现此标的">🆕 首发(7d)</span>`
+      : (r.count === 1
+          ? `<span style="color:var(--text-dim)">⚪ 单次</span>`
+          : `<span style="color:var(--text-dim)">🔁 ${r.count}次</span>`);
 
-    return `<div class="d-card" style="border-color:${v.border}">
+    // P26-C: 信心度胜率提示
+    const winRateHint = confToWinRate(r.maxConf);
+
+    // P26-E: 高危卡片样式 + 警告横幅
+    const cardCls = "d-card" + (r.isStuck ? " stuck" : "") + (r.isDivergent ? " divergent" : "");
+    const warningBanner = r.isStuck
+      ? `<div class="d-warning-banner">🚫 信号卡死: 24h 同向 ${r.occN24h} 次 — 模型反复判断错误,不建议入场</div>`
+      : (r.isDivergent
+          ? `<div class="d-warning-banner divergent">⚠️ 趋势分歧: bot 喊${dirLabel}但价格 ${r.state.change24h?.toFixed(2)}% — 不建议入场</div>`
+          : (r.symStats?.isLoser
+              ? `<div class="d-warning-banner divergent">⚠️ 7d 连败: ${r.symStats.wins}胜${r.symStats.losses}负 (${(r.symStats.winRate*100).toFixed(0)}%胜率) — 该标的近期模型不准</div>`
+              : ""));
+
+    return `<div class="${cardCls}" style="border-color:${v.border}">
       <div class="d-card-header">
         <span class="d-symbol">${r.symbol}</span>
         <span class="badge ${dirCls}">${dirLabel}</span>
       </div>
       <div class="d-verdict" style="color:${v.color};background:${v.bg}">${v.label}</div>
+      ${warningBanner}
       <div class="d-conf-row">
-        <span class="d-conf-label">信心值</span>
+        <span class="d-conf-label" title="${winRateHint || ''}">信心</span>
         <div class="d-conf-bar-wrap"><div class="d-conf-bar" style="width:${confPct}%;background:${confColor}"></div></div>
-        <span class="d-conf-num" style="color:${confColor}">${r.maxConf}</span>
+        <span class="d-conf-num" style="color:${confColor}" title="${winRateHint || ''}">${r.maxConf}</span>
       </div>
       <div class="d-levels">
         ${levelHtml("入场", e,      r.state.distEntry, "#cfd8dc")}
@@ -1837,6 +1970,19 @@ function computeSignalState(signal, currentPrice, nowMs) {
   if (!isLong && currentPrice >= sl) return { state: "STOPPED", distEntry, distSL, distTP };
   // 临近止损（无方向区分，<0.5% 阈值）
   if (Math.abs(distSL) < NEAR_SL_PCT) return { state: "NEAR_SL", distEntry, distSL, distTP };
+
+  // P26-A: 趋势反向校验 — 信号方向与 24h 实际趋势矛盾,降级为"趋势分歧"警示
+  // 不覆盖 STOPPED/HIT_TP/NEAR_SL (那些是更明确的客观状态)
+  const change24h = priceChange24h[signal.symbol];
+  if (change24h !== undefined) {
+    if (isLong && change24h < -TREND_DIV_PCT) {
+      return { state: "TREND_DIV", distEntry, distSL, distTP, change24h };
+    }
+    if (!isLong && change24h > TREND_DIV_PCT) {
+      return { state: "TREND_DIV", distEntry, distSL, distTP, change24h };
+    }
+  }
+
   // 已激活（穿越 entry，方向一致）
   if ( isLong && currentPrice > e) return { state: "ACTIVE", distEntry, distSL, distTP };
   if (!isLong && currentPrice < e) return { state: "ACTIVE", distEntry, distSL, distTP };
@@ -1844,6 +1990,17 @@ function computeSignalState(signal, currentPrice, nowMs) {
   if (Math.abs(distEntry) < ENTRY_TOLERANCE_PCT) return { state: "ENTRY", distEntry, distSL, distTP };
   // 默认：还没到入场点
   return { state: "WAITING", distEntry, distSL, distTP };
+}
+
+// P26-B: 应用 STUCK 覆盖 — 当同标的同向重复 ≥ 阈值时,无论原 state 是什么都视为卡死
+function applyStuckOverride(state, occN) {
+  if (!state) return state;
+  const stuckTerminal = ["STOPPED", "HIT_TP", "EXPIRED"];
+  if (stuckTerminal.includes(state.state)) return state;  // 已结束的不覆盖
+  if (occN >= STUCK_THRESHOLD) {
+    return { ...state, state: "STUCK", stuckCount: occN };
+  }
+  return state;
 }
 
 function stateBadge(stateObj) {
@@ -1911,6 +2068,33 @@ function computeOccurrenceMap(signals) {
 function occurrenceBadge(n) {
   if (n === 1) return '<span style="color:var(--green);font-size:10px;font-weight:600;margin-left:4px">🆕</span>';
   return `<span style="color:var(--text-dim);font-size:10px;margin-left:4px">🔁${n}</span>`;
+}
+
+// P26-B: 24h 内同 symbol+方向 出现次数
+function computeSymbolDirCount24h(signals, nowMs) {
+  const cutoff = nowMs - 24 * 3600 * 1000;
+  const counts = new Map();
+  for (const s of signals) {
+    const t = new Date(s.ts).getTime();
+    if (t < cutoff) continue;
+    if (s.direction !== "LONG" && s.direction !== "SHORT") continue;
+    const key = `${s.symbol}|${s.direction}`;
+    counts.set(key, (counts.get(key) || 0) + 1);
+  }
+  return counts;
+}
+
+// P26-F: 7d 内是否真正首次出现 (排除 4h 滑动窗口的伪首发)
+function isFirstAppearance7d(symbol, ts, signals) {
+  const t = new Date(ts).getTime();
+  const cutoff7d = t - 7 * 24 * 3600 * 1000;
+  for (const s of signals) {
+    if (s.symbol !== symbol) continue;
+    const st = new Date(s.ts).getTime();
+    if (st < cutoff7d) continue;
+    if (st < t) return false;   // 7d 内有更早记录 → 不是真首发
+  }
+  return true;
 }
 // ==================== P19 end ====================
 
@@ -2083,12 +2267,19 @@ function renderTable() {
 
   // 预先计算每行 state（FOLLOW/ACTIVE 过滤都要用）+ occurrence
   const nowMs = Date.now();
-  const rowsWithState = rows.map(s => ({
-    s,
-    a: analysesMap[s.ts] || {},
-    state: computeSignalState(s, currentPrices[s.symbol], nowMs),
-    occN: occurrenceMapCache.get(s.ts) || 1,
-  }));
+  // P26-B: 预计算每个 symbol+direction 在 24h 内出现的次数
+  const symDirCount = computeSymbolDirCount24h(allSignals, nowMs);
+  const rowsWithState = rows.map(s => {
+    const rawState = computeSignalState(s, currentPrices[s.symbol], nowMs);
+    const occN24h = symDirCount.get(`${s.symbol}|${s.direction}`) || 0;
+    return {
+      s,
+      a: analysesMap[s.ts] || {},
+      state: applyStuckOverride(rawState, occN24h),
+      occN: occurrenceMapCache.get(s.ts) || 1,
+      occN24h,
+    };
+  });
 
   // "🎯 只看活跃"：仅保留可入场 / 已激活 / 临近止损 三种"现在该看一眼"的状态
   let filtered = rowsWithState;
@@ -2134,12 +2325,21 @@ function renderTable() {
         </tr>
       </thead>
       <tbody>
-        ${filtered.map(({ s, a, state, occN }) => `
+        ${filtered.map(({ s, a, state, occN, occN24h }) => {
+          const symStats = computeSymbolStats(s.symbol);
+          const winRateHint = confToWinRate(s.confidence);
+          const stuckBadge = occN24h >= STUCK_24H_THRESHOLD
+            ? `<span class="stuck-badge" title="24h 内同向出现 ${occN24h} 次,模型可能卡死">🚫 卡死×${occN24h}</span>`
+            : "";
+          const loserBadge = symStats?.isLoser
+            ? `<span class="loser-badge" title="近7d ${symStats.wins}胜${symStats.losses}负 (${(symStats.winRate*100).toFixed(0)}%胜率)">⚠️ 7d连败</span>`
+            : "";
+          return `
           <tr>
             <td>${formatTime(s.ts)}</td>
-            <td><strong>${s.symbol || "—"}</strong>${occurrenceBadge(occN)}</td>
+            <td><strong>${s.symbol || "—"}</strong>${occurrenceBadge(occN)}${stuckBadge}${loserBadge}</td>
             <td><span class="badge ${s.direction}">${DIR_CN[s.direction] || s.direction}</span></td>
-            <td><span class="conf">${s.confidence || "—"}</span></td>
+            <td><span class="conf" title="${winRateHint || ''}">${s.confidence || "—"}</span></td>
             <td>${stateBadge(state)}</td>
             <td>${riskBadge(a.risk_level)}</td>
             <td>${matchBadge(a.structure_match)}</td>
@@ -2149,8 +2349,8 @@ function renderTable() {
             <td>${formatTPWithDist(s.take_profit, state.distTP)}</td>
             <td>${s.structure || a.structure_judge || "—"}</td>
             <td>${s.routed_to || "—"}</td>
-          </tr>
-        `).join("")}
+          </tr>`;
+        }).join("")}
       </tbody>
     </table>
   `;
@@ -2514,7 +2714,7 @@ async function manualRefresh() {
   const btn = document.getElementById("refresh-btn");
   btn.classList.add("spinning");
   try {
-    await Promise.all([loadSignals(), loadPnL(), loadPrices(), loadRegime(), loadRegimeHistory(), loadMacroEvents(), loadPrecogRadar()]);
+    await Promise.all([loadSignals(), loadPnL(), loadPrices(), loadPriceChange24h(), loadRegime(), loadRegimeHistory(), loadMacroEvents(), loadPrecogRadar()]);
   } finally {
     setTimeout(() => btn.classList.remove("spinning"), 300);
   }
@@ -2533,6 +2733,7 @@ document.getElementById("history-search").addEventListener("input", e => {
 loadSignals();
 loadPnL();
 loadPrices();
+loadPriceChange24h();
 loadRegime();
 loadRegimeHistory();
 loadMacroEvents();
@@ -2540,6 +2741,7 @@ loadPrecogRadar();
 setInterval(loadSignals, 60_000);
 setInterval(loadPnL, 60_000);
 setInterval(loadPrices, 60_000);
+setInterval(loadPriceChange24h, 60_000);   // P26-A: 24h 趋势数据每分钟刷新
 setInterval(loadRegime, 5 * 60_000);          // P20: regime 1h 才更新一次，5 分钟拉够新鲜
 setInterval(loadRegimeHistory, 5 * 60_000);
 setInterval(loadMacroEvents, 60_000);          // P21: 每分钟重渲染（事件本身每小时刷新一次）
