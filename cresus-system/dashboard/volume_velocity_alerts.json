@@ -1,13 +1,25 @@
 {
-  "updated_at": "2026-05-10T23:06:23.317049+00:00",
+  "updated_at": "2026-05-10T23:17:03.052290+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
     "price_move_pct": 0.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 6,
+  "alerts_count": 5,
   "alerts": [
+    {
+      "symbol": "IOUSDT",
+      "base": "IO",
+      "direction": "LONG",
+      "price": 0.1611,
+      "price_change_1m_pct": 1.003,
+      "volume_1m_usdt": 57897.0,
+      "volume_30m_avg_usdt": 5616.0,
+      "volume_ratio": 10.31,
+      "detected_at": "2026-05-10T23:16:58.985354+00:00",
+      "intensity": 3
+    },
     {
       "symbol": "CFGUSDT",
       "base": "CFG",
@@ -55,30 +67,6 @@
       "volume_ratio": 11.89,
       "detected_at": "2026-05-10T22:24:55.898525+00:00",
       "intensity": 3
-    },
-    {
-      "symbol": "OPGUSDT",
-      "base": "OPG",
-      "direction": "LONG",
-      "price": 0.2981,
-      "price_change_1m_pct": 0.88,
-      "volume_1m_usdt": 112248.0,
-      "volume_30m_avg_usdt": 11803.0,
-      "volume_ratio": 9.51,
-      "detected_at": "2026-05-10T22:16:21.730860+00:00",
-      "intensity": 2
-    },
-    {
-      "symbol": "IPUSDT",
-      "base": "IP",
-      "direction": "LONG",
-      "price": 0.5912,
-      "price_change_1m_pct": 1.268,
-      "volume_1m_usdt": 143953.0,
-      "volume_30m_avg_usdt": 15665.0,
-      "volume_ratio": 9.19,
-      "detected_at": "2026-05-10T22:07:52.226672+00:00",
-      "intensity": 2
     }
   ]
 }
