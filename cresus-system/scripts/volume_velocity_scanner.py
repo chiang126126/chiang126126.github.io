@@ -51,8 +51,8 @@ HTTP_TIMEOUT = 12
 
 SCAN_TOP_N             = 200      # 24h 成交额 Top N 标的
 KLINE_LIMIT            = 30       # 1m 数据条数 (30min 窗口)
-VOLUME_BURST_RATIO     = 5.0      # 1m 量 > 30m 均 × 此倍数 → 量能爆发
-PRICE_MOVE_THRESHOLD   = 0.005    # 1m 价格变化 ≥ 0.5% → 价格响应
+VOLUME_BURST_RATIO     = 8.0      # 1m 量 > 30m 均 × 此倍数 → 量能爆发 (上调减噪)
+PRICE_MOVE_THRESHOLD   = 0.008    # 1m 价格变化 ≥ 0.8% → 价格响应 (上调减噪)
 DEDUP_WINDOW_MIN       = 30       # 同标的去重窗口 (分钟)
 KEEP_ALERT_WINDOW_MIN  = 60       # 输出 JSON 保留最近 X 分钟内的报警
 
@@ -313,7 +313,7 @@ def run_scan() -> List[VelocityAlert]:
         if alert:
             new_alerts.append(alert)
             dedup[sym] = alert.detected_at
-            _log(f"⚡ {sym} {alert.direction} +{alert.price_change_1m_pct:+.2f}% × {alert.volume_ratio:.1f}x vol "
+            _log(f"⚡ {sym} {alert.direction} {alert.price_change_1m_pct:+.2f}% × {alert.volume_ratio:.1f}x vol "
                  f"[intensity={alert.intensity}]")
 
         # 防 rate limit: 每 50 个稍停
@@ -335,7 +335,14 @@ def run_scan() -> List[VelocityAlert]:
     _save_alerts(combined)
 
     if new_alerts:
-        _log(f"✅ {len(new_alerts)} new velocity alerts")
+        long_n  = sum(1 for a in new_alerts if a.direction == "LONG")
+        short_n = sum(1 for a in new_alerts if a.direction == "SHORT")
+        if long_n >= 30:
+            _log(f"🌊 全市场上涨事件: {long_n} 个 LONG (市场级,非个股 alpha)")
+        elif short_n >= 30:
+            _log(f"🌊 全市场下跌事件: {short_n} 个 SHORT (市场级,非个股 alpha)")
+        else:
+            _log(f"✅ {len(new_alerts)} alerts (LONG={long_n} SHORT={short_n})")
     return new_alerts
 
 
