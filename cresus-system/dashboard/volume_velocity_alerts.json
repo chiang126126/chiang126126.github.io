@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-11T10:18:16.056387+00:00",
+  "updated_at": "2026-05-11T10:19:24.446958+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,78 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 22,
+  "alerts_count": 27,
   "alerts": [
+    {
+      "symbol": "MOVRUSDT",
+      "base": "MOVR",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 2.618,
+      "price_change_pct": -0.607,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 38134.0,
+      "volume_baseline_usdt": 6193.0,
+      "volume_ratio": 6.16,
+      "detected_at": "2026-05-11T10:19:19.348184+00:00",
+      "intensity": 1
+    },
+    {
+      "symbol": "PARTIUSDT",
+      "base": "PARTI",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.06093,
+      "price_change_pct": 2.317,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 39987.0,
+      "volume_baseline_usdt": 6561.0,
+      "volume_ratio": 6.09,
+      "detected_at": "2026-05-11T10:19:13.825016+00:00",
+      "intensity": 1
+    },
+    {
+      "symbol": "TRIAUSDT",
+      "base": "TRIA",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.03626,
+      "price_change_pct": 0.947,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 67223.0,
+      "volume_baseline_usdt": 13159.0,
+      "volume_ratio": 5.11,
+      "detected_at": "2026-05-11T10:18:59.358795+00:00",
+      "intensity": 1
+    },
+    {
+      "symbol": "KITEUSDT",
+      "base": "KITE",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.18217,
+      "price_change_pct": -1.284,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 223350.0,
+      "volume_baseline_usdt": 28685.0,
+      "volume_ratio": 7.79,
+      "detected_at": "2026-05-11T10:18:43.973824+00:00",
+      "intensity": 2
+    },
+    {
+      "symbol": "TIAUSDT",
+      "base": "TIA",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.4593,
+      "price_change_pct": 2.936,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 623929.0,
+      "volume_baseline_usdt": 38596.0,
+      "volume_ratio": 16.17,
+      "detected_at": "2026-05-11T10:18:38.312702+00:00",
+      "intensity": 2
+    },
     {
       "symbol": "2ZUSDT",
       "base": "2Z",
