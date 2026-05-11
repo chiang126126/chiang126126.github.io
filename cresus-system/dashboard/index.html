@@ -1092,6 +1092,41 @@
   .velocity-row:hover { background: rgba(255,255,255,0.04); }
   .velocity-row.dir-LONG  { border-left-color: #00c853; }
   .velocity-row.dir-SHORT { border-left-color: #ff1744; }
+  /* Phase 3a: 钻石级置信信号视觉强化 */
+  .velocity-row.tier-diamond {
+    background: linear-gradient(90deg, rgba(255,193,7,0.10), rgba(255,193,7,0.02));
+    box-shadow: 0 0 14px rgba(255,193,7,0.25), inset 0 0 0 1px rgba(255,193,7,0.30);
+    animation: diamond-pulse 2.4s ease-in-out infinite;
+  }
+  .velocity-row.tier-premium {
+    background: linear-gradient(90deg, rgba(100,181,246,0.06), rgba(100,181,246,0.01));
+    box-shadow: inset 0 0 0 1px rgba(100,181,246,0.22);
+  }
+  @keyframes diamond-pulse {
+    0%, 100% { box-shadow: 0 0 14px rgba(255,193,7,0.25), inset 0 0 0 1px rgba(255,193,7,0.30); }
+    50%      { box-shadow: 0 0 22px rgba(255,193,7,0.40), inset 0 0 0 1px rgba(255,193,7,0.45); }
+  }
+  .velocity-tier-badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 7px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.3px;
+    vertical-align: middle;
+  }
+  .velocity-tier-badge.diamond {
+    background: linear-gradient(135deg, #ffd54f, #ff9800);
+    color: #1a0f00;
+    box-shadow: 0 0 8px rgba(255,193,7,0.55);
+  }
+  .velocity-tier-badge.premium {
+    background: rgba(100,181,246,0.20);
+    color: #64b5f6;
+    border: 1px solid rgba(100,181,246,0.40);
+  }
   .velocity-headline {
     display: grid;
     grid-template-columns: 28px 1fr 64px 50px 50px;
@@ -2000,8 +2035,13 @@ function renderVelocityPanel() {
     return;
   }
 
-  // 按 intensity × |price_change| 降序,各方向独立排序
-  const scoreOf = a => a.intensity * Math.abs(a.price_change_1m_pct);
+  // Phase 3a: 先按 conviction tier (diamond > premium > regular), 再按 intensity × |%change|
+  const TIER_RANK = {diamond: 2, premium: 1, regular: 0};
+  const scoreOf = a => {
+    const tierW = (TIER_RANK[a.conviction_tier] || 0) * 1000;
+    const intensityW = (a.intensity || 0) * Math.abs(a.price_change_pct || a.price_change_1m_pct || 0);
+    return tierW + intensityW;
+  };
   const longs  = alerts.filter(a => a.direction === "LONG" ).sort((a,b) => scoreOf(b) - scoreOf(a));
   const shorts = alerts.filter(a => a.direction === "SHORT").sort((a,b) => scoreOf(b) - scoreOf(a));
   const TOP_N_PER_COL = 10;
@@ -2136,10 +2176,20 @@ function renderVelocityPanel() {
 
     const sigsHtml = chips.filter(Boolean).join("");
 
-    return `<div class="velocity-row dir-${a.direction}" onclick="this.classList.toggle('expanded')">
+    // Phase 3a: 置信徽章 + 行级 class
+    const tier = a.conviction_tier || "regular";
+    const tierCls = tier !== "regular" ? `tier-${tier}` : "";
+    let tierBadge = "";
+    if (tier === "diamond") {
+      tierBadge = `<span class="velocity-tier-badge diamond" title="钻石信号 (score ${a.conviction_score}/10): funding 极端 + OI 方向匹配 + 历史胜率 ≥60% / 多窗口同向. GTC 类高胜率 setup">💎 ${a.conviction_score}</span>`;
+    } else if (tier === "premium") {
+      tierBadge = `<span class="velocity-tier-badge premium" title="中置信 (score ${a.conviction_score}/10)">⭐ ${a.conviction_score}</span>`;
+    }
+
+    return `<div class="velocity-row dir-${a.direction} ${tierCls}" onclick="this.classList.toggle('expanded')">
       <div class="velocity-headline">
         <span class="velocity-rank ${rankCls}">#${rank}</span>
-        <span><span class="velocity-symbol">${escapeHtml(a.symbol)}</span> <span class="velocity-type" title="${typeTitle}">${typeIcon}</span></span>
+        <span><span class="velocity-symbol">${escapeHtml(a.symbol)}</span> <span class="velocity-type" title="${typeTitle}">${typeIcon}</span>${tierBadge}</span>
         <span class="velocity-pct ${cls}">${pct.toFixed(2)}%<span class="velocity-win">/${winM}m</span></span>
         <span class="velocity-vol-ratio">${a.volume_ratio.toFixed(1)}x</span>
         <span class="velocity-when">${whenStr}${execHtml ? '<span class="velocity-toggle">▾</span>' : ''}</span>

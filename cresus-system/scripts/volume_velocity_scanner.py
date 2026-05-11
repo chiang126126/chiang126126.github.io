@@ -131,6 +131,10 @@ class VelocityAlert:
     suggested_tp1: Optional[float] = None        # 1.5R
     suggested_tp2: Optional[float] = None        # 3R
 
+    # Phase 3: 置信评分 (基于 GTC 反向工程: 极端 funding + OI 方向 + 历史胜率 + 多窗口)
+    conviction_score: int = 0       # 0-10
+    conviction_tier:  str = "regular"  # "diamond" (≥5) | "premium" (≥3) | "regular"
+
 
 # ============================================================================
 # HTTP + utilities
@@ -716,6 +720,75 @@ def _trim_old_alerts(alerts: List[dict]) -> List[dict]:
 
 
 # ============================================================================
+# Phase 3a: 置信评分 (Conviction) — 反向工程 GTC 的"DNA"
+# ============================================================================
+# GTC 案例 (entry 0.1698 → 现 0.19345, +13.9%, 远超 TP2 +4.65%):
+#   - sustained 类型 (+1)
+#   - funding -2.0% 极端 (+3, 最强信号: 空头被压制 → 轧空)
+#   - OI +1.40% 方向匹配 (+2)
+#   - 历史 30m 胜率 86% N=7 (+3, 经验主义)
+#   - 5m/15m 同向 (+1)
+#   总分 10/10 → 💎 diamond
+# 对比同时间 CUSDT/USUSDT: OI 方向不匹配 + funding 平 = 1/10 噪声
+
+CONVICTION_DIAMOND_THRESHOLD = 5   # ≥5 = 💎 钻石
+CONVICTION_PREMIUM_THRESHOLD = 3   # ≥3 = ⭐ 中置信
+
+def _compute_conviction(a: VelocityAlert, winrate_summary: Optional[dict]) -> tuple:
+    """计算 (score 0-10, tier str). 失败保护: 任何 None 跳过该项不加分."""
+    score = 0
+
+    # 1. 极端 funding (+3): 单边过度拥挤,反转动能强
+    if a.funding_rate_pct is not None and abs(a.funding_rate_pct) >= 0.3:
+        score += 3
+
+    # 2. 历史 30m 胜率 ≥ 60% AND N ≥ 5 (+3): 经验主义验证
+    if winrate_summary and winrate_summary.get("by_key"):
+        wkey = f"{a.symbol}|{a.alert_type}|{a.direction}"
+        w = winrate_summary["by_key"].get(wkey)
+        if w and w.get("stages"):
+            s30 = w["stages"].get("30m")
+            if s30 and s30.get("n", 0) >= 5 and s30.get("win_rate", 0) >= 0.60:
+                score += 3
+
+    # 3. OI 方向匹配 (+2): LONG+OI涨 = 真新多, SHORT+OI跌 = 真新空
+    if a.oi_delta_5m_pct is not None:
+        if a.direction == "LONG" and a.oi_delta_5m_pct > 0:
+            score += 2
+        elif a.direction == "SHORT" and a.oi_delta_5m_pct < 0:
+            score += 2
+
+    # 4. sustained 类型 (+1): 10m 累计比 1m burst 多一层时间验证
+    if a.alert_type == "sustained":
+        score += 1
+
+    # 5. 多窗口同向 (+1): 5m / 1h / 4h 跟主方向一致 (允许 1 个不一致)
+    if a.change_5m_pct is not None and a.change_1h_pct is not None:
+        dir_sign = 1 if a.direction == "LONG" else -1
+        matches = 0
+        total = 0
+        for v in (a.change_5m_pct, a.change_1h_pct, a.change_4h_pct):
+            if v is None:
+                continue
+            total += 1
+            if (v > 0) == (dir_sign > 0):
+                matches += 1
+        # 至少 2 个窗口, 多数同向
+        if total >= 2 and matches >= total - 1:
+            score += 1
+
+    # tier 分级
+    if score >= CONVICTION_DIAMOND_THRESHOLD:
+        tier = "diamond"
+    elif score >= CONVICTION_PREMIUM_THRESHOLD:
+        tier = "premium"
+    else:
+        tier = "regular"
+
+    return score, tier
+
+
+# ============================================================================
 # Phase 3: Telegram push (高质量信号绕过看板延迟, 直接推手机)
 # ============================================================================
 
@@ -773,9 +846,16 @@ def _format_alert_for_tg(a: VelocityAlert, winrate_summary: Optional[dict] = Non
     win_str = f"{a.metric_window_min}m"
     pct_str = f"{a.price_change_pct:+.2f}%"
 
+    # Phase 3a: 置信徽章 (放在最前, 一眼看出来)
+    tier_prefix = ""
+    if a.conviction_tier == "diamond":
+        tier_prefix = "💎💎💎 <b>钻石信号</b> 💎💎💎\n"
+    elif a.conviction_tier == "premium":
+        tier_prefix = "⭐ <b>中置信</b>\n"
+
     lines = [
-        f"<b>{type_icon} {a.symbol}</b> {type_label} <b>{a.direction}</b> {dir_icon}",
-        f"{pct_str} / {win_str} · vol <b>{a.volume_ratio:.1f}x</b> · 强度 {a.intensity}",
+        tier_prefix + f"<b>{type_icon} {a.symbol}</b> {type_label} <b>{a.direction}</b> {dir_icon}",
+        f"{pct_str} / {win_str} · vol <b>{a.volume_ratio:.1f}x</b> · 强度 {a.intensity} · 置信 <b>{a.conviction_score}/10</b>",
     ]
 
     # 富信息段 (chips)
@@ -856,20 +936,29 @@ def _push_to_telegram(new_alerts: List[VelocityAlert],
             del cooldown[sym]
 
     pushed = 0
+    diamond_n = 0
     for a in new_alerts:
-        if a.intensity < TG_MIN_INTENSITY:
-            continue
-        # 同 symbol 30min 内已推过 → 跳过
-        if a.symbol in cooldown:
-            continue
+        is_diamond = (a.conviction_tier == "diamond")
+        # 钻石信号: 跳过 intensity 门槛 + 跳过 cooldown (绝不漏)
+        # 普通信号: 严格 intensity ≥ TG_MIN_INTENSITY + 30min 冷却
+        if not is_diamond:
+            if a.intensity < TG_MIN_INTENSITY:
+                continue
+            if a.symbol in cooldown:
+                continue
         msg = _format_alert_for_tg(a, winrate_summary)
         if _send_telegram(msg):
             cooldown[a.symbol] = now.isoformat()
             pushed += 1
+            if is_diamond:
+                diamond_n += 1
 
     if pushed > 0:
         _save_tg_cooldown(cooldown)
-        _log(f"📲 Telegram 推送 {pushed} 条 (intensity ≥ {TG_MIN_INTENSITY})")
+        if diamond_n > 0:
+            _log(f"📲 Telegram 推送 {pushed} 条 (其中 💎 钻石 {diamond_n} 条)")
+        else:
+            _log(f"📲 Telegram 推送 {pushed} 条 (intensity ≥ {TG_MIN_INTENSITY})")
     return pushed
 
 
@@ -922,13 +1011,6 @@ def run_scan() -> List[VelocityAlert]:
                  if isinstance(ts, str) else False)}
     _save_dedup(dedup)
 
-    # 合并已有 alerts (近 60min 窗口) + 新增
-    existing = _load_alerts()
-    combined = _trim_old_alerts(existing) + [asdict(a) for a in new_alerts]
-    # 按 detected_at 降序
-    combined.sort(key=lambda a: a.get("detected_at", ""), reverse=True)
-    _save_alerts(combined)
-
     if new_alerts:
         long_n  = sum(1 for a in new_alerts if a.direction == "LONG")
         short_n = sum(1 for a in new_alerts if a.direction == "SHORT")
@@ -939,7 +1021,7 @@ def run_scan() -> List[VelocityAlert]:
         else:
             _log(f"✅ {len(new_alerts)} alerts (LONG={long_n} SHORT={short_n})")
 
-    # ===== Phase 2: outcome tracking =====
+    # ===== Phase 2: outcome tracking (需要先跑, 因为 conviction 评分依赖 winrate) =====
     winrate_summary = None
     try:
         outcomes_state = _load_outcomes()
@@ -954,6 +1036,25 @@ def run_scan() -> List[VelocityAlert]:
                  f"汇总 bucket={len(winrate_summary.get('by_key', {}))}")
     except Exception as e:
         _log(f"outcome tracking failed: {e}")
+
+    # ===== Phase 3a: 置信评分 (基于 GTC 反向工程, 必须在写盘前完成) =====
+    try:
+        for a in new_alerts:
+            score, tier = _compute_conviction(a, winrate_summary)
+            a.conviction_score = score
+            a.conviction_tier = tier
+        diamonds = [a for a in new_alerts if a.conviction_tier == "diamond"]
+        if diamonds:
+            _log(f"💎 高置信信号 {len(diamonds)} 条: " +
+                 ", ".join(f"{a.symbol}(score={a.conviction_score})" for a in diamonds))
+    except Exception as e:
+        _log(f"conviction scoring failed: {e}")
+
+    # ===== 合并已有 alerts + 新增 (conviction 已经在 dataclass 中, 一次写盘搞定) =====
+    existing = _load_alerts()
+    combined = _trim_old_alerts(existing) + [asdict(a) for a in new_alerts]
+    combined.sort(key=lambda a: a.get("detected_at", ""), reverse=True)
+    _save_alerts(combined)
 
     # ===== Phase 3: Telegram push (单独 try-except, 失败不影响主流程) =====
     try:
