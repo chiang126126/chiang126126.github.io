@@ -1083,6 +1083,8 @@
   }
   .velocity-dir-badge.LONG  { background: rgba(0,200,83,0.16); color: #00e676; }
   .velocity-dir-badge.SHORT { background: rgba(255,23,68,0.16); color: #ff5252; }
+  .velocity-type { font-size: 13px; cursor: help; }
+  .velocity-win  { font-size: 9px; color: var(--text-dim); margin-left: 2px; opacity: 0.75; }
   .velocity-pct {
     font-weight: 700; font-variant-numeric: tabular-nums; text-align: right;
   }
@@ -1815,19 +1817,28 @@ function renderVelocityPanel() {
   const longN  = alerts.filter(a => a.direction === "LONG").length;
   const shortN = alerts.filter(a => a.direction === "SHORT").length;
 
-  // 富 stat pill: 共振 + 多/空 + 扫描覆盖
+  // 按类型分类
+  const burstN     = alerts.filter(a => (a.alert_type || "burst") === "burst").length;
+  const sustainedN = alerts.filter(a => a.alert_type === "sustained").length;
+  const typeTag = sustainedN > 0
+    ? ` · ⚡${burstN} 🔥${sustainedN}`
+    : "";
+
+  // 富 stat pill: 共振 + 多/空 + 类型分布 + 扫描覆盖
   document.getElementById("velocity-stat-pill").innerHTML =
-    `${alerts.length} 共振 · <span style="color:#00e676">${longN}↑</span> <span style="color:#ff5252">${shortN}↓</span> · 扫描 ${universe}`;
+    `${alerts.length} 共振 · <span style="color:#00e676">${longN}↑</span> <span style="color:#ff5252">${shortN}↓</span>${typeTag} · 扫描 ${universe}`;
 
   const t = velocityData.thresholds || {};
-  const vr = (t.volume_burst_ratio || 5).toFixed(1).replace(/\.0$/, "");
-  const pp = (t.price_move_pct || 0.5).toFixed(1);
+  const bvr = (t.volume_burst_ratio || 5).toFixed(1).replace(/\.0$/, "");
+  const bpp = (t.price_move_pct || 0.5).toFixed(1);
+  const svr = (t.sustained_vol_24h_ratio || 5).toFixed(1).replace(/\.0$/, "");
+  const spp = (t.sustained_price_10m_pct || 1.5).toFixed(1);
   const metaEl = document.getElementById("velocity-meta");
   const stalePill = ageMin >= 5 && ageMin < 10
     ? ` <span class="velocity-stale" title="数据 ${ageMin}min 未更新,Mac 端同步可能滞后">⏱ 数据 ${ageMin}m 旧</span>`
     : "";
-  metaEl.innerHTML = `阈值 ${vr}x / ${pp}% · ${ageMin}m 前刷新${stalePill}`;
-  metaEl.title = `触发: 1m 量≥${vr}x · 价≥${pp}%`;
+  metaEl.innerHTML = `⚡启动 ${bvr}x/${bpp}% · 🔥持续 ${svr}x/${spp}%·10m · ${ageMin}m 前${stalePill}`;
+  metaEl.title = `⚡启动: 1m_vol≥${bvr}x(30m_avg) 且 1m_change≥${bpp}%\n🔥持续: 1m_vol≥${svr}x(24h_avg/min) 且 10m_change≥${spp}%`;
 
   const body = document.getElementById("velocity-body");
 
@@ -1875,10 +1886,17 @@ function renderVelocityPanel() {
     if (rank === 1) rankCls = "rank-1";
     else if (rank === 2) rankCls = "rank-2";
     else if (rank === 3) rankCls = "rank-3";
+    // 兼容旧 schema: 老 alerts 还在 60min 窗口里时, 用旧字段名
+    const isSustained = a.alert_type === "sustained";
+    const typeIcon = isSustained ? "🔥" : "⚡";
+    const typeTitle = isSustained ? "持续动能 (10m 累计)" : "启动瞬间 (1m spike)";
+    const winM = a.metric_window_min || 1;
+    const pct = (a.price_change_pct !== undefined ? a.price_change_pct : a.price_change_1m_pct) || 0;
     return `<div class="velocity-row dir-${a.direction}">
       <span class="velocity-rank ${rankCls}">#${rank}</span>
       <span class="velocity-symbol">${escapeHtml(a.symbol)}</span>
-      <span class="velocity-pct ${cls}">${a.price_change_1m_pct.toFixed(2)}%</span>
+      <span class="velocity-type" title="${typeTitle}">${typeIcon}</span>
+      <span class="velocity-pct ${cls}">${pct.toFixed(2)}%<span class="velocity-win">/${winM}m</span></span>
       <span class="velocity-vol-ratio">${a.volume_ratio.toFixed(1)}x</span>
       <span class="velocity-when">${whenStr}</span>
     </div>`;
