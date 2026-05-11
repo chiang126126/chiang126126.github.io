@@ -47,6 +47,35 @@ launchctl load -w "$LA/com.cresus.velocity-scanner.plist"
 launchctl list | grep cresus.velocity-scanner && echo "✓ launchd 启动"
 
 # ============================================
+# 2.5 precog_radar.py 更新 (Phase 2 胜率追踪)
+# !! 仅 cp .py, 绝不 cp .plist !!
+# 原因: ~/Library/LaunchAgents/com.cresus.precog-radar.plist 含真实 DEEPSEEK_API_KEY
+# 若用 repo 模板覆盖会把 key 抹成 YOUR_DEEPSEEK_API_KEY_HERE, AI 立即降级
+# ============================================
+echo ""
+echo "=== precog_radar.py 更新 (保留 plist 不动) ==="
+if [ -f "$REPO/cresus-system/scripts/precog_radar.py" ]; then
+    cp "$REPO/cresus-system/scripts/precog_radar.py" "$BOT/scripts/"
+    echo "✓ precog_radar.py 装载"
+    # 重启 launchd 让新 .py 被读取 (不改 plist, 保留 API key)
+    if [ -f "$LA/com.cresus.precog-radar.plist" ]; then
+        launchctl unload "$LA/com.cresus.precog-radar.plist" 2>/dev/null || true
+        launchctl load -w "$LA/com.cresus.precog-radar.plist"
+        # 校验 plist 里的 key 没被擦
+        if grep -q "YOUR_DEEPSEEK_API_KEY_HERE" "$LA/com.cresus.precog-radar.plist"; then
+            echo "⚠️  WARNING: plist 里 API key 是占位符,AI 不会真跑"
+            echo "    修复: 编辑 $LA/com.cresus.precog-radar.plist 把 YOUR_DEEPSEEK_API_KEY_HERE 换成真 key"
+        else
+            echo "✓ precog launchd 重启 (API key 保留)"
+        fi
+    else
+        echo "⚠️  $LA/com.cresus.precog-radar.plist 不存在,首次安装请手动配置 API key"
+    fi
+else
+    echo "⊘ 仓库无 precog_radar.py,跳过"
+fi
+
+# ============================================
 # 3. dashboard 同步 alerts json
 # ============================================
 echo ""
