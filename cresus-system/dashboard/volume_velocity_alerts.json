@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-11T14:14:13.511861+00:00",
+  "updated_at": "2026-05-11T14:17:39.896022+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,36 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 59,
+  "alerts_count": 58,
   "alerts": [
+    {
+      "symbol": "4USDT",
+      "base": "4",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.012566,
+      "price_change_pct": -1.187,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 117701.0,
+      "volume_baseline_usdt": 3023.0,
+      "volume_ratio": 38.94,
+      "detected_at": "2026-05-11T14:15:13.800374+00:00",
+      "intensity": 3
+    },
+    {
+      "symbol": "BANANAS31USDT",
+      "base": "BANANAS31",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 0.014295,
+      "price_change_pct": -2.516,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 71883.0,
+      "volume_baseline_usdt": 12365.0,
+      "volume_ratio": 5.81,
+      "detected_at": "2026-05-11T14:14:59.227541+00:00",
+      "intensity": 1
+    },
     {
       "symbol": "BANANAS31USDT",
       "base": "BANANAS31",
@@ -792,48 +820,6 @@
       "volume_baseline_usdt": 12686.0,
       "volume_ratio": 5.94,
       "detected_at": "2026-05-11T13:18:09.061275+00:00",
-      "intensity": 1
-    },
-    {
-      "symbol": "SKYAIUSDT",
-      "base": "SKYAI",
-      "direction": "SHORT",
-      "alert_type": "sustained",
-      "price": 0.39048,
-      "price_change_pct": -3.342,
-      "metric_window_min": 10,
-      "volume_1m_usdt": 433312.0,
-      "volume_baseline_usdt": 80182.0,
-      "volume_ratio": 5.4,
-      "detected_at": "2026-05-11T13:17:31.870051+00:00",
-      "intensity": 1
-    },
-    {
-      "symbol": "BLUAIUSDT",
-      "base": "BLUAI",
-      "direction": "LONG",
-      "alert_type": "burst",
-      "price": 0.013039,
-      "price_change_pct": 0.524,
-      "metric_window_min": 1,
-      "volume_1m_usdt": 70712.0,
-      "volume_baseline_usdt": 2903.0,
-      "volume_ratio": 24.36,
-      "detected_at": "2026-05-11T13:15:48.815756+00:00",
-      "intensity": 1
-    },
-    {
-      "symbol": "ZECUSDT",
-      "base": "ZEC",
-      "direction": "SHORT",
-      "alert_type": "burst",
-      "price": 562.87,
-      "price_change_pct": -0.525,
-      "metric_window_min": 1,
-      "volume_1m_usdt": 6381953.0,
-      "volume_baseline_usdt": 501957.0,
-      "volume_ratio": 12.71,
-      "detected_at": "2026-05-11T13:14:53.049861+00:00",
       "intensity": 1
     }
   ]
