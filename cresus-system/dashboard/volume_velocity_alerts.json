@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-11T14:06:55.912642+00:00",
+  "updated_at": "2026-05-11T14:14:13.511861+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,64 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 57,
+  "alerts_count": 59,
   "alerts": [
+    {
+      "symbol": "BANANAS31USDT",
+      "base": "BANANAS31",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 0.014343,
+      "price_change_pct": -1.517,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 61911.0,
+      "volume_baseline_usdt": 12290.0,
+      "volume_ratio": 5.04,
+      "detected_at": "2026-05-11T14:12:59.044315+00:00",
+      "intensity": 1
+    },
+    {
+      "symbol": "QCOMUSDT",
+      "base": "QCOM",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 239.1,
+      "price_change_pct": 1.771,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 70846.0,
+      "volume_baseline_usdt": 7577.0,
+      "volume_ratio": 9.35,
+      "detected_at": "2026-05-11T14:11:01.385919+00:00",
+      "intensity": 1
+    },
+    {
+      "symbol": "KASUSDT",
+      "base": "KAS",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.03927,
+      "price_change_pct": 1.552,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 76086.0,
+      "volume_baseline_usdt": 5800.0,
+      "volume_ratio": 13.12,
+      "detected_at": "2026-05-11T14:08:57.454099+00:00",
+      "intensity": 1
+    },
+    {
+      "symbol": "SNDKUSDT",
+      "base": "SNDK",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 1568.39,
+      "price_change_pct": 1.746,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 1099785.0,
+      "volume_baseline_usdt": 157424.0,
+      "volume_ratio": 6.99,
+      "detected_at": "2026-05-11T14:08:02.491694+00:00",
+      "intensity": 1
+    },
     {
       "symbol": "DUSDT",
       "base": "D",
@@ -779,34 +835,6 @@
       "volume_ratio": 12.71,
       "detected_at": "2026-05-11T13:14:53.049861+00:00",
       "intensity": 1
-    },
-    {
-      "symbol": "TRIAUSDT",
-      "base": "TRIA",
-      "direction": "LONG",
-      "alert_type": "sustained",
-      "price": 0.03613,
-      "price_change_pct": 2.207,
-      "metric_window_min": 10,
-      "volume_1m_usdt": 65379.0,
-      "volume_baseline_usdt": 9742.0,
-      "volume_ratio": 6.71,
-      "detected_at": "2026-05-11T13:13:29.390455+00:00",
-      "intensity": 1
-    },
-    {
-      "symbol": "QUSDT",
-      "base": "Q",
-      "direction": "SHORT",
-      "alert_type": "burst",
-      "price": 0.014493,
-      "price_change_pct": -1.119,
-      "metric_window_min": 1,
-      "volume_1m_usdt": 351324.0,
-      "volume_baseline_usdt": 25834.0,
-      "volume_ratio": 13.6,
-      "detected_at": "2026-05-11T13:08:14.358873+00:00",
-      "intensity": 3
     }
   ]
 }
