@@ -45,6 +45,14 @@ DEFAULT_OUTPUT  = Path.home() / "cresus-bot" / "volume_velocity_alerts.json"
 DEDUP_STATE     = Path.home() / "cresus-bot" / ".velocity_dedup.json"
 LOG_FILE        = Path.home() / "cresus-bot" / "logs" / "volume_velocity_scanner.log"
 
+# ---- Phase 2: 历史胜率追踪 ----
+OUTCOMES_STATE   = Path.home() / "cresus-bot" / ".velocity_outcomes.json"   # 本地状态,不 push
+WINRATE_OUTPUT   = Path.home() / "cresus-bot" / "velocity_winrate.json"     # push 给看板
+OUTCOME_STAGES_MIN = [30, 60, 240]    # 30m / 1h / 4h
+OUTCOMES_RETENTION_DAYS = 60          # 保留 60 天历史
+OUTCOME_WIN_THRESHOLD_PCT = 0.5       # outcome_pct ≥ 0.5% 视为"赢" (net of fees)
+WINRATE_MIN_SAMPLES = 5               # 样本数 ≥ 此值才显示胜率
+
 BINANCE_FAPI = "https://fapi.binance.com"
 UA = "Mozilla/5.0 (Macintosh) cresus-velocity-scanner"
 HTTP_TIMEOUT = 12
@@ -433,6 +441,194 @@ def analyze_symbol(symbol: str,
 
 
 # ============================================================================
+# Phase 2: Outcome tracking + win-rate
+# ============================================================================
+
+def _load_outcomes() -> dict:
+    if not OUTCOMES_STATE.exists():
+        return {"alerts": {}}
+    try:
+        data = json.loads(OUTCOMES_STATE.read_text(encoding="utf-8"))
+        if not isinstance(data, dict) or "alerts" not in data:
+            return {"alerts": {}}
+        return data
+    except Exception:
+        return {"alerts": {}}
+
+
+def _save_outcomes(state: dict) -> None:
+    try:
+        OUTCOMES_STATE.parent.mkdir(parents=True, exist_ok=True)
+        tmp = OUTCOMES_STATE.with_suffix(".tmp")
+        tmp.write_text(json.dumps(state, ensure_ascii=False), encoding="utf-8")
+        tmp.replace(OUTCOMES_STATE)
+    except Exception as e:
+        _log(f"save_outcomes failed: {e}")
+
+
+def _alert_id(a: VelocityAlert) -> str:
+    # detected_at 本身含 +00:00, 用作幂等键
+    return f"{a.symbol}|{a.alert_type}|{a.direction}|{a.detected_at}"
+
+
+def _log_new_alerts_to_outcomes(state: dict, new_alerts: List[VelocityAlert]) -> None:
+    """新 alert 落库为待结算 entry."""
+    for a in new_alerts:
+        aid = _alert_id(a)
+        if aid in state["alerts"]:
+            continue
+        state["alerts"][aid] = {
+            "symbol": a.symbol,
+            "alert_type": a.alert_type,
+            "direction": a.direction,
+            "intensity": a.intensity,
+            "entry_price": a.price,
+            "detected_at": a.detected_at,
+            # 上下文 (未来回归用)
+            "vol_ratio": a.volume_ratio,
+            "primary_change_pct": a.price_change_pct,
+            "outcomes": {f"{m}m": None for m in OUTCOME_STAGES_MIN},
+        }
+
+
+def _fetch_all_prices_now() -> dict:
+    """1 次 bulk 拉所有 USDT-M 永续现价. 返回 {symbol: float}."""
+    data = _http_get_json(f"{BINANCE_FAPI}/fapi/v1/ticker/price")
+    if not isinstance(data, list):
+        return {}
+    out = {}
+    for t in data:
+        try:
+            out[t["symbol"]] = float(t["price"])
+        except (KeyError, ValueError, TypeError):
+            pass
+    return out
+
+
+def _resolve_matured_outcomes(state: dict) -> int:
+    """扫所有 alert,把已到期但未结算的 stage 用当前价填上.
+    返回 resolved 条数 (用于日志)."""
+    now = datetime.now(timezone.utc)
+    pending: List[tuple] = []   # (aid, stage_key, stage_min)
+    for aid, rec in state["alerts"].items():
+        try:
+            det = datetime.fromisoformat(rec["detected_at"].replace("Z", "+00:00"))
+        except Exception:
+            continue
+        age_min = (now - det).total_seconds() / 60.0
+        for m in OUTCOME_STAGES_MIN:
+            key = f"{m}m"
+            if rec["outcomes"].get(key) is None and age_min >= m:
+                pending.append((aid, key, m))
+
+    if not pending:
+        return 0
+
+    prices = _fetch_all_prices_now()
+    if not prices:
+        return 0
+
+    resolved = 0
+    for aid, key, _m in pending:
+        rec = state["alerts"].get(aid)
+        if not rec:
+            continue
+        sym = rec["symbol"]
+        cur = prices.get(sym)
+        if cur is None:
+            continue
+        entry = float(rec["entry_price"])
+        if entry <= 0:
+            continue
+        raw_pct = (cur - entry) / entry * 100.0
+        # 方向化: LONG 取正向, SHORT 取反向 (正=对方向走对了)
+        signed_pct = raw_pct if rec["direction"] == "LONG" else -raw_pct
+        rec["outcomes"][key] = {
+            "price": cur,
+            "outcome_pct": round(signed_pct, 3),
+            "resolved_at": now.isoformat(),
+        }
+        resolved += 1
+    return resolved
+
+
+def _prune_old_outcomes(state: dict) -> int:
+    """删 >OUTCOMES_RETENTION_DAYS 天前的 alert. 返回删除数."""
+    cutoff = datetime.now(timezone.utc) - timedelta(days=OUTCOMES_RETENTION_DAYS)
+    to_del = []
+    for aid, rec in state["alerts"].items():
+        try:
+            det = datetime.fromisoformat(rec["detected_at"].replace("Z", "+00:00"))
+            if det < cutoff:
+                to_del.append(aid)
+        except Exception:
+            to_del.append(aid)
+    for aid in to_del:
+        del state["alerts"][aid]
+    return len(to_del)
+
+
+def _build_winrate_summary(state: dict) -> dict:
+    """按 (symbol|alert_type|direction) 聚合, 每个 stage 计算胜率."""
+    buckets: dict = {}
+    for rec in state["alerts"].values():
+        key = f"{rec['symbol']}|{rec['alert_type']}|{rec['direction']}"
+        b = buckets.setdefault(key, {
+            "symbol": rec["symbol"],
+            "alert_type": rec["alert_type"],
+            "direction": rec["direction"],
+            "stages": {f"{m}m": {"n": 0, "wins": 0, "sum_pct": 0.0} for m in OUTCOME_STAGES_MIN},
+        })
+        for m in OUTCOME_STAGES_MIN:
+            stk = f"{m}m"
+            oc = rec["outcomes"].get(stk)
+            if not oc:
+                continue
+            pct = oc.get("outcome_pct", 0.0)
+            b["stages"][stk]["n"] += 1
+            b["stages"][stk]["sum_pct"] += pct
+            if pct >= OUTCOME_WIN_THRESHOLD_PCT:
+                b["stages"][stk]["wins"] += 1
+
+    # 转输出格式
+    out_by_key = {}
+    for key, b in buckets.items():
+        stages_out = {}
+        any_data = False
+        for stk, s in b["stages"].items():
+            if s["n"] >= WINRATE_MIN_SAMPLES:
+                stages_out[stk] = {
+                    "n": s["n"],
+                    "win_rate": round(s["wins"] / s["n"], 3),
+                    "avg_outcome_pct": round(s["sum_pct"] / s["n"], 2),
+                }
+                any_data = True
+        if any_data:
+            out_by_key[key] = {
+                "symbol": b["symbol"],
+                "alert_type": b["alert_type"],
+                "direction": b["direction"],
+                "stages": stages_out,
+            }
+    return {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "win_threshold_pct": OUTCOME_WIN_THRESHOLD_PCT,
+        "min_samples": WINRATE_MIN_SAMPLES,
+        "by_key": out_by_key,
+    }
+
+
+def _save_winrate(summary: dict) -> None:
+    try:
+        WINRATE_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+        tmp = WINRATE_OUTPUT.with_suffix(".tmp")
+        tmp.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+        tmp.replace(WINRATE_OUTPUT)
+    except Exception as e:
+        _log(f"save_winrate failed: {e}")
+
+
+# ============================================================================
 # Dedup + persistence
 # ============================================================================
 
@@ -576,6 +772,22 @@ def run_scan() -> List[VelocityAlert]:
             _log(f"🌊 全市场下跌事件: {short_n} 个 SHORT (市场级,非个股 alpha)")
         else:
             _log(f"✅ {len(new_alerts)} alerts (LONG={long_n} SHORT={short_n})")
+
+    # ===== Phase 2: outcome tracking =====
+    try:
+        outcomes_state = _load_outcomes()
+        _log_new_alerts_to_outcomes(outcomes_state, new_alerts)
+        resolved_n = _resolve_matured_outcomes(outcomes_state)
+        pruned_n = _prune_old_outcomes(outcomes_state)
+        _save_outcomes(outcomes_state)
+        summary = _build_winrate_summary(outcomes_state)
+        _save_winrate(summary)
+        if resolved_n or pruned_n:
+            _log(f"📊 outcomes: 新增 {len(new_alerts)}, 结算 {resolved_n}, 清理 {pruned_n}, "
+                 f"汇总 bucket={len(summary.get('by_key', {}))}")
+    except Exception as e:
+        _log(f"outcome tracking failed: {e}")
+
     return new_alerts
 
 

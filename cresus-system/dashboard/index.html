@@ -1840,12 +1840,19 @@ function renderMacroPanel() {
 
 // ==================== P27-X: ⚡ 量能加速度雷达 ====================
 let velocityData = null;
+let velocityWinrate = null;   // { by_key: { "SYM|burst|LONG": {stages: {30m:{n,win_rate,avg_outcome_pct}}}}}
 
 async function loadVelocityRadar() {
   try {
-    const res = await fetch("./volume_velocity_alerts.json?_=" + Date.now());
-    if (!res.ok) return;
-    velocityData = await res.json();
+    const [alertsRes, winRes] = await Promise.all([
+      fetch("./volume_velocity_alerts.json?_=" + Date.now()),
+      fetch("./velocity_winrate.json?_=" + Date.now()).catch(() => null),
+    ]);
+    if (!alertsRes.ok) return;
+    velocityData = await alertsRes.json();
+    if (winRes && winRes.ok) {
+      try { velocityWinrate = await winRes.json(); } catch (_) { velocityWinrate = null; }
+    }
     renderVelocityPanel();
   } catch (e) {
     console.warn("[velocity] load failed:", e);
@@ -1969,6 +1976,38 @@ function renderVelocityPanel() {
       const tcls = t >= 0.55 ? "taker-buy" : (t <= 0.45 ? "taker-sell" : "fnd-neutral");
       chips.push(`<span class="vchip ${tcls}" title="主动买盘占比 (>55% 偏多, <45% 偏空)">主${pct100}</span>`);
     }
+    // 历史胜率 (Phase 2): 该 symbol+type+方向 的 30m 胜率
+    let wrChip = "";
+    let wrExecLine = "";
+    if (velocityWinrate && velocityWinrate.by_key) {
+      const wkey = `${a.symbol}|${a.alert_type}|${a.direction}`;
+      const w = velocityWinrate.by_key[wkey];
+      if (w && w.stages) {
+        const s30 = w.stages["30m"];
+        const s60 = w.stages["60m"];
+        const s240 = w.stages["240m"];
+        // 主 chip: 优先 30m
+        const primary = s30 || s60 || s240;
+        if (primary) {
+          const rate100 = Math.round(primary.win_rate * 100);
+          const label = s30 ? "30m" : (s60 ? "1h" : "4h");
+          let wcls = "win-flat";
+          if (primary.win_rate >= 0.6) wcls = "taker-buy";
+          else if (primary.win_rate <= 0.4) wcls = "taker-sell";
+          wrChip = `<span class="vchip ${wcls}" title="该 ${a.symbol}+${a.alert_type}+${a.direction} 历史 ${label} 胜率 (赢=outcome≥${velocityWinrate.win_threshold_pct||0.5}%)">胜${label} ${rate100}% N=${primary.n}</span>`;
+        }
+        // execution 区: 列出全部 stage
+        const stageStrs = [];
+        for (const [k, sn] of Object.entries(w.stages)) {
+          const r100 = Math.round(sn.win_rate * 100);
+          stageStrs.push(`<span class="vexec-label">${k}:</span><span class="vexec-val">${r100}%</span><span class="vexec-r">(N=${sn.n}, μ${sn.avg_outcome_pct>0?"+":""}${sn.avg_outcome_pct}%)</span>`);
+        }
+        if (stageStrs.length) {
+          wrExecLine = `<div><span class="vexec-label">历史胜率:</span>${stageStrs.join("&nbsp;·&nbsp;")}</div>`;
+        }
+      }
+    }
+
     // 多窗口涨幅
     const winChip = (winLabel, val) => {
       if (val == null) return "";
@@ -1979,6 +2018,7 @@ function renderVelocityPanel() {
     chips.push(winChip("5m",  a.change_5m_pct));
     chips.push(winChip("1h",  a.change_1h_pct));
     if (a.change_4h_pct != null) chips.push(winChip("4h", a.change_4h_pct));
+    if (wrChip) chips.push(wrChip);
 
     // ===== 入场建议 (expand 后显示) =====
     const fmt = (p) => {
@@ -2010,7 +2050,10 @@ function renderVelocityPanel() {
           <span class="vexec-label">ATR(14):</span><span class="vexec-val">${a.atr_pct != null ? a.atr_pct.toFixed(2) + "%" : "—"}</span>
           ${a.taker_buy_ratio_5m != null ? `&nbsp;·&nbsp;<span class="vexec-label">5m 主动买:</span><span class="vexec-val">${Math.round(a.taker_buy_ratio_5m*100)}%</span>` : ""}
           ${a.change_15m_pct != null ? `&nbsp;·&nbsp;<span class="vexec-label">15m:</span><span class="vexec-val">${a.change_15m_pct > 0 ? "+" : ""}${a.change_15m_pct.toFixed(2)}%</span>` : ""}
-        </div>`;
+        </div>
+        ${wrExecLine}`;
+    } else if (wrExecLine) {
+      execHtml = wrExecLine;
     }
 
     const sigsHtml = chips.filter(Boolean).join("");
