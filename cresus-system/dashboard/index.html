@@ -210,6 +210,42 @@
   }
   .panel-body { padding: 16px 20px; }
 
+  /* P30 视觉强化: 分区色彩归属 — panel 背景跟随所属 section 主色淡染 */
+  /* 🌍 宏观环境 — 浅浅冰蓝 */
+  #regime-panel, #macro-panel, #velocity-panel {
+    background-color: var(--panel);
+    background-image: linear-gradient(180deg, rgba(64,169,255,0.085) 0%, rgba(64,169,255,0.025) 100%);
+    border-color: rgba(64,169,255,0.22);
+    border-left: 3px solid rgba(64,169,255,0.55);
+  }
+  #regime-panel h2, #macro-panel h2, #velocity-panel h2 {
+    background: rgba(64,169,255,0.11);
+    border-bottom-color: rgba(64,169,255,0.25);
+  }
+
+  /* 📊 我的交易 — 浅浅翠绿 */
+  #pnl-panel, #positions-panel, #history-panel,
+  #struct-dist-panel, #histogram-panel {
+    background-color: var(--panel);
+    background-image: linear-gradient(180deg, rgba(0,200,83,0.085) 0%, rgba(0,200,83,0.025) 100%);
+    border-color: rgba(0,200,83,0.22);
+    border-left: 3px solid rgba(0,200,83,0.55);
+  }
+  #pnl-panel h2, #positions-panel h2, #history-panel h2,
+  #struct-dist-panel h2, #histogram-panel h2 {
+    background: rgba(0,200,83,0.11);
+    border-bottom-color: rgba(0,200,83,0.25);
+  }
+  /* #stats 是 grid 容器,加内边距 + 容器级绿染 */
+  #stats {
+    padding: 14px 16px;
+    border-radius: 12px;
+    background-color: var(--panel);
+    background-image: linear-gradient(180deg, rgba(0,200,83,0.085) 0%, rgba(0,200,83,0.025) 100%);
+    border: 1px solid rgba(0,200,83,0.22);
+    border-left: 3px solid rgba(0,200,83,0.55);
+  }
+
   /* histogram */
   .histogram {
     display: flex;
