@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-11T13:06:56.633090+00:00",
+  "updated_at": "2026-05-11T13:16:17.683940+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,64 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 34,
+  "alerts_count": 32,
   "alerts": [
+    {
+      "symbol": "BLUAIUSDT",
+      "base": "BLUAI",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.013039,
+      "price_change_pct": 0.524,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 70712.0,
+      "volume_baseline_usdt": 2903.0,
+      "volume_ratio": 24.36,
+      "detected_at": "2026-05-11T13:15:48.815756+00:00",
+      "intensity": 1
+    },
+    {
+      "symbol": "ZECUSDT",
+      "base": "ZEC",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 562.87,
+      "price_change_pct": -0.525,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 6381953.0,
+      "volume_baseline_usdt": 501957.0,
+      "volume_ratio": 12.71,
+      "detected_at": "2026-05-11T13:14:53.049861+00:00",
+      "intensity": 1
+    },
+    {
+      "symbol": "TRIAUSDT",
+      "base": "TRIA",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.03613,
+      "price_change_pct": 2.207,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 65379.0,
+      "volume_baseline_usdt": 9742.0,
+      "volume_ratio": 6.71,
+      "detected_at": "2026-05-11T13:13:29.390455+00:00",
+      "intensity": 1
+    },
+    {
+      "symbol": "QUSDT",
+      "base": "Q",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.014493,
+      "price_change_pct": -1.119,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 351324.0,
+      "volume_baseline_usdt": 25834.0,
+      "volume_ratio": 13.6,
+      "detected_at": "2026-05-11T13:08:14.358873+00:00",
+      "intensity": 3
+    },
     {
       "symbol": "CETUSUSDT",
       "base": "CETUS",
@@ -401,90 +457,6 @@
       "volume_ratio": 7.06,
       "detected_at": "2026-05-11T12:17:44.884592+00:00",
       "intensity": 1
-    },
-    {
-      "symbol": "INTCUSDT",
-      "base": "INTC",
-      "direction": "SHORT",
-      "alert_type": "sustained",
-      "price": 129.94,
-      "price_change_pct": -1.635,
-      "metric_window_min": 10,
-      "volume_1m_usdt": 262233.0,
-      "volume_baseline_usdt": 49006.0,
-      "volume_ratio": 5.35,
-      "detected_at": "2026-05-11T12:13:00.216848+00:00",
-      "intensity": 1
-    },
-    {
-      "symbol": "SPORTFUNUSDT",
-      "base": "SPORTFUN",
-      "direction": "LONG",
-      "alert_type": "sustained",
-      "price": 0.0764,
-      "price_change_pct": 2.413,
-      "metric_window_min": 10,
-      "volume_1m_usdt": 36218.0,
-      "volume_baseline_usdt": 5487.0,
-      "volume_ratio": 6.6,
-      "detected_at": "2026-05-11T12:11:38.319846+00:00",
-      "intensity": 1
-    },
-    {
-      "symbol": "EVAAUSDT",
-      "base": "EVAA",
-      "direction": "LONG",
-      "alert_type": "burst",
-      "price": 0.6104,
-      "price_change_pct": 0.544,
-      "metric_window_min": 1,
-      "volume_1m_usdt": 17967.0,
-      "volume_baseline_usdt": 2394.0,
-      "volume_ratio": 7.51,
-      "detected_at": "2026-05-11T12:11:36.683198+00:00",
-      "intensity": 1
-    },
-    {
-      "symbol": "CHZUSDT",
-      "base": "CHZ",
-      "direction": "SHORT",
-      "alert_type": "burst",
-      "price": 0.04384,
-      "price_change_pct": -0.635,
-      "metric_window_min": 1,
-      "volume_1m_usdt": 797477.0,
-      "volume_baseline_usdt": 14740.0,
-      "volume_ratio": 54.1,
-      "detected_at": "2026-05-11T12:11:10.058283+00:00",
-      "intensity": 1
-    },
-    {
-      "symbol": "BLUAIUSDT",
-      "base": "BLUAI",
-      "direction": "SHORT",
-      "alert_type": "burst",
-      "price": 0.012942,
-      "price_change_pct": -0.828,
-      "metric_window_min": 1,
-      "volume_1m_usdt": 72137.0,
-      "volume_baseline_usdt": 6922.0,
-      "volume_ratio": 10.42,
-      "detected_at": "2026-05-11T12:09:04.925549+00:00",
-      "intensity": 2
-    },
-    {
-      "symbol": "SAHARAUSDT",
-      "base": "SAHARA",
-      "direction": "LONG",
-      "alert_type": "burst",
-      "price": 0.03716,
-      "price_change_pct": 1.116,
-      "metric_window_min": 1,
-      "volume_1m_usdt": 294503.0,
-      "volume_baseline_usdt": 27136.0,
-      "volume_ratio": 10.85,
-      "detected_at": "2026-05-11T12:08:30.452752+00:00",
-      "intensity": 3
     }
   ]
 }
