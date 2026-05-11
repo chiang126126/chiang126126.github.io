@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-11T13:57:49.825908+00:00",
+  "updated_at": "2026-05-11T14:06:55.912642+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,64 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 58,
+  "alerts_count": 57,
   "alerts": [
+    {
+      "symbol": "DUSDT",
+      "base": "D",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.013973,
+      "price_change_pct": 0.511,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 46444.0,
+      "volume_baseline_usdt": 3089.0,
+      "volume_ratio": 15.03,
+      "detected_at": "2026-05-11T14:06:51.008265+00:00",
+      "intensity": 1
+    },
+    {
+      "symbol": "HUSDT",
+      "base": "H",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.23542,
+      "price_change_pct": 1.825,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 97289.0,
+      "volume_baseline_usdt": 14184.0,
+      "volume_ratio": 6.86,
+      "detected_at": "2026-05-11T14:06:29.379787+00:00",
+      "intensity": 1
+    },
+    {
+      "symbol": "FLOCKUSDT",
+      "base": "FLOCK",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.07917,
+      "price_change_pct": 0.969,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 22187.0,
+      "volume_baseline_usdt": 2269.0,
+      "volume_ratio": 9.78,
+      "detected_at": "2026-05-11T14:04:47.164043+00:00",
+      "intensity": 2
+    },
+    {
+      "symbol": "JASMYUSDT",
+      "base": "JASMY",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.007139,
+      "price_change_pct": 0.507,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 135747.0,
+      "volume_baseline_usdt": 19388.0,
+      "volume_ratio": 7.0,
+      "detected_at": "2026-05-11T14:04:22.402109+00:00",
+      "intensity": 1
+    },
     {
       "symbol": "DEEPUSDT",
       "base": "DEEP",
@@ -751,76 +807,6 @@
       "volume_ratio": 13.6,
       "detected_at": "2026-05-11T13:08:14.358873+00:00",
       "intensity": 3
-    },
-    {
-      "symbol": "CETUSUSDT",
-      "base": "CETUS",
-      "direction": "SHORT",
-      "alert_type": "burst",
-      "price": 0.03511,
-      "price_change_pct": -0.51,
-      "metric_window_min": 1,
-      "volume_1m_usdt": 52922.0,
-      "volume_baseline_usdt": 3246.0,
-      "volume_ratio": 16.3,
-      "detected_at": "2026-05-11T13:06:36.308469+00:00",
-      "intensity": 1
-    },
-    {
-      "symbol": "INTCUSDT",
-      "base": "INTC",
-      "direction": "LONG",
-      "alert_type": "sustained",
-      "price": 131.74,
-      "price_change_pct": 1.643,
-      "metric_window_min": 10,
-      "volume_1m_usdt": 282838.0,
-      "volume_baseline_usdt": 53070.0,
-      "volume_ratio": 5.33,
-      "detected_at": "2026-05-11T13:01:31.873827+00:00",
-      "intensity": 1
-    },
-    {
-      "symbol": "INXUSDT",
-      "base": "INX",
-      "direction": "SHORT",
-      "alert_type": "burst",
-      "price": 0.012499,
-      "price_change_pct": -0.612,
-      "metric_window_min": 1,
-      "volume_1m_usdt": 366736.0,
-      "volume_baseline_usdt": 40739.0,
-      "volume_ratio": 9.0,
-      "detected_at": "2026-05-11T13:01:23.477477+00:00",
-      "intensity": 1
-    },
-    {
-      "symbol": "QCOMUSDT",
-      "base": "QCOM",
-      "direction": "LONG",
-      "alert_type": "sustained",
-      "price": 239.31,
-      "price_change_pct": 1.995,
-      "metric_window_min": 10,
-      "volume_1m_usdt": 26461.0,
-      "volume_baseline_usdt": 5159.0,
-      "volume_ratio": 5.13,
-      "detected_at": "2026-05-11T13:00:08.901276+00:00",
-      "intensity": 1
-    },
-    {
-      "symbol": "GTCUSDT",
-      "base": "GTC",
-      "direction": "LONG",
-      "alert_type": "sustained",
-      "price": 0.12025,
-      "price_change_pct": 2.288,
-      "metric_window_min": 10,
-      "volume_1m_usdt": 193880.0,
-      "volume_baseline_usdt": 14016.0,
-      "volume_ratio": 13.83,
-      "detected_at": "2026-05-11T12:59:34.933319+00:00",
-      "intensity": 2
     }
   ]
 }
