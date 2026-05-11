@@ -50,16 +50,21 @@ UA = "Mozilla/5.0 (Macintosh) cresus-velocity-scanner"
 HTTP_TIMEOUT = 12
 
 SCAN_TOP_N             = 200      # 24h 成交额 Top N 标的
-KLINE_LIMIT            = 30       # 1m 数据条数 (30min 窗口)
+KLINE_LIMIT            = 240      # 1m 数据条数 (4h 窗口, 支持 1h/4h 多窗口涨幅 + ATR)
 
 # ---- 路径 A: 启动检测 (1m spike vs 30m 基线) ----
 VOLUME_BURST_RATIO     = 5.0      # 1m 量 > 30m 均 × 此倍数
 PRICE_MOVE_THRESHOLD   = 0.005    # 1m 价格变化 ≥ 0.5%
 
 # ---- 路径 B: 持续动能 (1m vs 24h 全天分钟均 + 10m 累计趋势) ----
-# 解决"BILLUSDT 已经飞了 2 小时,30m 均量也飞了,vol_ratio 跌回 3x"问题
 SUSTAINED_VOL_24H_RATIO     = 5.0    # 1m 量 ≥ X × (24h_quoteVol / 1440)
 SUSTAINED_PRICE_10M_THRESHOLD = 0.015  # 10m 累计变化 ≥ 1.5%
+
+# ---- ATR-based 入场建议 ----
+ATR_PERIOD = 14
+ATR_SL_MULT = 1.0   # 止损距 = 1.0 × ATR
+ATR_TP1_MULT = 1.5  # TP1 距 = 1.5 × ATR (1.5R)
+ATR_TP2_MULT = 3.0  # TP2 距 = 3.0 × ATR (3R)
 
 DEDUP_WINDOW_MIN       = 30       # 同标的+类型去重窗口 (分钟)
 KEEP_ALERT_WINDOW_MIN  = 60       # 输出 JSON 保留最近 X 分钟内的报警
@@ -82,10 +87,33 @@ class VelocityAlert:
     price_change_pct: float # burst=1m 变化, sustained=10m 累计
     metric_window_min: int  # 1 或 10
     volume_1m_usdt: float
-    volume_baseline_usdt: float  # burst=30m_avg, sustained=24h_avg/min
-    volume_ratio: float     # burst=vs 30m_avg, sustained=vs 24h_avg/min
-    detected_at: str        # ISO timestamp
-    intensity: int          # 1-3 (基于 volume_ratio 和 price_change 综合)
+    volume_baseline_usdt: float
+    volume_ratio: float
+    detected_at: str
+    intensity: int
+
+    # ---- Phase 1 富信息 ----
+    # 多窗口涨幅 (BILL 慢牛的解药)
+    change_5m_pct:  Optional[float] = None
+    change_15m_pct: Optional[float] = None
+    change_1h_pct:  Optional[float] = None
+    change_4h_pct:  Optional[float] = None
+
+    # 主动资金方向 (kline 字段 10 / 字段 7, 0-1, >0.55 偏多, <0.45 偏空)
+    taker_buy_ratio_1m: Optional[float] = None   # 最近 1m
+    taker_buy_ratio_5m: Optional[float] = None   # 最近 5m 加权
+
+    # OI Δ (新仓 vs 平仓识别): >0+价↑ = 真新仓; <0+价↑ = 空头回补
+    oi_delta_5m_pct: Optional[float] = None
+
+    # Funding rate (情绪拥挤指标): >0.05% = 多拥挤; <-0.05% = 空拥挤
+    funding_rate_pct: Optional[float] = None
+
+    # ATR-based 入场建议
+    atr_pct: Optional[float] = None              # ATR / current price * 100
+    suggested_sl:  Optional[float] = None
+    suggested_tp1: Optional[float] = None        # 1.5R
+    suggested_tp2: Optional[float] = None        # 3R
 
 
 # ============================================================================
@@ -149,7 +177,7 @@ def fetch_universe() -> List[tuple]:
 
 
 def fetch_1m_klines(symbol: str) -> List[list]:
-    """30 根 1m K 线 (Binance 永续)."""
+    """KLINE_LIMIT 根 1m K 线 (240 根 = 4h)."""
     url = f"{BINANCE_FAPI}/fapi/v1/klines?symbol={symbol}&interval=1m&limit={KLINE_LIMIT}"
     data = _http_get_json(url)
     if not isinstance(data, list):
@@ -157,11 +185,106 @@ def fetch_1m_klines(symbol: str) -> List[list]:
     return data
 
 
+def fetch_all_funding_rates() -> dict:
+    """一次 bulk 拉所有 USDT 永续 funding rate, 返回 {symbol: funding_rate_pct}."""
+    data = _http_get_json(f"{BINANCE_FAPI}/fapi/v1/premiumIndex")
+    if not isinstance(data, list):
+        return {}
+    out = {}
+    for t in data:
+        sym = t.get("symbol", "")
+        try:
+            out[sym] = float(t.get("lastFundingRate", 0)) * 100  # 转 %
+        except (ValueError, TypeError):
+            pass
+    return out
+
+
+def fetch_oi_delta_5m(symbol: str) -> Optional[float]:
+    """OI 5min 前 vs 当前的变化 %.  Binance: /futures/data/openInterestHist."""
+    url = f"{BINANCE_FAPI}/futures/data/openInterestHist?symbol={symbol}&period=5m&limit=2"
+    data = _http_get_json(url)
+    if not isinstance(data, list) or len(data) < 2:
+        return None
+    try:
+        prev = float(data[-2].get("sumOpenInterest", 0))
+        curr = float(data[-1].get("sumOpenInterest", 0))
+        if prev <= 0:
+            return None
+        return round((curr - prev) / prev * 100, 3)
+    except (ValueError, TypeError, KeyError):
+        return None
+
+
+def _safe_pct(klines: List[list], lookback: int) -> Optional[float]:
+    """klines[-(lookback+1)] open → klines[-1] close 的变化 %.
+    使用 [-1] 因为我们后面只对完成的 candle 走 [-2] 切片, 调用方应传完整切片."""
+    if len(klines) < lookback + 1:
+        return None
+    try:
+        start = float(klines[-(lookback + 1)][1])
+        end = float(klines[-1][4])
+        if start <= 0:
+            return None
+        return round((end - start) / start * 100, 3)
+    except (ValueError, IndexError, TypeError):
+        return None
+
+
+def _taker_buy_ratio(kline_row: list) -> Optional[float]:
+    """单根 kline 的主动买盘占比.  字段 7=quoteVol, 字段 10=taker_buy_quote_vol."""
+    try:
+        qv = float(kline_row[7])
+        tbq = float(kline_row[10])
+        if qv <= 0:
+            return None
+        return round(tbq / qv, 3)
+    except (ValueError, IndexError, TypeError):
+        return None
+
+
+def _taker_buy_ratio_n(klines: List[list], n: int) -> Optional[float]:
+    """最近 n 根完成 kline 的加权 taker buy 占比 (加权按 quoteVol)."""
+    if len(klines) < n + 1:
+        return None
+    try:
+        tot_qv = 0.0
+        tot_tbq = 0.0
+        for k in klines[-(n + 1):-1]:
+            tot_qv += float(k[7])
+            tot_tbq += float(k[10])
+        if tot_qv <= 0:
+            return None
+        return round(tot_tbq / tot_qv, 3)
+    except (ValueError, IndexError, TypeError):
+        return None
+
+
+def _compute_atr(klines: List[list], period: int = ATR_PERIOD) -> Optional[float]:
+    """ATR(period) on 1m candles. 返回绝对值 (与 close price 同单位)."""
+    if len(klines) < period + 2:
+        return None
+    try:
+        trs = []
+        for i in range(len(klines) - period - 1, len(klines) - 1):
+            high  = float(klines[i][2])
+            low   = float(klines[i][3])
+            prev_close = float(klines[i - 1][4])
+            tr = max(high - low, abs(high - prev_close), abs(low - prev_close))
+            trs.append(tr)
+        return sum(trs) / len(trs) if trs else None
+    except (ValueError, IndexError, TypeError):
+        return None
+
+
 # ============================================================================
 # Detection logic
 # ============================================================================
 
-def analyze_symbol(symbol: str, quote_vol_24h: Optional[float] = None) -> Optional[VelocityAlert]:
+def analyze_symbol(symbol: str,
+                   quote_vol_24h: Optional[float] = None,
+                   funding_rate_pct: Optional[float] = None,
+                   skip_oi: bool = False) -> Optional[VelocityAlert]:
     """对单个 symbol 做双路检测.
     路径 A "burst": 1m_vol/30m_avg ≥ 5x AND 1m 变化 ≥ 0.5%  → 启动瞬间
     路径 B "sustained": 1m_vol/24h_avg_per_min ≥ 5x AND 10m 累计 ≥ 1.5%  → 持续动能
@@ -247,6 +370,38 @@ def analyze_symbol(symbol: str, quote_vol_24h: Optional[float] = None) -> Option
         direction = "LONG" if primary_change > 0 else "SHORT"
         base = symbol[:-4].upper()
 
+        # ===== Phase 1 富信息 =====
+        # 多窗口涨幅: 用完整 klines (含最新 candle 也无妨, 价格点位)
+        change_5m  = _safe_pct(klines, 5)
+        change_15m = _safe_pct(klines, 15)
+        change_1h  = _safe_pct(klines, 60)
+        change_4h  = _safe_pct(klines, 240) if len(klines) > 240 else None
+
+        # 主动买盘占比 (kline 自带, 0 额外 API)
+        taker_1m = _taker_buy_ratio(last_completed)
+        taker_5m = _taker_buy_ratio_n(klines, 5)
+
+        # ATR(14) 1m
+        atr_abs = _compute_atr(klines, ATR_PERIOD)
+        atr_pct = round(atr_abs / last_close * 100, 3) if (atr_abs and last_close > 0) else None
+
+        # 入场建议: 以 last_close 为参考入场点
+        sl = tp1 = tp2 = None
+        if atr_abs and atr_abs > 0:
+            if direction == "LONG":
+                sl  = round(last_close - ATR_SL_MULT  * atr_abs, 8)
+                tp1 = round(last_close + ATR_TP1_MULT * atr_abs, 8)
+                tp2 = round(last_close + ATR_TP2_MULT * atr_abs, 8)
+            else:
+                sl  = round(last_close + ATR_SL_MULT  * atr_abs, 8)
+                tp1 = round(last_close - ATR_TP1_MULT * atr_abs, 8)
+                tp2 = round(last_close - ATR_TP2_MULT * atr_abs, 8)
+
+        # OI 5m Δ (额外 1 次 API,可禁用)
+        oi_delta = None
+        if not skip_oi:
+            oi_delta = fetch_oi_delta_5m(symbol)
+
         return VelocityAlert(
             symbol=symbol,
             base=base,
@@ -260,6 +415,18 @@ def analyze_symbol(symbol: str, quote_vol_24h: Optional[float] = None) -> Option
             volume_ratio=round(primary_ratio, 2),
             detected_at=datetime.now(timezone.utc).isoformat(),
             intensity=intensity,
+            change_5m_pct=change_5m,
+            change_15m_pct=change_15m,
+            change_1h_pct=change_1h,
+            change_4h_pct=change_4h,
+            taker_buy_ratio_1m=taker_1m,
+            taker_buy_ratio_5m=taker_5m,
+            oi_delta_5m_pct=oi_delta,
+            funding_rate_pct=round(funding_rate_pct, 4) if funding_rate_pct is not None else None,
+            atr_pct=atr_pct,
+            suggested_sl=sl,
+            suggested_tp1=tp1,
+            suggested_tp2=tp2,
         )
     except (ValueError, TypeError, IndexError):
         return None
@@ -354,13 +521,18 @@ def run_scan() -> List[VelocityAlert]:
         _log("empty universe, abort")
         return []
 
+    # 一次 bulk 拉所有 funding rate (premiumIndex 返回全部 symbol)
+    funding_map = fetch_all_funding_rates()
+
     dedup = _load_dedup()
     new_alerts: List[VelocityAlert] = []
 
     # 串行扫描 (避免触发 Binance rate limit)
-    # 200 标的 × ~80ms/请求 ≈ 16 秒, 留余量
+    # 200 标的 × klines + (条件性) OI ≈ 25-35 秒, 60s 周期内
     for i, (sym, qv) in enumerate(universe):
-        alert = analyze_symbol(sym, quote_vol_24h=qv)
+        alert = analyze_symbol(sym,
+                               quote_vol_24h=qv,
+                               funding_rate_pct=funding_map.get(sym))
         if not alert:
             if (i + 1) % 50 == 0:
                 time.sleep(0.5)
@@ -429,7 +601,7 @@ def main(argv) -> int:
     if argv and argv[0] == "show":
         return cmd_show()
     if argv and argv[0] == "test":
-        # 单标的快速测试 (拉单只 ticker 拿 24h vol 用于 sustained 路径)
+        # 单标的快速测试 (拉 24h vol + funding 给完整双路 + 富信息)
         sym = argv[1] if len(argv) >= 2 else "BTCUSDT"
         tdata = _http_get_json(f"{BINANCE_FAPI}/fapi/v1/ticker/24hr?symbol={sym}")
         qv = None
@@ -438,13 +610,23 @@ def main(argv) -> int:
                 qv = float(tdata.get("quoteVolume", 0))
             except (ValueError, TypeError):
                 qv = None
-        result = analyze_symbol(sym, quote_vol_24h=qv)
+        # funding (单标的)
+        pdata = _http_get_json(f"{BINANCE_FAPI}/fapi/v1/premiumIndex?symbol={sym}")
+        fr = None
+        if isinstance(pdata, dict):
+            try:
+                fr = float(pdata.get("lastFundingRate", 0)) * 100
+            except (ValueError, TypeError):
+                fr = None
+        result = analyze_symbol(sym, quote_vol_24h=qv, funding_rate_pct=fr)
         if result:
             print(f"✅ {sym} 触发 ({result.alert_type}): {result}")
         else:
             print(f"❌ {sym} 未触发 (启动 + 持续 都不达标)")
             if qv:
                 print(f"   参考: 24h_vol=${qv:,.0f} → avg_1m=${qv/1440:,.0f}")
+            if fr is not None:
+                print(f"   funding: {fr:+.4f}%")
         return 0
     new = run_scan()
     return 0
