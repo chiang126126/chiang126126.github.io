@@ -1364,6 +1364,47 @@
     border-radius: 8px; font-size: 12px; color: #ffd180;
   }
 
+  /* Phase 2: precog 历史胜率 chip + A/B 实验 banner */
+  .precog-hitrate {
+    font-size: 10px; font-weight: 700;
+    padding: 1px 6px; border-radius: 5px;
+    background: rgba(255,255,255,0.06);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    margin-left: 4px;
+  }
+  .precog-ab-banner {
+    margin-top: 14px; padding: 12px 14px;
+    background: linear-gradient(135deg, rgba(64,169,255,0.10), rgba(179,127,235,0.08));
+    border: 1px solid rgba(100,150,220,0.30);
+    border-radius: 10px; font-size: 12px;
+  }
+  .precog-ab-banner .ab-title {
+    font-weight: 700; font-size: 13px;
+    color: #b388ff; margin-bottom: 8px;
+    letter-spacing: 0.3px;
+  }
+  .precog-ab-banner .ab-bucket {
+    display: flex; gap: 10px;
+    padding: 6px 0;
+    align-items: baseline;
+  }
+  .precog-ab-banner .ab-bucket-name {
+    flex-shrink: 0; min-width: 72px;
+    font-weight: 700; color: var(--text);
+  }
+  .precog-ab-banner .ab-bucket-stages {
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+  }
+  .precog-ab-banner .ab-bucket-na {
+    color: var(--text-dim); font-style: italic;
+  }
+  .precog-ab-banner .ab-note {
+    margin-top: 6px; font-size: 10.5px;
+    color: var(--text-dim); opacity: 0.85;
+  }
+
   /* 手机端 LONG/SHORT 切换 Tab */
   .precog-mobile-tabs { display: none; }
 
@@ -1536,6 +1577,7 @@
         </div>
       </div>
       <div id="precog-degraded-note" style="display:none"></div>
+      <div id="precog-ab-banner" style="display:none"></div>
     </div>
   </div>
 
@@ -2153,6 +2195,7 @@ function switchVelocityTab(side) {
 
 // ==================== P23: 🔮 预兆雷达 ====================
 let precogData = null;
+let precogWinrate = null;   // Phase 2: precog A/B 评估数据
 
 // 手机端 LONG/SHORT Tab 切换
 function switchPrecogTab(side) {
@@ -2179,9 +2222,15 @@ function computePrecogPriority(c) {
 
 async function loadPrecogRadar() {
   try {
-    const res = await fetch("./precog_radar.json?_=" + Date.now());
-    if (!res.ok) return;
-    precogData = await res.json();
+    const [dataRes, winRes] = await Promise.all([
+      fetch("./precog_radar.json?_=" + Date.now()),
+      fetch("./precog_winrate.json?_=" + Date.now()).catch(() => null),
+    ]);
+    if (!dataRes.ok) return;
+    precogData = await dataRes.json();
+    if (winRes && winRes.ok) {
+      try { precogWinrate = await winRes.json(); } catch (_) { precogWinrate = null; }
+    }
     renderPrecogPanel();
   } catch (e) {
     console.warn("[precog] load failed:", e);
@@ -2195,6 +2244,29 @@ function renderPrecogCard(c, rank, isLong) {
   const isIgnition = (c.ignition_score || 0) > (c.setup_score || 0);
   const kindCls   = isIgnition ? "precog-kind-ignition" : "precog-kind-setup";
   const kindLabel = isIgnition ? "🚀 启动" : "📦 蓄势";
+
+  // Phase 2: 历史胜率 chip (此 symbol+pred_type+direction 累积数据)
+  let hitRateChip = "";
+  if (precogWinrate && precogWinrate.by_key) {
+    const predType = isIgnition ? "ignition" : "setup";
+    const direction = isLong ? "LONG" : "SHORT";
+    const wkey = `${c.symbol}|${predType}|${direction}`;
+    const w = precogWinrate.by_key[wkey];
+    if (w && w.stages) {
+      const s30 = w.stages["30m"];
+      const s60 = w.stages["60m"];
+      const s240 = w.stages["240m"];
+      const primary = s30 || s60 || s240;
+      if (primary) {
+        const rate100 = Math.round(primary.win_rate * 100);
+        const label = s30 ? "30m" : (s60 ? "1h" : "4h");
+        let wColor = "#8a96aa";  // 灰
+        if (primary.win_rate >= 0.6) wColor = "#00e676";
+        else if (primary.win_rate <= 0.4) wColor = "#ff5252";
+        hitRateChip = `<span class="precog-hitrate" style="color:${wColor}" title="此 setup 历史 ${label} 胜率 (赢=outcome≥${precogWinrate.win_threshold_pct||0.5}%)">胜${label} ${rate100}% N=${primary.n}</span>`;
+      }
+    }
+  }
   const conf = c.ai_confidence;
   const confDisplay = conf != null ? conf : "—";
   const confLabel = conf != null ? "AI 置信度" : "量化推断";
@@ -2214,6 +2286,7 @@ function renderPrecogCard(c, rank, isLong) {
           ${topBadge}
           <span class="precog-tradable ${tradable}">${tradableLabel}</span>
           <span class="precog-kind-tag ${kindCls}">${kindLabel}</span>
+          ${hitRateChip}
         </div>
       </div>
       <div class="precog-card-row2">
@@ -2282,6 +2355,34 @@ function renderPrecogPanel() {
     degraded.innerHTML = `⚠️ <strong>AI 推理未启用</strong> — 当前显示的是量化阶段方向推断。设置 <code>DEEPSEEK_API_KEY</code> 环境变量后可启用 DeepSeek 深度分析,显著提升预测准确度。`;
   } else {
     degraded.style.display = "none";
+  }
+
+  // Phase 2: AI vs 量化 A/B 对照 banner (用户的核心诉求 — 客观评估 precog 是否值得保留)
+  const ab = document.getElementById("precog-ab-banner");
+  ab.style.display = "none";
+  if (precogWinrate && precogWinrate.overall) {
+    const ovr = precogWinrate.overall;
+    const hasAi = ovr.with_ai && Object.keys(ovr.with_ai).length > 0;
+    const hasQuant = ovr.quant_only && Object.keys(ovr.quant_only).length > 0;
+    if (hasAi || hasQuant) {
+      const fmtBucket = (name, b) => {
+        if (!b || !b["30m"]) return `<span class="ab-bucket"><span class="ab-bucket-name">${name}</span><span class="ab-bucket-na">数据不足</span></span>`;
+        const r30 = b["30m"], r60 = b["60m"], r240 = b["240m"];
+        const cell = (label, s) => s ? `${label} ${Math.round(s.win_rate*100)}% (N=${s.n}, μ${s.avg_outcome_pct>0?"+":""}${s.avg_outcome_pct}%)` : `${label} —`;
+        return `<span class="ab-bucket">
+          <span class="ab-bucket-name">${name}</span>
+          <span class="ab-bucket-stages">${cell("30m", r30)} · ${cell("1h", r60)} · ${cell("4h", r240)}</span>
+        </span>`;
+      };
+      ab.className = "precog-ab-banner";
+      ab.style.display = "";
+      ab.innerHTML = `
+        <div class="ab-title">🧪 A/B 实验: AI 推理 vs 纯量化 (precog 自身对照)</div>
+        ${fmtBucket("AI 模式",  ovr.with_ai)}
+        ${fmtBucket("量化模式", ovr.quant_only)}
+        <div class="ab-note">胜率定义: outcome_pct ≥ ${precogWinrate.win_threshold_pct||0.5}% (扣手续费净值). 样本 ≥ ${precogWinrate.min_samples||5} 才显示.</div>
+      `;
+    }
   }
 }
 // ==================== P23 end ====================

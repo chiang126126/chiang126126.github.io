@@ -43,7 +43,7 @@ import time
 import urllib.request
 import urllib.error
 from dataclasses import dataclass, asdict, field
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from statistics import mean, median, stdev
 from typing import List, Optional, Dict, Tuple
@@ -54,6 +54,17 @@ from typing import List, Optional, Dict, Tuple
 
 DEFAULT_OUTPUT = Path.home() / "cresus-bot" / "precog_radar.json"
 CACHE_DIR      = Path.home() / "cresus-bot" / ".precog_cache"
+
+# ---- Phase 2: A/B 评估用胜率追踪 (跟 velocity 同 schema) ----
+OUTCOMES_STATE   = Path.home() / "cresus-bot" / ".precog_outcomes.json"
+WINRATE_OUTPUT   = Path.home() / "cresus-bot" / "precog_winrate.json"
+OUTCOME_STAGES_MIN = [30, 60, 240]   # 30m / 1h / 4h
+OUTCOMES_RETENTION_DAYS = 60
+OUTCOME_WIN_THRESHOLD_PCT = 0.5
+WINRATE_MIN_SAMPLES = 5
+# precog 每 10min 跑一次, 同一 (symbol, direction, pred_type) 在窗口内只算一次 prediction
+# 否则同一行情被算 6 次, 胜率失真
+PRED_DEDUP_WINDOW_MIN = 60
 
 BINANCE_FAPI = "https://fapi.binance.com"
 OKX_API      = "https://www.okx.com"
@@ -1025,8 +1036,286 @@ def run_pipeline(
     tmp = output_path.with_suffix(".tmp")
     tmp.write_text(json.dumps(payload, indent=2, ensure_ascii=False))
     tmp.replace(output_path)
+
+    # ===== Phase 2: outcome tracking (放在主文件写入之后, 即使追踪失败也不影响主输出) =====
+    _run_outcome_tracking(longs, shorts, ai_used, payload["updated_at"], verbose=verbose)
+
     return payload
 
+
+# ============================================================================
+# Phase 2: outcome tracking + win-rate (与 velocity 同 schema, 用于 A/B 评估)
+# ============================================================================
+
+def _load_precog_outcomes() -> dict:
+    if not OUTCOMES_STATE.exists():
+        return {"predictions": {}}
+    try:
+        data = json.loads(OUTCOMES_STATE.read_text(encoding="utf-8"))
+        if not isinstance(data, dict) or "predictions" not in data:
+            return {"predictions": {}}
+        return data
+    except Exception:
+        return {"predictions": {}}
+
+
+def _save_precog_outcomes(state: dict) -> None:
+    try:
+        OUTCOMES_STATE.parent.mkdir(parents=True, exist_ok=True)
+        tmp = OUTCOMES_STATE.with_suffix(".tmp")
+        tmp.write_text(json.dumps(state, ensure_ascii=False), encoding="utf-8")
+        tmp.replace(OUTCOMES_STATE)
+    except Exception as e:
+        print(f"[precog] save_outcomes failed: {e}", file=sys.stderr)
+
+
+def _pred_type(c: Candidate) -> str:
+    """ignition (启动) vs setup (蓄势), 与 dashboard 图标对应."""
+    return "ignition" if (c.ignition_score or 0) > (c.setup_score or 0) else "setup"
+
+
+def _pred_direction(c: Candidate) -> Optional[str]:
+    """优先用 AI 预测, 其次量化 hint. NEUTRAL/None 跳过."""
+    if c.ai_prediction == "BREAKOUT_LONG":
+        return "LONG"
+    if c.ai_prediction == "BREAKOUT_SHORT":
+        return "SHORT"
+    if c.direction_hint in ("LONG", "SHORT"):
+        return c.direction_hint
+    return None
+
+
+def _prediction_id(c: Candidate, detected_at: str) -> str:
+    direction = _pred_direction(c) or "NEUTRAL"
+    return f"{c.symbol}|{_pred_type(c)}|{direction}|{detected_at}"
+
+
+def _log_predictions_to_outcomes(state: dict,
+                                 longs: List[Candidate],
+                                 shorts: List[Candidate],
+                                 ai_used: bool,
+                                 detected_at: str) -> int:
+    """Top LONG + Top SHORT (实际给出的入场建议) 落库为待结算.
+    去重: 同 (symbol, pred_type, direction) 在 PRED_DEDUP_WINDOW_MIN 内只算 1 次.
+    """
+    try:
+        now = datetime.fromisoformat(detected_at.replace("Z", "+00:00"))
+    except Exception:
+        now = datetime.now(timezone.utc)
+    dedup_cutoff = now - timedelta(minutes=PRED_DEDUP_WINDOW_MIN)
+
+    # 构建已存在 (symbol|pred_type|direction) → 最近 detected_at 的索引
+    recent_by_natural_key: dict = {}
+    for rec in state["predictions"].values():
+        nat_key = f"{rec['symbol']}|{rec['pred_type']}|{rec['direction']}"
+        try:
+            ts = datetime.fromisoformat(rec["detected_at"].replace("Z", "+00:00"))
+        except Exception:
+            continue
+        if ts >= dedup_cutoff:
+            prev = recent_by_natural_key.get(nat_key)
+            if prev is None or ts > prev:
+                recent_by_natural_key[nat_key] = ts
+
+    logged = 0
+    for c in (longs + shorts):
+        direction = _pred_direction(c)
+        if not direction:
+            continue
+        nat_key = f"{c.symbol}|{_pred_type(c)}|{direction}"
+        if nat_key in recent_by_natural_key:
+            continue  # 窗口内已有, 跳过
+        pid = _prediction_id(c, detected_at)
+        if pid in state["predictions"]:
+            continue  # 完全相同的 detected_at 不重复
+        state["predictions"][pid] = {
+            "symbol": c.symbol,
+            "pred_type": _pred_type(c),
+            "direction": direction,
+            "ai_used": ai_used,
+            "ai_confidence": c.ai_confidence,
+            "breakout_score": round(c.breakout_score or 0, 3),
+            "entry_price": c.price,
+            "detected_at": detected_at,
+            "outcomes": {f"{m}m": None for m in OUTCOME_STAGES_MIN},
+        }
+        logged += 1
+    return logged
+
+
+def _fetch_all_prices_now() -> dict:
+    """1 次 bulk 拉所有 USDT-M 永续现价."""
+    data = _http_get_json(f"{BINANCE_FAPI}/fapi/v1/ticker/price")
+    if not isinstance(data, list):
+        return {}
+    out = {}
+    for t in data:
+        try:
+            out[t["symbol"]] = float(t["price"])
+        except (KeyError, ValueError, TypeError):
+            pass
+    return out
+
+
+def _resolve_matured_precog_outcomes(state: dict) -> int:
+    now = datetime.now(timezone.utc)
+    pending: List[tuple] = []
+    for pid, rec in state["predictions"].items():
+        try:
+            det = datetime.fromisoformat(rec["detected_at"].replace("Z", "+00:00"))
+        except Exception:
+            continue
+        age_min = (now - det).total_seconds() / 60.0
+        for m in OUTCOME_STAGES_MIN:
+            key = f"{m}m"
+            if rec["outcomes"].get(key) is None and age_min >= m:
+                pending.append((pid, key, m))
+    if not pending:
+        return 0
+    prices = _fetch_all_prices_now()
+    if not prices:
+        return 0
+    resolved = 0
+    for pid, key, _m in pending:
+        rec = state["predictions"].get(pid)
+        if not rec:
+            continue
+        cur = prices.get(rec["symbol"])
+        if cur is None:
+            continue
+        entry = float(rec["entry_price"])
+        if entry <= 0:
+            continue
+        raw_pct = (cur - entry) / entry * 100.0
+        signed_pct = raw_pct if rec["direction"] == "LONG" else -raw_pct
+        rec["outcomes"][key] = {
+            "price": cur,
+            "outcome_pct": round(signed_pct, 3),
+            "resolved_at": now.isoformat(),
+        }
+        resolved += 1
+    return resolved
+
+
+def _prune_old_precog_outcomes(state: dict) -> int:
+    cutoff = datetime.now(timezone.utc) - timedelta(days=OUTCOMES_RETENTION_DAYS)
+    to_del = []
+    for pid, rec in state["predictions"].items():
+        try:
+            det = datetime.fromisoformat(rec["detected_at"].replace("Z", "+00:00"))
+            if det < cutoff:
+                to_del.append(pid)
+        except Exception:
+            to_del.append(pid)
+    for pid in to_del:
+        del state["predictions"][pid]
+    return len(to_del)
+
+
+def _build_precog_winrate_summary(state: dict) -> dict:
+    """聚合: by_key (per symbol+type+direction) + overall (AI vs quant-only A/B)."""
+    by_key_buckets: dict = {}
+    overall: dict = {
+        "with_ai":    {f"{m}m": {"n": 0, "wins": 0, "sum_pct": 0.0} for m in OUTCOME_STAGES_MIN},
+        "quant_only": {f"{m}m": {"n": 0, "wins": 0, "sum_pct": 0.0} for m in OUTCOME_STAGES_MIN},
+    }
+    for rec in state["predictions"].values():
+        key = f"{rec['symbol']}|{rec['pred_type']}|{rec['direction']}"
+        b = by_key_buckets.setdefault(key, {
+            "symbol": rec["symbol"],
+            "pred_type": rec["pred_type"],
+            "direction": rec["direction"],
+            "stages": {f"{m}m": {"n": 0, "wins": 0, "sum_pct": 0.0} for m in OUTCOME_STAGES_MIN},
+        })
+        ai_bucket = "with_ai" if rec.get("ai_used") else "quant_only"
+        for m in OUTCOME_STAGES_MIN:
+            stk = f"{m}m"
+            oc = rec["outcomes"].get(stk)
+            if not oc:
+                continue
+            pct = oc.get("outcome_pct", 0.0)
+            is_win = pct >= OUTCOME_WIN_THRESHOLD_PCT
+            b["stages"][stk]["n"] += 1
+            b["stages"][stk]["sum_pct"] += pct
+            if is_win:
+                b["stages"][stk]["wins"] += 1
+            overall[ai_bucket][stk]["n"] += 1
+            overall[ai_bucket][stk]["sum_pct"] += pct
+            if is_win:
+                overall[ai_bucket][stk]["wins"] += 1
+
+    out_by_key = {}
+    for key, b in by_key_buckets.items():
+        stages_out = {}
+        for stk, s in b["stages"].items():
+            if s["n"] >= WINRATE_MIN_SAMPLES:
+                stages_out[stk] = {
+                    "n": s["n"],
+                    "win_rate": round(s["wins"] / s["n"], 3),
+                    "avg_outcome_pct": round(s["sum_pct"] / s["n"], 2),
+                }
+        if stages_out:
+            out_by_key[key] = {
+                "symbol": b["symbol"],
+                "pred_type": b["pred_type"],
+                "direction": b["direction"],
+                "stages": stages_out,
+            }
+
+    out_overall = {}
+    for bucket, stages in overall.items():
+        out_overall[bucket] = {}
+        for stk, s in stages.items():
+            if s["n"] >= WINRATE_MIN_SAMPLES:
+                out_overall[bucket][stk] = {
+                    "n": s["n"],
+                    "win_rate": round(s["wins"] / s["n"], 3),
+                    "avg_outcome_pct": round(s["sum_pct"] / s["n"], 2),
+                }
+
+    return {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "win_threshold_pct": OUTCOME_WIN_THRESHOLD_PCT,
+        "min_samples": WINRATE_MIN_SAMPLES,
+        "by_key": out_by_key,
+        "overall": out_overall,
+    }
+
+
+def _save_precog_winrate(summary: dict) -> None:
+    try:
+        WINRATE_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+        tmp = WINRATE_OUTPUT.with_suffix(".tmp")
+        tmp.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+        tmp.replace(WINRATE_OUTPUT)
+    except Exception as e:
+        print(f"[precog] save_winrate failed: {e}", file=sys.stderr)
+
+
+def _run_outcome_tracking(longs: List[Candidate],
+                          shorts: List[Candidate],
+                          ai_used: bool,
+                          detected_at: str,
+                          verbose: bool = True) -> None:
+    """嵌入 run_pipeline 末尾: 落库 + 结算 + 汇总."""
+    try:
+        state = _load_precog_outcomes()
+        new_n = _log_predictions_to_outcomes(state, longs, shorts, ai_used, detected_at)
+        resolved_n = _resolve_matured_precog_outcomes(state)
+        pruned_n = _prune_old_precog_outcomes(state)
+        _save_precog_outcomes(state)
+        summary = _build_precog_winrate_summary(state)
+        _save_precog_winrate(summary)
+        if verbose:
+            print(f"[precog] 📊 outcomes: 新增 {new_n}, 结算 {resolved_n}, 清理 {pruned_n}, "
+                  f"bucket={len(summary.get('by_key', {}))}", file=sys.stderr)
+    except Exception as e:
+        print(f"[precog] outcome tracking failed: {e}", file=sys.stderr)
+
+
+# ============================================================================
+# Payload helpers
+# ============================================================================
 
 def _empty_payload() -> dict:
     return {
