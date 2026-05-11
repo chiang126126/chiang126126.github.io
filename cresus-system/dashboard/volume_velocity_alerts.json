@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-11T10:54:29.247582+00:00",
+  "updated_at": "2026-05-11T11:06:26.709883+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,106 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 25,
+  "alerts_count": 31,
   "alerts": [
+    {
+      "symbol": "FFUSDT",
+      "base": "FF",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.07155,
+      "price_change_pct": 1.865,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 77805.0,
+      "volume_baseline_usdt": 9371.0,
+      "volume_ratio": 8.3,
+      "detected_at": "2026-05-11T11:05:57.791704+00:00",
+      "intensity": 1
+    },
+    {
+      "symbol": "2ZUSDT",
+      "base": "2Z",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.10453,
+      "price_change_pct": -0.58,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 69740.0,
+      "volume_baseline_usdt": 13610.0,
+      "volume_ratio": 5.12,
+      "detected_at": "2026-05-11T11:03:44.652257+00:00",
+      "intensity": 1
+    },
+    {
+      "symbol": "BANANAS31USDT",
+      "base": "BANANAS31",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 0.013446,
+      "price_change_pct": -1.595,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 59573.0,
+      "volume_baseline_usdt": 6410.0,
+      "volume_ratio": 9.29,
+      "detected_at": "2026-05-11T11:01:20.707801+00:00",
+      "intensity": 1
+    },
+    {
+      "symbol": "FFUSDT",
+      "base": "FF",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.07126,
+      "price_change_pct": 0.707,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 443842.0,
+      "volume_baseline_usdt": 88545.0,
+      "volume_ratio": 5.01,
+      "detected_at": "2026-05-11T11:01:13.187411+00:00",
+      "intensity": 1
+    },
+    {
+      "symbol": "2ZUSDT",
+      "base": "2Z",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 0.10505,
+      "price_change_pct": -1.528,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 57870.0,
+      "volume_baseline_usdt": 5378.0,
+      "volume_ratio": 10.76,
+      "detected_at": "2026-05-11T10:59:07.456983+00:00",
+      "intensity": 1
+    },
+    {
+      "symbol": "OPUSDT",
+      "base": "OP",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.1587,
+      "price_change_pct": -0.564,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 299236.0,
+      "volume_baseline_usdt": 38802.0,
+      "volume_ratio": 7.71,
+      "detected_at": "2026-05-11T10:58:24.006533+00:00",
+      "intensity": 1
+    },
+    {
+      "symbol": "ICPUSDT",
+      "base": "ICP",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 3.454,
+      "price_change_pct": -1.623,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 247426.0,
+      "volume_baseline_usdt": 44981.0,
+      "volume_ratio": 5.5,
+      "detected_at": "2026-05-11T10:58:12.929292+00:00",
+      "intensity": 1
+    },
     {
       "symbol": "SAGAUSDT",
       "base": "SAGA",
@@ -334,18 +432,6 @@
       "volume_30m_avg_usdt": 4747.0,
       "volume_ratio": 22.84,
       "detected_at": "2026-05-11T10:12:03.440355+00:00",
-      "intensity": 1
-    },
-    {
-      "symbol": "TONUSDT",
-      "base": "TON",
-      "direction": "LONG",
-      "price": 2.3258,
-      "price_change_1m_pct": 0.688,
-      "volume_1m_usdt": 795899.0,
-      "volume_30m_avg_usdt": 82696.0,
-      "volume_ratio": 9.62,
-      "detected_at": "2026-05-11T09:56:03.419529+00:00",
       "intensity": 1
     }
   ]
