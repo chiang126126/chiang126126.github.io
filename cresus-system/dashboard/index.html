@@ -3732,6 +3732,16 @@ setInterval(loadMacroEvents, 60_000);          // P21: 每分钟重渲染（事�
 setInterval(renderMacroPanel, 30_000);         // P21: 倒计时仅本地重算，30s 一次
 setInterval(loadPrecogRadar, 5 * 60_000);      // P23: 预兆雷达 5min 刷新
 loadVelocityRadar();
+setInterval(loadVelocityRadar, 60_000);        // P27-X: 量能加速度 1m 刷新 (跟 scanner cron 同频)
+
+// 切回 tab 时立刻刷新关键面板,避免看陈旧数据
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    loadVelocityRadar();
+    loadSignals();
+    loadPnL();
+  }
+});
 setInterval(loadVelocityRadar, 60_000);        // P27-X: 量能加速度 1min 刷新 (高时效)
 
 // P30: 电梯导航 active 状态跟随滚动

@@ -35,16 +35,26 @@ launchctl list | grep cresus.tp1-monitor && echo "✓ launchd 启动"
 echo ""
 echo "=== P27-X: 量能加速度早期检测 ==="
 cp "$REPO/cresus-system/scripts/volume_velocity_scanner.py" "$BOT/scripts/"
-echo "✓ volume_velocity_scanner.py 装载"
+# Phase 3: launchd 用 wrapper, 让它能读 ~/.cresus/env.sh 里的 TG token
+cp "$REPO/cresus-system/scripts/run_velocity_scanner.sh" "$BOT/scripts/"
+chmod +x "$BOT/scripts/run_velocity_scanner.sh"
+echo "✓ volume_velocity_scanner.py + run_velocity_scanner.sh 装载"
 
 # 立刻跑一次试 (验证网络 + 数据)
 echo "→ 试跑一次..."
-python3 "$BOT/scripts/volume_velocity_scanner.py" 2>&1 | tail -5
+bash "$BOT/scripts/run_velocity_scanner.sh" 2>&1 | tail -5
 
 cp "$REPO/cresus-system/scripts/com.cresus.velocity-scanner.plist" "$LA/"
 launchctl unload "$LA/com.cresus.velocity-scanner.plist" 2>/dev/null || true
 launchctl load -w "$LA/com.cresus.velocity-scanner.plist"
 launchctl list | grep cresus.velocity-scanner && echo "✓ launchd 启动"
+
+# Phase 3: 提示 Telegram 配置状态
+if [ -f "$HOME/.cresus/env.sh" ] && grep -q "TELEGRAM_BOT_TOKEN" "$HOME/.cresus/env.sh" 2>/dev/null; then
+    echo "✓ Telegram push 配置已检测到 (~/.cresus/env.sh)"
+else
+    echo "ⓘ Telegram push 未配置 — 创建 ~/.cresus/env.sh 写入 TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID 启用"
+fi
 
 # ============================================
 # 2.5 precog_radar.py 更新 (Phase 2 胜率追踪)

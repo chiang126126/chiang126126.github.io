@@ -27,6 +27,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 import time
 import urllib.request
@@ -52,6 +53,13 @@ OUTCOME_STAGES_MIN = [30, 60, 240]    # 30m / 1h / 4h
 OUTCOMES_RETENTION_DAYS = 60          # 保留 60 天历史
 OUTCOME_WIN_THRESHOLD_PCT = 0.5       # outcome_pct ≥ 0.5% 视为"赢" (net of fees)
 WINRATE_MIN_SAMPLES = 5               # 样本数 ≥ 此值才显示胜率
+
+# ---- Phase 3: Telegram push (绕过看板延迟链, 直接推手机) ----
+TG_BOT_TOKEN     = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
+TG_CHAT_ID       = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
+TG_COOLDOWN_STATE = Path.home() / "cresus-bot" / ".velocity_tg_cooldown.json"
+TG_COOLDOWN_MIN  = 30                 # 同 symbol 30min 只推 1 次
+TG_MIN_INTENSITY = 2                  # intensity ≥ 2 才推 (过滤弱信号噪声)
 
 BINANCE_FAPI = "https://fapi.binance.com"
 UA = "Mozilla/5.0 (Macintosh) cresus-velocity-scanner"
@@ -708,6 +716,164 @@ def _trim_old_alerts(alerts: List[dict]) -> List[dict]:
 
 
 # ============================================================================
+# Phase 3: Telegram push (高质量信号绕过看板延迟, 直接推手机)
+# ============================================================================
+
+def _load_tg_cooldown() -> dict:
+    if not TG_COOLDOWN_STATE.exists():
+        return {}
+    try:
+        return json.loads(TG_COOLDOWN_STATE.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _save_tg_cooldown(state: dict) -> None:
+    try:
+        TG_COOLDOWN_STATE.parent.mkdir(parents=True, exist_ok=True)
+        tmp = TG_COOLDOWN_STATE.with_suffix(".tmp")
+        tmp.write_text(json.dumps(state), encoding="utf-8")
+        tmp.replace(TG_COOLDOWN_STATE)
+    except Exception as e:
+        _log(f"tg_cooldown save failed: {e}")
+
+
+def _send_telegram(text: str) -> bool:
+    """发送一条 Telegram 消息. 失败静默, 不影响主流程."""
+    if not TG_BOT_TOKEN or not TG_CHAT_ID:
+        return False
+    url = f"https://api.telegram.org/bot{TG_BOT_TOKEN}/sendMessage"
+    body = json.dumps({
+        "chat_id": TG_CHAT_ID,
+        "text": text,
+        "disable_web_page_preview": True,
+        # 不用 markdown_v2 (转义太麻烦), 用 HTML 模式
+        "parse_mode": "HTML",
+    }).encode()
+    try:
+        req = urllib.request.Request(
+            url, data=body,
+            headers={"Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(req, timeout=8) as r:
+            if r.status == 200:
+                return True
+            _log(f"tg send non-200: {r.status}")
+            return False
+    except Exception as e:
+        _log(f"tg send failed: {e}")
+        return False
+
+
+def _format_alert_for_tg(a: VelocityAlert, winrate_summary: Optional[dict] = None) -> str:
+    """构造 Telegram 消息 (HTML 模式). 数据丰富但简洁,适配手机阅读."""
+    type_icon = "🔥" if a.alert_type == "sustained" else "⚡"
+    type_label = "持续" if a.alert_type == "sustained" else "启动"
+    dir_icon = "📈" if a.direction == "LONG" else "📉"
+    win_str = f"{a.metric_window_min}m"
+    pct_str = f"{a.price_change_pct:+.2f}%"
+
+    lines = [
+        f"<b>{type_icon} {a.symbol}</b> {type_label} <b>{a.direction}</b> {dir_icon}",
+        f"{pct_str} / {win_str} · vol <b>{a.volume_ratio:.1f}x</b> · 强度 {a.intensity}",
+    ]
+
+    # 富信息段 (chips)
+    chips = []
+    if a.funding_rate_pct is not None:
+        flag = "🔥" if abs(a.funding_rate_pct) > 0.05 else ""
+        chips.append(f"Fnd {a.funding_rate_pct:+.3f}%{flag}")
+    if a.oi_delta_5m_pct is not None:
+        oi_meaning = ""
+        if a.direction == "LONG":
+            oi_meaning = " 真新多" if a.oi_delta_5m_pct > 0 else " 空头回补"
+        else:
+            oi_meaning = " 真新空" if a.oi_delta_5m_pct < 0 else " 诱空"
+        chips.append(f"OI {a.oi_delta_5m_pct:+.2f}%{oi_meaning}")
+    if a.taker_buy_ratio_1m is not None:
+        chips.append(f"主{int(a.taker_buy_ratio_1m * 100)}")
+    if chips:
+        lines.append("  " + " · ".join(chips))
+
+    # 多窗口
+    multi = []
+    if a.change_5m_pct is not None: multi.append(f"5m {a.change_5m_pct:+.2f}%")
+    if a.change_1h_pct is not None: multi.append(f"1h {a.change_1h_pct:+.2f}%")
+    if a.change_4h_pct is not None: multi.append(f"4h {a.change_4h_pct:+.2f}%")
+    if multi:
+        lines.append("  " + " · ".join(multi))
+
+    # 入场建议
+    if a.suggested_sl is not None:
+        def _fmt(p):
+            n = float(p)
+            if n < 1:   return f"{n:.6g}"
+            if n < 100: return f"{n:.4f}"
+            return f"{n:.2f}"
+        def _dist(target):
+            return (target - a.price) / a.price * 100
+        lines.append("")
+        lines.append(f"💼 入场 <code>{_fmt(a.price)}</code>")
+        lines.append(f"  SL  <code>{_fmt(a.suggested_sl)}</code> ({_dist(a.suggested_sl):+.2f}%, 1R)")
+        lines.append(f"  TP1 <code>{_fmt(a.suggested_tp1)}</code> ({_dist(a.suggested_tp1):+.2f}%, 1.5R)")
+        lines.append(f"  TP2 <code>{_fmt(a.suggested_tp2)}</code> ({_dist(a.suggested_tp2):+.2f}%, 3R)")
+        if a.atr_pct is not None:
+            lines.append(f"  ATR(14) {a.atr_pct:.2f}%")
+
+    # 历史胜率 (如果该 setup 已有 N≥5 经验数据)
+    if winrate_summary and winrate_summary.get("by_key"):
+        wkey = f"{a.symbol}|{a.alert_type}|{a.direction}"
+        w = winrate_summary["by_key"].get(wkey)
+        if w and w.get("stages"):
+            s30 = w["stages"].get("30m")
+            if s30:
+                rate100 = round(s30["win_rate"] * 100)
+                mu = s30["avg_outcome_pct"]
+                lines.append(f"🏆 历史 30m 胜率 <b>{rate100}%</b> (N={s30['n']}, μ{mu:+.2f}%)")
+
+    return "\n".join(lines)
+
+
+def _push_to_telegram(new_alerts: List[VelocityAlert],
+                      winrate_summary: Optional[dict]) -> int:
+    """筛选高质量 alerts 并推送. 返回推送数 (含跳过).
+    门槛: intensity ≥ TG_MIN_INTENSITY AND 30min 冷却内未推过同 symbol.
+    """
+    if not TG_BOT_TOKEN or not TG_CHAT_ID:
+        return 0
+    if not new_alerts:
+        return 0
+    cooldown = _load_tg_cooldown()
+    now = datetime.now(timezone.utc)
+    cutoff = now - timedelta(minutes=TG_COOLDOWN_MIN)
+    # 清理过期 cooldown 条目
+    for sym in list(cooldown.keys()):
+        try:
+            ts = datetime.fromisoformat(cooldown[sym].replace("Z", "+00:00"))
+            if ts < cutoff:
+                del cooldown[sym]
+        except Exception:
+            del cooldown[sym]
+
+    pushed = 0
+    for a in new_alerts:
+        if a.intensity < TG_MIN_INTENSITY:
+            continue
+        # 同 symbol 30min 内已推过 → 跳过
+        if a.symbol in cooldown:
+            continue
+        msg = _format_alert_for_tg(a, winrate_summary)
+        if _send_telegram(msg):
+            cooldown[a.symbol] = now.isoformat()
+            pushed += 1
+
+    if pushed > 0:
+        _save_tg_cooldown(cooldown)
+        _log(f"📲 Telegram 推送 {pushed} 条 (intensity ≥ {TG_MIN_INTENSITY})")
+    return pushed
+
+
+# ============================================================================
 # Main scan
 # ============================================================================
 
@@ -774,19 +940,26 @@ def run_scan() -> List[VelocityAlert]:
             _log(f"✅ {len(new_alerts)} alerts (LONG={long_n} SHORT={short_n})")
 
     # ===== Phase 2: outcome tracking =====
+    winrate_summary = None
     try:
         outcomes_state = _load_outcomes()
         _log_new_alerts_to_outcomes(outcomes_state, new_alerts)
         resolved_n = _resolve_matured_outcomes(outcomes_state)
         pruned_n = _prune_old_outcomes(outcomes_state)
         _save_outcomes(outcomes_state)
-        summary = _build_winrate_summary(outcomes_state)
-        _save_winrate(summary)
+        winrate_summary = _build_winrate_summary(outcomes_state)
+        _save_winrate(winrate_summary)
         if resolved_n or pruned_n:
             _log(f"📊 outcomes: 新增 {len(new_alerts)}, 结算 {resolved_n}, 清理 {pruned_n}, "
-                 f"汇总 bucket={len(summary.get('by_key', {}))}")
+                 f"汇总 bucket={len(winrate_summary.get('by_key', {}))}")
     except Exception as e:
         _log(f"outcome tracking failed: {e}")
+
+    # ===== Phase 3: Telegram push (单独 try-except, 失败不影响主流程) =====
+    try:
+        _push_to_telegram(new_alerts, winrate_summary)
+    except Exception as e:
+        _log(f"telegram push failed: {e}")
 
     return new_alerts
 
