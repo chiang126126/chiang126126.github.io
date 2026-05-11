@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-11T19:34:28.434982+00:00",
+  "updated_at": "2026-05-11T19:35:55.097237+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -10,6 +10,32 @@
   },
   "alerts_count": 31,
   "alerts": [
+    {
+      "symbol": "CRVUSDT",
+      "base": "CRV",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.2831,
+      "price_change_pct": 0.568,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 551943.0,
+      "volume_baseline_usdt": 61594.0,
+      "volume_ratio": 8.96,
+      "detected_at": "2026-05-11T19:35:06.433310+00:00",
+      "intensity": 1,
+      "change_5m_pct": 1.615,
+      "change_15m_pct": 2.313,
+      "change_1h_pct": 3.814,
+      "change_4h_pct": null,
+      "taker_buy_ratio_1m": 0.757,
+      "taker_buy_ratio_5m": 0.654,
+      "oi_delta_5m_pct": 1.127,
+      "funding_rate_pct": -0.0018,
+      "atr_pct": 0.401,
+      "suggested_sl": 0.28196429,
+      "suggested_tp1": 0.28480357,
+      "suggested_tp2": 0.28650714
+    },
     {
       "symbol": "PENDLEUSDT",
       "base": "PENDLE",
@@ -789,32 +815,6 @@
       "suggested_sl": 0.06748571,
       "suggested_tp1": 0.06857143,
       "suggested_tp2": 0.06922286
-    },
-    {
-      "symbol": "KASUSDT",
-      "base": "KAS",
-      "direction": "LONG",
-      "alert_type": "burst",
-      "price": 0.04073,
-      "price_change_pct": 0.518,
-      "metric_window_min": 1,
-      "volume_1m_usdt": 81308.0,
-      "volume_baseline_usdt": 7780.0,
-      "volume_ratio": 10.45,
-      "detected_at": "2026-05-11T18:34:43.212506+00:00",
-      "intensity": 1,
-      "change_5m_pct": 0.843,
-      "change_15m_pct": 1.295,
-      "change_1h_pct": 2.78,
-      "change_4h_pct": null,
-      "taker_buy_ratio_1m": 0.463,
-      "taker_buy_ratio_5m": 0.508,
-      "oi_delta_5m_pct": 0.144,
-      "funding_rate_pct": 0.005,
-      "atr_pct": 0.26,
-      "suggested_sl": 0.04062429,
-      "suggested_tp1": 0.04088857,
-      "suggested_tp2": 0.04104714
     }
   ]
 }
