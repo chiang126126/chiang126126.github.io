@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-11T19:09:43.306130+00:00",
+  "updated_at": "2026-05-11T19:18:51.509417+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,34 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 26,
+  "alerts_count": 27,
   "alerts": [
+    {
+      "symbol": "NAORISUSDT",
+      "base": "NAORIS",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.09096,
+      "price_change_pct": 1.631,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 164935.0,
+      "volume_baseline_usdt": 9594.0,
+      "volume_ratio": 17.19,
+      "detected_at": "2026-05-11T19:13:40.393920+00:00",
+      "intensity": 3,
+      "change_5m_pct": 1.959,
+      "change_15m_pct": 1.629,
+      "change_1h_pct": 1.38,
+      "change_4h_pct": null,
+      "taker_buy_ratio_1m": 0.609,
+      "taker_buy_ratio_5m": 0.609,
+      "oi_delta_5m_pct": -0.011,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.485,
+      "suggested_sl": 0.09051929,
+      "suggested_tp1": 0.09162107,
+      "suggested_tp2": 0.09228214
+    },
     {
       "symbol": "PLAYUSDT",
       "base": "PLAY",
