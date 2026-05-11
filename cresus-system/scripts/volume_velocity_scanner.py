@@ -61,6 +61,13 @@ TG_COOLDOWN_STATE = Path.home() / "cresus-bot" / ".velocity_tg_cooldown.json"
 TG_COOLDOWN_MIN  = 30                 # 同 symbol 30min 只推 1 次
 TG_MIN_INTENSITY = 2                  # intensity ≥ 2 才推 (过滤弱信号噪声)
 
+# ---- Phase 4: 自动模拟仓 (仅钻石信号开仓, 跟踪真实收益曲线) ----
+PAPER_STATE       = Path.home() / "cresus-bot" / ".paper_trades.json"       # 本地全量 state
+PAPER_HISTORY     = Path.home() / "cresus-bot" / "paper_trades_history.json" # 推给看板
+PAPER_AUTO_CLOSE_HOURS = 4            # 4 小时未触发 SL/TP 自动平仓 (跟 OUTCOME_STAGES 4h 对齐)
+PAPER_RECENT_LIMIT = 50               # 看板只显示最近 50 个 closed
+PAPER_MIN_TIER     = "diamond"        # 只对钻石信号自动开仓 (高质量 only)
+
 BINANCE_FAPI = "https://fapi.binance.com"
 UA = "Mozilla/5.0 (Macintosh) cresus-velocity-scanner"
 HTTP_TIMEOUT = 12
@@ -963,6 +970,258 @@ def _push_to_telegram(new_alerts: List[VelocityAlert],
 
 
 # ============================================================================
+# Phase 4: 自动模拟仓 (仅钻石信号开仓, 跟踪真实收益曲线)
+# 只读 alerts + 公共 ticker 价, 不真实下单. 每 60s 检查 SL/TP 命中.
+# ============================================================================
+
+def _load_paper_state() -> dict:
+    if not PAPER_STATE.exists():
+        return {"open_trades": [], "closed_trades": []}
+    try:
+        data = json.loads(PAPER_STATE.read_text(encoding="utf-8"))
+        if not isinstance(data, dict):
+            return {"open_trades": [], "closed_trades": []}
+        data.setdefault("open_trades", [])
+        data.setdefault("closed_trades", [])
+        return data
+    except Exception:
+        return {"open_trades": [], "closed_trades": []}
+
+
+def _save_paper_state(state: dict) -> None:
+    try:
+        PAPER_STATE.parent.mkdir(parents=True, exist_ok=True)
+        tmp = PAPER_STATE.with_suffix(".tmp")
+        tmp.write_text(json.dumps(state, ensure_ascii=False), encoding="utf-8")
+        tmp.replace(PAPER_STATE)
+    except Exception as e:
+        _log(f"paper_state save failed: {e}")
+
+
+def _open_paper_trade(a: VelocityAlert, state: dict, now: datetime) -> Optional[dict]:
+    """钻石信号 → 开模拟仓. 返回 trade dict (None 表示跳过)."""
+    if a.conviction_tier != PAPER_MIN_TIER:
+        return None
+    if a.suggested_sl is None or a.suggested_tp1 is None or a.suggested_tp2 is None:
+        return None  # 缺入场建议则不开 (避免硬编码)
+    # 同 symbol+direction 已有 open trade → 跳过 (不加仓)
+    for t in state["open_trades"]:
+        if t.get("symbol") == a.symbol and t.get("direction") == a.direction:
+            return None
+    trade = {
+        "id": f"{a.symbol}|{a.direction}|{a.detected_at}",
+        "symbol": a.symbol,
+        "direction": a.direction,
+        "alert_type": a.alert_type,
+        "intensity": a.intensity,
+        "conviction_score": a.conviction_score,
+        "atr_pct": a.atr_pct,
+        "entry_price": a.price,
+        "sl":  a.suggested_sl,
+        "tp1": a.suggested_tp1,
+        "tp2": a.suggested_tp2,
+        "entered_at": now.isoformat(),
+        "current_price": a.price,
+        "unrealized_pnl_pct": 0.0,
+        # 上下文 (复盘用)
+        "funding_rate_pct": a.funding_rate_pct,
+        "oi_delta_5m_pct": a.oi_delta_5m_pct,
+        "taker_buy_ratio_1m": a.taker_buy_ratio_1m,
+        "change_1h_pct": a.change_1h_pct,
+    }
+    state["open_trades"].append(trade)
+    return trade
+
+
+def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
+    """逐个检查 open trades, 命中 SL/TP/timeout → 关仓.
+    返回 (newly_closed_count, list_of_closed_trades).
+    """
+    closed_now = []
+    still_open = []
+    for t in state["open_trades"]:
+        cur = prices.get(t["symbol"])
+        if cur is None:
+            still_open.append(t)
+            continue
+        t["current_price"] = cur
+        entry = float(t["entry_price"])
+        if entry <= 0:
+            still_open.append(t)
+            continue
+        is_long = (t["direction"] == "LONG")
+        # 方向化 unrealized PnL
+        raw_pct = (cur - entry) / entry * 100
+        t["unrealized_pnl_pct"] = round(raw_pct if is_long else -raw_pct, 3)
+
+        # 持仓时长
+        try:
+            entered = datetime.fromisoformat(t["entered_at"].replace("Z", "+00:00"))
+            hold_min = (now - entered).total_seconds() / 60.0
+        except Exception:
+            hold_min = 0.0
+
+        # 命中检查 — 关键: 检查顺序 SL → TP2 → TP1 (SL 优先, 避免一个 candle 内既触 SL 又触 TP)
+        close_reason = None
+        close_price = None
+        if is_long:
+            if cur <= t["sl"]:
+                close_reason = "hit_sl"
+                close_price = t["sl"]
+            elif cur >= t["tp2"]:
+                close_reason = "hit_tp2"
+                close_price = t["tp2"]
+            elif cur >= t["tp1"]:
+                close_reason = "hit_tp1"
+                close_price = t["tp1"]
+        else:  # SHORT
+            if cur >= t["sl"]:
+                close_reason = "hit_sl"
+                close_price = t["sl"]
+            elif cur <= t["tp2"]:
+                close_reason = "hit_tp2"
+                close_price = t["tp2"]
+            elif cur <= t["tp1"]:
+                close_reason = "hit_tp1"
+                close_price = t["tp1"]
+
+        # 时间超时 (4h)
+        if not close_reason and hold_min >= PAPER_AUTO_CLOSE_HOURS * 60:
+            close_reason = "timeout"
+            close_price = cur
+
+        if close_reason:
+            # 计算实际盈亏 (方向化)
+            realized_raw = (close_price - entry) / entry * 100
+            realized = realized_raw if is_long else -realized_raw
+            t["closed_at"] = now.isoformat()
+            t["close_price"] = close_price
+            t["close_reason"] = close_reason
+            t["realized_pnl_pct"] = round(realized, 3)
+            t["hold_time_min"] = round(hold_min, 1)
+            state["closed_trades"].append(t)
+            closed_now.append(t)
+        else:
+            still_open.append(t)
+
+    state["open_trades"] = still_open
+    return len(closed_now), closed_now
+
+
+def _compute_paper_stats(state: dict) -> dict:
+    open_n = len(state.get("open_trades", []))
+    closed = state.get("closed_trades", [])
+    closed_n = len(closed)
+    if closed_n == 0:
+        return {
+            "total_trades": open_n,
+            "open": open_n,
+            "closed": 0,
+            "wins": 0, "losses": 0,
+            "win_rate": None,
+            "total_pnl_pct": 0.0,
+            "avg_pnl_pct": None,
+            "best_trade": None,
+            "worst_trade": None,
+            "by_outcome": {},
+        }
+    wins = sum(1 for t in closed if t["realized_pnl_pct"] > 0)
+    losses = closed_n - wins
+    pnls = [t["realized_pnl_pct"] for t in closed]
+    by_outcome: dict = {}
+    for t in closed:
+        reason = t.get("close_reason", "?")
+        by_outcome.setdefault(reason, 0)
+        by_outcome[reason] += 1
+    return {
+        "total_trades": open_n + closed_n,
+        "open": open_n,
+        "closed": closed_n,
+        "wins": wins,
+        "losses": losses,
+        "win_rate": round(wins / closed_n, 3),
+        "total_pnl_pct": round(sum(pnls), 2),
+        "avg_pnl_pct": round(sum(pnls) / closed_n, 3),
+        "best_trade": round(max(pnls), 2),
+        "worst_trade": round(min(pnls), 2),
+        "by_outcome": by_outcome,
+    }
+
+
+def _save_paper_history(state: dict, stats: dict) -> None:
+    """对外发布的 view: stats + open + 最近 N 条 closed."""
+    closed = state.get("closed_trades", [])
+    # 按 closed_at 降序取最近 N
+    closed_sorted = sorted(closed, key=lambda t: t.get("closed_at", ""), reverse=True)
+    payload = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "stats": stats,
+        "open_trades": state.get("open_trades", []),
+        "recent_closed": closed_sorted[:PAPER_RECENT_LIMIT],
+        "auto_close_hours": PAPER_AUTO_CLOSE_HOURS,
+        "min_tier": PAPER_MIN_TIER,
+    }
+    try:
+        PAPER_HISTORY.parent.mkdir(parents=True, exist_ok=True)
+        tmp = PAPER_HISTORY.with_suffix(".tmp")
+        tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        tmp.replace(PAPER_HISTORY)
+    except Exception as e:
+        _log(f"paper_history save failed: {e}")
+
+
+def _run_paper_trading(new_alerts: List[VelocityAlert], now: datetime) -> None:
+    """钻石信号自动开仓 + 更新 open trades + 关仓 + 发布 history.
+    全部失败保护 — 主流程不受影响.
+    """
+    try:
+        state = _load_paper_state()
+        # 1. 新钻石开仓
+        opened_n = 0
+        for a in new_alerts:
+            if _open_paper_trade(a, state, now) is not None:
+                opened_n += 1
+                _log(f"💎 模拟开仓 {a.symbol} {a.direction} @ {a.price} "
+                     f"SL={a.suggested_sl} TP1={a.suggested_tp1} TP2={a.suggested_tp2}")
+        # 2. 更新 open trades (需要现价 — 重用 Phase 2 的 bulk ticker 函数)
+        closed_n = 0
+        closed_list: List[dict] = []
+        if state["open_trades"]:
+            prices = _fetch_all_prices_now()  # 同 Phase 2 outcome resolver
+            if prices:
+                closed_n, closed_list = _update_paper_trades(state, prices, now)
+        # 3. 写盘 state + 发布 history
+        _save_paper_state(state)
+        stats = _compute_paper_stats(state)
+        _save_paper_history(state, stats)
+        # 4. 关仓 → Telegram 通知 (告诉用户钻石信号最终输赢)
+        for t in closed_list:
+            try:
+                emoji = "💚" if t["realized_pnl_pct"] > 0 else "💔"
+                reason_label = {
+                    "hit_sl":   "止损",
+                    "hit_tp1":  "TP1 止盈",
+                    "hit_tp2":  "TP2 止盈",
+                    "timeout":  "超时 (4h)"
+                }.get(t["close_reason"], t["close_reason"])
+                msg = (
+                    f"{emoji} <b>模拟仓平仓 — {t['symbol']} {t['direction']}</b>\n"
+                    f"原因: {reason_label} · {t['realized_pnl_pct']:+.2f}% · 持仓 {t['hold_time_min']:.0f}min\n"
+                    f"入场 {t['entry_price']} → 平仓 {t['close_price']}\n"
+                    f"开仓时置信 {t.get('conviction_score','—')}/10"
+                )
+                _send_telegram(msg)
+            except Exception as e:
+                _log(f"paper close TG notify failed: {e}")
+        if opened_n or closed_n:
+            _log(f"📊 模拟仓: 新开 {opened_n}, 关 {closed_n}, "
+                 f"open={stats['open']} closed={stats['closed']} "
+                 f"win_rate={stats.get('win_rate','—')} total={stats['total_pnl_pct']:+.2f}%")
+    except Exception as e:
+        _log(f"paper trading failed: {e}")
+
+
+# ============================================================================
 # Main scan
 # ============================================================================
 
@@ -1061,6 +1320,12 @@ def run_scan() -> List[VelocityAlert]:
         _push_to_telegram(new_alerts, winrate_summary)
     except Exception as e:
         _log(f"telegram push failed: {e}")
+
+    # ===== Phase 4: 自动模拟仓 (仅钻石信号, 跟踪真实盈亏曲线) =====
+    try:
+        _run_paper_trading(new_alerts, datetime.now(timezone.utc))
+    except Exception as e:
+        _log(f"paper trading failed: {e}")
 
     return new_alerts
 

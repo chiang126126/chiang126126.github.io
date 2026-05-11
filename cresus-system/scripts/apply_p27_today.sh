@@ -120,6 +120,16 @@ else
     echo "✓ sync_signals.sh 加 precog winrate 同步"
 fi
 
+# Phase 4: 模拟仓 history
+if grep -q paper_trades_history "$SYNC" 2>/dev/null; then
+    echo "✓ sync_signals.sh 已含 paper trades 同步行,跳过"
+else
+    sed -i '' '/precog_winrate.json cresus-system/a\
+[ -f ~/cresus-bot/paper_trades_history.json ] \&\& cp ~/cresus-bot/paper_trades_history.json cresus-system/dashboard/paper_trades_history.json
+' "$SYNC"
+    echo "✓ sync_signals.sh 加 paper trades 同步"
+fi
+
 # 立刻同步一次
 bash "$SYNC" 2>&1 | tail -2
 
