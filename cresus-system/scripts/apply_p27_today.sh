@@ -63,12 +63,22 @@ fi
 
 # Phase 2: 胜率追踪 winrate.json
 if grep -q velocity_winrate "$SYNC" 2>/dev/null; then
-    echo "✓ sync_signals.sh 已含 winrate 同步行,跳过"
+    echo "✓ sync_signals.sh 已含 velocity winrate 同步行,跳过"
 else
     sed -i '' '/volume_velocity_alerts.json cresus-system/a\
 [ -f ~/cresus-bot/velocity_winrate.json ] \&\& cp ~/cresus-bot/velocity_winrate.json cresus-system/dashboard/velocity_winrate.json
 ' "$SYNC"
-    echo "✓ sync_signals.sh 加 winrate 同步"
+    echo "✓ sync_signals.sh 加 velocity winrate 同步"
+fi
+
+# Phase 2: precog A/B 评估用 winrate
+if grep -q precog_winrate "$SYNC" 2>/dev/null; then
+    echo "✓ sync_signals.sh 已含 precog winrate 同步行,跳过"
+else
+    sed -i '' '/velocity_winrate.json cresus-system/a\
+[ -f ~/cresus-bot/precog_winrate.json ] \&\& cp ~/cresus-bot/precog_winrate.json cresus-system/dashboard/precog_winrate.json
+' "$SYNC"
+    echo "✓ sync_signals.sh 加 precog winrate 同步"
 fi
 
 # 立刻同步一次
