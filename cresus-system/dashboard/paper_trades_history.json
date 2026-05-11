@@ -1,19 +1,22 @@
 {
-  "generated_at": "2026-05-11T23:37:47.730897+00:00",
+  "generated_at": "2026-05-11T23:48:24.943823+00:00",
   "stats": {
     "total_trades": 1,
-    "open": 1,
-    "closed": 0,
-    "wins": 0,
+    "open": 0,
+    "closed": 1,
+    "wins": 1,
     "losses": 0,
-    "win_rate": null,
-    "total_pnl_pct": 0.0,
-    "avg_pnl_pct": null,
-    "best_trade": null,
-    "worst_trade": null,
-    "by_outcome": {}
+    "win_rate": 1.0,
+    "total_pnl_pct": 2.74,
+    "avg_pnl_pct": 2.737,
+    "best_trade": 2.74,
+    "worst_trade": 2.74,
+    "by_outcome": {
+      "hit_tp1": 1
+    }
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "id": "GTCUSDT|SHORT|2026-05-11T23:02:18.321028+00:00",
       "symbol": "GTCUSDT",
@@ -27,15 +30,19 @@
       "tp1": 0.18171714,
       "tp2": 0.17660429,
       "entered_at": "2026-05-11T23:03:19.658906+00:00",
-      "current_price": 0.18361,
-      "unrealized_pnl_pct": 1.723,
+      "current_price": 0.1817,
+      "unrealized_pnl_pct": 2.746,
       "funding_rate_pct": -1.9655,
       "oi_delta_5m_pct": 0.186,
       "taker_buy_ratio_1m": 0.605,
-      "change_1h_pct": 0.054
+      "change_1h_pct": 0.054,
+      "closed_at": "2026-05-11T23:44:08.741670+00:00",
+      "close_price": 0.18171714,
+      "close_reason": "hit_tp1",
+      "realized_pnl_pct": 2.737,
+      "hold_time_min": 40.8
     }
   ],
-  "recent_closed": [],
   "auto_close_hours": 4,
   "min_tier": "diamond"
 }
