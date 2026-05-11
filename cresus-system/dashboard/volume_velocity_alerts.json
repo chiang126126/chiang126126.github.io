@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-11T12:35:23.350865+00:00",
+  "updated_at": "2026-05-11T12:46:21.461994+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,50 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 41,
+  "alerts_count": 39,
   "alerts": [
+    {
+      "symbol": "SKYAIUSDT",
+      "base": "SKYAI",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 0.40454,
+      "price_change_pct": -1.806,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 389547.0,
+      "volume_baseline_usdt": 75356.0,
+      "volume_ratio": 5.17,
+      "detected_at": "2026-05-11T12:43:04.113101+00:00",
+      "intensity": 1
+    },
+    {
+      "symbol": "MEUSDT",
+      "base": "ME",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.1228,
+      "price_change_pct": 0.573,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 20948.0,
+      "volume_baseline_usdt": 3157.0,
+      "volume_ratio": 6.63,
+      "detected_at": "2026-05-11T12:37:21.223003+00:00",
+      "intensity": 1
+    },
+    {
+      "symbol": "REZUSDT",
+      "base": "REZ",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.006965,
+      "price_change_pct": 3.94,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 64487.0,
+      "volume_baseline_usdt": 8874.0,
+      "volume_ratio": 7.27,
+      "detected_at": "2026-05-11T12:37:15.576791+00:00",
+      "intensity": 2
+    },
     {
       "symbol": "REZUSDT",
       "base": "REZ",
@@ -512,76 +554,6 @@
       "volume_baseline_usdt": 13935.0,
       "volume_ratio": 26.07,
       "detected_at": "2026-05-11T11:48:26.294947+00:00",
-      "intensity": 2
-    },
-    {
-      "symbol": "TIAUSDT",
-      "base": "TIA",
-      "direction": "SHORT",
-      "alert_type": "burst",
-      "price": 0.4541,
-      "price_change_pct": -1.024,
-      "metric_window_min": 1,
-      "volume_1m_usdt": 439972.0,
-      "volume_baseline_usdt": 87965.0,
-      "volume_ratio": 5.0,
-      "detected_at": "2026-05-11T11:45:52.243496+00:00",
-      "intensity": 1
-    },
-    {
-      "symbol": "BABYUSDT",
-      "base": "BABY",
-      "direction": "SHORT",
-      "alert_type": "burst",
-      "price": 0.01757,
-      "price_change_pct": -1.348,
-      "metric_window_min": 1,
-      "volume_1m_usdt": 411937.0,
-      "volume_baseline_usdt": 40895.0,
-      "volume_ratio": 10.07,
-      "detected_at": "2026-05-11T11:44:08.045495+00:00",
-      "intensity": 3
-    },
-    {
-      "symbol": "TIAUSDT",
-      "base": "TIA",
-      "direction": "SHORT",
-      "alert_type": "sustained",
-      "price": 0.4587,
-      "price_change_pct": -1.693,
-      "metric_window_min": 10,
-      "volume_1m_usdt": 285184.0,
-      "volume_baseline_usdt": 42433.0,
-      "volume_ratio": 6.72,
-      "detected_at": "2026-05-11T11:43:38.247146+00:00",
-      "intensity": 1
-    },
-    {
-      "symbol": "GIGGLEUSDT",
-      "base": "GIGGLE",
-      "direction": "LONG",
-      "alert_type": "burst",
-      "price": 38.2,
-      "price_change_pct": 0.818,
-      "metric_window_min": 1,
-      "volume_1m_usdt": 135140.0,
-      "volume_baseline_usdt": 12055.0,
-      "volume_ratio": 11.21,
-      "detected_at": "2026-05-11T11:39:02.689162+00:00",
-      "intensity": 2
-    },
-    {
-      "symbol": "CRCLUSDT",
-      "base": "CRCL",
-      "direction": "LONG",
-      "alert_type": "sustained",
-      "price": 118.06,
-      "price_change_pct": 2.492,
-      "metric_window_min": 10,
-      "volume_1m_usdt": 1364311.0,
-      "volume_baseline_usdt": 110341.0,
-      "volume_ratio": 12.36,
-      "detected_at": "2026-05-11T11:38:46.407975+00:00",
       "intensity": 2
     }
   ]
