@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-11T22:14:29.981707+00:00",
+  "updated_at": "2026-05-11T22:17:40.564717+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -10,6 +10,34 @@
   },
   "alerts_count": 24,
   "alerts": [
+    {
+      "symbol": "LYNUSDT",
+      "base": "LYN",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.05312,
+      "price_change_pct": 0.606,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 17975.0,
+      "volume_baseline_usdt": 2345.0,
+      "volume_ratio": 7.67,
+      "detected_at": "2026-05-11T22:17:28.077586+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.665,
+      "change_15m_pct": 1.416,
+      "change_1h_pct": 1.126,
+      "change_4h_pct": null,
+      "taker_buy_ratio_1m": 0.696,
+      "taker_buy_ratio_5m": 0.635,
+      "oi_delta_5m_pct": 0.004,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.266,
+      "suggested_sl": 0.05297857,
+      "suggested_tp1": 0.05333214,
+      "suggested_tp2": 0.05354429,
+      "conviction_score": 3,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "TONUSDT",
       "base": "TON",
@@ -607,32 +635,6 @@
       "suggested_sl": 0.01178471,
       "suggested_tp1": 0.01161293,
       "suggested_tp2": 0.01150986
-    },
-    {
-      "symbol": "PUMPUSDT",
-      "base": "PUMP",
-      "direction": "LONG",
-      "alert_type": "burst",
-      "price": 0.002113,
-      "price_change_pct": 0.523,
-      "metric_window_min": 1,
-      "volume_1m_usdt": 399825.0,
-      "volume_baseline_usdt": 19056.0,
-      "volume_ratio": 20.98,
-      "detected_at": "2026-05-11T21:17:34.745499+00:00",
-      "intensity": 1,
-      "change_5m_pct": 0.333,
-      "change_15m_pct": 0.429,
-      "change_1h_pct": -0.378,
-      "change_4h_pct": null,
-      "taker_buy_ratio_1m": 0.786,
-      "taker_buy_ratio_5m": 0.729,
-      "oi_delta_5m_pct": 0.107,
-      "funding_rate_pct": 0.005,
-      "atr_pct": 0.135,
-      "suggested_sl": 0.00211014,
-      "suggested_tp1": 0.00211729,
-      "suggested_tp2": 0.00212157
     }
   ]
 }
