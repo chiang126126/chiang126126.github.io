@@ -1044,17 +1044,63 @@
     display: flex; flex-direction: column; gap: 4px;
   }
   .velocity-row {
-    display: grid;
-    grid-template-columns: 28px 1fr 64px 50px 50px;
-    gap: 8px; align-items: center;
-    padding: 6px 9px;
+    display: flex; flex-direction: column; gap: 4px;
+    padding: 7px 10px;
     border-radius: 6px;
     background: rgba(255,255,255,0.02);
     border-left: 3px solid;
     font-size: 12px;
+    cursor: pointer;
+    transition: background 0.12s;
   }
+  .velocity-row:hover { background: rgba(255,255,255,0.04); }
   .velocity-row.dir-LONG  { border-left-color: #00c853; }
   .velocity-row.dir-SHORT { border-left-color: #ff1744; }
+  .velocity-headline {
+    display: grid;
+    grid-template-columns: 28px 1fr 64px 50px 50px;
+    gap: 8px; align-items: center;
+  }
+  .velocity-signals {
+    display: flex; flex-wrap: wrap; gap: 5px;
+    padding-left: 36px;
+  }
+  .velocity-execution {
+    display: none;
+    margin-top: 4px;
+    padding: 6px 8px 4px 36px;
+    border-top: 1px dashed rgba(255,255,255,0.10);
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+  .velocity-row.expanded .velocity-execution { display: block; }
+  .velocity-row.expanded .velocity-toggle    { transform: rotate(180deg); }
+  .velocity-toggle {
+    display: inline-block; transition: transform 0.15s;
+    font-size: 9px; margin-left: 2px; color: var(--text-dim);
+  }
+
+  /* micro chips for funding/OI/taker/windows */
+  .vchip {
+    font-size: 10px; font-weight: 600;
+    padding: 1px 6px; border-radius: 5px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .vchip.fnd-pos     { background: rgba(255,82,82,0.12);  color: #ffab91; }  /* 多拥挤 */
+  .vchip.fnd-neg     { background: rgba(0,200,83,0.12);   color: #80cbc4; }  /* 空拥挤 */
+  .vchip.fnd-neutral { background: rgba(138,150,170,0.10); color: var(--text-dim); }
+  .vchip.oi-pos      { background: rgba(0,200,83,0.14);   color: #00e676; }  /* 新仓 */
+  .vchip.oi-neg      { background: rgba(255,82,82,0.14);  color: #ff8a65; }  /* 平仓 */
+  .vchip.taker-buy   { background: rgba(0,200,83,0.10);   color: #69f0ae; }
+  .vchip.taker-sell  { background: rgba(255,82,82,0.10);  color: #ff8a80; }
+  .vchip.win-pos     { background: rgba(33,150,243,0.10); color: #64b5f6; }
+  .vchip.win-neg     { background: rgba(255,152,0,0.10);  color: #ffb74d; }
+  .vchip.win-flat    { background: rgba(138,150,170,0.08); color: var(--text-dim); }
+  .vexec-label { color: var(--text-dim); margin-right: 3px; }
+  .vexec-val   { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .vexec-r     { color: #ffd54f; font-size: 10px; margin-left: 2px; }
   .velocity-rank {
     text-align: center; font-size: 12px; font-weight: 800;
     font-variant-numeric: tabular-nums;
@@ -1794,12 +1840,19 @@ function renderMacroPanel() {
 
 // ==================== P27-X: ⚡ 量能加速度雷达 ====================
 let velocityData = null;
+let velocityWinrate = null;   // { by_key: { "SYM|burst|LONG": {stages: {30m:{n,win_rate,avg_outcome_pct}}}}}
 
 async function loadVelocityRadar() {
   try {
-    const res = await fetch("./volume_velocity_alerts.json?_=" + Date.now());
-    if (!res.ok) return;
-    velocityData = await res.json();
+    const [alertsRes, winRes] = await Promise.all([
+      fetch("./volume_velocity_alerts.json?_=" + Date.now()),
+      fetch("./velocity_winrate.json?_=" + Date.now()).catch(() => null),
+    ]);
+    if (!alertsRes.ok) return;
+    velocityData = await alertsRes.json();
+    if (winRes && winRes.ok) {
+      try { velocityWinrate = await winRes.json(); } catch (_) { velocityWinrate = null; }
+    }
     renderVelocityPanel();
   } catch (e) {
     console.warn("[velocity] load failed:", e);
@@ -1886,19 +1939,135 @@ function renderVelocityPanel() {
     if (rank === 1) rankCls = "rank-1";
     else if (rank === 2) rankCls = "rank-2";
     else if (rank === 3) rankCls = "rank-3";
-    // 兼容旧 schema: 老 alerts 还在 60min 窗口里时, 用旧字段名
     const isSustained = a.alert_type === "sustained";
     const typeIcon = isSustained ? "🔥" : "⚡";
     const typeTitle = isSustained ? "持续动能 (10m 累计)" : "启动瞬间 (1m spike)";
     const winM = a.metric_window_min || 1;
     const pct = (a.price_change_pct !== undefined ? a.price_change_pct : a.price_change_1m_pct) || 0;
-    return `<div class="velocity-row dir-${a.direction}">
-      <span class="velocity-rank ${rankCls}">#${rank}</span>
-      <span class="velocity-symbol">${escapeHtml(a.symbol)}</span>
-      <span class="velocity-type" title="${typeTitle}">${typeIcon}</span>
-      <span class="velocity-pct ${cls}">${pct.toFixed(2)}%<span class="velocity-win">/${winM}m</span></span>
-      <span class="velocity-vol-ratio">${a.volume_ratio.toFixed(1)}x</span>
-      <span class="velocity-when">${whenStr}</span>
+
+    // ===== Phase 1 富信息 chips =====
+    const chips = [];
+    // Funding rate
+    if (a.funding_rate_pct != null) {
+      const f = a.funding_rate_pct;
+      let fcls = "fnd-neutral";
+      if (f >= 0.05) fcls = "fnd-pos";       // 多拥挤
+      else if (f <= -0.05) fcls = "fnd-neg"; // 空拥挤
+      const sign = f >= 0 ? "+" : "";
+      chips.push(`<span class="vchip ${fcls}" title="资金费率 (>0.05% 多拥挤,<-0.05% 空拥挤)">Fnd ${sign}${f.toFixed(3)}%</span>`);
+    }
+    // OI Δ 5m
+    if (a.oi_delta_5m_pct != null) {
+      const o = a.oi_delta_5m_pct;
+      // 真新仓 vs 平仓回补 判断: 价涨+OI 涨 = 真新多 (绿); 价涨+OI 跌 = 空头回补 (红)
+      let ocls;
+      if ((isUp && o > 0) || (!isUp && o < 0)) ocls = "oi-pos";
+      else ocls = "oi-neg";
+      const sign = o >= 0 ? "+" : "";
+      const label = isUp
+        ? (o > 0 ? "真新多" : "空头回补")
+        : (o > 0 ? "诱空" : "真新空");
+      chips.push(`<span class="vchip ${ocls}" title="${label} (5m OI 变化)">OI ${sign}${o.toFixed(2)}%</span>`);
+    }
+    // Taker buy ratio 1m
+    if (a.taker_buy_ratio_1m != null) {
+      const t = a.taker_buy_ratio_1m;
+      const pct100 = Math.round(t * 100);
+      const tcls = t >= 0.55 ? "taker-buy" : (t <= 0.45 ? "taker-sell" : "fnd-neutral");
+      chips.push(`<span class="vchip ${tcls}" title="主动买盘占比 (>55% 偏多, <45% 偏空)">主${pct100}</span>`);
+    }
+    // 历史胜率 (Phase 2): 该 symbol+type+方向 的 30m 胜率
+    let wrChip = "";
+    let wrExecLine = "";
+    if (velocityWinrate && velocityWinrate.by_key) {
+      const wkey = `${a.symbol}|${a.alert_type}|${a.direction}`;
+      const w = velocityWinrate.by_key[wkey];
+      if (w && w.stages) {
+        const s30 = w.stages["30m"];
+        const s60 = w.stages["60m"];
+        const s240 = w.stages["240m"];
+        // 主 chip: 优先 30m
+        const primary = s30 || s60 || s240;
+        if (primary) {
+          const rate100 = Math.round(primary.win_rate * 100);
+          const label = s30 ? "30m" : (s60 ? "1h" : "4h");
+          let wcls = "win-flat";
+          if (primary.win_rate >= 0.6) wcls = "taker-buy";
+          else if (primary.win_rate <= 0.4) wcls = "taker-sell";
+          wrChip = `<span class="vchip ${wcls}" title="该 ${a.symbol}+${a.alert_type}+${a.direction} 历史 ${label} 胜率 (赢=outcome≥${velocityWinrate.win_threshold_pct||0.5}%)">胜${label} ${rate100}% N=${primary.n}</span>`;
+        }
+        // execution 区: 列出全部 stage
+        const stageStrs = [];
+        for (const [k, sn] of Object.entries(w.stages)) {
+          const r100 = Math.round(sn.win_rate * 100);
+          stageStrs.push(`<span class="vexec-label">${k}:</span><span class="vexec-val">${r100}%</span><span class="vexec-r">(N=${sn.n}, μ${sn.avg_outcome_pct>0?"+":""}${sn.avg_outcome_pct}%)</span>`);
+        }
+        if (stageStrs.length) {
+          wrExecLine = `<div><span class="vexec-label">历史胜率:</span>${stageStrs.join("&nbsp;·&nbsp;")}</div>`;
+        }
+      }
+    }
+
+    // 多窗口涨幅
+    const winChip = (winLabel, val) => {
+      if (val == null) return "";
+      const wcls = val > 0.5 ? "win-pos" : (val < -0.5 ? "win-neg" : "win-flat");
+      const sign = val > 0 ? "+" : "";
+      return `<span class="vchip ${wcls}">${winLabel} ${sign}${val.toFixed(2)}%</span>`;
+    };
+    chips.push(winChip("5m",  a.change_5m_pct));
+    chips.push(winChip("1h",  a.change_1h_pct));
+    if (a.change_4h_pct != null) chips.push(winChip("4h", a.change_4h_pct));
+    if (wrChip) chips.push(wrChip);
+
+    // ===== 入场建议 (expand 后显示) =====
+    const fmt = (p) => {
+      if (p == null) return "—";
+      const n = Number(p);
+      if (n < 1)   return n.toPrecision(4);
+      if (n < 100) return n.toFixed(4);
+      return n.toFixed(2);
+    };
+    const distPct = (target) => {
+      if (target == null || !a.price) return "—";
+      const d = (target - a.price) / a.price * 100;
+      const sign = d >= 0 ? "+" : "";
+      return `${sign}${d.toFixed(2)}%`;
+    };
+    let execHtml = "";
+    if (a.suggested_sl != null) {
+      execHtml = `
+        <div>
+          <span class="vexec-label">入场:</span><span class="vexec-val">${fmt(a.price)}</span>
+          &nbsp;·&nbsp;
+          <span class="vexec-label">SL:</span><span class="vexec-val">${fmt(a.suggested_sl)}</span> <span class="vexec-r">(${distPct(a.suggested_sl)}, 1R)</span>
+          &nbsp;·&nbsp;
+          <span class="vexec-label">TP1:</span><span class="vexec-val">${fmt(a.suggested_tp1)}</span> <span class="vexec-r">(${distPct(a.suggested_tp1)}, 1.5R)</span>
+          &nbsp;·&nbsp;
+          <span class="vexec-label">TP2:</span><span class="vexec-val">${fmt(a.suggested_tp2)}</span> <span class="vexec-r">(${distPct(a.suggested_tp2)}, 3R)</span>
+        </div>
+        <div>
+          <span class="vexec-label">ATR(14):</span><span class="vexec-val">${a.atr_pct != null ? a.atr_pct.toFixed(2) + "%" : "—"}</span>
+          ${a.taker_buy_ratio_5m != null ? `&nbsp;·&nbsp;<span class="vexec-label">5m 主动买:</span><span class="vexec-val">${Math.round(a.taker_buy_ratio_5m*100)}%</span>` : ""}
+          ${a.change_15m_pct != null ? `&nbsp;·&nbsp;<span class="vexec-label">15m:</span><span class="vexec-val">${a.change_15m_pct > 0 ? "+" : ""}${a.change_15m_pct.toFixed(2)}%</span>` : ""}
+        </div>
+        ${wrExecLine}`;
+    } else if (wrExecLine) {
+      execHtml = wrExecLine;
+    }
+
+    const sigsHtml = chips.filter(Boolean).join("");
+
+    return `<div class="velocity-row dir-${a.direction}" onclick="this.classList.toggle('expanded')">
+      <div class="velocity-headline">
+        <span class="velocity-rank ${rankCls}">#${rank}</span>
+        <span><span class="velocity-symbol">${escapeHtml(a.symbol)}</span> <span class="velocity-type" title="${typeTitle}">${typeIcon}</span></span>
+        <span class="velocity-pct ${cls}">${pct.toFixed(2)}%<span class="velocity-win">/${winM}m</span></span>
+        <span class="velocity-vol-ratio">${a.volume_ratio.toFixed(1)}x</span>
+        <span class="velocity-when">${whenStr}${execHtml ? '<span class="velocity-toggle">▾</span>' : ''}</span>
+      </div>
+      ${sigsHtml ? `<div class="velocity-signals">${sigsHtml}</div>` : ""}
+      ${execHtml ? `<div class="velocity-execution">${execHtml}</div>` : ""}
     </div>`;
   };
 

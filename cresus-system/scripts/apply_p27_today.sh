@@ -53,12 +53,22 @@ echo ""
 echo "=== sync_signals.sh 加 volume_velocity_alerts.json 同步 ==="
 SYNC=$BOT/scripts/sync_signals.sh
 if grep -q volume_velocity_alerts "$SYNC" 2>/dev/null; then
-    echo "✓ sync_signals.sh 已含同步行,跳过"
+    echo "✓ sync_signals.sh 已含 alerts 同步行,跳过"
 else
     sed -i '' '/precog_radar.json cresus-system/a\
 [ -f ~/cresus-bot/volume_velocity_alerts.json ] \&\& cp ~/cresus-bot/volume_velocity_alerts.json cresus-system/dashboard/volume_velocity_alerts.json
 ' "$SYNC"
-    echo "✓ sync_signals.sh 加 1 行同步"
+    echo "✓ sync_signals.sh 加 alerts 同步"
+fi
+
+# Phase 2: 胜率追踪 winrate.json
+if grep -q velocity_winrate "$SYNC" 2>/dev/null; then
+    echo "✓ sync_signals.sh 已含 winrate 同步行,跳过"
+else
+    sed -i '' '/volume_velocity_alerts.json cresus-system/a\
+[ -f ~/cresus-bot/velocity_winrate.json ] \&\& cp ~/cresus-bot/velocity_winrate.json cresus-system/dashboard/velocity_winrate.json
+' "$SYNC"
+    echo "✓ sync_signals.sh 加 winrate 同步"
 fi
 
 # 立刻同步一次
