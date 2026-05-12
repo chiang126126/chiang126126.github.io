@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-12T19:06:10.799120+00:00",
+  "generated_at": "2026-05-12T19:16:37.413837+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
@@ -536,9 +536,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 6,
-          "win_rate": 0.667,
-          "avg_outcome_pct": 0.7
+          "n": 7,
+          "win_rate": 0.571,
+          "avg_outcome_pct": 0.51
         },
         "60m": {
           "n": 6,
@@ -593,6 +593,18 @@
           "n": 5,
           "win_rate": 1.0,
           "avg_outcome_pct": 4.29
+        }
+      }
+    },
+    "STABLEUSDT|sustained|SHORT": {
+      "symbol": "STABLEUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": -0.32
         }
       }
     },
