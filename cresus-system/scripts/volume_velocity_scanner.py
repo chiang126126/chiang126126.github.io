@@ -1006,6 +1006,19 @@ def _open_paper_trade(a: VelocityAlert, state: dict, now: datetime) -> Optional[
         return None
     if a.suggested_sl is None or a.suggested_tp1 is None or a.suggested_tp2 is None:
         return None
+    # 防御: SL/TP 顺序异常 → 拒开 (避免逻辑 bug 把"止损"开在盈利方向)
+    if a.direction == "LONG":
+        if not (a.suggested_sl < a.price < a.suggested_tp1 < a.suggested_tp2):
+            _log(f"⚠️ {a.symbol} LONG SL/TP 顺序异常, 拒开: "
+                 f"SL={a.suggested_sl} entry={a.price} TP1={a.suggested_tp1} TP2={a.suggested_tp2}")
+            return None
+    elif a.direction == "SHORT":
+        if not (a.suggested_sl > a.price > a.suggested_tp1 > a.suggested_tp2):
+            _log(f"⚠️ {a.symbol} SHORT SL/TP 顺序异常, 拒开: "
+                 f"SL={a.suggested_sl} entry={a.price} TP1={a.suggested_tp1} TP2={a.suggested_tp2}")
+            return None
+    else:
+        return None  # 未知方向
     for t in state["open_trades"]:
         if t.get("symbol") == a.symbol and t.get("direction") == a.direction:
             return None
@@ -1121,8 +1134,10 @@ def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
                     # TP2 触发 → 进 Phase C, 不关仓!! 启动 trailing
                     t["phase"] = "C"
                     t["tp2_hit_at"] = now.isoformat()
-                    # trailing 起点: HWM - 2×ATR (用相对 % 算)
-                    t["trailing_sl"] = hwm * (1 - 2 * atr_pct / 100.0)
+                    # 安全地板: trailing 永不低于 TP1 level (已锁定 TP1 收益)
+                    base_floor = float(t["tp1"])
+                    hwm_trail  = hwm * (1 - 2 * atr_pct / 100.0)
+                    t["trailing_sl"] = max(base_floor, hwm_trail)
                     phase_transitions.append({"type": "tp2", "trade": t.copy()})
             else:  # SHORT
                 if cur >= t["sl"]:
@@ -1130,20 +1145,27 @@ def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
                 elif cur <= t["tp2"]:
                     t["phase"] = "C"
                     t["tp2_hit_at"] = now.isoformat()
-                    t["trailing_sl"] = hwm * (1 + 2 * atr_pct / 100.0)
+                    # SHORT 安全上限: trailing 永不高于 TP1 level (越低越好对 SHORT)
+                    base_ceil = float(t["tp1"])
+                    hwm_trail = hwm * (1 + 2 * atr_pct / 100.0)
+                    t["trailing_sl"] = min(base_ceil, hwm_trail)
                     phase_transitions.append({"type": "tp2", "trade": t.copy()})
 
         elif phase == "C":
-            # TP2 后跟踪止盈: trailing SL 棘轮只升 (LONG 时升 = 数字增大)
+            # TP2 后跟踪止盈: trailing SL 棘轮 + TP1 安全地板
             if is_long:
-                new_trail = hwm * (1 - 2 * atr_pct / 100.0)
+                base_floor = float(t["tp1"])
+                hwm_trail  = hwm * (1 - 2 * atr_pct / 100.0)
+                new_trail  = max(base_floor, hwm_trail)
                 # 棘轮: 只朝有利方向更新
                 if t.get("trailing_sl") is None or new_trail > t["trailing_sl"]:
                     t["trailing_sl"] = new_trail
                 if cur <= t["trailing_sl"]:
                     close_reason = "hit_trail"; close_price = t["trailing_sl"]
             else:  # SHORT
-                new_trail = hwm * (1 + 2 * atr_pct / 100.0)
+                base_ceil = float(t["tp1"])
+                hwm_trail = hwm * (1 + 2 * atr_pct / 100.0)
+                new_trail = min(base_ceil, hwm_trail)
                 if t.get("trailing_sl") is None or new_trail < t["trailing_sl"]:
                     t["trailing_sl"] = new_trail
                 if cur >= t["trailing_sl"]:
@@ -1171,37 +1193,41 @@ def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
 
 
 def _compute_paper_stats(state: dict) -> dict:
+    """胜率口径: BE 平仓 (≤0.1% 净) 算 scratch (不计胜/负). 这是行业惯例,
+    避免 BE 被误算成 loss 拉低胜率."""
     open_n = len(state.get("open_trades", []))
     closed = state.get("closed_trades", [])
     closed_n = len(closed)
     if closed_n == 0:
         return {
-            "total_trades": open_n,
-            "open": open_n,
-            "closed": 0,
-            "wins": 0, "losses": 0,
+            "total_trades": open_n, "open": open_n, "closed": 0,
+            "wins": 0, "losses": 0, "scratches": 0,
             "win_rate": None,
-            "total_pnl_pct": 0.0,
-            "avg_pnl_pct": None,
-            "best_trade": None,
-            "worst_trade": None,
+            "total_pnl_pct": 0.0, "avg_pnl_pct": None,
+            "best_trade": None, "worst_trade": None,
             "by_outcome": {},
         }
-    wins = sum(1 for t in closed if t["realized_pnl_pct"] > 0)
-    losses = closed_n - wins
+    BE_EPSILON = 0.1   # |outcome| ≤ 0.1% 视为 scratch (BE 平仓近似为 0)
+    wins      = sum(1 for t in closed if t["realized_pnl_pct"] >  BE_EPSILON)
+    losses    = sum(1 for t in closed if t["realized_pnl_pct"] < -BE_EPSILON)
+    scratches = closed_n - wins - losses
     pnls = [t["realized_pnl_pct"] for t in closed]
     by_outcome: dict = {}
     for t in closed:
         reason = t.get("close_reason", "?")
         by_outcome.setdefault(reason, 0)
         by_outcome[reason] += 1
+    # 胜率 = wins / (wins + losses), 排除 scratch (业内惯例)
+    decisive = wins + losses
+    win_rate = round(wins / decisive, 3) if decisive > 0 else None
     return {
         "total_trades": open_n + closed_n,
         "open": open_n,
         "closed": closed_n,
         "wins": wins,
         "losses": losses,
-        "win_rate": round(wins / closed_n, 3),
+        "scratches": scratches,
+        "win_rate": win_rate,
         "total_pnl_pct": round(sum(pnls), 2),
         "avg_pnl_pct": round(sum(pnls) / closed_n, 3),
         "best_trade": round(max(pnls), 2),

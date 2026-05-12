@@ -3550,8 +3550,12 @@ function renderPaperPanel(data) {
         <div class="value neutral">${winRate}</div>
       </div>
       <div class="paper-stat">
-        <div class="label">已平 / 胜 / 负</div>
-        <div class="value neutral">${stats.closed}/${stats.wins}/${stats.losses}</div>
+        <div class="label">胜 / 负 / BE</div>
+        <div class="value neutral" style="font-size:14px">
+          <span style="color:#00e676">${stats.wins}</span> /
+          <span style="color:#ff5252">${stats.losses}</span> /
+          <span style="color:#8a96aa">${stats.scratches || 0}</span>
+        </div>
       </div>
       <div class="paper-stat">
         <div class="label">平均/笔</div>
