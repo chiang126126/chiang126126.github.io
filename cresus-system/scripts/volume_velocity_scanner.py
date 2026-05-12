@@ -88,7 +88,7 @@ UA = "Mozilla/5.0 (Macintosh) cresus-velocity-scanner"
 HTTP_TIMEOUT = 12
 
 SCAN_TOP_N             = 200      # 24h 成交额 Top N 标的
-KLINE_LIMIT            = 240      # 1m 数据条数 (4h 窗口, 支持 1h/4h 多窗口涨幅 + ATR)
+KLINE_LIMIT            = 241      # 1m 数据条数 (4h+1 = 241 根, 让 _safe_pct(klines,240) 能访问 klines[-241])
 
 # ---- 路径 A: 启动检测 (1m spike vs 30m 基线) ----
 VOLUME_BURST_RATIO     = 5.0      # 1m 量 > 30m 均 × 此倍数
@@ -434,7 +434,7 @@ def analyze_symbol(symbol: str,
         change_5m  = _safe_pct(klines, 5)
         change_15m = _safe_pct(klines, 15)
         change_1h  = _safe_pct(klines, 60)
-        change_4h  = _safe_pct(klines, 240) if len(klines) > 240 else None
+        change_4h  = _safe_pct(klines, 240) if len(klines) >= 241 else None
 
         # 主动买盘占比 (kline 自带, 0 额外 API)
         taker_1m = _taker_buy_ratio(last_completed)

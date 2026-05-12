@@ -3526,7 +3526,7 @@ async function loadPaperTrades() {
   }
 }
 
-function renderPaperPanel(data) {
+function renderPaperPanel(data, shadowData) {
   const stats = data.stats || {};
   const open = data.open_trades || [];
   const closed = data.recent_closed || [];
