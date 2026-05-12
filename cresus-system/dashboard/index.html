@@ -3523,8 +3523,7 @@ function renderPaperPanel(data) {
   const stats = data.stats || {};
   const open = data.open_trades || [];
   const closed = data.recent_closed || [];
-  if (stats.total_trades === 0) return;  // 完全无数据 → 保持隐藏
-
+  // 只要 paper_trades_history.json 存在就显示 panel (即使 0 笔, 让用户看到"等待中" + 资金状态)
   document.getElementById("paper-panel").style.display = "";
   const upd = new Date(data.generated_at);
   const ageM = Math.floor((Date.now() - upd.getTime()) / 60_000);
