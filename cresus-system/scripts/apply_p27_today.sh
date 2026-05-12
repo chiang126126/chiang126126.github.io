@@ -130,6 +130,16 @@ else
     echo "✓ sync_signals.sh 加 paper trades 同步"
 fi
 
+# Phase 4 Shadow: premium 影子追踪 history
+if grep -q paper_shadow_history "$SYNC" 2>/dev/null; then
+    echo "✓ sync_signals.sh 已含 paper shadow 同步行,跳过"
+else
+    sed -i '' '/paper_trades_history.json cresus-system/a\
+[ -f ~/cresus-bot/paper_shadow_history.json ] \&\& cp ~/cresus-bot/paper_shadow_history.json cresus-system/dashboard/paper_shadow_history.json
+' "$SYNC"
+    echo "✓ sync_signals.sh 加 paper shadow 同步"
+fi
+
 # 立刻同步一次
 bash "$SYNC" 2>&1 | tail -2
 

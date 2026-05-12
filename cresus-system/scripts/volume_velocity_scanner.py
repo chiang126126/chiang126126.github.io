@@ -73,6 +73,16 @@ PAPER_MIN_TIER     = "diamond"        # 只对钻石信号自动开仓 (高质�
 PAPER_STARTING_CAPITAL_USDT   = 2000.0  # 起始账户余额 (整个仓总额)
 PAPER_NOTIONAL_PER_TRADE_USDT = 400.0   # 每笔交易分配 ($2000 × 20%, 最多并发 5)
 
+# ---- Phase 4 Shadow: premium tier 影子追踪 (不开真仓, 但模拟跟踪) ----
+# 目的: 在不冒资金风险的前提下, 用 1-2 周时间收集 premium 信号的真实 outcome,
+# 数据成熟后再决定是否启用 premium 自动开仓
+PAPER_SHADOW_STATE   = Path.home() / "cresus-bot" / ".paper_shadow_trades.json"
+PAPER_SHADOW_HISTORY = Path.home() / "cresus-bot" / "paper_shadow_history.json"
+PAPER_SHADOW_TIERS   = ["premium"]      # 哪些 tier 进 shadow tracking
+PAPER_SHADOW_NOTIONAL_HYPOTHETICAL = 200.0  # 假设的 notional (仅用于 P&L 计算, 不占用真实资金池)
+PAPER_SHADOW_TG_NOTIFY = False          # shadow 不发 Telegram (避免噪声)
+PAPER_SHADOW_VERDICT_MIN_N = 20         # 至少 N 笔已平才下结论
+
 BINANCE_FAPI = "https://fapi.binance.com"
 UA = "Mozilla/5.0 (Macintosh) cresus-velocity-scanner"
 HTTP_TIMEOUT = 12
@@ -1395,10 +1405,248 @@ def _save_paper_history(state: dict, stats: dict) -> None:
         _log(f"paper_history save failed: {e}")
 
 
+# ============================================================================
+# Phase 4 Shadow: premium 信号影子追踪 (不开真仓, 但模拟跟踪供数据评估)
+# ============================================================================
+
+def _load_shadow_state() -> dict:
+    if not PAPER_SHADOW_STATE.exists():
+        return {"open_trades": [], "closed_trades": []}
+    try:
+        data = json.loads(PAPER_SHADOW_STATE.read_text(encoding="utf-8"))
+        if not isinstance(data, dict):
+            return {"open_trades": [], "closed_trades": []}
+        data.setdefault("open_trades", [])
+        data.setdefault("closed_trades", [])
+        return data
+    except Exception:
+        return {"open_trades": [], "closed_trades": []}
+
+
+def _save_shadow_state(state: dict) -> None:
+    try:
+        PAPER_SHADOW_STATE.parent.mkdir(parents=True, exist_ok=True)
+        tmp = PAPER_SHADOW_STATE.with_suffix(".tmp")
+        tmp.write_text(json.dumps(state, ensure_ascii=False), encoding="utf-8")
+        tmp.replace(PAPER_SHADOW_STATE)
+    except Exception as e:
+        _log(f"shadow_state save failed: {e}")
+
+
+def _open_shadow_trade(a: VelocityAlert, state: dict, now: datetime) -> Optional[dict]:
+    """premium 信号 → 开 shadow 仓 (不占用真实资金, 仅记录).
+    保持跟真 paper 相同的 SL/TP 状态机, 便于后续直接对比'如果跟了会赚多少'.
+    """
+    if a.conviction_tier not in PAPER_SHADOW_TIERS:
+        return None
+    if a.suggested_sl is None or a.suggested_tp1 is None or a.suggested_tp2 is None:
+        return None
+    # 同方向校验 (跟真 paper 一样)
+    if a.direction == "LONG":
+        if not (a.suggested_sl < a.price < a.suggested_tp1 < a.suggested_tp2):
+            return None
+    elif a.direction == "SHORT":
+        if not (a.suggested_sl > a.price > a.suggested_tp1 > a.suggested_tp2):
+            return None
+    else:
+        return None
+    # 同 symbol+direction 已开 → 跳过 (避免短时重复)
+    for t in state["open_trades"]:
+        if t.get("symbol") == a.symbol and t.get("direction") == a.direction:
+            return None
+    trade = {
+        "id": f"shadow|{a.symbol}|{a.direction}|{a.detected_at}",
+        "shadow": True,                # 标记 shadow, 不混入真 paper 统计
+        "symbol": a.symbol,
+        "direction": a.direction,
+        "alert_type": a.alert_type,
+        "intensity": a.intensity,
+        "conviction_score": a.conviction_score,
+        "conviction_tier": a.conviction_tier,  # premium / etc
+        "atr_pct": a.atr_pct,
+        "range_4h_pct": a.range_4h_pct,
+        "vol_mult_used": a.vol_mult_used,
+        "entry_price": a.price,
+        "sl":  a.suggested_sl,
+        "tp1": a.suggested_tp1,
+        "tp2": a.suggested_tp2,
+        "entered_at": now.isoformat(),
+        "current_price": a.price,
+        "unrealized_pnl_pct": 0.0,
+        "notional_usdt": PAPER_SHADOW_NOTIONAL_HYPOTHETICAL,  # 仅供 P&L 计算, 不真扣
+        "unrealized_usdt_pnl": 0.0,
+        # 上下文 (供后续分析 'OI 匹配 vs 不匹配' 等子类型差异)
+        "funding_rate_pct": a.funding_rate_pct,
+        "oi_delta_5m_pct": a.oi_delta_5m_pct,
+        "oi_matches_direction": (
+            (a.direction == "LONG" and (a.oi_delta_5m_pct or 0) > 0) or
+            (a.direction == "SHORT" and (a.oi_delta_5m_pct or 0) < 0)
+        ) if a.oi_delta_5m_pct is not None else None,
+        "taker_buy_ratio_1m": a.taker_buy_ratio_1m,
+        "change_1h_pct": a.change_1h_pct,
+        "change_4h_pct": a.change_4h_pct,
+        # Phase 状态机字段 (跟真 paper 同 schema, 让 _update_paper_trades 直接复用)
+        "phase": "A",
+        "tp1_hit_at": None,
+        "tp2_hit_at": None,
+        "high_water_mark": a.price,
+        "trailing_sl": None,
+    }
+    state["open_trades"].append(trade)
+    return trade
+
+
+def _compute_shadow_stats(state: dict) -> dict:
+    """shadow 专用统计: hypothetical ROI + 自动 verdict + OI 子类型对比."""
+    open_n = len(state.get("open_trades", []))
+    closed = state.get("closed_trades", [])
+    closed_n = len(closed)
+    notional = PAPER_SHADOW_NOTIONAL_HYPOTHETICAL
+
+    if closed_n == 0:
+        return {
+            "total_trades": open_n + closed_n,
+            "open": open_n, "closed": 0,
+            "wins": 0, "losses": 0, "scratches": 0,
+            "win_rate": None,
+            "avg_pnl_pct": None, "total_usdt_pnl": 0.0,
+            "verdict": "📊 数据不足 — 等待 premium 信号触发",
+            "verdict_class": "neutral",
+            "hypothetical_notional_usdt": notional,
+            "by_outcome": {},
+            "oi_subset": {
+                "oi_match":    {"n": 0, "wins": 0, "win_rate": None, "avg_pct": None},
+                "oi_mismatch": {"n": 0, "wins": 0, "win_rate": None, "avg_pct": None},
+                "no_oi_data":  {"n": 0, "wins": 0, "win_rate": None, "avg_pct": None},
+            },
+        }
+
+    BE_EPSILON = 0.1
+    wins      = sum(1 for t in closed if t["realized_pnl_pct"] >  BE_EPSILON)
+    losses    = sum(1 for t in closed if t["realized_pnl_pct"] < -BE_EPSILON)
+    scratches = closed_n - wins - losses
+    pnls = [t["realized_pnl_pct"] for t in closed]
+    usdt_pnls = [round(notional * t["realized_pnl_pct"] / 100.0, 2) for t in closed]
+    decisive = wins + losses
+    win_rate = round(wins / decisive, 3) if decisive > 0 else None
+    avg_pnl = round(sum(pnls) / closed_n, 3)
+    total_usdt = round(sum(usdt_pnls), 2)
+
+    # by_outcome 分布
+    by_outcome: dict = {}
+    for t in closed:
+        reason = t.get("close_reason", "?")
+        by_outcome[reason] = by_outcome.get(reason, 0) + 1
+
+    # OI 子类型分析: 哪些 premium 是 OI 匹配 vs 不匹配
+    oi_subset = {
+        "oi_match":    {"n": 0, "wins": 0, "sum_pct": 0.0},
+        "oi_mismatch": {"n": 0, "wins": 0, "sum_pct": 0.0},
+        "no_oi_data":  {"n": 0, "wins": 0, "sum_pct": 0.0},
+    }
+    for t in closed:
+        oim = t.get("oi_matches_direction")
+        bucket = "oi_match" if oim is True else ("oi_mismatch" if oim is False else "no_oi_data")
+        oi_subset[bucket]["n"] += 1
+        oi_subset[bucket]["sum_pct"] += t["realized_pnl_pct"]
+        if t["realized_pnl_pct"] > BE_EPSILON:
+            oi_subset[bucket]["wins"] += 1
+    for k in oi_subset:
+        n = oi_subset[k]["n"]
+        if n > 0:
+            oi_subset[k]["win_rate"] = round(oi_subset[k]["wins"] / n, 3)
+            oi_subset[k]["avg_pct"]  = round(oi_subset[k]["sum_pct"] / n, 3)
+        else:
+            oi_subset[k]["win_rate"] = None
+            oi_subset[k]["avg_pct"]  = None
+        del oi_subset[k]["sum_pct"]   # 内部用,不发布
+
+    # ===== 自动 verdict (基于数据下结论, 不靠主观) =====
+    if closed_n < PAPER_SHADOW_VERDICT_MIN_N:
+        verdict = f"📊 数据不足 (N={closed_n} < {PAPER_SHADOW_VERDICT_MIN_N}) — 继续观察"
+        verdict_cls = "neutral"
+    elif avg_pnl >= 0.3 and (win_rate or 0) >= 0.5:
+        verdict = f"✅ 显示正向 edge (μ {avg_pnl:+.2f}% / 胜率 {int((win_rate or 0)*100)}%) — 可以考虑启用 premium 自动开仓"
+        verdict_cls = "positive"
+    elif avg_pnl <= -0.3 or (win_rate or 0) < 0.35:
+        verdict = f"❌ 负向 EV (μ {avg_pnl:+.2f}% / 胜率 {int((win_rate or 0)*100)}%) — 保持 shadow 不开真仓"
+        verdict_cls = "negative"
+    else:
+        verdict = f"⚖️ 中性 (μ {avg_pnl:+.2f}% / 胜率 {int((win_rate or 0)*100)}%) — 继续观察"
+        verdict_cls = "neutral"
+
+    return {
+        "total_trades": open_n + closed_n,
+        "open": open_n,
+        "closed": closed_n,
+        "wins": wins,
+        "losses": losses,
+        "scratches": scratches,
+        "win_rate": win_rate,
+        "avg_pnl_pct": avg_pnl,
+        "best_trade": round(max(pnls), 2),
+        "worst_trade": round(min(pnls), 2),
+        "total_usdt_pnl": total_usdt,
+        "verdict": verdict,
+        "verdict_class": verdict_cls,
+        "hypothetical_notional_usdt": notional,
+        "by_outcome": by_outcome,
+        "oi_subset": oi_subset,
+    }
+
+
+def _save_shadow_history(state: dict, stats: dict) -> None:
+    """发布到 paper_shadow_history.json 供看板 fetch."""
+    closed = state.get("closed_trades", [])
+    closed_sorted = sorted(closed, key=lambda t: t.get("closed_at", ""), reverse=True)
+    payload = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "stats": stats,
+        "open_trades": [_enrich_trade_for_publish(t) for t in state.get("open_trades", [])],
+        "recent_closed": [_enrich_trade_for_publish(t) for t in closed_sorted[:PAPER_RECENT_LIMIT]],
+        "shadow_mode": True,
+        "min_n_for_verdict": PAPER_SHADOW_VERDICT_MIN_N,
+    }
+    try:
+        PAPER_SHADOW_HISTORY.parent.mkdir(parents=True, exist_ok=True)
+        tmp = PAPER_SHADOW_HISTORY.with_suffix(".tmp")
+        tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        tmp.replace(PAPER_SHADOW_HISTORY)
+    except Exception as e:
+        _log(f"shadow_history save failed: {e}")
+
+
+def _prune_old_shadow(state: dict, retention_days: int = OUTCOMES_RETENTION_DAYS) -> int:
+    """超过 retention_days 的 closed shadow 自动清掉 (跟 outcomes 同保留策略)"""
+    cutoff = datetime.now(timezone.utc) - timedelta(days=retention_days)
+    keep = []
+    deleted = 0
+    for t in state.get("closed_trades", []):
+        try:
+            ca = datetime.fromisoformat(t["closed_at"].replace("Z", "+00:00"))
+            if ca >= cutoff:
+                keep.append(t)
+            else:
+                deleted += 1
+        except Exception:
+            keep.append(t)
+    state["closed_trades"] = keep
+    return deleted
+
+
 def _run_paper_trading(new_alerts: List[VelocityAlert], now: datetime) -> None:
     """钻石信号自动开仓 + 3 阶段动态 SL/TP 状态机 + 关仓 + 发布 history.
+    + Phase 4 Shadow: premium 信号同时记录到影子追踪 (不开真仓).
     全部失败保护 — 主流程不受影响.
     """
+    # 共享 prices fetch — 真 paper + shadow 都需要现价
+    prices_cache: Optional[dict] = None
+    def _get_prices():
+        nonlocal prices_cache
+        if prices_cache is None:
+            prices_cache = _fetch_all_prices_now() or {}
+        return prices_cache
+
     try:
         state = _load_paper_state()
         # 1. 新钻石开仓 — 跟踪 free 资金, 不够时跳过
@@ -1407,7 +1655,7 @@ def _run_paper_trading(new_alerts: List[VelocityAlert], now: datetime) -> None:
         skipped_capital = 0
         for a in new_alerts:
             if a.conviction_tier != PAPER_MIN_TIER:
-                continue  # 非钻石不进入 paper
+                continue  # 非钻石不进入 paper (premium 走 shadow)
             if free_capital < PAPER_NOTIONAL_PER_TRADE_USDT:
                 skipped_capital += 1
                 _log(f"💸 {a.symbol} 钻石信号但资金不足 (free=${free_capital:.2f} < notional=${PAPER_NOTIONAL_PER_TRADE_USDT}), 跳过开仓")
@@ -1423,7 +1671,7 @@ def _run_paper_trading(new_alerts: List[VelocityAlert], now: datetime) -> None:
         closed_list: List[dict] = []
         transitions: List[dict] = []
         if state["open_trades"]:
-            prices = _fetch_all_prices_now()
+            prices = _get_prices()
             if prices:
                 closed_n, closed_list, transitions = _update_paper_trades(state, prices, now)
         # 3. 写盘 state + 发布 history
@@ -1477,6 +1725,38 @@ def _run_paper_trading(new_alerts: List[VelocityAlert], now: datetime) -> None:
                  f"win_rate={stats.get('win_rate','—')} total={stats['total_pnl_pct']:+.2f}%")
     except Exception as e:
         _log(f"paper trading failed: {e}")
+
+    # ===== Phase 4 Shadow: premium 信号影子追踪 (不开真仓) =====
+    # 独立 try-except: shadow 出错绝不影响真 paper
+    try:
+        shadow_state = _load_shadow_state()
+        # 1. premium 信号开 shadow 仓 (不查资金)
+        shadow_opened = 0
+        for a in new_alerts:
+            if _open_shadow_trade(a, shadow_state, now) is not None:
+                shadow_opened += 1
+        # 2. 更新 shadow open trades — 复用 _update_paper_trades 同款 3-phase 状态机
+        shadow_closed_n = 0
+        shadow_transitions: List[dict] = []
+        if shadow_state["open_trades"]:
+            prices = _get_prices()
+            if prices:
+                shadow_closed_n, _, shadow_transitions = _update_paper_trades(
+                    shadow_state, prices, now
+                )
+        # 3. 清理过期 + 写盘
+        _prune_old_shadow(shadow_state)
+        _save_shadow_state(shadow_state)
+        shadow_stats = _compute_shadow_stats(shadow_state)
+        _save_shadow_history(shadow_state, shadow_stats)
+        # 4. Shadow TG 通知默认 OFF (避免噪声)
+        # if PAPER_SHADOW_TG_NOTIFY: ... 留作以后扩展
+        if shadow_opened or shadow_closed_n or shadow_transitions:
+            _log(f"📊 Shadow (premium): 新开 {shadow_opened}, 关 {shadow_closed_n}, "
+                 f"open={shadow_stats['open']} closed={shadow_stats['closed']} "
+                 f"verdict={shadow_stats.get('verdict','—')}")
+    except Exception as e:
+        _log(f"shadow tracking failed: {e}")
 
 
 # ============================================================================
