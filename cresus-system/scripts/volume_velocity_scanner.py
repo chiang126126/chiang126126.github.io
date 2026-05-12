@@ -999,12 +999,13 @@ def _save_paper_state(state: dict) -> None:
 
 
 def _open_paper_trade(a: VelocityAlert, state: dict, now: datetime) -> Optional[dict]:
-    """钻石信号 → 开模拟仓. 返回 trade dict (None 表示跳过)."""
+    """钻石信号 → 开模拟仓. 返回 trade dict (None 表示跳过).
+    初始 Phase A: SL = entry ± 1×ATR, TP1 = entry ± 1.5×ATR, TP2 = entry ± 3×ATR
+    """
     if a.conviction_tier != PAPER_MIN_TIER:
         return None
     if a.suggested_sl is None or a.suggested_tp1 is None or a.suggested_tp2 is None:
-        return None  # 缺入场建议则不开 (避免硬编码)
-    # 同 symbol+direction 已有 open trade → 跳过 (不加仓)
+        return None
     for t in state["open_trades"]:
         if t.get("symbol") == a.symbol and t.get("direction") == a.direction:
             return None
@@ -1028,16 +1029,27 @@ def _open_paper_trade(a: VelocityAlert, state: dict, now: datetime) -> Optional[
         "oi_delta_5m_pct": a.oi_delta_5m_pct,
         "taker_buy_ratio_1m": a.taker_buy_ratio_1m,
         "change_1h_pct": a.change_1h_pct,
+        # ===== Phase 4 动态 SL/TP 状态机 =====
+        "phase": "A",                            # A=初始 / B=TP1后BE / C=TP2后trailing
+        "tp1_hit_at": None,                      # ISO ts when TP1 触发
+        "tp2_hit_at": None,                      # ISO ts when TP2 触发
+        "high_water_mark": a.price,              # 持仓期间最高价(LONG)/最低价(SHORT)
+        "trailing_sl": None,                     # Phase C 跟踪止损 (只升不降棘轮)
     }
     state["open_trades"].append(trade)
     return trade
 
 
 def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
-    """逐个检查 open trades, 命中 SL/TP/timeout → 关仓.
-    返回 (newly_closed_count, list_of_closed_trades).
+    """3 阶段动态 SL/TP 状态机.
+    Phase A: 初始 SL/TP, 命中 TP1 → 进 B (移 SL 到 BE)
+    Phase B: SL=BE, 命中 TP2 → 进 C (启动 trailing); 触 BE SL → 关 0R
+    Phase C: trailing SL = HWM ∓ 2×ATR (棘轮只升); 触 trailing → 关跟踪止盈
+    返回 (newly_closed_count, list_of_closed_trades, list_of_phase_transitions).
+    phase_transitions 用于 Telegram 中途通知.
     """
     closed_now = []
+    phase_transitions: List[dict] = []
     still_open = []
     for t in state["open_trades"]:
         cur = prices.get(t["symbol"])
@@ -1050,6 +1062,15 @@ def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
             still_open.append(t)
             continue
         is_long = (t["direction"] == "LONG")
+
+        # 维护 high water mark (LONG 最高价, SHORT 最低价 — 跟踪 favorable 方向)
+        hwm = float(t.get("high_water_mark", entry))
+        if is_long:
+            if cur > hwm: hwm = cur
+        else:
+            if cur < hwm: hwm = cur
+        t["high_water_mark"] = hwm
+
         # 方向化 unrealized PnL
         raw_pct = (cur - entry) / entry * 100
         t["unrealized_pnl_pct"] = round(raw_pct if is_long else -raw_pct, 3)
@@ -1061,37 +1082,78 @@ def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
         except Exception:
             hold_min = 0.0
 
-        # 命中检查 — 关键: 检查顺序 SL → TP2 → TP1 (SL 优先, 避免一个 candle 内既触 SL 又触 TP)
         close_reason = None
         close_price = None
-        if is_long:
-            if cur <= t["sl"]:
-                close_reason = "hit_sl"
-                close_price = t["sl"]
-            elif cur >= t["tp2"]:
-                close_reason = "hit_tp2"
-                close_price = t["tp2"]
-            elif cur >= t["tp1"]:
-                close_reason = "hit_tp1"
-                close_price = t["tp1"]
-        else:  # SHORT
-            if cur >= t["sl"]:
-                close_reason = "hit_sl"
-                close_price = t["sl"]
-            elif cur <= t["tp2"]:
-                close_reason = "hit_tp2"
-                close_price = t["tp2"]
-            elif cur <= t["tp1"]:
-                close_reason = "hit_tp1"
-                close_price = t["tp1"]
+        phase = t.get("phase", "A")
+        atr_pct = t.get("atr_pct") or 0.5
 
-        # 时间超时 (4h)
+        # ===== 状态机 =====
+        if phase == "A":
+            # 初始阶段: 检查 SL → TP1 (TP2 还远, 不直接跳到 C)
+            if is_long:
+                if cur <= t["sl"]:
+                    close_reason = "hit_sl"; close_price = t["sl"]
+                elif cur >= t["tp1"]:
+                    # TP1 触发 → 进 Phase B, 不关仓!! SL 移到 entry (BE)
+                    t["phase"] = "B"
+                    t["tp1_hit_at"] = now.isoformat()
+                    t["sl"] = entry  # BE
+                    phase_transitions.append({
+                        "type": "tp1", "trade": t.copy(), "old_sl_pct": -atr_pct,
+                    })
+            else:  # SHORT
+                if cur >= t["sl"]:
+                    close_reason = "hit_sl"; close_price = t["sl"]
+                elif cur <= t["tp1"]:
+                    t["phase"] = "B"
+                    t["tp1_hit_at"] = now.isoformat()
+                    t["sl"] = entry
+                    phase_transitions.append({
+                        "type": "tp1", "trade": t.copy(), "old_sl_pct": -atr_pct,
+                    })
+
+        elif phase == "B":
+            # TP1 后免费仓位: SL=BE, 等 TP2 或回吐
+            if is_long:
+                if cur <= t["sl"]:  # = entry
+                    close_reason = "hit_be_sl"; close_price = entry
+                elif cur >= t["tp2"]:
+                    # TP2 触发 → 进 Phase C, 不关仓!! 启动 trailing
+                    t["phase"] = "C"
+                    t["tp2_hit_at"] = now.isoformat()
+                    # trailing 起点: HWM - 2×ATR (用相对 % 算)
+                    t["trailing_sl"] = hwm * (1 - 2 * atr_pct / 100.0)
+                    phase_transitions.append({"type": "tp2", "trade": t.copy()})
+            else:  # SHORT
+                if cur >= t["sl"]:
+                    close_reason = "hit_be_sl"; close_price = entry
+                elif cur <= t["tp2"]:
+                    t["phase"] = "C"
+                    t["tp2_hit_at"] = now.isoformat()
+                    t["trailing_sl"] = hwm * (1 + 2 * atr_pct / 100.0)
+                    phase_transitions.append({"type": "tp2", "trade": t.copy()})
+
+        elif phase == "C":
+            # TP2 后跟踪止盈: trailing SL 棘轮只升 (LONG 时升 = 数字增大)
+            if is_long:
+                new_trail = hwm * (1 - 2 * atr_pct / 100.0)
+                # 棘轮: 只朝有利方向更新
+                if t.get("trailing_sl") is None or new_trail > t["trailing_sl"]:
+                    t["trailing_sl"] = new_trail
+                if cur <= t["trailing_sl"]:
+                    close_reason = "hit_trail"; close_price = t["trailing_sl"]
+            else:  # SHORT
+                new_trail = hwm * (1 + 2 * atr_pct / 100.0)
+                if t.get("trailing_sl") is None or new_trail < t["trailing_sl"]:
+                    t["trailing_sl"] = new_trail
+                if cur >= t["trailing_sl"]:
+                    close_reason = "hit_trail"; close_price = t["trailing_sl"]
+
+        # 任何 phase: 4h timeout 兜底
         if not close_reason and hold_min >= PAPER_AUTO_CLOSE_HOURS * 60:
-            close_reason = "timeout"
-            close_price = cur
+            close_reason = "timeout"; close_price = cur
 
         if close_reason:
-            # 计算实际盈亏 (方向化)
             realized_raw = (close_price - entry) / entry * 100
             realized = realized_raw if is_long else -realized_raw
             t["closed_at"] = now.isoformat()
@@ -1105,7 +1167,7 @@ def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
             still_open.append(t)
 
     state["open_trades"] = still_open
-    return len(closed_now), closed_now
+    return len(closed_now), closed_now, phase_transitions
 
 
 def _compute_paper_stats(state: dict) -> dict:
@@ -1171,7 +1233,7 @@ def _save_paper_history(state: dict, stats: dict) -> None:
 
 
 def _run_paper_trading(new_alerts: List[VelocityAlert], now: datetime) -> None:
-    """钻石信号自动开仓 + 更新 open trades + 关仓 + 发布 history.
+    """钻石信号自动开仓 + 3 阶段动态 SL/TP 状态机 + 关仓 + 发布 history.
     全部失败保护 — 主流程不受影响.
     """
     try:
@@ -1183,38 +1245,60 @@ def _run_paper_trading(new_alerts: List[VelocityAlert], now: datetime) -> None:
                 opened_n += 1
                 _log(f"💎 模拟开仓 {a.symbol} {a.direction} @ {a.price} "
                      f"SL={a.suggested_sl} TP1={a.suggested_tp1} TP2={a.suggested_tp2}")
-        # 2. 更新 open trades (需要现价 — 重用 Phase 2 的 bulk ticker 函数)
+        # 2. 更新 open trades (含 phase 转移)
         closed_n = 0
         closed_list: List[dict] = []
+        transitions: List[dict] = []
         if state["open_trades"]:
-            prices = _fetch_all_prices_now()  # 同 Phase 2 outcome resolver
+            prices = _fetch_all_prices_now()
             if prices:
-                closed_n, closed_list = _update_paper_trades(state, prices, now)
+                closed_n, closed_list, transitions = _update_paper_trades(state, prices, now)
         # 3. 写盘 state + 发布 history
         _save_paper_state(state)
         stats = _compute_paper_stats(state)
         _save_paper_history(state, stats)
-        # 4. 关仓 → Telegram 通知 (告诉用户钻石信号最终输赢)
+        # 4. Phase 转移通知 (Telegram) — TP1 移 BE / TP2 启动 trailing
+        for tr in transitions:
+            try:
+                t = tr["trade"]
+                if tr["type"] == "tp1":
+                    msg = (
+                        f"🛡️ <b>TP1 触发 — SL 已移到 breakeven</b>\n"
+                        f"{t['symbol']} {t['direction']} · 入 {t['entry_price']} · 现 {t['current_price']}\n"
+                        f"已锁定: 零风险, 等 TP2 / trailing"
+                    )
+                else:  # tp2
+                    msg = (
+                        f"🎯 <b>TP2 触发 — 启动跟踪止盈 (trailing 2×ATR)</b>\n"
+                        f"{t['symbol']} {t['direction']} · 入 {t['entry_price']} · 现 {t['current_price']}\n"
+                        f"已落袋 +{t['unrealized_pnl_pct']}% 浮盈, 让利润奔跑"
+                    )
+                _send_telegram(msg)
+            except Exception as e:
+                _log(f"phase transition TG notify failed: {e}")
+        # 5. 关仓通知
         for t in closed_list:
             try:
-                emoji = "💚" if t["realized_pnl_pct"] > 0 else "💔"
+                emoji = "💚" if t["realized_pnl_pct"] > 0 else ("💔" if t["realized_pnl_pct"] < 0 else "⚖️")
                 reason_label = {
-                    "hit_sl":   "止损",
-                    "hit_tp1":  "TP1 止盈",
-                    "hit_tp2":  "TP2 止盈",
-                    "timeout":  "超时 (4h)"
+                    "hit_sl":     "止损 (Phase A)",
+                    "hit_be_sl":  "BE 平仓 (TP1 后回吐)",
+                    "hit_trail":  "跟踪止盈 (TP2 后)",
+                    "hit_tp1":    "TP1 止盈 (旧逻辑)",
+                    "hit_tp2":    "TP2 止盈 (旧逻辑)",
+                    "timeout":    "超时 (4h)",
                 }.get(t["close_reason"], t["close_reason"])
                 msg = (
                     f"{emoji} <b>模拟仓平仓 — {t['symbol']} {t['direction']}</b>\n"
-                    f"原因: {reason_label} · {t['realized_pnl_pct']:+.2f}% · 持仓 {t['hold_time_min']:.0f}min\n"
+                    f"原因: {reason_label} · <b>{t['realized_pnl_pct']:+.2f}%</b> · 持仓 {t['hold_time_min']:.0f}min\n"
                     f"入场 {t['entry_price']} → 平仓 {t['close_price']}\n"
-                    f"开仓时置信 {t.get('conviction_score','—')}/10"
+                    f"高水位: {t.get('high_water_mark','—')} · 置信 {t.get('conviction_score','—')}/10"
                 )
                 _send_telegram(msg)
             except Exception as e:
                 _log(f"paper close TG notify failed: {e}")
-        if opened_n or closed_n:
-            _log(f"📊 模拟仓: 新开 {opened_n}, 关 {closed_n}, "
+        if opened_n or closed_n or transitions:
+            _log(f"📊 模拟仓: 新开 {opened_n}, 关 {closed_n}, 阶段转移 {len(transitions)}, "
                  f"open={stats['open']} closed={stats['closed']} "
                  f"win_rate={stats.get('win_rate','—')} total={stats['total_pnl_pct']:+.2f}%")
     except Exception as e:
