@@ -139,6 +139,8 @@ class VelocityAlert:
 
     # ATR-based 入场建议
     atr_pct: Optional[float] = None              # ATR / current price * 100
+    range_4h_pct: Optional[float] = None         # 4h 真实波动幅度 (用于 vol regime 检测)
+    vol_mult_used: float = 1.0                   # SL/TP 应用的 vol 倍数 (1.0 / 1.5 / 2.0)
     suggested_sl:  Optional[float] = None
     suggested_tp1: Optional[float] = None        # 1.5R
     suggested_tp2: Optional[float] = None        # 3R
@@ -309,6 +311,21 @@ def _compute_atr(klines: List[list], period: int = ATR_PERIOD) -> Optional[float
         return None
 
 
+def _compute_4h_range_pct(klines: List[list], current_price: float) -> Optional[float]:
+    """4h 真实波动幅度 = (最高 - 最低) / 现价 × 100.
+    比 1m ATR(14) 更能反映 memecoin/高波动币的宏观真实波动,
+    用于 vol regime 检测 → 调整 SL/TP 宽度防止被局部洗盘.
+    """
+    if len(klines) < 240 or current_price <= 0:
+        return None
+    try:
+        highs = [float(k[2]) for k in klines[-240:]]
+        lows  = [float(k[3]) for k in klines[-240:]]
+        return round((max(highs) - min(lows)) / current_price * 100, 2)
+    except (ValueError, IndexError, TypeError):
+        return None
+
+
 # ============================================================================
 # Detection logic
 # ============================================================================
@@ -417,17 +434,29 @@ def analyze_symbol(symbol: str,
         atr_abs = _compute_atr(klines, ATR_PERIOD)
         atr_pct = round(atr_abs / last_close * 100, 3) if (atr_abs and last_close > 0) else None
 
+        # 4h 宏观波动幅度 (vol regime 检测) — 比 1m ATR 更能反映 memecoin 真实波动
+        range_4h = _compute_4h_range_pct(klines, last_close)
+
+        # vol regime → SL/TP 倍数. USELESS-style 高波动币用更宽 SL/TP, 防止被局部洗盘.
+        # 比例保持 1:1.5:3 不变, 整体缩放.
+        if range_4h is not None and range_4h >= 10.0:
+            vol_mult = 2.0    # 极端波动 (24h 范围 >=10%): SL/TP 翻倍
+        elif range_4h is not None and range_4h >= 5.0:
+            vol_mult = 1.5    # 高波动: SL/TP 1.5x
+        else:
+            vol_mult = 1.0    # 普通波动: 标准 ATR
+
         # 入场建议: 以 last_close 为参考入场点
         sl = tp1 = tp2 = None
         if atr_abs and atr_abs > 0:
             if direction == "LONG":
-                sl  = round(last_close - ATR_SL_MULT  * atr_abs, 8)
-                tp1 = round(last_close + ATR_TP1_MULT * atr_abs, 8)
-                tp2 = round(last_close + ATR_TP2_MULT * atr_abs, 8)
+                sl  = round(last_close - ATR_SL_MULT  * atr_abs * vol_mult, 8)
+                tp1 = round(last_close + ATR_TP1_MULT * atr_abs * vol_mult, 8)
+                tp2 = round(last_close + ATR_TP2_MULT * atr_abs * vol_mult, 8)
             else:
-                sl  = round(last_close + ATR_SL_MULT  * atr_abs, 8)
-                tp1 = round(last_close - ATR_TP1_MULT * atr_abs, 8)
-                tp2 = round(last_close - ATR_TP2_MULT * atr_abs, 8)
+                sl  = round(last_close + ATR_SL_MULT  * atr_abs * vol_mult, 8)
+                tp1 = round(last_close - ATR_TP1_MULT * atr_abs * vol_mult, 8)
+                tp2 = round(last_close - ATR_TP2_MULT * atr_abs * vol_mult, 8)
 
         # OI 5m Δ (额外 1 次 API,可禁用)
         oi_delta = None
@@ -456,6 +485,8 @@ def analyze_symbol(symbol: str,
             oi_delta_5m_pct=oi_delta,
             funding_rate_pct=round(funding_rate_pct, 4) if funding_rate_pct is not None else None,
             atr_pct=atr_pct,
+            range_4h_pct=range_4h,
+            vol_mult_used=vol_mult,
             suggested_sl=sl,
             suggested_tp1=tp1,
             suggested_tp2=tp2,
@@ -747,49 +778,65 @@ CONVICTION_DIAMOND_THRESHOLD = 5   # ≥5 = 💎 钻石
 CONVICTION_PREMIUM_THRESHOLD = 3   # ≥3 = ⭐ 中置信
 
 def _compute_conviction(a: VelocityAlert, winrate_summary: Optional[dict]) -> tuple:
-    """计算 (score 0-10, tier str). 失败保护: 任何 None 跳过该项不加分."""
+    """计算 (score 0-10, tier str).
+    修订 v2 (基于 USELESS/GTC 失败案例反向工程):
+    - 加宏观逆势硬否决 (1h/4h 严重反向直接拒绝, 不靠加分扛)
+    - 历史胜率: N≥10 严格 / N≥5 高胜率折扣 (避免小样本误导)
+    - Funding 权重 +3 → +2 (单一指标不应主导评分)
+    - 多窗口对齐: 1h+4h 都同向 +2 (强对齐), 单边同向 +1
+    """
+    is_long = (a.direction == "LONG")
+
+    # ===== 硬否决: 宏观逆势 → 直接 0 分, 不进入加分 =====
+    # 防止"下跌趋势中追多"或"上涨趋势中追空"这类 GTC 式陷阱
+    if a.change_4h_pct is not None:
+        h4 = a.change_4h_pct
+        if (is_long and h4 <= -3.0) or (not is_long and h4 >= 3.0):
+            return 0, "regular"   # 4h 反向 ≥3%: 强趋势中逆向, 拒
+    if a.change_1h_pct is not None:
+        h1 = a.change_1h_pct
+        if (is_long and h1 <= -1.5) or (not is_long and h1 >= 1.5):
+            return 0, "regular"   # 1h 反向 ≥1.5%: 短线趋势逆向, 拒
+
     score = 0
 
-    # 1. 极端 funding (+3): 单边过度拥挤,反转动能强
+    # 1. 极端 funding (+2, 旧 +3): 单一指标降权, 不再主导
     if a.funding_rate_pct is not None and abs(a.funding_rate_pct) >= 0.3:
-        score += 3
+        score += 2
 
-    # 2. 历史 30m 胜率 ≥ 60% AND N ≥ 5 (+3): 经验主义验证
+    # 2. 历史 30m 胜率: N≥10 高门槛 (+3) / N≥5 + 高胜率折扣 (+2)
     if winrate_summary and winrate_summary.get("by_key"):
         wkey = f"{a.symbol}|{a.alert_type}|{a.direction}"
         w = winrate_summary["by_key"].get(wkey)
         if w and w.get("stages"):
             s30 = w["stages"].get("30m")
-            if s30 and s30.get("n", 0) >= 5 and s30.get("win_rate", 0) >= 0.60:
-                score += 3
+            if s30:
+                n = s30.get("n", 0)
+                rate = s30.get("win_rate", 0)
+                if n >= 10 and rate >= 0.65:
+                    score += 3   # 统计有意义的样本量
+                elif n >= 5 and rate >= 0.70:
+                    score += 2   # 小样本但表现优异, 折扣到 +2
 
     # 3. OI 方向匹配 (+2): LONG+OI涨 = 真新多, SHORT+OI跌 = 真新空
     if a.oi_delta_5m_pct is not None:
-        if a.direction == "LONG" and a.oi_delta_5m_pct > 0:
-            score += 2
-        elif a.direction == "SHORT" and a.oi_delta_5m_pct < 0:
+        if (is_long and a.oi_delta_5m_pct > 0) or (not is_long and a.oi_delta_5m_pct < 0):
             score += 2
 
     # 4. sustained 类型 (+1): 10m 累计比 1m burst 多一层时间验证
     if a.alert_type == "sustained":
         score += 1
 
-    # 5. 多窗口同向 (+1): 5m / 1h / 4h 跟主方向一致 (允许 1 个不一致)
-    if a.change_5m_pct is not None and a.change_1h_pct is not None:
-        dir_sign = 1 if a.direction == "LONG" else -1
-        matches = 0
-        total = 0
-        for v in (a.change_5m_pct, a.change_1h_pct, a.change_4h_pct):
-            if v is None:
-                continue
-            total += 1
-            if (v > 0) == (dir_sign > 0):
-                matches += 1
-        # 至少 2 个窗口, 多数同向
-        if total >= 2 and matches >= total - 1:
+    # 5. 多窗口对齐: 1h+4h 都同向 (+2, 强对齐) / 单边同向 (+1)
+    if a.change_1h_pct is not None and a.change_4h_pct is not None:
+        h1_aligned = (a.change_1h_pct > 0) == is_long
+        h4_aligned = (a.change_4h_pct > 0) == is_long
+        if h1_aligned and h4_aligned:
+            score += 2   # 强对齐: 短线 + 中线趋势都站我方
+        elif h1_aligned or h4_aligned:
             score += 1
 
-    # tier 分级
+    # tier 分级 (阈值不变)
     if score >= CONVICTION_DIAMOND_THRESHOLD:
         tier = "diamond"
     elif score >= CONVICTION_PREMIUM_THRESHOLD:

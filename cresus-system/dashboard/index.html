@@ -2223,6 +2223,8 @@ function renderVelocityPanel() {
         </div>
         <div>
           <span class="vexec-label">ATR(14):</span><span class="vexec-val">${a.atr_pct != null ? a.atr_pct.toFixed(2) + "%" : "—"}</span>
+          ${a.range_4h_pct != null ? `&nbsp;·&nbsp;<span class="vexec-label">4h range:</span><span class="vexec-val">${a.range_4h_pct.toFixed(1)}%</span>` : ""}
+          ${a.vol_mult_used != null && a.vol_mult_used > 1.0 ? `&nbsp;·&nbsp;<span class="vexec-label">vol×</span><span class="vexec-val" style="color:#ffd54f">${a.vol_mult_used.toFixed(1)}</span>` : ""}
           ${a.taker_buy_ratio_5m != null ? `&nbsp;·&nbsp;<span class="vexec-label">5m 主动买:</span><span class="vexec-val">${Math.round(a.taker_buy_ratio_5m*100)}%</span>` : ""}
           ${a.change_15m_pct != null ? `&nbsp;·&nbsp;<span class="vexec-label">15m:</span><span class="vexec-val">${a.change_15m_pct > 0 ? "+" : ""}${a.change_15m_pct.toFixed(2)}%</span>` : ""}
         </div>
