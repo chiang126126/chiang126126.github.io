@@ -3538,12 +3538,33 @@ function renderPaperPanel(data) {
     return n.toFixed(2);
   };
   const winRate = stats.win_rate != null ? Math.round(stats.win_rate * 100) + "%" : "—";
+  const startCap = stats.starting_capital_usdt || 2000;
+  const balance = stats.current_balance_usdt != null ? stats.current_balance_usdt : startCap;
+  const totalUsdt = stats.total_usdt_pnl || 0;
+  const roi = stats.roi_pct || 0;
+  const avgUsdt = stats.avg_usdt_pnl;
+  const bestUsdt = stats.best_trade_usdt;
+  const worstUsdt = stats.worst_trade_usdt;
+  const fmtUsdt = (v) => (v == null ? "—" : (v >= 0 ? "+" : "") + "$" + v.toFixed(2));
+  const usdtCls = (v) => (v == null ? "neutral" : (v > 0 ? "up" : (v < 0 ? "down" : "neutral")));
+
+  const allocatedUsdt = stats.allocated_usdt != null ? stats.allocated_usdt : 0;
+  const freeUsdt = stats.free_capital_usdt != null ? stats.free_capital_usdt : startCap;
+  const notionalPer = stats.notional_per_trade_usdt || 400;
+  const maxSlots = stats.max_concurrent_slots || 5;
+  const slotsUsed = stats.slots_used || 0;
 
   const statsHtml = `
     <div class="paper-stats-grid">
-      <div class="paper-stat">
-        <div class="label">累计盈亏</div>
-        <div class="value ${stats.total_pnl_pct > 0 ? 'up' : (stats.total_pnl_pct < 0 ? 'down' : 'neutral')}">${fmtPct(stats.total_pnl_pct)}</div>
+      <div class="paper-stat" style="grid-column: span 2;">
+        <div class="label">账户余额 (起始 $${startCap.toFixed(0)})</div>
+        <div class="value ${usdtCls(totalUsdt)}" style="font-size:22px">
+          $${balance.toFixed(2)}
+          <span style="font-size:13px;opacity:0.85;margin-left:6px">${fmtUsdt(totalUsdt)} · ${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:4px">
+          已分配 $${allocatedUsdt.toFixed(0)} / 可用 $${freeUsdt.toFixed(0)} · 仓位 ${slotsUsed}/${maxSlots} · 每笔 $${notionalPer.toFixed(0)}
+        </div>
       </div>
       <div class="paper-stat">
         <div class="label">胜率</div>
@@ -3559,14 +3580,16 @@ function renderPaperPanel(data) {
       </div>
       <div class="paper-stat">
         <div class="label">平均/笔</div>
-        <div class="value ${stats.avg_pnl_pct > 0 ? 'up' : (stats.avg_pnl_pct < 0 ? 'down' : 'neutral')}">${stats.avg_pnl_pct == null ? '—' : fmtPct(stats.avg_pnl_pct)}</div>
+        <div class="value ${usdtCls(avgUsdt)}" style="font-size:15px">
+          ${fmtUsdt(avgUsdt)}
+          <div style="font-size:11px;opacity:0.7;margin-top:2px">${stats.avg_pnl_pct == null ? '' : fmtPct(stats.avg_pnl_pct)}</div>
+        </div>
       </div>
       <div class="paper-stat">
-        <div class="label">最佳/最差</div>
-        <div class="value neutral" style="font-size:13px">
-          <span style="color:#00e676">${stats.best_trade == null ? '—' : fmtPct(stats.best_trade)}</span>
-          /
-          <span style="color:#ff5252">${stats.worst_trade == null ? '—' : fmtPct(stats.worst_trade)}</span>
+        <div class="label">最佳 / 最差</div>
+        <div class="value neutral" style="font-size:12px">
+          <span style="color:#00e676">${fmtUsdt(bestUsdt)}</span><br/>
+          <span style="color:#ff5252">${fmtUsdt(worstUsdt)}</span>
         </div>
       </div>
     </div>`;
@@ -3577,8 +3600,17 @@ function renderPaperPanel(data) {
     "C": "🎯 trailing", // TP2 后 跟踪
   };
 
+  const notionalDefault = stats.notional_per_trade_usdt || 2000;
+  const usdtOfTrade = (t, pct) => {
+    if (t.realized_usdt_pnl != null) return t.realized_usdt_pnl;
+    if (t.unrealized_usdt_pnl != null && pct === t.unrealized_pnl_pct) return t.unrealized_usdt_pnl;
+    const notional = t.notional_usdt || notionalDefault;
+    return notional * pct / 100;
+  };
+
   const renderOpen = (t) => {
     const pnl = t.unrealized_pnl_pct;
+    const usdt = usdtOfTrade(t, pnl);
     const cls = pnl > 0 ? "up" : (pnl < 0 ? "down" : "");
     const enteredAt = new Date(t.entered_at);
     const holdMin = Math.floor((Date.now() - enteredAt.getTime()) / 60_000);
@@ -3586,7 +3618,7 @@ function renderPaperPanel(data) {
     const phaseLabel = PHASE_LABEL[phase] || phase;
     return `<div class="paper-trade-row dir-${t.direction}">
       <span><strong>${escapeHtml(t.symbol)}</strong> ${t.direction} · 入 ${fmtPrice(t.entry_price)} · 现 ${fmtPrice(t.current_price)}</span>
-      <span class="paper-pnl ${cls}">${fmtPct(pnl)}</span>
+      <span class="paper-pnl ${cls}">${fmtPct(pnl)}<br/><span style="font-size:10px;opacity:0.85">${fmtUsdt(usdt)}</span></span>
       <span class="paper-reason">${phaseLabel} · 置信${t.conviction_score}</span>
       <span class="paper-hold">${holdMin}min</span>
     </div>`;
@@ -3594,6 +3626,7 @@ function renderPaperPanel(data) {
 
   const renderClosed = (t) => {
     const pnl = t.realized_pnl_pct;
+    const usdt = usdtOfTrade(t, pnl);
     const cls = pnl > 0 ? "up" : (pnl < 0 ? "down" : "");
     const winLossCls = pnl > 0.1 ? "win" : (pnl < -0.1 ? "loss" : "");
     const reasonLabel = {
@@ -3606,7 +3639,7 @@ function renderPaperPanel(data) {
     }[t.close_reason] || t.close_reason;
     return `<div class="paper-trade-row dir-${t.direction} ${winLossCls}">
       <span><strong>${escapeHtml(t.symbol)}</strong> ${t.direction} · 入 ${fmtPrice(t.entry_price)} → ${fmtPrice(t.close_price)}</span>
-      <span class="paper-pnl ${cls}">${fmtPct(pnl)}</span>
+      <span class="paper-pnl ${cls}">${fmtPct(pnl)}<br/><span style="font-size:10px;opacity:0.85">${fmtUsdt(usdt)}</span></span>
       <span class="paper-reason">${reasonLabel} · 置信${t.conviction_score}</span>
       <span class="paper-hold">${Math.round(t.hold_time_min)}min</span>
     </div>`;
