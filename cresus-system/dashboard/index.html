@@ -285,6 +285,13 @@
   .paper-reason { font-size: 10px; color: var(--text-dim); }
   .paper-hold   { font-size: 10px; color: var(--text-dim); text-align: right; }
   .paper-empty  { padding: 14px; text-align: center; color: var(--text-dim); font-size: 12px; }
+  .paper-mfe-line {
+    display: block;
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
 
   /* 手机端: paper-trade-row 改为 2 行 grid 避免内容挤爆 */
   @media (max-width: 720px) {
@@ -3665,8 +3672,15 @@ function renderPaperPanel(data, shadowData) {
     const holdMin = Math.floor((Date.now() - enteredAt.getTime()) / 60_000);
     const phase = t.phase || "A";
     const phaseLabel = PHASE_LABEL[phase] || phase;
+    // Open trade 显示各 phase MFE 帮助实时观察"已经摸到的最高点"
+    const fmtMfePct = v => v == null ? null : (v >= 0 ? "+" : "") + v.toFixed(2) + "%";
+    const mfeParts = [];
+    if (t.phase_a_mfe_pct != null) mfeParts.push(`A↑ ${fmtMfePct(t.phase_a_mfe_pct)}`);
+    if (t.phase_b_mfe_pct != null) mfeParts.push(`B↑ ${fmtMfePct(t.phase_b_mfe_pct)}`);
+    if (t.phase_c_mfe_pct != null) mfeParts.push(`C↑ ${fmtMfePct(t.phase_c_mfe_pct)}`);
+    const mfeLine = mfeParts.length ? `<span class="paper-mfe-line">最佳: ${mfeParts.join(" · ")}</span>` : "";
     return `<div class="paper-trade-row dir-${t.direction}">
-      <span><strong>${escapeHtml(t.symbol)}</strong> ${t.direction} · 入 ${fmtPrice(t.entry_price)} · 现 ${fmtPrice(t.current_price)}</span>
+      <span><strong>${escapeHtml(t.symbol)}</strong> ${t.direction} · 入 ${fmtPrice(t.entry_price)} · 现 ${fmtPrice(t.current_price)}${mfeLine}</span>
       <span class="paper-pnl ${cls}">${fmtPct(pnl)}<br/><span style="font-size:10px;opacity:0.85">${fmtUsdt(usdt)}</span></span>
       <span class="paper-reason">${phaseLabel} · 置信${t.conviction_score}</span>
       <span class="paper-hold">${holdMin}min</span>
@@ -3686,8 +3700,30 @@ function renderPaperPanel(data, shadowData) {
       "hit_tp2":    "🎯 TP2",   // backward compat
       "timeout":    "⏱ 超时"
     }[t.close_reason] || t.close_reason;
+
+    // Per-phase MFE 复盘: 显示每个 phase 最高摸到多少 + 是否错过利润
+    const fmtMfePct = v => v == null ? null : (v >= 0 ? "+" : "") + v.toFixed(2) + "%";
+    const mfeParts = [];
+    const aMfe = fmtMfePct(t.phase_a_mfe_pct);
+    const bMfe = fmtMfePct(t.phase_b_mfe_pct);
+    const cMfe = fmtMfePct(t.phase_c_mfe_pct);
+    if (aMfe != null) mfeParts.push(`A↑ ${aMfe}`);
+    if (bMfe != null) mfeParts.push(`B↑ ${bMfe}`);
+    if (cMfe != null) mfeParts.push(`C↑ ${cMfe}`);
+    // 计算 regret: 最高 MFE - 实际平仓 % = 错失利润
+    const allMfes = [t.phase_a_mfe_pct, t.phase_b_mfe_pct, t.phase_c_mfe_pct].filter(v => v != null);
+    const bestMfe = allMfes.length ? Math.max(...allMfes) : null;
+    const regret = (bestMfe != null && pnl != null) ? bestMfe - pnl : null;
+    let mfeLine = "";
+    if (mfeParts.length) {
+      const regretStr = (regret != null && regret > 0.5)
+        ? `<span style="color:#ffb74d">错失 +${regret.toFixed(2)}%</span>`
+        : "";
+      mfeLine = `<span class="paper-mfe-line">最佳: ${mfeParts.join(" · ")}${regretStr ? " · " + regretStr : ""}</span>`;
+    }
+
     return `<div class="paper-trade-row dir-${t.direction} ${winLossCls}">
-      <span><strong>${escapeHtml(t.symbol)}</strong> ${t.direction} · 入 ${fmtPrice(t.entry_price)} → ${fmtPrice(t.close_price)}</span>
+      <span><strong>${escapeHtml(t.symbol)}</strong> ${t.direction} · 入 ${fmtPrice(t.entry_price)} → ${fmtPrice(t.close_price)}${mfeLine}</span>
       <span class="paper-pnl ${cls}">${fmtPct(pnl)}<br/><span style="font-size:10px;opacity:0.85">${fmtUsdt(usdt)}</span></span>
       <span class="paper-reason">${reasonLabel} · 置信${t.conviction_score}</span>
       <span class="paper-hold">${Math.round(t.hold_time_min)}min</span>
