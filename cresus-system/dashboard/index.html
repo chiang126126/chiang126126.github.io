@@ -3548,6 +3548,12 @@ function renderPaperPanel(data) {
   const fmtUsdt = (v) => (v == null ? "—" : (v >= 0 ? "+" : "") + "$" + v.toFixed(2));
   const usdtCls = (v) => (v == null ? "neutral" : (v > 0 ? "up" : (v < 0 ? "down" : "neutral")));
 
+  const allocatedUsdt = stats.allocated_usdt != null ? stats.allocated_usdt : 0;
+  const freeUsdt = stats.free_capital_usdt != null ? stats.free_capital_usdt : startCap;
+  const notionalPer = stats.notional_per_trade_usdt || 400;
+  const maxSlots = stats.max_concurrent_slots || 5;
+  const slotsUsed = stats.slots_used || 0;
+
   const statsHtml = `
     <div class="paper-stats-grid">
       <div class="paper-stat" style="grid-column: span 2;">
@@ -3555,6 +3561,9 @@ function renderPaperPanel(data) {
         <div class="value ${usdtCls(totalUsdt)}" style="font-size:22px">
           $${balance.toFixed(2)}
           <span style="font-size:13px;opacity:0.85;margin-left:6px">${fmtUsdt(totalUsdt)} · ${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:4px">
+          已分配 $${allocatedUsdt.toFixed(0)} / 可用 $${freeUsdt.toFixed(0)} · 仓位 ${slotsUsed}/${maxSlots} · 每笔 $${notionalPer.toFixed(0)}
         </div>
       </div>
       <div class="paper-stat">
