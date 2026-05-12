@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-12T09:18:51.192557+00:00",
+  "generated_at": "2026-05-12T09:35:36.920257+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
@@ -46,24 +46,36 @@
           "avg_outcome_pct": -5.07
         }
       }
+    },
+    "SAHARAUSDT|ignition|LONG": {
+      "symbol": "SAHARAUSDT",
+      "pred_type": "ignition",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.8,
+          "avg_outcome_pct": 1.32
+        }
+      }
     }
   },
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 274,
-        "win_rate": 0.255,
-        "avg_outcome_pct": -0.02
+        "n": 283,
+        "win_rate": 0.265,
+        "avg_outcome_pct": -0.01
       },
       "60m": {
-        "n": 266,
-        "win_rate": 0.289,
+        "n": 274,
+        "win_rate": 0.288,
         "avg_outcome_pct": -0.08
       },
       "240m": {
-        "n": 201,
+        "n": 206,
         "win_rate": 0.383,
-        "avg_outcome_pct": -0.5
+        "avg_outcome_pct": -0.51
       }
     },
     "quant_only": {}
