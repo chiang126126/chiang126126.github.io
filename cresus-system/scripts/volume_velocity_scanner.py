@@ -30,8 +30,10 @@ import json
 import os
 import sys
 import time
+import smtplib
 import urllib.request
 import urllib.error
+from email.mime.text import MIMEText
 from dataclasses import dataclass, asdict
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
@@ -60,6 +62,16 @@ TG_CHAT_ID       = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
 TG_COOLDOWN_STATE = Path.home() / "cresus-bot" / ".velocity_tg_cooldown.json"
 TG_COOLDOWN_MIN  = 30                 # 同 symbol 30min 只推 1 次
 TG_MIN_INTENSITY = 2                  # intensity ≥ 2 才推 (过滤弱信号噪声)
+
+# ---- Phase 3b: Email VIP 通道 (仅钻石信号, 避免被 TG 噪声淹没) ----
+EMAIL_SMTP_HOST  = os.environ.get("EMAIL_SMTP_HOST", "").strip()    # 如 smtp.gmail.com
+EMAIL_SMTP_PORT  = int(os.environ.get("EMAIL_SMTP_PORT", "587") or "587")
+EMAIL_USERNAME   = os.environ.get("EMAIL_USERNAME", "").strip()
+EMAIL_PASSWORD   = os.environ.get("EMAIL_PASSWORD", "").strip()    # Gmail app password (非常规密码)
+EMAIL_FROM       = os.environ.get("EMAIL_FROM", "").strip() or EMAIL_USERNAME
+EMAIL_TO         = os.environ.get("EMAIL_TO", "").strip() or EMAIL_USERNAME
+EMAIL_COOLDOWN_STATE = Path.home() / "cresus-bot" / ".velocity_email_cooldown.json"
+EMAIL_COOLDOWN_MIN   = 60             # 同 symbol+direction 1 小时只发 1 封 (比 TG 严, 避免邮件刷屏)
 
 # ---- Phase 4: 自动模拟仓 (仅钻石信号开仓, 跟踪真实收益曲线) ----
 PAPER_STATE       = Path.home() / "cresus-bot" / ".paper_trades.json"       # 本地全量 state
@@ -983,6 +995,161 @@ def _format_alert_for_tg(a: VelocityAlert, winrate_summary: Optional[dict] = Non
     return "\n".join(lines)
 
 
+# ============================================================================
+# Phase 3b: Email VIP 通道 (仅钻石信号, 避免被 TG 噪声淹没)
+# ============================================================================
+
+def _load_email_cooldown() -> dict:
+    if not EMAIL_COOLDOWN_STATE.exists():
+        return {}
+    try:
+        return json.loads(EMAIL_COOLDOWN_STATE.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _save_email_cooldown(state: dict) -> None:
+    try:
+        EMAIL_COOLDOWN_STATE.parent.mkdir(parents=True, exist_ok=True)
+        tmp = EMAIL_COOLDOWN_STATE.with_suffix(".tmp")
+        tmp.write_text(json.dumps(state), encoding="utf-8")
+        tmp.replace(EMAIL_COOLDOWN_STATE)
+    except Exception as e:
+        _log(f"email_cooldown save failed: {e}")
+
+
+def _send_email(subject: str, body: str) -> bool:
+    """发送邮件. 失败静默 (不影响主流程)."""
+    if not (EMAIL_SMTP_HOST and EMAIL_USERNAME and EMAIL_PASSWORD and EMAIL_TO):
+        return False
+    try:
+        msg = MIMEText(body, "plain", "utf-8")
+        msg["Subject"] = subject
+        msg["From"] = EMAIL_FROM
+        msg["To"] = EMAIL_TO
+        with smtplib.SMTP(EMAIL_SMTP_HOST, EMAIL_SMTP_PORT, timeout=10) as smtp:
+            smtp.starttls()
+            smtp.login(EMAIL_USERNAME, EMAIL_PASSWORD)
+            smtp.sendmail(EMAIL_FROM, [EMAIL_TO], msg.as_string())
+        return True
+    except Exception as e:
+        _log(f"email send failed: {e}")
+        return False
+
+
+def _format_alert_for_email(a: VelocityAlert, winrate_summary: Optional[dict] = None) -> tuple:
+    """构造邮件 (subject, body). 比 TG 更详细, 适合慢慢看."""
+    type_label = "持续" if a.alert_type == "sustained" else "启动"
+    dir_icon = "📈" if a.direction == "LONG" else "📉"
+    type_icon = "🔥" if a.alert_type == "sustained" else "⚡"
+
+    # Subject: 让 Gmail 过滤规则容易匹配 [CRESUS 💎] 前缀
+    subject = (
+        f"[CRESUS 💎] {a.symbol} {a.direction} "
+        f"{a.price_change_pct:+.2f}%/{a.metric_window_min}m "
+        f"· 置信 {a.conviction_score}/10"
+    )
+
+    L = []
+    L.append("💎💎💎  钻石信号  💎💎💎")
+    L.append("")
+    L.append(f"{type_icon} {a.symbol}  {type_label}{a.direction} {dir_icon}")
+    L.append(f"{a.price_change_pct:+.2f}% / {a.metric_window_min}m  ·  vol {a.volume_ratio:.1f}x  ·  置信 {a.conviction_score}/10")
+    L.append("")
+    L.append("─────── 富信息 ───────")
+    if a.funding_rate_pct is not None:
+        flag = " 🔥" if abs(a.funding_rate_pct) > 0.05 else ""
+        L.append(f"Funding 资金费率: {a.funding_rate_pct:+.4f}%{flag}")
+    if a.oi_delta_5m_pct is not None:
+        meaning = ""
+        if a.direction == "LONG":
+            meaning = "（真新多）" if a.oi_delta_5m_pct > 0 else "（空头回补，弱信号）"
+        else:
+            meaning = "（真新空）" if a.oi_delta_5m_pct < 0 else "（诱空，弱信号）"
+        L.append(f"OI 5m 变化: {a.oi_delta_5m_pct:+.2f}% {meaning}")
+    if a.taker_buy_ratio_1m is not None:
+        L.append(f"1m 主动买盘: {int(a.taker_buy_ratio_1m * 100)}%")
+    if a.taker_buy_ratio_5m is not None:
+        L.append(f"5m 主动买盘: {int(a.taker_buy_ratio_5m * 100)}%")
+    L.append("")
+
+    L.append("─────── 多窗口涨幅 ───────")
+    if a.change_5m_pct  is not None: L.append(f"5m:  {a.change_5m_pct:+.2f}%")
+    if a.change_15m_pct is not None: L.append(f"15m: {a.change_15m_pct:+.2f}%")
+    if a.change_1h_pct  is not None: L.append(f"1h:  {a.change_1h_pct:+.2f}%")
+    if a.change_4h_pct  is not None: L.append(f"4h:  {a.change_4h_pct:+.2f}%")
+    L.append("")
+
+    if a.suggested_sl is not None:
+        def _fmt(p):
+            n = float(p)
+            if n < 1:   return f"{n:.6g}"
+            if n < 100: return f"{n:.4f}"
+            return f"{n:.2f}"
+        def _dist(target):
+            return (target - a.price) / a.price * 100
+        L.append("─────── 入场建议 (3-阶段动态 SL/TP) ───────")
+        L.append(f"入场: {_fmt(a.price)}")
+        L.append(f"SL  (Phase A 止损):    {_fmt(a.suggested_sl)}   ({_dist(a.suggested_sl):+.2f}%, 1R)")
+        L.append(f"TP1 (触发 → SL 移 BE): {_fmt(a.suggested_tp1)}   ({_dist(a.suggested_tp1):+.2f}%, 1.5R)")
+        L.append(f"TP2 (触发 → 启动 trailing): {_fmt(a.suggested_tp2)}   ({_dist(a.suggested_tp2):+.2f}%, 3R)")
+        if a.atr_pct is not None:
+            L.append(f"ATR(14): {a.atr_pct:.2f}%")
+        if a.range_4h_pct is not None:
+            L.append(f"4h 真实波动范围: {a.range_4h_pct:.1f}%")
+        if a.vol_mult_used and a.vol_mult_used > 1.0:
+            L.append(f"vol_mult: {a.vol_mult_used:.1f}× (高波动 regime, SL/TP 已放宽)")
+        L.append("")
+
+    if winrate_summary and winrate_summary.get("by_key"):
+        wkey = f"{a.symbol}|{a.alert_type}|{a.direction}"
+        w = winrate_summary["by_key"].get(wkey)
+        if w and w.get("stages"):
+            s30 = w["stages"].get("30m")
+            if s30:
+                L.append("─────── 历史胜率 ───────")
+                L.append(f"30m 胜率: {int(s30['win_rate']*100)}% (N={s30['n']}, μ {s30['avg_outcome_pct']:+.2f}%)")
+                s60 = w["stages"].get("60m")
+                if s60:
+                    L.append(f"1h  胜率: {int(s60['win_rate']*100)}% (N={s60['n']}, μ {s60['avg_outcome_pct']:+.2f}%)")
+                s240 = w["stages"].get("240m")
+                if s240:
+                    L.append(f"4h  胜率: {int(s240['win_rate']*100)}% (N={s240['n']}, μ {s240['avg_outcome_pct']:+.2f}%)")
+                L.append("")
+
+    L.append("─────── 元信息 ───────")
+    L.append(f"触发时间 (UTC): {a.detected_at[:19].replace('T', ' ')}")
+    L.append(f"Binance 链接: https://www.binance.com/en/futures/{a.symbol}")
+    L.append("")
+    L.append("--")
+    L.append("Cresus 量能加速度雷达 · 钻石信号专属邮件通道")
+    L.append("仅 conviction_tier=diamond (score ≥5) 触发, TP1/TP2/止损自动管理")
+    return subject, "\n".join(L)
+
+
+def _push_diamond_email(a: VelocityAlert, winrate_summary: Optional[dict],
+                        email_cooldown: dict, now: datetime) -> bool:
+    """钻石信号邮件推送, 含 cooldown 检查."""
+    if not (EMAIL_SMTP_HOST and EMAIL_USERNAME and EMAIL_PASSWORD and EMAIL_TO):
+        return False
+    if a.conviction_tier != "diamond":
+        return False
+    # cooldown 按 (symbol, direction) 1 小时去重
+    key = f"{a.symbol}|{a.direction}"
+    if key in email_cooldown:
+        try:
+            ts = datetime.fromisoformat(email_cooldown[key].replace("Z", "+00:00"))
+            if (now - ts).total_seconds() < EMAIL_COOLDOWN_MIN * 60:
+                return False  # cooldown active
+        except Exception:
+            pass
+    subject, body = _format_alert_for_email(a, winrate_summary)
+    if _send_email(subject, body):
+        email_cooldown[key] = now.isoformat()
+        return True
+    return False
+
+
 def _push_to_telegram(new_alerts: List[VelocityAlert],
                       winrate_summary: Optional[dict]) -> int:
     """筛选高质量 alerts 并推送. 返回推送数 (含跳过).
@@ -1004,11 +1171,24 @@ def _push_to_telegram(new_alerts: List[VelocityAlert],
         except Exception:
             del cooldown[sym]
 
+    # Phase 3b: email cooldown (跟 TG 独立, 1h)
+    email_cooldown = _load_email_cooldown()
+    # 清理过期 email cooldown
+    e_cutoff = now - timedelta(minutes=EMAIL_COOLDOWN_MIN)
+    for k in list(email_cooldown.keys()):
+        try:
+            ts = datetime.fromisoformat(email_cooldown[k].replace("Z", "+00:00"))
+            if ts < e_cutoff:
+                del email_cooldown[k]
+        except Exception:
+            del email_cooldown[k]
+
     pushed = 0
     diamond_n = 0
+    email_sent = 0
     for a in new_alerts:
         is_diamond = (a.conviction_tier == "diamond")
-        # 钻石信号: 跳过 intensity 门槛 + 跳过 cooldown (绝不漏)
+        # 钻石信号: 跳过 intensity 门槛 + 跳过 TG cooldown (绝不漏)
         # 普通信号: 严格 intensity ≥ TG_MIN_INTENSITY + 30min 冷却
         if not is_diamond:
             if a.intensity < TG_MIN_INTENSITY:
@@ -1021,11 +1201,20 @@ def _push_to_telegram(new_alerts: List[VelocityAlert],
             pushed += 1
             if is_diamond:
                 diamond_n += 1
+                # Phase 3b: 钻石专属邮件 (1h cooldown, 独立于 TG)
+                try:
+                    if _push_diamond_email(a, winrate_summary, email_cooldown, now):
+                        email_sent += 1
+                        _log(f"📧 钻石邮件已发 {a.symbol} {a.direction}")
+                except Exception as e:
+                    _log(f"diamond email failed: {e}")
 
     if pushed > 0:
         _save_tg_cooldown(cooldown)
+        if email_sent > 0:
+            _save_email_cooldown(email_cooldown)
         if diamond_n > 0:
-            _log(f"📲 Telegram 推送 {pushed} 条 (其中 💎 钻石 {diamond_n} 条)")
+            _log(f"📲 Telegram 推送 {pushed} 条 (其中 💎 钻石 {diamond_n} 条, 📧 邮件 {email_sent} 封)")
         else:
             _log(f"📲 Telegram 推送 {pushed} 条 (intensity ≥ {TG_MIN_INTENSITY})")
     return pushed
@@ -1929,6 +2118,21 @@ def cmd_show() -> int:
 def main(argv) -> int:
     if argv and argv[0] == "show":
         return cmd_show()
+    if argv and argv[0] == "test-email":
+        # 测试邮件配置 (不依赖真钻石信号触发)
+        if not EMAIL_SMTP_HOST:
+            print("❌ EMAIL_SMTP_HOST 未配置. 请在 ~/.cresus/env.sh 中设置邮件环境变量")
+            print("   参考: EMAIL_SMTP_HOST, EMAIL_USERNAME, EMAIL_PASSWORD, EMAIL_TO 等")
+            return 1
+        print(f"测试发送邮件到 {EMAIL_TO} 通过 {EMAIL_SMTP_HOST}:{EMAIL_SMTP_PORT} ...")
+        ok = _send_email(
+            "[CRESUS 💎] 邮件配置测试",
+            "如果收到这封邮件, Cresus 钻石信号邮件通道配置成功!\n\n"
+            "下次钻石信号触发时, 你会自动收到一封更详细的告警邮件.\n\n"
+            "--\nCresus 量能加速度雷达"
+        )
+        print("✅ 已发送" if ok else "❌ 发送失败 (检查 log: ~/cresus-bot/logs/velocity_scanner.log)")
+        return 0 if ok else 1
     if argv and argv[0] == "test":
         # 单标的快速测试 (拉 24h vol + funding 给完整双路 + 富信息)
         sym = argv[1] if len(argv) >= 2 else "BTCUSDT"
