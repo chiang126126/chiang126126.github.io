@@ -3550,8 +3550,12 @@ function renderPaperPanel(data) {
         <div class="value neutral">${winRate}</div>
       </div>
       <div class="paper-stat">
-        <div class="label">已平 / 胜 / 负</div>
-        <div class="value neutral">${stats.closed}/${stats.wins}/${stats.losses}</div>
+        <div class="label">胜 / 负 / BE</div>
+        <div class="value neutral" style="font-size:14px">
+          <span style="color:#00e676">${stats.wins}</span> /
+          <span style="color:#ff5252">${stats.losses}</span> /
+          <span style="color:#8a96aa">${stats.scratches || 0}</span>
+        </div>
       </div>
       <div class="paper-stat">
         <div class="label">平均/笔</div>
@@ -3567,28 +3571,38 @@ function renderPaperPanel(data) {
       </div>
     </div>`;
 
+  const PHASE_LABEL = {
+    "A": "🅰 初始",
+    "B": "🛡 BE锁定",   // TP1 后 SL=BE
+    "C": "🎯 trailing", // TP2 后 跟踪
+  };
+
   const renderOpen = (t) => {
     const pnl = t.unrealized_pnl_pct;
     const cls = pnl > 0 ? "up" : (pnl < 0 ? "down" : "");
     const enteredAt = new Date(t.entered_at);
     const holdMin = Math.floor((Date.now() - enteredAt.getTime()) / 60_000);
+    const phase = t.phase || "A";
+    const phaseLabel = PHASE_LABEL[phase] || phase;
     return `<div class="paper-trade-row dir-${t.direction}">
       <span><strong>${escapeHtml(t.symbol)}</strong> ${t.direction} · 入 ${fmtPrice(t.entry_price)} · 现 ${fmtPrice(t.current_price)}</span>
       <span class="paper-pnl ${cls}">${fmtPct(pnl)}</span>
-      <span class="paper-reason">置信 ${t.conviction_score}/10</span>
+      <span class="paper-reason">${phaseLabel} · 置信${t.conviction_score}</span>
       <span class="paper-hold">${holdMin}min</span>
     </div>`;
   };
 
   const renderClosed = (t) => {
     const pnl = t.realized_pnl_pct;
-    const cls = pnl > 0 ? "up" : "down";
-    const winLossCls = pnl > 0 ? "win" : "loss";
+    const cls = pnl > 0 ? "up" : (pnl < 0 ? "down" : "");
+    const winLossCls = pnl > 0.1 ? "win" : (pnl < -0.1 ? "loss" : "");
     const reasonLabel = {
-      "hit_sl":  "🛑 止损",
-      "hit_tp1": "🎯 TP1",
-      "hit_tp2": "🎯 TP2",
-      "timeout": "⏱ 超时"
+      "hit_sl":     "🛑 止损",
+      "hit_be_sl":  "⚖ BE平仓",
+      "hit_trail":  "🚀 跟踪止盈",
+      "hit_tp1":    "🎯 TP1",   // backward compat
+      "hit_tp2":    "🎯 TP2",   // backward compat
+      "timeout":    "⏱ 超时"
     }[t.close_reason] || t.close_reason;
     return `<div class="paper-trade-row dir-${t.direction} ${winLossCls}">
       <span><strong>${escapeHtml(t.symbol)}</strong> ${t.direction} · 入 ${fmtPrice(t.entry_price)} → ${fmtPrice(t.close_price)}</span>
