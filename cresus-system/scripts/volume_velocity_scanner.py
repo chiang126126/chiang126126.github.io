@@ -67,6 +67,9 @@ PAPER_HISTORY     = Path.home() / "cresus-bot" / "paper_trades_history.json" # �
 PAPER_AUTO_CLOSE_HOURS = 4            # 4 小时未触发 SL/TP 自动平仓 (跟 OUTCOME_STAGES 4h 对齐)
 PAPER_RECENT_LIMIT = 50               # 看板只显示最近 50 个 closed
 PAPER_MIN_TIER     = "diamond"        # 只对钻石信号自动开仓 (高质量 only)
+# 模拟仓金额: 起始资金 + 每笔固定 notional. 假设 1x 杠杆全仓投入 (可同时多笔 = 隐性杠杆)
+PAPER_STARTING_CAPITAL_USDT  = 2000.0  # 起始账户余额
+PAPER_NOTIONAL_PER_TRADE_USDT = 2000.0 # 每笔交易的本金 (notional)
 
 BINANCE_FAPI = "https://fapi.binance.com"
 UA = "Mozilla/5.0 (Macintosh) cresus-velocity-scanner"
@@ -1037,6 +1040,9 @@ def _open_paper_trade(a: VelocityAlert, state: dict, now: datetime) -> Optional[
         "entered_at": now.isoformat(),
         "current_price": a.price,
         "unrealized_pnl_pct": 0.0,
+        # Phase 4 资金跟踪
+        "notional_usdt": PAPER_NOTIONAL_PER_TRADE_USDT,
+        "unrealized_usdt_pnl": 0.0,
         # 上下文 (复盘用)
         "funding_rate_pct": a.funding_rate_pct,
         "oi_delta_5m_pct": a.oi_delta_5m_pct,
@@ -1084,9 +1090,12 @@ def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
             if cur < hwm: hwm = cur
         t["high_water_mark"] = hwm
 
-        # 方向化 unrealized PnL
+        # 方向化 unrealized PnL (% + USDT)
         raw_pct = (cur - entry) / entry * 100
-        t["unrealized_pnl_pct"] = round(raw_pct if is_long else -raw_pct, 3)
+        pnl_pct = raw_pct if is_long else -raw_pct
+        t["unrealized_pnl_pct"] = round(pnl_pct, 3)
+        notional = float(t.get("notional_usdt", PAPER_NOTIONAL_PER_TRADE_USDT))
+        t["unrealized_usdt_pnl"] = round(notional * pnl_pct / 100.0, 2)
 
         # 持仓时长
         try:
@@ -1178,10 +1187,12 @@ def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
         if close_reason:
             realized_raw = (close_price - entry) / entry * 100
             realized = realized_raw if is_long else -realized_raw
+            notional = float(t.get("notional_usdt", PAPER_NOTIONAL_PER_TRADE_USDT))
             t["closed_at"] = now.isoformat()
             t["close_price"] = close_price
             t["close_reason"] = close_reason
             t["realized_pnl_pct"] = round(realized, 3)
+            t["realized_usdt_pnl"] = round(notional * realized / 100.0, 2)
             t["hold_time_min"] = round(hold_min, 1)
             state["closed_trades"].append(t)
             closed_now.append(t)
@@ -1192,12 +1203,24 @@ def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
     return len(closed_now), closed_now, phase_transitions
 
 
+def _trade_usdt_pnl(t: dict) -> float:
+    """从一条 trade dict 取/算 realized_usdt_pnl. 老数据没此字段则按默认 notional 回算."""
+    if "realized_usdt_pnl" in t and t["realized_usdt_pnl"] is not None:
+        return float(t["realized_usdt_pnl"])
+    notional = float(t.get("notional_usdt", PAPER_NOTIONAL_PER_TRADE_USDT))
+    pct = float(t.get("realized_pnl_pct", 0.0))
+    return round(notional * pct / 100.0, 2)
+
+
 def _compute_paper_stats(state: dict) -> dict:
     """胜率口径: BE 平仓 (≤0.1% 净) 算 scratch (不计胜/负). 这是行业惯例,
-    避免 BE 被误算成 loss 拉低胜率."""
+    避免 BE 被误算成 loss 拉低胜率.
+    资金口径: 起始 PAPER_STARTING_CAPITAL_USDT, 每笔固定 notional.
+    """
     open_n = len(state.get("open_trades", []))
     closed = state.get("closed_trades", [])
     closed_n = len(closed)
+    starting_capital = PAPER_STARTING_CAPITAL_USDT
     if closed_n == 0:
         return {
             "total_trades": open_n, "open": open_n, "closed": 0,
@@ -1206,20 +1229,31 @@ def _compute_paper_stats(state: dict) -> dict:
             "total_pnl_pct": 0.0, "avg_pnl_pct": None,
             "best_trade": None, "worst_trade": None,
             "by_outcome": {},
+            # 资金视图
+            "starting_capital_usdt": starting_capital,
+            "notional_per_trade_usdt": PAPER_NOTIONAL_PER_TRADE_USDT,
+            "current_balance_usdt": starting_capital,
+            "total_usdt_pnl": 0.0,
+            "avg_usdt_pnl": None,
+            "best_trade_usdt": None,
+            "worst_trade_usdt": None,
+            "roi_pct": 0.0,
         }
-    BE_EPSILON = 0.1   # |outcome| ≤ 0.1% 视为 scratch (BE 平仓近似为 0)
+    BE_EPSILON = 0.1
     wins      = sum(1 for t in closed if t["realized_pnl_pct"] >  BE_EPSILON)
     losses    = sum(1 for t in closed if t["realized_pnl_pct"] < -BE_EPSILON)
     scratches = closed_n - wins - losses
     pnls = [t["realized_pnl_pct"] for t in closed]
+    usdt_pnls = [_trade_usdt_pnl(t) for t in closed]
     by_outcome: dict = {}
     for t in closed:
         reason = t.get("close_reason", "?")
         by_outcome.setdefault(reason, 0)
         by_outcome[reason] += 1
-    # 胜率 = wins / (wins + losses), 排除 scratch (业内惯例)
     decisive = wins + losses
     win_rate = round(wins / decisive, 3) if decisive > 0 else None
+    total_usdt = round(sum(usdt_pnls), 2)
+    current_balance = round(starting_capital + total_usdt, 2)
     return {
         "total_trades": open_n + closed_n,
         "open": open_n,
@@ -1233,19 +1267,43 @@ def _compute_paper_stats(state: dict) -> dict:
         "best_trade": round(max(pnls), 2),
         "worst_trade": round(min(pnls), 2),
         "by_outcome": by_outcome,
+        # 资金视图
+        "starting_capital_usdt": starting_capital,
+        "notional_per_trade_usdt": PAPER_NOTIONAL_PER_TRADE_USDT,
+        "current_balance_usdt": current_balance,
+        "total_usdt_pnl": total_usdt,
+        "avg_usdt_pnl": round(total_usdt / closed_n, 2),
+        "best_trade_usdt": round(max(usdt_pnls), 2),
+        "worst_trade_usdt": round(min(usdt_pnls), 2),
+        "roi_pct": round(total_usdt / starting_capital * 100, 2),
     }
+
+
+def _enrich_trade_for_publish(t: dict) -> dict:
+    """对外发布前给 trade 补 USDT 字段 (老数据可能缺). 不改原 state."""
+    out = dict(t)
+    if "notional_usdt" not in out:
+        out["notional_usdt"] = PAPER_NOTIONAL_PER_TRADE_USDT
+    if "realized_pnl_pct" in out and "realized_usdt_pnl" not in out:
+        out["realized_usdt_pnl"] = round(
+            float(out["notional_usdt"]) * float(out["realized_pnl_pct"]) / 100.0, 2
+        )
+    if "unrealized_pnl_pct" in out and "unrealized_usdt_pnl" not in out:
+        out["unrealized_usdt_pnl"] = round(
+            float(out["notional_usdt"]) * float(out["unrealized_pnl_pct"]) / 100.0, 2
+        )
+    return out
 
 
 def _save_paper_history(state: dict, stats: dict) -> None:
     """对外发布的 view: stats + open + 最近 N 条 closed."""
     closed = state.get("closed_trades", [])
-    # 按 closed_at 降序取最近 N
     closed_sorted = sorted(closed, key=lambda t: t.get("closed_at", ""), reverse=True)
     payload = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "stats": stats,
-        "open_trades": state.get("open_trades", []),
-        "recent_closed": closed_sorted[:PAPER_RECENT_LIMIT],
+        "open_trades": [_enrich_trade_for_publish(t) for t in state.get("open_trades", [])],
+        "recent_closed": [_enrich_trade_for_publish(t) for t in closed_sorted[:PAPER_RECENT_LIMIT]],
         "auto_close_hours": PAPER_AUTO_CLOSE_HOURS,
         "min_tier": PAPER_MIN_TIER,
     }
@@ -1314,9 +1372,10 @@ def _run_paper_trading(new_alerts: List[VelocityAlert], now: datetime) -> None:
                     "hit_tp2":    "TP2 止盈 (旧逻辑)",
                     "timeout":    "超时 (4h)",
                 }.get(t["close_reason"], t["close_reason"])
+                usdt_pnl = _trade_usdt_pnl(t)
                 msg = (
                     f"{emoji} <b>模拟仓平仓 — {t['symbol']} {t['direction']}</b>\n"
-                    f"原因: {reason_label} · <b>{t['realized_pnl_pct']:+.2f}%</b> · 持仓 {t['hold_time_min']:.0f}min\n"
+                    f"原因: {reason_label} · <b>{t['realized_pnl_pct']:+.2f}% (${usdt_pnl:+.2f})</b> · 持仓 {t['hold_time_min']:.0f}min\n"
                     f"入场 {t['entry_price']} → 平仓 {t['close_price']}\n"
                     f"高水位: {t.get('high_water_mark','—')} · 置信 {t.get('conviction_score','—')}/10"
                 )
