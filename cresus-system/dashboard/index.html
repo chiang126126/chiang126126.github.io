@@ -3510,10 +3510,17 @@ async function loadPnL() {
 // Phase 4: 💎 钻石信号模拟仓追踪
 async function loadPaperTrades() {
   try {
-    const res = await fetch("./paper_trades_history.json?_=" + Date.now());
-    if (!res.ok) return;  // 文件不存在 = 还没出过钻石 (正常)
-    const data = await res.json();
-    renderPaperPanel(data);
+    const [paperRes, shadowRes] = await Promise.all([
+      fetch("./paper_trades_history.json?_=" + Date.now()),
+      fetch("./paper_shadow_history.json?_=" + Date.now()).catch(() => null),
+    ]);
+    if (!paperRes.ok) return;
+    const data = await paperRes.json();
+    let shadowData = null;
+    if (shadowRes && shadowRes.ok) {
+      try { shadowData = await shadowRes.json(); } catch (_) { shadowData = null; }
+    }
+    renderPaperPanel(data, shadowData);
   } catch (e) {
     console.warn("[paper] load failed:", e);
   }
@@ -3658,7 +3665,74 @@ function renderPaperPanel(data) {
   if (open.length === 0 && closed.length === 0) {
     body += `<div class="paper-empty">等待第一个钻石信号触发…</div>`;
   }
+
+  // ===== Phase 4 Shadow: premium 影子追踪 section =====
+  if (shadowData && shadowData.stats) {
+    body += renderShadowSection(shadowData);
+  }
+
   document.getElementById("paper-body").innerHTML = body;
+}
+
+function renderShadowSection(data) {
+  const s = data.stats || {};
+  const totalTrades = (s.open || 0) + (s.closed || 0);
+  if (totalTrades === 0) {
+    return `
+      <div class="paper-shadow-section">
+        <div class="paper-section-title" style="margin-top:18px">
+          🔬 Premium 影子追踪 <span style="font-size:10px;opacity:0.6">(不开真仓, 用真 outcomes 数据评估)</span>
+        </div>
+        <div class="paper-empty">等待第一个 premium ⭐ 信号…</div>
+      </div>`;
+  }
+  const verdictColor = {
+    "positive": "#00e676",
+    "negative": "#ff5252",
+    "neutral":  "#ffd54f",
+  }[s.verdict_class || "neutral"] || "#ffd54f";
+  const winRateStr = s.win_rate != null ? Math.round(s.win_rate * 100) + "%" : "—";
+  const avgPctStr = s.avg_pnl_pct != null ? (s.avg_pnl_pct >= 0 ? "+" : "") + s.avg_pnl_pct.toFixed(2) + "%" : "—";
+  const totalUsdtStr = (s.total_usdt_pnl >= 0 ? "+" : "") + "$" + s.total_usdt_pnl.toFixed(2);
+  const hypoNotional = s.hypothetical_notional_usdt || 200;
+
+  // OI 子类型对比
+  const oi = s.oi_subset || {};
+  const renderOiRow = (label, key) => {
+    const r = oi[key] || {};
+    if (!r.n) return "";
+    const rate = r.win_rate != null ? Math.round(r.win_rate * 100) + "%" : "—";
+    const avg = r.avg_pct != null ? (r.avg_pct >= 0 ? "+" : "") + r.avg_pct.toFixed(2) + "%" : "—";
+    return `<div style="font-size:11px;color:var(--text-dim)">
+      ${label}: N=${r.n} · 胜率 ${rate} · μ ${avg}
+    </div>`;
+  };
+
+  return `
+    <div class="paper-shadow-section" style="margin-top:18px;padding-top:14px;border-top:1px dashed rgba(255,255,255,0.08)">
+      <div class="paper-section-title" style="display:flex;justify-content:space-between;align-items:center">
+        <span>🔬 Premium 影子追踪 <span style="font-size:10px;opacity:0.6">(假设 $${hypoNotional}/笔)</span></span>
+        <span style="font-size:10px;color:var(--text-dim)">N=${s.closed} 已平 · ${s.open} 持仓</span>
+      </div>
+      <div style="padding:8px 10px;background:rgba(255,255,255,0.02);border-radius:6px;margin-bottom:8px">
+        <div style="font-size:13px;font-weight:600;color:${verdictColor};margin-bottom:6px">
+          ${escapeHtml(s.verdict || '—')}
+        </div>
+        <div style="font-size:11px;color:var(--text-dim);display:flex;gap:12px;flex-wrap:wrap">
+          <span>胜率 <strong style="color:var(--text)">${winRateStr}</strong></span>
+          <span>胜/负/BE <strong style="color:var(--text)">${s.wins}/${s.losses}/${s.scratches}</strong></span>
+          <span>平均/笔 <strong style="color:var(--text)">${avgPctStr}</strong></span>
+          <span>累计 (假设) <strong style="color:${s.total_usdt_pnl >= 0 ? '#00e676' : '#ff5252'}">${totalUsdtStr}</strong></span>
+        </div>
+        ${(oi.oi_match?.n || oi.oi_mismatch?.n) ? `
+        <div style="margin-top:8px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.05)">
+          <div style="font-size:10px;color:var(--text-dim);margin-bottom:3px">OI 子类型对比 (帮助识别哪种 premium 有 edge):</div>
+          ${renderOiRow("✓ OI 匹配方向", "oi_match")}
+          ${renderOiRow("✗ OI 不匹配", "oi_mismatch")}
+          ${renderOiRow("○ 无 OI 数据", "no_oi_data")}
+        </div>` : ''}
+      </div>
+    </div>`;
 }
 
 function renderPnLStats(s, updatedAt, closes) {
