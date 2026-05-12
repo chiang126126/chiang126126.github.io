@@ -1,8 +1,20 @@
 {
-  "generated_at": "2026-05-12T19:56:03.086121+00:00",
+  "generated_at": "2026-05-12T20:06:31.904948+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
+    "MOVRUSDT|burst|SHORT": {
+      "symbol": "MOVRUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": 0.03
+        }
+      }
+    },
     "CHIPUSDT|sustained|SHORT": {
       "symbol": "CHIPUSDT",
       "alert_type": "sustained",
@@ -493,6 +505,11 @@
           "n": 5,
           "win_rate": 0.2,
           "avg_outcome_pct": -0.72
+        },
+        "240m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.13
         }
       }
     },
@@ -507,9 +524,9 @@
           "avg_outcome_pct": -0.9
         },
         "60m": {
-          "n": 6,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -1.58
+          "n": 7,
+          "win_rate": 0.286,
+          "avg_outcome_pct": -1.7
         },
         "240m": {
           "n": 5,
