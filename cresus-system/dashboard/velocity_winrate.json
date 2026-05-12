@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-12T14:03:47.545423+00:00",
+  "generated_at": "2026-05-12T14:19:44.495121+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
@@ -131,9 +131,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 8,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 0.81
+          "n": 9,
+          "win_rate": 0.444,
+          "avg_outcome_pct": 0.65
         },
         "60m": {
           "n": 8,
@@ -191,6 +191,18 @@
         }
       }
     },
+    "BASUSDT|burst|LONG": {
+      "symbol": "BASUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": -0.88
+        }
+      }
+    },
     "INXUSDT|burst|SHORT": {
       "symbol": "INXUSDT",
       "alert_type": "burst",
@@ -222,6 +234,23 @@
           "n": 5,
           "win_rate": 0.2,
           "avg_outcome_pct": -0.29
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -1.39
+        }
+      }
+    },
+    "ALCHUSDT|burst|SHORT": {
+      "symbol": "ALCHUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": 1.5
         }
       }
     },
@@ -346,6 +375,11 @@
           "n": 5,
           "win_rate": 0.4,
           "avg_outcome_pct": -0.64
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.8,
+          "avg_outcome_pct": 1.48
         }
       }
     }
