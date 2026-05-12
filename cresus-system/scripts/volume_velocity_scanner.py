@@ -1129,6 +1129,15 @@ def _open_paper_trade(a: VelocityAlert, state: dict, now: datetime,
         "tp2_hit_at": None,                      # ISO ts when TP2 触发
         "high_water_mark": a.price,              # 持仓期间最高价(LONG)/最低价(SHORT)
         "trailing_sl": None,                     # Phase C 跟踪止损 (只升不降棘轮)
+        # ===== Per-phase MFE (Maximum Favorable Excursion) 复盘用 =====
+        # 记录每个 phase 期间到达的最佳价 + 方向化 % from entry
+        # 比如 "Phase B 最高摸到 +9% 但 BE 关 0R" → 显示 +9% regret
+        "phase_a_mfe_price": a.price,
+        "phase_a_mfe_pct":   0.0,
+        "phase_b_mfe_price": None,
+        "phase_b_mfe_pct":   None,
+        "phase_c_mfe_price": None,
+        "phase_c_mfe_pct":   None,
     }
     state["open_trades"].append(trade)
     return trade
@@ -1165,6 +1174,25 @@ def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
             if cur < hwm: hwm = cur
         t["high_water_mark"] = hwm
 
+        # ===== Per-phase MFE: 更新当前 phase 的最佳价 =====
+        # 比如 trade 在 Phase B 时, 这里只更新 phase_b_mfe_*
+        phase = t.get("phase", "A")
+        mfe_pkey = f"phase_{phase.lower()}_mfe_price"
+        mfe_qkey = f"phase_{phase.lower()}_mfe_pct"
+        cur_mfe = t.get(mfe_pkey)
+        # 老 trade 没这字段时初始化为 entry
+        if cur_mfe is None:
+            cur_mfe = entry
+        update_mfe = False
+        if is_long and cur > cur_mfe:
+            update_mfe = True
+        elif (not is_long) and cur < cur_mfe:
+            update_mfe = True
+        if update_mfe:
+            t[mfe_pkey] = cur
+            raw = (cur - entry) / entry * 100
+            t[mfe_qkey] = round(raw if is_long else -raw, 3)
+
         # 方向化 unrealized PnL (% + USDT)
         raw_pct = (cur - entry) / entry * 100
         pnl_pct = raw_pct if is_long else -raw_pct
@@ -1195,6 +1223,9 @@ def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
                     t["phase"] = "B"
                     t["tp1_hit_at"] = now.isoformat()
                     t["sl"] = entry  # BE
+                    # 初始化 Phase B MFE 起点 = 当前价 (TP1 trigger price)
+                    t["phase_b_mfe_price"] = cur
+                    t["phase_b_mfe_pct"]   = round((cur - entry) / entry * 100, 3)
                     phase_transitions.append({
                         "type": "tp1", "trade": t.copy(), "old_sl_pct": -atr_pct,
                     })
@@ -1205,6 +1236,9 @@ def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
                     t["phase"] = "B"
                     t["tp1_hit_at"] = now.isoformat()
                     t["sl"] = entry
+                    # 初始化 Phase B MFE (SHORT 取反向 %)
+                    t["phase_b_mfe_price"] = cur
+                    t["phase_b_mfe_pct"]   = round((entry - cur) / entry * 100, 3)
                     phase_transitions.append({
                         "type": "tp1", "trade": t.copy(), "old_sl_pct": -atr_pct,
                     })
@@ -1222,6 +1256,9 @@ def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
                     base_floor = float(t["tp1"])
                     hwm_trail  = hwm * (1 - 2 * atr_pct / 100.0)
                     t["trailing_sl"] = max(base_floor, hwm_trail)
+                    # 初始化 Phase C MFE
+                    t["phase_c_mfe_price"] = cur
+                    t["phase_c_mfe_pct"]   = round((cur - entry) / entry * 100, 3)
                     phase_transitions.append({"type": "tp2", "trade": t.copy()})
             else:  # SHORT
                 if cur >= t["sl"]:
@@ -1233,6 +1270,9 @@ def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
                     base_ceil = float(t["tp1"])
                     hwm_trail = hwm * (1 + 2 * atr_pct / 100.0)
                     t["trailing_sl"] = min(base_ceil, hwm_trail)
+                    # 初始化 Phase C MFE (SHORT 反向)
+                    t["phase_c_mfe_price"] = cur
+                    t["phase_c_mfe_pct"]   = round((entry - cur) / entry * 100, 3)
                     phase_transitions.append({"type": "tp2", "trade": t.copy()})
 
         elif phase == "C":
