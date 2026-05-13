@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-13T22:35:14.160378+00:00",
+  "updated_at": "2026-05-13T22:37:25.143723+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 16,
+  "alerts_count": 17,
   "alerts": [
+    {
+      "symbol": "AVAAIUSDT",
+      "base": "AVAAI",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.008153,
+      "price_change_pct": 0.543,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 27683.0,
+      "volume_baseline_usdt": 1987.0,
+      "volume_ratio": 13.93,
+      "detected_at": "2026-05-13T22:36:54.471372+00:00",
+      "intensity": 1,
+      "change_5m_pct": 1.206,
+      "change_15m_pct": 0.693,
+      "change_1h_pct": 0.668,
+      "change_4h_pct": -3.713,
+      "taker_buy_ratio_1m": 0.772,
+      "taker_buy_ratio_5m": 0.784,
+      "oi_delta_5m_pct": 0.024,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.444,
+      "range_4h_pct": 7.02,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.00809868,
+      "suggested_tp1": 0.00823448,
+      "suggested_tp2": 0.00831596,
+      "conviction_score": 0,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "WLFIUSDT",
       "base": "WLFI",
