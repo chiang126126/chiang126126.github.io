@@ -1189,28 +1189,47 @@
   .velocity-row:hover { background: rgba(255,255,255,0.04); }
   .velocity-row.dir-LONG  { border-left-color: #00c853; }
   .velocity-row.dir-SHORT { border-left-color: #ff1744; }
-  /* Phase 3a: 钻石级置信信号视觉强化 */
+  /* Phase 3a: 钻石级置信信号视觉强化 (按方向分绿/红) */
   .velocity-row.tier-diamond {
+    /* 默认 fallback (NEUTRAL 极少出现, 用原黄色) */
     background: linear-gradient(90deg, rgba(255,193,7,0.10), rgba(255,193,7,0.02));
-    /* 仅 inset 边框 + 内部背景脉冲, 不用外发光 (避免溢出污染相邻行) */
-    box-shadow: inset 0 0 0 1.5px rgba(255,193,7,0.45);
-    animation: diamond-pulse 2.4s ease-in-out infinite;
+    box-shadow: inset 0 0 0 1px rgba(255,193,7,0.30);
     position: relative;
     isolation: isolate;
+  }
+  .velocity-row.tier-diamond.dir-LONG {
+    background: linear-gradient(90deg, rgba(0,200,83,0.10), rgba(0,200,83,0.02));
+    box-shadow: inset 0 0 0 1px rgba(0,200,83,0.30);
+    animation: diamond-pulse-long 2.4s ease-in-out infinite;
+  }
+  .velocity-row.tier-diamond.dir-SHORT {
+    background: linear-gradient(90deg, rgba(255,23,68,0.10), rgba(255,23,68,0.02));
+    box-shadow: inset 0 0 0 1px rgba(255,23,68,0.30);
+    animation: diamond-pulse-short 2.4s ease-in-out infinite;
   }
   .velocity-row.tier-premium {
     background: linear-gradient(90deg, rgba(100,181,246,0.06), rgba(100,181,246,0.01));
     box-shadow: inset 0 0 0 1px rgba(100,181,246,0.28);
     isolation: isolate;
   }
-  @keyframes diamond-pulse {
+  @keyframes diamond-pulse-long {
     0%, 100% {
-      background: linear-gradient(90deg, rgba(255,193,7,0.10), rgba(255,193,7,0.02));
-      box-shadow: inset 0 0 0 1.5px rgba(255,193,7,0.45);
+      background: linear-gradient(90deg, rgba(0,200,83,0.10), rgba(0,200,83,0.02));
+      box-shadow: inset 0 0 0 1px rgba(0,200,83,0.30);
     }
     50% {
-      background: linear-gradient(90deg, rgba(255,193,7,0.18), rgba(255,193,7,0.04));
-      box-shadow: inset 0 0 0 2px rgba(255,193,7,0.65);
+      background: linear-gradient(90deg, rgba(0,200,83,0.20), rgba(0,200,83,0.05));
+      box-shadow: inset 0 0 0 1.5px rgba(0,200,83,0.55);
+    }
+  }
+  @keyframes diamond-pulse-short {
+    0%, 100% {
+      background: linear-gradient(90deg, rgba(255,23,68,0.10), rgba(255,23,68,0.02));
+      box-shadow: inset 0 0 0 1px rgba(255,23,68,0.30);
+    }
+    50% {
+      background: linear-gradient(90deg, rgba(255,23,68,0.20), rgba(255,23,68,0.05));
+      box-shadow: inset 0 0 0 1.5px rgba(255,23,68,0.55);
     }
   }
   .velocity-tier-badge {
