@@ -1192,16 +1192,26 @@
   /* Phase 3a: 钻石级置信信号视觉强化 */
   .velocity-row.tier-diamond {
     background: linear-gradient(90deg, rgba(255,193,7,0.10), rgba(255,193,7,0.02));
-    box-shadow: 0 0 14px rgba(255,193,7,0.25), inset 0 0 0 1px rgba(255,193,7,0.30);
+    /* 仅 inset 边框 + 内部背景脉冲, 不用外发光 (避免溢出污染相邻行) */
+    box-shadow: inset 0 0 0 1.5px rgba(255,193,7,0.45);
     animation: diamond-pulse 2.4s ease-in-out infinite;
+    position: relative;
+    isolation: isolate;
   }
   .velocity-row.tier-premium {
     background: linear-gradient(90deg, rgba(100,181,246,0.06), rgba(100,181,246,0.01));
-    box-shadow: inset 0 0 0 1px rgba(100,181,246,0.22);
+    box-shadow: inset 0 0 0 1px rgba(100,181,246,0.28);
+    isolation: isolate;
   }
   @keyframes diamond-pulse {
-    0%, 100% { box-shadow: 0 0 14px rgba(255,193,7,0.25), inset 0 0 0 1px rgba(255,193,7,0.30); }
-    50%      { box-shadow: 0 0 22px rgba(255,193,7,0.40), inset 0 0 0 1px rgba(255,193,7,0.45); }
+    0%, 100% {
+      background: linear-gradient(90deg, rgba(255,193,7,0.10), rgba(255,193,7,0.02));
+      box-shadow: inset 0 0 0 1.5px rgba(255,193,7,0.45);
+    }
+    50% {
+      background: linear-gradient(90deg, rgba(255,193,7,0.18), rgba(255,193,7,0.04));
+      box-shadow: inset 0 0 0 2px rgba(255,193,7,0.65);
+    }
   }
   .velocity-tier-badge {
     display: inline-block;
