@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.cresus.push-retry</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/mangzi/cresus-bot/scripts/git_push_retry.sh</string>
+    </array>
+
+    <!-- 每 60s 检查本地 main 是否有未推 commit, 有则 retry push -->
+    <!-- 跟 sync_signals.sh (10min cron) 互补, 不冲突 (只 push 不 commit) -->
+    <key>StartInterval</key>
+    <integer>60</integer>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/mangzi/cresus-bot/logs/git_push_retry.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/mangzi/cresus-bot/logs/git_push_retry.err</string>
+</dict>
+</plist>
