@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-13T23:29:20.525685+00:00",
+  "updated_at": "2026-05-13T23:31:44.405508+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 8,
+  "alerts_count": 9,
   "alerts": [
+    {
+      "symbol": "AIGENSYNUSDT",
+      "base": "AIGENSYN",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.02913,
+      "price_change_pct": 1.357,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 786927.0,
+      "volume_baseline_usdt": 50716.0,
+      "volume_ratio": 15.52,
+      "detected_at": "2026-05-13T23:30:38.318983+00:00",
+      "intensity": 3,
+      "change_5m_pct": 3.193,
+      "change_15m_pct": 3.625,
+      "change_1h_pct": 4.024,
+      "change_4h_pct": 3.733,
+      "taker_buy_ratio_1m": 0.43,
+      "taker_buy_ratio_5m": 0.439,
+      "oi_delta_5m_pct": 0.311,
+      "funding_rate_pct": -0.0255,
+      "atr_pct": 0.36,
+      "range_4h_pct": 4.98,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.029025,
+      "suggested_tp1": 0.0292875,
+      "suggested_tp2": 0.029445,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "NAORISUSDT",
       "base": "NAORIS",
