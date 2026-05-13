@@ -3778,6 +3778,12 @@ function renderPaperPanel(data, shadowData) {
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">
           已分配 $${allocatedUsdt.toFixed(0)} / 可用 $${freeUsdt.toFixed(0)} · 仓位 ${slotsUsed}/${maxSlots} · 每笔 $${notionalPer.toFixed(0)}
         </div>
+        ${stats.total_fees_usdt != null && stats.total_fees_usdt > 0 ? `
+        <div style="font-size:11px;color:var(--text-dim);margin-top:3px">
+          💸 已付手续费 <span style="color:#ff8a65">-$${stats.total_fees_usdt.toFixed(2)}</span>
+          <span style="opacity:0.7">(每笔 round-trip ${stats.fee_pct_per_trade != null ? stats.fee_pct_per_trade.toFixed(2) : '0.08'}% · ${stats.closed} 笔累计)</span>
+          · 余额已为 NET (净额)
+        </div>` : ''}
       </div>
       <div class="paper-stat">
         <div class="label">胜率</div>
