@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-12T22:58:25.012137+00:00",
+  "generated_at": "2026-05-13T00:28:21.159324+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
@@ -53,13 +53,13 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 8,
-          "win_rate": 0.125,
-          "avg_outcome_pct": -0.64
+          "n": 9,
+          "win_rate": 0.111,
+          "avg_outcome_pct": -0.62
         },
         "60m": {
-          "n": 8,
-          "win_rate": 0.25,
+          "n": 9,
+          "win_rate": 0.222,
           "avg_outcome_pct": -0.48
         },
         "240m": {
@@ -85,9 +85,9 @@
           "avg_outcome_pct": 0.2
         },
         "240m": {
-          "n": 5,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -1.54
+          "n": 6,
+          "win_rate": 0.167,
+          "avg_outcome_pct": -1.2
         }
       }
     },
@@ -119,14 +119,14 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 5,
-          "win_rate": 0.6,
-          "avg_outcome_pct": 0.57
+          "n": 6,
+          "win_rate": 0.667,
+          "avg_outcome_pct": 0.71
         },
         "60m": {
-          "n": 5,
-          "win_rate": 0.6,
-          "avg_outcome_pct": 0.74
+          "n": 6,
+          "win_rate": 0.667,
+          "avg_outcome_pct": 0.85
         },
         "240m": {
           "n": 5,
@@ -173,9 +173,9 @@
           "avg_outcome_pct": 1.32
         },
         "240m": {
-          "n": 6,
-          "win_rate": 0.667,
-          "avg_outcome_pct": 2.9
+          "n": 7,
+          "win_rate": 0.571,
+          "avg_outcome_pct": 1.54
         }
       }
     },
@@ -207,14 +207,36 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
+          "n": 6,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 0.93
+        },
+        "60m": {
+          "n": 6,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 1.39
+        },
+        "240m": {
           "n": 5,
-          "win_rate": 0.4,
-          "avg_outcome_pct": 0.61
+          "win_rate": 0.6,
+          "avg_outcome_pct": 1.19
+        }
+      }
+    },
+    "BIOUSDT|setup|LONG": {
+      "symbol": "BIOUSDT",
+      "pred_type": "setup",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -0.06
         },
         "60m": {
           "n": 5,
-          "win_rate": 0.4,
-          "avg_outcome_pct": 1.17
+          "win_rate": 0.2,
+          "avg_outcome_pct": -0.3
         }
       }
     }
@@ -222,19 +244,19 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 570,
-        "win_rate": 0.289,
+        "n": 580,
+        "win_rate": 0.291,
         "avg_outcome_pct": -0.04
       },
       "60m": {
-        "n": 570,
-        "win_rate": 0.346,
+        "n": 580,
+        "win_rate": 0.347,
         "avg_outcome_pct": -0.09
       },
       "240m": {
-        "n": 515,
-        "win_rate": 0.41,
-        "avg_outcome_pct": -0.13
+        "n": 555,
+        "win_rate": 0.402,
+        "avg_outcome_pct": -0.14
       }
     },
     "quant_only": {}
