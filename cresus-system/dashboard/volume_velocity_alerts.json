@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-13T20:36:20.253426+00:00",
+  "updated_at": "2026-05-13T20:38:40.811448+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 12,
+  "alerts_count": 13,
   "alerts": [
+    {
+      "symbol": "SIRENUSDT",
+      "base": "SIREN",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 1.0881,
+      "price_change_pct": -5.069,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 263828.0,
+      "volume_baseline_usdt": 23611.0,
+      "volume_ratio": 11.17,
+      "detected_at": "2026-05-13T20:37:56.478812+00:00",
+      "intensity": 3,
+      "change_5m_pct": -2.851,
+      "change_15m_pct": -6.978,
+      "change_1h_pct": -12.342,
+      "change_4h_pct": -10.619,
+      "taker_buy_ratio_1m": 0.385,
+      "taker_buy_ratio_5m": 0.489,
+      "oi_delta_5m_pct": 0.314,
+      "funding_rate_pct": -0.4727,
+      "atr_pct": 2.134,
+      "range_4h_pct": 16.6,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 1.13454286,
+      "suggested_tp1": 1.01843571,
+      "suggested_tp2": 0.94877143,
+      "conviction_score": 5,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "AINUSDT",
       "base": "AIN",
