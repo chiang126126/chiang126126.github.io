@@ -100,6 +100,11 @@ PAPER_SHADOW_NOTIONAL_HYPOTHETICAL = 200.0  # 假设的 notional (仅用于 P&L 
 PAPER_SHADOW_TG_NOTIFY = False          # shadow 不发 Telegram (避免噪声)
 PAPER_SHADOW_VERDICT_MIN_N = 20         # 至少 N 笔已平才下结论
 
+# ---- Regime 快照 (开仓时记录, 用于后续 regime × 胜率切片复盘, 不参与开仓决策) ----
+# 数据来源: regime_radar 写入 ~/cresus-bot/regime.json (与行情天气表同源)
+# 当前阶段: 仅记录, 不过滤; 等每种 regime 各积累 N≥20 钻石/shadow trade 后才考虑加 gate
+REGIME_FILE = Path.home() / "cresus-bot" / "regime.json"
+
 BINANCE_FAPI = "https://fapi.binance.com"
 UA = "Mozilla/5.0 (Macintosh) cresus-velocity-scanner"
 HTTP_TIMEOUT = 12
@@ -1249,6 +1254,20 @@ def _push_to_telegram(new_alerts: List[VelocityAlert],
 # 只读 alerts + 公共 ticker 价, 不真实下单. 每 60s 检查 SL/TP 命中.
 # ============================================================================
 
+def _load_current_regime() -> dict:
+    """读 regime.json 快照, 取开仓时刻的 macro state. 失败返回空 dict (字段为 None).
+    仅用于打 tag 复盘, 绝不参与开仓决策, 失败必须不影响交易逻辑."""
+    try:
+        data = json.loads(REGIME_FILE.read_text(encoding="utf-8"))
+        return {
+            "regime":            data.get("regime") or None,
+            "regime_zh":         data.get("regime_zh") or None,
+            "regime_confidence": data.get("confidence"),
+        }
+    except Exception:
+        return {"regime": None, "regime_zh": None, "regime_confidence": None}
+
+
 def _load_paper_state() -> dict:
     if not PAPER_STATE.exists():
         return {"open_trades": [], "closed_trades": []}
@@ -1313,6 +1332,7 @@ def _open_paper_trade(a: VelocityAlert, state: dict, now: datetime,
     for t in state["open_trades"]:
         if t.get("symbol") == a.symbol and t.get("direction") == a.direction:
             return None
+    regime_snap = _load_current_regime()
     trade = {
         "id": f"{a.symbol}|{a.direction}|{a.detected_at}",
         "symbol": a.symbol,
@@ -1336,6 +1356,10 @@ def _open_paper_trade(a: VelocityAlert, state: dict, now: datetime,
         "oi_delta_5m_pct": a.oi_delta_5m_pct,
         "taker_buy_ratio_1m": a.taker_buy_ratio_1m,
         "change_1h_pct": a.change_1h_pct,
+        # Regime 快照 (开仓时, 不影响决策, 仅 regime×胜率 切片复盘用)
+        "regime_at_open":            regime_snap["regime"],
+        "regime_zh_at_open":         regime_snap["regime_zh"],
+        "regime_confidence_at_open": regime_snap["regime_confidence"],
         # ===== Phase 4 动态 SL/TP 状态机 =====
         "phase": "A",                            # A=初始 / B=TP1后BE / C=TP2后trailing
         "tp1_hit_at": None,                      # ISO ts when TP1 触发
@@ -1784,6 +1808,7 @@ def _open_shadow_trade(a: VelocityAlert, state: dict, now: datetime) -> Optional
     for t in state["open_trades"]:
         if t.get("symbol") == a.symbol and t.get("direction") == a.direction:
             return None
+    regime_snap = _load_current_regime()
     trade = {
         "id": f"shadow|{a.symbol}|{a.direction}|{a.detected_at}",
         "shadow": True,                # 标记 shadow, 不混入真 paper 统计
@@ -1815,6 +1840,10 @@ def _open_shadow_trade(a: VelocityAlert, state: dict, now: datetime) -> Optional
         "taker_buy_ratio_1m": a.taker_buy_ratio_1m,
         "change_1h_pct": a.change_1h_pct,
         "change_4h_pct": a.change_4h_pct,
+        # Regime 快照 (开仓时, 不影响决策, 仅 regime×胜率 切片复盘用)
+        "regime_at_open":            regime_snap["regime"],
+        "regime_zh_at_open":         regime_snap["regime_zh"],
+        "regime_confidence_at_open": regime_snap["regime_confidence"],
         # Phase 状态机字段 (跟真 paper 同 schema, 让 _update_paper_trades 直接复用)
         "phase": "A",
         "tp1_hit_at": None,
