@@ -160,6 +160,20 @@ launchctl unload "$LA/com.cresus.push-retry.plist" 2>/dev/null || true
 launchctl load -w "$LA/com.cresus.push-retry.plist"
 launchctl list | grep cresus.push-retry && echo "✓ push-retry launchd 启动 (60s 周期)"
 
+# ============================================
+# 5. Velocity fast-sync (2min 高频同步钻石模拟仓相关 4 个 JSON)
+# ============================================
+echo ""
+echo "=== Velocity fast-sync (2min 高频) ==="
+cp "$REPO/cresus-system/scripts/velocity_fast_sync.sh" "$BOT/scripts/"
+chmod +x "$BOT/scripts/velocity_fast_sync.sh"
+echo "✓ velocity_fast_sync.sh 装载"
+
+cp "$REPO/cresus-system/scripts/com.cresus.velocity-fast-sync.plist" "$LA/"
+launchctl unload "$LA/com.cresus.velocity-fast-sync.plist" 2>/dev/null || true
+launchctl load -w "$LA/com.cresus.velocity-fast-sync.plist"
+launchctl list | grep cresus.velocity-fast-sync && echo "✓ velocity-fast-sync launchd 启动 (120s 周期)"
+
 echo ""
 echo "下一步验证:"
 echo "  1. tail -f ~/cresus-bot/logs/velocity_scanner.log     # 看到 ⚡ 标的报警"
