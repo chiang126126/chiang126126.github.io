@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-13T17:20:24.896934+00:00",
+  "generated_at": "2026-05-13T17:22:38.401076+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
@@ -787,6 +787,18 @@
         }
       }
     },
+    "ESPORTSUSDT|burst|SHORT": {
+      "symbol": "ESPORTSUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -1.22
+        }
+      }
+    },
     "PLUMEUSDT|burst|SHORT": {
       "symbol": "PLUMEUSDT",
       "alert_type": "burst",
@@ -1008,9 +1020,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 13,
-          "win_rate": 0.462,
-          "avg_outcome_pct": 0.63
+          "n": 14,
+          "win_rate": 0.429,
+          "avg_outcome_pct": 0.56
         },
         "60m": {
           "n": 13,
