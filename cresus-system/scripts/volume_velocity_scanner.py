@@ -84,6 +84,10 @@ PAPER_MIN_TIER     = "diamond"        # 只对钻石信号自动开仓 (高质�
 # 可用资金 = 余额 - 已分配; 若 < notional 则新钻石信号跳过 (资金不足)
 PAPER_STARTING_CAPITAL_USDT   = 2000.0  # 起始账户余额 (整个仓总额)
 PAPER_NOTIONAL_PER_TRADE_USDT = 400.0   # 每笔交易分配 ($2000 × 20%, 最多并发 5)
+# 手续费 — Binance USDT-M 永续 taker 0.04%, system 触发的 open/close 都是 market = taker
+# round-trip = 0.04% × 2 = 0.08% (保守估计, 实战 maker 可能更便宜)
+# 老 trade (无 fee_pct 字段) 会在 _enrich_trade_for_publish + 统计时追溯扣手续费
+PAPER_FEE_PCT_ROUND_TRIP      = 0.08
 
 # ---- Phase 4 Shadow: premium tier 影子追踪 (不开真仓, 但模拟跟踪) ----
 # 目的: 在不冒资金风险的前提下, 用 1-2 周时间收集 premium 信号的真实 outcome,
@@ -1519,14 +1523,22 @@ def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
             close_reason = "timeout"; close_price = cur
 
         if close_reason:
+            # 毛盈亏 (price diff only, 跟 Binance 显示的 unrealized 一致)
             realized_raw = (close_price - entry) / entry * 100
-            realized = realized_raw if is_long else -realized_raw
+            gross_pct = realized_raw if is_long else -realized_raw
+            # 手续费 (taker open + taker close round-trip)
+            fee_pct = PAPER_FEE_PCT_ROUND_TRIP
+            # 净盈亏 (扣手续费后的真实落袋)
+            net_pct = gross_pct - fee_pct
             notional = float(t.get("notional_usdt", PAPER_NOTIONAL_PER_TRADE_USDT))
             t["closed_at"] = now.isoformat()
             t["close_price"] = close_price
             t["close_reason"] = close_reason
-            t["realized_pnl_pct"] = round(realized, 3)
-            t["realized_usdt_pnl"] = round(notional * realized / 100.0, 2)
+            t["gross_pnl_pct"]   = round(gross_pct, 3)
+            t["fee_pct"]         = fee_pct
+            t["fee_usdt"]        = round(notional * fee_pct / 100.0, 2)
+            t["realized_pnl_pct"] = round(net_pct, 3)   # 改义: 现在存的是 NET
+            t["realized_usdt_pnl"]= round(notional * net_pct / 100.0, 2)
             t["hold_time_min"] = round(hold_min, 1)
             state["closed_trades"].append(t)
             closed_now.append(t)
@@ -1537,13 +1549,35 @@ def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
     return len(closed_now), closed_now, phase_transitions
 
 
+def _trade_net_pct(t: dict) -> float:
+    """返回 NET pct (扣手续费后).
+    新 trade (有 fee_pct 字段): realized_pnl_pct 已是 net, 直接返回.
+    老 trade (无 fee_pct 字段): realized_pnl_pct 是 gross, 追溯扣 PAPER_FEE_PCT_ROUND_TRIP.
+    """
+    pct = float(t.get("realized_pnl_pct", 0.0))
+    if "fee_pct" not in t:
+        pct -= PAPER_FEE_PCT_ROUND_TRIP   # 老 trade 追溯扣费
+    return round(pct, 3)
+
+
 def _trade_usdt_pnl(t: dict) -> float:
-    """从一条 trade dict 取/算 realized_usdt_pnl. 老数据没此字段则按默认 notional 回算."""
-    if "realized_usdt_pnl" in t and t["realized_usdt_pnl"] is not None:
+    """返回 NET USDT 盈亏 (扣手续费后).
+    新 trade: realized_usdt_pnl 已是 net, 直接返回.
+    老 trade: 用 _trade_net_pct 重算 (gross 扣费 → net) × notional.
+    """
+    if "fee_pct" in t and "realized_usdt_pnl" in t and t["realized_usdt_pnl"] is not None:
         return float(t["realized_usdt_pnl"])
     notional = float(t.get("notional_usdt", PAPER_NOTIONAL_PER_TRADE_USDT))
-    pct = float(t.get("realized_pnl_pct", 0.0))
-    return round(notional * pct / 100.0, 2)
+    net_pct = _trade_net_pct(t)
+    return round(notional * net_pct / 100.0, 2)
+
+
+def _trade_fee_usdt(t: dict) -> float:
+    """返回该 trade 支付的手续费 USDT (新 trade 取存储, 老 trade 按 PAPER_FEE_PCT 估算)."""
+    if "fee_usdt" in t and t["fee_usdt"] is not None:
+        return float(t["fee_usdt"])
+    notional = float(t.get("notional_usdt", PAPER_NOTIONAL_PER_TRADE_USDT))
+    return round(notional * PAPER_FEE_PCT_ROUND_TRIP / 100.0, 2)
 
 
 def _compute_paper_stats(state: dict) -> dict:
@@ -1580,13 +1614,17 @@ def _compute_paper_stats(state: dict) -> dict:
             "best_trade_usdt": None,
             "worst_trade_usdt": None,
             "roi_pct": 0.0,
+            "total_fees_usdt": 0.0,
+            "fee_pct_per_trade": PAPER_FEE_PCT_ROUND_TRIP,
         }
     BE_EPSILON = 0.1
-    wins      = sum(1 for t in closed if t["realized_pnl_pct"] >  BE_EPSILON)
-    losses    = sum(1 for t in closed if t["realized_pnl_pct"] < -BE_EPSILON)
+    # 使用 NET pct (扣手续费) 做所有判断 — 老 trade 通过 _trade_net_pct 追溯扣费
+    net_pcts = [_trade_net_pct(t) for t in closed]
+    wins      = sum(1 for v in net_pcts if v >  BE_EPSILON)
+    losses    = sum(1 for v in net_pcts if v < -BE_EPSILON)
     scratches = closed_n - wins - losses
-    pnls = [t["realized_pnl_pct"] for t in closed]
     usdt_pnls = [_trade_usdt_pnl(t) for t in closed]
+    fee_usdts = [_trade_fee_usdt(t) for t in closed]
     by_outcome: dict = {}
     for t in closed:
         reason = t.get("close_reason", "?")
@@ -1595,8 +1633,8 @@ def _compute_paper_stats(state: dict) -> dict:
     decisive = wins + losses
     win_rate = round(wins / decisive, 3) if decisive > 0 else None
     total_usdt = round(sum(usdt_pnls), 2)
+    total_fees_usdt = round(sum(fee_usdts), 2)
     current_balance = round(starting_capital + total_usdt, 2)
-    # allocated 已在函数顶部算过
     free_capital = round(current_balance - allocated, 2)
     return {
         "total_trades": open_n + closed_n,
@@ -1606,10 +1644,10 @@ def _compute_paper_stats(state: dict) -> dict:
         "losses": losses,
         "scratches": scratches,
         "win_rate": win_rate,
-        "total_pnl_pct": round(sum(pnls), 2),
-        "avg_pnl_pct": round(sum(pnls) / closed_n, 3),
-        "best_trade": round(max(pnls), 2),
-        "worst_trade": round(min(pnls), 2),
+        "total_pnl_pct": round(sum(net_pcts), 2),
+        "avg_pnl_pct": round(sum(net_pcts) / closed_n, 3),
+        "best_trade": round(max(net_pcts), 2),
+        "worst_trade": round(min(net_pcts), 2),
         "by_outcome": by_outcome,
         # 资金视图
         "starting_capital_usdt": starting_capital,
@@ -1619,19 +1657,44 @@ def _compute_paper_stats(state: dict) -> dict:
         "free_capital_usdt": free_capital,
         "max_concurrent_slots": max_concurrent_slots,
         "slots_used": open_n,
-        "total_usdt_pnl": total_usdt,
+        "total_usdt_pnl": total_usdt,        # NET (扣手续费后)
         "avg_usdt_pnl": round(total_usdt / closed_n, 2),
         "best_trade_usdt": round(max(usdt_pnls), 2),
         "worst_trade_usdt": round(min(usdt_pnls), 2),
         "roi_pct": round(total_usdt / starting_capital * 100, 2),
+        # 手续费视图
+        "total_fees_usdt": total_fees_usdt,
+        "fee_pct_per_trade": PAPER_FEE_PCT_ROUND_TRIP,
     }
 
 
 def _enrich_trade_for_publish(t: dict) -> dict:
-    """对外发布前给 trade 补 USDT 字段 (老数据可能缺). 不改原 state."""
+    """对外发布前给 trade 补字段 (老数据可能缺). 不改原 state.
+    重要: 老 closed trade 没 fee_pct → realized_pnl_pct 是 gross
+    → 这里追溯扣手续费, 让看板/邮件等始终显示 NET (诚实数字).
+    """
     out = dict(t)
     if "notional_usdt" not in out:
         out["notional_usdt"] = PAPER_NOTIONAL_PER_TRADE_USDT
+
+    # ===== 老 closed trade: 追溯扣手续费, gross → net =====
+    # 判定: 已 closed (有 close_reason) 且 无 fee_pct 字段 = legacy
+    is_closed_legacy = (
+        "close_reason" in out
+        and "fee_pct" not in out
+        and "realized_pnl_pct" in out
+    )
+    if is_closed_legacy:
+        gross_pct = float(out["realized_pnl_pct"])
+        out["gross_pnl_pct"] = round(gross_pct, 3)
+        out["fee_pct"]       = PAPER_FEE_PCT_ROUND_TRIP
+        net_pct = gross_pct - PAPER_FEE_PCT_ROUND_TRIP
+        out["realized_pnl_pct"]  = round(net_pct, 3)   # 改回 net 供发布
+        notional = float(out["notional_usdt"])
+        out["realized_usdt_pnl"] = round(notional * net_pct / 100.0, 2)
+        out["fee_usdt"]          = round(notional * PAPER_FEE_PCT_ROUND_TRIP / 100.0, 2)
+
+    # 新数据 / open trade 兜底补 USDT 字段
     if "realized_pnl_pct" in out and "realized_usdt_pnl" not in out:
         out["realized_usdt_pnl"] = round(
             float(out["notional_usdt"]) * float(out["realized_pnl_pct"]) / 100.0, 2
@@ -1781,11 +1844,13 @@ def _compute_shadow_stats(state: dict) -> dict:
         }
 
     BE_EPSILON = 0.1
-    wins      = sum(1 for t in closed if t["realized_pnl_pct"] >  BE_EPSILON)
-    losses    = sum(1 for t in closed if t["realized_pnl_pct"] < -BE_EPSILON)
+    # Shadow 也用 NET pct (跟真 paper 一致, 公平评估 EV)
+    net_pcts  = [_trade_net_pct(t) for t in closed]
+    wins      = sum(1 for v in net_pcts if v >  BE_EPSILON)
+    losses    = sum(1 for v in net_pcts if v < -BE_EPSILON)
     scratches = closed_n - wins - losses
-    pnls = [t["realized_pnl_pct"] for t in closed]
-    usdt_pnls = [round(notional * t["realized_pnl_pct"] / 100.0, 2) for t in closed]
+    pnls = net_pcts
+    usdt_pnls = [round(notional * v / 100.0, 2) for v in net_pcts]
     decisive = wins + losses
     win_rate = round(wins / decisive, 3) if decisive > 0 else None
     avg_pnl = round(sum(pnls) / closed_n, 3)
@@ -1806,9 +1871,10 @@ def _compute_shadow_stats(state: dict) -> dict:
     for t in closed:
         oim = t.get("oi_matches_direction")
         bucket = "oi_match" if oim is True else ("oi_mismatch" if oim is False else "no_oi_data")
+        net = _trade_net_pct(t)   # NET pct (扣手续费后)
         oi_subset[bucket]["n"] += 1
-        oi_subset[bucket]["sum_pct"] += t["realized_pnl_pct"]
-        if t["realized_pnl_pct"] > BE_EPSILON:
+        oi_subset[bucket]["sum_pct"] += net
+        if net > BE_EPSILON:
             oi_subset[bucket]["wins"] += 1
     for k in oi_subset:
         n = oi_subset[k]["n"]
