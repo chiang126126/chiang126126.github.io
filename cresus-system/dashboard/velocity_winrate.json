@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-13T07:42:46.600714+00:00",
+  "generated_at": "2026-05-13T07:53:46.869325+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
@@ -75,14 +75,26 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 5,
-          "win_rate": 0.6,
-          "avg_outcome_pct": 1.82
+          "n": 6,
+          "win_rate": 0.667,
+          "avg_outcome_pct": 1.9
         },
         "60m": {
           "n": 5,
           "win_rate": 0.4,
           "avg_outcome_pct": -0.07
+        }
+      }
+    },
+    "SKYAIUSDT|sustained|LONG": {
+      "symbol": "SKYAIUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.8,
+          "avg_outcome_pct": 4.36
         }
       }
     },
