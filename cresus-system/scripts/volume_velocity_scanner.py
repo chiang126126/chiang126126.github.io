@@ -72,6 +72,7 @@ EMAIL_FROM       = os.environ.get("EMAIL_FROM", "").strip() or EMAIL_USERNAME
 EMAIL_TO         = os.environ.get("EMAIL_TO", "").strip() or EMAIL_USERNAME
 EMAIL_COOLDOWN_STATE = Path.home() / "cresus-bot" / ".velocity_email_cooldown.json"
 EMAIL_COOLDOWN_MIN   = 60             # 同 symbol+direction 1 小时只发 1 封 (比 TG 严, 避免邮件刷屏)
+EMAIL_MIN_SCORE      = 6              # 仅 score ≥6 才发邮件 (基于 N=42 数据: score 6+ 100% 胜率 avg+9.6%; score 5 ≈ 0%)
 
 # ---- Phase 4: 自动模拟仓 (仅钻石信号开仓, 跟踪真实收益曲线) ----
 PAPER_STATE       = Path.home() / "cresus-bot" / ".paper_trades.json"       # 本地全量 state
@@ -1145,11 +1146,18 @@ def _format_alert_for_email(a: VelocityAlert, winrate_summary: Optional[dict] = 
 
 def _push_diamond_email(a: VelocityAlert, winrate_summary: Optional[dict],
                         email_cooldown: dict, now: datetime) -> bool:
-    """钻石信号邮件推送, 含 cooldown 检查."""
+    """钻石信号邮件推送, 含 cooldown 检查.
+    仅 conviction_score ≥ EMAIL_MIN_SCORE 才发邮件 — 实战数据 (N=42) 证明:
+      score 5 钻石: avg ≈ 0% (大多 SL/BE, 偶发小赢)
+      score 6+ 钻石: avg +9.6%, 100% 胜率 (N=3 仅供参考但方向明确)
+    邮件留给真正高质量信号, Telegram 仍发所有钻石.
+    """
     if not (EMAIL_SMTP_HOST and EMAIL_USERNAME and EMAIL_PASSWORD and EMAIL_TO):
         return False
     if a.conviction_tier != "diamond":
         return False
+    if (a.conviction_score or 0) < EMAIL_MIN_SCORE:
+        return False   # 低分钻石不发邮件 (走 TG 即可)
     # cooldown 按 (symbol, direction) 1 小时去重
     key = f"{a.symbol}|{a.direction}"
     if key in email_cooldown:
