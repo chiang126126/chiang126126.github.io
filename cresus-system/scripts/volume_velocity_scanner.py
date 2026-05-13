@@ -820,6 +820,18 @@ def _compute_conviction(a: VelocityAlert, winrate_summary: Optional[dict]) -> tu
         if (is_long and h1 <= -1.5) or (not is_long and h1 >= 1.5):
             return 0, "regular"   # 1h 反向 ≥1.5%: 短线趋势逆向, 拒
 
+    # ===== 硬否决: 顺势追末段 → 直接 0 分 =====
+    # 防止"24h 跌 30%+ 才喊 SHORT" 或 "涨 30%+ 才喊 LONG" 这类追尾陷阱
+    # 主跌/主涨已完成, RR 极差 (TP 距 24h 极值不足, SL 易被反向打)
+    # 实战案例: ATAUSDT 4h -36%, SYSUSDT 4h -33%, MLNUSDT 4h -25%+
+    # 这类 SHORT 几乎不可能盈利 — 距 24h 低 <5% 但 TP1 要求 -6%+
+    LATE_ENTRY_4H_LIMIT = 20.0
+    if a.change_4h_pct is not None:
+        h4 = a.change_4h_pct
+        if (is_long and h4 >= LATE_ENTRY_4H_LIMIT) or \
+           (not is_long and h4 <= -LATE_ENTRY_4H_LIMIT):
+            return 0, "regular"   # 4h |变化| ≥20%: 主移动已完成, 拒末段追单
+
     score = 0
 
     # 1. 极端 funding (+2, 旧 +3): 单一指标降权, 不再主导
