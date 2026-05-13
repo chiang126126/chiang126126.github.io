@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-13T17:07:14.382274+00:00",
+  "updated_at": "2026-05-13T17:09:22.232494+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 21,
+  "alerts_count": 22,
   "alerts": [
+    {
+      "symbol": "LYNUSDT",
+      "base": "LYN",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 0.04896,
+      "price_change_pct": -5.828,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 216497.0,
+      "volume_baseline_usdt": 12739.0,
+      "volume_ratio": 17.0,
+      "detected_at": "2026-05-13T17:08:55.464507+00:00",
+      "intensity": 3,
+      "change_5m_pct": -5.518,
+      "change_15m_pct": -6.791,
+      "change_1h_pct": -6.186,
+      "change_4h_pct": -7.978,
+      "taker_buy_ratio_1m": 0.526,
+      "taker_buy_ratio_5m": 0.379,
+      "oi_delta_5m_pct": 0.12,
+      "funding_rate_pct": 0.1085,
+      "atr_pct": 1.609,
+      "range_4h_pct": 15.69,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.05053571,
+      "suggested_tp1": 0.04659643,
+      "suggested_tp2": 0.04423286,
+      "conviction_score": 3,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "TRADOORUSDT",
       "base": "TRADOOR",
