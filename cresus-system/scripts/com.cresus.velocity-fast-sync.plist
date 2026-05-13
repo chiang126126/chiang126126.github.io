@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.cresus.velocity-fast-sync</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/mangzi/cresus-bot/scripts/velocity_fast_sync.sh</string>
+    </array>
+
+    <!-- 每 120s (2min) 同步 4 个 velocity 核心 JSON 到 GitHub Pages -->
+    <!-- 跟 sync_signals.sh (10min 全量) + git_push_retry (60s 兜底) 互补 -->
+    <key>StartInterval</key>
+    <integer>120</integer>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/mangzi/cresus-bot/logs/velocity_fast_sync.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/mangzi/cresus-bot/logs/velocity_fast_sync.err</string>
+</dict>
+</plist>
