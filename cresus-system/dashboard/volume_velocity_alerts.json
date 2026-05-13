@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-13T18:17:03.721060+00:00",
+  "updated_at": "2026-05-13T18:19:22.884765+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 20,
+  "alerts_count": 21,
   "alerts": [
+    {
+      "symbol": "INXUSDT",
+      "base": "INX",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 0.012141,
+      "price_change_pct": -1.804,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 60743.0,
+      "volume_baseline_usdt": 10379.0,
+      "volume_ratio": 5.85,
+      "detected_at": "2026-05-13T18:18:57.156000+00:00",
+      "intensity": 1,
+      "change_5m_pct": -1.073,
+      "change_15m_pct": -1.704,
+      "change_1h_pct": -2.989,
+      "change_4h_pct": -5.372,
+      "taker_buy_ratio_1m": 0.552,
+      "taker_buy_ratio_5m": 0.385,
+      "oi_delta_5m_pct": -0.193,
+      "funding_rate_pct": 0.0139,
+      "atr_pct": 0.313,
+      "range_4h_pct": 6.03,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.012198,
+      "suggested_tp1": 0.0120555,
+      "suggested_tp2": 0.01197,
+      "conviction_score": 5,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "DEXEUSDT",
       "base": "DEXE",
