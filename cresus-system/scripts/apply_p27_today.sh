@@ -145,8 +145,24 @@ bash "$SYNC" 2>&1 | tail -2
 
 echo ""
 echo "✅ 今日全部 patch 应用完毕"
+
+# ============================================
+# 4. Git push retry watcher (保险丝 — 防 sync curl 56 网络瞬断卡 commit)
+# ============================================
+echo ""
+echo "=== Git push retry watcher (1min 安全网) ==="
+cp "$REPO/cresus-system/scripts/git_push_retry.sh" "$BOT/scripts/"
+chmod +x "$BOT/scripts/git_push_retry.sh"
+echo "✓ git_push_retry.sh 装载"
+
+cp "$REPO/cresus-system/scripts/com.cresus.push-retry.plist" "$LA/"
+launchctl unload "$LA/com.cresus.push-retry.plist" 2>/dev/null || true
+launchctl load -w "$LA/com.cresus.push-retry.plist"
+launchctl list | grep cresus.push-retry && echo "✓ push-retry launchd 启动 (60s 周期)"
+
 echo ""
 echo "下一步验证:"
-echo "  1. tail -f ~/cresus-bot/logs/velocity_scanner.log    # 看到 ⚡ 标的报警"
-echo "  2. tail -f ~/cresus-bot/logs/tp1_monitor.log         # 看到 BE SL 调整"
-echo "  3. dashboard 刷新 → ⚡ 量能加速度雷达 panel 出现"
+echo "  1. tail -f ~/cresus-bot/logs/velocity_scanner.log     # 看到 ⚡ 标的报警"
+echo "  2. tail -f ~/cresus-bot/logs/tp1_monitor.log          # 看到 BE SL 调整"
+echo "  3. tail -f ~/cresus-bot/logs/git_push_retry.log       # 网络瞬断时自动重试 push"
+echo "  4. dashboard 刷新 → ⚡ 量能加速度雷达 panel 出现"
