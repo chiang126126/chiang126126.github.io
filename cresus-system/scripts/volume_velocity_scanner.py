@@ -1445,33 +1445,51 @@ def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
                     })
 
         elif phase == "B":
-            # TP1 后免费仓位: SL=BE, 等 TP2 或回吐
+            # TP1 后 trailing (新设计): SL = max/min(entry, HWM ∓ 1.5×ATR×vol_mult)
+            # 旧设计 SL 固定 BE → 价回吐到 entry 才关 0R, 中段利润全错失
+            # 新设计: HWM 升 → SL 棘轮跟着升, floor=entry 保证最差仍 BE
+            vol_mult = float(t.get("vol_mult_used", 1.0) or 1.0)
+            trail_pct = 1.5 * atr_pct * vol_mult   # 1.5×ATR (跟 Phase C 同款)
             if is_long:
-                if cur <= t["sl"]:  # = entry
-                    close_reason = "hit_be_sl"; close_price = entry
+                # 计算新 trailing SL (永不低于 entry)
+                new_sl = max(entry, hwm * (1 - trail_pct / 100.0))
+                # 棘轮: LONG SL 只升不降
+                if new_sl > float(t["sl"]):
+                    t["sl"] = new_sl
+                if cur <= float(t["sl"]):
+                    # 区分关仓原因: SL≈entry → BE; SL > entry → trailing 锁利
+                    if float(t["sl"]) <= entry * 1.0001:
+                        close_reason = "hit_be_sl"
+                    else:
+                        close_reason = "hit_b_trail"
+                    close_price = float(t["sl"])
                 elif cur >= t["tp2"]:
-                    # TP2 触发 → 进 Phase C, 不关仓!! 启动 trailing
+                    # TP2 触发 → 进 Phase C, 不关仓!! 启动 Phase C trailing
                     t["phase"] = "C"
                     t["tp2_hit_at"] = now.isoformat()
-                    # 安全地板: trailing 永不低于 TP1 level (已锁定 TP1 收益)
                     base_floor = float(t["tp1"])
                     hwm_trail  = hwm * (1 - 2 * atr_pct / 100.0)
                     t["trailing_sl"] = max(base_floor, hwm_trail)
-                    # 初始化 Phase C MFE
                     t["phase_c_mfe_price"] = cur
                     t["phase_c_mfe_pct"]   = round((cur - entry) / entry * 100, 3)
                     phase_transitions.append({"type": "tp2", "trade": t.copy()})
             else:  # SHORT
-                if cur >= t["sl"]:
-                    close_reason = "hit_be_sl"; close_price = entry
+                new_sl = min(entry, hwm * (1 + trail_pct / 100.0))
+                # 棘轮: SHORT SL 只降不升
+                if new_sl < float(t["sl"]):
+                    t["sl"] = new_sl
+                if cur >= float(t["sl"]):
+                    if float(t["sl"]) >= entry * 0.9999:
+                        close_reason = "hit_be_sl"
+                    else:
+                        close_reason = "hit_b_trail"
+                    close_price = float(t["sl"])
                 elif cur <= t["tp2"]:
                     t["phase"] = "C"
                     t["tp2_hit_at"] = now.isoformat()
-                    # SHORT 安全上限: trailing 永不高于 TP1 level (越低越好对 SHORT)
                     base_ceil = float(t["tp1"])
                     hwm_trail = hwm * (1 + 2 * atr_pct / 100.0)
                     t["trailing_sl"] = min(base_ceil, hwm_trail)
-                    # 初始化 Phase C MFE (SHORT 反向)
                     t["phase_c_mfe_price"] = cur
                     t["phase_c_mfe_pct"]   = round((entry - cur) / entry * 100, 3)
                     phase_transitions.append({"type": "tp2", "trade": t.copy()})
@@ -1945,6 +1963,7 @@ def _run_paper_trading(new_alerts: List[VelocityAlert], now: datetime) -> None:
                 reason_label = {
                     "hit_sl":     "止损 (Phase A)",
                     "hit_be_sl":  "BE 平仓 (TP1 后回吐)",
+                    "hit_b_trail":"Phase B 跟踪平仓 (锁部分利润)",
                     "hit_trail":  "跟踪止盈 (TP2 后)",
                     "hit_tp1":    "TP1 止盈 (旧逻辑)",
                     "hit_tp2":    "TP2 止盈 (旧逻辑)",
