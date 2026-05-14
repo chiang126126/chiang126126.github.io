@@ -30,6 +30,7 @@ import hmac
 import json
 import logging
 import os
+import re
 import time
 import urllib.error
 import urllib.parse
@@ -126,6 +127,46 @@ def _validate_credential(value: str, name: str) -> None:
 
 
 # ============================================================================
+# 订单参数格式化 helpers (Binance 要求 decimal string, 不接受 sci notation)
+# ============================================================================
+
+# Binance newClientOrderId 规则: 1-36 chars, [a-zA-Z0-9-_]
+_CLIENT_ORDER_ID_RE = re.compile(r"^[a-zA-Z0-9_-]{1,36}$")
+
+
+def _validate_client_order_id(coid: str) -> None:
+    """验证 client_order_id 符合 Binance 规范.
+    1-36 chars, 仅 [a-zA-Z0-9-_]. 不合规则会被 Binance 拒.
+    """
+    if not isinstance(coid, str) or not coid:
+        raise ValueError("client_order_id 必须是非空字符串")
+    if not _CLIENT_ORDER_ID_RE.match(coid):
+        raise ValueError(
+            f"client_order_id {coid!r} 不合规: "
+            f"必须 1-36 字符 [a-zA-Z0-9_-], 实际 len={len(coid)}"
+        )
+
+
+def _format_quantity(qty: float) -> str:
+    """格式化 quantity. Binance 不接 sci notation (e.g. '1e-05').
+    用 decimal string. 实际精度由 LOT_SIZE filter 限定, 上层负责 round.
+    """
+    if qty <= 0:
+        raise ValueError(f"quantity 必须 > 0, got {qty}")
+    # 用 :f 强制 decimal, 然后去尾随 0 (保留至少 1 位小数 / 整数)
+    s = f"{float(qty):.8f}".rstrip("0").rstrip(".")
+    return s if s else "0"
+
+
+def _format_price(price: float) -> str:
+    """格式化 price. 同 _format_quantity."""
+    if price <= 0:
+        raise ValueError(f"price 必须 > 0, got {price}")
+    s = f"{float(price):.8f}".rstrip("0").rstrip(".")
+    return s if s else "0"
+
+
+# ============================================================================
 # Token Bucket (rate limiting)
 # ============================================================================
 
@@ -189,6 +230,7 @@ class BinanceClient:
         testnet: bool = True,
         timeout: float = 10.0,
         recv_window_ms: int = RECV_WINDOW_MS,
+        dry_run: bool = True,
     ):
         if not api_key or not isinstance(api_key, str):
             raise ValueError("api_key 必须是非空字符串")
@@ -206,6 +248,9 @@ class BinanceClient:
         self.base_url = TESTNET_BASE if self.testnet else MAINNET_BASE
         self.timeout = float(timeout)
         self.recv_window_ms = int(recv_window_ms)
+        # Phase 2.2: dry_run 模式. 默认 True (即使 testnet, 防误操作).
+        # 必须显式 dry_run=False 才下真单. mainnet 还要 ~/.allow-live 文件.
+        self.dry_run = bool(dry_run)
         self._bucket = _TokenBucket(
             capacity=RATE_LIMIT_WEIGHT_PER_MIN,
             refill_per_sec=RATE_LIMIT_WEIGHT_PER_MIN / RATE_LIMIT_WINDOW_SEC,
@@ -290,6 +335,293 @@ class BinanceClient:
     def get_balance(self) -> list:
         """获取每个币种的余额 (USDT 等)."""
         return self._signed_request("GET", "/fapi/v2/balance", {})
+
+    # ============================================================
+    # Phase 2.2.1: 订单操作 (写) + 账户配置
+    # ============================================================
+
+    def _check_live_authorization(self, dry_run: bool) -> None:
+        """实下单前的安全闸门. dry_run=True 直接放行.
+
+        非 dry_run 时:
+        - testnet: 放行 (testnet 没真钱)
+        - mainnet: 必须存在 ~/.allow-live 文件 (二级授权)
+        """
+        if dry_run:
+            return
+        if self.testnet:
+            return
+        allow_file = Path.home() / ".allow-live"
+        if not allow_file.exists():
+            raise BinanceError(
+                "🛑 主网实盘下单需要 ~/.allow-live 文件存在 (二级安全闸门). "
+                "明确创建: touch ~/.allow-live (创建后随时 rm 可一键禁用)."
+            )
+
+    def _is_dry_run(self, override: Optional[bool]) -> bool:
+        """方法级 dry_run 参数 None 时回退到实例级配置."""
+        return self.dry_run if override is None else bool(override)
+
+    @staticmethod
+    def _dry_run_response(method_name: str, params: dict) -> dict:
+        """构造与真实响应类似的 mock dict, status='DRY_RUN' 便于上层识别."""
+        # 真实响应 orderId 是 long int; 用负数防混淆
+        return {
+            "orderId": -1,
+            "status": "DRY_RUN",
+            "clientOrderId": params.get("newClientOrderId", ""),
+            "symbol": params.get("symbol", ""),
+            "side": params.get("side", ""),
+            "type": params.get("type", ""),
+            "origQty": str(params.get("quantity", "0")),
+            "stopPrice": str(params.get("stopPrice", "0")),
+            "reduceOnly": params.get("reduceOnly", False),
+            "closePosition": params.get("closePosition", False),
+            "_method": method_name,
+            "_dryRun": True,
+            "_params": params,
+        }
+
+    def place_market_order(
+        self,
+        symbol: str,
+        side: str,
+        quantity: float,
+        *,
+        client_order_id: Optional[str] = None,
+        reduce_only: bool = False,
+        dry_run: Optional[bool] = None,
+    ) -> dict:
+        """市价单. side: 'BUY' 开多 / 'SELL' 开空 (one-way mode 下 positionSide=BOTH).
+        reduce_only=True 表示仅平仓不开新仓.
+        """
+        side = side.upper()
+        if side not in ("BUY", "SELL"):
+            raise ValueError(f"side 必须是 BUY 或 SELL, got {side!r}")
+        if quantity <= 0:
+            raise ValueError(f"quantity 必须 > 0, got {quantity}")
+        is_dry = self._is_dry_run(dry_run)
+        self._check_live_authorization(is_dry)
+        params = {
+            "symbol": symbol.upper(),
+            "side": side,
+            "type": "MARKET",
+            "quantity": _format_quantity(quantity),
+            "newOrderRespType": "RESULT",  # 返回 fill 信息
+        }
+        if reduce_only:
+            params["reduceOnly"] = "true"
+        if client_order_id:
+            _validate_client_order_id(client_order_id)
+            params["newClientOrderId"] = client_order_id
+        if is_dry:
+            log.info(f"[DRY_RUN] place_market_order {symbol} {side} qty={quantity}")
+            return self._dry_run_response("place_market_order", params)
+        return self._signed_request("POST", "/fapi/v1/order", params)
+
+    def place_stop_market_order(
+        self,
+        symbol: str,
+        side: str,
+        stop_price: float,
+        *,
+        quantity: Optional[float] = None,
+        close_position: bool = True,
+        client_order_id: Optional[str] = None,
+        working_type: str = "CONTRACT_PRICE",
+        dry_run: Optional[bool] = None,
+    ) -> dict:
+        """STOP_MARKET 止损单. 默认 close_position=True (触发时平整仓).
+
+        side 是 *平仓方向*:
+        - LONG 持仓的 SL: side='SELL'
+        - SHORT 持仓的 SL: side='BUY'
+
+        working_type: 'CONTRACT_PRICE' (默认, 用最新成交价触发) 或 'MARK_PRICE' (标记价, 防插针).
+        """
+        side = side.upper()
+        if side not in ("BUY", "SELL"):
+            raise ValueError(f"side 必须是 BUY 或 SELL, got {side!r}")
+        if stop_price <= 0:
+            raise ValueError(f"stop_price 必须 > 0, got {stop_price}")
+        if working_type not in ("CONTRACT_PRICE", "MARK_PRICE"):
+            raise ValueError(f"working_type 必须是 CONTRACT_PRICE 或 MARK_PRICE")
+        # close_position=True 和 quantity 互斥
+        if close_position and quantity is not None:
+            raise ValueError("close_position=True 时不能同时指定 quantity")
+        if not close_position and quantity is None:
+            raise ValueError("close_position=False 时必须指定 quantity")
+        is_dry = self._is_dry_run(dry_run)
+        self._check_live_authorization(is_dry)
+        params = {
+            "symbol": symbol.upper(),
+            "side": side,
+            "type": "STOP_MARKET",
+            "stopPrice": _format_price(stop_price),
+            "workingType": working_type,
+            "priceProtect": "true",   # 防插针触发
+            "newOrderRespType": "RESULT",
+        }
+        if close_position:
+            params["closePosition"] = "true"
+        else:
+            params["quantity"] = _format_quantity(quantity)
+            params["reduceOnly"] = "true"  # 非 closePosition 时必须 reduceOnly
+        if client_order_id:
+            _validate_client_order_id(client_order_id)
+            params["newClientOrderId"] = client_order_id
+        if is_dry:
+            log.info(f"[DRY_RUN] place_stop_market {symbol} {side} stop={stop_price} "
+                     f"closePos={close_position}")
+            return self._dry_run_response("place_stop_market_order", params)
+        return self._signed_request("POST", "/fapi/v1/order", params)
+
+    def cancel_order(
+        self,
+        symbol: str,
+        *,
+        order_id: Optional[int] = None,
+        client_order_id: Optional[str] = None,
+        dry_run: Optional[bool] = None,
+    ) -> dict:
+        """撤单. 用 order_id 或 client_order_id 任一."""
+        if order_id is None and client_order_id is None:
+            raise ValueError("必须提供 order_id 或 client_order_id 之一")
+        is_dry = self._is_dry_run(dry_run)
+        self._check_live_authorization(is_dry)
+        params = {"symbol": symbol.upper()}
+        if order_id is not None:
+            params["orderId"] = int(order_id)
+        if client_order_id is not None:
+            params["origClientOrderId"] = client_order_id
+        if is_dry:
+            log.info(f"[DRY_RUN] cancel_order {symbol} order_id={order_id} "
+                     f"client_id={client_order_id}")
+            return self._dry_run_response("cancel_order", params)
+        return self._signed_request("DELETE", "/fapi/v1/order", params)
+
+    def get_order(
+        self,
+        symbol: str,
+        *,
+        order_id: Optional[int] = None,
+        client_order_id: Optional[str] = None,
+    ) -> dict:
+        """查询单笔订单状态. 用 order_id 或 client_order_id 任一. 只读, 无 dry_run."""
+        if order_id is None and client_order_id is None:
+            raise ValueError("必须提供 order_id 或 client_order_id 之一")
+        params = {"symbol": symbol.upper()}
+        if order_id is not None:
+            params["orderId"] = int(order_id)
+        if client_order_id is not None:
+            params["origClientOrderId"] = client_order_id
+        return self._signed_request("GET", "/fapi/v1/order", params)
+
+    # --- 账户配置 (启动前检查) ---
+
+    def set_leverage(self, symbol: str, leverage: int,
+                     dry_run: Optional[bool] = None) -> dict:
+        """设置 symbol 杠杆 (1-125). 推荐 3x."""
+        if not (1 <= int(leverage) <= 125):
+            raise ValueError(f"leverage 必须在 [1, 125], got {leverage}")
+        is_dry = self._is_dry_run(dry_run)
+        self._check_live_authorization(is_dry)
+        params = {"symbol": symbol.upper(), "leverage": int(leverage)}
+        if is_dry:
+            log.info(f"[DRY_RUN] set_leverage {symbol}={leverage}x")
+            return {"_dryRun": True, "leverage": leverage, "symbol": symbol.upper()}
+        return self._signed_request("POST", "/fapi/v1/leverage", params)
+
+    def set_margin_type(self, symbol: str, margin_type: str,
+                        dry_run: Optional[bool] = None) -> dict:
+        """设置保证金模式. margin_type ∈ {'ISOLATED', 'CROSSED'}.
+        注意: 该 symbol 必须无持仓时才能切.
+        """
+        margin_type = margin_type.upper()
+        if margin_type not in ("ISOLATED", "CROSSED"):
+            raise ValueError(f"margin_type ∈ {{ISOLATED, CROSSED}}, got {margin_type!r}")
+        is_dry = self._is_dry_run(dry_run)
+        self._check_live_authorization(is_dry)
+        params = {"symbol": symbol.upper(), "marginType": margin_type}
+        if is_dry:
+            log.info(f"[DRY_RUN] set_margin_type {symbol}={margin_type}")
+            return {"_dryRun": True, "marginType": margin_type, "symbol": symbol.upper()}
+        # Binance 在已是该模式时返回 code -4046 "No need to change margin type"
+        # 我们把这视为成功 (幂等)
+        try:
+            return self._signed_request("POST", "/fapi/v1/marginType", params)
+        except BinanceError as e:
+            if "-4046" in str(e):
+                return {"alreadySet": True, "marginType": margin_type, "symbol": symbol.upper()}
+            raise
+
+    def get_position_mode(self) -> dict:
+        """查询持仓模式. dualSidePosition=true 是 Hedge mode, false 是 One-way (推荐)."""
+        return self._signed_request("GET", "/fapi/v1/positionSide/dual", {})
+
+    def set_position_mode(self, dual_side: bool,
+                          dry_run: Optional[bool] = None) -> dict:
+        """设置持仓模式. dual_side=False = One-way (推荐, 匹配 paper trader 模型).
+        注意: 必须所有 symbol 无持仓 + 无挂单时才能切.
+        """
+        is_dry = self._is_dry_run(dry_run)
+        self._check_live_authorization(is_dry)
+        params = {"dualSidePosition": "true" if dual_side else "false"}
+        if is_dry:
+            log.info(f"[DRY_RUN] set_position_mode dual_side={dual_side}")
+            return {"_dryRun": True, "dualSidePosition": dual_side}
+        try:
+            return self._signed_request("POST", "/fapi/v1/positionSide/dual", params)
+        except BinanceError as e:
+            if "-4059" in str(e):  # No need to change
+                return {"alreadySet": True, "dualSidePosition": dual_side}
+            raise
+
+    def verify_setup(self, symbol: str, *, expected_leverage: int = 3,
+                     expected_margin: str = "ISOLATED",
+                     expected_dual_side: bool = False) -> dict:
+        """启动 preflight: 检查账户配置是否符合预期. 返回问题列表 (空=OK).
+        不修改任何设置, 只读检查.
+
+        返回示例:
+            {"ok": True, "issues": [], "current": {...}}
+            {"ok": False, "issues": ["leverage 20x != 3x", ...], "current": {...}}
+        """
+        issues = []
+        current = {}
+        # 1. 持仓模式 (账户级)
+        pm = self.get_position_mode()
+        current["dualSidePosition"] = pm.get("dualSidePosition")
+        if pm.get("dualSidePosition") != expected_dual_side:
+            issues.append(
+                f"持仓模式 dualSidePosition={pm.get('dualSidePosition')} "
+                f"!= 期望 {expected_dual_side} (One-way mode)"
+            )
+        # 2. 该 symbol 的杠杆 + 保证金模式 (在 positionRisk 里)
+        positions = self.get_positions()
+        sym_info = next((p for p in positions if p.get("symbol") == symbol.upper()), None)
+        if sym_info is None:
+            issues.append(f"{symbol} 不在 positionRisk 列表里 (symbol 不存在?)")
+        else:
+            current["leverage"] = sym_info.get("leverage")
+            current["marginType"] = sym_info.get("marginType", "").upper()
+            try:
+                lev = int(sym_info.get("leverage", 0))
+                if lev != expected_leverage:
+                    issues.append(f"{symbol} leverage={lev}x != 期望 {expected_leverage}x")
+            except (TypeError, ValueError):
+                issues.append(f"{symbol} leverage 字段无法解析: {sym_info.get('leverage')}")
+            mt = (sym_info.get("marginType") or "").upper()
+            # Binance 在 positionRisk 里返回 'isolated'/'cross', 不是 'CROSSED'
+            mt_normalized = "ISOLATED" if mt == "ISOLATED" else "CROSSED"
+            if mt_normalized != expected_margin.upper():
+                issues.append(f"{symbol} marginType={mt} != 期望 {expected_margin}")
+        return {
+            "ok": len(issues) == 0,
+            "issues": issues,
+            "current": current,
+            "symbol": symbol.upper(),
+        }
 
     # ============================================================
     # Internal: HTTP plumbing
@@ -470,7 +802,20 @@ def _cli_main() -> int:
     p.add_argument("--positions", action="store_true", help="拉取持仓")
     p.add_argument("--balance", action="store_true", help="拉取每币种余额")
     p.add_argument("--exchange-info", action="store_true", help="拉取 exchange info (大)")
-    p.add_argument("--symbol", type=str, default=None, help="指定 symbol 测试")
+    p.add_argument("--symbol", type=str, default="BTCUSDT", help="指定 symbol (默认 BTCUSDT)")
+    p.add_argument("--verify-setup", action="store_true",
+                   help="检查 leverage / margin type / position mode 是否符合预期")
+    p.add_argument("--auto-setup", action="store_true",
+                   help="自动修正配置 (set isolated + 3x + one-way mode), 需 --live")
+    p.add_argument("--place-test-order", action="store_true",
+                   help="下一个 $20 BTCUSDT 测试市价单 (默认 dry-run, 默认 BUY)")
+    p.add_argument("--side", type=str, default="BUY", choices=["BUY", "SELL"],
+                   help="测试订单方向 (BUY=开多, SELL=开空), 默认 BUY")
+    p.add_argument("--cancel-all", action="store_true",
+                   help="撤销该 symbol 所有挂单 (默认 dry-run)")
+    p.add_argument("--live", action="store_true",
+                   help="🛑 关闭 dry-run, 真下单. 主网还需 ~/.allow-live 文件")
+    p.add_argument("--leverage", type=int, default=3, help="期望/设置杠杆 (默认 3)")
     args = p.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
@@ -480,9 +825,18 @@ def _cli_main() -> int:
     if args.mainnet and env_testnet:
         log.warning("⚠️ env 配置是 testnet, 但 --mainnet flag 已切到主网")
 
-    client = BinanceClient(key, secret, testnet=use_testnet)
+    # dry_run 默认 True (--live 显式关闭). 这是 Phase 2.2 的核心安全机制.
+    dry_run = not args.live
+    client = BinanceClient(key, secret, testnet=use_testnet, dry_run=dry_run)
     print(f"Connected: {client}")
     print(f"Base URL: {client.base_url}")
+    if dry_run:
+        print(f"🟢 Mode: DRY-RUN (won't place real orders, use --live to disable)")
+    else:
+        if not use_testnet:
+            print(f"🔴 Mode: LIVE TRADING ON MAINNET — REAL MONEY")
+        else:
+            print(f"🟡 Mode: LIVE on testnet (no real money)")
     print()
 
     # 默认都跑一遍 check-time
@@ -539,6 +893,65 @@ def _cli_main() -> int:
                     if f.get("filterType") in ("MIN_NOTIONAL", "LOT_SIZE", "PRICE_FILTER"):
                         print(f"   filter[{f['filterType']}]: {f}")
         print()
+
+    if args.verify_setup:
+        sym = args.symbol.upper()
+        print(f"🔧 Verify setup for {sym} (期望 isolated + {args.leverage}x + one-way):")
+        result = client.verify_setup(sym,
+                                      expected_leverage=args.leverage,
+                                      expected_margin="ISOLATED",
+                                      expected_dual_side=False)
+        if result["ok"]:
+            print(f"   ✓ 全部符合预期. current={result['current']}")
+        else:
+            print(f"   ✗ 发现 {len(result['issues'])} 处不符:")
+            for issue in result["issues"]:
+                print(f"     - {issue}")
+            print(f"   current={result['current']}")
+            print(f"   修复方法: 加 --auto-setup --live (或在 Binance 网页手动改)")
+        print()
+
+    if args.auto_setup:
+        sym = args.symbol.upper()
+        print(f"⚙️  Auto setup {sym} → ISOLATED + {args.leverage}x + one-way mode")
+        r1 = client.set_position_mode(dual_side=False)
+        print(f"   position mode: {r1}")
+        r2 = client.set_margin_type(sym, "ISOLATED")
+        print(f"   margin type: {r2}")
+        r3 = client.set_leverage(sym, args.leverage)
+        print(f"   leverage: {r3}")
+        print()
+
+    if args.place_test_order:
+        sym = args.symbol.upper()
+        # 拉当前价估算 qty (用 1m kline 最新收盘价)
+        klines = client.get_klines(sym, interval="1m", limit=1)
+        if not klines:
+            print(f"   ✗ 无法获取 {sym} 当前价, 取消")
+            return 1
+        last_close = float(klines[0][4])
+        notional_usd = 20.0
+        qty = round(notional_usd / last_close, 6)  # 6 位精度, 实际由 LOT_SIZE 决定
+        coid = f"cresus_test_{int(time.time())}"[:36]
+        print(f"📝 Place test order: {args.side} {qty} {sym} @ market (~${notional_usd}, "
+              f"last_close=${last_close:.2f}), coid={coid}")
+        resp = client.place_market_order(sym, args.side, qty, client_order_id=coid)
+        print(f"   响应: {json.dumps(resp, indent=2, ensure_ascii=False)}")
+        if not dry_run and resp.get("status") not in ("DRY_RUN",):
+            print(f"   ⚠️ 真的下单了! 记得用 --cancel-all 或手动平仓")
+
+    if args.cancel_all:
+        sym = args.symbol.upper()
+        open_orders = client.get_open_orders(sym)
+        print(f"📋 Cancel all {len(open_orders)} open orders on {sym}:")
+        for o in open_orders:
+            print(f"   - {o.get('orderId')} {o.get('side')} {o.get('type')} "
+                  f"@ {o.get('stopPrice') or o.get('price')}")
+            try:
+                resp = client.cancel_order(sym, order_id=int(o["orderId"]))
+                print(f"     ✓ canceled (status={resp.get('status')})")
+            except BinanceError as e:
+                print(f"     ✗ 失败: {e}")
 
     return 0
 
