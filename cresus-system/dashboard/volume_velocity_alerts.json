@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-14T02:42:55.692761+00:00",
+  "updated_at": "2026-05-14T02:45:08.935651+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 30,
+  "alerts_count": 31,
   "alerts": [
+    {
+      "symbol": "CYSUSDT",
+      "base": "CYS",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.4432,
+      "price_change_pct": -0.606,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 81748.0,
+      "volume_baseline_usdt": 2144.0,
+      "volume_ratio": 38.13,
+      "detected_at": "2026-05-14T02:45:05.090452+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.827,
+      "change_15m_pct": -1.247,
+      "change_1h_pct": -1.269,
+      "change_4h_pct": -1.313,
+      "taker_buy_ratio_1m": 0.098,
+      "taker_buy_ratio_5m": 0.125,
+      "oi_delta_5m_pct": -0.015,
+      "funding_rate_pct": 0.0056,
+      "atr_pct": 0.263,
+      "range_4h_pct": 3.7,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.44436429,
+      "suggested_tp1": 0.44145357,
+      "suggested_tp2": 0.43970714,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "STABLEUSDT",
       "base": "STABLE",
