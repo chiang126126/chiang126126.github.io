@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-14T08:19:28.827289+00:00",
+  "updated_at": "2026-05-14T08:21:49.771285+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 26,
+  "alerts_count": 27,
   "alerts": [
+    {
+      "symbol": "SYSUSDT",
+      "base": "SYS",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.00665,
+      "price_change_pct": 2.151,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 65096.0,
+      "volume_baseline_usdt": 12163.0,
+      "volume_ratio": 5.35,
+      "detected_at": "2026-05-14T08:21:19.592039+00:00",
+      "intensity": 1,
+      "change_5m_pct": 3.733,
+      "change_15m_pct": 4.71,
+      "change_1h_pct": 4.545,
+      "change_4h_pct": -1.912,
+      "taker_buy_ratio_1m": 0.697,
+      "taker_buy_ratio_5m": 0.628,
+      "oi_delta_5m_pct": 0.857,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 1.117,
+      "range_4h_pct": 10.23,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.00650143,
+      "suggested_tp1": 0.00687286,
+      "suggested_tp2": 0.00709571,
+      "conviction_score": 3,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "PIEVERSEUSDT",
       "base": "PIEVERSE",
