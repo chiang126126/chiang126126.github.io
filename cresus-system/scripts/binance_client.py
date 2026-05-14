@@ -516,18 +516,23 @@ class BinanceClient:
         stop_price: float,
         *,
         quantity: Optional[float] = None,
-        close_position: bool = True,
+        close_position: bool = False,
         client_order_id: Optional[str] = None,
         working_type: str = "CONTRACT_PRICE",
+        price_protect: bool = False,
         dry_run: Optional[bool] = None,
     ) -> dict:
-        """STOP_MARKET 止损单. 默认 close_position=True (触发时平整仓).
+        """STOP_MARKET 止损单.
+
+        默认 close_position=False + 需 quantity (兼容性最好, testnet/mainnet 都接)
+        若 close_position=True 则不需 quantity (触发时平整仓), 但部分 testnet 不支持.
 
         side 是 *平仓方向*:
         - LONG 持仓的 SL: side='SELL'
         - SHORT 持仓的 SL: side='BUY'
 
-        working_type: 'CONTRACT_PRICE' (默认, 用最新成交价触发) 或 'MARK_PRICE' (标记价, 防插针).
+        working_type: 'CONTRACT_PRICE' (默认, 最新成交价触发) 或 'MARK_PRICE' (标记价, 防插针).
+        price_protect: 防插针保护 (默认 False; 部分账户/testnet 开启会拒单 -4120).
         """
         side = side.upper()
         if side not in ("BUY", "SELL"):
@@ -549,9 +554,10 @@ class BinanceClient:
             "type": "STOP_MARKET",
             "stopPrice": _format_price(stop_price),
             "workingType": working_type,
-            "priceProtect": "true",   # 防插针触发
             "newOrderRespType": "RESULT",
         }
+        if price_protect:
+            params["priceProtect"] = "true"
         if close_position:
             params["closePosition"] = "true"
         else:
@@ -841,17 +847,17 @@ class BinanceClient:
         if executed_qty <= 0:
             raise BinanceError(f"Entry executed_qty={executed_qty}, abnormal")
 
-        # 10. 下 STOP_MARKET SL (close_position=true)
+        # 10. 下 STOP_MARKET SL (quantity + reduceOnly, 比 closePosition 兼容性好)
         log.info(
-            f"open_position step 2/2: SL {sl_coid} {sl_side} @ {sl_price} "
-            f"(close_position)"
+            f"open_position step 2/2: SL {sl_coid} {sl_side} qty={executed_qty} @ {sl_price}"
         )
         try:
             sl_resp = self.place_stop_market_order(
                 symbol=symbol,
                 side=sl_side,
                 stop_price=sl_price,
-                close_position=True,
+                quantity=executed_qty,           # 精确平实际持仓
+                close_position=False,            # reduceOnly + quantity 模式
                 client_order_id=sl_coid,
                 dry_run=False,
             )
@@ -986,16 +992,24 @@ class BinanceClient:
 
         # ====== 实盘: place-then-cancel ======
 
-        # 1. 先 place 新 SL
+        # 1. 先 place 新 SL (用 quantity-based 模式, 查实际持仓 size)
+        positions = self.get_positions()
+        pos = next((p for p in positions if p.get("symbol") == symbol), None)
+        if pos is None or float(pos.get("positionAmt", 0)) == 0:
+            raise BinanceError(
+                f"update_stop_order {symbol}: 无开仓, 无法移 SL"
+            )
+        pos_qty = abs(float(pos.get("positionAmt", 0)))
         log.info(
             f"update_stop_order step 1/2: place NEW SL {new_sl_client_order_id} "
-            f"@ {new_stop_price}"
+            f"qty={pos_qty} @ {new_stop_price}"
         )
         new_sl_resp = self.place_stop_market_order(
             symbol=symbol,
             side=sl_side,
             stop_price=new_stop_price,
-            close_position=True,
+            quantity=pos_qty,
+            close_position=False,
             client_order_id=new_sl_client_order_id,
             dry_run=False,
         )
