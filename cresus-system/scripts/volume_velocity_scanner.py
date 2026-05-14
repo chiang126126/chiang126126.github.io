@@ -79,6 +79,7 @@ PAPER_STATE       = Path.home() / "cresus-bot" / ".paper_trades.json"       # �
 PAPER_HISTORY     = Path.home() / "cresus-bot" / "paper_trades_history.json" # 推给看板
 PAPER_AUTO_CLOSE_HOURS = 4            # 4 小时未触发 SL/TP 自动平仓 (跟 OUTCOME_STAGES 4h 对齐)
 PAPER_SYMBOL_COOLDOWN_MIN = 30        # Phase 1.1: 同 symbol 任意 exit 后冷却 (任意 close_reason, 防信号抖动 + 长尾反复亏损)
+PAPER_MAX_ATR_PCT = 2.0               # Phase 1.3: ATR>=2% 信号 reject (审计 N=142: ATR 2.0-2.5% cell n=6 全亏 avg -2.89%)
 PAPER_RECENT_LIMIT = 0                # 已废弃 (改为全量发布以支持任意日期复盘, N=1000 时 ~150KB 也可接受)
 PAPER_MIN_TIER     = "diamond"        # 只对钻石信号自动开仓 (高质量 only)
 # 模拟仓金额: 总账户 $2000, 每笔分配 $400 (20%), 最多并发 5 笔
@@ -1330,6 +1331,13 @@ def _open_paper_trade(a: VelocityAlert, state: dict, now: datetime,
     初始 Phase A: SL = entry ± 1×ATR, TP1 = entry ± 1.5×ATR, TP2 = entry ± 3×ATR
     """
     if a.conviction_tier != PAPER_MIN_TIER:
+        return None
+    # Phase 1.3: 极高 ATR (>=2%) 信号 reject — 降低 variance, 接受失去稀有 outlier.
+    # 审计 N=142: ATR 2.0-2.5% (n=6) 全亏 avg -2.89%, ATR>=2% 整体 cell 净亏.
+    # 100U 实盘期核心目标是 variance 降低, 不是追 outlier.
+    if a.atr_pct is not None and a.atr_pct >= PAPER_MAX_ATR_PCT:
+        _log(f"[paper] SKIP open {a.symbol} {a.direction}: "
+             f"ATR {a.atr_pct:.2f}% >= {PAPER_MAX_ATR_PCT}% (high volatility filter)")
         return None
     if a.suggested_sl is None or a.suggested_tp1 is None or a.suggested_tp2 is None:
         return None
