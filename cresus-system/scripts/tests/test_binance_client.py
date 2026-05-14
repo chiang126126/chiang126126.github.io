@@ -870,6 +870,36 @@ class TestOpenPositionDryRun(unittest.TestCase):
                 notional_usdt=100, sl_price=80000, trade_id="has space",
             )
 
+    def test_open_client_side_sl_marker(self):
+        """use_exchange_sl=False 应在返回 dict 标记 sl_mode='client_side'."""
+        patches = self._patch_helpers()
+        for p in patches: p.start()
+        try:
+            r = self.client.open_position(
+                symbol="BTCUSDT", side="BUY",
+                notional_usdt=100.0, sl_price=80000.0,
+                trade_id="t099", use_exchange_sl=False,
+            )
+        finally:
+            for p in patches: p.stop()
+        self.assertEqual(r["sl_mode"], "client_side")
+        # SL price 仍然记录, 但 order_id/client_id 为 None (待客户端 polling)
+        self.assertEqual(r["sl_price"], 80000.0)
+
+    def test_open_default_exchange_sl_marker(self):
+        """默认 use_exchange_sl=True, 返回 dict 标记 sl_mode='exchange'."""
+        patches = self._patch_helpers()
+        for p in patches: p.start()
+        try:
+            r = self.client.open_position(
+                symbol="BTCUSDT", side="BUY",
+                notional_usdt=100.0, sl_price=80000.0,
+                trade_id="t100",
+            )
+        finally:
+            for p in patches: p.stop()
+        self.assertEqual(r["sl_mode"], "exchange")
+
 
 class TestUpdateStopOrderDryRun(unittest.TestCase):
 
