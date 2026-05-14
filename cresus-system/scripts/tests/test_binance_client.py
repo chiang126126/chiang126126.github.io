@@ -31,6 +31,7 @@ from binance_client import (  # noqa: E402
     BinanceError, BinanceAuthError, BinanceRateLimitError,
     BinanceNetworkError, BinanceTimeError,
     _TokenBucket, _validate_credential,
+    _validate_client_order_id, _format_quantity, _format_price,
     MAINNET_BASE, TESTNET_BASE,
     RECV_WINDOW_MS, MAX_TIME_DRIFT_SEC,
     DEFAULT_MAX_ATTEMPTS,
@@ -455,6 +456,219 @@ class TestURLConstruction(unittest.TestCase):
         h = captured_headers[0]
         api_keys = [v for k, v in h.items() if k.lower() == "x-mbx-apikey"]
         self.assertTrue(api_keys, f"X-MBX-APIKEY header 缺失: {h}")
+
+
+# ============================================================================
+# Phase 2.2.1: 订单参数格式化 helpers
+# ============================================================================
+
+class TestFormatHelpers(unittest.TestCase):
+
+    def test_quantity_decimal(self):
+        self.assertEqual(_format_quantity(0.001), "0.001")
+        self.assertEqual(_format_quantity(1.0), "1")
+        self.assertEqual(_format_quantity(0.12345678), "0.12345678")
+
+    def test_quantity_no_sci_notation(self):
+        """Binance 不接受 1e-05 这种格式."""
+        self.assertNotIn("e", _format_quantity(0.00001))
+        self.assertNotIn("E", _format_quantity(0.000001))
+
+    def test_quantity_zero_rejected(self):
+        with self.assertRaises(ValueError):
+            _format_quantity(0)
+        with self.assertRaises(ValueError):
+            _format_quantity(-1)
+
+    def test_price_strips_trailing_zeros(self):
+        self.assertEqual(_format_price(0.50000), "0.5")
+        self.assertEqual(_format_price(80000.0), "80000")
+
+    def test_client_order_id_valid(self):
+        _validate_client_order_id("cresus_test_123")
+        _validate_client_order_id("a")
+        _validate_client_order_id("A" * 36)
+
+    def test_client_order_id_invalid(self):
+        with self.assertRaises(ValueError):
+            _validate_client_order_id("")
+        with self.assertRaises(ValueError):
+            _validate_client_order_id("a" * 37)   # too long
+        with self.assertRaises(ValueError):
+            _validate_client_order_id("has space")
+        with self.assertRaises(ValueError):
+            _validate_client_order_id("has.dot")
+        with self.assertRaises(ValueError):
+            _validate_client_order_id("has/slash")
+
+
+# ============================================================================
+# Phase 2.2.1: dry_run 默认行为 + 安全闸门
+# ============================================================================
+
+class TestDryRunDefault(unittest.TestCase):
+
+    def test_dry_run_default_true(self):
+        """实例默认 dry_run=True (安全默认)."""
+        c = BinanceClient(FAKE_KEY, FAKE_SECRET)
+        self.assertTrue(c.dry_run)
+
+    def test_dry_run_explicit_false(self):
+        c = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=False)
+        self.assertFalse(c.dry_run)
+
+    def test_method_dry_run_overrides_instance(self):
+        """方法级 dry_run 参数可覆盖实例配置."""
+        c = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+        # _is_dry_run 方法测试
+        self.assertTrue(c._is_dry_run(None))     # 用实例
+        self.assertTrue(c._is_dry_run(True))     # 显式
+        self.assertFalse(c._is_dry_run(False))   # 显式覆盖
+
+
+class TestLiveAuthorization(unittest.TestCase):
+    """非 dry_run + mainnet 必须存在 ~/.allow-live 文件."""
+
+    def test_dry_run_always_allowed(self):
+        c = BinanceClient(FAKE_KEY, FAKE_SECRET, testnet=False, dry_run=True)
+        c._check_live_authorization(dry_run=True)  # 不应抛错
+
+    def test_testnet_live_allowed_no_file(self):
+        c = BinanceClient(FAKE_KEY, FAKE_SECRET, testnet=True, dry_run=False)
+        c._check_live_authorization(dry_run=False)  # testnet 直接放行
+
+    def test_mainnet_live_requires_file(self):
+        c = BinanceClient(FAKE_KEY, FAKE_SECRET, testnet=False, dry_run=False)
+        with patch("pathlib.Path.exists", return_value=False):
+            with self.assertRaises(BinanceError) as ctx:
+                c._check_live_authorization(dry_run=False)
+            self.assertIn("allow-live", str(ctx.exception))
+
+    def test_mainnet_live_with_file_allowed(self):
+        c = BinanceClient(FAKE_KEY, FAKE_SECRET, testnet=False, dry_run=False)
+        with patch("pathlib.Path.exists", return_value=True):
+            c._check_live_authorization(dry_run=False)  # 不应抛错
+
+
+# ============================================================================
+# Phase 2.2.1: 下单方法 (dry_run 模式, 不联网)
+# ============================================================================
+
+class TestOrderMethods(unittest.TestCase):
+
+    def setUp(self):
+        # dry_run 模式: 所有方法返回 mock dict, 不调真 API
+        self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+
+    def test_place_market_order_dry_run(self):
+        r = self.client.place_market_order("btcusdt", "BUY", 0.001)
+        self.assertEqual(r["status"], "DRY_RUN")
+        self.assertEqual(r["symbol"], "BTCUSDT")
+        self.assertEqual(r["side"], "BUY")
+        self.assertEqual(r["type"], "MARKET")
+        self.assertEqual(r["_method"], "place_market_order")
+
+    def test_place_market_order_invalid_side(self):
+        with self.assertRaises(ValueError):
+            self.client.place_market_order("BTCUSDT", "HOLD", 0.001)
+
+    def test_place_market_order_invalid_qty(self):
+        with self.assertRaises(ValueError):
+            self.client.place_market_order("BTCUSDT", "BUY", 0)
+        with self.assertRaises(ValueError):
+            self.client.place_market_order("BTCUSDT", "BUY", -0.001)
+
+    def test_place_market_order_with_client_id(self):
+        r = self.client.place_market_order(
+            "BTCUSDT", "BUY", 0.001,
+            client_order_id="cresus_test_001",
+        )
+        self.assertEqual(r["clientOrderId"], "cresus_test_001")
+
+    def test_place_market_order_invalid_client_id(self):
+        with self.assertRaises(ValueError):
+            self.client.place_market_order(
+                "BTCUSDT", "BUY", 0.001,
+                client_order_id="invalid id with spaces",
+            )
+
+    def test_place_stop_market_close_position_default(self):
+        r = self.client.place_stop_market_order("BTCUSDT", "SELL", 75000)
+        self.assertEqual(r["status"], "DRY_RUN")
+        self.assertEqual(r["type"], "STOP_MARKET")
+        self.assertEqual(r["closePosition"], "true")
+        self.assertEqual(r["stopPrice"], "75000")
+
+    def test_place_stop_market_with_quantity(self):
+        r = self.client.place_stop_market_order(
+            "BTCUSDT", "SELL", 75000,
+            quantity=0.001, close_position=False,
+        )
+        self.assertEqual(r["origQty"], "0.001")
+        # 验证内部 _params 包含 reduceOnly=true
+        self.assertEqual(r["_params"].get("reduceOnly"), "true")
+
+    def test_place_stop_market_close_and_qty_conflict(self):
+        with self.assertRaises(ValueError):
+            self.client.place_stop_market_order(
+                "BTCUSDT", "SELL", 75000,
+                quantity=0.001, close_position=True,
+            )
+
+    def test_place_stop_market_no_qty_no_close_position(self):
+        with self.assertRaises(ValueError):
+            self.client.place_stop_market_order(
+                "BTCUSDT", "SELL", 75000,
+                close_position=False,  # 不带 quantity → 矛盾
+            )
+
+    def test_place_stop_market_invalid_working_type(self):
+        with self.assertRaises(ValueError):
+            self.client.place_stop_market_order(
+                "BTCUSDT", "SELL", 75000,
+                working_type="WEIRD_PRICE",
+            )
+
+    def test_cancel_order_requires_one_id(self):
+        with self.assertRaises(ValueError):
+            self.client.cancel_order("BTCUSDT")  # 既没 order_id 也没 client_order_id
+
+    def test_cancel_order_by_client_id(self):
+        r = self.client.cancel_order("BTCUSDT", client_order_id="cresus_test_001")
+        self.assertEqual(r["status"], "DRY_RUN")
+        self.assertEqual(r["_params"]["origClientOrderId"], "cresus_test_001")
+
+    def test_cancel_order_by_order_id(self):
+        r = self.client.cancel_order("BTCUSDT", order_id=12345)
+        self.assertEqual(r["_params"]["orderId"], 12345)
+
+
+class TestAccountConfigMethods(unittest.TestCase):
+
+    def setUp(self):
+        self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+
+    def test_set_leverage_valid(self):
+        r = self.client.set_leverage("BTCUSDT", 3)
+        self.assertEqual(r["leverage"], 3)
+
+    def test_set_leverage_invalid(self):
+        with self.assertRaises(ValueError):
+            self.client.set_leverage("BTCUSDT", 0)
+        with self.assertRaises(ValueError):
+            self.client.set_leverage("BTCUSDT", 200)
+
+    def test_set_margin_type_valid(self):
+        r = self.client.set_margin_type("BTCUSDT", "ISOLATED")
+        self.assertEqual(r["marginType"], "ISOLATED")
+
+    def test_set_margin_type_invalid(self):
+        with self.assertRaises(ValueError):
+            self.client.set_margin_type("BTCUSDT", "FANCY")
+
+    def test_set_position_mode_one_way(self):
+        r = self.client.set_position_mode(dual_side=False)
+        self.assertEqual(r["dualSidePosition"], False)
 
 
 # ============================================================================
