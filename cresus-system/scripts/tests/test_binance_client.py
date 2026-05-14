@@ -32,6 +32,7 @@ from binance_client import (  # noqa: E402
     BinanceNetworkError, BinanceTimeError,
     _TokenBucket, _validate_credential,
     _validate_client_order_id, _format_quantity, _format_price,
+    round_qty_down_to_step, round_price_to_tick,
     MAINNET_BASE, TESTNET_BASE,
     RECV_WINDOW_MS, MAX_TIME_DRIFT_SEC,
     DEFAULT_MAX_ATTEMPTS,
@@ -500,6 +501,48 @@ class TestFormatHelpers(unittest.TestCase):
             _validate_client_order_id("has.dot")
         with self.assertRaises(ValueError):
             _validate_client_order_id("has/slash")
+
+
+class TestQuantityRounding(unittest.TestCase):
+    """Phase 2.2.1.1: 防止 -1111 precision error."""
+
+    def test_round_down_to_step_basic(self):
+        # 0.000246 BTC at stepSize=0.001 → 0.0 (太小)
+        self.assertEqual(round_qty_down_to_step(0.000246, 0.001), 0.0)
+        # 0.0035 → 0.003
+        self.assertEqual(round_qty_down_to_step(0.0035, 0.001), 0.003)
+        # 1.234 at stepSize=0.01 → 1.23
+        self.assertEqual(round_qty_down_to_step(1.234, 0.01), 1.23)
+
+    def test_round_down_exact_step(self):
+        self.assertEqual(round_qty_down_to_step(0.001, 0.001), 0.001)
+        self.assertEqual(round_qty_down_to_step(1.0, 0.1), 1.0)
+
+    def test_round_down_floating_point_robust(self):
+        # 0.3 / 0.1 在浮点下不等于 3.0 而是 2.999999...
+        # 我们的实现用 +1e-9 防御
+        self.assertEqual(round_qty_down_to_step(0.3, 0.1), 0.3)
+        self.assertEqual(round_qty_down_to_step(0.6, 0.1), 0.6)
+
+    def test_round_down_no_trailing_decimals(self):
+        # stepSize=0.001 → 结果应该是 0.001, 不是 0.001000000004
+        result = round_qty_down_to_step(0.005, 0.001)
+        self.assertEqual(result, 0.005)
+        # 检查 string representation
+        self.assertNotIn("000004", str(result))
+
+    def test_round_down_invalid_step(self):
+        with self.assertRaises(ValueError):
+            round_qty_down_to_step(1.0, 0)
+        with self.assertRaises(ValueError):
+            round_qty_down_to_step(1.0, -0.001)
+
+    def test_round_price_to_tick(self):
+        # BTCUSDT tickSize=0.10: $81234.56 → $81234.6 (round to nearest)
+        self.assertEqual(round_price_to_tick(81234.56, 0.1), 81234.6)
+        self.assertEqual(round_price_to_tick(81234.54, 0.1), 81234.5)
+        # ETHUSDT tickSize=0.01: $3000.123 → $3000.12
+        self.assertEqual(round_price_to_tick(3000.123, 0.01), 3000.12)
 
 
 # ============================================================================
