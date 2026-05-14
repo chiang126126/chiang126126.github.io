@@ -526,6 +526,51 @@
   .paper-review-stat-val .chip.long  { background: rgba(0,200,83,0.12); color: #00e676; }
   .paper-review-stat-val .chip.short { background: rgba(255,82,82,0.12); color: #ff5252; }
 
+  /* 单日深度: 明细折叠包裹 */
+  .paper-review-trades-wrapper {
+    background: rgba(255,255,255,0.02);
+    border-radius: 7px;
+    overflow: hidden;
+  }
+  .paper-review-trades-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    list-style: none;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .paper-review-trades-summary::-webkit-details-marker { display: none; }
+  .paper-review-trades-summary:hover { background: rgba(255,255,255,0.03); }
+  .paper-review-trades-wrapper[open] > .paper-review-trades-summary {
+    border-bottom: 1px dashed rgba(255,255,255,0.08);
+  }
+  .paper-review-trades-chevron {
+    font-size: 10px;
+    color: var(--text-dim);
+    transition: transform 0.15s;
+    display: inline-block;
+  }
+  .paper-review-trades-wrapper[open] .paper-review-trades-chevron {
+    transform: rotate(90deg);
+  }
+  .paper-review-trades-label {
+    font-weight: 600;
+    color: var(--text);
+  }
+  .paper-review-trades-hint {
+    font-size: 10.5px;
+    color: var(--text-dim);
+    margin-left: auto;
+  }
+  @media (max-width: 720px) {
+    .paper-review-trades-hint { font-size: 9.5px; }
+    .paper-review-trades-summary { padding: 7px 10px; }
+  }
+
   .paper-review-empty {
     text-align: center;
     padding: 24px 12px;
@@ -4373,7 +4418,20 @@ function renderSingleDayView(byDate, allDates, notional) {
     </div>`;
   }).join("");
 
-  const tradesBlock = `<div class="paper-day-trades" style="background:rgba(255,255,255,0.02);border-radius:7px;padding:6px 12px;border:none">${tradeRows}</div>`;
+  const tradesOpen = (() => {
+    try { return localStorage.getItem("paper_review_trades_collapsed") !== "1"; }
+    catch (_) { return true; }
+  })();
+  const tradesBlock = `
+    <details class="paper-review-trades-wrapper" ${tradesOpen ? "open" : ""} id="paper-review-trades-details">
+      <summary class="paper-review-trades-summary">
+        <span class="paper-review-trades-chevron">▸</span>
+        <span class="paper-review-trades-label">📋 ${trades.length} 笔明细</span>
+        <span class="paper-review-trades-hint">点击${tradesOpen ? "收起" : "展开"}</span>
+      </summary>
+      <div class="paper-day-trades" style="padding:6px 12px 10px;border:none">${tradeRows}</div>
+    </details>
+  `;
 
   return toolbar + statsCard + tradesBlock;
 }
@@ -4411,6 +4469,15 @@ function _paperWireSingleDayHandlers() {
     todayBtn.addEventListener("click", () => {
       _paperSetSelectedDate(new Date().toLocaleDateString("sv-SE"));
       _paperRenderView("single");
+    });
+  }
+  // 明细折叠: 持久化状态 + 切换 hint 文案
+  const detailsEl = document.getElementById("paper-review-trades-details");
+  if (detailsEl) {
+    detailsEl.addEventListener("toggle", () => {
+      try { localStorage.setItem("paper_review_trades_collapsed", detailsEl.open ? "0" : "1"); } catch (_) {}
+      const hint = detailsEl.querySelector(".paper-review-trades-hint");
+      if (hint) hint.textContent = `点击${detailsEl.open ? "收起" : "展开"}`;
     });
   }
 }
