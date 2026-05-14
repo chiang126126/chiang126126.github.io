@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-14T03:34:08.188715+00:00",
+  "generated_at": "2026-05-14T03:49:30.274012+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
@@ -264,6 +264,18 @@
           "n": 5,
           "win_rate": 0.6,
           "avg_outcome_pct": 2.21
+        }
+      }
+    },
+    "SIRENUSDT|ignition|LONG": {
+      "symbol": "SIRENUSDT",
+      "pred_type": "ignition",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": -2.82
         }
       }
     },
@@ -669,9 +681,9 @@
           "avg_outcome_pct": 1.2
         },
         "60m": {
-          "n": 7,
-          "win_rate": 0.429,
-          "avg_outcome_pct": 1.73
+          "n": 8,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 2.61
         },
         "240m": {
           "n": 6,
@@ -746,6 +758,18 @@
         }
       }
     },
+    "PIEVERSEUSDT|ignition|LONG": {
+      "symbol": "PIEVERSEUSDT",
+      "pred_type": "ignition",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": -0.66
+        }
+      }
+    },
     "JELLYJELLYUSDT|ignition|SHORT": {
       "symbol": "JELLYJELLYUSDT",
       "pred_type": "ignition",
@@ -782,6 +806,11 @@
           "n": 5,
           "win_rate": 0.2,
           "avg_outcome_pct": 0.09
+        },
+        "240m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.14
         }
       }
     },
@@ -794,6 +823,11 @@
           "n": 5,
           "win_rate": 0.4,
           "avg_outcome_pct": -1.51
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.6,
+          "avg_outcome_pct": -0.74
         }
       }
     },
@@ -833,6 +867,11 @@
           "n": 5,
           "win_rate": 0.2,
           "avg_outcome_pct": 0.04
+        },
+        "240m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -0.3
         }
       }
     },
@@ -1025,9 +1064,9 @@
           "avg_outcome_pct": -3.29
         },
         "60m": {
-          "n": 5,
-          "win_rate": 0.4,
-          "avg_outcome_pct": -1.43
+          "n": 6,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -6.33
         }
       }
     },
@@ -1052,19 +1091,19 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 1064,
-        "win_rate": 0.313,
-        "avg_outcome_pct": 0.02
+        "n": 1072,
+        "win_rate": 0.314,
+        "avg_outcome_pct": 0.0
       },
       "60m": {
-        "n": 1050,
-        "win_rate": 0.354,
-        "avg_outcome_pct": -0.01
+        "n": 1056,
+        "win_rate": 0.355,
+        "avg_outcome_pct": -0.03
       },
       "240m": {
-        "n": 974,
-        "win_rate": 0.401,
-        "avg_outcome_pct": -0.12
+        "n": 981,
+        "win_rate": 0.404,
+        "avg_outcome_pct": -0.11
       }
     },
     "quant_only": {}
