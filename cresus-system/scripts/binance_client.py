@@ -29,6 +29,7 @@ import hashlib
 import hmac
 import json
 import logging
+import math
 import os
 import re
 import time
@@ -164,6 +165,39 @@ def _format_price(price: float) -> str:
         raise ValueError(f"price 必须 > 0, got {price}")
     s = f"{float(price):.8f}".rstrip("0").rstrip(".")
     return s if s else "0"
+
+
+def round_qty_down_to_step(qty: float, step_size: float) -> float:
+    """把 qty round DOWN 到 step_size 倍数 (满足 Binance LOT_SIZE filter).
+    例: round_qty_down_to_step(0.000246, 0.001) → 0.0 (太小, 上层应改用 min_qty)
+    例: round_qty_down_to_step(0.0035, 0.001)   → 0.003
+    例: round_qty_down_to_step(1.23, 0.01)      → 1.23
+    """
+    if step_size <= 0:
+        raise ValueError(f"step_size 必须 > 0, got {step_size}")
+    if qty < 0:
+        raise ValueError(f"qty 不能为负, got {qty}")
+    # 用 round 避免 floating point 精度问题
+    n_steps = math.floor(qty / step_size + 1e-9)  # 防 0.3/0.1 = 2.99999...
+    result = n_steps * step_size
+    # round 到与 step_size 同样的小数位避免 0.30000000004
+    # step_size = "0.001" → 3 decimal places
+    s = f"{step_size:.10f}".rstrip("0").rstrip(".")
+    decimals = len(s.split(".")[-1]) if "." in s else 0
+    return round(result, decimals)
+
+
+def round_price_to_tick(price: float, tick_size: float) -> float:
+    """把 price round 到 tick_size 倍数 (满足 PRICE_FILTER)."""
+    if tick_size <= 0:
+        raise ValueError(f"tick_size 必须 > 0, got {tick_size}")
+    if price < 0:
+        raise ValueError(f"price 不能为负, got {price}")
+    n_ticks = round(price / tick_size)
+    result = n_ticks * tick_size
+    s = f"{tick_size:.10f}".rstrip("0").rstrip(".")
+    decimals = len(s.split(".")[-1]) if "." in s else 0
+    return round(result, decimals)
 
 
 # ============================================================================
@@ -308,6 +342,41 @@ class BinanceClient:
     def get_exchange_info(self) -> dict:
         """获取所有 symbol 的交易规则 (minNotional / minQty / stepSize / 等)."""
         return self._public_request("GET", "/fapi/v1/exchangeInfo", {})
+
+    def get_symbol_filters(self, symbol: str) -> dict:
+        """提取该 symbol 的交易精度规则. Returns dict:
+            {
+              'step_size': 0.001,      # LOT_SIZE 数量步长
+              'min_qty': 0.001,        # LOT_SIZE 最小数量
+              'max_qty': 1000.0,       # LOT_SIZE 最大
+              'min_notional': 100.0,   # MIN_NOTIONAL 最小订单总额
+              'tick_size': 0.10,       # PRICE_FILTER 价格步长
+              'quantity_precision': 3, # 数量小数位
+              'price_precision': 2,    # 价格小数位
+            }
+        测试网 vs 主网过滤器可能不同, 启动时必查.
+        """
+        ei = self.get_exchange_info()
+        sym = symbol.upper()
+        sym_info = next((s for s in ei.get("symbols", []) if s.get("symbol") == sym), None)
+        if sym_info is None:
+            raise BinanceError(f"symbol {sym} 不在 exchangeInfo 中 (可能下架或拼写错)")
+        if sym_info.get("status") != "TRADING":
+            log.warning(f"⚠️ {sym} status={sym_info.get('status')} 非 TRADING")
+        filters = {f["filterType"]: f for f in sym_info.get("filters", [])}
+        lot = filters.get("LOT_SIZE", {})
+        notional = filters.get("MIN_NOTIONAL", {}) or filters.get("NOTIONAL", {})
+        price_f = filters.get("PRICE_FILTER", {})
+        return {
+            "step_size":           float(lot.get("stepSize", 0.001)),
+            "min_qty":             float(lot.get("minQty", 0.001)),
+            "max_qty":             float(lot.get("maxQty", 0)),
+            "min_notional":        float(notional.get("notional", 0) or notional.get("minNotional", 0)),
+            "tick_size":           float(price_f.get("tickSize", 0.01)),
+            "quantity_precision":  int(sym_info.get("quantityPrecision", 3)),
+            "price_precision":     int(sym_info.get("pricePrecision", 2)),
+            "status":              sym_info.get("status"),
+        }
 
     # ============================================================
     # Signed API methods (需要签名)
@@ -808,9 +877,11 @@ def _cli_main() -> int:
     p.add_argument("--auto-setup", action="store_true",
                    help="自动修正配置 (set isolated + 3x + one-way mode), 需 --live")
     p.add_argument("--place-test-order", action="store_true",
-                   help="下一个 $20 BTCUSDT 测试市价单 (默认 dry-run, 默认 BUY)")
+                   help="下一个测试市价单 (默认 dry-run, 默认 BUY, 默认 ~$100)")
     p.add_argument("--side", type=str, default="BUY", choices=["BUY", "SELL"],
                    help="测试订单方向 (BUY=开多, SELL=开空), 默认 BUY")
+    p.add_argument("--notional", type=float, default=100.0,
+                   help="测试单 notional USDT (默认 100, 会按 LOT_SIZE 和 minNotional 调整)")
     p.add_argument("--cancel-all", action="store_true",
                    help="撤销该 symbol 所有挂单 (默认 dry-run)")
     p.add_argument("--live", action="store_true",
@@ -924,21 +995,44 @@ def _cli_main() -> int:
 
     if args.place_test_order:
         sym = args.symbol.upper()
-        # 拉当前价估算 qty (用 1m kline 最新收盘价)
+        # 1. 拉 symbol filters (LOT_SIZE / MIN_NOTIONAL / PRICE_FILTER)
+        filters = client.get_symbol_filters(sym)
+        print(f"📋 {sym} filters: step_size={filters['step_size']} "
+              f"min_qty={filters['min_qty']} min_notional={filters['min_notional']} "
+              f"qty_precision={filters['quantity_precision']}")
+        # 2. 拉当前价
         klines = client.get_klines(sym, interval="1m", limit=1)
         if not klines:
             print(f"   ✗ 无法获取 {sym} 当前价, 取消")
             return 1
         last_close = float(klines[0][4])
-        notional_usd = 20.0
-        qty = round(notional_usd / last_close, 6)  # 6 位精度, 实际由 LOT_SIZE 决定
+        # 3. 按 LOT_SIZE round 数量
+        raw_qty = args.notional / last_close
+        qty = round_qty_down_to_step(raw_qty, filters["step_size"])
+        # 不足 min_qty 提到 min_qty
+        if qty < filters["min_qty"]:
+            qty = filters["min_qty"]
+        # 不足 min_notional 提到能满足的最小档
+        actual_notional = qty * last_close
+        if filters["min_notional"] > 0 and actual_notional < filters["min_notional"]:
+            need_qty = filters["min_notional"] / last_close
+            # 向上 round 到 step 倍数
+            qty = math.ceil(need_qty / filters["step_size"]) * filters["step_size"]
+            qty = round(qty, filters["quantity_precision"])
+            actual_notional = qty * last_close
+            print(f"   ⚠️ 请求 ${args.notional:.2f} 不足 minNotional ${filters['min_notional']:.2f}, "
+                  f"调整为 ${actual_notional:.2f}")
         coid = f"cresus_test_{int(time.time())}"[:36]
-        print(f"📝 Place test order: {args.side} {qty} {sym} @ market (~${notional_usd}, "
-              f"last_close=${last_close:.2f}), coid={coid}")
-        resp = client.place_market_order(sym, args.side, qty, client_order_id=coid)
-        print(f"   响应: {json.dumps(resp, indent=2, ensure_ascii=False)}")
-        if not dry_run and resp.get("status") not in ("DRY_RUN",):
-            print(f"   ⚠️ 真的下单了! 记得用 --cancel-all 或手动平仓")
+        print(f"📝 Place test order: {args.side} {qty} {sym} @ market "
+              f"(实际 ~${actual_notional:.2f}, last_close=${last_close:.2f}), coid={coid}")
+        try:
+            resp = client.place_market_order(sym, args.side, qty, client_order_id=coid)
+            print(f"   响应: {json.dumps(resp, indent=2, ensure_ascii=False)}")
+            if not dry_run and resp.get("status") not in ("DRY_RUN",):
+                print(f"   ⚠️ 真的下单了! 记得用 --cancel-all 或手动平仓")
+        except BinanceError as e:
+            print(f"   ✗ 下单失败: {e}")
+            return 1
 
     if args.cancel_all:
         sym = args.symbol.upper()
