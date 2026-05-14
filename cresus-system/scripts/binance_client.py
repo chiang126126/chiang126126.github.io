@@ -518,29 +518,36 @@ class BinanceClient:
         quantity: Optional[float] = None,
         close_position: bool = False,
         client_order_id: Optional[str] = None,
-        working_type: str = "CONTRACT_PRICE",
+        working_type: Optional[str] = None,
         price_protect: bool = False,
+        response_type: Optional[str] = None,
         dry_run: Optional[bool] = None,
     ) -> dict:
         """STOP_MARKET 止损单.
 
-        默认 close_position=False + 需 quantity (兼容性最好, testnet/mainnet 都接)
-        若 close_position=True 则不需 quantity (触发时平整仓), 但部分 testnet 不支持.
+        默认参数极简 — 只发送必需字段, 避免 Binance 对某些可选字段的严格校验.
 
-        side 是 *平仓方向*:
-        - LONG 持仓的 SL: side='SELL'
-        - SHORT 持仓的 SL: side='BUY'
+        close_position 模式 (close_position=True): 不需 quantity, 触发平整仓.
+        quantity 模式 (close_position=False, 默认): 需指定 quantity + reduceOnly=true.
 
-        working_type: 'CONTRACT_PRICE' (默认, 最新成交价触发) 或 'MARK_PRICE' (标记价, 防插针).
-        price_protect: 防插针保护 (默认 False; 部分账户/testnet 开启会拒单 -4120).
+        side 是 *平仓方向*: LONG 持仓的 SL = SELL; SHORT 持仓的 SL = BUY.
+
+        可选参数:
+        - working_type: None (默认 = 不发送, 让 Binance 用 CONTRACT_PRICE)
+          可显式 'CONTRACT_PRICE' / 'MARK_PRICE'
+        - price_protect: 防插针 (默认 False)
+        - response_type: None (默认 = 不发送, 让 Binance 用 ACK 适合 pending 单)
+          可显式 'ACK' / 'RESULT' / 'FULL'
         """
         side = side.upper()
         if side not in ("BUY", "SELL"):
             raise ValueError(f"side 必须是 BUY 或 SELL, got {side!r}")
         if stop_price <= 0:
             raise ValueError(f"stop_price 必须 > 0, got {stop_price}")
-        if working_type not in ("CONTRACT_PRICE", "MARK_PRICE"):
-            raise ValueError(f"working_type 必须是 CONTRACT_PRICE 或 MARK_PRICE")
+        if working_type is not None and working_type not in ("CONTRACT_PRICE", "MARK_PRICE"):
+            raise ValueError(f"working_type 必须是 CONTRACT_PRICE 或 MARK_PRICE 或 None")
+        if response_type is not None and response_type not in ("ACK", "RESULT", "FULL"):
+            raise ValueError(f"response_type 必须是 ACK/RESULT/FULL 或 None")
         # close_position=True 和 quantity 互斥
         if close_position and quantity is not None:
             raise ValueError("close_position=True 时不能同时指定 quantity")
@@ -548,16 +555,19 @@ class BinanceClient:
             raise ValueError("close_position=False 时必须指定 quantity")
         is_dry = self._is_dry_run(dry_run)
         self._check_live_authorization(is_dry)
+        # 极简参数集 — 只放必需字段, 其他全部 opt-in
         params = {
             "symbol": symbol.upper(),
             "side": side,
             "type": "STOP_MARKET",
             "stopPrice": _format_price(stop_price),
-            "workingType": working_type,
-            "newOrderRespType": "RESULT",
         }
+        if working_type is not None:
+            params["workingType"] = working_type
         if price_protect:
             params["priceProtect"] = "true"
+        if response_type is not None:
+            params["newOrderRespType"] = response_type
         if close_position:
             params["closePosition"] = "true"
         else:
@@ -1201,6 +1211,10 @@ class BinanceClient:
 
     def _signed_request(self, method: str, path: str, params: dict) -> Union[dict, list]:
         self._bucket.acquire(weight=1)
+        # DEBUG 打印发送的 params (不含 signature, signature 是 HMAC hash 不泄露 secret)
+        if log.isEnabledFor(logging.DEBUG):
+            safe_params = {k: v for k, v in params.items()}
+            log.debug(f"→ {method} {path}  params={safe_params}")
         query = self._build_signed_query(params)
         url = f"{self.base_url}{path}?{query}"
         return self._do_request(method, url, signed=True)
@@ -1370,9 +1384,12 @@ def _cli_main() -> int:
     p.add_argument("--live", action="store_true",
                    help="🛑 关闭 dry-run, 真下单. 主网还需 ~/.allow-live 文件")
     p.add_argument("--leverage", type=int, default=3, help="期望/设置杠杆 (默认 3)")
+    p.add_argument("--verbose", "-v", action="store_true",
+                   help="DEBUG 级日志 (打印每个 API 请求的 params, 不含 secret)")
     args = p.parse_args()
 
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    log_level = logging.DEBUG if args.verbose else logging.INFO
+    logging.basicConfig(level=log_level, format="%(levelname)s %(message)s")
 
     key, secret, env_testnet = load_credentials()
     use_testnet = not args.mainnet  # CLI 优先级最高
