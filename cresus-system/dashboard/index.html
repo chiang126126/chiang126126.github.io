@@ -402,6 +402,225 @@
   .paper-day-usdt.down { color: #ff5252; }
   .paper-day-reason { text-align: center; font-size: 13px; }
 
+  /* ===== 📅 每日复盘 v2 — 三视图切换 ===== */
+  .paper-review-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+    padding: 3px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 7px;
+  }
+  .paper-review-tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    font-size: 11.5px;
+    padding: 6px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .paper-review-tab:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+  .paper-review-tab.active {
+    background: rgba(140,99,255,0.18);
+    color: #c7b8ff;
+    font-weight: 600;
+  }
+
+  .paper-review-toolbar {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .paper-review-nav-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--text);
+    font-size: 14px;
+    width: 28px;
+    height: 28px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+  .paper-review-nav-btn:hover:not(:disabled) { background: rgba(140,99,255,0.15); }
+  .paper-review-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .paper-review-date-input {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--text);
+    font-size: 12px;
+    padding: 5px 8px;
+    border-radius: 5px;
+    font-family: inherit;
+    color-scheme: dark;
+  }
+  .paper-review-jump-today {
+    background: rgba(140,99,255,0.12);
+    border: 1px solid rgba(140,99,255,0.25);
+    color: #c7b8ff;
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .paper-review-jump-today:hover { background: rgba(140,99,255,0.2); }
+  .paper-review-day-label {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+    margin-left: auto;
+  }
+
+  .paper-review-stats {
+    background: rgba(255,255,255,0.03);
+    border-radius: 7px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+  }
+  .paper-review-stats-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+  .paper-review-stats-head-left {
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+  .paper-review-stats-head-pnl {
+    font-size: 18px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .paper-review-stats-head-pnl.up   { color: #00e676; }
+  .paper-review-stats-head-pnl.down { color: #ff5252; }
+  .paper-review-stat-line {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 8px;
+    font-size: 11px;
+    padding: 3px 0;
+    align-items: center;
+  }
+  .paper-review-stat-key { color: var(--text-dim); }
+  .paper-review-stat-val { color: var(--text); font-variant-numeric: tabular-nums; }
+  .paper-review-stat-val .chip {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-right: 4px;
+    margin-bottom: 2px;
+    font-size: 10.5px;
+    background: rgba(255,255,255,0.05);
+  }
+  .paper-review-stat-val .chip.long  { background: rgba(0,200,83,0.12); color: #00e676; }
+  .paper-review-stat-val .chip.short { background: rgba(255,82,82,0.12); color: #ff5252; }
+
+  .paper-review-empty {
+    text-align: center;
+    padding: 24px 12px;
+    color: var(--text-dim);
+    font-size: 12px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 7px;
+  }
+
+  .paper-review-heatmap {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+  .paper-review-heatmap-weekday {
+    text-align: center;
+    font-size: 9.5px;
+    color: var(--text-dim);
+    padding: 2px 0;
+  }
+  .paper-review-heatmap-cell {
+    aspect-ratio: 1.2;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 5px;
+    padding: 4px 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.12s;
+    overflow: hidden;
+    min-height: 48px;
+  }
+  .paper-review-heatmap-cell:hover {
+    border-color: rgba(140,99,255,0.5);
+    transform: translateY(-1px);
+  }
+  .paper-review-heatmap-cell.empty { opacity: 0.35; cursor: default; }
+  .paper-review-heatmap-cell.empty:hover { transform: none; border-color: rgba(255,255,255,0.04); }
+  .paper-review-heatmap-cell.win    { background: rgba(0,200,83,0.10); border-color: rgba(0,200,83,0.30); }
+  .paper-review-heatmap-cell.win.strong { background: rgba(0,200,83,0.22); border-color: rgba(0,200,83,0.55); }
+  .paper-review-heatmap-cell.loss   { background: rgba(255,82,82,0.10); border-color: rgba(255,82,82,0.30); }
+  .paper-review-heatmap-cell.loss.strong { background: rgba(255,82,82,0.22); border-color: rgba(255,82,82,0.55); }
+  .paper-review-heatmap-cell.scratch { background: rgba(255,213,79,0.08); border-color: rgba(255,213,79,0.25); }
+  .paper-review-heatmap-cell.today { box-shadow: inset 0 0 0 2px rgba(140,99,255,0.45); }
+  .paper-review-heatmap-day-num { font-size: 11px; font-weight: 600; color: var(--text); }
+  .paper-review-heatmap-cell.empty .paper-review-heatmap-day-num { color: var(--text-dim); font-weight: 400; }
+  .paper-review-heatmap-day-pnl {
+    font-size: 9.5px;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .paper-review-heatmap-day-pnl.up   { color: #00e676; }
+  .paper-review-heatmap-day-pnl.down { color: #ff5252; }
+  .paper-review-heatmap-day-n {
+    font-size: 9px;
+    color: var(--text-dim);
+    text-align: right;
+  }
+  .paper-review-heatmap-legend {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 10px;
+    color: var(--text-dim);
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+  }
+  .paper-review-heatmap-legend-swatch {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    margin-right: 3px;
+    vertical-align: middle;
+  }
+
+  @media (max-width: 720px) {
+    .paper-review-stat-line { grid-template-columns: 60px 1fr; font-size: 10.5px; }
+    .paper-review-stats-head-pnl { font-size: 16px; }
+    .paper-review-tab { font-size: 10.5px; padding: 5px 4px; }
+    .paper-review-heatmap-day-pnl { font-size: 8.5px; }
+    .paper-review-heatmap-cell { min-height: 44px; padding: 3px; }
+    .paper-review-heatmap-day-num { font-size: 10px; }
+    .paper-review-heatmap-day-n { font-size: 8.5px; }
+    .paper-review-day-label { font-size: 11px; width: 100%; margin-left: 0; }
+    .paper-review-date-input { font-size: 13px; }
+  }
+
   @media (max-width: 720px) {
     .paper-day > summary {
       grid-template-columns: auto 1fr auto;
@@ -3907,9 +4126,9 @@ function renderPaperPanel(data, shadowData) {
     body += `<div class="paper-empty">等待第一个钻石信号触发…</div>`;
   }
 
-  // ===== 📅 每日复盘日历 =====
+  // ===== 📅 每日复盘 v2 — 三视图切换 =====
   if (closed.length > 0) {
-    body += renderDailyCalendar(closed, notionalDefault);
+    body += renderDailyReview(closed, notionalDefault);
   }
 
   // ===== Phase 4 Shadow: premium 影子追踪 section =====
@@ -3918,68 +4137,312 @@ function renderPaperPanel(data, shadowData) {
   }
 
   document.getElementById("paper-body").innerHTML = body;
+
+  // innerHTML 设完后再 wire 事件 (tab / 日期选择器 / 热力图点击)
+  if (closed.length > 0) {
+    initPaperReviewInteractions(closed, notionalDefault);
+  }
 }
 
-function renderDailyCalendar(closedTrades, defaultNotional) {
-  // 按本地日期分组 closed_at (UTC ISO → 本地)
+// ===== 📅 每日复盘 v2 — 三视图: 单日深度 / 14天列表 / 月历热力图 =====
+
+const PAPER_REASON_ICON = {
+  hit_sl:      { icon: "🛑", label: "止损" },
+  hit_be_sl:   { icon: "⚖",  label: "BE 平仓" },
+  hit_b_trail: { icon: "🛡", label: "B Trail" },
+  hit_trail:   { icon: "🚀", label: "C Trail 跟踪止盈" },
+  hit_tp1:     { icon: "🎯", label: "TP1" },
+  hit_tp2:     { icon: "🎯", label: "TP2" },
+  timeout:     { icon: "⏱", label: "超时" },
+};
+
+function _paperUsdtPnl(t, defaultNotional) {
+  if (t.realized_usdt_pnl != null) return t.realized_usdt_pnl;
+  const notional = t.notional_usdt || defaultNotional || 400;
+  return (t.realized_pnl_pct || 0) * notional / 100;
+}
+function _paperFmtUsdt(v) { return (v >= 0 ? "+$" : "-$") + Math.abs(v).toFixed(2); }
+function _paperFmtPct(v)  { return (v >= 0 ? "+" : "") + v.toFixed(2) + "%"; }
+
+function _paperGroupByDate(closedTrades) {
   const byDate = {};
   for (const t of closedTrades) {
     if (!t.closed_at) continue;
     const d = new Date(t.closed_at);
     if (isNaN(d.getTime())) continue;
-    const key = d.toLocaleDateString("sv-SE"); // YYYY-MM-DD
+    const key = d.toLocaleDateString("sv-SE"); // YYYY-MM-DD local TZ
     if (!byDate[key]) byDate[key] = [];
     byDate[key].push(t);
   }
-  const dates = Object.keys(byDate).sort().reverse();
-  if (dates.length === 0) return "";
+  const dates = Object.keys(byDate).sort(); // ascending
+  return { byDate, dates };
+}
 
-  const usdtPnl = (t) => {
-    if (t.realized_usdt_pnl != null) return t.realized_usdt_pnl;
-    const notional = t.notional_usdt || defaultNotional || 400;
-    return (t.realized_pnl_pct || 0) * notional / 100;
-  };
-  const fmtU = v => (v >= 0 ? "+$" : "-$") + Math.abs(v).toFixed(2);
-  const startCapital = 2000;
+function _paperDayStats(trades, defaultNotional) {
+  const n = trades.length;
+  const wins   = trades.filter(t => (t.realized_pnl_pct || 0) >  0.1).length;
+  const losses = trades.filter(t => (t.realized_pnl_pct || 0) < -0.1).length;
+  const scratch = n - wins - losses;
+  const decisive = wins + losses;
+  const winRate = decisive > 0 ? Math.round(wins / decisive * 100) : null;
+  const totUsdt = trades.reduce((s, t) => s + _paperUsdtPnl(t, defaultNotional), 0);
+  const longs  = trades.filter(t => t.direction === "LONG");
+  const shorts = trades.filter(t => t.direction === "SHORT");
+  const longWins  = longs.filter(t => (t.realized_pnl_pct || 0) > 0.1).length;
+  const shortWins = shorts.filter(t => (t.realized_pnl_pct || 0) > 0.1).length;
+  const reasonCounts = {};
+  for (const t of trades) {
+    const r = t.close_reason || "?";
+    reasonCounts[r] = (reasonCounts[r] || 0) + 1;
+  }
+  const scoreCounts = {};
+  for (const t of trades) {
+    const s = t.conviction_score != null ? t.conviction_score : "?";
+    if (!scoreCounts[s]) scoreCounts[s] = { n: 0, wins: 0 };
+    scoreCounts[s].n++;
+    if ((t.realized_pnl_pct || 0) > 0.1) scoreCounts[s].wins++;
+  }
+  const best  = trades.reduce((b, t) => (t.realized_pnl_pct || 0) > ((b && b.realized_pnl_pct) || -Infinity) ? t : b, null);
+  const worst = trades.reduce((b, t) => (t.realized_pnl_pct || 0) < ((b && b.realized_pnl_pct) ||  Infinity) ? t : b, null);
+  return { n, wins, losses, scratch, winRate, totUsdt,
+    longs: longs.length, shorts: shorts.length, longWins, shortWins,
+    reasonCounts, scoreCounts, best, worst };
+}
 
-  let html = `<div class="paper-section-title" style="margin-top:18px">📅 每日复盘 (最近 ${Math.min(dates.length, 14)} 天)</div>`;
-  html += `<div class="paper-calendar">`;
+function renderDailyReview(closed, notionalDefault) {
+  window._paperReviewData = { closed, notional: notionalDefault };
+  let view = "single";
+  try { view = localStorage.getItem("paper_review_view") || "single"; } catch (_) {}
+  if (!["single", "list", "heatmap"].includes(view)) view = "single";
+  return `
+    <div class="paper-section-title" style="margin-top:18px">📅 每日复盘</div>
+    <div class="paper-review-tabs" id="paper-review-tabs">
+      <button class="paper-review-tab ${view === "single"  ? "active" : ""}" data-view="single">📊 单日深度</button>
+      <button class="paper-review-tab ${view === "list"    ? "active" : ""}" data-view="list">📋 14天列表</button>
+      <button class="paper-review-tab ${view === "heatmap" ? "active" : ""}" data-view="heatmap">🔥 月历热力</button>
+    </div>
+    <div id="paper-review-body"></div>
+  `;
+}
 
-  for (const date of dates.slice(0, 14)) {
-    const trades = byDate[date];
+function initPaperReviewInteractions(closed, notional) {
+  const { byDate, dates } = _paperGroupByDate(closed);
+  window._paperReviewIdx = { byDate, dates };
+  const tabsEl = document.getElementById("paper-review-tabs");
+  if (tabsEl) {
+    tabsEl.querySelectorAll(".paper-review-tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const view = btn.dataset.view;
+        try { localStorage.setItem("paper_review_view", view); } catch (_) {}
+        tabsEl.querySelectorAll(".paper-review-tab").forEach(b => b.classList.toggle("active", b === btn));
+        _paperRenderView(view);
+      });
+    });
+  }
+  let view = "single";
+  try { view = localStorage.getItem("paper_review_view") || "single"; } catch (_) {}
+  if (!["single", "list", "heatmap"].includes(view)) view = "single";
+  _paperRenderView(view);
+}
+
+function _paperRenderView(view) {
+  const body = document.getElementById("paper-review-body");
+  if (!body) return;
+  const idx = window._paperReviewIdx || {};
+  const data = window._paperReviewData || {};
+  const { byDate, dates } = idx;
+  const { notional } = data;
+  if (!byDate) return;
+  if (view === "single") {
+    body.innerHTML = renderSingleDayView(byDate, dates, notional);
+    _paperWireSingleDayHandlers();
+  } else if (view === "list") {
+    body.innerHTML = render14DayListView(byDate, dates, notional);
+  } else if (view === "heatmap") {
+    body.innerHTML = renderHeatmapView(byDate, dates, notional);
+    _paperWireHeatmapHandlers();
+  }
+}
+
+function _paperGetSelectedDate(allDates) {
+  let stored = null;
+  try { stored = localStorage.getItem("paper_review_date"); } catch (_) {}
+  if (stored && /^\d{4}-\d{2}-\d{2}$/.test(stored)) return stored;
+  if (allDates && allDates.length > 0) return allDates[allDates.length - 1];
+  return new Date().toLocaleDateString("sv-SE");
+}
+
+function _paperSetSelectedDate(date) {
+  try { localStorage.setItem("paper_review_date", date); } catch (_) {}
+}
+
+function renderSingleDayView(byDate, allDates, notional) {
+  const today = new Date().toLocaleDateString("sv-SE");
+  const date = _paperGetSelectedDate(allDates);
+  const trades = (byDate[date] || []).slice().sort((a, b) => (b.closed_at || "").localeCompare(a.closed_at || ""));
+  // 跳到相邻 *有交易* 的日期 (skip empty days)
+  const prevDate = (allDates || []).filter(d => d < date).slice(-1)[0] || null;
+  const nextDate = (allDates || []).find(d => d > date) || null;
+  const dObj = new Date(date + "T12:00:00");
+  const weekdays = ["周日","周一","周二","周三","周四","周五","周六"];
+  const dayLabel = `${weekdays[dObj.getDay()]} ${dObj.getMonth()+1}月${dObj.getDate()}日`;
+  const isToday = (date === today);
+
+  const toolbar = `
+    <div class="paper-review-toolbar">
+      <button class="paper-review-nav-btn" id="prev-day-btn" ${!prevDate ? "disabled" : ""} title="上一交易日">◀</button>
+      <input type="date" id="paper-review-date" class="paper-review-date-input" value="${date}" max="${today}">
+      <button class="paper-review-nav-btn" id="next-day-btn" ${!nextDate ? "disabled" : ""} title="下一交易日">▶</button>
+      ${!isToday ? `<button class="paper-review-jump-today" id="jump-today-btn">今日</button>` : ""}
+      <span class="paper-review-day-label">${dayLabel}${isToday ? " · 今日" : ""}</span>
+    </div>
+  `;
+
+  if (trades.length === 0) {
+    return toolbar + `<div class="paper-review-empty">📭 ${dayLabel} 无交易记录</div>`;
+  }
+
+  const stats = _paperDayStats(trades, notional);
+  const pnlCls = stats.totUsdt > 0 ? "up" : (stats.totUsdt < 0 ? "down" : "");
+  const totPct = stats.totUsdt / 2000 * 100;
+
+  const reasonChips = Object.entries(stats.reasonCounts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([r, c]) => {
+      const r2 = PAPER_REASON_ICON[r] || { icon: "?", label: r };
+      return `<span class="chip" title="${escapeHtml(r2.label)}">${r2.icon} ${c}</span>`;
+    }).join("");
+
+  const scoreChips = Object.entries(stats.scoreCounts)
+    .sort((a, b) => String(a[0]).localeCompare(String(b[0])))
+    .map(([s, v]) => {
+      const winColor = v.wins === v.n ? "#00e676" : (v.wins === 0 ? "#ff5252" : "var(--text)");
+      return `<span class="chip" title="score=${s}">S${s} <strong style="color:${winColor}">${v.wins}/${v.n}</strong></span>`;
+    }).join("");
+
+  const statsCard = `
+    <div class="paper-review-stats">
+      <div class="paper-review-stats-head">
+        <div class="paper-review-stats-head-left">
+          ${stats.n} 笔 · ${stats.winRate != null ? "胜率 " + stats.winRate + "%" : "—"} · ${stats.wins}胜 ${stats.losses}负${stats.scratch ? " " + stats.scratch + "平" : ""}
+        </div>
+        <div class="paper-review-stats-head-pnl ${pnlCls}">
+          ${_paperFmtUsdt(stats.totUsdt)} <span style="font-size:11px;opacity:0.7">(${_paperFmtPct(totPct)})</span>
+        </div>
+      </div>
+      ${stats.best && (stats.best.realized_pnl_pct || 0) > 0 ? `<div class="paper-review-stat-line">
+        <span class="paper-review-stat-key">最佳</span>
+        <span class="paper-review-stat-val">${escapeHtml(stats.best.symbol || "?")} ${stats.best.direction || ""} <strong style="color:#00e676">${_paperFmtPct(stats.best.realized_pnl_pct || 0)}</strong></span>
+      </div>` : ""}
+      ${stats.worst && stats.worst !== stats.best && (stats.worst.realized_pnl_pct || 0) < 0 ? `<div class="paper-review-stat-line">
+        <span class="paper-review-stat-key">最差</span>
+        <span class="paper-review-stat-val">${escapeHtml(stats.worst.symbol || "?")} ${stats.worst.direction || ""} <strong style="color:#ff5252">${_paperFmtPct(stats.worst.realized_pnl_pct || 0)}</strong></span>
+      </div>` : ""}
+      <div class="paper-review-stat-line">
+        <span class="paper-review-stat-key">方向</span>
+        <span class="paper-review-stat-val">
+          ${stats.longs > 0 ? `<span class="chip long">多 ${stats.longWins}/${stats.longs}</span>` : ""}
+          ${stats.shorts > 0 ? `<span class="chip short">空 ${stats.shortWins}/${stats.shorts}</span>` : ""}
+        </span>
+      </div>
+      ${scoreChips ? `<div class="paper-review-stat-line">
+        <span class="paper-review-stat-key">Score</span>
+        <span class="paper-review-stat-val">${scoreChips}</span>
+      </div>` : ""}
+      ${reasonChips ? `<div class="paper-review-stat-line">
+        <span class="paper-review-stat-key">出场</span>
+        <span class="paper-review-stat-val">${reasonChips}</span>
+      </div>` : ""}
+    </div>
+  `;
+
+  const tradeRows = trades.map(t => {
+    const time = (t.closed_at || "").slice(11, 16);
+    const pct = t.realized_pnl_pct || 0;
+    const u = _paperUsdtPnl(t, notional);
+    const pCls = pct > 0 ? "up" : (pct < 0 ? "down" : "");
+    const r = PAPER_REASON_ICON[t.close_reason] || { icon: "?", label: t.close_reason || "" };
+    const dirCls = t.direction === "LONG" ? "long" : "short";
+    const scoreTag = t.conviction_score != null ? `<span style="font-size:9.5px;opacity:0.6"> · S${t.conviction_score}</span>` : "";
+    return `<div class="paper-day-trade">
+      <span class="paper-day-time">${time}</span>
+      <span><strong>${escapeHtml(t.symbol || "?")}</strong> <span class="paper-day-dir ${dirCls}">${t.direction || ""}</span>${scoreTag}</span>
+      <span class="paper-pnl ${pCls}">${pct >= 0 ? "+" : ""}${pct.toFixed(2)}%</span>
+      <span class="paper-day-usdt ${pCls}">${_paperFmtUsdt(u)}</span>
+      <span class="paper-day-reason" title="${escapeHtml(r.label)}">${r.icon}</span>
+    </div>`;
+  }).join("");
+
+  const tradesBlock = `<div class="paper-day-trades" style="background:rgba(255,255,255,0.02);border-radius:7px;padding:6px 12px;border:none">${tradeRows}</div>`;
+
+  return toolbar + statsCard + tradesBlock;
+}
+
+function _paperWireSingleDayHandlers() {
+  const dateEl = document.getElementById("paper-review-date");
+  if (dateEl) {
+    dateEl.addEventListener("change", () => {
+      if (dateEl.value) {
+        _paperSetSelectedDate(dateEl.value);
+        _paperRenderView("single");
+      }
+    });
+  }
+  const prevBtn = document.getElementById("prev-day-btn");
+  if (prevBtn && !prevBtn.disabled) {
+    prevBtn.addEventListener("click", () => {
+      const idx = window._paperReviewIdx || {};
+      const cur = _paperGetSelectedDate(idx.dates);
+      const target = (idx.dates || []).filter(d => d < cur).slice(-1)[0];
+      if (target) { _paperSetSelectedDate(target); _paperRenderView("single"); }
+    });
+  }
+  const nextBtn = document.getElementById("next-day-btn");
+  if (nextBtn && !nextBtn.disabled) {
+    nextBtn.addEventListener("click", () => {
+      const idx = window._paperReviewIdx || {};
+      const cur = _paperGetSelectedDate(idx.dates);
+      const target = (idx.dates || []).find(d => d > cur);
+      if (target) { _paperSetSelectedDate(target); _paperRenderView("single"); }
+    });
+  }
+  const todayBtn = document.getElementById("jump-today-btn");
+  if (todayBtn) {
+    todayBtn.addEventListener("click", () => {
+      _paperSetSelectedDate(new Date().toLocaleDateString("sv-SE"));
+      _paperRenderView("single");
+    });
+  }
+}
+
+function render14DayListView(byDate, allDates, notional) {
+  const datesDesc = (allDates || []).slice().reverse();
+  if (datesDesc.length === 0) return `<div class="paper-review-empty">📭 暂无已平仓数据</div>`;
+  let html = `<div class="paper-calendar">`;
+  for (const date of datesDesc.slice(0, 14)) {
+    const trades = byDate[date].slice().sort((a, b) => (b.closed_at || "").localeCompare(a.closed_at || ""));
     const n = trades.length;
-    const wins  = trades.filter(t => (t.realized_pnl_pct || 0) >  0.1).length;
-    const losses= trades.filter(t => (t.realized_pnl_pct || 0) < -0.1).length;
+    const wins   = trades.filter(t => (t.realized_pnl_pct || 0) >  0.1).length;
+    const losses = trades.filter(t => (t.realized_pnl_pct || 0) < -0.1).length;
     const scratch = n - wins - losses;
-    const totUsdt = trades.reduce((s, t) => s + usdtPnl(t), 0);
-    const totPct = totUsdt / startCapital * 100;
+    const totUsdt = trades.reduce((s, t) => s + _paperUsdtPnl(t, notional), 0);
+    const totPct = totUsdt / 2000 * 100;
     const cls = totUsdt > 0.01 ? "win" : (totUsdt < -0.01 ? "loss" : "");
     const pnlCls = totUsdt > 0 ? "up" : (totUsdt < 0 ? "down" : "");
-
-    trades.sort((a, b) => (b.closed_at || "").localeCompare(a.closed_at || ""));
 
     const tradeRows = trades.map(t => {
       const time = (t.closed_at || "").slice(11, 16);
       const pct = t.realized_pnl_pct || 0;
-      const u = usdtPnl(t);
+      const u = _paperUsdtPnl(t, notional);
       const pCls = pct > 0 ? "up" : (pct < 0 ? "down" : "");
-      const reasonMap = {
-        "hit_sl":     "🛑",
-        "hit_be_sl":  "⚖",
-        "hit_b_trail":"🛡",
-        "hit_trail":  "🚀",
-        "hit_tp1":    "🎯",
-        "hit_tp2":    "🎯",
-        "timeout":    "⏱",
-      };
-      const r = reasonMap[t.close_reason] || "?";
+      const r = PAPER_REASON_ICON[t.close_reason] || { icon: "?", label: t.close_reason || "" };
       const dirCls = t.direction === "LONG" ? "long" : "short";
       return `<div class="paper-day-trade">
         <span class="paper-day-time">${time}</span>
         <span><strong>${escapeHtml(t.symbol || "?")}</strong> <span class="paper-day-dir ${dirCls}">${t.direction || ""}</span></span>
         <span class="paper-pnl ${pCls}">${pct >= 0 ? "+" : ""}${pct.toFixed(2)}%</span>
-        <span class="paper-day-usdt ${pCls}">${fmtU(u)}</span>
-        <span class="paper-day-reason" title="${t.close_reason || ''}">${r}</span>
+        <span class="paper-day-usdt ${pCls}">${_paperFmtUsdt(u)}</span>
+        <span class="paper-day-reason" title="${escapeHtml(r.label)}">${r.icon}</span>
       </div>`;
     }).join("");
 
@@ -3988,13 +4451,95 @@ function renderDailyCalendar(closedTrades, defaultNotional) {
         <span class="paper-day-date">${date}</span>
         <span class="paper-day-count">${n} 笔</span>
         <span class="paper-day-record">${wins}胜 ${losses}负${scratch > 0 ? " " + scratch + "平" : ""}</span>
-        <span class="paper-day-pnl ${pnlCls}">${fmtU(totUsdt)} (${totPct >= 0 ? "+" : ""}${totPct.toFixed(2)}%)</span>
+        <span class="paper-day-pnl ${pnlCls}">${_paperFmtUsdt(totUsdt)} (${_paperFmtPct(totPct)})</span>
       </summary>
       <div class="paper-day-trades">${tradeRows}</div>
     </details>`;
   }
   html += `</div>`;
   return html;
+}
+
+function renderHeatmapView(byDate, allDates, notional) {
+  const today = new Date();
+  today.setHours(12, 0, 0, 0);
+  const DAYS_BACK = 34; // 5 weeks
+  const cells = [];
+  for (let i = DAYS_BACK; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    cells.push({ date: d.toLocaleDateString("sv-SE"), dObj: new Date(d) });
+  }
+  const padding = cells[0].dObj.getDay();
+  const todayKey = today.toLocaleDateString("sv-SE");
+
+  let maxAbsPnl = 0;
+  for (const c of cells) {
+    if (byDate[c.date]) {
+      const v = byDate[c.date].reduce((s, t) => s + _paperUsdtPnl(t, notional), 0);
+      if (Math.abs(v) > maxAbsPnl) maxAbsPnl = Math.abs(v);
+    }
+  }
+
+  const weekdayLabels = ["日", "一", "二", "三", "四", "五", "六"];
+  let html = `<div class="paper-review-heatmap-legend">
+    <span><span class="paper-review-heatmap-legend-swatch" style="background:rgba(0,200,83,0.22);border:1px solid rgba(0,200,83,0.55)"></span>盈</span>
+    <span><span class="paper-review-heatmap-legend-swatch" style="background:rgba(255,82,82,0.22);border:1px solid rgba(255,82,82,0.55)"></span>亏</span>
+    <span><span class="paper-review-heatmap-legend-swatch" style="background:rgba(255,213,79,0.08);border:1px solid rgba(255,213,79,0.25)"></span>平</span>
+    <span style="margin-left:auto;opacity:0.7">点格子→单日深度</span>
+  </div>`;
+  html += `<div class="paper-review-heatmap">`;
+  html += weekdayLabels.map(w => `<div class="paper-review-heatmap-weekday">${w}</div>`).join("");
+  for (let i = 0; i < padding; i++) {
+    html += `<div class="paper-review-heatmap-cell empty"></div>`;
+  }
+  for (const c of cells) {
+    const trades = byDate[c.date];
+    const isToday = (c.date === todayKey);
+    const dayNum = c.dObj.getDate();
+    if (!trades || trades.length === 0) {
+      html += `<div class="paper-review-heatmap-cell empty${isToday ? " today" : ""}" data-date="${c.date}" title="${c.date} · 无交易">
+        <div class="paper-review-heatmap-day-num">${dayNum}</div>
+        <div class="paper-review-heatmap-day-n">—</div>
+      </div>`;
+      continue;
+    }
+    const tot = trades.reduce((s, t) => s + _paperUsdtPnl(t, notional), 0);
+    const tN = trades.length;
+    const isWin  = tot >  0.5;
+    const isLoss = tot < -0.5;
+    const strong = (maxAbsPnl > 0 && Math.abs(tot) / maxAbsPnl > 0.5);
+    let cls = "scratch";
+    if (isWin)       cls = "win"  + (strong ? " strong" : "");
+    else if (isLoss) cls = "loss" + (strong ? " strong" : "");
+    const pnlCls = tot > 0 ? "up" : (tot < 0 ? "down" : "");
+    html += `<div class="paper-review-heatmap-cell ${cls}${isToday ? " today" : ""}" data-date="${c.date}" title="${c.date} · ${tN} 笔 · ${_paperFmtUsdt(tot)}">
+      <div class="paper-review-heatmap-day-num">${dayNum}</div>
+      <div class="paper-review-heatmap-day-pnl ${pnlCls}">${_paperFmtUsdt(tot)}</div>
+      <div class="paper-review-heatmap-day-n">${tN}笔</div>
+    </div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+function _paperWireHeatmapHandlers() {
+  document.querySelectorAll(".paper-review-heatmap-cell").forEach(cell => {
+    if (cell.classList.contains("empty")) return;
+    cell.addEventListener("click", () => {
+      const date = cell.dataset.date;
+      if (!date) return;
+      _paperSetSelectedDate(date);
+      try { localStorage.setItem("paper_review_view", "single"); } catch (_) {}
+      const tabsEl = document.getElementById("paper-review-tabs");
+      if (tabsEl) {
+        tabsEl.querySelectorAll(".paper-review-tab").forEach(b => {
+          b.classList.toggle("active", b.dataset.view === "single");
+        });
+      }
+      _paperRenderView("single");
+    });
+  });
 }
 
 

@@ -78,7 +78,7 @@ EMAIL_MIN_SCORE      = 6              # 仅 score ≥6 才发邮件 (基于 N=42
 PAPER_STATE       = Path.home() / "cresus-bot" / ".paper_trades.json"       # 本地全量 state
 PAPER_HISTORY     = Path.home() / "cresus-bot" / "paper_trades_history.json" # 推给看板
 PAPER_AUTO_CLOSE_HOURS = 4            # 4 小时未触发 SL/TP 自动平仓 (跟 OUTCOME_STAGES 4h 对齐)
-PAPER_RECENT_LIMIT = 50               # 看板只显示最近 50 个 closed
+PAPER_RECENT_LIMIT = 0                # 已废弃 (改为全量发布以支持任意日期复盘, N=1000 时 ~150KB 也可接受)
 PAPER_MIN_TIER     = "diamond"        # 只对钻石信号自动开仓 (高质量 only)
 # 模拟仓金额: 总账户 $2000, 每笔分配 $400 (20%), 最多并发 5 笔
 # 关仓后 realized P&L 回到账户余额; 已分配资金 = Σ open 仓的 notional_usdt
@@ -1739,14 +1739,15 @@ def _enrich_trade_for_publish(t: dict) -> dict:
 
 
 def _save_paper_history(state: dict, stats: dict) -> None:
-    """对外发布的 view: stats + open + 最近 N 条 closed."""
+    """对外发布的 view: stats + open + 全部 closed.
+    全量发布以支持任意日期复盘 (N=200 时 ~30KB, N=1000 时 ~150KB 也可接受)."""
     closed = state.get("closed_trades", [])
     closed_sorted = sorted(closed, key=lambda t: t.get("closed_at", ""), reverse=True)
     payload = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "stats": stats,
         "open_trades": [_enrich_trade_for_publish(t) for t in state.get("open_trades", [])],
-        "recent_closed": [_enrich_trade_for_publish(t) for t in closed_sorted[:PAPER_RECENT_LIMIT]],
+        "recent_closed": [_enrich_trade_for_publish(t) for t in closed_sorted],
         "auto_close_hours": PAPER_AUTO_CLOSE_HOURS,
         "min_tier": PAPER_MIN_TIER,
     }
@@ -1965,7 +1966,7 @@ def _save_shadow_history(state: dict, stats: dict) -> None:
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "stats": stats,
         "open_trades": [_enrich_trade_for_publish(t) for t in state.get("open_trades", [])],
-        "recent_closed": [_enrich_trade_for_publish(t) for t in closed_sorted[:PAPER_RECENT_LIMIT]],
+        "recent_closed": [_enrich_trade_for_publish(t) for t in closed_sorted],
         "shadow_mode": True,
         "min_n_for_verdict": PAPER_SHADOW_VERDICT_MIN_N,
     }
