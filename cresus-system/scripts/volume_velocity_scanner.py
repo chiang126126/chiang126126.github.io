@@ -1144,7 +1144,7 @@ def _format_alert_for_email(a: VelocityAlert, winrate_summary: Optional[dict] = 
     L.append(f"Binance 链接: https://www.binance.com/en/futures/{a.symbol}")
     L.append("")
     L.append("--")
-    L.append("Cresus 量能加速度雷达 · 钻石信号专属邮件通道")
+    L.append("Cresus 量能加速雷达 · 钻石信号专属邮件通道")
     L.append("仅 conviction_tier=diamond (score ≥5) 触发, TP1/TP2/止损自动管理")
     return subject, "\n".join(L)
 
@@ -2264,7 +2264,7 @@ def main(argv) -> int:
             "[CRESUS 💎] 邮件配置测试",
             "如果收到这封邮件, Cresus 钻石信号邮件通道配置成功!\n\n"
             "下次钻石信号触发时, 你会自动收到一封更详细的告警邮件.\n\n"
-            "--\nCresus 量能加速度雷达"
+            "--\nCresus 量能加速雷达"
         )
         print("✅ 已发送" if ok else "❌ 发送失败 (检查 log: ~/cresus-bot/logs/velocity_scanner.log)")
         return 0 if ok else 1
