@@ -741,13 +741,18 @@ class BinanceClient:
         sl_price: float,
         *,
         trade_id: str,
+        use_exchange_sl: bool = True,
         dry_run: Optional[bool] = None,
     ) -> dict:
-        """开仓 + 立挂 SL 的原子操作.
+        """开仓 + (可选) 立挂 SL 的原子操作.
 
         side='BUY' → LONG, side='SELL' → SHORT (one-way mode)
 
-        失败保护:
+        use_exchange_sl=True (默认): 挂 STOP_MARKET 到 exchange. 失败 → rollback.
+        use_exchange_sl=False: 只开仓, sl_price 仅供上层客户端轮询使用.
+            (用于 Binance testnet 不支持 STOP_MARKET 的情景, 或主动选择 client-side SL)
+
+        失败保护 (use_exchange_sl=True 时):
         - SL 挂单失败 → 立刻反向 market close (rollback)
         - rollback 失败 → raise CRITICAL, 要求人工介入
 
@@ -830,6 +835,7 @@ class BinanceClient:
                 "sl_side": sl_side,
                 "sl_order_id": -1,
                 "sl_client_id": sl_coid,
+                "sl_mode": "exchange" if use_exchange_sl else "client_side",
                 "opened_at": datetime.now(timezone.utc).isoformat(),
                 "fees_paid_usdt": 0.0,
                 "_dryRun": True,
@@ -857,7 +863,32 @@ class BinanceClient:
         if executed_qty <= 0:
             raise BinanceError(f"Entry executed_qty={executed_qty}, abnormal")
 
-        # 10. 下 STOP_MARKET SL (quantity + reduceOnly, 比 closePosition 兼容性好)
+        # 10. 下 STOP_MARKET SL (除非 use_exchange_sl=False)
+        if not use_exchange_sl:
+            # Client-side SL 模式: 不挂 exchange, 仅返回 sl_price 供上层轮询
+            log.info(
+                f"open_position done (no exchange SL): {symbol} {side} qty={executed_qty} "
+                f"@ {avg_fill_price} SL(client-side)={sl_price}"
+            )
+            return {
+                "trade_id": trade_id,
+                "symbol": symbol,
+                "side": side,
+                "qty": executed_qty,
+                "avg_fill_price": avg_fill_price,
+                "requested_notional": notional_usdt,
+                "actual_notional": cum_quote,
+                "entry_order_id": int(entry_resp.get("orderId") or 0),
+                "entry_client_id": entry_coid,
+                "sl_price": sl_price,             # 上层负责 monitor
+                "sl_side": sl_side,
+                "sl_order_id": None,              # 没挂 exchange
+                "sl_client_id": None,
+                "sl_mode": "client_side",         # 标记上层用 polling
+                "opened_at": datetime.now(timezone.utc).isoformat(),
+                "fees_paid_usdt": fee_estimate,
+            }
+
         log.info(
             f"open_position step 2/2: SL {sl_coid} {sl_side} qty={executed_qty} @ {sl_price}"
         )
@@ -920,6 +951,7 @@ class BinanceClient:
             "sl_side": sl_side,
             "sl_order_id": int(sl_resp.get("orderId") or 0),
             "sl_client_id": sl_coid,
+            "sl_mode": "exchange",
             "opened_at": datetime.now(timezone.utc).isoformat(),
             "fees_paid_usdt": fee_estimate,
         }
@@ -1379,6 +1411,9 @@ def _cli_main() -> int:
                    help="update-test-stop 用: 新 SL 距 entry 的 % (默认 0.5)")
     p.add_argument("--trade-id", type=str, default=None,
                    help="trade_id (默认自动生成 test_<timestamp>)")
+    p.add_argument("--no-exchange-sl", action="store_true",
+                   help="open-test-position 用: 跳过 exchange-side SL "
+                        "(workaround for -4120 errors / 客户端轮询模式)")
     p.add_argument("--cancel-all", action="store_true",
                    help="撤销该 symbol 所有挂单 (默认 dry-run)")
     p.add_argument("--live", action="store_true",
@@ -1567,6 +1602,7 @@ def _cli_main() -> int:
                 notional_usdt=args.notional,
                 sl_price=sl_price,
                 trade_id=trade_id,
+                use_exchange_sl=not args.no_exchange_sl,
             )
             print(f"   响应: {json.dumps(result, indent=2, ensure_ascii=False, default=str)}")
             if not dry_run:
