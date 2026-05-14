@@ -78,6 +78,7 @@ EMAIL_MIN_SCORE      = 6              # 仅 score ≥6 才发邮件 (基于 N=42
 PAPER_STATE       = Path.home() / "cresus-bot" / ".paper_trades.json"       # 本地全量 state
 PAPER_HISTORY     = Path.home() / "cresus-bot" / "paper_trades_history.json" # 推给看板
 PAPER_AUTO_CLOSE_HOURS = 4            # 4 小时未触发 SL/TP 自动平仓 (跟 OUTCOME_STAGES 4h 对齐)
+PAPER_SYMBOL_COOLDOWN_MIN = 30        # Phase 1.1: 同 symbol 任意 exit 后冷却 (任意 close_reason, 防信号抖动 + 长尾反复亏损)
 PAPER_RECENT_LIMIT = 0                # 已废弃 (改为全量发布以支持任意日期复盘, N=1000 时 ~150KB 也可接受)
 PAPER_MIN_TIER     = "diamond"        # 只对钻石信号自动开仓 (高质量 only)
 # 模拟仓金额: 总账户 $2000, 每笔分配 $400 (20%), 最多并发 5 笔
@@ -1292,6 +1293,25 @@ def _save_paper_state(state: dict) -> None:
         _log(f"paper_state save failed: {e}")
 
 
+def _get_last_close_for_symbol(state: dict, symbol: str) -> Optional[datetime]:
+    """返回该 symbol 最近一次 closed_at (UTC datetime), 没有则 None.
+    Phase 1.1 同 symbol 冷却用. O(N) 扫描 closed_trades, N=1000 时仍亚毫秒."""
+    latest = None
+    for t in state.get("closed_trades", []):
+        if t.get("symbol") != symbol:
+            continue
+        ca = t.get("closed_at")
+        if not ca:
+            continue
+        try:
+            dt = datetime.fromisoformat(ca.replace("Z", "+00:00"))
+            if latest is None or dt > latest:
+                latest = dt
+        except Exception:
+            continue
+    return latest
+
+
 def _compute_free_capital(state: dict) -> float:
     """账户可用资金 = 起始 + Σ realized P&L - Σ open notional.
     open trade 时使用此函数预算是否够本金开新仓.
@@ -1331,6 +1351,17 @@ def _open_paper_trade(a: VelocityAlert, state: dict, now: datetime,
         return None  # 未知方向
     for t in state["open_trades"]:
         if t.get("symbol") == a.symbol and t.get("direction") == a.direction:
+            return None
+    # Phase 1.1: 同 symbol 任意 exit 后冷却 (无视方向 / close_reason).
+    # 审计 N=118 显示: SIREN/QUSDT/ATA 等抖动重入贡献 ~-10% 噪音损失.
+    # 30min 阈值同时保留 SIREN #3 (226min 间隔) 这类真正的反弹机会.
+    last_close = _get_last_close_for_symbol(state, a.symbol)
+    if last_close is not None:
+        elapsed_min = (now - last_close).total_seconds() / 60.0
+        if elapsed_min < PAPER_SYMBOL_COOLDOWN_MIN:
+            _log(f"[paper] SKIP open {a.symbol} {a.direction}: "
+                 f"symbol cooldown {elapsed_min:.0f}min < {PAPER_SYMBOL_COOLDOWN_MIN}min "
+                 f"(last_close={last_close.isoformat()})")
             return None
     regime_snap = _load_current_regime()
     trade = {
