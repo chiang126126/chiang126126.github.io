@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-14T22:14:15.308345+00:00",
+  "updated_at": "2026-05-14T22:16:29.518584+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 13,
+  "alerts_count": 14,
   "alerts": [
+    {
+      "symbol": "DASHUSDT",
+      "base": "DASH",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 46.89,
+      "price_change_pct": 0.622,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 211999.0,
+      "volume_baseline_usdt": 24404.0,
+      "volume_ratio": 8.69,
+      "detected_at": "2026-05-14T22:15:41.488937+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.905,
+      "change_15m_pct": 1.759,
+      "change_1h_pct": 1.429,
+      "change_4h_pct": 2.967,
+      "taker_buy_ratio_1m": 0.815,
+      "taker_buy_ratio_5m": 0.738,
+      "oi_delta_5m_pct": 0.183,
+      "funding_rate_pct": 0.0065,
+      "atr_pct": 0.242,
+      "range_4h_pct": 3.58,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 46.77642857,
+      "suggested_tp1": 47.06035714,
+      "suggested_tp2": 47.23071429,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "XPINUSDT",
       "base": "XPIN",
