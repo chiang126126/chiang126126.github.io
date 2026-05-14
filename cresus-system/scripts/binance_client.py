@@ -36,6 +36,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional, Union
 
@@ -145,6 +146,26 @@ def _validate_client_order_id(coid: str) -> None:
         raise ValueError(
             f"client_order_id {coid!r} 不合规: "
             f"必须 1-36 字符 [a-zA-Z0-9_-], 实际 len={len(coid)}"
+        )
+
+
+# Phase 2.2.2: trade_id 是高阶接口入参, 会嵌进 client_order_id.
+# 规则: cresus_{trade_id}_{role}, role 最多 3 字符 (E/SL/RB...).
+# 所以 trade_id 最多 36 - 7 (prefix) - 4 (suffix) = 25 chars.
+_TRADE_ID_MAX_LEN = 25
+
+
+def _validate_trade_id(trade_id: str) -> None:
+    """验证 trade_id 用于构造 client_order_id."""
+    if not isinstance(trade_id, str) or not trade_id:
+        raise ValueError("trade_id 必须是非空字符串")
+    if len(trade_id) > _TRADE_ID_MAX_LEN:
+        raise ValueError(
+            f"trade_id 太长 (max {_TRADE_ID_MAX_LEN} chars), got {len(trade_id)}"
+        )
+    if not _CLIENT_ORDER_ID_RE.match(trade_id):
+        raise ValueError(
+            f"trade_id {trade_id!r} 不合规: 只能含 [a-zA-Z0-9_-]"
         )
 
 
@@ -693,6 +714,442 @@ class BinanceClient:
         }
 
     # ============================================================
+    # Phase 2.2.2: 高阶 trade lifecycle (open / update_stop / close)
+    # ============================================================
+
+    def open_position(
+        self,
+        symbol: str,
+        side: str,
+        notional_usdt: float,
+        sl_price: float,
+        *,
+        trade_id: str,
+        dry_run: Optional[bool] = None,
+    ) -> dict:
+        """开仓 + 立挂 SL 的原子操作.
+
+        side='BUY' → LONG, side='SELL' → SHORT (one-way mode)
+
+        失败保护:
+        - SL 挂单失败 → 立刻反向 market close (rollback)
+        - rollback 失败 → raise CRITICAL, 要求人工介入
+
+        Returns dict (见函数末尾).
+        """
+        # 1. 入参验证
+        side = side.upper()
+        if side not in ("BUY", "SELL"):
+            raise ValueError(f"side 必须 BUY 或 SELL, got {side!r}")
+        if notional_usdt <= 0:
+            raise ValueError(f"notional_usdt 必须 > 0, got {notional_usdt}")
+        if sl_price <= 0:
+            raise ValueError(f"sl_price 必须 > 0, got {sl_price}")
+        _validate_trade_id(trade_id)
+        is_dry = self._is_dry_run(dry_run)
+        self._check_live_authorization(is_dry)
+        symbol = symbol.upper()
+
+        # 2. 拉 symbol filters
+        filters = self.get_symbol_filters(symbol)
+
+        # 3. 拉当前价
+        klines = self.get_klines(symbol, interval="1m", limit=1)
+        if not klines:
+            raise BinanceError(f"无法获取 {symbol} 当前价")
+        last_close = float(klines[0][4])
+
+        # 4. 验证 SL 价位于持仓方向相反侧
+        if side == "BUY":  # LONG: SL 必须 < 当前价
+            if sl_price >= last_close:
+                raise ValueError(
+                    f"LONG sl_price={sl_price} 必须 < 当前价 {last_close} "
+                    f"(否则立即触发)"
+                )
+        else:              # SHORT: SL 必须 > 当前价
+            if sl_price <= last_close:
+                raise ValueError(
+                    f"SHORT sl_price={sl_price} 必须 > 当前价 {last_close}"
+                )
+
+        # 5. 计算 qty (round to step + 满足 min_qty / min_notional)
+        raw_qty = notional_usdt / last_close
+        qty = round_qty_down_to_step(raw_qty, filters["step_size"])
+        if qty < filters["min_qty"]:
+            qty = filters["min_qty"]
+        actual_notional = qty * last_close
+        if filters["min_notional"] > 0 and actual_notional < filters["min_notional"]:
+            need = filters["min_notional"] / last_close
+            qty = math.ceil(need / filters["step_size"]) * filters["step_size"]
+            qty = round(qty, filters["quantity_precision"])
+            actual_notional = qty * last_close
+
+        # 6. Round SL 到 tick_size
+        sl_price = round_price_to_tick(sl_price, filters["tick_size"])
+
+        # 7. 构造 client_order_ids
+        entry_coid = f"cresus_{trade_id}_E"
+        sl_coid = f"cresus_{trade_id}_SL"
+        _validate_client_order_id(entry_coid)
+        _validate_client_order_id(sl_coid)
+        sl_side = "SELL" if side == "BUY" else "BUY"
+
+        # 8. Dry-run: 模拟返回
+        if is_dry:
+            log.info(
+                f"[DRY_RUN] open_position {symbol} {side} qty={qty} "
+                f"~${actual_notional:.2f} sl={sl_price}"
+            )
+            return {
+                "trade_id": trade_id,
+                "symbol": symbol,
+                "side": side,
+                "qty": qty,
+                "avg_fill_price": last_close,   # mock (实盘时是真实 fill)
+                "requested_notional": notional_usdt,
+                "actual_notional": actual_notional,
+                "entry_order_id": -1,
+                "entry_client_id": entry_coid,
+                "sl_price": sl_price,
+                "sl_side": sl_side,
+                "sl_order_id": -1,
+                "sl_client_id": sl_coid,
+                "opened_at": datetime.now(timezone.utc).isoformat(),
+                "fees_paid_usdt": 0.0,
+                "_dryRun": True,
+            }
+
+        # ====== 实盘路径 ======
+
+        # 9. 下市价开仓单
+        log.info(f"open_position step 1/2: ENTRY {entry_coid} {side} {qty} {symbol}")
+        entry_resp = self.place_market_order(
+            symbol=symbol, side=side, quantity=qty,
+            client_order_id=entry_coid,
+            dry_run=False,
+        )
+        entry_status = entry_resp.get("status")
+        if entry_status not in ("FILLED", "PARTIALLY_FILLED"):
+            raise BinanceError(
+                f"Entry 未成交 status={entry_status} resp={entry_resp}"
+            )
+        avg_fill_price = float(entry_resp.get("avgPrice") or 0)
+        executed_qty = float(entry_resp.get("executedQty") or 0)
+        cum_quote = float(entry_resp.get("cumQuote") or 0)
+        fee_estimate = round(cum_quote * 0.0004, 4)   # Binance Futures taker 0.04%
+
+        if executed_qty <= 0:
+            raise BinanceError(f"Entry executed_qty={executed_qty}, abnormal")
+
+        # 10. 下 STOP_MARKET SL (close_position=true)
+        log.info(
+            f"open_position step 2/2: SL {sl_coid} {sl_side} @ {sl_price} "
+            f"(close_position)"
+        )
+        try:
+            sl_resp = self.place_stop_market_order(
+                symbol=symbol,
+                side=sl_side,
+                stop_price=sl_price,
+                close_position=True,
+                client_order_id=sl_coid,
+                dry_run=False,
+            )
+        except BinanceError as sl_err:
+            # ⚠️ ROLLBACK: SL 失败, 立刻反向 market close
+            log.error(
+                f"🚨 SL placement failed for {trade_id}: {sl_err}. "
+                f"Initiating rollback (reverse market close)..."
+            )
+            rb_coid = f"cresus_{trade_id}_RB"
+            try:
+                rb_resp = self.place_market_order(
+                    symbol=symbol,
+                    side=sl_side,                # 反向
+                    quantity=executed_qty,
+                    client_order_id=rb_coid,
+                    reduce_only=True,
+                    dry_run=False,
+                )
+                log.info(
+                    f"Rollback OK: closed at {rb_resp.get('avgPrice')} "
+                    f"(entry was {avg_fill_price})"
+                )
+            except BinanceError as rb_err:
+                # 灾难情景: rollback 也失败, 持仓裸奔
+                raise BinanceError(
+                    f"🚨🚨 CRITICAL: SL failed AND rollback failed for {trade_id}. "
+                    f"POSITION IS NAKED, manual intervention required. "
+                    f"entry_order={entry_resp.get('orderId')} "
+                    f"sl_err={sl_err} rb_err={rb_err}"
+                )
+            # rollback 成功, 抛原始 SL 错
+            raise BinanceError(
+                f"SL placement failed for {trade_id}, position auto-closed. "
+                f"trade_id={trade_id} err={sl_err}"
+            )
+
+        # 11. 一切成功, 返回 trade dict
+        result = {
+            "trade_id": trade_id,
+            "symbol": symbol,
+            "side": side,
+            "qty": executed_qty,
+            "avg_fill_price": avg_fill_price,
+            "requested_notional": notional_usdt,
+            "actual_notional": cum_quote,
+            "entry_order_id": int(entry_resp.get("orderId") or 0),
+            "entry_client_id": entry_coid,
+            "sl_price": sl_price,
+            "sl_side": sl_side,
+            "sl_order_id": int(sl_resp.get("orderId") or 0),
+            "sl_client_id": sl_coid,
+            "opened_at": datetime.now(timezone.utc).isoformat(),
+            "fees_paid_usdt": fee_estimate,
+        }
+        log.info(
+            f"✓ open_position done: {symbol} {side} qty={executed_qty} "
+            f"@ {avg_fill_price} SL={sl_price}"
+        )
+        return result
+
+    def update_stop_order(
+        self,
+        symbol: str,
+        new_stop_price: float,
+        *,
+        old_sl_client_order_id: str,
+        new_sl_client_order_id: str,
+        sl_side: str,
+        dry_run: Optional[bool] = None,
+    ) -> dict:
+        """原子地把 SL 从一个价格移到另一个价格 (place-then-cancel).
+
+        sl_side: 平仓方向 ('SELL' for LONG position, 'BUY' for SHORT).
+
+        核心原则: 新 SL 挂上之前永远不撤旧 SL — 不允许"无 SL 时刻".
+
+        Race window:
+        - T1: 新 SL 挂上, 旧 SL 仍在 → 双重保护
+        - T2: cancel 旧 SL
+        - 若 cancel 失败: 新 SL 已在保护, 仅日志 warning (不抛错)
+        """
+        # 验证
+        sl_side = sl_side.upper()
+        if sl_side not in ("BUY", "SELL"):
+            raise ValueError(f"sl_side 必须 BUY 或 SELL, got {sl_side!r}")
+        if new_stop_price <= 0:
+            raise ValueError(f"new_stop_price 必须 > 0")
+        if old_sl_client_order_id == new_sl_client_order_id:
+            raise ValueError("new_sl_client_order_id 必须与 old 不同")
+        _validate_client_order_id(old_sl_client_order_id)
+        _validate_client_order_id(new_sl_client_order_id)
+        is_dry = self._is_dry_run(dry_run)
+        self._check_live_authorization(is_dry)
+        symbol = symbol.upper()
+
+        # round 到 tick
+        filters = self.get_symbol_filters(symbol)
+        new_stop_price = round_price_to_tick(new_stop_price, filters["tick_size"])
+
+        # 验证 new_stop_price 不会立即触发 (相对当前价)
+        klines = self.get_klines(symbol, interval="1m", limit=1)
+        last_close = float(klines[0][4])
+        if sl_side == "SELL":   # LONG SL: stop < current
+            if new_stop_price >= last_close:
+                raise ValueError(
+                    f"SELL SL new={new_stop_price} 必须 < 当前价 {last_close}"
+                )
+        else:                    # SHORT SL: stop > current
+            if new_stop_price <= last_close:
+                raise ValueError(
+                    f"BUY SL new={new_stop_price} 必须 > 当前价 {last_close}"
+                )
+
+        if is_dry:
+            log.info(
+                f"[DRY_RUN] update_stop_order {symbol} {sl_side} "
+                f"new_sl={new_stop_price} (old: {old_sl_client_order_id} → "
+                f"new: {new_sl_client_order_id})"
+            )
+            return {
+                "symbol": symbol,
+                "new_sl_price": new_stop_price,
+                "new_sl_order_id": -1,
+                "new_sl_client_id": new_sl_client_order_id,
+                "old_sl_client_id": old_sl_client_order_id,
+                "old_sl_canceled": True,
+                "sl_side": sl_side,
+                "updated_at": datetime.now(timezone.utc).isoformat(),
+                "_dryRun": True,
+            }
+
+        # ====== 实盘: place-then-cancel ======
+
+        # 1. 先 place 新 SL
+        log.info(
+            f"update_stop_order step 1/2: place NEW SL {new_sl_client_order_id} "
+            f"@ {new_stop_price}"
+        )
+        new_sl_resp = self.place_stop_market_order(
+            symbol=symbol,
+            side=sl_side,
+            stop_price=new_stop_price,
+            close_position=True,
+            client_order_id=new_sl_client_order_id,
+            dry_run=False,
+        )
+
+        # 2. cancel 旧 SL (容忍失败 — 新 SL 已生效)
+        old_canceled = False
+        try:
+            log.info(
+                f"update_stop_order step 2/2: cancel OLD SL "
+                f"{old_sl_client_order_id}"
+            )
+            self.cancel_order(
+                symbol, client_order_id=old_sl_client_order_id, dry_run=False,
+            )
+            old_canceled = True
+        except BinanceError as e:
+            # 旧 SL cancel 失败: 可能已经被外部撤掉, 或者 race 触发了
+            # 新 SL 在保护, 不影响安全, 只 warning
+            log.warning(
+                f"⚠️ Old SL {old_sl_client_order_id} cancel 失败: {e}. "
+                f"新 SL 已在保护, 继续."
+            )
+
+        return {
+            "symbol": symbol,
+            "new_sl_price": new_stop_price,
+            "new_sl_order_id": int(new_sl_resp.get("orderId") or 0),
+            "new_sl_client_id": new_sl_client_order_id,
+            "old_sl_client_id": old_sl_client_order_id,
+            "old_sl_canceled": old_canceled,
+            "sl_side": sl_side,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }
+
+    def close_position(
+        self,
+        symbol: str,
+        side: str,
+        *,
+        trade_id: Optional[str] = None,
+        dry_run: Optional[bool] = None,
+    ) -> dict:
+        """主动平仓 (timeout / 手动 kill / TP2 触发 / 等).
+
+        side: 持仓的开仓方向 (BUY=LONG, SELL=SHORT). 平仓方向自动反.
+
+        流程:
+        1. 拉持仓, 验证存在且方向匹配
+        2. 撤该 symbol 所有挂单 (清理残留 SL/TP)
+        3. reduceOnly market 平仓
+        4. 计算 realized PnL
+        """
+        side = side.upper()
+        if side not in ("BUY", "SELL"):
+            raise ValueError(f"side 必须 BUY 或 SELL")
+        if trade_id is not None:
+            _validate_trade_id(trade_id)
+        is_dry = self._is_dry_run(dry_run)
+        self._check_live_authorization(is_dry)
+        symbol = symbol.upper()
+        close_side = "SELL" if side == "BUY" else "BUY"
+
+        if is_dry:
+            log.info(f"[DRY_RUN] close_position {symbol} {side} (close_side={close_side})")
+            return {
+                "symbol": symbol,
+                "side": side,
+                "qty_closed": 0.0,
+                "entry_price": 0.0,
+                "avg_exit_price": 0.0,
+                "realized_pnl_usdt": 0.0,
+                "close_order_id": -1,
+                "open_orders_canceled": 0,
+                "closed_at": datetime.now(timezone.utc).isoformat(),
+                "_dryRun": True,
+            }
+
+        # 1. 拉持仓
+        positions = self.get_positions()
+        pos = next(
+            (p for p in positions if p.get("symbol") == symbol),
+            None,
+        )
+        if pos is None:
+            raise BinanceError(f"无 {symbol} 持仓记录")
+        pos_amt = float(pos.get("positionAmt") or 0)
+        if pos_amt == 0:
+            raise BinanceError(f"{symbol} 当前无持仓 (positionAmt=0)")
+        # 方向校验
+        is_long = pos_amt > 0
+        expected_long = (side == "BUY")
+        if is_long != expected_long:
+            raise BinanceError(
+                f"{symbol} 持仓方向不符: 期望 side={side} "
+                f"(LONG={expected_long}), 实际 positionAmt={pos_amt}"
+            )
+        qty = abs(pos_amt)
+        entry_price = float(pos.get("entryPrice") or 0)
+
+        # 2. 撤该 symbol 所有挂单 (避免和平仓 race)
+        canceled = 0
+        try:
+            open_orders = self.get_open_orders(symbol)
+            for o in open_orders:
+                try:
+                    self.cancel_order(symbol, order_id=int(o["orderId"]),
+                                      dry_run=False)
+                    canceled += 1
+                except BinanceError as e:
+                    log.warning(f"cancel order {o.get('orderId')} 失败: {e}")
+        except BinanceError as e:
+            log.warning(f"get_open_orders 失败 (继续平仓): {e}")
+
+        # 3. reduceOnly market 平仓
+        coid = f"cresus_{trade_id}_C" if trade_id else None
+        if coid:
+            _validate_client_order_id(coid)
+        log.info(
+            f"close_position: market {close_side} {qty} {symbol} "
+            f"(reduceOnly, canceled {canceled} pending orders)"
+        )
+        close_resp = self.place_market_order(
+            symbol=symbol,
+            side=close_side,
+            quantity=qty,
+            reduce_only=True,
+            client_order_id=coid,
+            dry_run=False,
+        )
+        exit_price = float(close_resp.get("avgPrice") or 0)
+        # PnL: LONG = (exit - entry) * qty; SHORT = (entry - exit) * qty
+        if side == "BUY":
+            pnl = (exit_price - entry_price) * qty
+        else:
+            pnl = (entry_price - exit_price) * qty
+
+        result = {
+            "symbol": symbol,
+            "side": side,
+            "qty_closed": qty,
+            "entry_price": entry_price,
+            "avg_exit_price": exit_price,
+            "realized_pnl_usdt": round(pnl, 4),
+            "close_order_id": int(close_resp.get("orderId") or 0),
+            "open_orders_canceled": canceled,
+            "closed_at": datetime.now(timezone.utc).isoformat(),
+        }
+        log.info(
+            f"✓ close_position done: {symbol} {side} qty={qty} "
+            f"entry={entry_price} exit={exit_price} pnl={pnl:+.4f}"
+        )
+        return result
+
+    # ============================================================
     # Internal: HTTP plumbing
     # ============================================================
 
@@ -882,6 +1339,18 @@ def _cli_main() -> int:
                    help="测试订单方向 (BUY=开多, SELL=开空), 默认 BUY")
     p.add_argument("--notional", type=float, default=100.0,
                    help="测试单 notional USDT (默认 100, 会按 LOT_SIZE 和 minNotional 调整)")
+    p.add_argument("--open-test-position", action="store_true",
+                   help="Phase 2.2.2: open_position 端到端 (开仓 + 挂 SL). 默认 dry-run")
+    p.add_argument("--update-test-stop", action="store_true",
+                   help="Phase 2.2.2: 移 SL (需先 open-test-position)")
+    p.add_argument("--close-test-position", action="store_true",
+                   help="Phase 2.2.2: 主动平仓 + 撤挂单. 默认 dry-run")
+    p.add_argument("--sl-pct", type=float, default=1.0,
+                   help="测试 SL 距 entry 的 % (默认 1.0 = 1%)")
+    p.add_argument("--new-sl-pct", type=float, default=0.5,
+                   help="update-test-stop 用: 新 SL 距 entry 的 % (默认 0.5)")
+    p.add_argument("--trade-id", type=str, default=None,
+                   help="trade_id (默认自动生成 test_<timestamp>)")
     p.add_argument("--cancel-all", action="store_true",
                    help="撤销该 symbol 所有挂单 (默认 dry-run)")
     p.add_argument("--live", action="store_true",
@@ -1046,6 +1515,78 @@ def _cli_main() -> int:
                 print(f"     ✓ canceled (status={resp.get('status')})")
             except BinanceError as e:
                 print(f"     ✗ 失败: {e}")
+
+    # Phase 2.2.2 CLI: open_position
+    if args.open_test_position:
+        sym = args.symbol.upper()
+        klines = client.get_klines(sym, interval="1m", limit=1)
+        last_close = float(klines[0][4])
+        # SL 计算: LONG → entry * (1 - sl_pct/100); SHORT → entry * (1 + sl_pct/100)
+        if args.side == "BUY":
+            sl_price = last_close * (1 - args.sl_pct / 100.0)
+        else:
+            sl_price = last_close * (1 + args.sl_pct / 100.0)
+        trade_id = args.trade_id or f"test{int(time.time())}"
+        print(f"📝 open_position: {args.side} {sym} notional=${args.notional} "
+              f"sl={sl_price:.2f} ({-args.sl_pct if args.side=='BUY' else args.sl_pct:+}% "
+              f"vs {last_close:.2f}) trade_id={trade_id}")
+        try:
+            result = client.open_position(
+                symbol=sym, side=args.side,
+                notional_usdt=args.notional,
+                sl_price=sl_price,
+                trade_id=trade_id,
+            )
+            print(f"   响应: {json.dumps(result, indent=2, ensure_ascii=False, default=str)}")
+            if not dry_run:
+                print(f"   ⚠️ 真开仓了! trade_id={trade_id}")
+                print(f"   后续: --update-test-stop --trade-id {trade_id} --new-sl-pct ...")
+                print(f"   或:   --close-test-position --trade-id {trade_id} --side {args.side}")
+        except BinanceError as e:
+            print(f"   ✗ 失败: {e}")
+            return 1
+
+    if args.update_test_stop:
+        sym = args.symbol.upper()
+        if not args.trade_id:
+            print(f"   ✗ --update-test-stop 必须提供 --trade-id")
+            return 1
+        klines = client.get_klines(sym, interval="1m", limit=1)
+        last_close = float(klines[0][4])
+        if args.side == "BUY":
+            new_sl = last_close * (1 - args.new_sl_pct / 100.0)
+            sl_side = "SELL"
+        else:
+            new_sl = last_close * (1 + args.new_sl_pct / 100.0)
+            sl_side = "BUY"
+        old_coid = f"cresus_{args.trade_id}_SL"
+        new_coid = f"cresus_{args.trade_id}_SLB"   # B for "moved to BE/Better"
+        print(f"📝 update_stop_order: {sym} {sl_side} new_sl={new_sl:.2f} "
+              f"(old={old_coid} → new={new_coid})")
+        try:
+            result = client.update_stop_order(
+                symbol=sym,
+                new_stop_price=new_sl,
+                old_sl_client_order_id=old_coid,
+                new_sl_client_order_id=new_coid,
+                sl_side=sl_side,
+            )
+            print(f"   响应: {json.dumps(result, indent=2, ensure_ascii=False, default=str)}")
+        except BinanceError as e:
+            print(f"   ✗ 失败: {e}")
+            return 1
+
+    if args.close_test_position:
+        sym = args.symbol.upper()
+        print(f"📝 close_position: {sym} {args.side} trade_id={args.trade_id}")
+        try:
+            result = client.close_position(
+                symbol=sym, side=args.side, trade_id=args.trade_id,
+            )
+            print(f"   响应: {json.dumps(result, indent=2, ensure_ascii=False, default=str)}")
+        except BinanceError as e:
+            print(f"   ✗ 失败: {e}")
+            return 1
 
     return 0
 
