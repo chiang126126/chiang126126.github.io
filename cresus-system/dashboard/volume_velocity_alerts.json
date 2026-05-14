@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-13T23:59:08.780986+00:00",
+  "updated_at": "2026-05-14T00:01:28.456042+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 15,
+  "alerts_count": 16,
   "alerts": [
+    {
+      "symbol": "VVVUSDT",
+      "base": "VVV",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 14.356,
+      "price_change_pct": -0.637,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 388810.0,
+      "volume_baseline_usdt": 52917.0,
+      "volume_ratio": 7.35,
+      "detected_at": "2026-05-14T00:00:24.105176+00:00",
+      "intensity": 1,
+      "change_5m_pct": -2.279,
+      "change_15m_pct": -2.279,
+      "change_1h_pct": -1.255,
+      "change_4h_pct": -3.956,
+      "taker_buy_ratio_1m": 0.433,
+      "taker_buy_ratio_5m": 0.411,
+      "oi_delta_5m_pct": 0.274,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.423,
+      "range_4h_pct": 6.74,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 14.44717857,
+      "suggested_tp1": 14.21923214,
+      "suggested_tp2": 14.08246429,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "SAPIENUSDT",
       "base": "SAPIEN",
