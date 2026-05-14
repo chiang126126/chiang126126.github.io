@@ -636,21 +636,36 @@ class TestOrderMethods(unittest.TestCase):
                 client_order_id="invalid id with spaces",
             )
 
-    def test_place_stop_market_close_position_default(self):
-        r = self.client.place_stop_market_order("BTCUSDT", "SELL", 75000)
+    def test_place_stop_market_with_quantity_default(self):
+        """默认 close_position=False, 需要 quantity (兼容性最好)."""
+        r = self.client.place_stop_market_order(
+            "BTCUSDT", "SELL", 75000, quantity=0.001,
+        )
         self.assertEqual(r["status"], "DRY_RUN")
         self.assertEqual(r["type"], "STOP_MARKET")
-        self.assertEqual(r["closePosition"], "true")
-        self.assertEqual(r["stopPrice"], "75000")
-
-    def test_place_stop_market_with_quantity(self):
-        r = self.client.place_stop_market_order(
-            "BTCUSDT", "SELL", 75000,
-            quantity=0.001, close_position=False,
-        )
         self.assertEqual(r["origQty"], "0.001")
-        # 验证内部 _params 包含 reduceOnly=true
         self.assertEqual(r["_params"].get("reduceOnly"), "true")
+        # priceProtect 默认 False, 不应在 params 里
+        self.assertNotIn("priceProtect", r["_params"])
+
+    def test_place_stop_market_close_position_explicit(self):
+        """显式 close_position=True 仍支持 (但不推荐, 兼容性差)."""
+        r = self.client.place_stop_market_order(
+            "BTCUSDT", "SELL", 75000, close_position=True,
+        )
+        self.assertEqual(r["status"], "DRY_RUN")
+        self.assertEqual(r["closePosition"], "true")
+
+    def test_place_stop_market_price_protect_opt_in(self):
+        """priceProtect 默认关闭, 仅 opt-in 时启用."""
+        r1 = self.client.place_stop_market_order(
+            "BTCUSDT", "SELL", 75000, quantity=0.001,
+        )
+        self.assertNotIn("priceProtect", r1["_params"])
+        r2 = self.client.place_stop_market_order(
+            "BTCUSDT", "SELL", 75000, quantity=0.001, price_protect=True,
+        )
+        self.assertEqual(r2["_params"].get("priceProtect"), "true")
 
     def test_place_stop_market_close_and_qty_conflict(self):
         with self.assertRaises(ValueError):
@@ -663,7 +678,7 @@ class TestOrderMethods(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.client.place_stop_market_order(
                 "BTCUSDT", "SELL", 75000,
-                close_position=False,  # 不带 quantity → 矛盾
+                # 默认 close_position=False, 不带 quantity → 矛盾
             )
 
     def test_place_stop_market_invalid_working_type(self):
@@ -866,11 +881,13 @@ class TestUpdateStopOrderDryRun(unittest.TestCase):
             "quantity_precision": 4, "price_precision": 2, "status": "TRADING",
         }
         self._mock_klines = [[0, 0, 0, 0, "81000.00", 0, 0, 0, 0, 0, 0, 0]]
+        self._mock_positions = [{"symbol": "BTCUSDT", "positionAmt": "0.0012"}]
 
     def _patch(self):
         return [
             patch.object(self.client, "get_symbol_filters", return_value=self._mock_filters),
             patch.object(self.client, "get_klines", return_value=self._mock_klines),
+            patch.object(self.client, "get_positions", return_value=self._mock_positions),
         ]
 
     def test_basic_update(self):
