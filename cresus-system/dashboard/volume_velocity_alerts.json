@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-14T22:27:25.166453+00:00",
+  "updated_at": "2026-05-14T22:29:33.539595+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 12,
+  "alerts_count": 13,
   "alerts": [
+    {
+      "symbol": "TACUSDT",
+      "base": "TAC",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.023649,
+      "price_change_pct": 2.178,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 128346.0,
+      "volume_baseline_usdt": 18128.0,
+      "volume_ratio": 7.08,
+      "detected_at": "2026-05-14T22:28:58.765713+00:00",
+      "intensity": 2,
+      "change_5m_pct": 0.218,
+      "change_15m_pct": 1.078,
+      "change_1h_pct": 0.145,
+      "change_4h_pct": 19.542,
+      "taker_buy_ratio_1m": 0.649,
+      "taker_buy_ratio_5m": 0.539,
+      "oi_delta_5m_pct": 0.91,
+      "funding_rate_pct": -0.0973,
+      "atr_pct": 0.928,
+      "range_4h_pct": 21.01,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.02320986,
+      "suggested_tp1": 0.02430771,
+      "suggested_tp2": 0.02496643,
+      "conviction_score": 5,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "GWEIUSDT",
       "base": "GWEI",
