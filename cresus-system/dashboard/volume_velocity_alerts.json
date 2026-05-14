@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-14T04:53:49.726257+00:00",
+  "updated_at": "2026-05-14T04:56:10.889794+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 29,
+  "alerts_count": 30,
   "alerts": [
+    {
+      "symbol": "XNYUSDT",
+      "base": "XNY",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 0.009421,
+      "price_change_pct": -3.936,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 62503.0,
+      "volume_baseline_usdt": 6961.0,
+      "volume_ratio": 8.98,
+      "detected_at": "2026-05-14T04:55:56.105430+00:00",
+      "intensity": 2,
+      "change_5m_pct": -1.98,
+      "change_15m_pct": -3.718,
+      "change_1h_pct": -3.728,
+      "change_4h_pct": -0.304,
+      "taker_buy_ratio_1m": 0.509,
+      "taker_buy_ratio_5m": 0.325,
+      "oi_delta_5m_pct": 0.003,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.958,
+      "range_4h_pct": 8.13,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.00955632,
+      "suggested_tp1": 0.00921802,
+      "suggested_tp2": 0.00901504,
+      "conviction_score": 3,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "INJUSDT",
       "base": "INJ",
