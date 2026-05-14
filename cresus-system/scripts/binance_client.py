@@ -88,6 +88,44 @@ class BinanceTimeError(BinanceError):
 
 
 # ============================================================================
+# 凭证格式校验 (在签名前发现误粘贴的 placeholder, 比 401 更友好)
+# ============================================================================
+
+def _validate_credential(value: str, name: str) -> None:
+    """检测常见的误粘贴模式. 抛 ValueError + 修复建议.
+    实际 Binance key/secret 是 64 位 alphanumeric. 我们用宽松检测避免误杀.
+    """
+    if value.startswith("<") or value.endswith(">"):
+        raise ValueError(
+            f"{name} 看起来包含尖括号 (起始='<' 或结尾='>'). "
+            f"你可能复制了文档里的占位符 <...>. 请只粘贴 key 本身, 不要带尖括号."
+        )
+    if value in ("...", "...your_key...", "your_key", "your_secret"):
+        raise ValueError(
+            f"{name} 是字面占位符 '{value}'. "
+            f"请去 Binance API 管理页面生成真实 key 后填入."
+        )
+    # 含空格或换行 (通常 copy-paste 把回车带进来)
+    if any(c in value for c in (" ", "\n", "\t", "\r")):
+        raise ValueError(
+            f"{name} 包含空格/换行 (长度={len(value)}). "
+            f"请去掉所有不可见字符后重试."
+        )
+    # 长度异常 (Binance 通常 64, 容许 40-128 范围)
+    if len(value) < 30 or len(value) > 200:
+        raise ValueError(
+            f"{name} 长度异常 (实际={len(value)}, Binance 标准 64). "
+            f"请确认 key 完整无截断."
+        )
+    # 非 ASCII 可见字符 (可能 copy-paste 引入 unicode 字符)
+    if not all(0x20 <= ord(c) < 0x7F for c in value):
+        raise ValueError(
+            f"{name} 包含非 ASCII 字符. "
+            f"请确认在终端正确粘贴 (建议先粘到记事本看是否有奇怪字符)."
+        )
+
+
+# ============================================================================
 # Token Bucket (rate limiting)
 # ============================================================================
 
@@ -158,6 +196,9 @@ class BinanceClient:
             raise ValueError("api_secret 必须是非空字符串")
         if recv_window_ms <= 0 or recv_window_ms > 60000:
             raise ValueError("recv_window_ms 必须在 (0, 60000] 范围")
+        # 防御: 检测常见的占位符 / 误拷贝模式 (在签名前发现, 比 401 友好)
+        _validate_credential(api_key, "api_key")
+        _validate_credential(api_secret, "api_secret")
         self._api_key = api_key
         # 保留 bytes 形式给 HMAC 用. 不暴露 __dict__ 外.
         self._api_secret_bytes = api_secret.encode("utf-8")

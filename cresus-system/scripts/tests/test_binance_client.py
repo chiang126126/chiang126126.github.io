@@ -30,12 +30,17 @@ from binance_client import (  # noqa: E402
     BinanceClient,
     BinanceError, BinanceAuthError, BinanceRateLimitError,
     BinanceNetworkError, BinanceTimeError,
-    _TokenBucket,
+    _TokenBucket, _validate_credential,
     MAINNET_BASE, TESTNET_BASE,
     RECV_WINDOW_MS, MAX_TIME_DRIFT_SEC,
     DEFAULT_MAX_ATTEMPTS,
     load_credentials,
 )
+
+# Fake keys for unit tests (real Binance keys are 64-char alphanumeric).
+# These must pass _validate_credential's length/format checks.
+FAKE_KEY    = "FAKE_API_KEY_DO_NOT_USE_" + "x" * 40   # 64 chars
+FAKE_SECRET = "FAKE_API_SECRET_DO_NOT_USE_" + "y" * 37  # 64 chars
 
 
 # ============================================================================
@@ -44,10 +49,12 @@ from binance_client import (  # noqa: E402
 
 class TestSecretSafety(unittest.TestCase):
 
-    SECRET = "MY_SUPER_SECRET_XYZ789_DO_NOT_LEAK"
+    # 64 chars to pass length validation
+    SECRET = "MY_SUPER_SECRET_XYZ789_DO_NOT_LEAK_" + "z" * 29
+    API_KEY = "api_key_abc123def456_" + "k" * 43  # 64 chars
 
     def setUp(self):
-        self.client = BinanceClient("api_key_abc123def456", self.SECRET)
+        self.client = BinanceClient(self.API_KEY, self.SECRET)
 
     def test_repr_hides_secret(self):
         r = repr(self.client)
@@ -69,7 +76,7 @@ class TestSecretSafety(unittest.TestCase):
         self.assertIn("_api_secret_bytes", d)
 
     def test_repr_shows_only_partial_api_key(self):
-        # api_key = "api_key_abc123def456" → 前 6 位 = "api_ke"
+        # api_key 前 6 位 = "api_ke"
         r = repr(self.client)
         self.assertIn("api_ke", r)      # 前 6 位
         self.assertNotIn("abc123", r)   # 后面截掉
@@ -83,14 +90,17 @@ class TestSecretSafety(unittest.TestCase):
 
 class TestSigning(unittest.TestCase):
 
+    # Must be 30+ chars to pass _validate_credential
+    SIGN_SECRET = "test_secret_value_padded_to_64_chars_" + "p" * 27
+
     def setUp(self):
-        self.client = BinanceClient("k", "test_secret_value")
+        self.client = BinanceClient(FAKE_KEY, self.SIGN_SECRET)
 
     def test_signature_matches_stdlib_hmac(self):
         """签名结果必须匹配标准 HMAC-SHA256."""
         query = "symbol=BTCUSDT&side=BUY&quantity=0.001&timestamp=1234567890"
         expected = hmac.new(
-            b"test_secret_value",
+            self.SIGN_SECRET.encode("utf-8"),
             query.encode("utf-8"),
             hashlib.sha256,
         ).hexdigest()
@@ -116,7 +126,7 @@ class TestSigning(unittest.TestCase):
 
     def test_signed_query_does_not_leak_secret(self):
         q = self.client._build_signed_query({"x": "y"})
-        self.assertNotIn("test_secret_value", q)
+        self.assertNotIn(self.SIGN_SECRET, q)
 
 
 # ============================================================================
@@ -126,13 +136,13 @@ class TestSigning(unittest.TestCase):
 class TestEndpointConfig(unittest.TestCase):
 
     def test_testnet_default(self):
-        c = BinanceClient("k", "s")
+        c = BinanceClient(FAKE_KEY, FAKE_SECRET)
         self.assertTrue(c.testnet)
         self.assertEqual(c.base_url, TESTNET_BASE)
         self.assertTrue(c.base_url.startswith("https://"))
 
     def test_mainnet_explicit(self):
-        c = BinanceClient("k", "s", testnet=False)
+        c = BinanceClient(FAKE_KEY, FAKE_SECRET, testnet=False)
         self.assertFalse(c.testnet)
         self.assertEqual(c.base_url, MAINNET_BASE)
         self.assertTrue(c.base_url.startswith("https://"))
@@ -161,10 +171,41 @@ class TestInputValidation(unittest.TestCase):
             BinanceClient("k", None)  # type: ignore
 
     def test_invalid_recv_window_rejected(self):
+        # 用合法 key 长度, 让 recv_window 检查能命中
         with self.assertRaises(ValueError):
-            BinanceClient("k", "s", recv_window_ms=0)
+            BinanceClient(FAKE_KEY, FAKE_SECRET, recv_window_ms=0)
         with self.assertRaises(ValueError):
-            BinanceClient("k", "s", recv_window_ms=70000)
+            BinanceClient(FAKE_KEY, FAKE_SECRET, recv_window_ms=70000)
+
+    def test_angle_brackets_rejected(self):
+        # 用户最常见错误: 复制了文档里的 <占位符>
+        bad_key = "<" + "x" * 62 + ">"
+        with self.assertRaises(ValueError) as ctx:
+            BinanceClient(bad_key, FAKE_SECRET)
+        self.assertIn("尖括号", str(ctx.exception))
+
+    def test_three_dots_placeholder_rejected(self):
+        with self.assertRaises(ValueError) as ctx:
+            BinanceClient("...", FAKE_SECRET)
+        # 实际会命中 length 校验先, 但都是 helpful error
+        self.assertIsInstance(ctx.exception, ValueError)
+
+    def test_whitespace_rejected(self):
+        bad_key = "abc123 " + "x" * 56   # 64 chars but has space
+        with self.assertRaises(ValueError) as ctx:
+            BinanceClient(bad_key, FAKE_SECRET)
+        self.assertIn("空格", str(ctx.exception))
+
+    def test_short_key_rejected(self):
+        with self.assertRaises(ValueError) as ctx:
+            BinanceClient("too_short_5chars", FAKE_SECRET)  # 16 chars
+        self.assertIn("长度", str(ctx.exception))
+
+    def test_unicode_in_key_rejected(self):
+        bad_key = "abc密钥" + "x" * 58  # has non-ASCII
+        with self.assertRaises(ValueError) as ctx:
+            BinanceClient(bad_key, FAKE_SECRET)
+        self.assertIn("ASCII", str(ctx.exception))
 
 
 # ============================================================================
@@ -218,7 +259,7 @@ def _make_http_error(status, body_bytes):
 class TestErrorCategorization(unittest.TestCase):
 
     def setUp(self):
-        self.client = BinanceClient("k", "s")
+        self.client = BinanceClient(FAKE_KEY, FAKE_SECRET)
         # 不让 _bucket 真等待
         self.client._bucket.acquire = MagicMock(return_value=True)
 
@@ -363,7 +404,7 @@ class TestLoadCredentials(unittest.TestCase):
 class TestURLConstruction(unittest.TestCase):
 
     def setUp(self):
-        self.client = BinanceClient("k", "s", testnet=True)
+        self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, testnet=True)
         # 不让 acquire 阻塞 + 不让真的 urlopen 跑
         self.client._bucket.acquire = MagicMock(return_value=True)
 
