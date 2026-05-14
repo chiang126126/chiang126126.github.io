@@ -1,32 +1,32 @@
 {
-  "ts": "2026-05-14T12:03:01.422267+00:00",
+  "ts": "2026-05-14T13:03:01.398828+00:00",
   "regime": "RISK_OFF",
   "regime_zh": "风险释放",
   "confidence": 68,
-  "judgment": "Alpha 池上涨币占比 13.3%，中位涨跌 -4.67%。 跌幅超过 3% 的币数 (399) 明显多于涨幅 (34)，市场偏空。 BTC 24h -1.55%，funding -0.0001%。 判定: 风险释放。",
+  "judgment": "Alpha 池上涨币占比 18.9%，中位涨跌 -2.71%。 跌幅超过 3% 的币数 (256) 明显多于涨幅 (47)，市场偏空。 BTC 24h -0.64%，funding 0.0004%。 判定: 风险释放。",
   "support": [
-    "Alpha 池 565 币样本中，上涨 75 个 (13.3%)，中位涨跌 -4.67%，平均涨跌 -4.37%",
-    "涨幅 >3% 的币 34 个，跌幅 >3% 的币 399 个；暴涨 >10% 有 12 个，暴跌 >10% 有 43 个",
-    "Binance BTCUSDT 当前约 79,263，24h 涨幅 -1.55%，24h 区间 78,713.80 - 80,558.00",
-    "BTCUSDT 永续 funding rate 为 -0.000001 (~-0.0001%)；Fear & Greed Index 为 34 (Fear)"
+    "Alpha 池 565 币样本中，上涨 107 个 (18.9%)，中位涨跌 -2.71%，平均涨跌 -2.57%",
+    "涨幅 >3% 的币 47 个，跌幅 >3% 的币 256 个；暴涨 >10% 有 11 个，暴跌 >10% 有 33 个",
+    "Binance BTCUSDT 当前约 79,729，24h 涨幅 -0.64%，24h 区间 78,713.80 - 80,316.60",
+    "BTCUSDT 永续 funding rate 为 0.000004 (~0.0004%)；Fear & Greed Index 为 34 (Fear)"
   ],
   "challenge": [
-    "当前条件较为明确，主要风险是后续数据快速变化"
+    "funding 0.0004% 仍为正，并未出现极端做多拥挤后的爆仓，可能只是暂时回调而非系统性风险释放"
   ],
   "metrics": {
     "alpha_pool_size": 565,
-    "rising_count": 75,
-    "rising_pct": 0.1327,
-    "median_change_pct": -4.67,
-    "average_change_pct": -4.37,
-    "pump_3pct_count": 34,
-    "dump_3pct_count": 399,
-    "extreme_pump_10pct_count": 12,
-    "extreme_dump_10pct_count": 43,
-    "btc_price": 79262.8,
-    "btc_change_24h_pct": -1.547,
-    "btc_24h_range": "78,713.80 - 80,558.00",
-    "btc_funding_rate": -8.7e-07,
+    "rising_count": 107,
+    "rising_pct": 0.1894,
+    "median_change_pct": -2.71,
+    "average_change_pct": -2.57,
+    "pump_3pct_count": 47,
+    "dump_3pct_count": 256,
+    "extreme_pump_10pct_count": 11,
+    "extreme_dump_10pct_count": 33,
+    "btc_price": 79729.2,
+    "btc_change_24h_pct": -0.636,
+    "btc_24h_range": "78,713.80 - 80,316.60",
+    "btc_funding_rate": 3.71e-06,
     "fear_greed": 34,
     "fear_greed_classification": "Fear"
   },
