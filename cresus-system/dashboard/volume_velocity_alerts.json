@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-14T20:33:34.620622+00:00",
+  "updated_at": "2026-05-14T20:35:40.427481+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 25,
+  "alerts_count": 26,
   "alerts": [
+    {
+      "symbol": "IDOLUSDT",
+      "base": "IDOL",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.0265,
+      "price_change_pct": 0.837,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 14728.0,
+      "volume_baseline_usdt": 522.0,
+      "volume_ratio": 28.21,
+      "detected_at": "2026-05-14T20:35:34.555697+00:00",
+      "intensity": 2,
+      "change_5m_pct": 0.798,
+      "change_15m_pct": 0.227,
+      "change_1h_pct": 0.189,
+      "change_4h_pct": -1.669,
+      "taker_buy_ratio_1m": 0.505,
+      "taker_buy_ratio_5m": 0.512,
+      "oi_delta_5m_pct": -0.011,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.226,
+      "range_4h_pct": 3.25,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.02644,
+      "suggested_tp1": 0.02659,
+      "suggested_tp2": 0.02668,
+      "conviction_score": 1,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "CYSUSDT",
       "base": "CYS",
