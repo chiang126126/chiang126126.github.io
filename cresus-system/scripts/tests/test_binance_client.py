@@ -31,7 +31,8 @@ from binance_client import (  # noqa: E402
     BinanceError, BinanceAuthError, BinanceRateLimitError,
     BinanceNetworkError, BinanceTimeError,
     _TokenBucket, _validate_credential,
-    _validate_client_order_id, _format_quantity, _format_price,
+    _validate_client_order_id, _validate_trade_id,
+    _format_quantity, _format_price,
     round_qty_down_to_step, round_price_to_tick,
     MAINNET_BASE, TESTNET_BASE,
     RECV_WINDOW_MS, MAX_TIME_DRIFT_SEC,
@@ -712,6 +713,235 @@ class TestAccountConfigMethods(unittest.TestCase):
     def test_set_position_mode_one_way(self):
         r = self.client.set_position_mode(dual_side=False)
         self.assertEqual(r["dualSidePosition"], False)
+
+
+# ============================================================================
+# Phase 2.2.2: trade_id validation
+# ============================================================================
+
+class TestTradeIdValidation(unittest.TestCase):
+
+    def test_valid_trade_id(self):
+        _validate_trade_id("sig_123")
+        _validate_trade_id("a")
+        _validate_trade_id("A" * 25)  # max len
+
+    def test_too_long_trade_id(self):
+        with self.assertRaises(ValueError):
+            _validate_trade_id("a" * 26)
+
+    def test_empty_trade_id(self):
+        with self.assertRaises(ValueError):
+            _validate_trade_id("")
+
+    def test_invalid_chars_trade_id(self):
+        with self.assertRaises(ValueError):
+            _validate_trade_id("has space")
+        with self.assertRaises(ValueError):
+            _validate_trade_id("has.dot")
+
+
+# ============================================================================
+# Phase 2.2.2: 高阶 trade lifecycle (dry-run mode)
+# ============================================================================
+
+class TestOpenPositionDryRun(unittest.TestCase):
+    """open_position 在 dry-run 模式下的逻辑 (含 filters / qty / SL 验证)."""
+
+    def setUp(self):
+        self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+        # Mock filters: BTCUSDT testnet 实际值
+        self._mock_filters = {
+            "step_size": 0.0001,
+            "min_qty": 0.0001,
+            "max_qty": 1000.0,
+            "min_notional": 50.0,
+            "tick_size": 0.10,
+            "quantity_precision": 4,
+            "price_precision": 2,
+            "status": "TRADING",
+        }
+        self._mock_klines = [[0, 0, 0, 0, "81000.00", 0, 0, 0, 0, 0, 0, 0]]
+
+    def _patch_helpers(self):
+        return [
+            patch.object(self.client, "get_symbol_filters",
+                         return_value=self._mock_filters),
+            patch.object(self.client, "get_klines",
+                         return_value=self._mock_klines),
+        ]
+
+    def test_open_long_basic(self):
+        patches = self._patch_helpers()
+        for p in patches: p.start()
+        try:
+            r = self.client.open_position(
+                symbol="BTCUSDT", side="BUY",
+                notional_usdt=100.0, sl_price=80000.0,
+                trade_id="t001",
+            )
+        finally:
+            for p in patches: p.stop()
+        self.assertTrue(r["_dryRun"])
+        self.assertEqual(r["symbol"], "BTCUSDT")
+        self.assertEqual(r["side"], "BUY")
+        self.assertEqual(r["sl_side"], "SELL")
+        self.assertEqual(r["sl_price"], 80000.0)   # round to tick
+        self.assertEqual(r["entry_client_id"], "cresus_t001_E")
+        self.assertEqual(r["sl_client_id"], "cresus_t001_SL")
+        # qty: 100 / 81000 = 0.00123, round to step 0.0001 → 0.0012
+        self.assertAlmostEqual(r["qty"], 0.0012, places=4)
+
+    def test_open_short_basic(self):
+        patches = self._patch_helpers()
+        for p in patches: p.start()
+        try:
+            r = self.client.open_position(
+                symbol="BTCUSDT", side="SELL",
+                notional_usdt=100.0, sl_price=82000.0,
+                trade_id="t002",
+            )
+        finally:
+            for p in patches: p.stop()
+        self.assertEqual(r["side"], "SELL")
+        self.assertEqual(r["sl_side"], "BUY")
+
+    def test_open_long_sl_above_current_rejected(self):
+        """LONG SL 必须 < 当前价 (否则立即触发)."""
+        patches = self._patch_helpers()
+        for p in patches: p.start()
+        try:
+            with self.assertRaises(ValueError) as ctx:
+                self.client.open_position(
+                    symbol="BTCUSDT", side="BUY",
+                    notional_usdt=100.0, sl_price=82000.0,  # > 81000
+                    trade_id="t003",
+                )
+            self.assertIn("必须 <", str(ctx.exception))
+        finally:
+            for p in patches: p.stop()
+
+    def test_open_short_sl_below_current_rejected(self):
+        patches = self._patch_helpers()
+        for p in patches: p.start()
+        try:
+            with self.assertRaises(ValueError):
+                self.client.open_position(
+                    symbol="BTCUSDT", side="SELL",
+                    notional_usdt=100.0, sl_price=80000.0,  # < 81000
+                    trade_id="t004",
+                )
+        finally:
+            for p in patches: p.stop()
+
+    def test_open_invalid_side(self):
+        with self.assertRaises(ValueError):
+            self.client.open_position(
+                symbol="BTCUSDT", side="HOLD",
+                notional_usdt=100, sl_price=80000, trade_id="t005",
+            )
+
+    def test_open_negative_notional(self):
+        with self.assertRaises(ValueError):
+            self.client.open_position(
+                symbol="BTCUSDT", side="BUY",
+                notional_usdt=-10, sl_price=80000, trade_id="t006",
+            )
+
+    def test_open_invalid_trade_id(self):
+        with self.assertRaises(ValueError):
+            self.client.open_position(
+                symbol="BTCUSDT", side="BUY",
+                notional_usdt=100, sl_price=80000, trade_id="has space",
+            )
+
+
+class TestUpdateStopOrderDryRun(unittest.TestCase):
+
+    def setUp(self):
+        self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+        self._mock_filters = {
+            "step_size": 0.0001, "min_qty": 0.0001, "max_qty": 1000.0,
+            "min_notional": 50.0, "tick_size": 0.10,
+            "quantity_precision": 4, "price_precision": 2, "status": "TRADING",
+        }
+        self._mock_klines = [[0, 0, 0, 0, "81000.00", 0, 0, 0, 0, 0, 0, 0]]
+
+    def _patch(self):
+        return [
+            patch.object(self.client, "get_symbol_filters", return_value=self._mock_filters),
+            patch.object(self.client, "get_klines", return_value=self._mock_klines),
+        ]
+
+    def test_basic_update(self):
+        ps = self._patch()
+        for p in ps: p.start()
+        try:
+            r = self.client.update_stop_order(
+                symbol="BTCUSDT",
+                new_stop_price=80500.0,           # < 81000 OK for LONG SELL SL
+                old_sl_client_order_id="cresus_t001_SL",
+                new_sl_client_order_id="cresus_t001_SLB",
+                sl_side="SELL",
+            )
+        finally:
+            for p in ps: p.stop()
+        self.assertTrue(r["_dryRun"])
+        self.assertEqual(r["new_sl_price"], 80500.0)
+        self.assertEqual(r["new_sl_client_id"], "cresus_t001_SLB")
+
+    def test_same_old_new_id_rejected(self):
+        ps = self._patch()
+        for p in ps: p.start()
+        try:
+            with self.assertRaises(ValueError):
+                self.client.update_stop_order(
+                    symbol="BTCUSDT", new_stop_price=80500.0,
+                    old_sl_client_order_id="cresus_t001_SL",
+                    new_sl_client_order_id="cresus_t001_SL",  # SAME
+                    sl_side="SELL",
+                )
+        finally:
+            for p in ps: p.stop()
+
+    def test_sell_sl_above_current_rejected(self):
+        """LONG SL (SELL) 必须 < 当前价."""
+        ps = self._patch()
+        for p in ps: p.start()
+        try:
+            with self.assertRaises(ValueError):
+                self.client.update_stop_order(
+                    symbol="BTCUSDT",
+                    new_stop_price=82000.0,    # > 81000
+                    old_sl_client_order_id="old_id",
+                    new_sl_client_order_id="new_id",
+                    sl_side="SELL",
+                )
+        finally:
+            for p in ps: p.stop()
+
+
+class TestClosePositionDryRun(unittest.TestCase):
+
+    def setUp(self):
+        self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+
+    def test_dry_run_returns_zero(self):
+        r = self.client.close_position(
+            symbol="BTCUSDT", side="BUY", trade_id="t001",
+        )
+        self.assertTrue(r["_dryRun"])
+        self.assertEqual(r["qty_closed"], 0)
+
+    def test_invalid_side(self):
+        with self.assertRaises(ValueError):
+            self.client.close_position(symbol="BTCUSDT", side="X")
+
+    def test_invalid_trade_id(self):
+        with self.assertRaises(ValueError):
+            self.client.close_position(
+                symbol="BTCUSDT", side="BUY", trade_id="has space",
+            )
 
 
 # ============================================================================
