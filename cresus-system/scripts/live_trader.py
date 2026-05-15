@@ -65,6 +65,15 @@ LIVE_SYMBOL_WHITELIST = [              # Phase 6 第 1 周限主流币
 LIVE_MIRROR_MAX_AGE_SEC = 600          # 仅 mirror 10min 内开的 paper trade
                                        # (防止启动时把陈年 paper open 全部 mirror)
 
+# Phase 3.3.a 风控参数 (实盘 $100 USDT 起始)
+LIVE_STARTING_CAPITAL_USDT = 100.0     # 实盘起始资金 (校准用)
+LIVE_DAILY_DD_LIMIT_USDT = 5.0         # 日亏 -$5 → block new opens
+LIVE_MAX_DEPLOY_USDT = 60.0            # 总部署上限 $60 (40% 现金保留)
+
+# Phase 3.3.a 控制文件 (在 ~/.cresus-*)
+PAUSE_FLAG_PATH = Path.home() / ".cresus-pause"
+EMERGENCY_STOP_PATH = Path.home() / ".cresus-emergency-stop"
+
 # 状态管理
 MIRRORED_IDS_KEEP_LAST_N = 500          # mirrored_paper_ids 滚动窗口
 
@@ -228,6 +237,123 @@ def _generate_trade_id(paper_id: str) -> str:
     # 去掉非 [a-zA-Z0-9_-]
     trade_id = "".join(c for c in trade_id if c.isalnum() or c in ("_", "-"))
     return trade_id[:25]
+
+
+# ============================================================================
+# Phase 3.3.a 风控硬装置 — soft gates (仅 block 新开, 不影响管理已有)
+# ============================================================================
+
+def _check_emergency_stop_flag() -> Optional[str]:
+    """~/.cresus-emergency-stop 文件存在 → 完全停 (Phase 3.3.b 触发后自动创建).
+    人工删文件才能恢复. 优先级最高."""
+    if not EMERGENCY_STOP_PATH.exists():
+        return None
+    try:
+        content = EMERGENCY_STOP_PATH.read_text(encoding="utf-8").strip()
+    except Exception:
+        content = ""
+    short = content[:200] if content else "no reason"
+    return f"emergency stop flag exists: {short!r}"
+
+
+def _check_pause_flag() -> Optional[str]:
+    """~/.cresus-pause 文件存在 → 手动暂停 (人工新建/删除即可).
+    适用场景: 你出门/睡觉/不想 bot 操作时."""
+    if not PAUSE_FLAG_PATH.exists():
+        return None
+    try:
+        content = PAUSE_FLAG_PATH.read_text(encoding="utf-8").strip()
+    except Exception:
+        content = ""
+    short = content[:80] if content else ""
+    return f"manual pause flag exists: {short!r}" if short else "manual pause"
+
+
+def _check_cash_reserve(live_state: dict) -> Optional[str]:
+    """部署总额 >= LIVE_MAX_DEPLOY_USDT → 不开新仓.
+    保护现金缓冲, 防止满仓后任何额外开销/突发情况."""
+    deployed = sum(
+        float(lt.get("notional_usdt", 0) or 0)
+        for lt in (live_state.get("live_open_trades") or [])
+    )
+    if deployed >= LIVE_MAX_DEPLOY_USDT:
+        return (
+            f"deployed ${deployed:.2f} >= cap ${LIVE_MAX_DEPLOY_USDT:.2f} "
+            f"({LIVE_STARTING_CAPITAL_USDT - LIVE_MAX_DEPLOY_USDT:.0f}% 现金保留触发)"
+        )
+    return None
+
+
+def _calculate_daily_realized_pnl(
+    live_state: dict, now: datetime,
+) -> tuple:
+    """汇总 UTC 今日已平仓 trades 的 realized_pnl_usdt.
+    Returns: (total_pnl, count, day_start_dt).
+    """
+    day_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    total = 0.0
+    count = 0
+    for lt in (live_state.get("live_closed_trades") or []):
+        ca = lt.get("closed_at")
+        if not ca:
+            continue
+        try:
+            dt = datetime.fromisoformat(str(ca).replace("Z", "+00:00"))
+        except Exception:
+            continue
+        if dt >= day_start:
+            total += float(lt.get("realized_pnl_usdt", 0) or 0)
+            count += 1
+    return total, count, day_start
+
+
+def _check_daily_dd(live_state: dict, now: datetime) -> Optional[str]:
+    """日内已实现亏损达 -LIVE_DAILY_DD_LIMIT_USDT → 不开新仓.
+    (不含未实现 PnL — 那是 Phase 3.3.b 用 get_account 才能精确计算)"""
+    pnl, count, day_start = _calculate_daily_realized_pnl(live_state, now)
+    if pnl <= -LIVE_DAILY_DD_LIMIT_USDT:
+        return (
+            f"daily realized PnL ${pnl:+.2f} <= -${LIVE_DAILY_DD_LIMIT_USDT:.2f} "
+            f"({count} closed trades since {day_start.strftime('%Y-%m-%dT%H:%MZ')})"
+        )
+    return None
+
+
+def check_risk_gates(live_state: dict, now: datetime) -> dict:
+    """Phase 3.3.a 软门聚合检查. 只 block 新开仓, 不影响已有仓位管理.
+
+    Returns: {
+        'block_new_opens': bool,
+        'reasons': [str, ...],   # 触发的 gate 列表 (可能多个)
+        'daily_pnl': float,      # 当日已实现 PnL (供 logging/dashboard)
+        'deployed_usdt': float,  # 当前部署 (供 logging/dashboard)
+    }
+    """
+    reasons = []
+    # 优先级 1: emergency stop (Phase 3.3.b 自动写, 人工删)
+    msg = _check_emergency_stop_flag()
+    if msg: reasons.append(msg)
+    # 优先级 2: 手动 pause (人工随时新建/删)
+    msg = _check_pause_flag()
+    if msg: reasons.append(msg)
+    # 优先级 3: 现金保留
+    msg = _check_cash_reserve(live_state)
+    if msg: reasons.append(msg)
+    # 优先级 4: 日 DD
+    msg = _check_daily_dd(live_state, now)
+    if msg: reasons.append(msg)
+
+    daily_pnl, _, _ = _calculate_daily_realized_pnl(live_state, now)
+    deployed = sum(
+        float(lt.get("notional_usdt", 0) or 0)
+        for lt in (live_state.get("live_open_trades") or [])
+    )
+    return {
+        "block_new_opens": bool(reasons),
+        "reasons": reasons,
+        "daily_pnl": round(daily_pnl, 4),
+        "deployed_usdt": round(deployed, 2),
+    }
 
 
 def _get_current_price(client: BinanceClient, symbol: str) -> Optional[float]:
@@ -436,7 +562,18 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
         f"client_dry_run={client.dry_run}"
     )
 
-    # 1. 找 eligible candidates
+    # Phase 3.3.a: 风控软门检查 (在尝试新开仓前)
+    risk = check_risk_gates(live, now)
+    log.info(
+        f"[risk] daily_pnl=${risk['daily_pnl']:+.2f} "
+        f"deployed=${risk['deployed_usdt']:.2f}/{LIVE_MAX_DEPLOY_USDT:.0f} "
+        f"block_new_opens={risk['block_new_opens']}"
+    )
+    if risk["block_new_opens"]:
+        for r in risk["reasons"]:
+            log.warning(f"🛑 [risk-gate] {r}")
+
+    # 1. 找 eligible candidates (即使风控触发也走 eligibility 检查, 便于日志一致)
     mirror_candidates = []
     skip_log = []
     for pt in paper_open:
@@ -451,22 +588,30 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
             log.debug(f"[skip-mirror] {sym} ({pid[:30]}...): {reason}")
 
     # 2. 对每个 candidate 真实下单 (Plan B: 无 exchange SL)
+    #    仅当风控未 block 时执行
     mirrored_count = 0
-    for pt in mirror_candidates:
-        new_trade = _try_mirror_open(client, pt, dry_run=dry_run)
-        if new_trade is None:
-            # 失败也记入 mirrored_paper_ids 防止下次重试 (避免重复砍腰)
+    if risk["block_new_opens"]:
+        if mirror_candidates:
+            log.warning(
+                f"🛑 {len(mirror_candidates)} eligible paper trade(s) "
+                f"NOT mirrored due to risk gate."
+            )
+    else:
+        for pt in mirror_candidates:
+            new_trade = _try_mirror_open(client, pt, dry_run=dry_run)
+            if new_trade is None:
+                # 失败也记入 mirrored_paper_ids 防止下次重试 (避免重复砍腰)
+                live.setdefault("mirrored_paper_ids", []).append(pt["id"])
+                log.warning(f"[mirror-open] {pt['symbol']} 失败, paper_id 加入 skip 列表")
+                continue
+            live.setdefault("live_open_trades", []).append(new_trade)
             live.setdefault("mirrored_paper_ids", []).append(pt["id"])
-            log.warning(f"[mirror-open] {pt['symbol']} 失败, paper_id 加入 skip 列表")
-            continue
-        live.setdefault("live_open_trades", []).append(new_trade)
-        live.setdefault("mirrored_paper_ids", []).append(pt["id"])
-        mirrored_count += 1
-        log.info(
-            f"[mirrored ✓] {new_trade['symbol']} {new_trade['side']} "
-            f"slippage={new_trade['slippage_bps']:+.1f}bps "
-            f"({len(live['live_open_trades'])} live open now)"
-        )
+            mirrored_count += 1
+            log.info(
+                f"[mirrored ✓] {new_trade['symbol']} {new_trade['side']} "
+                f"slippage={new_trade['slippage_bps']:+.1f}bps "
+                f"({len(live['live_open_trades'])} live open now)"
+            )
 
     # 3. Sync + monitor live opens, 触发 close 条件 (Phase 3.2.b)
     # 三个 close 触发器 (按优先级):
