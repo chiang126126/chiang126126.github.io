@@ -5,13 +5,17 @@
     <key>Label</key>
     <string>com.cresus.live-trader</string>
 
-    <!-- Phase 3 live_trader.py: 镜像 paper 决策到真实 Binance Futures.
-         默认 dry-run, 即使白名单触发也不下真单, 需手动加 --live + ~/.allow-live -->
+    <!-- Phase 3 live_trader.py: 镜像 paper 决策到 Binance Futures.
+         当前: testnet + --live + OBS mode = 真单到 testnet (testnet 钱, 不烧真钱).
+         切主网真钱前 3 步: 1) 改 LIVE_OBSERVATION_MODE=False
+                          2) 加 --mainnet 这行
+                          3) touch ~/.allow-live -->
     <key>ProgramArguments</key>
     <array>
         <string>/usr/bin/python3</string>
         <string>/Users/mangzi/chiang126126.github.io/cresus-system/scripts/live_trader.py</string>
         <string>--once</string>
+        <string>--live</string>
     </array>
 
     <!-- 每 30 秒跑一次 (跟 paper trader 频率相近, 含 SL polling 间隔) -->

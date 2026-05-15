@@ -841,19 +841,27 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
         for r in risk["reasons"]:
             log.warning(f"🛑 [risk-gate] {r}")
 
-    # Phase 3.3.b: 仓位对账 (live state vs exchange)
-    recon = check_position_reconciliation(client, live)
-    if not recon["ok"]:
-        for m in recon["mismatches"]:
-            log.warning(f"⚠️ [recon-{m['kind']}] {m['message']}")
-        log.warning(
-            f"[recon] live_symbols={recon['live_symbols']} "
-            f"exchange_symbols={recon['exchange_symbols']}"
-        )
-    elif recon["api_failed"]:
-        log.debug(f"[recon] API failed, skipped reconciliation this tick")
+    # Phase 3.3.b: 仓位对账 (live state vs exchange).
+    # DRY-RUN 模式下不对账 (因为 mock 单不会出现在 exchange, 必然 false mismatch).
+    if client.dry_run:
+        log.debug("[recon] skipped (DRY-RUN mode, mirror creates mock state)")
+        recon = {
+            "ok": True, "mismatches": [], "api_failed": False,
+            "live_symbols": [], "exchange_symbols": [], "_skipped": "dry_run",
+        }
     else:
-        log.debug(f"[recon] OK ({len(recon['live_symbols'])} symbols matched)")
+        recon = check_position_reconciliation(client, live)
+        if not recon["ok"]:
+            for m in recon["mismatches"]:
+                log.warning(f"⚠️ [recon-{m['kind']}] {m['message']}")
+            log.warning(
+                f"[recon] live_symbols={recon['live_symbols']} "
+                f"exchange_symbols={recon['exchange_symbols']}"
+            )
+        elif recon["api_failed"]:
+            log.debug(f"[recon] API failed, skipped reconciliation this tick")
+        else:
+            log.debug(f"[recon] OK ({len(recon['live_symbols'])} symbols matched)")
 
     # 1. 找 eligible candidates (即使风控触发也走 eligibility 检查, 便于日志一致)
     mirror_candidates = []
