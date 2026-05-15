@@ -894,7 +894,29 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
                 f"NOT mirrored due to risk gate."
             )
     else:
+        # Orphan protection: 用 recon 数据预防"state 被清后重复 mirror"
+        # 场景: 第一次 mirror 已下单到 exchange, 但 state file 被 rm 等清掉,
+        #       下次 tick fresh state 看不到 mirrored_paper_ids → 又 mirror 一次,
+        #       Binance one-way mode 合并成 2× size 的孤儿持仓.
+        # 防护: 若 recon 数据可信 (非 dry_run / api_failed), 且 symbol 已在 exchange,
+        #       skip mirror (即使 live_state 不知). 用户需手动 reconcile.
+        recon_has_data = (not recon.get("api_failed", False)
+                          and not recon.get("_skipped"))
+        exchange_symbols_now = set(recon.get("exchange_symbols", []))
+
         for pt in mirror_candidates:
+            sym = pt.get("symbol", "")
+            # Orphan check: 第一道防线
+            if recon_has_data and sym in exchange_symbols_now:
+                log.warning(
+                    f"[skip-orphan] {sym}: exchange 已有持仓但 live_state 不知 "
+                    f"(可能 state 被清). 跳过 mirror 防 2× size 孤儿. "
+                    f"修复: 检查 testnet UI 手动平仓 OR 等 exchange 自然平仓后下次重试"
+                )
+                # 加入 mirrored_paper_ids 防本 tick 反复触发同 warning
+                live.setdefault("mirrored_paper_ids", []).append(pt["id"])
+                continue
+
             # Re-check eligibility 用最新 live state (含本轮已 mirror 的)
             eligible, reason = is_eligible_for_mirror(pt, live, now)
             if not eligible:
