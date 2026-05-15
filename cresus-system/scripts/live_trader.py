@@ -871,6 +871,12 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
 
     # 2. 对每个 candidate 真实下单 (Plan B: 无 exchange SL)
     #    仅当风控未 block 时执行
+    #
+    # ⚠️ Bug fix: 每次 mirror 前重新检查 eligibility, 因为 live state 在循环中变化:
+    #   - single_symbol cap: 上一笔 mirror 后, 同 symbol 应被阻止
+    #   - max_concurrent: 达到 3 笔后, 后续应被阻止
+    #   - cash reserve: 部署达 $60 后, 后续应被阻止
+    # 不再用一次性预计算的 mirror_candidates 列表盲目迭代.
     mirrored_count = 0
     if risk["block_new_opens"]:
         if mirror_candidates:
@@ -880,9 +886,29 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
             )
     else:
         for pt in mirror_candidates:
+            # Re-check eligibility 用最新 live state (含本轮已 mirror 的)
+            eligible, reason = is_eligible_for_mirror(pt, live, now)
+            if not eligible:
+                log.debug(f"[skip-during-iter] {pt['symbol']}: {reason}")
+                # 不加 mirrored_paper_ids — 下 tick 状态变化后可以重试
+                continue
+
+            # Re-check cash reserve (mirror_candidates 计算时未含本轮已部署)
+            deployed_now = sum(
+                float(lt.get("notional_usdt", 0) or 0)
+                for lt in (live.get("live_open_trades") or [])
+            )
+            if deployed_now + LIVE_NOTIONAL_USDT > LIVE_MAX_DEPLOY_USDT:
+                log.debug(
+                    f"[skip-during-iter-cash] {pt['symbol']}: "
+                    f"deployed ${deployed_now:.0f} + ${LIVE_NOTIONAL_USDT} "
+                    f"> cap ${LIVE_MAX_DEPLOY_USDT}"
+                )
+                continue
+
             new_trade = _try_mirror_open(client, pt, dry_run=dry_run)
             if new_trade is None:
-                # 失败也记入 mirrored_paper_ids 防止下次重试 (避免重复砍腰)
+                # API/业务错失败 → 加 mirrored_paper_ids 防重试无限砍腰
                 live.setdefault("mirrored_paper_ids", []).append(pt["id"])
                 log.warning(f"[mirror-open] {pt['symbol']} 失败, paper_id 加入 skip 列表")
                 continue

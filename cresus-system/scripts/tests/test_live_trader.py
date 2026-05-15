@@ -1402,6 +1402,147 @@ class TestRiskGatesWithClient(unittest.TestCase):
 
 
 # ============================================================================
+# Bug fix: 循环内 re-check eligibility (防 max_concurrent / single_symbol / cash 超限)
+# ============================================================================
+
+class TestMirrorIterationGuards(unittest.TestCase):
+    """Bug fix verification: 循环内 mirror 多个时, 每次都重新评估 state."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self._orig_live_state = live_trader.LIVE_STATE
+        self._orig_paper_history = live_trader.PAPER_HISTORY
+        live_trader.LIVE_STATE = Path(self.tmpdir) / "live.json"
+        live_trader.PAPER_HISTORY = Path(self.tmpdir) / "paper.json"
+        self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+
+        self.mock_open_result = {
+            "trade_id": "L1", "symbol": "X",
+            "side": "BUY", "qty": 0.001,
+            "avg_fill_price": 100.0, "actual_notional": 20.0,
+            "entry_order_id": 1, "entry_client_id": "x",
+            "sl_price": 95.0, "sl_side": "SELL", "sl_mode": "client_side",
+            "opened_at": "x", "fees_paid_usdt": 0, "_dryRun": True,
+        }
+
+    def tearDown(self):
+        live_trader.LIVE_STATE = self._orig_live_state
+        live_trader.PAPER_HISTORY = self._orig_paper_history
+        import shutil
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def _write_paper(self, trades):
+        live_trader.PAPER_HISTORY.parent.mkdir(parents=True, exist_ok=True)
+        live_trader.PAPER_HISTORY.write_text(json.dumps({
+            "open_trades": trades, "recent_closed": [],
+        }))
+
+    def test_max_concurrent_enforced_during_loop(self):
+        """Paper 有 5 笔 eligible 信号, 但 max_concurrent=3 → 只 mirror 3 笔."""
+        now = datetime.now(timezone.utc)
+        trades = []
+        for i, sym in enumerate(["AAA", "BBB", "CCC", "DDD", "EEE"]):
+            trades.append({
+                "id": f"{sym}|LONG|2026-05-15T10:00:0{i}+00:00",
+                "symbol": f"{sym}USDT",
+                "direction": "LONG",
+                "entered_at": (now - timedelta(seconds=10)).isoformat(),
+                "entry_price": 100.0,
+                "sl": 95.0,
+            })
+        self._write_paper(trades)
+
+        # 自定义 mock_result 每次返回不同 symbol
+        call_count = [0]
+        def make_result(symbol, side, **kwargs):
+            call_count[0] += 1
+            r = dict(self.mock_open_result)
+            r["symbol"] = symbol
+            r["trade_id"] = f"L{call_count[0]}"
+            return r
+
+        with patch.object(self.client, "open_position",
+                          side_effect=make_result):
+            with patch.object(self.client, "get_klines",
+                              return_value=[[0, 0, 0, 0, "100.0", 0, 0, 0, 0, 0, 0, 0]]):
+                result = main_loop(self.client, dry_run=True)
+
+        # ⚠️ Bug fix verification: max_concurrent=3, 必须只 mirror 3 笔
+        self.assertEqual(call_count[0], 3,
+                         f"应严格在 max_concurrent=3 处停止, 实际 mirror {call_count[0]} 次")
+        self.assertEqual(len(result["live_open_trades"]), 3)
+
+    def test_same_symbol_blocks_within_iteration(self):
+        """Paper 有 POLYX LONG + POLYX SHORT 同时 open → 只 mirror 第一笔."""
+        now = datetime.now(timezone.utc)
+        trades = [
+            {
+                "id": "POLYXUSDT|LONG|2026-05-15T10:00:00+00:00",
+                "symbol": "POLYXUSDT", "direction": "LONG",
+                "entered_at": (now - timedelta(seconds=10)).isoformat(),
+                "entry_price": 1.0, "sl": 0.95,
+            },
+            {
+                "id": "POLYXUSDT|SHORT|2026-05-15T10:00:05+00:00",
+                "symbol": "POLYXUSDT", "direction": "SHORT",
+                "entered_at": (now - timedelta(seconds=5)).isoformat(),
+                "entry_price": 1.0, "sl": 1.05,
+            },
+        ]
+        self._write_paper(trades)
+
+        call_count = [0]
+        def make_result(symbol, side, **kwargs):
+            call_count[0] += 1
+            r = dict(self.mock_open_result)
+            r["symbol"] = symbol
+            r["side"] = side
+            return r
+
+        with patch.object(self.client, "open_position",
+                          side_effect=make_result):
+            with patch.object(self.client, "get_klines",
+                              return_value=[[0, 0, 0, 0, "1.0", 0, 0, 0, 0, 0, 0, 0]]):
+                result = main_loop(self.client, dry_run=True)
+
+        # ⚠️ Bug fix: 同 symbol 即使不同方向, 也只能开 1 笔
+        self.assertEqual(call_count[0], 1,
+                         f"同 symbol 应只 mirror 1 笔, 实际 {call_count[0]}")
+        self.assertEqual(len(result["live_open_trades"]), 1)
+
+    def test_cash_reserve_blocks_within_iteration(self):
+        """Paper 有 4 笔 eligible, deploy cap $60 → 最多 mirror 3 笔 (3 × $20 = $60)."""
+        now = datetime.now(timezone.utc)
+        trades = []
+        for i, sym in enumerate(["AAA", "BBB", "CCC", "DDD"]):
+            trades.append({
+                "id": f"{sym}|LONG|2026-05-15T10:00:0{i}+00:00",
+                "symbol": f"{sym}USDT",
+                "direction": "LONG",
+                "entered_at": (now - timedelta(seconds=10)).isoformat(),
+                "entry_price": 100.0, "sl": 95.0,
+            })
+        self._write_paper(trades)
+
+        call_count = [0]
+        def make_result(symbol, side, **kwargs):
+            call_count[0] += 1
+            r = dict(self.mock_open_result)
+            r["symbol"] = symbol
+            r["actual_notional"] = 20.0   # 每笔 $20
+            return r
+
+        with patch.object(self.client, "open_position",
+                          side_effect=make_result):
+            with patch.object(self.client, "get_klines",
+                              return_value=[[0, 0, 0, 0, "100.0", 0, 0, 0, 0, 0, 0, 0]]):
+                result = main_loop(self.client, dry_run=True)
+
+        # 应在 max_concurrent (3) OR cash reserve ($60) 早触发处停, 都是 3
+        self.assertLessEqual(call_count[0], 3)
+
+
+# ============================================================================
 # Phase 3.2.c: Live trades history publishing
 # ============================================================================
 
