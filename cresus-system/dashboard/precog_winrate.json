@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-15T00:32:47.114939+00:00",
+  "generated_at": "2026-05-15T00:47:51.403236+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
@@ -232,6 +232,11 @@
           "n": 5,
           "win_rate": 0.2,
           "avg_outcome_pct": -0.39
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -0.25
         }
       }
     },
@@ -466,9 +471,9 @@
           "avg_outcome_pct": 1.42
         },
         "60m": {
-          "n": 5,
-          "win_rate": 0.6,
-          "avg_outcome_pct": 1.83
+          "n": 6,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 1.4
         },
         "240m": {
           "n": 5,
@@ -676,9 +681,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 8,
-          "win_rate": 0.625,
-          "avg_outcome_pct": 0.75
+          "n": 9,
+          "win_rate": 0.667,
+          "avg_outcome_pct": 0.83
         },
         "60m": {
           "n": 8,
@@ -1459,6 +1464,30 @@
         }
       }
     },
+    "BASEDUSDT|ignition|SHORT": {
+      "symbol": "BASEDUSDT",
+      "pred_type": "ignition",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": -0.43
+        }
+      }
+    },
+    "SAGAUSDT|ignition|SHORT": {
+      "symbol": "SAGAUSDT",
+      "pred_type": "ignition",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": -0.21
+        }
+      }
+    },
     "COSUSDT|ignition|SHORT": {
       "symbol": "COSUSDT",
       "pred_type": "ignition",
@@ -1681,6 +1710,18 @@
         }
       }
     },
+    "DYMUSDT|ignition|SHORT": {
+      "symbol": "DYMUSDT",
+      "pred_type": "ignition",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": 0.13
+        }
+      }
+    },
     "SIRENUSDT|setup|LONG": {
       "symbol": "SIRENUSDT",
       "pred_type": "setup",
@@ -1748,9 +1789,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 7,
-          "win_rate": 0.143,
-          "avg_outcome_pct": 0.16
+          "n": 8,
+          "win_rate": 0.125,
+          "avg_outcome_pct": -0.33
         },
         "60m": {
           "n": 7,
@@ -1868,13 +1909,13 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 1520,
+        "n": 1527,
         "win_rate": 0.306,
-        "avg_outcome_pct": 0.0
+        "avg_outcome_pct": -0.0
       },
       "60m": {
-        "n": 1509,
-        "win_rate": 0.353,
+        "n": 1514,
+        "win_rate": 0.351,
         "avg_outcome_pct": -0.05
       },
       "240m": {
