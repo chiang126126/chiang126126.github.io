@@ -230,14 +230,100 @@ def _generate_trade_id(paper_id: str) -> str:
     return trade_id[:25]
 
 
+def _try_mirror_open(
+    client: BinanceClient,
+    paper_trade: dict,
+    *,
+    dry_run: bool,
+) -> Optional[dict]:
+    """实际 mirror paper trade → live. Plan B (client-side SL).
+
+    Returns: 新的 live trade dict (添加到 live_open_trades 用), 失败返回 None.
+    异常完全捕获 (不让单笔失败让 loop 崩).
+    """
+    paper_id = paper_trade.get("id", "")
+    sym = paper_trade.get("symbol", "")
+    direction = paper_trade.get("direction", "")
+    side = _paper_to_live_side(direction)
+    trade_id = _generate_trade_id(paper_id)
+
+    # 提取必需字段
+    try:
+        sl_price = float(paper_trade["sl"])
+        paper_entry = float(paper_trade.get("entry_price", 0))
+    except (KeyError, ValueError, TypeError) as e:
+        log.error(f"[mirror-open FAILED] {sym}: paper trade 缺关键字段: {e}")
+        return None
+
+    log.info(
+        f"[mirror-open] {sym} {side} notional=${LIVE_NOTIONAL_USDT} sl={sl_price} "
+        f"paper_id={paper_id[:40]} → trade_id={trade_id}"
+    )
+
+    try:
+        result = client.open_position(
+            symbol=sym,
+            side=side,
+            notional_usdt=LIVE_NOTIONAL_USDT,
+            sl_price=sl_price,
+            trade_id=trade_id,
+            use_exchange_sl=False,   # Plan B: client-side SL (Phase 3.2.b 实现 polling)
+        )
+    except (BinanceError, ValueError) as e:
+        log.error(f"[mirror-open FAILED] {sym} {side}: {type(e).__name__}: {e}")
+        return None
+    except Exception as e:
+        # 兜底: 任何意外异常都不让 loop 崩
+        log.error(f"[mirror-open UNEXPECTED] {sym} {side}: {type(e).__name__}: {e}",
+                  exc_info=True)
+        return None
+
+    # Slippage 计算 (paper_entry 是信号时价格, actual_fill 是真实成交)
+    actual_fill = float(result.get("avg_fill_price") or 0)
+    slippage_bps = 0.0
+    if paper_entry > 0 and actual_fill > 0:
+        # LONG: 实际成交 > 预期 = 不利 (正 bps)
+        # SHORT: 实际成交 < 预期 = 不利 (取负)
+        raw_bps = (actual_fill - paper_entry) / paper_entry * 10000.0
+        slippage_bps = raw_bps if side == "BUY" else -raw_bps
+
+    live_trade = {
+        "paper_id": paper_id,
+        "trade_id": trade_id,
+        "symbol": sym,
+        "side": side,
+        "direction": direction,
+        "entry_price_paper": paper_entry,
+        "avg_fill_price": actual_fill,
+        "slippage_bps": round(slippage_bps, 2),
+        "qty": result.get("qty", 0),
+        "notional_usdt": result.get("actual_notional", 0),
+        "sl_price": result.get("sl_price", sl_price),
+        "tp1_price": float(paper_trade.get("tp1") or 0),
+        "tp2_price": float(paper_trade.get("tp2") or 0),
+        "phase": "A",
+        "entry_order_id": result.get("entry_order_id"),
+        "entry_client_id": result.get("entry_client_id"),
+        "sl_order_id": result.get("sl_order_id"),
+        "sl_mode": result.get("sl_mode", "client_side"),
+        "conviction_score": paper_trade.get("conviction_score"),
+        "alert_type": paper_trade.get("alert_type"),
+        "atr_pct": paper_trade.get("atr_pct"),
+        "fees_paid_usdt": result.get("fees_paid_usdt", 0),
+        "opened_at": result.get("opened_at"),
+        "is_dry_run": bool(dry_run or result.get("_dryRun")),
+    }
+    return live_trade
+
+
 # ============================================================================
 # Main loop
 # ============================================================================
 
 def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
-    """单次循环 — 读 paper, 决策, 持久化 live state.
+    """单次循环 — 读 paper, mirror eligible 的, 持久化 live state.
 
-    Phase 3.1: 仅输出 would-mirror 日志, 不真下单.
+    Phase 3.2.a: 真实调 open_position (但 dry_run=True 时仍返回 mock).
     Returns: live state dict (for testing/inspection).
     """
     paper = load_paper_state()
@@ -253,7 +339,7 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
         f"client_dry_run={client.dry_run}"
     )
 
-    # 1. 检查 paper 新开的 trade, 是否要 mirror
+    # 1. 找 eligible candidates
     mirror_candidates = []
     skip_log = []
     for pt in paper_open:
@@ -264,31 +350,39 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
             skip_log.append((pt.get("symbol"), pt.get("id"), reason))
 
     if skip_log:
-        for sym, pid, reason in skip_log[:5]:  # 前 5 条避免太冗长
+        for sym, pid, reason in skip_log[:5]:
             log.debug(f"[skip-mirror] {sym} ({pid[:30]}...): {reason}")
 
-    # 2. 对 candidate 输出 would-mirror (Phase 3.2 将真下单)
+    # 2. 对每个 candidate 真实下单 (Plan B: 无 exchange SL)
+    mirrored_count = 0
     for pt in mirror_candidates:
-        live_trade_id = _generate_trade_id(pt.get("id", ""))
-        side = _paper_to_live_side(pt.get("direction", ""))
+        new_trade = _try_mirror_open(client, pt, dry_run=dry_run)
+        if new_trade is None:
+            # 失败也记入 mirrored_paper_ids 防止下次重试 (避免重复砍腰)
+            live.setdefault("mirrored_paper_ids", []).append(pt["id"])
+            log.warning(f"[mirror-open] {pt['symbol']} 失败, paper_id 加入 skip 列表")
+            continue
+        live.setdefault("live_open_trades", []).append(new_trade)
+        live.setdefault("mirrored_paper_ids", []).append(pt["id"])
+        mirrored_count += 1
         log.info(
-            f"[WOULD-MIRROR] {pt['symbol']} {side} "
-            f"entry≈{pt.get('entry_price')} sl≈{pt.get('sl')} "
-            f"paper_id={pt.get('id', '')[:40]} "
-            f"→ live_trade_id={live_trade_id}"
+            f"[mirrored ✓] {new_trade['symbol']} {new_trade['side']} "
+            f"slippage={new_trade['slippage_bps']:+.1f}bps "
+            f"({len(live['live_open_trades'])} live open now)"
         )
-        # Phase 3.2 在这里调 client.open_position(...)
 
-    # 3. 监控 live open trades (Phase 3.4 会做 SL polling)
+    # 3. 监控 live open trades (Phase 3.2.b 会做 SL polling + paper close mirror)
     for lt in live_open:
         log.info(
             f"[live-monitor] {lt.get('symbol')} {lt.get('side')} "
-            f"phase={lt.get('phase')} entry={lt.get('entry_price')} "
+            f"phase={lt.get('phase')} entry={lt.get('avg_fill_price')} "
             f"sl={lt.get('sl_price')}"
         )
 
     # 4. 持久化 state
     save_live_state(live)
+    if mirrored_count > 0:
+        log.info(f"[live_trader] mirrored {mirrored_count} new trade(s) this tick")
     return live
 
 
