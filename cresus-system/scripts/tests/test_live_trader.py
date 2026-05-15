@@ -29,6 +29,7 @@ from live_trader import (  # noqa: E402
     _check_daily_dd, check_risk_gates,
     _get_account_balance, _check_cumulative_dd_and_trigger,
     check_position_reconciliation,
+    _compute_live_stats, publish_live_history,
     load_paper_state, load_live_state, save_live_state,
     main_loop, _empty_live_state,
     LIVE_SYMBOL_WHITELIST, LIVE_MAX_CONCURRENT, LIVE_MIRROR_MAX_AGE_SEC,
@@ -1384,6 +1385,160 @@ class TestRiskGatesWithClient(unittest.TestCase):
         # 但下次 tick 会同时命中 (emergency_stop_flag + cumulative_DD)
         # 这里只测第一次, 所以 emergency_reasons 数应该是 0 或 1
         self.assertLessEqual(len(emergency_reasons), 1)
+
+
+# ============================================================================
+# Phase 3.2.c: Live trades history publishing
+# ============================================================================
+
+class TestComputeLiveStats(unittest.TestCase):
+
+    def test_empty_state(self):
+        state = _empty_live_state()
+        s = _compute_live_stats(state)
+        self.assertEqual(s["total_trades"], 0)
+        self.assertEqual(s["wins"], 0)
+        self.assertEqual(s["losses"], 0)
+        self.assertEqual(s["total_pnl_usdt"], 0)
+        self.assertEqual(s["starting_capital_usdt"], 100.0)
+
+    def test_with_closed_trades(self):
+        state = _empty_live_state()
+        state["live_closed_trades"] = [
+            {"realized_pnl_usdt": 0.5, "fees_paid_usdt": 0.02},
+            {"realized_pnl_usdt": -0.3, "fees_paid_usdt": 0.02},
+            {"realized_pnl_usdt": 1.0, "fees_paid_usdt": 0.02},
+        ]
+        s = _compute_live_stats(state)
+        self.assertEqual(s["total_trades"], 3)
+        self.assertEqual(s["closed"], 3)
+        self.assertEqual(s["wins"], 2)
+        self.assertEqual(s["losses"], 1)
+        self.assertAlmostEqual(s["win_rate"], 2/3, places=2)
+        self.assertAlmostEqual(s["total_pnl_usdt"], 1.2, places=2)
+        self.assertAlmostEqual(s["best_trade_usdt"], 1.0, places=2)
+        self.assertAlmostEqual(s["worst_trade_usdt"], -0.3, places=2)
+
+    def test_with_open_positions(self):
+        state = _empty_live_state()
+        state["live_open_trades"] = [
+            {"notional_usdt": 20.0, "fees_paid_usdt": 0.01},
+            {"notional_usdt": 25.0, "fees_paid_usdt": 0.01},
+        ]
+        s = _compute_live_stats(state)
+        self.assertEqual(s["open"], 2)
+        self.assertEqual(s["slots_used"], 2)
+        self.assertAlmostEqual(s["deployed_usdt"], 45.0, places=2)
+        # free = 100 - 45 + 0 = 55
+        self.assertAlmostEqual(s["free_capital_usdt"], 55.0, places=2)
+
+
+class TestPublishLiveHistory(unittest.TestCase):
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self._orig_history = live_trader.LIVE_HISTORY
+        live_trader.LIVE_HISTORY = Path(self.tmpdir) / "live_history.json"
+
+    def tearDown(self):
+        live_trader.LIVE_HISTORY = self._orig_history
+        import shutil
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def test_publish_empty_state(self):
+        state = _empty_live_state()
+        ok = publish_live_history(state)
+        self.assertTrue(ok)
+        self.assertTrue(live_trader.LIVE_HISTORY.exists())
+        payload = json.loads(live_trader.LIVE_HISTORY.read_text())
+        # 验证关键字段
+        self.assertIn("version", payload)
+        self.assertIn("generated_at", payload)
+        self.assertIn("stats", payload)
+        self.assertIn("open_trades", payload)
+        self.assertIn("recent_closed", payload)
+        self.assertIn("config", payload)
+        self.assertEqual(payload["open_trades"], [])
+        self.assertEqual(payload["recent_closed"], [])
+
+    def test_publish_with_trades(self):
+        state = _empty_live_state()
+        state["live_open_trades"] = [{
+            "symbol": "BTCUSDT", "side": "BUY",
+            "qty": 0.001, "avg_fill_price": 81000.0,
+            "notional_usdt": 81.0, "sl_price": 80190.0,
+            "phase": "A", "trade_id": "L1",
+        }]
+        state["live_closed_trades"] = [{
+            "symbol": "ETHUSDT", "side": "BUY",
+            "realized_pnl_usdt": 0.3,
+            "closed_at": "2026-05-15T10:00:00+00:00",
+            "close_reason": "paper:hit_trail",
+        }]
+        ok = publish_live_history(state)
+        self.assertTrue(ok)
+        payload = json.loads(live_trader.LIVE_HISTORY.read_text())
+        self.assertEqual(len(payload["open_trades"]), 1)
+        self.assertEqual(len(payload["recent_closed"]), 1)
+        self.assertEqual(payload["stats"]["total_trades"], 2)
+        self.assertEqual(payload["stats"]["wins"], 1)
+
+    def test_publish_atomic(self):
+        """publish 应用 .tmp + rename 原子写."""
+        state = _empty_live_state()
+        ok = publish_live_history(state)
+        self.assertTrue(ok)
+        # .tmp 不应残留
+        tmp_path = live_trader.LIVE_HISTORY.with_suffix(".tmp")
+        self.assertFalse(tmp_path.exists())
+
+    def test_publish_includes_risk_and_recon(self):
+        state = _empty_live_state()
+        risk = {
+            "block_new_opens": True,
+            "reasons": ["test reason"],
+            "daily_pnl": -2.5,
+            "deployed_usdt": 40.0,
+        }
+        recon = {
+            "ok": False,
+            "mismatches": [{"symbol": "BTC", "kind": "live_only",
+                            "message": "test"}],
+            "api_failed": False,
+            "live_symbols": ["BTCUSDT"],
+            "exchange_symbols": [],
+        }
+        ok = publish_live_history(state, risk=risk, recon=recon)
+        self.assertTrue(ok)
+        payload = json.loads(live_trader.LIVE_HISTORY.read_text())
+        self.assertTrue(payload["risk_status"]["block_new_opens"])
+        self.assertFalse(payload["reconciliation"]["ok"])
+        self.assertEqual(len(payload["reconciliation"]["mismatches"]), 1)
+
+    def test_publish_config_section(self):
+        state = _empty_live_state()
+        publish_live_history(state)
+        payload = json.loads(live_trader.LIVE_HISTORY.read_text())
+        config = payload["config"]
+        self.assertEqual(config["starting_capital_usdt"], 100.0)
+        self.assertEqual(config["max_concurrent"], 3)
+        self.assertIn("BTCUSDT", config["symbol_whitelist"])
+        self.assertEqual(config["daily_dd_limit_usdt"], 5.0)
+
+    def test_publish_recent_closed_sorted_desc(self):
+        """recent_closed 应按 closed_at 倒序 (最新在前)."""
+        state = _empty_live_state()
+        state["live_closed_trades"] = [
+            {"closed_at": "2026-05-15T10:00:00+00:00", "realized_pnl_usdt": 0.5},
+            {"closed_at": "2026-05-15T12:00:00+00:00", "realized_pnl_usdt": -0.2},
+            {"closed_at": "2026-05-15T11:00:00+00:00", "realized_pnl_usdt": 0.3},
+        ]
+        publish_live_history(state)
+        payload = json.loads(live_trader.LIVE_HISTORY.read_text())
+        # 应按时间倒序: 12:00, 11:00, 10:00
+        ts = [t["closed_at"] for t in payload["recent_closed"]]
+        self.assertEqual(ts[0], "2026-05-15T12:00:00+00:00")
+        self.assertEqual(ts[-1], "2026-05-15T10:00:00+00:00")
 
 
 if __name__ == "__main__":
