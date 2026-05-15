@@ -320,9 +320,21 @@
                 rgba(13,128,67,0.015) 100%);
     box-shadow: inset 1px 0 0 rgba(13,128,67,0.15);
   }
+  /* 标题栏: 深翡翠渐变背景, 与 paper 浅翠绿明显差异 */
   .live-panel h2 {
-    color: #1cbe72;
-    text-shadow: 0 0 12px rgba(28,190,114,0.15);
+    color: #2dd07a;
+    background: linear-gradient(90deg,
+                rgba(13,128,67,0.22) 0%,
+                rgba(13,128,67,0.10) 60%,
+                rgba(13,128,67,0.04) 100%);
+    border-bottom-color: rgba(13,128,67,0.4);
+    text-shadow: 0 0 14px rgba(28,190,114,0.20);
+  }
+  .live-panel h2 .meta-inline {
+    color: var(--text-dim);
+    font-weight: 400;
+    margin-left: 10px;
+    text-shadow: none;
   }
   /* live-panel 内的 paper-stat 卡 — 4 张统计卡精致版 (Task 2) */
   .live-panel .paper-stat {
@@ -349,40 +361,44 @@
   .live-panel .paper-stat .value.wr-good { color: #00e676; }
   .live-panel .paper-stat .value.wr-mid  { color: #ffd54f; }
   .live-panel .paper-stat .value.wr-bad  { color: #ff7373; }
-  /* 胜 / 负: 双色对比 */
+  /* 胜 / 负: 双色对比, justify-content:center 强制水平居中 */
   .live-stat-wl {
     display: flex;
     align-items: baseline;
-    gap: 4px;
+    justify-content: center;
+    gap: 6px;
     font-variant-numeric: tabular-nums;
+    line-height: 1;
   }
-  .live-stat-wl .w { color: #00e676; font-weight: 700; font-size: 20px; }
-  .live-stat-wl .sep { color: var(--text-dim); opacity: 0.4; font-weight: 300; font-size: 18px; }
-  .live-stat-wl .l { color: #ff5252; font-weight: 700; font-size: 20px; }
-  /* 最佳 / 最差: 两行清晰栈式, 等宽数字, 同字号 */
+  .live-stat-wl .w   { color: #00e676; font-weight: 700; font-size: 20px; }
+  .live-stat-wl .sep { color: var(--text-dim); opacity: 0.45; font-weight: 400; font-size: 16px; }
+  .live-stat-wl .l   { color: #ff5252; font-weight: 700; font-size: 20px; }
+  /* 最佳 / 最差: 上下两行同字号, align-items:center 强制水平居中 */
   .live-stat-bw {
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    align-items: center;
+    gap: 4px;
     font-variant-numeric: tabular-nums;
-    font-size: 14px;
+    font-size: 16px;
+    line-height: 1.1;
   }
   .live-stat-bw .b {
     color: #00e676;
     font-weight: 700;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
   }
-  .live-stat-bw .b::before { content: "▲"; font-size: 8px; color: rgba(0,230,118,0.7); }
+  .live-stat-bw .b::before { content: "▲"; font-size: 9px; color: rgba(0,230,118,0.75); }
   .live-stat-bw .w-row {
     color: #ff5252;
     font-weight: 700;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
   }
-  .live-stat-bw .w-row::before { content: "▼"; font-size: 8px; color: rgba(255,82,82,0.7); }
+  .live-stat-bw .w-row::before { content: "▼"; font-size: 9px; color: rgba(255,82,82,0.75); }
   /* 平均/笔: 强调色 + 字号 */
   .live-panel .paper-stat .value.avg-up   { color: #00e676; }
   .live-panel .paper-stat .value.avg-down { color: #ff7373; }
@@ -5020,10 +5036,15 @@ function _liveRenderView(view) {
 }
 
 function _liveGetSelectedDate(allDates) {
+  // 优先用 localStorage 中的存储值, 但必须在 allDates 中存在 (避免 stale 日期导致空 view).
+  // 否则回退到 allDates 最末 (最近一日). 都没有时返回今日.
   let stored = null;
   try { stored = localStorage.getItem("live_review_date"); } catch (_) {}
-  if (stored && /^\d{4}-\d{2}-\d{2}$/.test(stored)) return stored;
-  if (allDates && allDates.length > 0) return allDates[allDates.length - 1];
+  const dates = allDates || [];
+  if (stored && /^\d{4}-\d{2}-\d{2}$/.test(stored) && dates.indexOf(stored) >= 0) {
+    return stored;
+  }
+  if (dates.length > 0) return dates[dates.length - 1];
   return new Date().toLocaleDateString("sv-SE");
 }
 
@@ -5057,7 +5078,12 @@ function _liveRenderSingleDay(byDate, allDates) {
   `;
 
   if (trades.length === 0) {
-    return toolbar + `<div class="live-review-empty">📭 ${dayLabel} 无交易记录</div>`;
+    // 友好空态: 提示最近一日有数据, 一键跳过去
+    const mostRecent = (allDates || []).slice(-1)[0];
+    const jumpHint = (mostRecent && mostRecent !== date)
+      ? `<div style="margin-top:8px"><button class="live-review-jump-today" id="live-jump-recent-btn" data-date="${mostRecent}">跳到最近交易日 (${mostRecent})</button></div>`
+      : "";
+    return toolbar + `<div class="live-review-empty">📭 ${dayLabel} 无交易记录${jumpHint}</div>`;
   }
 
   // === 当日 stats ===
@@ -5262,6 +5288,13 @@ function _liveWireSingleDayHandlers() {
   if (todayBtn) {
     todayBtn.addEventListener("click", () => {
       _liveSetSelectedDate(new Date().toLocaleDateString("sv-SE"));
+      _liveRenderView("single");
+    });
+  }
+  const jumpRecentBtn = document.getElementById("live-jump-recent-btn");
+  if (jumpRecentBtn) {
+    jumpRecentBtn.addEventListener("click", () => {
+      _liveSetSelectedDate(jumpRecentBtn.dataset.date);
       _liveRenderView("single");
     });
   }
