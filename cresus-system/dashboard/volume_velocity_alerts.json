@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-15T07:25:15.579076+00:00",
+  "updated_at": "2026-05-15T07:27:20.443929+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 32,
+  "alerts_count": 33,
   "alerts": [
+    {
+      "symbol": "BILLUSDT",
+      "base": "BILL",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.22467,
+      "price_change_pct": 1.836,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 2102403.0,
+      "volume_baseline_usdt": 323416.0,
+      "volume_ratio": 6.5,
+      "detected_at": "2026-05-15T07:26:21.248765+00:00",
+      "intensity": 1,
+      "change_5m_pct": 3.255,
+      "change_15m_pct": 4.565,
+      "change_1h_pct": 4.887,
+      "change_4h_pct": 5.235,
+      "taker_buy_ratio_1m": 0.631,
+      "taker_buy_ratio_5m": 0.598,
+      "oi_delta_5m_pct": 0.194,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.725,
+      "range_4h_pct": 8.55,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.22222607,
+      "suggested_tp1": 0.22833589,
+      "suggested_tp2": 0.23200179,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "REZUSDT",
       "base": "REZ",
