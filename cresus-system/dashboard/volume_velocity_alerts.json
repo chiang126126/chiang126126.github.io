@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-15T07:48:22.956770+00:00",
+  "updated_at": "2026-05-15T07:50:29.488085+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 31,
+  "alerts_count": 32,
   "alerts": [
+    {
+      "symbol": "XPLUSDT",
+      "base": "XPL",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.093,
+      "price_change_pct": -0.641,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 353863.0,
+      "volume_baseline_usdt": 28773.0,
+      "volume_ratio": 12.3,
+      "detected_at": "2026-05-15T07:49:50.502595+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.639,
+      "change_15m_pct": -0.533,
+      "change_1h_pct": -0.321,
+      "change_4h_pct": -2.406,
+      "taker_buy_ratio_1m": 0.371,
+      "taker_buy_ratio_5m": 0.388,
+      "oi_delta_5m_pct": -0.092,
+      "funding_rate_pct": 0.0027,
+      "atr_pct": 0.284,
+      "range_4h_pct": 3.76,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.09326429,
+      "suggested_tp1": 0.09260357,
+      "suggested_tp2": 0.09220714,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "SWARMSUSDT",
       "base": "SWARMS",
