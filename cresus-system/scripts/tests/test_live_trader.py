@@ -430,6 +430,59 @@ class TestTryMirrorOpen(unittest.TestCase):
             result = _try_mirror_open(self.client, self.paper_trade, dry_run=True)
         self.assertIsNone(result)
 
+    def test_set_leverage_called_before_open(self):
+        """每次 mirror_open 前必须调 set_leverage(LIVE_LEVERAGE), 防止 Binance 默认 20x."""
+        order = []
+        def lev_call(symbol, lev, **kw):
+            order.append(("lev", symbol, lev))
+            return {"_dryRun": True, "leverage": lev, "symbol": symbol}
+        def open_call(**kw):
+            order.append(("open", kw["symbol"]))
+            return self.mock_open_result
+        with patch.object(self.client, "set_leverage", side_effect=lev_call), \
+             patch.object(self.client, "open_position", side_effect=open_call):
+            r = _try_mirror_open(self.client, self.paper_trade, dry_run=True)
+        self.assertIsNotNone(r)
+        # set_leverage 必须先于 open_position
+        self.assertEqual(order[0][0], "lev")
+        self.assertEqual(order[0][1], "BTCUSDT")
+        self.assertEqual(order[0][2], live_trader.LIVE_LEVERAGE)
+        self.assertEqual(order[1][0], "open")
+        # live_trade 中应记录 leverage
+        self.assertEqual(r["leverage"], live_trader.LIVE_LEVERAGE)
+
+    def test_set_leverage_failure_aborts_mirror(self):
+        """set_leverage 失败 → 不开仓 (避免误用错杠杆), 返回 None."""
+        with patch.object(self.client, "set_leverage",
+                          side_effect=BinanceError("leverage not allowed")):
+            with patch.object(self.client, "open_position") as op_mock:
+                r = _try_mirror_open(self.client, self.paper_trade, dry_run=True)
+        self.assertIsNone(r)
+        # open_position 一定没被调
+        op_mock.assert_not_called()
+
+    def test_risk_amount_recorded(self):
+        """live_trade 应记录 risk_usdt / risk_pct = (entry - SL) / entry × notional."""
+        # paper sl = 80190, entry fill = 81050, notional = 16.21
+        # risk_pct = |81050 - 80190| / 81050 * 100 = 1.0611%
+        # risk_usdt = 1.0611% * 16.21 = 0.172
+        with patch.object(self.client, "open_position",
+                          return_value=self.mock_open_result):
+            r = _try_mirror_open(self.client, self.paper_trade, dry_run=True)
+        self.assertIsNotNone(r["risk_pct"])
+        self.assertAlmostEqual(r["risk_pct"], 1.061, places=2)
+        self.assertAlmostEqual(r["risk_usdt"], 0.172, places=2)
+
+    def test_mirror_latency_recorded(self):
+        """信号→镜像延迟 = live.opened_at − paper.entered_at."""
+        paper_t = dict(self.paper_trade)
+        paper_t["entered_at"] = "2026-05-15T10:00:00+00:00"
+        # mock_open_result opened_at = 2026-05-15T10:00:30+00:00 → 30s
+        with patch.object(self.client, "open_position",
+                          return_value=self.mock_open_result):
+            r = _try_mirror_open(self.client, paper_t, dry_run=True)
+        self.assertAlmostEqual(r["mirror_latency_sec"], 30.0, places=0)
+
     def test_mirror_missing_sl_field(self):
         """Paper 缺关键字段 → 返回 None."""
         bad_paper = dict(self.paper_trade)
@@ -618,6 +671,31 @@ class TestSyncLiveWithPaper(unittest.TestCase):
         self.assertEqual(lt["sl_price"], 80500.0)
         self.assertEqual(lt["phase"], "A")
 
+    def test_mfe_copied_from_paper(self):
+        """Per-phase MFE 从 paper 拷贝 (paper 已在监控 high water mark)."""
+        lt = {"symbol": "BTC", "sl_price": 80000.0, "phase": "A",
+              "phase_a_mfe_pct": None, "phase_b_mfe_pct": None,
+              "phase_c_mfe_pct": None}
+        paper = {"sl": 80000.0, "phase": "B",
+                 "phase_a_mfe_pct": 1.85, "phase_b_mfe_pct": 0.32,
+                 "phase_a_mfe_price": 82500.0}
+        updated = _sync_live_with_paper(lt, paper)
+        self.assertTrue(updated)
+        self.assertEqual(lt["phase_a_mfe_pct"], 1.85)
+        self.assertEqual(lt["phase_b_mfe_pct"], 0.32)
+        self.assertEqual(lt["phase_a_mfe_price"], 82500.0)
+        # phase_c 未在 paper 提供 → 保持 None
+        self.assertIsNone(lt["phase_c_mfe_pct"])
+
+    def test_mfe_unchanged_no_update(self):
+        """MFE 值未变 + sl/phase 未变 → updated=False."""
+        lt = {"symbol": "BTC", "sl_price": 80000.0, "phase": "A",
+              "phase_a_mfe_pct": 1.85}
+        paper = {"sl": 80000.0, "phase": "A", "phase_a_mfe_pct": 1.85}
+        self.assertFalse(_sync_live_with_paper(lt, paper))
+        self.assertEqual(lt["sl_price"], 80000.0)
+        self.assertEqual(lt["phase"], "A")
+
     def test_only_phase_change(self):
         lt = {"symbol": "BTC", "sl_price": 80000.0, "phase": "A"}
         paper = {"sl": 80000.0, "phase": "B"}
@@ -731,6 +809,59 @@ class TestTryMirrorClose(unittest.TestCase):
         self.assertAlmostEqual(result["close_fees_usdt"], 0.0075, places=6)
         self.assertAlmostEqual(result["fees_paid_usdt"], 0.0155, places=6)
         self.assertTrue(result["fees_are_actual"])
+
+    def test_close_slippage_on_sl_breach(self):
+        """SL 触发: 期望价 = sl_price, 实际成交 vs 期望 → close_slippage_bps."""
+        lt = dict(self.live_trade)
+        lt["sl_price"] = 80000.0
+        # LONG (BUY) 平出 SELL: 实际 79900 比期望 80000 低 → 不利 (正 bps)
+        close = dict(self.mock_close)
+        close["avg_exit_price"] = 79900.0
+        with patch.object(self.client, "close_position", return_value=close):
+            r = _try_mirror_close(
+                self.client, lt, reason="sl_breach_client", dry_run=True,
+            )
+        self.assertIsNotNone(r["close_slippage_bps"])
+        # (79900 - 80000) / 80000 * 10000 = -12.5 → LONG 平仓低于期望 → 正 (不利)
+        self.assertAlmostEqual(r["close_slippage_bps"], 12.5, places=1)
+
+    def test_close_slippage_short_inverse(self):
+        """SHORT 平出 BUY: 实际高于期望 = 不利 (正 bps)."""
+        lt = dict(self.live_trade)
+        lt["side"] = "SELL"
+        lt["sl_price"] = 80000.0
+        close = dict(self.mock_close)
+        close["avg_exit_price"] = 80100.0   # SHORT 平仓 100 高 = 不利
+        with patch.object(self.client, "close_position", return_value=close):
+            r = _try_mirror_close(
+                self.client, lt, reason="sl_breach_client", dry_run=True,
+            )
+        self.assertGreater(r["close_slippage_bps"], 0)
+        self.assertAlmostEqual(r["close_slippage_bps"], 12.5, places=1)
+
+    def test_close_slippage_paper_close_uses_current_price(self):
+        """paper:hit_tp2 等情况: 期望价 = live_trade.current_price."""
+        lt = dict(self.live_trade)
+        lt["current_price"] = 81500.0
+        # close 在 81600 = LONG 平仓高于期望 = 有利 (负 bps)
+        close = dict(self.mock_close)
+        close["avg_exit_price"] = 81600.0
+        with patch.object(self.client, "close_position", return_value=close):
+            r = _try_mirror_close(
+                self.client, lt, reason="paper:hit_tp2", dry_run=True,
+            )
+        self.assertLess(r["close_slippage_bps"], 0)
+
+    def test_close_slippage_none_when_no_reference(self):
+        """无 current_price + 非 SL 触发 → close_slippage_bps = None."""
+        lt = dict(self.live_trade)
+        lt.pop("current_price", None)
+        with patch.object(self.client, "close_position",
+                          return_value=self.mock_close):
+            r = _try_mirror_close(
+                self.client, lt, reason="paper:timeout", dry_run=True,
+            )
+        self.assertIsNone(r["close_slippage_bps"])
 
     def test_fees_are_actual_false_if_either_side_estimated(self):
         """开仓 actual 但平仓回退到估算 → fees_are_actual = False (混合)."""

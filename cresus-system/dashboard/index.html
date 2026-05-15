@@ -4226,6 +4226,18 @@ function renderLivePanel(data) {
     "paper:timeout":    "⏱ 超时",
   };
 
+  const fmtMfePct = v => (v == null) ? null : ((v >= 0 ? '+' : '') + Number(v).toFixed(2) + '%');
+  const buildMfeLine = (t) => {
+    const parts = [];
+    const a = fmtMfePct(t.phase_a_mfe_pct);
+    const b = fmtMfePct(t.phase_b_mfe_pct);
+    const c = fmtMfePct(t.phase_c_mfe_pct);
+    if (a != null) parts.push('A↑ ' + a);
+    if (b != null) parts.push('B↑ ' + b);
+    if (c != null) parts.push('C↑ ' + c);
+    return parts;
+  };
+
   // ===== 持仓中 =====
   if (open.length > 0) {
     body += `<div class="paper-section-title">持仓中 (${open.length})</div>`;
@@ -4245,17 +4257,29 @@ function renderLivePanel(data) {
       const qty = t.qty != null ? Number(t.qty) : null;
       const sl = t.sl_price != null ? Number(t.sl_price) : null;
       const hold = liveFmtHold(t.opened_at || t.created_at);
+      const lev = t.leverage || 3;
+      const riskUsdt = (t.risk_usdt != null) ? Number(t.risk_usdt) : null;
+      const riskPct = (t.risk_pct != null) ? Number(t.risk_pct) : null;
+      const lat = (t.mirror_latency_sec != null) ? Number(t.mirror_latency_sec) : null;
+      const latBad = lat != null && lat > 60;
+      const mfeParts = buildMfeLine(t);
+      const mfeLine = mfeParts.length
+        ? `<br><span class="paper-mfe-line">最佳: ${mfeParts.join(' · ')}</span>` : '';
       body += `<div class="paper-trade-row dir-${dir}">
         <span>
           <strong>${escapeHtml(t.symbol || '?')}</strong>
           <span class="paper-day-dir ${dirCls}">${dir}</span>
+          <span style="font-size:10px;color:#bbb;background:rgba(255,255,255,0.06);border-radius:3px;padding:1px 4px;margin-left:4px">${lev}x</span>
           ${t.is_dry_run ? '<span style="font-size:10px;color:#ffb84d;margin-left:4px">🟡DRY</span>' : '<span style="font-size:10px;color:#ff5252;margin-left:4px">🔴LIVE</span>'}
           <br><span style="font-size:11px;color:var(--text-dim)">
             入 ${liveFmtPrice(entry)} · 现 ${cur != null ? liveFmtPrice(cur) : '—'}
             ${qty != null ? ' · qty ' + qty : ''}
           </span>
           <br><span style="font-size:10px;color:#ff8888">SL ${liveFmtPrice(sl)}</span>
+          ${riskUsdt != null && riskPct != null ? `<span style="font-size:10px;color:var(--text-dim);margin-left:6px">风险 -$${riskUsdt.toFixed(2)} (-${riskPct.toFixed(2)}%)</span>` : ''}
           <span style="font-size:10px;color:var(--text-dim);margin-left:6px">slip <span class="live-trade-slippage ${slipClass}">${slip >= 0 ? '+' : ''}${slip.toFixed(1)}bps</span></span>
+          ${lat != null ? `<span style="font-size:10px;color:${latBad ? '#ffb84d' : 'var(--text-dim)'};margin-left:6px">⏱ ${lat.toFixed(0)}s${latBad ? ' ⚠' : ''}</span>` : ''}
+          ${mfeLine}
         </span>
         <span class="paper-pnl ${pnlCls}">
           ${upct != null ? liveFmtPct(upct) : '—'}
@@ -4275,7 +4299,7 @@ function renderLivePanel(data) {
       const dir = side === 'BUY' ? 'LONG' : (side === 'SELL' ? 'SHORT' : (t.direction || '?'));
       const pnlUsdt = Number(t.realized_pnl_usdt || 0);
       const entry = Number(t.avg_fill_price || 0);
-      const exit  = Number(t.close_price || t.exit_price || 0);
+      const exit  = Number(t.avg_exit_price || t.close_price || t.exit_price || 0);
       let pnlPct = null;
       if (entry > 0 && exit > 0) {
         const sign = side === 'BUY' ? 1 : -1;
@@ -4287,15 +4311,33 @@ function renderLivePanel(data) {
       const closedAtTime = (t.closed_at || '').slice(11, 16);
       const hold = liveFmtHold(t.opened_at || t.created_at, t.closed_at);
       const reasonLabel = LIVE_REASON_LABEL[t.close_reason] || (t.close_reason || '?');
+      const lev = t.leverage || 3;
+      const closeSlip = (t.close_slippage_bps != null) ? Number(t.close_slippage_bps) : null;
+      const closeSlipClass = closeSlip == null ? '' : (closeSlip > 5 ? 'bad' : (closeSlip < -5 ? 'good' : ''));
+      // MFE + 错失 (vs 实际平仓 pct)
+      const mfeParts = buildMfeLine(t);
+      const allMfes = [t.phase_a_mfe_pct, t.phase_b_mfe_pct, t.phase_c_mfe_pct]
+                        .filter(v => v != null).map(Number);
+      const bestMfe = allMfes.length ? Math.max(...allMfes) : null;
+      const regret = (bestMfe != null && pnlPct != null) ? bestMfe - pnlPct : null;
+      let mfeLine = '';
+      if (mfeParts.length) {
+        const regretStr = (regret != null && regret > 0.5)
+          ? ` · <span style="color:#ffb74d">错失 +${regret.toFixed(2)}%</span>` : '';
+        mfeLine = `<br><span class="paper-mfe-line">最佳: ${mfeParts.join(' · ')}${regretStr}</span>`;
+      }
       body += `<div class="paper-trade-row dir-${dir} ${winLossCls}">
         <span>
           <strong>${escapeHtml(t.symbol || '?')}</strong>
           <span class="paper-day-dir ${dir === 'LONG' ? 'long' : 'short'}">${dir}</span>
+          <span style="font-size:10px;color:#bbb;background:rgba(255,255,255,0.06);border-radius:3px;padding:1px 4px;margin-left:4px">${lev}x</span>
           ${t.is_dry_run ? '<span style="font-size:10px;color:#ffb84d;margin-left:4px">🟡DRY</span>' : '<span style="font-size:10px;color:#ff5252;margin-left:4px">🔴LIVE</span>'}
           <br><span style="font-size:11px;color:var(--text-dim)">
             ${liveFmtPrice(entry)} → ${liveFmtPrice(exit)}
             ${fee > 0 ? ' · 手续费 -$' + fee.toFixed(3) : ''}
+            ${closeSlip != null ? ` · 平仓slip <span class="live-trade-slippage ${closeSlipClass}">${closeSlip >= 0 ? '+' : ''}${closeSlip.toFixed(1)}bps</span>` : ''}
           </span>
+          ${mfeLine}
         </span>
         <span class="paper-pnl ${pnlCls}">
           ${pnlPct != null ? liveFmtPct(pnlPct) : '—'}
@@ -4363,6 +4405,7 @@ function renderLivePanel(data) {
   body += `<div class="live-config-grid">
     <div class="live-config-cell"><div class="k">起始资金</div><div class="v">$${config.starting_capital_usdt || 100}</div></div>
     <div class="live-config-cell"><div class="k">每笔仓位</div><div class="v">$${config.notional_per_trade_usdt || 20}</div></div>
+    <div class="live-config-cell"><div class="k">杠杆</div><div class="v">${config.leverage || 3}x</div></div>
     <div class="live-config-cell"><div class="k">最大并发</div><div class="v">${config.max_concurrent || 3}</div></div>
     <div class="live-config-cell"><div class="k">部署上限</div><div class="v">$${config.max_deploy_usdt || 60}</div></div>
     <div class="live-config-cell"><div class="k">日 DD 触发</div><div class="v" style="color:#ff8888">-$${config.daily_dd_limit_usdt || 5}</div></div>

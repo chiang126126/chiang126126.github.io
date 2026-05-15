@@ -59,6 +59,9 @@ LIVE_HISTORY = Path.home() / "cresus-bot" / "live_trades_history.json"
 # Live 交易配置 (小心调整)
 LIVE_NOTIONAL_USDT = 20.0              # 每笔 $20 (paper 是 $400, 等比缩放 1/20)
 LIVE_MAX_CONCURRENT = 3                # 实盘并发上限 (比 paper 5 严格)
+LIVE_LEVERAGE = 3                      # 杠杆 (符合 $100 起始资金的保守设定);
+                                       # 每次 mirror_open 前强制 set_leverage,
+                                       # 防止 Binance 默认 20x 漂移
 LIVE_SYMBOL_WHITELIST = [              # Phase 6 第 1 周限主流币
     "BTCUSDT", "ETHUSDT", "SOLUSDT",
 ]
@@ -560,6 +563,7 @@ def publish_live_history(
         "config": {
             "starting_capital_usdt": LIVE_STARTING_CAPITAL_USDT,
             "notional_per_trade_usdt": LIVE_NOTIONAL_USDT,
+            "leverage": LIVE_LEVERAGE,
             "max_concurrent": LIVE_MAX_CONCURRENT,
             "symbol_whitelist": list(LIVE_SYMBOL_WHITELIST),
             "daily_dd_limit_usdt": LIVE_DAILY_DD_LIMIT_USDT,
@@ -692,6 +696,13 @@ def _sync_live_with_paper(live_trade: dict, paper_open_trade: dict) -> bool:
         )
         live_trade["phase"] = new_phase
         updated = True
+    # Per-phase MFE: paper 已经在监控 high water mark, 直接拷 (live 不重复计算)
+    for k in ("phase_a_mfe_pct", "phase_b_mfe_pct", "phase_c_mfe_pct",
+              "phase_a_mfe_price", "phase_b_mfe_price", "phase_c_mfe_price"):
+        v = paper_open_trade.get(k)
+        if v is not None and live_trade.get(k) != v:
+            live_trade[k] = v
+            updated = True
     return updated
 
 
@@ -723,10 +734,32 @@ def _try_mirror_close(
     closed = dict(live_trade)
     closed["closed_at"] = result.get("closed_at")
     closed["close_reason"] = reason
-    closed["avg_exit_price"] = float(result.get("avg_exit_price") or 0)
+    exit_price = float(result.get("avg_exit_price") or 0)
+    closed["avg_exit_price"] = exit_price
     closed["realized_pnl_usdt"] = float(result.get("realized_pnl_usdt") or 0)
     closed["close_order_id"] = result.get("close_order_id")
     closed["close_qty"] = float(result.get("qty_closed") or 0)
+
+    # 平仓 slippage (期望价 vs 实际成交).
+    #   SL 触发: 期望 = sl_price (我们设的止损)
+    #   其他情况 (paper closed, timeout): 期望 = 最后一次记录的 current_price (无则跳过)
+    expected_exit = None
+    if reason == "sl_breach_client":
+        expected_exit = float(live_trade.get("sl_price") or 0) or None
+    elif live_trade.get("current_price") is not None:
+        try:
+            expected_exit = float(live_trade["current_price"])
+        except (ValueError, TypeError):
+            expected_exit = None
+    close_slip_bps = None
+    if expected_exit and expected_exit > 0 and exit_price > 0:
+        side = str(live_trade.get("side", "")).upper()
+        # 平仓: BUY (LONG 平出 SELL): 实际 < 期望 = 不利
+        # SHORT 平出 BUY: 实际 > 期望 = 不利. 统一 正 bps = 不利.
+        raw = (exit_price - expected_exit) / expected_exit * 10000.0
+        close_slip_bps = round(-raw if side == "BUY" else raw, 2)
+    closed["close_expected_price"] = expected_exit
+    closed["close_slippage_bps"] = close_slip_bps
 
     # 费用聚合: 开仓侧 (live_trade 已有) + 平仓侧 (来自 close 返回)
     entry_fee = float(live_trade.get("fees_paid_usdt") or 0)
@@ -766,9 +799,27 @@ def _try_mirror_open(
         return None
 
     log.info(
-        f"[mirror-open] {sym} {side} notional=${LIVE_NOTIONAL_USDT} sl={sl_price} "
+        f"[mirror-open] {sym} {side} notional=${LIVE_NOTIONAL_USDT} "
+        f"lev={LIVE_LEVERAGE}x sl={sl_price} "
         f"paper_id={paper_id[:40]} → trade_id={trade_id}"
     )
+
+    # 1. 强制 set_leverage (防 Binance 默认 20x; 已有相同杠杆是 idempotent).
+    #    失败 → 放弃本次 mirror, 下 tick 重试 (避免误用错的杠杆开仓).
+    try:
+        client.set_leverage(sym, LIVE_LEVERAGE)
+    except (BinanceError, ValueError) as e:
+        log.error(
+            f"[mirror-open FAILED] {sym}: set_leverage({LIVE_LEVERAGE}x) "
+            f"失败 → 放弃本次 mirror: {type(e).__name__}: {e}"
+        )
+        return None
+    except Exception as e:
+        log.error(
+            f"[mirror-open UNEXPECTED] {sym}: set_leverage: "
+            f"{type(e).__name__}: {e}", exc_info=True,
+        )
+        return None
 
     try:
         result = client.open_position(
@@ -797,6 +848,30 @@ def _try_mirror_open(
         raw_bps = (actual_fill - paper_entry) / paper_entry * 10000.0
         slippage_bps = raw_bps if side == "BUY" else -raw_bps
 
+    # 风险金额: (entry - SL) / entry × notional = "最多丢多少"
+    actual_notional = float(result.get("actual_notional", 0) or 0)
+    risk_usdt = 0.0
+    risk_pct = 0.0
+    if actual_fill > 0 and sl_price > 0 and actual_notional > 0:
+        risk_pct = abs(actual_fill - sl_price) / actual_fill * 100.0
+        risk_usdt = risk_pct / 100.0 * actual_notional
+
+    # 信号→镜像延迟: paper 开仓时间到 live 开仓时间
+    mirror_latency_sec = None
+    paper_entered_at = paper_trade.get("entered_at") or paper_trade.get("opened_at")
+    opened_at_iso = result.get("opened_at")
+    if paper_entered_at and opened_at_iso:
+        try:
+            paper_dt = datetime.fromisoformat(
+                str(paper_entered_at).replace("Z", "+00:00")
+            )
+            live_dt = datetime.fromisoformat(
+                str(opened_at_iso).replace("Z", "+00:00")
+            )
+            mirror_latency_sec = round((live_dt - paper_dt).total_seconds(), 1)
+        except (ValueError, TypeError):
+            pass
+
     live_trade = {
         "paper_id": paper_id,
         "trade_id": trade_id,
@@ -807,7 +882,11 @@ def _try_mirror_open(
         "avg_fill_price": actual_fill,
         "slippage_bps": round(slippage_bps, 2),
         "qty": result.get("qty", 0),
-        "notional_usdt": result.get("actual_notional", 0),
+        "notional_usdt": actual_notional,
+        "leverage": LIVE_LEVERAGE,
+        "risk_usdt": round(risk_usdt, 4),
+        "risk_pct": round(risk_pct, 3),
+        "mirror_latency_sec": mirror_latency_sec,
         "sl_price": result.get("sl_price", sl_price),
         "tp1_price": float(paper_trade.get("tp1") or 0),
         "tp2_price": float(paper_trade.get("tp2") or 0),
@@ -819,9 +898,13 @@ def _try_mirror_open(
         "conviction_score": paper_trade.get("conviction_score"),
         "alert_type": paper_trade.get("alert_type"),
         "atr_pct": paper_trade.get("atr_pct"),
+        # MFE 字段初始化为 None — 会在 _sync_live_with_paper 中从 paper 拷过来
+        "phase_a_mfe_pct": None,
+        "phase_b_mfe_pct": None,
+        "phase_c_mfe_pct": None,
         "fees_paid_usdt": result.get("fees_paid_usdt", 0),
         "fees_are_actual": bool(result.get("fees_are_actual", False)),
-        "opened_at": result.get("opened_at"),
+        "opened_at": opened_at_iso,
         "is_dry_run": bool(dry_run or result.get("_dryRun")),
     }
     return live_trade
