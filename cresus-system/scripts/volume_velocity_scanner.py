@@ -80,6 +80,9 @@ PAPER_HISTORY     = Path.home() / "cresus-bot" / "paper_trades_history.json" # �
 PAPER_AUTO_CLOSE_HOURS = 4            # 4 小时未触发 SL/TP 自动平仓 (跟 OUTCOME_STAGES 4h 对齐)
 PAPER_SYMBOL_COOLDOWN_MIN = 30        # Phase 1.1: 同 symbol 任意 exit 后冷却 (任意 close_reason, 防信号抖动 + 长尾反复亏损)
 PAPER_MAX_ATR_PCT = 2.0               # Phase 1.3: ATR>=2% 信号 reject (审计 N=142: ATR 2.0-2.5% cell n=6 全亏 avg -2.89%)
+PAPER_CONSEC_SL_TRIGGER = 2           # Phase 1.2: 同 symbol 连续 SL 次数阈值 (审计: QUSDT 5/5 SL, ATA 4/4 SL)
+PAPER_CONSEC_SL_WINDOW_HOURS = 4      # Phase 1.2: 连续 SL 检测窗口 (4h 内)
+PAPER_CONSEC_SL_COOLDOWN_HOURS = 4    # Phase 1.2: 触发后冷却时长
 PAPER_RECENT_LIMIT = 0                # 已废弃 (改为全量发布以支持任意日期复盘, N=1000 时 ~150KB 也可接受)
 PAPER_MIN_TIER     = "diamond"        # 只对钻石信号自动开仓 (高质量 only)
 # 模拟仓金额: 总账户 $2000, 每笔分配 $400 (20%), 最多并发 5 笔
@@ -1313,6 +1316,44 @@ def _get_last_close_for_symbol(state: dict, symbol: str) -> Optional[datetime]:
     return latest
 
 
+def _count_recent_consecutive_sl(
+    state: dict, symbol: str, now: datetime, window_hours: float,
+) -> tuple:
+    """统计该 symbol 在过去 window_hours 内的连续 SL 次数 (从最近向前).
+    一旦遇到非 SL 出场 (win / be / trail / timeout) 计数中断.
+
+    Phase 1.2 用. Returns (count, last_sl_at | None).
+    """
+    cutoff = now - timedelta(hours=window_hours)
+    # 该 symbol 所有平仓单, 按 closed_at 倒序
+    matches = []
+    for t in state.get("closed_trades", []):
+        if t.get("symbol") != symbol:
+            continue
+        ca = t.get("closed_at")
+        if not ca:
+            continue
+        try:
+            dt = datetime.fromisoformat(ca.replace("Z", "+00:00"))
+            matches.append((dt, t))
+        except Exception:
+            continue
+    matches.sort(key=lambda x: x[0], reverse=True)
+
+    count = 0
+    last_sl_at = None
+    for dt, t in matches:
+        if dt < cutoff:
+            break  # 出窗口, 不再回看
+        if t.get("close_reason") == "hit_sl":
+            count += 1
+            if last_sl_at is None:
+                last_sl_at = dt
+        else:
+            break  # 非 SL 出场 → 连续中断
+    return count, last_sl_at
+
+
 def _compute_free_capital(state: dict) -> float:
     """账户可用资金 = 起始 + Σ realized P&L - Σ open notional.
     open trade 时使用此函数预算是否够本金开新仓.
@@ -1371,6 +1412,23 @@ def _open_paper_trade(a: VelocityAlert, state: dict, now: datetime,
                  f"symbol cooldown {elapsed_min:.0f}min < {PAPER_SYMBOL_COOLDOWN_MIN}min "
                  f"(last_close={last_close.isoformat()})")
             return None
+    # Phase 1.2: 同 symbol 在过去 4h 内已经连续 SL >= 2 次 → 冷却 4h 不再开新.
+    # 审计: QUSDT 5/5 SL (-11.57%), ATA 4/4 SL (-13.86%), TRUTH 3/3 SL (-9.56%).
+    # 这些长尾损失靠 30min cooldown 救不了 (gap 太大), 必须靠 SL streak detection.
+    consec_sl, last_sl_at = _count_recent_consecutive_sl(
+        state, a.symbol, now, PAPER_CONSEC_SL_WINDOW_HOURS,
+    )
+    if consec_sl >= PAPER_CONSEC_SL_TRIGGER:
+        # 检查最近一次 SL 是否还在冷却期内
+        if last_sl_at is not None:
+            elapsed_h = (now - last_sl_at).total_seconds() / 3600.0
+            if elapsed_h < PAPER_CONSEC_SL_COOLDOWN_HOURS:
+                _log(
+                    f"[paper] SKIP open {a.symbol} {a.direction}: "
+                    f"{consec_sl} consecutive SL in last {PAPER_CONSEC_SL_WINDOW_HOURS}h, "
+                    f"cooldown {elapsed_h:.1f}h < {PAPER_CONSEC_SL_COOLDOWN_HOURS}h"
+                )
+                return None
     regime_snap = _load_current_regime()
     trade = {
         "id": f"{a.symbol}|{a.direction}|{a.detected_at}",
