@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.cresus.live-trader</string>
+
+    <!-- Phase 3 live_trader.py: 镜像 paper 决策到真实 Binance Futures.
+         默认 dry-run, 即使白名单触发也不下真单, 需手动加 --live + ~/.allow-live -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/python3</string>
+        <string>/Users/mangzi/chiang126126.github.io/cresus-system/scripts/live_trader.py</string>
+        <string>--once</string>
+    </array>
+
+    <!-- 每 30 秒跑一次 (跟 paper trader 频率相近, 含 SL polling 间隔) -->
+    <key>StartInterval</key>
+    <integer>30</integer>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!-- 凭证从 ~/.cresus-bot/binance_keys.json 自动读取 (load_credentials helper).
+         不在 plist 里硬编码 key (即使 plist 是私有的, 也避免事故). -->
+
+    <key>WorkingDirectory</key>
+    <string>/Users/mangzi/chiang126126.github.io</string>
+
+    <key>StandardOutPath</key>
+    <string>/Users/mangzi/cresus-bot/logs/live_trader.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/mangzi/cresus-bot/logs/live_trader.log</string>
+</dict>
+</plist>
