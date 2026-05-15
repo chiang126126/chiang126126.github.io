@@ -537,33 +537,197 @@
     border-bottom-right-radius: 8px;
     background: rgba(255,255,255,0.012);
   }
-  /* ==== 每日复盘 tab (复用 paper 的 .paper-review-tab 样式; 这里附加 live tint) ==== */
+  /* ==== 每日复盘 — 框架复刻 paper 风格 + 绿色 tint ==== */
   .live-review-tabs {
     display: flex;
-    gap: 6px;
-    margin: 8px 0 10px;
-    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 10px;
+    padding: 3px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 7px;
   }
   .live-review-tab {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
+    flex: 1;
+    background: transparent;
+    border: none;
     color: var(--text-dim);
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 12px;
+    font-size: 11.5px;
+    padding: 6px 8px;
+    border-radius: 5px;
     cursor: pointer;
     transition: all 0.15s;
-    font-weight: 500;
+    font-family: inherit;
   }
-  .live-review-tab:hover {
-    border-color: rgba(0,200,83,0.3);
-    color: #66dd99;
-  }
+  .live-review-tab:hover { color: var(--text); background: rgba(255,255,255,0.04); }
   .live-review-tab.active {
-    background: rgba(0,200,83,0.12);
-    border-color: rgba(0,200,83,0.45);
-    color: #00e676;
+    background: rgba(0,200,83,0.16);
+    color: #66dd99;
     font-weight: 600;
+  }
+
+  /* toolbar (日期 + 上一日/下一日/今日 按钮) */
+  .live-review-toolbar {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .live-review-nav-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--text);
+    font-size: 14px;
+    width: 28px;
+    height: 28px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    font-family: inherit;
+  }
+  .live-review-nav-btn:hover:not(:disabled) { background: rgba(0,200,83,0.15); }
+  .live-review-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .live-review-date-input {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--text);
+    font-size: 12px;
+    padding: 5px 8px;
+    border-radius: 5px;
+    font-family: inherit;
+    color-scheme: dark;
+  }
+  .live-review-jump-today {
+    background: rgba(0,200,83,0.12);
+    border: 1px solid rgba(0,200,83,0.3);
+    color: #66dd99;
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .live-review-jump-today:hover { background: rgba(0,200,83,0.2); }
+  .live-review-day-label {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+    margin-left: auto;
+  }
+
+  /* 当日 stats 卡 */
+  .live-review-stats {
+    background: rgba(0,200,83,0.04);
+    border: 1px solid rgba(0,200,83,0.12);
+    border-radius: 7px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+  }
+  .live-review-stats-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .live-review-stats-head-left {
+    font-size: 11.5px;
+    color: var(--text-dim);
+  }
+  .live-review-stats-head-pnl {
+    font-size: 18px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .live-review-stats-head-pnl.up   { color: #00e676; }
+  .live-review-stats-head-pnl.down { color: #ff5252; }
+  .live-review-stat-line {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 8px;
+    font-size: 11px;
+    padding: 3px 0;
+    align-items: center;
+  }
+  .live-review-stat-key { color: var(--text-dim); }
+  .live-review-stat-val { color: var(--text); font-variant-numeric: tabular-nums; }
+  .live-review-stat-val .chip {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-right: 4px;
+    margin-bottom: 2px;
+    font-size: 10.5px;
+    background: rgba(255,255,255,0.05);
+  }
+  .live-review-stat-val .chip.long  { background: rgba(0,200,83,0.12); color: #00e676; }
+  .live-review-stat-val .chip.short { background: rgba(255,82,82,0.12); color: #ff5252; }
+
+  /* 单日明细折叠包裹 */
+  .live-review-trades-wrapper {
+    background: rgba(255,255,255,0.02);
+    border-radius: 7px;
+    overflow: hidden;
+  }
+  .live-review-trades-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    list-style: none;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .live-review-trades-summary::-webkit-details-marker { display: none; }
+  .live-review-trades-summary:hover { background: rgba(255,255,255,0.03); }
+  .live-review-trades-wrapper[open] > .live-review-trades-summary {
+    border-bottom: 1px dashed rgba(255,255,255,0.08);
+  }
+  .live-review-trades-chevron {
+    font-size: 10px;
+    color: var(--text-dim);
+    transition: transform 0.15s;
+    display: inline-block;
+  }
+  .live-review-trades-wrapper[open] .live-review-trades-chevron {
+    transform: rotate(90deg);
+  }
+  .live-review-trades-label {
+    font-weight: 600;
+    color: var(--text);
+  }
+  .live-review-trades-hint {
+    font-size: 10.5px;
+    color: var(--text-dim);
+    margin-left: auto;
+  }
+  .live-review-trades-list {
+    padding: 8px 6px;
+  }
+
+  .live-review-empty {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-dim);
+    font-size: 12px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 7px;
+  }
+
+  @media (max-width: 720px) {
+    .live-review-stat-line { grid-template-columns: 60px 1fr; font-size: 10.5px; }
+    .live-review-stats-head-pnl { font-size: 16px; }
+    .live-review-tab { font-size: 10.5px; padding: 5px 4px; }
+    .live-review-day-label { font-size: 11px; width: 100%; margin-left: 0; }
+    .live-review-date-input { font-size: 13px; }
+    .live-review-trades-hint { font-size: 9.5px; }
+    .live-review-trades-summary { padding: 7px 10px; }
   }
   /* 月历热力图 cell */
   .live-heatmap {
@@ -4653,7 +4817,6 @@ function renderLivePanel(data) {
         <div class="live-config-cell"><div class="k">部署上限</div><div class="v">$${config.max_deploy_usdt || 80}</div></div>
         <div class="live-config-cell"><div class="k">日 DD 触发</div><div class="v" style="color:#ff8888">-$${config.daily_dd_limit_usdt || 5}</div></div>
         <div class="live-config-cell"><div class="k">累计 DD kill</div><div class="v" style="color:#ff8888">-${config.total_dd_limit_pct || 5}%</div></div>
-        <div class="live-config-cell"><div class="k">白名单</div><div class="v" style="font-size:11px;${obsMode ? 'text-decoration:line-through;opacity:0.5' : ''}">${(config.symbol_whitelist || []).join(' / ')}</div></div>
       </div>
     </div>
   </details>`;
@@ -4784,7 +4947,7 @@ function _liveSetSelectedDate(date) {
   try { localStorage.setItem("live_review_date", date); } catch (_) {}
 }
 
-// ----- 单日深度 -----
+// ----- 单日深度 (框架复刻 paper 复盘) -----
 function _liveRenderSingleDay(byDate, allDates) {
   const today = new Date().toLocaleDateString("sv-SE");
   const date = _liveGetSelectedDate(allDates);
@@ -4798,54 +4961,131 @@ function _liveRenderSingleDay(byDate, allDates) {
   const dayLabel = `${weekdays[dObj.getDay()]} ${dObj.getMonth()+1}月${dObj.getDate()}日`;
   const isToday = (date === today);
 
+  // === Toolbar (上一日 / 日期选择器 / 下一日 / 今日 + 日期 label) ===
   const toolbar = `
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-      <button class="live-review-tab" id="live-prev-day-btn" ${!prevDate ? "disabled" : ""} title="上一交易日" style="padding:4px 10px">◀</button>
-      <input type="date" id="live-review-date" value="${date}" max="${today}"
-             style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:5px 8px;border-radius:6px;font-size:12px;font-family:inherit">
-      <button class="live-review-tab" id="live-next-day-btn" ${!nextDate ? "disabled" : ""} title="下一交易日" style="padding:4px 10px">▶</button>
-      ${!isToday ? `<button class="live-review-tab" id="live-jump-today-btn" style="padding:4px 10px">今日</button>` : ""}
-      <span style="font-size:12px;color:var(--text-dim);margin-left:auto">${dayLabel}${isToday ? " · 今日" : ""}</span>
+    <div class="live-review-toolbar">
+      <button class="live-review-nav-btn" id="live-prev-day-btn" ${!prevDate ? "disabled" : ""} title="上一交易日">◀</button>
+      <input type="date" id="live-review-date" class="live-review-date-input" value="${date}" max="${today}">
+      <button class="live-review-nav-btn" id="live-next-day-btn" ${!nextDate ? "disabled" : ""} title="下一交易日">▶</button>
+      ${!isToday ? `<button class="live-review-jump-today" id="live-jump-today-btn">今日</button>` : ""}
+      <span class="live-review-day-label">${dayLabel}${isToday ? " · 今日" : ""}</span>
     </div>
   `;
 
   if (trades.length === 0) {
-    return toolbar + `<div style="padding:24px;text-align:center;color:var(--text-dim);font-size:13px">📭 ${dayLabel} 无交易记录</div>`;
+    return toolbar + `<div class="live-review-empty">📭 ${dayLabel} 无交易记录</div>`;
   }
 
+  // === 当日 stats ===
   const stats = _liveDayStats(trades);
   const pnlCls = stats.totPnl > 0 ? "up" : (stats.totPnl < 0 ? "down" : "");
-  const startCap = (window._liveReviewClosed && window._liveReviewClosed.length && stats) ? 100 : 100;
-  const totPct = (stats.totPnl / startCap) * 100;
+  const totPct = (stats.totPnl / 100) * 100;   // 起始资金 $100
 
-  // reason chips
+  // close_reason 分布 chips
   const reasonChips = Object.entries(stats.reasonCounts)
     .sort((a, b) => b[1] - a[1])
     .map(([r, c]) => {
       const meta = LIVE_REASON_ICON[r] || { icon: "?", label: r };
-      return `<span style="display:inline-block;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px;padding:2px 6px;margin:2px;font-size:11px" title="${escapeHtml(meta.label)}">${meta.icon} ${c}</span>`;
+      return `<span class="chip" title="${escapeHtml(meta.label)}">${meta.icon} ${c}</span>`;
     }).join("");
 
+  // 找最佳 / 最差 单笔
+  const bestTrade  = stats.best;
+  const worstTrade = stats.worst;
+  const bestPnl  = bestTrade ? Number(bestTrade.realized_pnl_usdt || 0) : 0;
+  const worstPnl = worstTrade ? Number(worstTrade.realized_pnl_usdt || 0) : 0;
+
+  // 实盘特有指标: 平均滑点, 平均延迟, fees_are_actual 比例
+  const slipsEntry = trades.map(t => Number(t.slippage_bps || 0)).filter(v => v !== 0);
+  const slipsClose = trades.map(t => Number(t.close_slippage_bps != null ? t.close_slippage_bps : 0)).filter(v => v !== 0);
+  const avgEntrySlip = slipsEntry.length ? slipsEntry.reduce((a, b) => a + b, 0) / slipsEntry.length : null;
+  const avgCloseSlip = slipsClose.length ? slipsClose.reduce((a, b) => a + b, 0) / slipsClose.length : null;
+  const latencies = trades.map(t => t.mirror_latency_sec).filter(v => v != null).map(Number);
+  const avgLatency = latencies.length ? latencies.reduce((a, b) => a + b, 0) / latencies.length : null;
+  const actualFeeCount = trades.filter(t => t.fees_are_actual === true).length;
+
+  // 风险金额累计
+  const totRiskUsdt = trades.reduce((s, t) => s + Number(t.risk_usdt || 0), 0);
+
   const statsCard = `
-    <div style="background:linear-gradient(180deg,rgba(0,200,83,0.05),rgba(0,200,83,0.01));border:1px solid rgba(0,200,83,0.15);border-radius:10px;padding:10px 14px;margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px">
-        <div style="font-size:12px;color:var(--text-dim)">
-          ${stats.n} 笔 · ${stats.winRate != null ? "胜率 " + stats.winRate + "%" : "胜率 —"} · <span style="color:#00e676">${stats.wins}胜</span> <span style="color:#ff5252">${stats.losses}负</span>${stats.scratch ? ' <span style="color:#9aa4b8">' + stats.scratch + "平</span>" : ""}
-          · L${stats.longs}/S${stats.shorts}
+    <div class="live-review-stats">
+      <div class="live-review-stats-head">
+        <div class="live-review-stats-head-left">
+          ${stats.n} 笔 · ${stats.winRate != null ? "胜率 " + stats.winRate + "%" : "胜率 —"} ·
+          <span style="color:#00e676">${stats.wins}胜</span> <span style="color:#ff5252">${stats.losses}负</span>${stats.scratch ? ' <span style="color:#9aa4b8">' + stats.scratch + '平</span>' : ''}
         </div>
-        <div class="${pnlCls}" style="font-size:18px;font-weight:700;font-variant-numeric:tabular-nums">
-          ${liveFmtUsdt(stats.totPnl)}
-          <span style="font-size:11px;opacity:0.7">(${(totPct >= 0 ? "+" : "") + totPct.toFixed(2)}%)</span>
+        <div class="live-review-stats-head-pnl ${pnlCls}">
+          ${liveFmtUsdt(stats.totPnl)} <span style="font-size:11px;opacity:0.7">(${(totPct >= 0 ? "+" : "") + totPct.toFixed(2)}%)</span>
         </div>
       </div>
-      ${stats.totFees > 0 ? `<div style="font-size:10.5px;color:var(--text-dim);margin-top:4px">
-        💸 当日费用 <span style="color:#ff8a65">-$${stats.totFees.toFixed(3)}</span>
-        · 净 ${liveFmtUsdt(stats.totPnl - 0)} (PnL 已含费)</div>` : ""}
-      ${reasonChips ? `<div style="margin-top:6px">${reasonChips}</div>` : ""}
+
+      <div class="live-review-stat-line">
+        <span class="live-review-stat-key">方向</span>
+        <span class="live-review-stat-val">
+          <span class="chip long">L ${stats.longs}</span>
+          <span class="chip short">S ${stats.shorts}</span>
+        </span>
+      </div>
+
+      ${bestTrade && bestPnl > 0 ? `
+      <div class="live-review-stat-line">
+        <span class="live-review-stat-key">最佳</span>
+        <span class="live-review-stat-val">
+          ${escapeHtml(bestTrade.symbol || "?")} ${(bestTrade.side === "BUY" ? "LONG" : "SHORT")}
+          <strong style="color:#00e676">${liveFmtUsdt(bestPnl)}</strong>
+        </span>
+      </div>` : ""}
+
+      ${worstTrade && worstTrade !== bestTrade && worstPnl < 0 ? `
+      <div class="live-review-stat-line">
+        <span class="live-review-stat-key">最差</span>
+        <span class="live-review-stat-val">
+          ${escapeHtml(worstTrade.symbol || "?")} ${(worstTrade.side === "BUY" ? "LONG" : "SHORT")}
+          <strong style="color:#ff5252">${liveFmtUsdt(worstPnl)}</strong>
+        </span>
+      </div>` : ""}
+
+      ${reasonChips ? `
+      <div class="live-review-stat-line">
+        <span class="live-review-stat-key">平仓原因</span>
+        <span class="live-review-stat-val">${reasonChips}</span>
+      </div>` : ""}
+
+      ${stats.totFees > 0 ? `
+      <div class="live-review-stat-line">
+        <span class="live-review-stat-key">费用</span>
+        <span class="live-review-stat-val">
+          <span style="color:#ff8a65">-$${stats.totFees.toFixed(3)}</span>
+          <span style="font-size:10px;color:var(--text-dim);margin-left:6px">
+            ${actualFeeCount}/${stats.n} ${actualFeeCount === stats.n ? "✓ 实际" : "⚠ 含估算"}
+          </span>
+        </span>
+      </div>` : ""}
+
+      ${totRiskUsdt > 0 ? `
+      <div class="live-review-stat-line">
+        <span class="live-review-stat-key">累计风险</span>
+        <span class="live-review-stat-val" style="color:#ffb84d">-$${totRiskUsdt.toFixed(2)}</span>
+      </div>` : ""}
+
+      ${(avgEntrySlip != null || avgCloseSlip != null) ? `
+      <div class="live-review-stat-line">
+        <span class="live-review-stat-key">滑点</span>
+        <span class="live-review-stat-val">
+          ${avgEntrySlip != null ? `开: <span class="${avgEntrySlip > 0 ? '' : 'live-trade-slippage good'}" style="${avgEntrySlip > 0 ? 'color:#ff8888' : ''}">${(avgEntrySlip >= 0 ? "+" : "") + avgEntrySlip.toFixed(1)}bps</span>` : ""}
+          ${avgCloseSlip != null ? ` · 平: <span class="${avgCloseSlip > 0 ? '' : 'live-trade-slippage good'}" style="${avgCloseSlip > 0 ? 'color:#ff8888' : ''}">${(avgCloseSlip >= 0 ? "+" : "") + avgCloseSlip.toFixed(1)}bps</span>` : ""}
+        </span>
+      </div>` : ""}
+
+      ${avgLatency != null ? `
+      <div class="live-review-stat-line">
+        <span class="live-review-stat-key">镜像延迟</span>
+        <span class="live-review-stat-val" style="${avgLatency > 60 ? 'color:#ffb84d' : ''}">⏱ ${avgLatency.toFixed(1)}s (信号→开仓)${avgLatency > 60 ? ' ⚠' : ''}</span>
+      </div>` : ""}
     </div>
   `;
 
-  // 单笔列表
+  // === 单笔明细 (默认折叠, 点击展开) ===
   const tradeRows = trades.map(t => {
     const side = t.side || '';
     const dir = side === 'BUY' ? 'LONG' : (side === 'SELL' ? 'SHORT' : '?');
@@ -4857,23 +5097,34 @@ function _liveRenderSingleDay(byDate, allDates) {
       const sign = side === 'BUY' ? 1 : -1;
       pnlPct = (exit - entry) / entry * 100 * sign;
     }
-    const pnlCls = pnl > 0 ? 'up' : (pnl < 0 ? 'down' : '');
+    const pnlCls2 = pnl > 0 ? 'up' : (pnl < 0 ? 'down' : '');
     const winLossCls = pnl > 0.01 ? 'win' : (pnl < -0.01 ? 'loss' : '');
     const fee = Number(t.fees_paid_usdt || 0);
     const closedAtTime = (t.closed_at || '').slice(11, 16);
     const hold = liveFmtHold(t.opened_at || t.created_at, t.closed_at);
     const reasonMeta = LIVE_REASON_ICON[t.close_reason] || { icon: '?', label: t.close_reason || '?' };
     const lev = t.leverage || 3;
+    const entrySlip = (t.slippage_bps != null) ? Number(t.slippage_bps) : null;
+    const closeSlip = (t.close_slippage_bps != null) ? Number(t.close_slippage_bps) : null;
+    const slipBits = [];
+    if (entrySlip != null && entrySlip !== 0) {
+      const cls = entrySlip > 5 ? 'bad' : (entrySlip < -5 ? 'good' : '');
+      slipBits.push(`<span class="live-trade-slippage ${cls}">开${entrySlip >= 0 ? "+" : ""}${entrySlip.toFixed(1)}</span>`);
+    }
+    if (closeSlip != null) {
+      const cls = closeSlip > 5 ? 'bad' : (closeSlip < -5 ? 'good' : '');
+      slipBits.push(`<span class="live-trade-slippage ${cls}">平${closeSlip >= 0 ? "+" : ""}${closeSlip.toFixed(1)}</span>`);
+    }
     return `<div class="paper-trade-row dir-${dir} ${winLossCls}" style="margin-bottom:3px">
       <span>
         <strong>${escapeHtml(t.symbol || '?')}</strong>
         <span class="paper-day-dir ${dir === 'LONG' ? 'long' : 'short'}">${dir}</span>
         <span class="live-lev-chip">${lev}x</span>
         <br><span style="font-size:11px;color:var(--text-dim)">
-          ${liveFmtPrice(entry)} → ${liveFmtPrice(exit)}${fee > 0 ? ' · 费 -$' + fee.toFixed(3) : ''}
+          ${liveFmtPrice(entry)} → ${liveFmtPrice(exit)}${fee > 0 ? ' · 费 -$' + fee.toFixed(3) : ''}${slipBits.length ? ' · ' + slipBits.join(' / ') : ''}
         </span>
       </span>
-      <span class="paper-pnl ${pnlCls}">
+      <span class="paper-pnl ${pnlCls2}">
         ${pnlPct != null ? liveFmtPct(pnlPct) : '—'}
         <br><span style="font-size:10px;opacity:0.85">${liveFmtUsdt(pnl)}</span>
       </span>
@@ -4882,7 +5133,19 @@ function _liveRenderSingleDay(byDate, allDates) {
     </div>`;
   }).join("");
 
-  return toolbar + statsCard + tradeRows;
+  // 单笔明细折叠 — 默认 open (复刻 paper 风格)
+  const tradesSection = `
+    <details class="live-review-trades-wrapper" open>
+      <summary class="live-review-trades-summary">
+        <span class="live-review-trades-chevron">▶</span>
+        <span class="live-review-trades-label">单笔明细</span>
+        <span class="live-review-trades-hint">${trades.length} 笔 · 点击折叠</span>
+      </summary>
+      <div class="live-review-trades-list">${tradeRows}</div>
+    </details>
+  `;
+
+  return toolbar + statsCard + tradesSection;
 }
 
 function _liveWireSingleDayHandlers() {
