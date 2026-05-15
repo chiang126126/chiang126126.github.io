@@ -4176,21 +4176,81 @@ function renderLivePanel(data) {
     body += `<div class="live-recon-warning">⚠️ 本轮对账 API 调用失败 (下轮重试)</div>`;
   }
 
+  // Helpers: 智能小数 + 时长格式化 (与 paper 一致)
+  const liveFmtPrice = p => {
+    if (p == null || p === 0) return "—";
+    const n = Number(p);
+    if (!isFinite(n)) return "—";
+    if (n < 0.01)   return n.toPrecision(4);    // 0.0003719
+    if (n < 1)      return n.toPrecision(4);    // 0.03067
+    if (n < 100)    return n.toFixed(4);        // 99.5432
+    return n.toFixed(2);                         // 123456.78
+  };
+  const liveFmtUsdt = v => (v == null ? "—" : (v >= 0 ? "+$" : "-$") + Math.abs(v).toFixed(2));
+  const liveFmtPct  = v => (v == null ? "—" : (v >= 0 ? "+" : "") + v.toFixed(2) + "%");
+  const liveFmtHold = (fromIso, toIso) => {
+    if (!fromIso) return "—";
+    const start = new Date(fromIso).getTime();
+    const end = toIso ? new Date(toIso).getTime() : Date.now();
+    if (!isFinite(start) || !isFinite(end)) return "—";
+    const mins = Math.max(0, Math.floor((end - start) / 60000));
+    if (mins < 60) return mins + "min";
+    const h = Math.floor(mins / 60), m = mins % 60;
+    return h + "h" + (m > 0 ? m + "m" : "");
+  };
+  const LIVE_PHASE_LABEL = {
+    "A": "🅰 初始",
+    "B": "🛡 BE锁定",
+    "C": "🎯 trailing",
+  };
+  const LIVE_REASON_LABEL = {
+    "sl_breach_client": "🛑 SL 触发",
+    "paper:hit_sl":     "🛑 止损 (paper)",
+    "paper:hit_be_sl":  "⚖ BE 平仓",
+    "paper:hit_b_trail":"🛡 B Trail",
+    "paper:hit_trail":  "🚀 跟踪止盈",
+    "paper:hit_tp1":    "🎯 TP1",
+    "paper:hit_tp2":    "🎯 TP2",
+    "paper:timeout":    "⏱ 超时",
+  };
+
   // ===== 持仓中 =====
   if (open.length > 0) {
     body += `<div class="paper-section-title">持仓中 (${open.length})</div>`;
     for (const t of open) {
-      const slip = t.slippage_bps || 0;
+      const side = t.side || '';
+      const dir = side === 'BUY' ? 'LONG' : (side === 'SELL' ? 'SHORT' : (t.direction || '?'));
+      const dirCls = side === 'BUY' ? 'long' : 'short';
+      const entry = Number(t.avg_fill_price || 0);
+      const cur = (t.current_price != null) ? Number(t.current_price) : null;
+      const upnl = (t.unrealized_pnl_usdt != null) ? Number(t.unrealized_pnl_usdt) : null;
+      const upct = (t.unrealized_pnl_pct  != null) ? Number(t.unrealized_pnl_pct)  : null;
+      const pnlCls = (upnl == null) ? '' : (upnl > 0 ? 'up' : (upnl < 0 ? 'down' : ''));
+      const slip = Number(t.slippage_bps || 0);
       const slipClass = slip > 5 ? 'bad' : (slip < -5 ? 'good' : '');
-      body += `<div class="live-trade-row">
-        <span><strong>${escapeHtml(t.symbol || '?')}</strong>
-          <span class="paper-day-dir ${(t.side === 'BUY' ? 'long' : 'short')}">${t.direction || t.side || '?'}</span>
-          <span class="live-trade-slippage ${slipClass}">slip ${slip >= 0 ? '+' : ''}${slip.toFixed(1)}bps</span>
+      const phase = t.phase || 'A';
+      const phaseLabel = LIVE_PHASE_LABEL[phase] || phase;
+      const qty = t.qty != null ? Number(t.qty) : null;
+      const sl = t.sl_price != null ? Number(t.sl_price) : null;
+      const hold = liveFmtHold(t.opened_at || t.created_at);
+      body += `<div class="paper-trade-row dir-${dir}">
+        <span>
+          <strong>${escapeHtml(t.symbol || '?')}</strong>
+          <span class="paper-day-dir ${dirCls}">${dir}</span>
+          ${t.is_dry_run ? '<span style="font-size:10px;color:#ffb84d;margin-left:4px">🟡DRY</span>' : '<span style="font-size:10px;color:#ff5252;margin-left:4px">🔴LIVE</span>'}
+          <br><span style="font-size:11px;color:var(--text-dim)">
+            入 ${liveFmtPrice(entry)} · 现 ${cur != null ? liveFmtPrice(cur) : '—'}
+            ${qty != null ? ' · qty ' + qty : ''}
+          </span>
+          <br><span style="font-size:10px;color:#ff8888">SL ${liveFmtPrice(sl)}</span>
+          <span style="font-size:10px;color:var(--text-dim);margin-left:6px">slip <span class="live-trade-slippage ${slipClass}">${slip >= 0 ? '+' : ''}${slip.toFixed(1)}bps</span></span>
         </span>
-        <span style="font-size:10px;color:var(--text-dim)">entry ${(t.avg_fill_price || 0).toFixed(2)}</span>
-        <span style="font-size:10px;color:#ff8888">SL ${(t.sl_price || 0).toFixed(2)}</span>
-        <span style="font-size:10px">Phase ${t.phase || 'A'}</span>
-        <span style="font-size:11px">${t.is_dry_run ? '🟡' : '🔴'}</span>
+        <span class="paper-pnl ${pnlCls}">
+          ${upct != null ? liveFmtPct(upct) : '—'}
+          <br><span style="font-size:10px;opacity:0.85">${upnl != null ? liveFmtUsdt(upnl) : ''}</span>
+        </span>
+        <span class="paper-reason">${phaseLabel}</span>
+        <span class="paper-hold">${hold}</span>
       </div>`;
     }
   }
@@ -4199,17 +4259,73 @@ function renderLivePanel(data) {
   if (closed.length > 0) {
     body += `<div class="paper-section-title">最近 ${Math.min(closed.length, 10)} 条已平仓</div>`;
     for (const t of closed.slice(0, 10)) {
-      const pnl = t.realized_pnl_usdt || 0;
-      const pnlClass = pnl > 0 ? 'up' : (pnl < 0 ? 'down' : '');
-      body += `<div class="live-trade-row">
-        <span><strong>${escapeHtml(t.symbol || '?')}</strong>
-          <span class="paper-day-dir ${(t.side === 'BUY' ? 'long' : 'short')}">${t.direction || t.side || ''}</span>
+      const side = t.side || '';
+      const dir = side === 'BUY' ? 'LONG' : (side === 'SELL' ? 'SHORT' : (t.direction || '?'));
+      const pnlUsdt = Number(t.realized_pnl_usdt || 0);
+      const entry = Number(t.avg_fill_price || 0);
+      const exit  = Number(t.close_price || t.exit_price || 0);
+      let pnlPct = null;
+      if (entry > 0 && exit > 0) {
+        const sign = side === 'BUY' ? 1 : -1;
+        pnlPct = (exit - entry) / entry * 100 * sign;
+      }
+      const pnlCls = pnlUsdt > 0 ? 'up' : (pnlUsdt < 0 ? 'down' : '');
+      const winLossCls = pnlUsdt > 0.01 ? 'win' : (pnlUsdt < -0.01 ? 'loss' : '');
+      const fee = Number(t.fees_paid_usdt || 0);
+      const closedAtTime = (t.closed_at || '').slice(11, 16);
+      const hold = liveFmtHold(t.opened_at || t.created_at, t.closed_at);
+      const reasonLabel = LIVE_REASON_LABEL[t.close_reason] || (t.close_reason || '?');
+      body += `<div class="paper-trade-row dir-${dir} ${winLossCls}">
+        <span>
+          <strong>${escapeHtml(t.symbol || '?')}</strong>
+          <span class="paper-day-dir ${dir === 'LONG' ? 'long' : 'short'}">${dir}</span>
+          ${t.is_dry_run ? '<span style="font-size:10px;color:#ffb84d;margin-left:4px">🟡DRY</span>' : '<span style="font-size:10px;color:#ff5252;margin-left:4px">🔴LIVE</span>'}
+          <br><span style="font-size:11px;color:var(--text-dim)">
+            ${liveFmtPrice(entry)} → ${liveFmtPrice(exit)}
+            ${fee > 0 ? ' · 手续费 -$' + fee.toFixed(3) : ''}
+          </span>
         </span>
-        <span style="font-size:10px;color:var(--text-dim)">${(t.close_reason || '?').slice(0, 20)}</span>
-        <span class="paper-pnl ${pnlClass}" style="font-size:11px">${pnl >= 0 ? '+' : ''}$${pnl.toFixed(2)}</span>
-        <span style="font-size:10px;color:var(--text-dim)">${(t.closed_at || '').slice(11, 16)}</span>
-        <span></span>
+        <span class="paper-pnl ${pnlCls}">
+          ${pnlPct != null ? liveFmtPct(pnlPct) : '—'}
+          <br><span style="font-size:10px;opacity:0.85">${liveFmtUsdt(pnlUsdt)}</span>
+        </span>
+        <span class="paper-reason">${reasonLabel}${closedAtTime ? ' · ' + closedAtTime : ''}</span>
+        <span class="paper-hold">${hold}</span>
       </div>`;
+    }
+  }
+
+  // ===== 📅 每日 P&L 汇总 (实盘) =====
+  if (closed.length > 0) {
+    const liveByDate = {};
+    for (const t of closed) {
+      if (!t.closed_at) continue;
+      const d = new Date(t.closed_at);
+      if (isNaN(d.getTime())) continue;
+      const key = d.toLocaleDateString("sv-SE");
+      if (!liveByDate[key]) liveByDate[key] = [];
+      liveByDate[key].push(t);
+    }
+    const liveDates = Object.keys(liveByDate).sort().reverse().slice(0, 7);
+    if (liveDates.length > 0) {
+      body += `<div class="paper-section-title">📅 每日 P&L 汇总 (近 ${liveDates.length} 天)</div>`;
+      body += `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:6px;margin-bottom:8px">`;
+      for (const date of liveDates) {
+        const dayTrades = liveByDate[date];
+        const dayPnl = dayTrades.reduce((s, t) => s + Number(t.realized_pnl_usdt || 0), 0);
+        const dayWins = dayTrades.filter(t => Number(t.realized_pnl_usdt || 0) > 0.01).length;
+        const dayLosses = dayTrades.filter(t => Number(t.realized_pnl_usdt || 0) < -0.01).length;
+        const dayCls = dayPnl > 0 ? 'up' : (dayPnl < 0 ? 'down' : '');
+        body += `
+          <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:6px;padding:8px 10px">
+            <div style="font-size:10px;color:var(--text-dim)">${date.slice(5)}</div>
+            <div class="value ${dayCls}" style="font-size:16px;font-weight:600">${liveFmtUsdt(dayPnl)}</div>
+            <div style="font-size:10px;color:var(--text-dim)">
+              ${dayTrades.length} 笔 · <span style="color:#00e676">${dayWins}W</span>/<span style="color:#ff5252">${dayLosses}L</span>
+            </div>
+          </div>`;
+      }
+      body += `</div>`;
     }
   }
 

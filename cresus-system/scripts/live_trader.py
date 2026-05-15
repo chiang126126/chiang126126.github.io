@@ -1004,6 +1004,23 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
             # 取价失败 → 保留, 下 tick 重试
             still_open.append(lt)
             continue
+
+        # 记录当前价 + 浮动盈亏 (供 dashboard 显示)
+        try:
+            entry = float(lt.get("avg_fill_price") or 0)
+            qty = float(lt.get("qty") or 0)
+            sign = 1 if str(lt.get("side", "")).upper() == "BUY" else -1
+            lt["current_price"] = current_price
+            if entry > 0 and qty > 0:
+                lt["unrealized_pnl_usdt"] = round((current_price - entry) * qty * sign, 4)
+                lt["unrealized_pnl_pct"] = round((current_price - entry) / entry * 100 * sign, 3)
+            else:
+                lt["unrealized_pnl_usdt"] = 0.0
+                lt["unrealized_pnl_pct"] = 0.0
+            lt["last_price_check_at"] = now.isoformat()
+        except Exception as e:
+            log.debug(f"[live-monitor] failed to record unrealized for {lt.get('symbol')}: {e}")
+
         if _check_sl_breach(lt, current_price):
             log.warning(
                 f"[SL-BREACH] {lt.get('symbol')} {lt.get('side')}: "
