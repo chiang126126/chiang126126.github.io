@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-15T01:36:48.403022+00:00",
+  "updated_at": "2026-05-15T01:38:54.522549+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 34,
+  "alerts_count": 35,
   "alerts": [
+    {
+      "symbol": "TACUSDT",
+      "base": "TAC",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.0226,
+      "price_change_pct": -1.379,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 256307.0,
+      "volume_baseline_usdt": 46785.0,
+      "volume_ratio": 5.48,
+      "detected_at": "2026-05-15T01:38:16.946165+00:00",
+      "intensity": 1,
+      "change_5m_pct": -2.572,
+      "change_15m_pct": -3.176,
+      "change_1h_pct": -3.101,
+      "change_4h_pct": -5.475,
+      "taker_buy_ratio_1m": 0.367,
+      "taker_buy_ratio_5m": 0.372,
+      "oi_delta_5m_pct": 0.325,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.747,
+      "range_4h_pct": 7.84,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.02285329,
+      "suggested_tp1": 0.02222007,
+      "suggested_tp2": 0.02184014,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "BABAUSDT",
       "base": "BABA",
