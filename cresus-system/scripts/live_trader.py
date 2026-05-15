@@ -70,7 +70,10 @@ LIVE_STARTING_CAPITAL_USDT = 100.0     # 实盘起始资金 (校准用)
 LIVE_DAILY_DD_LIMIT_USDT = 5.0         # 日亏 -$5 → block new opens
 LIVE_MAX_DEPLOY_USDT = 60.0            # 总部署上限 $60 (40% 现金保留)
 
-# Phase 3.3.a 控制文件 (在 ~/.cresus-*)
+# Phase 3.3.b 累计 DD kill switch
+LIVE_TOTAL_DD_LIMIT_PCT = 5.0          # 总回撤 5% → 自动写 emergency flag
+
+# Phase 3.3.a/b 控制文件 (在 ~/.cresus-*)
 PAUSE_FLAG_PATH = Path.home() / ".cresus-pause"
 EMERGENCY_STOP_PATH = Path.home() / ".cresus-emergency-stop"
 
@@ -195,11 +198,18 @@ def is_eligible_for_mirror(
     current_open = len(live_state.get("live_open_trades", []))
     if current_open >= LIVE_MAX_CONCURRENT:
         return False, f"max_concurrent reached ({current_open}/{LIVE_MAX_CONCURRENT})"
-    # 4. Trade 太旧 (启动时陈年 paper trades 不 mirror)
+    # 4. Phase 3.3.b: 单 symbol 最多 1 笔 (不分方向, 防对冲 / 重复曝光)
+    existing_symbols = {
+        lt.get("symbol", "")
+        for lt in (live_state.get("live_open_trades") or [])
+    }
+    if sym in existing_symbols:
+        return False, f"symbol {sym} already has open live position (1-per-symbol cap)"
+    # 5. Trade 太旧 (启动时陈年 paper trades 不 mirror)
     age = _trade_age_sec(paper_trade, now)
     if age is not None and age > LIVE_MIRROR_MAX_AGE_SEC:
         return False, f"paper trade too old ({age:.0f}s > {LIVE_MIRROR_MAX_AGE_SEC}s)"
-    # 5. Direction 有效
+    # 6. Direction 有效
     direction = paper_trade.get("direction", "").upper()
     if direction not in ("LONG", "SHORT"):
         return False, f"invalid direction {direction!r}"
@@ -319,27 +329,166 @@ def _check_daily_dd(live_state: dict, now: datetime) -> Optional[str]:
     return None
 
 
-def check_risk_gates(live_state: dict, now: datetime) -> dict:
-    """Phase 3.3.a 软门聚合检查. 只 block 新开仓, 不影响已有仓位管理.
+def _get_account_balance(client: BinanceClient) -> Optional[float]:
+    """获取 totalMarginBalance (含未实现 PnL). API 失败返 None.
+
+    Phase 3.3.b 用. 关键: 用 totalMarginBalance 而非 totalWalletBalance,
+    因为前者 = wallet + unrealized profit, 是真实账户净值.
+    """
+    try:
+        account = client.get_account()
+    except (BinanceError, ValueError) as e:
+        log.warning(f"[recon] get_account failed: {e}")
+        return None
+    except Exception as e:
+        log.error(f"[recon] get_account unexpected: {type(e).__name__}: {e}")
+        return None
+    try:
+        return float(account.get("totalMarginBalance") or 0)
+    except (ValueError, TypeError):
+        return None
+
+
+def _check_cumulative_dd_and_trigger(client: BinanceClient) -> Optional[str]:
+    """Phase 3.3.b: 累计 DD kill switch.
+
+    查 totalMarginBalance vs LIVE_STARTING_CAPITAL_USDT.
+    若 DD >= LIVE_TOTAL_DD_LIMIT_PCT, AUTO-CREATE EMERGENCY_STOP_PATH 文件.
+    人工删文件 + 修复底层 (注资 / 减仓) 才能恢复 (因为下次跑还是 trigger).
+
+    Returns: 触发时 reason string, 否则 None.
+    """
+    balance = _get_account_balance(client)
+    if balance is None:
+        return None  # API 不可用, 不 block (其他 gate 会兜底)
+    threshold = LIVE_STARTING_CAPITAL_USDT * (1 - LIVE_TOTAL_DD_LIMIT_PCT / 100)
+    if balance >= threshold:
+        return None  # 安全
+    dd_pct = (LIVE_STARTING_CAPITAL_USDT - balance) / LIVE_STARTING_CAPITAL_USDT * 100
+    reason = (
+        f"cumulative DD {dd_pct:.2f}% (balance ${balance:.2f} < "
+        f"threshold ${threshold:.2f})"
+    )
+    # AUTO 写 emergency flag
+    try:
+        EMERGENCY_STOP_PATH.write_text(
+            f"AUTO {datetime.now(timezone.utc).isoformat()}: {reason}",
+            encoding="utf-8",
+        )
+        log.critical(
+            f"🚨🚨 KILL SWITCH TRIGGERED: {reason}. "
+            f"Emergency stop flag created: {EMERGENCY_STOP_PATH}. "
+            f"To recover: 1) 注资或减仓 to bring balance > ${threshold:.2f} "
+            f"2) rm {EMERGENCY_STOP_PATH}"
+        )
+    except Exception as e:
+        log.error(f"[KILL] failed to write emergency flag: {e}")
+    return reason
+
+
+def check_position_reconciliation(
+    client: BinanceClient, live_state: dict,
+) -> dict:
+    """Phase 3.3.b: 对账 live state vs exchange.
+
+    比对 symbol (不比 quantity / direction, 简化第一版).
+    Returns: {
+        'ok': bool (无 mismatch),
+        'mismatches': [{'symbol', 'kind', 'message'}, ...],
+        'live_symbols': set,
+        'exchange_symbols': set,
+        'api_failed': bool,  # API 调用失败时 True
+    }
+
+    mismatch kinds:
+    - 'live_only': live tracks 但 exchange 已无 (可能外部 close)
+    - 'exchange_only': exchange 有但 live 不知 (可能用户手动开 / 我们丢 state)
+    """
+    live_symbols = {
+        lt.get("symbol", "")
+        for lt in (live_state.get("live_open_trades") or [])
+        if lt.get("symbol")
+    }
+    try:
+        positions = client.get_positions()
+    except (BinanceError, ValueError) as e:
+        log.warning(f"[recon] get_positions failed: {e}")
+        return {
+            "ok": True, "mismatches": [], "api_failed": True,
+            "live_symbols": list(live_symbols), "exchange_symbols": [],
+        }
+    except Exception as e:
+        log.error(f"[recon] get_positions unexpected: {e}")
+        return {
+            "ok": True, "mismatches": [], "api_failed": True,
+            "live_symbols": list(live_symbols), "exchange_symbols": [],
+        }
+
+    exchange_symbols = set()
+    for p in positions:
+        try:
+            amt = float(p.get("positionAmt") or 0)
+        except (ValueError, TypeError):
+            continue
+        if abs(amt) > 0:
+            exchange_symbols.add(p.get("symbol", ""))
+
+    mismatches = []
+    for sym in live_symbols - exchange_symbols:
+        mismatches.append({
+            "symbol": sym, "kind": "live_only",
+            "message": f"live tracks {sym} but exchange has no position "
+                       f"(externally closed? or state stale)",
+        })
+    for sym in exchange_symbols - live_symbols:
+        mismatches.append({
+            "symbol": sym, "kind": "exchange_only",
+            "message": f"exchange has {sym} position but live doesn't track "
+                       f"(user manual? or state lost)",
+        })
+    return {
+        "ok": not mismatches,
+        "mismatches": mismatches,
+        "api_failed": False,
+        "live_symbols": list(live_symbols),
+        "exchange_symbols": list(exchange_symbols),
+    }
+
+
+def check_risk_gates(
+    live_state: dict, now: datetime, *,
+    client: Optional[BinanceClient] = None,
+) -> dict:
+    """Phase 3.3.a/b 软+硬门聚合检查. 只 block 新开仓, 不影响已有持仓管理.
+
+    Args:
+        live_state: 本地 state.
+        now: 当前 UTC 时间.
+        client: 可选; 提供后启用 cumulative DD 检查 (需 API). 不提供则跳过该检查
+                (向后兼容; 适合单测).
 
     Returns: {
         'block_new_opens': bool,
-        'reasons': [str, ...],   # 触发的 gate 列表 (可能多个)
-        'daily_pnl': float,      # 当日已实现 PnL (供 logging/dashboard)
-        'deployed_usdt': float,  # 当前部署 (供 logging/dashboard)
+        'reasons': [str, ...],
+        'daily_pnl': float,
+        'deployed_usdt': float,
     }
     """
     reasons = []
-    # 优先级 1: emergency stop (Phase 3.3.b 自动写, 人工删)
+    # 优先级 1: emergency stop (Phase 3.3.b 累计 DD 自动写, 人工删)
     msg = _check_emergency_stop_flag()
     if msg: reasons.append(msg)
-    # 优先级 2: 手动 pause (人工随时新建/删)
+    # 优先级 2: 累计 DD (Phase 3.3.b, 触发时自动写 emergency 文件)
+    if client is not None:
+        msg = _check_cumulative_dd_and_trigger(client)
+        if msg: reasons.append(msg)
+    # 优先级 3: 手动 pause (人工随时新建/删)
     msg = _check_pause_flag()
     if msg: reasons.append(msg)
-    # 优先级 3: 现金保留
+    # 优先级 4: 现金保留
     msg = _check_cash_reserve(live_state)
     if msg: reasons.append(msg)
-    # 优先级 4: 日 DD
+    # 优先级 5: 日 DD
     msg = _check_daily_dd(live_state, now)
     if msg: reasons.append(msg)
 
@@ -562,8 +711,8 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
         f"client_dry_run={client.dry_run}"
     )
 
-    # Phase 3.3.a: 风控软门检查 (在尝试新开仓前)
-    risk = check_risk_gates(live, now)
+    # Phase 3.3.a/b: 风控软+硬门检查
+    risk = check_risk_gates(live, now, client=client)
     log.info(
         f"[risk] daily_pnl=${risk['daily_pnl']:+.2f} "
         f"deployed=${risk['deployed_usdt']:.2f}/{LIVE_MAX_DEPLOY_USDT:.0f} "
@@ -572,6 +721,20 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
     if risk["block_new_opens"]:
         for r in risk["reasons"]:
             log.warning(f"🛑 [risk-gate] {r}")
+
+    # Phase 3.3.b: 仓位对账 (live state vs exchange)
+    recon = check_position_reconciliation(client, live)
+    if not recon["ok"]:
+        for m in recon["mismatches"]:
+            log.warning(f"⚠️ [recon-{m['kind']}] {m['message']}")
+        log.warning(
+            f"[recon] live_symbols={recon['live_symbols']} "
+            f"exchange_symbols={recon['exchange_symbols']}"
+        )
+    elif recon["api_failed"]:
+        log.debug(f"[recon] API failed, skipped reconciliation this tick")
+    else:
+        log.debug(f"[recon] OK ({len(recon['live_symbols'])} symbols matched)")
 
     # 1. 找 eligible candidates (即使风控触发也走 eligibility 检查, 便于日志一致)
     mirror_candidates = []

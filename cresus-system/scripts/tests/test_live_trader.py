@@ -27,10 +27,13 @@ from live_trader import (  # noqa: E402
     _check_emergency_stop_flag, _check_pause_flag,
     _check_cash_reserve, _calculate_daily_realized_pnl,
     _check_daily_dd, check_risk_gates,
+    _get_account_balance, _check_cumulative_dd_and_trigger,
+    check_position_reconciliation,
     load_paper_state, load_live_state, save_live_state,
     main_loop, _empty_live_state,
     LIVE_SYMBOL_WHITELIST, LIVE_MAX_CONCURRENT, LIVE_MIRROR_MAX_AGE_SEC,
     LIVE_NOTIONAL_USDT, LIVE_MAX_DEPLOY_USDT, LIVE_DAILY_DD_LIMIT_USDT,
+    LIVE_STARTING_CAPITAL_USDT, LIVE_TOTAL_DD_LIMIT_PCT,
 )
 from binance_client import (  # noqa: E402
     _validate_trade_id, BinanceError, BinanceClient,
@@ -1148,6 +1151,239 @@ class TestMainLoopWithRiskGates(unittest.TestCase):
                               return_value=[[0, 0, 0, 0, "100.0", 0, 0, 0, 0, 0, 0, 0]]):
                 result = main_loop(self.client, dry_run=True)
         self.assertEqual(mock_open.call_count, 0)
+
+
+# ============================================================================
+# Phase 3.3.b: 单 symbol 上限 (is_eligible_for_mirror 加的新检查)
+# ============================================================================
+
+class TestSingleSymbolLimit(unittest.TestCase):
+
+    def setUp(self):
+        self.now = datetime.now(timezone.utc)
+        self.trade = {
+            "id": "BTCUSDT|LONG|2026-05-15T10:00:00+00:00",
+            "symbol": "BTCUSDT",
+            "direction": "LONG",
+            "entered_at": (self.now - timedelta(seconds=30)).isoformat(),
+            "entry_price": 81000.0,
+            "sl": 80190.0,
+        }
+
+    def test_symbol_already_open_blocks(self):
+        """live 已有同 symbol 持仓 (即使 direction 不同) → block."""
+        live = _empty_live_state()
+        live["live_open_trades"] = [{
+            "symbol": "BTCUSDT", "side": "SELL",  # SHORT
+            "paper_id": "other_paper_id",
+        }]
+        ok, reason = is_eligible_for_mirror(self.trade, live, self.now)
+        self.assertFalse(ok)
+        self.assertIn("already has open", reason)
+
+    def test_different_symbol_doesnt_block(self):
+        """live 有 ETH 持仓, 不阻碍开 BTC."""
+        live = _empty_live_state()
+        live["live_open_trades"] = [{
+            "symbol": "ETHUSDT", "side": "BUY",
+            "paper_id": "ethpaper",
+        }]
+        ok, reason = is_eligible_for_mirror(self.trade, live, self.now)
+        self.assertTrue(ok, f"unexpected block: {reason}")
+
+
+# ============================================================================
+# Phase 3.3.b: Cumulative DD kill switch
+# ============================================================================
+
+class TestCumulativeDD(unittest.TestCase):
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self._orig_stop = live_trader.EMERGENCY_STOP_PATH
+        live_trader.EMERGENCY_STOP_PATH = Path(self.tmpdir) / ".emergency-stop"
+        self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+
+    def tearDown(self):
+        live_trader.EMERGENCY_STOP_PATH = self._orig_stop
+        import shutil
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def test_account_balance_normal(self):
+        with patch.object(self.client, "get_account",
+                          return_value={"totalMarginBalance": "95.5"}):
+            b = _get_account_balance(self.client)
+        self.assertAlmostEqual(b, 95.5)
+
+    def test_account_balance_api_failure(self):
+        with patch.object(self.client, "get_account",
+                          side_effect=BinanceError("network")):
+            b = _get_account_balance(self.client)
+        self.assertIsNone(b)
+
+    def test_dd_under_limit_no_trigger(self):
+        """balance ≥ threshold ($95) → 不触发."""
+        with patch.object(self.client, "get_account",
+                          return_value={"totalMarginBalance": "96.0"}):
+            result = _check_cumulative_dd_and_trigger(self.client)
+        self.assertIsNone(result)
+        self.assertFalse(live_trader.EMERGENCY_STOP_PATH.exists())
+
+    def test_dd_at_threshold_triggers(self):
+        """balance = 94.99 < threshold $95 → 触发 + 自动写文件."""
+        with patch.object(self.client, "get_account",
+                          return_value={"totalMarginBalance": "94.99"}):
+            result = _check_cumulative_dd_and_trigger(self.client)
+        self.assertIsNotNone(result)
+        self.assertIn("cumulative DD", result)
+        # 文件被自动创建
+        self.assertTrue(live_trader.EMERGENCY_STOP_PATH.exists())
+        content = live_trader.EMERGENCY_STOP_PATH.read_text()
+        self.assertIn("AUTO", content)
+        self.assertIn("cumulative DD", content)
+
+    def test_dd_deep_triggers(self):
+        """balance = 80 (-20% DD) → 触发."""
+        with patch.object(self.client, "get_account",
+                          return_value={"totalMarginBalance": "80.0"}):
+            result = _check_cumulative_dd_and_trigger(self.client)
+        self.assertIsNotNone(result)
+        self.assertIn("20", result)  # 20% DD 应出现在 reason
+
+    def test_dd_api_failure_doesnt_block(self):
+        """get_account 失败时返 None (不 trigger), 让其他 gate 兜底."""
+        with patch.object(self.client, "get_account",
+                          side_effect=BinanceError("temp")):
+            result = _check_cumulative_dd_and_trigger(self.client)
+        self.assertIsNone(result)
+        self.assertFalse(live_trader.EMERGENCY_STOP_PATH.exists())
+
+
+# ============================================================================
+# Phase 3.3.b: Position reconciliation
+# ============================================================================
+
+class TestPositionReconciliation(unittest.TestCase):
+
+    def setUp(self):
+        self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+
+    def test_all_match_ok(self):
+        """Live 和 exchange 同样的 symbols → ok."""
+        live = _empty_live_state()
+        live["live_open_trades"] = [
+            {"symbol": "BTCUSDT"}, {"symbol": "ETHUSDT"},
+        ]
+        mock_positions = [
+            {"symbol": "BTCUSDT", "positionAmt": "0.001"},
+            {"symbol": "ETHUSDT", "positionAmt": "0.01"},
+            {"symbol": "SOLUSDT", "positionAmt": "0"},  # 空仓不算
+        ]
+        with patch.object(self.client, "get_positions",
+                          return_value=mock_positions):
+            result = check_position_reconciliation(self.client, live)
+        self.assertTrue(result["ok"])
+        self.assertEqual(result["mismatches"], [])
+
+    def test_live_only_mismatch(self):
+        """Live tracks BTCUSDT 但 exchange 0 持仓 → live_only mismatch."""
+        live = _empty_live_state()
+        live["live_open_trades"] = [{"symbol": "BTCUSDT"}]
+        mock_positions = [{"symbol": "BTCUSDT", "positionAmt": "0"}]
+        with patch.object(self.client, "get_positions",
+                          return_value=mock_positions):
+            result = check_position_reconciliation(self.client, live)
+        self.assertFalse(result["ok"])
+        self.assertEqual(len(result["mismatches"]), 1)
+        self.assertEqual(result["mismatches"][0]["kind"], "live_only")
+        self.assertEqual(result["mismatches"][0]["symbol"], "BTCUSDT")
+
+    def test_exchange_only_mismatch(self):
+        """Exchange 有 ETHUSDT 但 live 不知 → exchange_only mismatch."""
+        live = _empty_live_state()
+        # live 没有 trades
+        mock_positions = [{"symbol": "ETHUSDT", "positionAmt": "0.01"}]
+        with patch.object(self.client, "get_positions",
+                          return_value=mock_positions):
+            result = check_position_reconciliation(self.client, live)
+        self.assertFalse(result["ok"])
+        self.assertEqual(result["mismatches"][0]["kind"], "exchange_only")
+
+    def test_api_failure_returns_ok_with_flag(self):
+        """API 失败时 ok=True (不 block), 但 api_failed=True 标记."""
+        live = _empty_live_state()
+        live["live_open_trades"] = [{"symbol": "BTCUSDT"}]
+        with patch.object(self.client, "get_positions",
+                          side_effect=BinanceError("rate limit")):
+            result = check_position_reconciliation(self.client, live)
+        self.assertTrue(result["ok"])
+        self.assertTrue(result["api_failed"])
+
+    def test_short_position_detected(self):
+        """SHORT 持仓 (positionAmt 负数) 也算 active."""
+        live = _empty_live_state()
+        mock_positions = [{"symbol": "BTCUSDT", "positionAmt": "-0.001"}]
+        with patch.object(self.client, "get_positions",
+                          return_value=mock_positions):
+            result = check_position_reconciliation(self.client, live)
+        # live 没 BTC, exchange 有 → exchange_only mismatch
+        self.assertEqual(len(result["mismatches"]), 1)
+
+
+# ============================================================================
+# Phase 3.3.b: check_risk_gates 含 client 参数 (累计 DD)
+# ============================================================================
+
+class TestRiskGatesWithClient(unittest.TestCase):
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self._orig_stop = live_trader.EMERGENCY_STOP_PATH
+        self._orig_pause = live_trader.PAUSE_FLAG_PATH
+        live_trader.EMERGENCY_STOP_PATH = Path(self.tmpdir) / ".emergency"
+        live_trader.PAUSE_FLAG_PATH = Path(self.tmpdir) / ".pause"
+        self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+        self.now = datetime.now(timezone.utc)
+
+    def tearDown(self):
+        live_trader.EMERGENCY_STOP_PATH = self._orig_stop
+        live_trader.PAUSE_FLAG_PATH = self._orig_pause
+        import shutil
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def test_without_client_skips_cumulative_dd(self):
+        """不传 client → 跳过累计 DD 检查 (向后兼容)."""
+        state = _empty_live_state()
+        result = check_risk_gates(state, self.now)
+        self.assertFalse(result["block_new_opens"])
+
+    def test_with_client_normal_no_block(self):
+        state = _empty_live_state()
+        with patch.object(self.client, "get_account",
+                          return_value={"totalMarginBalance": "100.0"}):
+            result = check_risk_gates(state, self.now, client=self.client)
+        self.assertFalse(result["block_new_opens"])
+
+    def test_with_client_dd_triggers_and_creates_flag(self):
+        state = _empty_live_state()
+        with patch.object(self.client, "get_account",
+                          return_value={"totalMarginBalance": "85.0"}):
+            result = check_risk_gates(state, self.now, client=self.client)
+        self.assertTrue(result["block_new_opens"])
+        # 应该有 cumulative DD reason
+        dd_reasons = [r for r in result["reasons"] if "cumulative DD" in r]
+        self.assertEqual(len(dd_reasons), 1)
+        # 也应该有 emergency stop reason (因为 trigger 也 creates 文件)
+        # 然后下次 check 时 emergency_stop_flag 也命中
+        # 实际上第一次 check_risk_gates 调用里两个 reason 都会出 (因为 emergency 先 check, 然后 cumulative DD 也 check 并触发)
+        emergency_reasons = [r for r in result["reasons"]
+                             if "emergency stop" in r]
+        # 第一次调用时, emergency_stop_flag check 先, 那时还没文件
+        # 然后 cumulative DD check 触发 + 写文件
+        # 所以这一次只看到 cumulative DD reason
+        # 但下次 tick 会同时命中 (emergency_stop_flag + cumulative_DD)
+        # 这里只测第一次, 所以 emergency_reasons 数应该是 0 或 1
+        self.assertLessEqual(len(emergency_reasons), 1)
 
 
 if __name__ == "__main__":
