@@ -569,11 +569,18 @@ class TestMainLoopMirroring(unittest.TestCase):
             result["mirrored_paper_ids"],
         )
 
-    def test_main_loop_failed_mirror_blocks_retry(self):
-        """mirror 失败的 paper_id 也加入 mirrored_paper_ids (防重复砍腰)."""
+    def test_main_loop_failed_mirror_retries_next_tick(self):
+        """mirror 失败不再永久 blacklist — 下 tick 重试.
+
+        过去行为: 失败 → 加 mirrored_paper_ids → 永不重试 (set_leverage 临时
+        失败 / API 超时等可恢复错误也被放弃, 是 bug).
+        现在: 失败 → 记 missed_signal + 不加 mirrored_paper_ids → 下 tick 重试.
+        退出条件由 mirror_max_age (10min) 和 paper 自然平仓提供.
+        """
         now = datetime.now(timezone.utc)
+        paper_id = "BTCUSDT|LONG|2026-05-15T10:00:00+00:00"
         self._write_paper([{
-            "id": "BTCUSDT|LONG|2026-05-15T10:00:00+00:00",
+            "id": paper_id,
             "symbol": "BTCUSDT",
             "direction": "LONG",
             "entered_at": (now - timedelta(seconds=10)).isoformat(),
@@ -583,13 +590,13 @@ class TestMainLoopMirroring(unittest.TestCase):
         with patch.object(self.client, "open_position",
                           side_effect=BinanceError("simulated")):
             result = main_loop(self.client, dry_run=True)
-        # live_open_trades 没增加
+        # live_open_trades 没增加 (开仓失败)
         self.assertEqual(len(result["live_open_trades"]), 0)
-        # 但 paper_id 已记入 mirrored_paper_ids (下次不重试)
-        self.assertIn(
-            "BTCUSDT|LONG|2026-05-15T10:00:00+00:00",
-            result["mirrored_paper_ids"],
-        )
+        # ✓ 关键: paper_id NOT 在 mirrored_paper_ids 里 — 下 tick 可重试
+        self.assertNotIn(paper_id, result["mirrored_paper_ids"])
+        # ✓ 被记为 missed_signal 供 dashboard 诊断
+        missed_ids = [m["paper_id"] for m in result.get("missed_signals", [])]
+        self.assertIn(paper_id, missed_ids)
 
     def test_main_loop_skips_already_mirrored(self):
         """已 mirror 过的 paper_id 不会被再次调用."""
@@ -1082,7 +1089,9 @@ class TestCashReserve(unittest.TestCase):
 
     def test_at_cap_blocks(self):
         state = _empty_live_state()
+        # 4 笔 × $20 = $80 = LIVE_MAX_DEPLOY_USDT cap
         state["live_open_trades"] = [
+            {"notional_usdt": 20.0},
             {"notional_usdt": 20.0},
             {"notional_usdt": 20.0},
             {"notional_usdt": 20.0},
@@ -1093,7 +1102,9 @@ class TestCashReserve(unittest.TestCase):
 
     def test_over_cap_blocks(self):
         state = _empty_live_state()
+        # 4 笔 × $25 = $100 > $80 cap
         state["live_open_trades"] = [
+            {"notional_usdt": 25.0},
             {"notional_usdt": 25.0},
             {"notional_usdt": 25.0},
             {"notional_usdt": 25.0},
@@ -1238,7 +1249,8 @@ class TestRiskGatesAggregator(unittest.TestCase):
         live_trader.PAUSE_FLAG_PATH.write_text("manual")
         live_trader.EMERGENCY_STOP_PATH.write_text("auto: DD limit")
         state = _empty_live_state()
-        state["live_open_trades"] = [{"notional_usdt": 60.0}]   # 触发 cash reserve
+        # 触发 cash reserve cap ($80)
+        state["live_open_trades"] = [{"notional_usdt": 80.0}]
         result = check_risk_gates(state, self.now)
         self.assertTrue(result["block_new_opens"])
         self.assertGreaterEqual(len(result["reasons"]), 3)
@@ -1321,8 +1333,8 @@ class TestMainLoopWithRiskGates(unittest.TestCase):
         self.assertEqual(len(result["live_open_trades"]), 1)
 
     def test_cash_reserve_blocks(self):
-        """已部署 $60 = cap → 新单不开."""
-        # seed 已有 3 笔满 cap
+        """已部署 $80 = cap → 新单不开."""
+        # seed 已有 4 笔满 cap
         state = _empty_live_state()
         state["live_open_trades"] = [
             {"trade_id": "L1", "symbol": "ETHUSDT", "paper_id": "x1",
@@ -1330,6 +1342,8 @@ class TestMainLoopWithRiskGates(unittest.TestCase):
             {"trade_id": "L2", "symbol": "SOLUSDT", "paper_id": "x2",
              "notional_usdt": 20.0, "side": "BUY", "sl_price": 1.0, "phase": "A"},
             {"trade_id": "L3", "symbol": "BNBUSDT", "paper_id": "x3",
+             "notional_usdt": 20.0, "side": "BUY", "sl_price": 1.0, "phase": "A"},
+            {"trade_id": "L4", "symbol": "ADAUSDT", "paper_id": "x4",
              "notional_usdt": 20.0, "side": "BUY", "sl_price": 1.0, "phase": "A"},
         ]
         save_live_state(state)
@@ -1612,7 +1626,7 @@ class TestMirrorIterationGuards(unittest.TestCase):
         }))
 
     def test_max_concurrent_enforced_during_loop(self):
-        """Paper 有 5 笔 eligible 信号, 但 max_concurrent=3 → 只 mirror 3 笔."""
+        """Paper 有 5 笔 eligible 信号, 但 max_concurrent=4 → 只 mirror 4 笔."""
         now = datetime.now(timezone.utc)
         trades = []
         for i, sym in enumerate(["AAA", "BBB", "CCC", "DDD", "EEE"]):
@@ -1641,10 +1655,10 @@ class TestMirrorIterationGuards(unittest.TestCase):
                               return_value=[[0, 0, 0, 0, "100.0", 0, 0, 0, 0, 0, 0, 0]]):
                 result = main_loop(self.client, dry_run=True)
 
-        # ⚠️ Bug fix verification: max_concurrent=3, 必须只 mirror 3 笔
-        self.assertEqual(call_count[0], 3,
-                         f"应严格在 max_concurrent=3 处停止, 实际 mirror {call_count[0]} 次")
-        self.assertEqual(len(result["live_open_trades"]), 3)
+        # ⚠️ Bug fix verification: max_concurrent=4, 必须只 mirror 4 笔
+        self.assertEqual(call_count[0], 4,
+                         f"应严格在 max_concurrent=4 处停止, 实际 mirror {call_count[0]} 次")
+        self.assertEqual(len(result["live_open_trades"]), 4)
 
     def test_same_symbol_blocks_within_iteration(self):
         """Paper 有 POLYX LONG + POLYX SHORT 同时 open → 只 mirror 第一笔."""
@@ -1728,7 +1742,7 @@ class TestMirrorIterationGuards(unittest.TestCase):
         """Paper 有 4 笔 eligible, deploy cap $60 → 最多 mirror 3 笔 (3 × $20 = $60)."""
         now = datetime.now(timezone.utc)
         trades = []
-        for i, sym in enumerate(["AAA", "BBB", "CCC", "DDD"]):
+        for i, sym in enumerate(["AAA", "BBB", "CCC", "DDD", "EEE"]):
             trades.append({
                 "id": f"{sym}|LONG|2026-05-15T10:00:0{i}+00:00",
                 "symbol": f"{sym}USDT",
@@ -1752,8 +1766,8 @@ class TestMirrorIterationGuards(unittest.TestCase):
                               return_value=[[0, 0, 0, 0, "100.0", 0, 0, 0, 0, 0, 0, 0]]):
                 result = main_loop(self.client, dry_run=True)
 
-        # 应在 max_concurrent (3) OR cash reserve ($60) 早触发处停, 都是 3
-        self.assertLessEqual(call_count[0], 3)
+        # 应在 max_concurrent (4) OR cash reserve ($80) 早触发处停, 都是 4
+        self.assertLessEqual(call_count[0], 4)
 
 
 # ============================================================================
@@ -1798,8 +1812,8 @@ class TestComputeLiveStats(unittest.TestCase):
         self.assertEqual(s["open"], 2)
         self.assertEqual(s["slots_used"], 2)
         self.assertAlmostEqual(s["deployed_usdt"], 45.0, places=2)
-        # free = 100 - 45 + 0 (无已实现 PnL) = 55
-        self.assertAlmostEqual(s["free_capital_usdt"], 55.0, places=2)
+        # free = 100 - 45 + 0 (无已实现 PnL) - 0.02 (开仓费扣钱包) = 54.98
+        self.assertAlmostEqual(s["free_capital_usdt"], 54.98, places=2)
 
     def test_net_pnl_and_fees_breakdown(self):
         """net_pnl = total_pnl − fees_realized; free_capital 用 NET."""
@@ -1825,7 +1839,9 @@ class TestComputeLiveStats(unittest.TestCase):
         self.assertAlmostEqual(s["fees_paid_usdt"], 0.035, places=6)
         # net = 0.20 − 0.027 = 0.173
         self.assertAlmostEqual(s["net_pnl_usdt"], 0.173, places=4)
-        # free_capital = starting − deployed + net = 100 − 20 + 0.173 → round(2) = 80.17
+        # free_capital = starting − deployed + total_pnl − fees_total
+        #             = 100 − 20 + 0.20 − 0.035 = 80.165 → round(2) = 80.17 (float imprecision)
+        # (注意: 修复前用 net_pnl 只扣 realized fee, 现在扣所有 fee 含 fees_open)
         self.assertAlmostEqual(s["free_capital_usdt"], 80.17, places=2)
         self.assertTrue(s["fees_are_actual"])
 
@@ -2008,7 +2024,9 @@ class TestPublishLiveHistory(unittest.TestCase):
         payload = json.loads(live_trader.LIVE_HISTORY.read_text())
         config = payload["config"]
         self.assertEqual(config["starting_capital_usdt"], 100.0)
-        self.assertEqual(config["max_concurrent"], 3)
+        self.assertEqual(config["max_concurrent"], 4)
+        self.assertEqual(config["max_deploy_usdt"], 80.0)
+        self.assertEqual(config["leverage"], 3)
         self.assertIn("BTCUSDT", config["symbol_whitelist"])
         self.assertEqual(config["daily_dd_limit_usdt"], 5.0)
 

@@ -309,33 +309,35 @@
     text-transform: uppercase;
   }
 
-  /* ==== Phase 8 实盘 04 panel — 红色警告主题 (区别于 paper) ==== */
+  /* ==== Phase 8 实盘 04 panel — 绿色主题 (与 paper 一致) ==== */
   .live-panel {
-    border-left: 3px solid #ff4444;
+    border-left: 3px solid #00c853;
     background: linear-gradient(180deg,
-                rgba(255,68,68,0.04) 0%,
-                rgba(255,68,68,0.01) 100%);
+                rgba(0,200,83,0.035) 0%,
+                rgba(0,200,83,0.01) 100%);
   }
   .live-panel h2 {
-    color: #ff8888;
+    color: #66dd99;
   }
+  /* Kill switch: armed 是常态绿色, triggered 才警告红 */
   .live-kill-status {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    border-radius: 8px;
+    gap: 10px;
+    padding: 11px 16px;
+    border-radius: 10px;
     margin-bottom: 12px;
     font-weight: 600;
     font-size: 13px;
+    transition: all 0.25s ease;
   }
   .live-kill-status.armed {
-    background: rgba(0,200,83,0.08);
-    border: 1px solid rgba(0,200,83,0.3);
+    background: linear-gradient(135deg, rgba(0,200,83,0.08), rgba(0,200,83,0.04));
+    border: 1px solid rgba(0,200,83,0.35);
     color: #00e676;
   }
   .live-kill-status.triggered {
-    background: rgba(255,68,68,0.12);
+    background: linear-gradient(135deg, rgba(255,68,68,0.12), rgba(255,68,68,0.06));
     border: 1px solid rgba(255,68,68,0.5);
     color: #ff5252;
     animation: pulse-red 2s ease-in-out infinite;
@@ -368,38 +370,259 @@
     border-radius: 6px;
     margin-bottom: 10px;
   }
+  /* ==== 配置 grid — 精致卡片 ==== */
   .live-config-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 8px;
     font-size: 11px;
-    margin-top: 8px;
+    margin-top: 10px;
   }
   .live-config-cell {
-    background: rgba(255,255,255,0.02);
-    padding: 6px 10px;
-    border-radius: 4px;
+    background: linear-gradient(180deg,
+                rgba(255,255,255,0.035) 0%,
+                rgba(255,255,255,0.015) 100%);
+    border: 1px solid rgba(255,255,255,0.05);
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: border-color 0.2s, background 0.2s;
   }
-  .live-config-cell .k { color: var(--text-dim); font-size: 10px; }
-  .live-config-cell .v { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
-  .live-trade-row {
+  .live-config-cell:hover {
+    border-color: rgba(0,200,83,0.2);
+    background: linear-gradient(180deg,
+                rgba(0,200,83,0.04) 0%,
+                rgba(255,255,255,0.015) 100%);
+  }
+  .live-config-cell .k {
+    color: var(--text-dim);
+    font-size: 10px;
+    margin-bottom: 3px;
+    letter-spacing: 0.3px;
+  }
+  .live-config-cell .v {
+    color: var(--text);
+    font-weight: 700;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+  }
+  /* ==== 每日 P&L 汇总卡 — 精致版 ==== */
+  .live-daily-grid {
     display: grid;
-    grid-template-columns: 1fr 70px 70px 80px 24px;
-    gap: 6px;
-    padding: 4px 8px;
-    font-size: 11px;
-    align-items: center;
-    border-radius: 4px;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px;
+    margin: 6px 0 10px;
   }
-  .live-trade-row:nth-child(even) { background: rgba(255,255,255,0.02); }
+  .live-daily-card {
+    background: linear-gradient(180deg,
+                rgba(255,255,255,0.035) 0%,
+                rgba(255,255,255,0.015) 100%);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+    padding: 10px 12px;
+    transition: transform 0.15s, border-color 0.15s, box-shadow 0.2s;
+  }
+  .live-daily-card:hover {
+    transform: translateY(-1px);
+    border-color: rgba(0,200,83,0.25);
+    box-shadow: 0 2px 8px rgba(0,200,83,0.08);
+  }
+  .live-daily-card.up    { border-left: 3px solid #00c853; }
+  .live-daily-card.down  { border-left: 3px solid #ff5252; }
+  .live-daily-card.flat  { border-left: 3px solid rgba(255,255,255,0.15); }
+  .live-daily-card .d-date {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+  }
+  .live-daily-card .d-pnl {
+    font-size: 17px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    margin: 2px 0 3px;
+  }
+  .live-daily-card .d-pnl.up    { color: #00e676; }
+  .live-daily-card .d-pnl.down  { color: #ff5252; }
+  .live-daily-card .d-meta {
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  /* ==== 14 天明细表 — 精致 zebra ==== */
+  .live-detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11.5px;
+    font-variant-numeric: tabular-nums;
+    background: rgba(255,255,255,0.015);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .live-detail-table thead {
+    background: rgba(255,255,255,0.04);
+  }
+  .live-detail-table th {
+    padding: 7px 8px;
+    text-align: left;
+    color: var(--text-dim);
+    font-weight: 600;
+    font-size: 10.5px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .live-detail-table th.num { text-align: right; }
+  .live-detail-table td {
+    padding: 7px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .live-detail-table td.num { text-align: right; }
+  .live-detail-table tbody tr:hover {
+    background: rgba(0,200,83,0.04);
+  }
+  .live-detail-table tbody tr:last-child td { border-bottom: none; }
   .live-trade-slippage { font-size: 10px; color: var(--text-dim); }
   .live-trade-slippage.bad { color: #ff8888; }
   .live-trade-slippage.good { color: #66dd99; }
+  /* 杠杆 chip — 紧凑显示 */
+  .live-lev-chip {
+    display: inline-block;
+    font-size: 10px;
+    color: #bbb;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 3px;
+    padding: 1px 5px;
+    margin-left: 4px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+  /* ==== 折叠 section ==== */
+  .live-collapsible {
+    margin: 6px 0;
+  }
+  .live-collapsible > summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 8px 12px;
+    background: linear-gradient(90deg,
+                rgba(0,200,83,0.05) 0%,
+                rgba(0,200,83,0.01) 100%);
+    border: 1px solid rgba(0,200,83,0.15);
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    color: #66dd99;
+    user-select: none;
+    transition: all 0.2s;
+  }
+  .live-collapsible > summary::-webkit-details-marker { display: none; }
+  .live-collapsible > summary::before {
+    content: "▶";
+    display: inline-block;
+    margin-right: 6px;
+    font-size: 9px;
+    transition: transform 0.2s;
+    color: rgba(0,200,83,0.6);
+  }
+  .live-collapsible[open] > summary::before { transform: rotate(90deg); }
+  .live-collapsible[open] > summary {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: 1px solid rgba(0,200,83,0.05);
+  }
+  .live-collapsible > .live-collapsible-body {
+    padding: 10px 4px 6px;
+    border: 1px solid rgba(0,200,83,0.1);
+    border-top: none;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    background: rgba(255,255,255,0.012);
+  }
+  /* ==== 每日复盘 tab (复用 paper 的 .paper-review-tab 样式; 这里附加 live tint) ==== */
+  .live-review-tabs {
+    display: flex;
+    gap: 6px;
+    margin: 8px 0 10px;
+    flex-wrap: wrap;
+  }
+  .live-review-tab {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--text-dim);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+  .live-review-tab:hover {
+    border-color: rgba(0,200,83,0.3);
+    color: #66dd99;
+  }
+  .live-review-tab.active {
+    background: rgba(0,200,83,0.12);
+    border-color: rgba(0,200,83,0.45);
+    color: #00e676;
+    font-weight: 600;
+  }
+  /* 月历热力图 cell */
+  .live-heatmap {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    max-width: 520px;
+    margin: 6px auto;
+  }
+  .live-heatmap-cell {
+    aspect-ratio: 1;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    cursor: pointer;
+    background: rgba(255,255,255,0.04);
+    color: var(--text-dim);
+    transition: transform 0.1s, box-shadow 0.15s;
+  }
+  .live-heatmap-cell.has-data { color: var(--text); font-weight: 600; }
+  .live-heatmap-cell:hover { transform: scale(1.08); box-shadow: 0 1px 6px rgba(0,200,83,0.25); }
+  .live-heatmap-legend {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: var(--text-dim);
+    justify-content: center;
+    margin-top: 6px;
+  }
+  .live-heatmap-legend-cell {
+    width: 14px; height: 14px; border-radius: 3px;
+  }
+  /* ==== 移动端响应式 ==== */
   @media (max-width: 720px) {
-    .live-kill-status { font-size: 12px; padding: 8px 10px; }
-    .live-kill-detail { display: none; }
-    .live-config-grid { grid-template-columns: 1fr 1fr; }
-    .live-trade-row { grid-template-columns: 1fr auto auto; gap: 4px; font-size: 10.5px; }
+    .live-kill-status { font-size: 12px; padding: 9px 12px; }
+    .live-kill-detail {
+      display: block;
+      margin-left: 0;
+      margin-top: 4px;
+      flex-basis: 100%;
+      font-size: 10px;
+    }
+    .live-kill-status { flex-wrap: wrap; }
+    .live-config-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+    .live-config-cell { padding: 7px 9px; }
+    .live-config-cell .v { font-size: 13px; }
+    .live-daily-grid { grid-template-columns: 1fr 1fr; }
+    .live-daily-card { padding: 8px 10px; }
+    .live-daily-card .d-pnl { font-size: 15px; }
+    .live-detail-table { font-size: 10.5px; }
+    .live-detail-table th, .live-detail-table td { padding: 5px 6px; }
+    .live-detail-table th.hide-mobile,
+    .live-detail-table td.hide-mobile { display: none; }
+    .live-review-tab { padding: 5px 9px; font-size: 11px; }
+    .live-heatmap { max-width: 100%; }
+    .live-collapsible > summary { font-size: 12px; padding: 7px 10px; }
   }
   .paper-trade-row {
     display: grid;
@@ -4269,7 +4492,7 @@ function renderLivePanel(data) {
         <span>
           <strong>${escapeHtml(t.symbol || '?')}</strong>
           <span class="paper-day-dir ${dirCls}">${dir}</span>
-          <span style="font-size:10px;color:#bbb;background:rgba(255,255,255,0.06);border-radius:3px;padding:1px 4px;margin-left:4px">${lev}x</span>
+          <span class="live-lev-chip">${lev}x</span>
           ${t.is_dry_run ? '<span style="font-size:10px;color:#ffb84d;margin-left:4px">🟡DRY</span>' : '<span style="font-size:10px;color:#ff5252;margin-left:4px">🔴LIVE</span>'}
           <br><span style="font-size:11px;color:var(--text-dim)">
             入 ${liveFmtPrice(entry)} · 现 ${cur != null ? liveFmtPrice(cur) : '—'}
@@ -4330,7 +4553,7 @@ function renderLivePanel(data) {
         <span>
           <strong>${escapeHtml(t.symbol || '?')}</strong>
           <span class="paper-day-dir ${dir === 'LONG' ? 'long' : 'short'}">${dir}</span>
-          <span style="font-size:10px;color:#bbb;background:rgba(255,255,255,0.06);border-radius:3px;padding:1px 4px;margin-left:4px">${lev}x</span>
+          <span class="live-lev-chip">${lev}x</span>
           ${t.is_dry_run ? '<span style="font-size:10px;color:#ffb84d;margin-left:4px">🟡DRY</span>' : '<span style="font-size:10px;color:#ff5252;margin-left:4px">🔴LIVE</span>'}
           <br><span style="font-size:11px;color:var(--text-dim)">
             ${liveFmtPrice(entry)} → ${liveFmtPrice(exit)}
@@ -4397,76 +4620,9 @@ function renderLivePanel(data) {
     }
   }
 
-  // ===== 📅 每日 P&L 汇总 (实盘) =====
+  // ===== 📅 每日复盘 v2 — 三视图: 单日深度 / 14天列表 / 月历热力 =====
   if (closed.length > 0) {
-    const liveByDate = {};
-    for (const t of closed) {
-      if (!t.closed_at) continue;
-      const d = new Date(t.closed_at);
-      if (isNaN(d.getTime())) continue;
-      const key = d.toLocaleDateString("sv-SE");
-      if (!liveByDate[key]) liveByDate[key] = [];
-      liveByDate[key].push(t);
-    }
-    const liveDates = Object.keys(liveByDate).sort().reverse().slice(0, 7);
-    if (liveDates.length > 0) {
-      body += `<div class="paper-section-title">📅 每日 P&L 汇总 (近 ${liveDates.length} 天)</div>`;
-      body += `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:6px;margin-bottom:8px">`;
-      for (const date of liveDates) {
-        const dayTrades = liveByDate[date];
-        const dayPnl = dayTrades.reduce((s, t) => s + Number(t.realized_pnl_usdt || 0), 0);
-        const dayWins = dayTrades.filter(t => Number(t.realized_pnl_usdt || 0) > 0.01).length;
-        const dayLosses = dayTrades.filter(t => Number(t.realized_pnl_usdt || 0) < -0.01).length;
-        const dayCls = dayPnl > 0 ? 'up' : (dayPnl < 0 ? 'down' : '');
-        body += `
-          <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:6px;padding:8px 10px">
-            <div style="font-size:10px;color:var(--text-dim)">${date.slice(5)}</div>
-            <div class="value ${dayCls}" style="font-size:16px;font-weight:600">${liveFmtUsdt(dayPnl)}</div>
-            <div style="font-size:10px;color:var(--text-dim)">
-              ${dayTrades.length} 笔 · <span style="color:#00e676">${dayWins}W</span>/<span style="color:#ff5252">${dayLosses}L</span>
-            </div>
-          </div>`;
-      }
-      body += `</div>`;
-    }
-
-    // 14 天明细列表 (date | 笔数 | W/L | PnL | 最佳/最差 | 胜率 | 费用 | 总滑点)
-    const liveDates14 = Object.keys(liveByDate).sort().reverse().slice(0, 14);
-    if (liveDates14.length > 0) {
-      body += `<div class="paper-section-title" style="margin-top:12px">📋 近 ${liveDates14.length} 天交易明细</div>`;
-      body += `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px;font-variant-numeric:tabular-nums">
-        <thead><tr style="border-bottom:1px solid var(--border);color:var(--text-dim);text-align:left">
-          <th style="padding:4px 6px">日期</th>
-          <th style="padding:4px 6px;text-align:right">PnL ($)</th>
-          <th style="padding:4px 6px;text-align:right">笔数</th>
-          <th style="padding:4px 6px;text-align:right">胜率</th>
-          <th style="padding:4px 6px;text-align:right">最佳</th>
-          <th style="padding:4px 6px;text-align:right">最差</th>
-          <th style="padding:4px 6px;text-align:right">费用</th>
-        </tr></thead><tbody>`;
-      for (const date of liveDates14) {
-        const dt = liveByDate[date];
-        const dPnl = dt.reduce((s, t) => s + Number(t.realized_pnl_usdt || 0), 0);
-        const dWins = dt.filter(t => Number(t.realized_pnl_usdt || 0) > 0.01).length;
-        const dLosses = dt.filter(t => Number(t.realized_pnl_usdt || 0) < -0.01).length;
-        const decisive = dWins + dLosses;
-        const winRate = decisive > 0 ? Math.round(dWins / decisive * 100) + '%' : '—';
-        const best = dt.reduce((b, t) => Math.max(b, Number(t.realized_pnl_usdt || 0)), -Infinity);
-        const worst = dt.reduce((b, t) => Math.min(b, Number(t.realized_pnl_usdt || 0)), Infinity);
-        const fees = dt.reduce((s, t) => s + Number(t.fees_paid_usdt || 0), 0);
-        const pnlCls = dPnl > 0 ? 'up' : (dPnl < 0 ? 'down' : '');
-        body += `<tr style="border-bottom:1px solid rgba(255,255,255,0.04)">
-          <td style="padding:4px 6px">${date}</td>
-          <td style="padding:4px 6px;text-align:right" class="${pnlCls}"><strong>${liveFmtUsdt(dPnl)}</strong></td>
-          <td style="padding:4px 6px;text-align:right">${dt.length}</td>
-          <td style="padding:4px 6px;text-align:right">${winRate} <span style="color:var(--text-dim);font-size:10px">(${dWins}/${dLosses})</span></td>
-          <td style="padding:4px 6px;text-align:right;color:#00e676">${isFinite(best) ? liveFmtUsdt(best) : '—'}</td>
-          <td style="padding:4px 6px;text-align:right;color:#ff5252">${isFinite(worst) ? liveFmtUsdt(worst) : '—'}</td>
-          <td style="padding:4px 6px;text-align:right;color:#ff8a65">${fees > 0 ? '-$' + fees.toFixed(3) : '—'}</td>
-        </tr>`;
-      }
-      body += `</tbody></table></div>`;
-    }
+    body += renderLiveDailyReview(closed);
   }
 
   // OBS mode banner (顶部突出, 让用户知道当前是观察模式)
@@ -4486,20 +4642,411 @@ function renderLivePanel(data) {
     body += `<div class="paper-section-title">${waitMsg}</div>`;
   }
 
-  // ===== 配置 (always show) =====
-  body += `<div class="paper-section-title">配置 ${obsMode ? '(⚠️ OBS mode active)' : ''}</div>`;
-  body += `<div class="live-config-grid">
-    <div class="live-config-cell"><div class="k">起始资金</div><div class="v">$${config.starting_capital_usdt || 100}</div></div>
-    <div class="live-config-cell"><div class="k">每笔仓位</div><div class="v">$${config.notional_per_trade_usdt || 20}</div></div>
-    <div class="live-config-cell"><div class="k">杠杆</div><div class="v">${config.leverage || 3}x</div></div>
-    <div class="live-config-cell"><div class="k">最大并发</div><div class="v">${config.max_concurrent || 3}</div></div>
-    <div class="live-config-cell"><div class="k">部署上限</div><div class="v">$${config.max_deploy_usdt || 60}</div></div>
-    <div class="live-config-cell"><div class="k">日 DD 触发</div><div class="v" style="color:#ff8888">-$${config.daily_dd_limit_usdt || 5}</div></div>
-    <div class="live-config-cell"><div class="k">累计 DD kill</div><div class="v" style="color:#ff8888">-${config.total_dd_limit_pct || 5}%</div></div>
-    <div class="live-config-cell"><div class="k">白名单</div><div class="v" style="font-size:10px;${obsMode ? 'text-decoration:line-through;opacity:0.5' : ''}">${(config.symbol_whitelist || []).join(' / ')}</div></div>
-  </div>`;
+  // ===== 配置 (折叠) =====
+  body += `<details class="live-collapsible"><summary>⚙️ 配置 ${obsMode ? '<span style="color:#ffb84d;font-size:11px;margin-left:6px">(⚠️ OBS mode active)</span>' : ''}</summary>
+    <div class="live-collapsible-body">
+      <div class="live-config-grid">
+        <div class="live-config-cell"><div class="k">起始资金</div><div class="v">$${config.starting_capital_usdt || 100}</div></div>
+        <div class="live-config-cell"><div class="k">每笔仓位</div><div class="v">$${config.notional_per_trade_usdt || 20}</div></div>
+        <div class="live-config-cell"><div class="k">杠杆</div><div class="v">${config.leverage || 3}x</div></div>
+        <div class="live-config-cell"><div class="k">最大并发</div><div class="v">${config.max_concurrent || 4}</div></div>
+        <div class="live-config-cell"><div class="k">部署上限</div><div class="v">$${config.max_deploy_usdt || 80}</div></div>
+        <div class="live-config-cell"><div class="k">日 DD 触发</div><div class="v" style="color:#ff8888">-$${config.daily_dd_limit_usdt || 5}</div></div>
+        <div class="live-config-cell"><div class="k">累计 DD kill</div><div class="v" style="color:#ff8888">-${config.total_dd_limit_pct || 5}%</div></div>
+        <div class="live-config-cell"><div class="k">白名单</div><div class="v" style="font-size:11px;${obsMode ? 'text-decoration:line-through;opacity:0.5' : ''}">${(config.symbol_whitelist || []).join(' / ')}</div></div>
+      </div>
+    </div>
+  </details>`;
 
   document.getElementById("live-body").innerHTML = body;
+
+  // 每日复盘 tabs 交互 (innerHTML 设完后)
+  if (closed.length > 0) {
+    initLiveReviewInteractions(closed);
+  }
+}
+
+// ===== 📅 每日复盘 v2 — 三视图: 单日深度 / 14天列表 / 月历热力 (实盘) =====
+
+const LIVE_REASON_ICON = {
+  "sl_breach_client": { icon: "🛑", label: "SL 触发" },
+  "paper:hit_sl":     { icon: "🛑", label: "止损" },
+  "paper:hit_be_sl":  { icon: "⚖", label: "BE 平仓" },
+  "paper:hit_b_trail":{ icon: "🛡", label: "B Trail" },
+  "paper:hit_trail":  { icon: "🚀", label: "跟踪止盈" },
+  "paper:hit_tp1":    { icon: "🎯", label: "TP1" },
+  "paper:hit_tp2":    { icon: "🎯", label: "TP2" },
+  "paper:timeout":    { icon: "⏱", label: "超时" },
+};
+
+function _liveGroupByDate(closedTrades) {
+  const byDate = {};
+  for (const t of closedTrades) {
+    if (!t.closed_at) continue;
+    const d = new Date(t.closed_at);
+    if (isNaN(d.getTime())) continue;
+    const key = d.toLocaleDateString("sv-SE");
+    if (!byDate[key]) byDate[key] = [];
+    byDate[key].push(t);
+  }
+  return { byDate, dates: Object.keys(byDate).sort() };
+}
+
+function _liveDayStats(trades) {
+  const n = trades.length;
+  const totPnl = trades.reduce((s, t) => s + Number(t.realized_pnl_usdt || 0), 0);
+  const totFees = trades.reduce((s, t) => s + Number(t.fees_paid_usdt || 0), 0);
+  const wins   = trades.filter(t => Number(t.realized_pnl_usdt || 0) >  0.01).length;
+  const losses = trades.filter(t => Number(t.realized_pnl_usdt || 0) < -0.01).length;
+  const scratch = n - wins - losses;
+  const decisive = wins + losses;
+  const winRate = decisive > 0 ? Math.round(wins / decisive * 100) : null;
+  const longs  = trades.filter(t => (t.side || '') === 'BUY').length;
+  const shorts = trades.filter(t => (t.side || '') === 'SELL').length;
+  const reasonCounts = {};
+  for (const t of trades) {
+    const r = t.close_reason || '?';
+    reasonCounts[r] = (reasonCounts[r] || 0) + 1;
+  }
+  const best  = trades.reduce((b, t) => (Number(t.realized_pnl_usdt || 0) > (b ? Number(b.realized_pnl_usdt || 0) : -Infinity)) ? t : b, null);
+  const worst = trades.reduce((b, t) => (Number(t.realized_pnl_usdt || 0) < (b ? Number(b.realized_pnl_usdt || 0) :  Infinity)) ? t : b, null);
+  return { n, wins, losses, scratch, winRate, totPnl, totFees,
+    longs, shorts, reasonCounts, best, worst };
+}
+
+function renderLiveDailyReview(closed) {
+  window._liveReviewClosed = closed;
+  let view = "single";
+  try { view = localStorage.getItem("live_review_view") || "single"; } catch (_) {}
+  if (!["single", "list", "heatmap"].includes(view)) view = "single";
+  return `
+    <details class="live-collapsible" open>
+      <summary>📅 每日复盘</summary>
+      <div class="live-collapsible-body">
+        <div class="live-review-tabs" id="live-review-tabs">
+          <button class="live-review-tab ${view === "single"  ? "active" : ""}" data-view="single">📊 单日深度</button>
+          <button class="live-review-tab ${view === "list"    ? "active" : ""}" data-view="list">📋 14天列表</button>
+          <button class="live-review-tab ${view === "heatmap" ? "active" : ""}" data-view="heatmap">🔥 月历热力</button>
+        </div>
+        <div id="live-review-body"></div>
+      </div>
+    </details>
+  `;
+}
+
+function initLiveReviewInteractions(closed) {
+  const { byDate, dates } = _liveGroupByDate(closed);
+  window._liveReviewIdx = { byDate, dates };
+  const tabsEl = document.getElementById("live-review-tabs");
+  if (tabsEl) {
+    tabsEl.querySelectorAll(".live-review-tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const view = btn.dataset.view;
+        try { localStorage.setItem("live_review_view", view); } catch (_) {}
+        tabsEl.querySelectorAll(".live-review-tab").forEach(b => b.classList.toggle("active", b === btn));
+        _liveRenderView(view);
+      });
+    });
+  }
+  let view = "single";
+  try { view = localStorage.getItem("live_review_view") || "single"; } catch (_) {}
+  if (!["single", "list", "heatmap"].includes(view)) view = "single";
+  _liveRenderView(view);
+}
+
+function _liveRenderView(view) {
+  const body = document.getElementById("live-review-body");
+  if (!body) return;
+  const idx = window._liveReviewIdx || {};
+  const { byDate, dates } = idx;
+  if (!byDate) return;
+  if (view === "single") {
+    body.innerHTML = _liveRenderSingleDay(byDate, dates);
+    _liveWireSingleDayHandlers();
+  } else if (view === "list") {
+    body.innerHTML = _liveRenderListView(byDate, dates);
+    _liveWireListHandlers();
+  } else if (view === "heatmap") {
+    body.innerHTML = _liveRenderHeatmap(byDate, dates);
+    _liveWireHeatmapHandlers();
+  }
+}
+
+function _liveGetSelectedDate(allDates) {
+  let stored = null;
+  try { stored = localStorage.getItem("live_review_date"); } catch (_) {}
+  if (stored && /^\d{4}-\d{2}-\d{2}$/.test(stored)) return stored;
+  if (allDates && allDates.length > 0) return allDates[allDates.length - 1];
+  return new Date().toLocaleDateString("sv-SE");
+}
+
+function _liveSetSelectedDate(date) {
+  try { localStorage.setItem("live_review_date", date); } catch (_) {}
+}
+
+// ----- 单日深度 -----
+function _liveRenderSingleDay(byDate, allDates) {
+  const today = new Date().toLocaleDateString("sv-SE");
+  const date = _liveGetSelectedDate(allDates);
+  const trades = (byDate[date] || []).slice().sort(
+    (a, b) => (b.closed_at || "").localeCompare(a.closed_at || "")
+  );
+  const prevDate = (allDates || []).filter(d => d < date).slice(-1)[0] || null;
+  const nextDate = (allDates || []).find(d => d > date) || null;
+  const dObj = new Date(date + "T12:00:00");
+  const weekdays = ["周日","周一","周二","周三","周四","周五","周六"];
+  const dayLabel = `${weekdays[dObj.getDay()]} ${dObj.getMonth()+1}月${dObj.getDate()}日`;
+  const isToday = (date === today);
+
+  const toolbar = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+      <button class="live-review-tab" id="live-prev-day-btn" ${!prevDate ? "disabled" : ""} title="上一交易日" style="padding:4px 10px">◀</button>
+      <input type="date" id="live-review-date" value="${date}" max="${today}"
+             style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:5px 8px;border-radius:6px;font-size:12px;font-family:inherit">
+      <button class="live-review-tab" id="live-next-day-btn" ${!nextDate ? "disabled" : ""} title="下一交易日" style="padding:4px 10px">▶</button>
+      ${!isToday ? `<button class="live-review-tab" id="live-jump-today-btn" style="padding:4px 10px">今日</button>` : ""}
+      <span style="font-size:12px;color:var(--text-dim);margin-left:auto">${dayLabel}${isToday ? " · 今日" : ""}</span>
+    </div>
+  `;
+
+  if (trades.length === 0) {
+    return toolbar + `<div style="padding:24px;text-align:center;color:var(--text-dim);font-size:13px">📭 ${dayLabel} 无交易记录</div>`;
+  }
+
+  const stats = _liveDayStats(trades);
+  const pnlCls = stats.totPnl > 0 ? "up" : (stats.totPnl < 0 ? "down" : "");
+  const startCap = (window._liveReviewClosed && window._liveReviewClosed.length && stats) ? 100 : 100;
+  const totPct = (stats.totPnl / startCap) * 100;
+
+  // reason chips
+  const reasonChips = Object.entries(stats.reasonCounts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([r, c]) => {
+      const meta = LIVE_REASON_ICON[r] || { icon: "?", label: r };
+      return `<span style="display:inline-block;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px;padding:2px 6px;margin:2px;font-size:11px" title="${escapeHtml(meta.label)}">${meta.icon} ${c}</span>`;
+    }).join("");
+
+  const statsCard = `
+    <div style="background:linear-gradient(180deg,rgba(0,200,83,0.05),rgba(0,200,83,0.01));border:1px solid rgba(0,200,83,0.15);border-radius:10px;padding:10px 14px;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px">
+        <div style="font-size:12px;color:var(--text-dim)">
+          ${stats.n} 笔 · ${stats.winRate != null ? "胜率 " + stats.winRate + "%" : "胜率 —"} · <span style="color:#00e676">${stats.wins}胜</span> <span style="color:#ff5252">${stats.losses}负</span>${stats.scratch ? ' <span style="color:#9aa4b8">' + stats.scratch + "平</span>" : ""}
+          · L${stats.longs}/S${stats.shorts}
+        </div>
+        <div class="${pnlCls}" style="font-size:18px;font-weight:700;font-variant-numeric:tabular-nums">
+          ${liveFmtUsdt(stats.totPnl)}
+          <span style="font-size:11px;opacity:0.7">(${(totPct >= 0 ? "+" : "") + totPct.toFixed(2)}%)</span>
+        </div>
+      </div>
+      ${stats.totFees > 0 ? `<div style="font-size:10.5px;color:var(--text-dim);margin-top:4px">
+        💸 当日费用 <span style="color:#ff8a65">-$${stats.totFees.toFixed(3)}</span>
+        · 净 ${liveFmtUsdt(stats.totPnl - 0)} (PnL 已含费)</div>` : ""}
+      ${reasonChips ? `<div style="margin-top:6px">${reasonChips}</div>` : ""}
+    </div>
+  `;
+
+  // 单笔列表
+  const tradeRows = trades.map(t => {
+    const side = t.side || '';
+    const dir = side === 'BUY' ? 'LONG' : (side === 'SELL' ? 'SHORT' : '?');
+    const pnl = Number(t.realized_pnl_usdt || 0);
+    const entry = Number(t.avg_fill_price || 0);
+    const exit  = Number(t.avg_exit_price || t.close_price || 0);
+    let pnlPct = null;
+    if (entry > 0 && exit > 0) {
+      const sign = side === 'BUY' ? 1 : -1;
+      pnlPct = (exit - entry) / entry * 100 * sign;
+    }
+    const pnlCls = pnl > 0 ? 'up' : (pnl < 0 ? 'down' : '');
+    const winLossCls = pnl > 0.01 ? 'win' : (pnl < -0.01 ? 'loss' : '');
+    const fee = Number(t.fees_paid_usdt || 0);
+    const closedAtTime = (t.closed_at || '').slice(11, 16);
+    const hold = liveFmtHold(t.opened_at || t.created_at, t.closed_at);
+    const reasonMeta = LIVE_REASON_ICON[t.close_reason] || { icon: '?', label: t.close_reason || '?' };
+    const lev = t.leverage || 3;
+    return `<div class="paper-trade-row dir-${dir} ${winLossCls}" style="margin-bottom:3px">
+      <span>
+        <strong>${escapeHtml(t.symbol || '?')}</strong>
+        <span class="paper-day-dir ${dir === 'LONG' ? 'long' : 'short'}">${dir}</span>
+        <span class="live-lev-chip">${lev}x</span>
+        <br><span style="font-size:11px;color:var(--text-dim)">
+          ${liveFmtPrice(entry)} → ${liveFmtPrice(exit)}${fee > 0 ? ' · 费 -$' + fee.toFixed(3) : ''}
+        </span>
+      </span>
+      <span class="paper-pnl ${pnlCls}">
+        ${pnlPct != null ? liveFmtPct(pnlPct) : '—'}
+        <br><span style="font-size:10px;opacity:0.85">${liveFmtUsdt(pnl)}</span>
+      </span>
+      <span class="paper-reason">${reasonMeta.icon} ${reasonMeta.label} · ${closedAtTime}</span>
+      <span class="paper-hold">${hold}</span>
+    </div>`;
+  }).join("");
+
+  return toolbar + statsCard + tradeRows;
+}
+
+function _liveWireSingleDayHandlers() {
+  const idx = window._liveReviewIdx || {};
+  const dates = idx.dates || [];
+  const dateInput = document.getElementById("live-review-date");
+  const prevBtn = document.getElementById("live-prev-day-btn");
+  const nextBtn = document.getElementById("live-next-day-btn");
+  const todayBtn = document.getElementById("live-jump-today-btn");
+  if (dateInput) {
+    dateInput.addEventListener("change", () => {
+      _liveSetSelectedDate(dateInput.value);
+      _liveRenderView("single");
+    });
+  }
+  if (prevBtn && !prevBtn.disabled) {
+    prevBtn.addEventListener("click", () => {
+      const cur = _liveGetSelectedDate(dates);
+      const prev = dates.filter(d => d < cur).slice(-1)[0];
+      if (prev) { _liveSetSelectedDate(prev); _liveRenderView("single"); }
+    });
+  }
+  if (nextBtn && !nextBtn.disabled) {
+    nextBtn.addEventListener("click", () => {
+      const cur = _liveGetSelectedDate(dates);
+      const next = dates.find(d => d > cur);
+      if (next) { _liveSetSelectedDate(next); _liveRenderView("single"); }
+    });
+  }
+  if (todayBtn) {
+    todayBtn.addEventListener("click", () => {
+      _liveSetSelectedDate(new Date().toLocaleDateString("sv-SE"));
+      _liveRenderView("single");
+    });
+  }
+}
+
+// ----- 14 天列表 -----
+function _liveRenderListView(byDate, dates) {
+  const recent = (dates || []).slice().reverse().slice(0, 14);
+  if (recent.length === 0) {
+    return `<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px">📭 无历史交易日</div>`;
+  }
+  let html = `<table class="live-detail-table">
+    <thead><tr>
+      <th>日期</th>
+      <th class="num">PnL</th>
+      <th class="num">笔数</th>
+      <th class="num">胜率 (W/L)</th>
+      <th class="num hide-mobile">最佳</th>
+      <th class="num hide-mobile">最差</th>
+      <th class="num">费用</th>
+    </tr></thead><tbody>`;
+  for (const date of recent) {
+    const dt = byDate[date];
+    const s = _liveDayStats(dt);
+    const pnlCls = s.totPnl > 0 ? 'up' : (s.totPnl < 0 ? 'down' : '');
+    const wrText = s.winRate != null ? s.winRate + '%' : '—';
+    html += `<tr style="cursor:pointer" data-date="${date}" class="live-list-row">
+      <td><strong>${date}</strong></td>
+      <td class="num ${pnlCls}"><strong>${liveFmtUsdt(s.totPnl)}</strong></td>
+      <td class="num">${s.n}</td>
+      <td class="num">${wrText} <span style="color:var(--text-dim);font-size:10px">(${s.wins}/${s.losses})</span></td>
+      <td class="num hide-mobile" style="color:#00e676">${s.best ? liveFmtUsdt(Number(s.best.realized_pnl_usdt || 0)) : '—'}</td>
+      <td class="num hide-mobile" style="color:#ff5252">${s.worst ? liveFmtUsdt(Number(s.worst.realized_pnl_usdt || 0)) : '—'}</td>
+      <td class="num" style="color:#ff8a65">${s.totFees > 0 ? '-$' + s.totFees.toFixed(3) : '—'}</td>
+    </tr>`;
+  }
+  html += `</tbody></table>
+    <div style="font-size:10px;color:var(--text-dim);margin-top:6px;text-align:right">点击行 → 切到单日深度</div>`;
+  return html;
+}
+
+// ----- 月历热力 -----
+function _liveRenderHeatmap(byDate, dates) {
+  if (!dates || dates.length === 0) {
+    return `<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px">📭 无历史交易日</div>`;
+  }
+  // 最近 28 天 = 4 周
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const days = [];
+  for (let i = 27; i >= 0; i--) {
+    const d = new Date(today.getTime() - i * 86400000);
+    days.push(d.toLocaleDateString("sv-SE"));
+  }
+  // 颜色梯度: 计算所有日 PnL 范围
+  const pnls = days.map(d => {
+    const dt = byDate[d];
+    return dt ? dt.reduce((s, t) => s + Number(t.realized_pnl_usdt || 0), 0) : null;
+  });
+  const valued = pnls.filter(v => v != null);
+  const maxAbs = valued.length ? Math.max(...valued.map(Math.abs)) : 1;
+  const colorFor = (v) => {
+    if (v == null) return "rgba(255,255,255,0.04)";
+    if (v === 0)   return "rgba(255,255,255,0.06)";
+    const intensity = Math.min(Math.abs(v) / maxAbs, 1);
+    if (v > 0) return `rgba(0,200,83,${0.15 + intensity * 0.6})`;
+    return `rgba(255,82,82,${0.15 + intensity * 0.6})`;
+  };
+
+  const weekdays = ["一","二","三","四","五","六","日"];
+  let html = `<div class="live-heatmap">`;
+  for (const w of weekdays) {
+    html += `<div style="text-align:center;font-size:10px;color:var(--text-dim);padding-bottom:2px">${w}</div>`;
+  }
+  // 对齐到星期一: 找第一天的星期 (1=周一, 0=周日 → 6)
+  const firstDay = new Date(days[0] + "T12:00:00");
+  const firstDow = (firstDay.getDay() + 6) % 7;
+  for (let i = 0; i < firstDow; i++) {
+    html += `<div class="live-heatmap-cell" style="background:transparent"></div>`;
+  }
+  for (let i = 0; i < days.length; i++) {
+    const d = days[i];
+    const v = pnls[i];
+    const dt = byDate[d];
+    const hasData = !!dt;
+    const dObj = new Date(d + "T12:00:00");
+    const label = dObj.getDate();
+    const tip = hasData
+      ? `${d}: ${liveFmtUsdt(v)} (${dt.length} 笔)`
+      : `${d}: 无交易`;
+    html += `<div class="live-heatmap-cell ${hasData ? 'has-data' : ''}"
+              style="background:${colorFor(v)}"
+              title="${tip}"
+              data-date="${d}"
+              ${hasData ? '' : 'data-empty="1"'}>${label}</div>`;
+  }
+  html += `</div>
+    <div class="live-heatmap-legend">
+      <span>少</span>
+      <div class="live-heatmap-legend-cell" style="background:rgba(255,82,82,0.7)"></div>
+      <div class="live-heatmap-legend-cell" style="background:rgba(255,82,82,0.3)"></div>
+      <div class="live-heatmap-legend-cell" style="background:rgba(255,255,255,0.06)"></div>
+      <div class="live-heatmap-legend-cell" style="background:rgba(0,200,83,0.3)"></div>
+      <div class="live-heatmap-legend-cell" style="background:rgba(0,200,83,0.7)"></div>
+      <span>多</span>
+      <span style="margin-left:12px">点击 → 跳到单日</span>
+    </div>`;
+  return html;
+}
+
+function _liveJumpToSingleDay(date) {
+  _liveSetSelectedDate(date);
+  try { localStorage.setItem("live_review_view", "single"); } catch (_) {}
+  const tabsEl = document.getElementById("live-review-tabs");
+  if (tabsEl) {
+    tabsEl.querySelectorAll(".live-review-tab").forEach(b => {
+      b.classList.toggle("active", b.dataset.view === "single");
+    });
+  }
+  _liveRenderView("single");
+}
+
+function _liveWireListHandlers() {
+  document.querySelectorAll(".live-list-row").forEach(row => {
+    row.addEventListener("click", () => _liveJumpToSingleDay(row.dataset.date));
+  });
+}
+
+function _liveWireHeatmapHandlers() {
+  document.querySelectorAll(".live-heatmap-cell[data-date]:not([data-empty])").forEach(cell => {
+    cell.addEventListener("click", () => _liveJumpToSingleDay(cell.dataset.date));
+  });
 }
 
 // Phase 4: 💎 钻石信号模拟仓追踪

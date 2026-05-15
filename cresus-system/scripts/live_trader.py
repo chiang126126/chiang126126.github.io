@@ -58,7 +58,7 @@ LIVE_HISTORY = Path.home() / "cresus-bot" / "live_trades_history.json"
 
 # Live 交易配置 (小心调整)
 LIVE_NOTIONAL_USDT = 20.0              # 每笔 $20 (paper 是 $400, 等比缩放 1/20)
-LIVE_MAX_CONCURRENT = 3                # 实盘并发上限 (比 paper 5 严格)
+LIVE_MAX_CONCURRENT = 4                # 实盘并发上限 ($100 起始: 4×$20=$80 部署 + $20 保留)
 LIVE_LEVERAGE = 3                      # 杠杆 (符合 $100 起始资金的保守设定);
                                        # 每次 mirror_open 前强制 set_leverage,
                                        # 防止 Binance 默认 20x 漂移
@@ -79,7 +79,7 @@ LIVE_OBSERVATION_MODE = True
 # Phase 3.3.a 风控参数 (实盘 $100 USDT 起始)
 LIVE_STARTING_CAPITAL_USDT = 100.0     # 实盘起始资金 (校准用)
 LIVE_DAILY_DD_LIMIT_USDT = 5.0         # 日亏 -$5 → block new opens
-LIVE_MAX_DEPLOY_USDT = 60.0            # 总部署上限 $60 (40% 现金保留)
+LIVE_MAX_DEPLOY_USDT = 80.0            # 总部署上限 $80 (20% 现金保留, 配合 4 并发)
 
 # Phase 3.3.b 累计 DD kill switch
 LIVE_TOTAL_DD_LIMIT_PCT = 5.0          # 总回撤 5% → 自动写 emergency flag
@@ -566,8 +566,10 @@ def _compute_live_stats(live_state: dict) -> dict:
         "fees_are_actual": fees_all_actual,
         "starting_capital_usdt": LIVE_STARTING_CAPITAL_USDT,
         "deployed_usdt": round(deployed, 2),
+        # free_capital: 钱包余额视角 — 起始 − 当前部署 + 已实现毛利 − 全部已付费用
+        # (持仓中的开仓费也已从钱包扣过, 必须减; 否则可用资金虚高)
         "free_capital_usdt": round(LIVE_STARTING_CAPITAL_USDT
-                                    - deployed + net_pnl, 2),
+                                    - deployed + total_pnl - fees_total, 2),
         "max_concurrent_slots": LIVE_MAX_CONCURRENT,
         "slots_used": len(opens),
     }
@@ -1109,9 +1111,17 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
 
             new_trade = _try_mirror_open(client, pt, dry_run=dry_run)
             if new_trade is None:
-                # API/业务错失败 → 加 mirrored_paper_ids 防重试无限砍腰
-                live.setdefault("mirrored_paper_ids", []).append(pt["id"])
-                log.warning(f"[mirror-open] {pt['symbol']} 失败, paper_id 加入 skip 列表")
+                # 失败不永久 blacklist — 改为记录 missed signal, 下 tick 重试.
+                # 之前直接加 mirrored_paper_ids 导致 set_leverage 临时失败 / API 超时
+                # 等可恢复的错误也永不重试. 由 mirror_max_age (10min) 和 paper 自然
+                # 平仓提供退出条件, 不会无限循环.
+                _record_missed_signal(
+                    live, pt, "open_failed (retry next tick)", now,
+                )
+                log.warning(
+                    f"[mirror-open] {pt['symbol']} 失败, 不 blacklist, "
+                    f"下 tick 重试 (或等 paper 关闭 / mirror_max_age 过期)"
+                )
                 continue
             live.setdefault("live_open_trades", []).append(new_trade)
             live.setdefault("mirrored_paper_ids", []).append(pt["id"])
