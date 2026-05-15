@@ -4349,6 +4349,54 @@ function renderLivePanel(data) {
     }
   }
 
+  // ===== 🚫 错过的钻石信号 (paper 出钻石但 live 没 mirror, 诊断用) =====
+  const missed = data.missed_signals || [];
+  if (missed.length > 0) {
+    body += `<div class="paper-section-title">🚫 错过的钻石信号 (${missed.length})
+      <span style="font-size:10px;color:var(--text-dim);font-weight:normal;margin-left:6px">
+        — paper 出钻石但 live 没 mirror 的原因. 每 tick 自动更新, 被成功 mirror 或 paper 平仓后自动消失.
+      </span></div>`;
+    const liveFmtAgeMin = (iso) => {
+      if (!iso) return '—';
+      const t = new Date(iso).getTime();
+      if (!isFinite(t)) return '—';
+      const min = Math.floor((Date.now() - t) / 60000);
+      if (min < 60) return min + 'min前';
+      return Math.floor(min / 60) + 'h前';
+    };
+    // reason 归类 → 中文标签 + 颜色
+    const classifyReason = (r) => {
+      const s = r || '';
+      if (s.includes('risk_gate'))            return { label: '🛑 风控阻断',         color: '#ff5252' };
+      if (s.includes('max_concurrent'))       return { label: '🔒 并发已满 (3/3)',    color: '#ffb84d' };
+      if (s.includes('symbol_already_open'))  return { label: '🔒 同币种已持仓',       color: '#ffb84d' };
+      if (s.includes('not in live whitelist'))return { label: '⛔ 不在白名单',         color: '#9aa4b8' };
+      if (s.includes('cash reserve') || s.includes('deploy'))
+                                              return { label: '💰 现金保留触发',      color: '#ffb84d' };
+      if (s.includes('age') || s.includes('mirror_max_age'))
+                                              return { label: '⏰ 信号过期 (>10min)',  color: '#9aa4b8' };
+      if (s.includes('missing'))              return { label: '⚠ paper 字段缺失',     color: '#ffb84d' };
+      return { label: s.slice(0, 40), color: '#9aa4b8' };
+    };
+    for (const m of missed.slice(0, 10)) {
+      const tag = classifyReason(m.reason || '');
+      const dir = m.direction || '?';
+      const dirCls = dir === 'LONG' ? 'long' : (dir === 'SHORT' ? 'short' : '');
+      body += `<div class="paper-trade-row" style="opacity:0.85">
+        <span>
+          <strong>${escapeHtml(m.symbol || '?')}</strong>
+          <span class="paper-day-dir ${dirCls}">${dir}</span>
+          ${m.conviction_score != null ? `<span style="font-size:10px;color:var(--text-dim);margin-left:4px">置信 ${m.conviction_score}</span>` : ''}
+          <br><span style="font-size:11px;color:${tag.color}">${tag.label}</span>
+          <span style="font-size:10px;color:var(--text-dim);margin-left:6px">${escapeHtml((m.reason || '').slice(0, 60))}</span>
+        </span>
+        <span></span>
+        <span class="paper-reason" style="font-size:10px">信号 ${liveFmtAgeMin(m.signal_at)}</span>
+        <span class="paper-hold" style="font-size:10px">检查 ${liveFmtAgeMin(m.last_checked_at)}</span>
+      </div>`;
+    }
+  }
+
   // ===== 📅 每日 P&L 汇总 (实盘) =====
   if (closed.length > 0) {
     const liveByDate = {};
@@ -4380,6 +4428,44 @@ function renderLivePanel(data) {
           </div>`;
       }
       body += `</div>`;
+    }
+
+    // 14 天明细列表 (date | 笔数 | W/L | PnL | 最佳/最差 | 胜率 | 费用 | 总滑点)
+    const liveDates14 = Object.keys(liveByDate).sort().reverse().slice(0, 14);
+    if (liveDates14.length > 0) {
+      body += `<div class="paper-section-title" style="margin-top:12px">📋 近 ${liveDates14.length} 天交易明细</div>`;
+      body += `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px;font-variant-numeric:tabular-nums">
+        <thead><tr style="border-bottom:1px solid var(--border);color:var(--text-dim);text-align:left">
+          <th style="padding:4px 6px">日期</th>
+          <th style="padding:4px 6px;text-align:right">PnL ($)</th>
+          <th style="padding:4px 6px;text-align:right">笔数</th>
+          <th style="padding:4px 6px;text-align:right">胜率</th>
+          <th style="padding:4px 6px;text-align:right">最佳</th>
+          <th style="padding:4px 6px;text-align:right">最差</th>
+          <th style="padding:4px 6px;text-align:right">费用</th>
+        </tr></thead><tbody>`;
+      for (const date of liveDates14) {
+        const dt = liveByDate[date];
+        const dPnl = dt.reduce((s, t) => s + Number(t.realized_pnl_usdt || 0), 0);
+        const dWins = dt.filter(t => Number(t.realized_pnl_usdt || 0) > 0.01).length;
+        const dLosses = dt.filter(t => Number(t.realized_pnl_usdt || 0) < -0.01).length;
+        const decisive = dWins + dLosses;
+        const winRate = decisive > 0 ? Math.round(dWins / decisive * 100) + '%' : '—';
+        const best = dt.reduce((b, t) => Math.max(b, Number(t.realized_pnl_usdt || 0)), -Infinity);
+        const worst = dt.reduce((b, t) => Math.min(b, Number(t.realized_pnl_usdt || 0)), Infinity);
+        const fees = dt.reduce((s, t) => s + Number(t.fees_paid_usdt || 0), 0);
+        const pnlCls = dPnl > 0 ? 'up' : (dPnl < 0 ? 'down' : '');
+        body += `<tr style="border-bottom:1px solid rgba(255,255,255,0.04)">
+          <td style="padding:4px 6px">${date}</td>
+          <td style="padding:4px 6px;text-align:right" class="${pnlCls}"><strong>${liveFmtUsdt(dPnl)}</strong></td>
+          <td style="padding:4px 6px;text-align:right">${dt.length}</td>
+          <td style="padding:4px 6px;text-align:right">${winRate} <span style="color:var(--text-dim);font-size:10px">(${dWins}/${dLosses})</span></td>
+          <td style="padding:4px 6px;text-align:right;color:#00e676">${isFinite(best) ? liveFmtUsdt(best) : '—'}</td>
+          <td style="padding:4px 6px;text-align:right;color:#ff5252">${isFinite(worst) ? liveFmtUsdt(worst) : '—'}</td>
+          <td style="padding:4px 6px;text-align:right;color:#ff8a65">${fees > 0 ? '-$' + fees.toFixed(3) : '—'}</td>
+        </tr>`;
+      }
+      body += `</tbody></table></div>`;
     }
   }
 

@@ -32,6 +32,8 @@ from live_trader import (  # noqa: E402
     _compute_live_stats, publish_live_history,
     load_paper_state, load_live_state, save_live_state,
     main_loop, _empty_live_state,
+    _record_missed_signal, _prune_obsolete_missed,
+    MISSED_SIGNALS_KEEP_LAST_N,
     LIVE_SYMBOL_WHITELIST, LIVE_MAX_CONCURRENT, LIVE_MIRROR_MAX_AGE_SEC,
     LIVE_NOTIONAL_USDT, LIVE_MAX_DEPLOY_USDT, LIVE_DAILY_DD_LIMIT_USDT,
     LIVE_STARTING_CAPITAL_USDT, LIVE_TOTAL_DD_LIMIT_PCT,
@@ -1837,6 +1839,85 @@ class TestComputeLiveStats(unittest.TestCase):
         ]
         s = _compute_live_stats(state)
         self.assertFalse(s["fees_are_actual"])
+
+
+class TestMissedSignals(unittest.TestCase):
+
+    def setUp(self):
+        self.now = datetime.now(timezone.utc)
+
+    def test_record_basic(self):
+        live = _empty_live_state()
+        pt = {"id": "BTC|LONG|t1", "symbol": "BTCUSDT", "direction": "LONG",
+              "conviction_score": 5, "entered_at": "2026-05-15T10:00:00+00:00"}
+        _record_missed_signal(live, pt, "max_concurrent reached (3/3)", self.now)
+        self.assertEqual(len(live["missed_signals"]), 1)
+        m = live["missed_signals"][0]
+        self.assertEqual(m["paper_id"], "BTC|LONG|t1")
+        self.assertEqual(m["symbol"], "BTCUSDT")
+        self.assertEqual(m["direction"], "LONG")
+        self.assertEqual(m["conviction_score"], 5)
+        self.assertIn("max_concurrent", m["reason"])
+
+    def test_already_mirrored_not_recorded(self):
+        """"already mirrored" 是噪音, 不应记录."""
+        live = _empty_live_state()
+        pt = {"id": "BTC|LONG|t1", "symbol": "BTCUSDT", "direction": "LONG"}
+        _record_missed_signal(live, pt, "already mirrored", self.now)
+        self.assertEqual(len(live["missed_signals"]), 0)
+
+    def test_dedupe_same_paper_id(self):
+        """同 paper_id 多次记录 → 只保留最新 (reason 变化时也更新)."""
+        live = _empty_live_state()
+        pt = {"id": "BTC|LONG|t1", "symbol": "BTCUSDT", "direction": "LONG"}
+        _record_missed_signal(live, pt, "max_concurrent reached", self.now)
+        # 下一 tick: 原因变了 (空了 slot 但风控触发)
+        _record_missed_signal(live, pt, "risk_gate: daily_dd", self.now)
+        self.assertEqual(len(live["missed_signals"]), 1)
+        self.assertIn("daily_dd", live["missed_signals"][0]["reason"])
+
+    def test_rolling_window_cap(self):
+        live = _empty_live_state()
+        for i in range(MISSED_SIGNALS_KEEP_LAST_N + 10):
+            pt = {"id": f"SYM{i}|LONG|t", "symbol": f"SYM{i}USDT",
+                  "direction": "LONG"}
+            _record_missed_signal(live, pt, "max_concurrent reached", self.now)
+        # 保留最近 N 条
+        self.assertEqual(len(live["missed_signals"]), MISSED_SIGNALS_KEEP_LAST_N)
+        # 验证保留的是最新的 (最后 10 个)
+        symbols = [m["symbol"] for m in live["missed_signals"]]
+        self.assertIn(f"SYM{MISSED_SIGNALS_KEEP_LAST_N + 9}USDT", symbols)
+        self.assertNotIn("SYM0USDT", symbols)
+
+    def test_prune_paper_closed(self):
+        """paper 已平仓的 signal → 从 missed 移除 (不再 actionable)."""
+        live = _empty_live_state()
+        live["missed_signals"] = [
+            {"paper_id": "BTC|LONG|t1", "symbol": "BTCUSDT"},
+            {"paper_id": "ETH|LONG|t2", "symbol": "ETHUSDT"},
+        ]
+        _prune_obsolete_missed(live, paper_open_ids={"BTC|LONG|t1"})
+        self.assertEqual(len(live["missed_signals"]), 1)
+        self.assertEqual(live["missed_signals"][0]["symbol"], "BTCUSDT")
+
+    def test_prune_already_mirrored(self):
+        """后来被成功 mirror 的 → 从 missed 移除."""
+        live = _empty_live_state()
+        live["mirrored_paper_ids"] = ["BTC|LONG|t1"]
+        live["missed_signals"] = [
+            {"paper_id": "BTC|LONG|t1", "symbol": "BTCUSDT"},
+            {"paper_id": "ETH|LONG|t2", "symbol": "ETHUSDT"},
+        ]
+        _prune_obsolete_missed(live, paper_open_ids={"BTC|LONG|t1", "ETH|LONG|t2"})
+        symbols = [m["symbol"] for m in live["missed_signals"]]
+        self.assertNotIn("BTCUSDT", symbols)
+        self.assertIn("ETHUSDT", symbols)
+
+    def test_missing_paper_id_noop(self):
+        """没 paper_id 不应崩."""
+        live = _empty_live_state()
+        _record_missed_signal(live, {"symbol": "x"}, "any", self.now)
+        self.assertEqual(len(live["missed_signals"]), 0)
 
 
 class TestPublishLiveHistory(unittest.TestCase):

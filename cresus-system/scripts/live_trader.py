@@ -90,6 +90,7 @@ EMERGENCY_STOP_PATH = Path.home() / ".cresus-emergency-stop"
 
 # 状态管理
 MIRRORED_IDS_KEEP_LAST_N = 500          # mirrored_paper_ids 滚动窗口
+MISSED_SIGNALS_KEEP_LAST_N = 50         # missed_signals 滚动窗口 (诊断用)
 
 # 主循环
 POLL_INTERVAL_SEC = 30                  # --loop 模式 poll 间隔
@@ -110,9 +111,51 @@ def _empty_live_state() -> dict:
         "live_open_trades": [],
         "live_closed_trades": [],
         "mirrored_paper_ids": [],
+        "missed_signals": [],
         "last_update": None,
         "session_started_at": datetime.now(timezone.utc).isoformat(),
     }
+
+
+def _record_missed_signal(live: dict, paper_trade: dict,
+                          reason: str, now: datetime) -> None:
+    """记录 missed signal (paper 出钻石但 live 没 mirror). 去重 by paper_id.
+
+    "already mirrored" 是正常状态, 不算 missed (跳过).
+    """
+    paper_id = paper_trade.get("id", "")
+    if not paper_id:
+        return
+    if reason and "already mirrored" in reason:
+        return
+    missed = live.setdefault("missed_signals", [])
+    # 去重: 同 paper_id 保留最新 reason
+    missed[:] = [m for m in missed if m.get("paper_id") != paper_id]
+    missed.append({
+        "paper_id": paper_id,
+        "symbol": paper_trade.get("symbol"),
+        "direction": paper_trade.get("direction"),
+        "conviction_score": paper_trade.get("conviction_score"),
+        "signal_at": paper_trade.get("entered_at"),
+        "reason": reason,
+        "last_checked_at": now.isoformat(),
+    })
+    if len(missed) > MISSED_SIGNALS_KEEP_LAST_N:
+        del missed[:-MISSED_SIGNALS_KEEP_LAST_N]
+
+
+def _prune_obsolete_missed(live: dict, paper_open_ids: set) -> None:
+    """清理已不 actionable 的 missed 记录:
+       - paper 已平仓 (不在 open list 里)
+       - 后来被成功 mirror (在 mirrored_paper_ids 里)
+    """
+    mirrored = set(live.get("mirrored_paper_ids") or [])
+    missed = live.get("missed_signals") or []
+    live["missed_signals"] = [
+        m for m in missed
+        if m.get("paper_id") in paper_open_ids
+        and m.get("paper_id") not in mirrored
+    ]
 
 
 def load_paper_state() -> dict:
@@ -148,6 +191,7 @@ def load_live_state() -> dict:
         data.setdefault("live_open_trades", [])
         data.setdefault("live_closed_trades", [])
         data.setdefault("mirrored_paper_ids", [])
+        data.setdefault("missed_signals", [])
         data.setdefault("last_update", None)
         data.setdefault("session_started_at",
                         datetime.now(timezone.utc).isoformat())
@@ -560,6 +604,12 @@ def publish_live_history(
         },
         "open_trades": list(live_state.get("live_open_trades") or []),
         "recent_closed": list(closed),
+        # 按 last_checked_at 倒序, 最近的在前
+        "missed_signals": sorted(
+            list(live_state.get("missed_signals") or []),
+            key=lambda m: m.get("last_checked_at", ""),
+            reverse=True,
+        ),
         "config": {
             "starting_capital_usdt": LIVE_STARTING_CAPITAL_USDT,
             "notional_per_trade_usdt": LIVE_NOTIONAL_USDT,
@@ -981,10 +1031,22 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
             mirror_candidates.append(pt)
         else:
             skip_log.append((pt.get("symbol"), pt.get("id"), reason))
+            # 记录 missed signal 供 dashboard 诊断 (排除"已 mirror"噪音)
+            _record_missed_signal(live, pt, reason, now)
 
     if skip_log:
         for sym, pid, reason in skip_log[:5]:
             log.debug(f"[skip-mirror] {sym} ({pid[:30]}...): {reason}")
+
+    # 若风控 block, 把所有 eligible 候选也记为 missed (原因 = 风控原因列表)
+    if risk["block_new_opens"] and mirror_candidates:
+        block_reason = "risk_gate: " + ", ".join(risk.get("reasons", []) or ["blocked"])
+        for pt in mirror_candidates:
+            _record_missed_signal(live, pt, block_reason, now)
+
+    # 清理已平仓/已 mirror 的过期 missed 记录
+    paper_open_ids = {pt.get("id") for pt in paper_open if pt.get("id")}
+    _prune_obsolete_missed(live, paper_open_ids)
 
     # 2. 对每个 candidate 真实下单 (Plan B: 无 exchange SL)
     #    仅当风控未 block 时执行
