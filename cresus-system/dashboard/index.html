@@ -4213,13 +4213,25 @@ function renderLivePanel(data) {
     }
   }
 
-  // 完全空状态 (没开过任何交易) → 显示 DRY-RUN 提示 + 配置
+  // OBS mode banner (顶部突出, 让用户知道当前是观察模式)
+  const obsMode = config.observation_mode === true;
+  if (obsMode) {
+    body = `<div class="live-recon-warning" style="background:rgba(255,200,0,0.10);border-left:3px solid #ffb84d">
+      🟡 <strong>OBS MODE 观察期</strong> — 跳过白名单, mirror paper 所有 diamond signal.
+      <br><span style="font-size:10px;opacity:0.85">实盘前必须改 LIVE_OBSERVATION_MODE=False 恢复严格白名单 (BTC/ETH/SOL)</span>
+    </div>` + body;
+  }
+
+  // 完全空状态 (没开过任何交易) → 显示等待提示
   if (totalTrades === 0) {
-    body += `<div class="paper-section-title">⏳ 等待 paper 触发白名单内 (${(config.symbol_whitelist || []).join('/')}) 钻石信号</div>`;
+    const waitMsg = obsMode
+      ? `⏳ 等待 paper 触发任意 diamond signal (OBS 模式)`
+      : `⏳ 等待 paper 触发白名单内 (${(config.symbol_whitelist || []).join('/')}) 钻石信号`;
+    body += `<div class="paper-section-title">${waitMsg}</div>`;
   }
 
   // ===== 配置 (always show) =====
-  body += `<div class="paper-section-title">配置</div>`;
+  body += `<div class="paper-section-title">配置 ${obsMode ? '(⚠️ OBS mode active)' : ''}</div>`;
   body += `<div class="live-config-grid">
     <div class="live-config-cell"><div class="k">起始资金</div><div class="v">$${config.starting_capital_usdt || 100}</div></div>
     <div class="live-config-cell"><div class="k">每笔仓位</div><div class="v">$${config.notional_per_trade_usdt || 20}</div></div>
@@ -4227,7 +4239,7 @@ function renderLivePanel(data) {
     <div class="live-config-cell"><div class="k">部署上限</div><div class="v">$${config.max_deploy_usdt || 60}</div></div>
     <div class="live-config-cell"><div class="k">日 DD 触发</div><div class="v" style="color:#ff8888">-$${config.daily_dd_limit_usdt || 5}</div></div>
     <div class="live-config-cell"><div class="k">累计 DD kill</div><div class="v" style="color:#ff8888">-${config.total_dd_limit_pct || 5}%</div></div>
-    <div class="live-config-cell"><div class="k">白名单</div><div class="v" style="font-size:10px">${(config.symbol_whitelist || []).join(' / ')}</div></div>
+    <div class="live-config-cell"><div class="k">白名单</div><div class="v" style="font-size:10px;${obsMode ? 'text-decoration:line-through;opacity:0.5' : ''}">${(config.symbol_whitelist || []).join(' / ')}</div></div>
   </div>`;
 
   document.getElementById("live-body").innerHTML = body;
