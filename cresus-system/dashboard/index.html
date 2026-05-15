@@ -5026,7 +5026,11 @@ function renderLiveDailyReview(closed) {
   if (!["single", "list", "heatmap"].includes(view)) view = "single";
   return `
     <details class="live-collapsible" open>
-      <summary>📅 每日复盘</summary>
+      <summary>📅 每日复盘
+        <button id="live-review-reset" title="重置复盘视图 (清掉记忆的日期/Tab 选择, 回到最近一日)"
+                style="float:right;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--text-dim);font-size:10px;padding:2px 8px;border-radius:4px;cursor:pointer;margin-top:1px"
+                onclick="event.preventDefault(); event.stopPropagation(); _liveReviewReset();">↻ 重置</button>
+      </summary>
       <div class="live-collapsible-body">
         <div class="live-review-tabs" id="live-review-tabs">
           <button class="live-review-tab ${view === "single"  ? "active" : ""}" data-view="single">📊 单日深度</button>
@@ -5037,6 +5041,16 @@ function renderLiveDailyReview(closed) {
       </div>
     </details>
   `;
+}
+
+// 重置每日复盘 — 一键清掉 localStorage 记忆 (无需开 DevTools)
+function _liveReviewReset() {
+  try {
+    localStorage.removeItem("live_review_date");
+    localStorage.removeItem("live_review_view");
+  } catch (_) {}
+  // 重新加载实盘数据 + 重渲染
+  if (typeof loadLiveTrades === "function") loadLiveTrades();
 }
 
 function initLiveReviewInteractions(closed) {
