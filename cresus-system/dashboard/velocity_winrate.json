@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-15T19:47:42.061909+00:00",
+  "generated_at": "2026-05-15T19:49:49.942309+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
@@ -1037,6 +1037,18 @@
         }
       }
     },
+    "LAYERUSDT|burst|LONG": {
+      "symbol": "LAYERUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -0.75
+        }
+      }
+    },
     "NAORISUSDT|burst|LONG": {
       "symbol": "NAORISUSDT",
       "alert_type": "burst",
@@ -1295,9 +1307,9 @@
           "avg_outcome_pct": 1.08
         },
         "240m": {
-          "n": 13,
-          "win_rate": 0.615,
-          "avg_outcome_pct": 0.45
+          "n": 14,
+          "win_rate": 0.643,
+          "avg_outcome_pct": 0.48
         }
       }
     },
