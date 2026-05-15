@@ -22,7 +22,8 @@ sys.path.insert(0, str(HERE.parent))
 import live_trader  # noqa: E402
 from live_trader import (  # noqa: E402
     is_eligible_for_mirror, _trade_age_sec, _generate_trade_id,
-    _paper_to_live_side, _try_mirror_open,
+    _paper_to_live_side, _try_mirror_open, _try_mirror_close,
+    _get_current_price, _check_sl_breach, _sync_live_with_paper,
     load_paper_state, load_live_state, save_live_state,
     main_loop, _empty_live_state,
     LIVE_SYMBOL_WHITELIST, LIVE_MAX_CONCURRENT, LIVE_MIRROR_MAX_AGE_SEC,
@@ -535,6 +536,294 @@ class TestMainLoopMirroring(unittest.TestCase):
             result = main_loop(self.client, dry_run=True)
         # open_position 不应被调用 (已 mirrored skip)
         self.assertEqual(mock_open.call_count, 0)
+
+
+# ============================================================================
+# Phase 3.2.b: SL breach detection / paper-close mirror
+# ============================================================================
+
+class TestCheckSLBreach(unittest.TestCase):
+
+    def test_long_above_sl_no_breach(self):
+        lt = {"side": "BUY", "sl_price": 80000.0}
+        self.assertFalse(_check_sl_breach(lt, 81000.0))
+
+    def test_long_at_sl_breach(self):
+        lt = {"side": "BUY", "sl_price": 80000.0}
+        self.assertTrue(_check_sl_breach(lt, 80000.0))  # equal counts as breach
+
+    def test_long_below_sl_breach(self):
+        lt = {"side": "BUY", "sl_price": 80000.0}
+        self.assertTrue(_check_sl_breach(lt, 79500.0))
+
+    def test_short_below_sl_no_breach(self):
+        lt = {"side": "SELL", "sl_price": 82000.0}
+        self.assertFalse(_check_sl_breach(lt, 81000.0))
+
+    def test_short_above_sl_breach(self):
+        lt = {"side": "SELL", "sl_price": 82000.0}
+        self.assertTrue(_check_sl_breach(lt, 82500.0))
+
+    def test_no_sl_no_breach(self):
+        lt = {"side": "BUY", "sl_price": None}
+        self.assertFalse(_check_sl_breach(lt, 1.0))
+
+    def test_invalid_side(self):
+        lt = {"side": "HOLD", "sl_price": 100.0}
+        self.assertFalse(_check_sl_breach(lt, 50.0))
+
+
+class TestSyncLiveWithPaper(unittest.TestCase):
+
+    def test_sl_changed(self):
+        lt = {"symbol": "BTC", "sl_price": 80000.0, "phase": "A"}
+        paper = {"sl": 81000.0, "phase": "B"}
+        updated = _sync_live_with_paper(lt, paper)
+        self.assertTrue(updated)
+        self.assertEqual(lt["sl_price"], 81000.0)
+        self.assertEqual(lt["phase"], "B")
+
+    def test_no_change(self):
+        lt = {"symbol": "BTC", "sl_price": 80000.0, "phase": "A"}
+        paper = {"sl": 80000.0, "phase": "A"}
+        updated = _sync_live_with_paper(lt, paper)
+        self.assertFalse(updated)
+
+    def test_only_sl_change(self):
+        lt = {"symbol": "BTC", "sl_price": 80000.0, "phase": "A"}
+        paper = {"sl": 80500.0, "phase": "A"}
+        updated = _sync_live_with_paper(lt, paper)
+        self.assertTrue(updated)
+        self.assertEqual(lt["sl_price"], 80500.0)
+        self.assertEqual(lt["phase"], "A")
+
+    def test_only_phase_change(self):
+        lt = {"symbol": "BTC", "sl_price": 80000.0, "phase": "A"}
+        paper = {"sl": 80000.0, "phase": "B"}
+        updated = _sync_live_with_paper(lt, paper)
+        self.assertTrue(updated)
+        self.assertEqual(lt["phase"], "B")
+
+    def test_paper_missing_sl(self):
+        """Paper 缺 sl 字段不应崩."""
+        lt = {"symbol": "BTC", "sl_price": 80000.0, "phase": "A"}
+        paper = {"phase": "A"}   # 没 sl
+        # 不应崩, 也不变 lt
+        _sync_live_with_paper(lt, paper)
+        self.assertEqual(lt["sl_price"], 80000.0)
+
+
+class TestGetCurrentPrice(unittest.TestCase):
+
+    def setUp(self):
+        self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+
+    def test_normal(self):
+        with patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "81000.5", 0, 0, 0, 0, 0, 0, 0]]):
+            price = _get_current_price(self.client, "BTCUSDT")
+        self.assertEqual(price, 81000.5)
+
+    def test_api_error_returns_none(self):
+        with patch.object(self.client, "get_klines",
+                          side_effect=BinanceError("network")):
+            price = _get_current_price(self.client, "BTCUSDT")
+        self.assertIsNone(price)
+
+    def test_empty_klines_returns_none(self):
+        with patch.object(self.client, "get_klines", return_value=[]):
+            price = _get_current_price(self.client, "BTCUSDT")
+        self.assertIsNone(price)
+
+
+class TestTryMirrorClose(unittest.TestCase):
+
+    def setUp(self):
+        self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+        self.live_trade = {
+            "trade_id": "L1_BTC_L",
+            "symbol": "BTCUSDT",
+            "side": "BUY",
+            "paper_id": "BTCUSDT|LONG|...",
+            "sl_price": 80000.0,
+            "phase": "A",
+        }
+        self.mock_close = {
+            "closed_at": "2026-05-15T10:30:00+00:00",
+            "avg_exit_price": 81500.0,
+            "realized_pnl_usdt": 0.5,
+            "close_order_id": 99999,
+            "qty_closed": 0.0002,
+        }
+
+    def test_close_success(self):
+        with patch.object(self.client, "close_position",
+                          return_value=self.mock_close):
+            result = _try_mirror_close(
+                self.client, self.live_trade,
+                reason="sl_breach_client", dry_run=True,
+            )
+        self.assertIsNotNone(result)
+        self.assertEqual(result["close_reason"], "sl_breach_client")
+        self.assertEqual(result["avg_exit_price"], 81500.0)
+        self.assertEqual(result["realized_pnl_usdt"], 0.5)
+        # 原字段保留
+        self.assertEqual(result["trade_id"], "L1_BTC_L")
+        self.assertEqual(result["symbol"], "BTCUSDT")
+
+    def test_close_binance_error(self):
+        with patch.object(self.client, "close_position",
+                          side_effect=BinanceError("oops")):
+            result = _try_mirror_close(
+                self.client, self.live_trade,
+                reason="test", dry_run=True,
+            )
+        self.assertIsNone(result)
+
+    def test_close_unexpected_error(self):
+        with patch.object(self.client, "close_position",
+                          side_effect=RuntimeError("unexpected")):
+            result = _try_mirror_close(
+                self.client, self.live_trade,
+                reason="test", dry_run=True,
+            )
+        self.assertIsNone(result)
+
+
+class TestMainLoopPhase32b(unittest.TestCase):
+    """Phase 3.2.b: 三种 close 触发 + sync from paper."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self._orig_live_state = live_trader.LIVE_STATE
+        self._orig_paper_history = live_trader.PAPER_HISTORY
+        live_trader.LIVE_STATE = Path(self.tmpdir) / "live.json"
+        live_trader.PAPER_HISTORY = Path(self.tmpdir) / "paper.json"
+        self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+
+    def tearDown(self):
+        live_trader.LIVE_STATE = self._orig_live_state
+        live_trader.PAPER_HISTORY = self._orig_paper_history
+        import shutil
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def _seed(self, paper_open, paper_closed, live_open):
+        """Seed paper history + live state."""
+        live_trader.PAPER_HISTORY.parent.mkdir(parents=True, exist_ok=True)
+        live_trader.PAPER_HISTORY.write_text(json.dumps({
+            "open_trades": paper_open,
+            "recent_closed": paper_closed,
+        }))
+        state = _empty_live_state()
+        state["live_open_trades"] = live_open
+        save_live_state(state)
+
+    def test_paper_closed_triggers_mirror_close(self):
+        """A. Paper 把 trade 关了 → live 也关."""
+        paper_id = "BTCUSDT|LONG|2026-05-15T10:00:00+00:00"
+        live_open = [{
+            "trade_id": "L1_BTC_L",
+            "paper_id": paper_id,
+            "symbol": "BTCUSDT", "side": "BUY", "direction": "LONG",
+            "sl_price": 80000.0, "phase": "A",
+        }]
+        paper_closed = [{
+            "id": paper_id, "symbol": "BTCUSDT", "direction": "LONG",
+            "close_reason": "hit_trail",
+        }]
+        self._seed([], paper_closed, live_open)
+        mock_close = {
+            "closed_at": "...", "avg_exit_price": 82000.0,
+            "realized_pnl_usdt": 0.6, "close_order_id": 1, "qty_closed": 0.0002,
+        }
+        with patch.object(self.client, "close_position",
+                          return_value=mock_close) as mock_call:
+            result = main_loop(self.client, dry_run=True)
+        # close_position 应被调用
+        self.assertEqual(mock_call.call_count, 1)
+        # live_open 清空, live_closed 增加
+        self.assertEqual(len(result["live_open_trades"]), 0)
+        self.assertEqual(len(result["live_closed_trades"]), 1)
+        # close_reason 包含 paper:hit_trail
+        self.assertIn("paper:hit_trail",
+                      result["live_closed_trades"][0]["close_reason"])
+
+    def test_sl_breach_triggers_close(self):
+        """C. Paper 还开着, 但当前价触 SL → client-side close."""
+        paper_id = "BTCUSDT|LONG|2026-05-15T10:00:00+00:00"
+        live_open = [{
+            "trade_id": "L1_BTC_L",
+            "paper_id": paper_id,
+            "symbol": "BTCUSDT", "side": "BUY", "direction": "LONG",
+            "sl_price": 80000.0, "phase": "A",
+        }]
+        paper_open = [{
+            "id": paper_id, "symbol": "BTCUSDT", "direction": "LONG",
+            "sl": 80000.0, "phase": "A",
+        }]
+        self._seed(paper_open, [], live_open)
+        mock_close = {
+            "closed_at": "...", "avg_exit_price": 79900.0,
+            "realized_pnl_usdt": -0.22, "close_order_id": 2, "qty_closed": 0.0002,
+        }
+        # Current price = 79900 < sl 80000 → breach
+        with patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "79900.0", 0, 0, 0, 0, 0, 0, 0]]):
+            with patch.object(self.client, "close_position",
+                              return_value=mock_close) as mock_call:
+                result = main_loop(self.client, dry_run=True)
+        self.assertEqual(mock_call.call_count, 1)
+        self.assertEqual(len(result["live_open_trades"]), 0)
+        self.assertEqual(len(result["live_closed_trades"]), 1)
+        self.assertEqual(result["live_closed_trades"][0]["close_reason"],
+                         "sl_breach_client")
+
+    def test_sl_sync_from_paper(self):
+        """B. Paper 还开着但 sl 更新 → live sync 但不关."""
+        paper_id = "BTCUSDT|LONG|2026-05-15T10:00:00+00:00"
+        live_open = [{
+            "trade_id": "L1_BTC_L",
+            "paper_id": paper_id,
+            "symbol": "BTCUSDT", "side": "BUY", "direction": "LONG",
+            "sl_price": 80000.0, "phase": "A",
+        }]
+        paper_open = [{
+            "id": paper_id, "symbol": "BTCUSDT", "direction": "LONG",
+            "sl": 81000.0, "phase": "B",   # paper 把 sl 移到 BE+
+        }]
+        self._seed(paper_open, [], live_open)
+        # 当前价 81500, > 新 sl 81000, 不触发
+        with patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "81500.0", 0, 0, 0, 0, 0, 0, 0]]):
+            with patch.object(self.client, "close_position") as mock_close:
+                result = main_loop(self.client, dry_run=True)
+        # close 不应被调
+        self.assertEqual(mock_close.call_count, 0)
+        # live_open 仍在, sl/phase 已 sync
+        self.assertEqual(len(result["live_open_trades"]), 1)
+        self.assertEqual(result["live_open_trades"][0]["sl_price"], 81000.0)
+        self.assertEqual(result["live_open_trades"][0]["phase"], "B")
+
+    def test_close_failure_keeps_open_for_retry(self):
+        """Close 失败 → trade 留在 live_open 下 tick 重试."""
+        paper_id = "BTCUSDT|LONG|2026-05-15T10:00:00+00:00"
+        live_open = [{
+            "trade_id": "L1_BTC_L",
+            "paper_id": paper_id,
+            "symbol": "BTCUSDT", "side": "BUY", "direction": "LONG",
+            "sl_price": 80000.0, "phase": "A",
+        }]
+        # paper 关了, 但 close 调用失败
+        paper_closed = [{
+            "id": paper_id, "close_reason": "timeout",
+        }]
+        self._seed([], paper_closed, live_open)
+        with patch.object(self.client, "close_position",
+                          side_effect=BinanceError("temp fail")):
+            result = main_loop(self.client, dry_run=True)
+        # 仍 open 等下 tick 重试
+        self.assertEqual(len(result["live_open_trades"]), 1)
+        self.assertEqual(len(result["live_closed_trades"]), 0)
 
 
 if __name__ == "__main__":

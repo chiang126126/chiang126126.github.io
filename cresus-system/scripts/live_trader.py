@@ -230,6 +230,103 @@ def _generate_trade_id(paper_id: str) -> str:
     return trade_id[:25]
 
 
+def _get_current_price(client: BinanceClient, symbol: str) -> Optional[float]:
+    """获取 symbol 当前价 (用 1m 最新 kline). 失败返 None."""
+    try:
+        klines = client.get_klines(symbol, interval="1m", limit=1)
+        if not klines:
+            return None
+        return float(klines[0][4])  # close price
+    except (BinanceError, ValueError, IndexError, TypeError) as e:
+        log.warning(f"[get_price] {symbol}: {type(e).__name__}: {e}")
+        return None
+
+
+def _check_sl_breach(live_trade: dict, current_price: float) -> bool:
+    """检查当前价是否触 SL.
+    LONG (side=BUY): current ≤ sl 触发
+    SHORT (side=SELL): current ≥ sl 触发
+    """
+    sl = live_trade.get("sl_price")
+    if sl is None:
+        return False
+    sl = float(sl)
+    side = live_trade.get("side", "").upper()
+    if side == "BUY":
+        return current_price <= sl
+    elif side == "SELL":
+        return current_price >= sl
+    return False
+
+
+def _sync_live_with_paper(live_trade: dict, paper_open_trade: dict) -> bool:
+    """从 paper 同步 sl_price / phase 到 live_trade (mutates in place).
+    Returns: True 若有更新.
+
+    设计逻辑: Live trader 是 paper 的执行层. Paper 内部管理 Phase A/B/C 转换
+    (TP1 命中 → SL 移 BE; TP2 → trailing), live 只需 mirror paper 当前的 sl.
+    """
+    updated = False
+    new_sl = paper_open_trade.get("sl")
+    new_phase = paper_open_trade.get("phase")
+    if new_sl is not None:
+        try:
+            new_sl_f = float(new_sl)
+            if abs(new_sl_f - float(live_trade.get("sl_price", 0))) > 1e-9:
+                old = live_trade.get("sl_price")
+                live_trade["sl_price"] = new_sl_f
+                log.info(
+                    f"[sl-sync] {live_trade['symbol']}: {old} → {new_sl_f} "
+                    f"(paper phase={new_phase})"
+                )
+                updated = True
+        except (ValueError, TypeError):
+            pass
+    if new_phase and new_phase != live_trade.get("phase"):
+        log.info(
+            f"[phase-sync] {live_trade['symbol']}: "
+            f"{live_trade.get('phase')} → {new_phase}"
+        )
+        live_trade["phase"] = new_phase
+        updated = True
+    return updated
+
+
+def _try_mirror_close(
+    client: BinanceClient,
+    live_trade: dict,
+    *,
+    reason: str,
+    dry_run: bool,
+) -> Optional[dict]:
+    """关 live position. Returns updated live_trade (含 close 信息), 失败 None."""
+    sym = live_trade.get("symbol", "")
+    side = live_trade.get("side", "")
+    trade_id = live_trade.get("trade_id", "")
+    log.info(f"[mirror-close] {sym} {side} reason={reason} trade_id={trade_id}")
+    try:
+        result = client.close_position(
+            symbol=sym, side=side, trade_id=trade_id,
+        )
+    except (BinanceError, ValueError) as e:
+        log.error(f"[mirror-close FAILED] {sym}: {type(e).__name__}: {e}")
+        return None
+    except Exception as e:
+        log.error(f"[mirror-close UNEXPECTED] {sym}: {type(e).__name__}: {e}",
+                  exc_info=True)
+        return None
+
+    # 把 close 信息合并进 live_trade
+    closed = dict(live_trade)
+    closed["closed_at"] = result.get("closed_at")
+    closed["close_reason"] = reason
+    closed["avg_exit_price"] = float(result.get("avg_exit_price") or 0)
+    closed["realized_pnl_usdt"] = float(result.get("realized_pnl_usdt") or 0)
+    closed["close_order_id"] = result.get("close_order_id")
+    closed["close_qty"] = float(result.get("qty_closed") or 0)
+    return closed
+
+
 def _try_mirror_open(
     client: BinanceClient,
     paper_trade: dict,
@@ -371,18 +468,93 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
             f"({len(live['live_open_trades'])} live open now)"
         )
 
-    # 3. 监控 live open trades (Phase 3.2.b 会做 SL polling + paper close mirror)
-    for lt in live_open:
-        log.info(
+    # 3. Sync + monitor live opens, 触发 close 条件 (Phase 3.2.b)
+    # 三个 close 触发器 (按优先级):
+    #   A. paper 已关 (timeout / TP / SL 等) → mirror close
+    #   B. paper 还开着但 sl 已更新 (BE move / trailing) → sync sl
+    #   C. 当前价触 SL (client-side polling) → close
+    paper_open_by_id = {pt.get("id"): pt for pt in paper_open if pt.get("id")}
+    paper_closed_ids = {
+        pt.get("id") for pt in paper.get("recent_closed", []) or []
+        if pt.get("id")
+    }
+    paper_closed_by_id = {
+        pt.get("id"): pt for pt in paper.get("recent_closed", []) or []
+        if pt.get("id")
+    }
+
+    still_open = []
+    closed_now = []
+    for lt in (live.get("live_open_trades") or []):
+        paper_id = lt.get("paper_id", "")
+
+        # === A. Paper 已关 → mirror close ===
+        if paper_id in paper_closed_ids:
+            paper_closed = paper_closed_by_id.get(paper_id, {})
+            paper_reason = paper_closed.get("close_reason", "paper_closed")
+            closed_lt = _try_mirror_close(
+                client, lt, reason=f"paper:{paper_reason}", dry_run=dry_run,
+            )
+            if closed_lt is not None:
+                closed_now.append(closed_lt)
+            else:
+                # close 失败 → 保留 open, 下 tick 重试
+                still_open.append(lt)
+                log.warning(f"[mirror-close retry] {lt.get('symbol')} 留下 tick 重试")
+            continue
+
+        # === B. Sync sl/phase from paper ===
+        paper_current = paper_open_by_id.get(paper_id)
+        if paper_current is not None:
+            _sync_live_with_paper(lt, paper_current)
+        else:
+            # Paper 关了但还没进 recent_closed (罕见 race)
+            log.warning(
+                f"[mirror-sync] {lt.get('symbol')} paper_id={paper_id[:30]} "
+                f"既不在 paper open 也不在 recent_closed (race?)"
+            )
+
+        # === C. Client-side SL polling ===
+        current_price = _get_current_price(client, lt.get("symbol", ""))
+        if current_price is None:
+            # 取价失败 → 保留, 下 tick 重试
+            still_open.append(lt)
+            continue
+        if _check_sl_breach(lt, current_price):
+            log.warning(
+                f"[SL-BREACH] {lt.get('symbol')} {lt.get('side')}: "
+                f"current={current_price} crossed sl={lt.get('sl_price')}"
+            )
+            closed_lt = _try_mirror_close(
+                client, lt, reason="sl_breach_client", dry_run=dry_run,
+            )
+            if closed_lt is not None:
+                closed_now.append(closed_lt)
+            else:
+                still_open.append(lt)
+                log.error(f"[SL-BREACH retry] {lt.get('symbol')} close 失败, 下 tick 重试")
+            continue
+
+        # 没触发任何 close → 仍 open
+        still_open.append(lt)
+        log.debug(
             f"[live-monitor] {lt.get('symbol')} {lt.get('side')} "
             f"phase={lt.get('phase')} entry={lt.get('avg_fill_price')} "
-            f"sl={lt.get('sl_price')}"
+            f"sl={lt.get('sl_price')} current={current_price}"
         )
+
+    # 更新 state
+    live["live_open_trades"] = still_open
+    live.setdefault("live_closed_trades", []).extend(closed_now)
 
     # 4. 持久化 state
     save_live_state(live)
-    if mirrored_count > 0:
-        log.info(f"[live_trader] mirrored {mirrored_count} new trade(s) this tick")
+    if mirrored_count > 0 or closed_now:
+        log.info(
+            f"[live_trader tick] +{mirrored_count} opened, "
+            f"+{len(closed_now)} closed, "
+            f"{len(still_open)} still open"
+        )
     return live
 
 
