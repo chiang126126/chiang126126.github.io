@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-15T10:47:37.143817+00:00",
+  "updated_at": "2026-05-15T10:49:42.252490+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 37,
+  "alerts_count": 38,
   "alerts": [
+    {
+      "symbol": "ATAUSDT",
+      "base": "ATA",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.00622,
+      "price_change_pct": -2.047,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 99049.0,
+      "volume_baseline_usdt": 1211.0,
+      "volume_ratio": 81.79,
+      "detected_at": "2026-05-15T10:49:24.636668+00:00",
+      "intensity": 3,
+      "change_5m_pct": -1.738,
+      "change_15m_pct": -1.893,
+      "change_1h_pct": -2.355,
+      "change_4h_pct": -5.9,
+      "taker_buy_ratio_1m": 0.233,
+      "taker_buy_ratio_5m": 0.258,
+      "oi_delta_5m_pct": -0.056,
+      "funding_rate_pct": 0.01,
+      "atr_pct": 0.517,
+      "range_4h_pct": 8.84,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.00626821,
+      "suggested_tp1": 0.00614768,
+      "suggested_tp2": 0.00607536,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "GIGGLEUSDT",
       "base": "GIGGLE",
