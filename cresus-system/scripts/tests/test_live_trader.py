@@ -24,10 +24,13 @@ from live_trader import (  # noqa: E402
     is_eligible_for_mirror, _trade_age_sec, _generate_trade_id,
     _paper_to_live_side, _try_mirror_open, _try_mirror_close,
     _get_current_price, _check_sl_breach, _sync_live_with_paper,
+    _check_emergency_stop_flag, _check_pause_flag,
+    _check_cash_reserve, _calculate_daily_realized_pnl,
+    _check_daily_dd, check_risk_gates,
     load_paper_state, load_live_state, save_live_state,
     main_loop, _empty_live_state,
     LIVE_SYMBOL_WHITELIST, LIVE_MAX_CONCURRENT, LIVE_MIRROR_MAX_AGE_SEC,
-    LIVE_NOTIONAL_USDT,
+    LIVE_NOTIONAL_USDT, LIVE_MAX_DEPLOY_USDT, LIVE_DAILY_DD_LIMIT_USDT,
 )
 from binance_client import (  # noqa: E402
     _validate_trade_id, BinanceError, BinanceClient,
@@ -824,6 +827,327 @@ class TestMainLoopPhase32b(unittest.TestCase):
         # 仍 open 等下 tick 重试
         self.assertEqual(len(result["live_open_trades"]), 1)
         self.assertEqual(len(result["live_closed_trades"]), 0)
+
+
+# ============================================================================
+# Phase 3.3.a 风控软门测试
+# ============================================================================
+
+class TestFileFlags(unittest.TestCase):
+    """测试 pause / emergency stop flag 文件的检测."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self._orig_pause = live_trader.PAUSE_FLAG_PATH
+        self._orig_stop = live_trader.EMERGENCY_STOP_PATH
+        live_trader.PAUSE_FLAG_PATH = Path(self.tmpdir) / ".cresus-pause"
+        live_trader.EMERGENCY_STOP_PATH = Path(self.tmpdir) / ".cresus-emergency-stop"
+
+    def tearDown(self):
+        live_trader.PAUSE_FLAG_PATH = self._orig_pause
+        live_trader.EMERGENCY_STOP_PATH = self._orig_stop
+        import shutil
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def test_pause_flag_absent_returns_none(self):
+        self.assertIsNone(_check_pause_flag())
+
+    def test_pause_flag_empty(self):
+        live_trader.PAUSE_FLAG_PATH.write_text("")
+        result = _check_pause_flag()
+        self.assertIsNotNone(result)
+        self.assertIn("manual pause", result)
+
+    def test_pause_flag_with_message(self):
+        live_trader.PAUSE_FLAG_PATH.write_text("睡觉了, 别交易")
+        result = _check_pause_flag()
+        self.assertIsNotNone(result)
+        self.assertIn("睡觉了", result)
+
+    def test_emergency_stop_absent(self):
+        self.assertIsNone(_check_emergency_stop_flag())
+
+    def test_emergency_stop_with_reason(self):
+        live_trader.EMERGENCY_STOP_PATH.write_text("auto: cumulative DD 5.2%")
+        result = _check_emergency_stop_flag()
+        self.assertIsNotNone(result)
+        self.assertIn("cumulative DD", result)
+
+
+class TestCashReserve(unittest.TestCase):
+
+    def test_empty_state_no_block(self):
+        state = _empty_live_state()
+        self.assertIsNone(_check_cash_reserve(state))
+
+    def test_under_cap(self):
+        state = _empty_live_state()
+        state["live_open_trades"] = [
+            {"notional_usdt": 20.0},
+            {"notional_usdt": 20.0},
+        ]
+        self.assertIsNone(_check_cash_reserve(state))  # $40 < $60 cap
+
+    def test_at_cap_blocks(self):
+        state = _empty_live_state()
+        state["live_open_trades"] = [
+            {"notional_usdt": 20.0},
+            {"notional_usdt": 20.0},
+            {"notional_usdt": 20.0},
+        ]
+        result = _check_cash_reserve(state)
+        self.assertIsNotNone(result)
+        self.assertIn("cap", result)
+
+    def test_over_cap_blocks(self):
+        state = _empty_live_state()
+        state["live_open_trades"] = [
+            {"notional_usdt": 25.0},
+            {"notional_usdt": 25.0},
+            {"notional_usdt": 25.0},
+        ]
+        result = _check_cash_reserve(state)
+        self.assertIsNotNone(result)
+
+
+class TestDailyPnL(unittest.TestCase):
+
+    def setUp(self):
+        # Fix "now" 在 UTC 12:00 当天某天
+        self.now = datetime(2026, 5, 15, 12, 0, 0, tzinfo=timezone.utc)
+        self.day_start = self.now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    def test_no_trades_zero_pnl(self):
+        state = _empty_live_state()
+        pnl, count, day_start = _calculate_daily_realized_pnl(state, self.now)
+        self.assertEqual(pnl, 0.0)
+        self.assertEqual(count, 0)
+
+    def test_today_trade_counted(self):
+        state = _empty_live_state()
+        state["live_closed_trades"] = [{
+            "closed_at": (self.now - timedelta(hours=2)).isoformat(),
+            "realized_pnl_usdt": -1.5,
+        }, {
+            "closed_at": (self.now - timedelta(hours=1)).isoformat(),
+            "realized_pnl_usdt": +0.5,
+        }]
+        pnl, count, _ = _calculate_daily_realized_pnl(state, self.now)
+        self.assertAlmostEqual(pnl, -1.0, places=2)
+        self.assertEqual(count, 2)
+
+    def test_yesterday_not_counted(self):
+        state = _empty_live_state()
+        state["live_closed_trades"] = [{
+            "closed_at": (self.day_start - timedelta(hours=2)).isoformat(),
+            "realized_pnl_usdt": -10.0,   # 昨天的大亏不算
+        }]
+        pnl, count, _ = _calculate_daily_realized_pnl(state, self.now)
+        self.assertEqual(pnl, 0.0)
+        self.assertEqual(count, 0)
+
+    def test_mixed_days(self):
+        state = _empty_live_state()
+        state["live_closed_trades"] = [
+            {"closed_at": (self.day_start - timedelta(hours=5)).isoformat(),
+             "realized_pnl_usdt": -100.0},   # 昨天
+            {"closed_at": (self.now - timedelta(hours=1)).isoformat(),
+             "realized_pnl_usdt": -2.0},     # 今天
+            {"closed_at": (self.now - timedelta(minutes=30)).isoformat(),
+             "realized_pnl_usdt": +1.0},     # 今天
+        ]
+        pnl, count, _ = _calculate_daily_realized_pnl(state, self.now)
+        self.assertAlmostEqual(pnl, -1.0, places=2)
+        self.assertEqual(count, 2)
+
+    def test_malformed_timestamp_skipped(self):
+        state = _empty_live_state()
+        state["live_closed_trades"] = [
+            {"closed_at": "garbage", "realized_pnl_usdt": -10.0},
+            {"closed_at": self.now.isoformat(), "realized_pnl_usdt": -1.0},
+        ]
+        pnl, count, _ = _calculate_daily_realized_pnl(state, self.now)
+        self.assertAlmostEqual(pnl, -1.0, places=2)
+        self.assertEqual(count, 1)
+
+
+class TestDailyDD(unittest.TestCase):
+
+    def setUp(self):
+        self.now = datetime(2026, 5, 15, 12, 0, 0, tzinfo=timezone.utc)
+
+    def test_profitable_day_no_block(self):
+        state = _empty_live_state()
+        state["live_closed_trades"] = [{
+            "closed_at": self.now.isoformat(),
+            "realized_pnl_usdt": +2.0,
+        }]
+        self.assertIsNone(_check_daily_dd(state, self.now))
+
+    def test_small_loss_no_block(self):
+        state = _empty_live_state()
+        state["live_closed_trades"] = [{
+            "closed_at": self.now.isoformat(),
+            "realized_pnl_usdt": -3.0,  # 没到 -$5
+        }]
+        self.assertIsNone(_check_daily_dd(state, self.now))
+
+    def test_over_limit_blocks(self):
+        state = _empty_live_state()
+        state["live_closed_trades"] = [{
+            "closed_at": self.now.isoformat(),
+            "realized_pnl_usdt": -5.5,
+        }]
+        result = _check_daily_dd(state, self.now)
+        self.assertIsNotNone(result)
+        self.assertIn("-$5", result)
+
+    def test_at_limit_blocks(self):
+        """Edge: 正好 -$5 也触发 (使用 <= 而非 <)."""
+        state = _empty_live_state()
+        state["live_closed_trades"] = [{
+            "closed_at": self.now.isoformat(),
+            "realized_pnl_usdt": -LIVE_DAILY_DD_LIMIT_USDT,
+        }]
+        self.assertIsNotNone(_check_daily_dd(state, self.now))
+
+
+class TestRiskGatesAggregator(unittest.TestCase):
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self._orig_pause = live_trader.PAUSE_FLAG_PATH
+        self._orig_stop = live_trader.EMERGENCY_STOP_PATH
+        live_trader.PAUSE_FLAG_PATH = Path(self.tmpdir) / ".cresus-pause"
+        live_trader.EMERGENCY_STOP_PATH = Path(self.tmpdir) / ".cresus-emergency-stop"
+        self.now = datetime.now(timezone.utc)
+
+    def tearDown(self):
+        live_trader.PAUSE_FLAG_PATH = self._orig_pause
+        live_trader.EMERGENCY_STOP_PATH = self._orig_stop
+        import shutil
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def test_all_clear_doesnt_block(self):
+        state = _empty_live_state()
+        result = check_risk_gates(state, self.now)
+        self.assertFalse(result["block_new_opens"])
+        self.assertEqual(result["reasons"], [])
+
+    def test_pause_blocks(self):
+        live_trader.PAUSE_FLAG_PATH.write_text("paused for sleep")
+        state = _empty_live_state()
+        result = check_risk_gates(state, self.now)
+        self.assertTrue(result["block_new_opens"])
+        self.assertEqual(len(result["reasons"]), 1)
+
+    def test_multiple_triggers_reported(self):
+        """多个 gate 同时触发应全部报告."""
+        live_trader.PAUSE_FLAG_PATH.write_text("manual")
+        live_trader.EMERGENCY_STOP_PATH.write_text("auto: DD limit")
+        state = _empty_live_state()
+        state["live_open_trades"] = [{"notional_usdt": 60.0}]   # 触发 cash reserve
+        result = check_risk_gates(state, self.now)
+        self.assertTrue(result["block_new_opens"])
+        self.assertGreaterEqual(len(result["reasons"]), 3)
+
+    def test_metrics_included(self):
+        state = _empty_live_state()
+        state["live_open_trades"] = [{"notional_usdt": 20.0}]
+        state["live_closed_trades"] = [{
+            "closed_at": self.now.isoformat(),
+            "realized_pnl_usdt": -1.5,
+        }]
+        result = check_risk_gates(state, self.now)
+        self.assertAlmostEqual(result["daily_pnl"], -1.5, places=2)
+        self.assertAlmostEqual(result["deployed_usdt"], 20.0, places=2)
+
+
+class TestMainLoopWithRiskGates(unittest.TestCase):
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self._orig_live_state = live_trader.LIVE_STATE
+        self._orig_paper_history = live_trader.PAPER_HISTORY
+        self._orig_pause = live_trader.PAUSE_FLAG_PATH
+        self._orig_stop = live_trader.EMERGENCY_STOP_PATH
+        live_trader.LIVE_STATE = Path(self.tmpdir) / "live.json"
+        live_trader.PAPER_HISTORY = Path(self.tmpdir) / "paper.json"
+        live_trader.PAUSE_FLAG_PATH = Path(self.tmpdir) / ".cresus-pause"
+        live_trader.EMERGENCY_STOP_PATH = Path(self.tmpdir) / ".cresus-emergency-stop"
+        self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+
+    def tearDown(self):
+        live_trader.LIVE_STATE = self._orig_live_state
+        live_trader.PAPER_HISTORY = self._orig_paper_history
+        live_trader.PAUSE_FLAG_PATH = self._orig_pause
+        live_trader.EMERGENCY_STOP_PATH = self._orig_stop
+        import shutil
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def _seed_eligible_paper_trade(self):
+        now = datetime.now(timezone.utc)
+        live_trader.PAPER_HISTORY.parent.mkdir(parents=True, exist_ok=True)
+        live_trader.PAPER_HISTORY.write_text(json.dumps({
+            "open_trades": [{
+                "id": "BTCUSDT|LONG|2026-05-15T10:00:00+00:00",
+                "symbol": "BTCUSDT",
+                "direction": "LONG",
+                "entered_at": (now - timedelta(seconds=10)).isoformat(),
+                "entry_price": 81000.0,
+                "sl": 80190.0,
+                "tp1": 82215.0,
+                "tp2": 83430.0,
+            }],
+            "recent_closed": [],
+        }))
+
+    def test_pause_flag_blocks_new_open(self):
+        """pause flag 存在 → eligible trade 不被 mirror."""
+        live_trader.PAUSE_FLAG_PATH.write_text("test pause")
+        self._seed_eligible_paper_trade()
+        with patch.object(self.client, "open_position") as mock_open:
+            result = main_loop(self.client, dry_run=True)
+        self.assertEqual(mock_open.call_count, 0)
+        self.assertEqual(len(result["live_open_trades"]), 0)
+        # 也不应记入 mirrored (这样删 pause flag 后还能再 mirror)
+        self.assertEqual(len(result["mirrored_paper_ids"]), 0)
+
+    def test_no_pause_allows_open(self):
+        """没 pause flag → eligible trade 正常 mirror."""
+        self._seed_eligible_paper_trade()
+        mock_result = {
+            "trade_id": "L1", "symbol": "BTCUSDT", "side": "BUY",
+            "qty": 0.0002, "avg_fill_price": 81000.0,
+            "actual_notional": 16.2, "entry_order_id": 1,
+            "entry_client_id": "x", "sl_price": 80190.0, "sl_side": "SELL",
+            "sl_mode": "client_side", "opened_at": "x", "fees_paid_usdt": 0,
+            "_dryRun": True,
+        }
+        with patch.object(self.client, "open_position", return_value=mock_result):
+            result = main_loop(self.client, dry_run=True)
+        self.assertEqual(len(result["live_open_trades"]), 1)
+
+    def test_cash_reserve_blocks(self):
+        """已部署 $60 = cap → 新单不开."""
+        # seed 已有 3 笔满 cap
+        state = _empty_live_state()
+        state["live_open_trades"] = [
+            {"trade_id": "L1", "symbol": "ETHUSDT", "paper_id": "x1",
+             "notional_usdt": 20.0, "side": "BUY", "sl_price": 1.0, "phase": "A"},
+            {"trade_id": "L2", "symbol": "SOLUSDT", "paper_id": "x2",
+             "notional_usdt": 20.0, "side": "BUY", "sl_price": 1.0, "phase": "A"},
+            {"trade_id": "L3", "symbol": "BNBUSDT", "paper_id": "x3",
+             "notional_usdt": 20.0, "side": "BUY", "sl_price": 1.0, "phase": "A"},
+        ]
+        save_live_state(state)
+        self._seed_eligible_paper_trade()
+        with patch.object(self.client, "open_position") as mock_open:
+            # 同时 mock klines 避免 sl polling 试网络
+            with patch.object(self.client, "get_klines",
+                              return_value=[[0, 0, 0, 0, "100.0", 0, 0, 0, 0, 0, 0, 0]]):
+                result = main_loop(self.client, dry_run=True)
+        self.assertEqual(mock_open.call_count, 0)
 
 
 if __name__ == "__main__":
