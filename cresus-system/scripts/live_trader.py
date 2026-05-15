@@ -552,6 +552,7 @@ def publish_live_history(
             "max_deploy_usdt": LIVE_MAX_DEPLOY_USDT,
             "total_dd_limit_pct": LIVE_TOTAL_DD_LIMIT_PCT,
             "mirror_max_age_sec": LIVE_MIRROR_MAX_AGE_SEC,
+            "observation_mode": LIVE_OBSERVATION_MODE,
         },
     }
     try:
@@ -1060,13 +1061,14 @@ def _cli_main() -> int:
     dry_run = not args.live
 
     # 🛑 安全锁: LIVE_OBSERVATION_MODE + --live 互斥 (不允许观察模式 + 真钱)
-    if LIVE_OBSERVATION_MODE and not dry_run:
+    # 🛑 安全锁: OBS mode + 主网 + 真单 = 真钱风险, reject.
+    # (testnet + OBS + --live 是 OK 的: testnet 钱用于观察真订单流程)
+    if LIVE_OBSERVATION_MODE and not dry_run and not use_testnet:
         raise SystemExit(
-            "🛑 LIVE_OBSERVATION_MODE=True 时禁止 --live (真钱模式).\n"
-            "理由: 观察模式跳过 symbol 白名单, 接受所有 paper signal.\n"
-            "      实盘需要严格白名单, 两者互斥.\n"
-            "修复: 编辑 live_trader.py 把 LIVE_OBSERVATION_MODE 设为 False,\n"
-            "      然后重启 launchd."
+            "🛑 LIVE_OBSERVATION_MODE=True + 主网 + --live = 真钱风险.\n"
+            "观察模式跳过 symbol 白名单, 跟主网严格白名单不兼容.\n"
+            "修复方案 1: 改 LIVE_OBSERVATION_MODE=False (恢复严格白名单)\n"
+            "修复方案 2: 不带 --mainnet (用 testnet 真单观察)"
         )
 
     client = BinanceClient(key, secret, testnet=use_testnet, dry_run=dry_run)
