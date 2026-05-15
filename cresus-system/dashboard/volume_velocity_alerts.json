@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-15T05:59:23.483139+00:00",
+  "updated_at": "2026-05-15T06:01:30.470679+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 101,
+  "alerts_count": 102,
   "alerts": [
+    {
+      "symbol": "EDUUSDT",
+      "base": "EDU",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 0.04693,
+      "price_change_pct": -2.412,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 125058.0,
+      "volume_baseline_usdt": 4479.0,
+      "volume_ratio": 27.92,
+      "detected_at": "2026-05-15T06:01:28.554306+00:00",
+      "intensity": 2,
+      "change_5m_pct": -2.532,
+      "change_15m_pct": -2.995,
+      "change_1h_pct": -4.065,
+      "change_4h_pct": -4.785,
+      "taker_buy_ratio_1m": 0.408,
+      "taker_buy_ratio_5m": 0.312,
+      "oi_delta_5m_pct": -2.839,
+      "funding_rate_pct": 0.01,
+      "atr_pct": 0.662,
+      "range_4h_pct": 7.82,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.04739607,
+      "suggested_tp1": 0.04623089,
+      "suggested_tp2": 0.04553179,
+      "conviction_score": 5,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "XNYUSDT",
       "base": "XNY",
