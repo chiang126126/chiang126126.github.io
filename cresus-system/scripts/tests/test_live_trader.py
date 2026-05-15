@@ -1510,6 +1510,46 @@ class TestMirrorIterationGuards(unittest.TestCase):
                          f"同 symbol 应只 mirror 1 笔, 实际 {call_count[0]}")
         self.assertEqual(len(result["live_open_trades"]), 1)
 
+    def test_orphan_position_blocks_mirror(self):
+        """关键 bug fix: state 被清后, exchange 有但 live 不知 → 跳过 mirror."""
+        now = datetime.now(timezone.utc)
+        # paper 有 STORJUSDT signal
+        self._write_paper([{
+            "id": "STORJUSDT|LONG|2026-05-15T15:00:00+00:00",
+            "symbol": "STORJUSDT",
+            "direction": "LONG",
+            "entered_at": (now - timedelta(seconds=60)).isoformat(),
+            "entry_price": 0.1089, "sl": 0.1073,
+        }])
+        # exchange 已经有 STORJUSDT 持仓 (上次 mirror 留下的孤儿)
+        mock_positions = [{"symbol": "STORJUSDT", "positionAmt": "183.0"}]
+
+        call_count = [0]
+        def make_open(*args, **kwargs):
+            call_count[0] += 1
+            r = dict(self.mock_open_result)
+            r["symbol"] = kwargs.get("symbol", "STORJUSDT")
+            return r
+
+        # client.dry_run=False (真实模式, recon 会跑)
+        live_client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=False, testnet=True)
+        with patch.object(live_client, "open_position", side_effect=make_open):
+            with patch.object(live_client, "get_positions",
+                              return_value=mock_positions):
+                with patch.object(live_client, "get_account",
+                                  return_value={"totalMarginBalance": "5000"}):
+                    with patch.object(live_client, "get_klines",
+                                      return_value=[[0, 0, 0, 0, "0.1089",
+                                                     0, 0, 0, 0, 0, 0, 0]]):
+                        result = main_loop(live_client, dry_run=False)
+
+        # ⚠️ Bug fix: 即使 paper 有 signal, 不应再 mirror (防 2× size)
+        self.assertEqual(call_count[0], 0,
+                         f"orphan 已存在, 不应 mirror, 实际调用 {call_count[0]} 次")
+        # paper_id 应被加入 mirrored_paper_ids (防本 tick warning 刷屏)
+        self.assertIn("STORJUSDT|LONG|2026-05-15T15:00:00+00:00",
+                      result["mirrored_paper_ids"])
+
     def test_cash_reserve_blocks_within_iteration(self):
         """Paper 有 4 笔 eligible, deploy cap $60 → 最多 mirror 3 笔 (3 × $20 = $60)."""
         now = datetime.now(timezone.utc)
