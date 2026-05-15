@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-15T07:18:59.269992+00:00",
+  "updated_at": "2026-05-15T07:21:04.507725+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 27,
+  "alerts_count": 28,
   "alerts": [
+    {
+      "symbol": "REZUSDT",
+      "base": "REZ",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.005796,
+      "price_change_pct": 0.73,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 11856.0,
+      "volume_baseline_usdt": 1398.0,
+      "volume_ratio": 8.48,
+      "detected_at": "2026-05-15T07:20:54.098301+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.919,
+      "change_15m_pct": 0.797,
+      "change_1h_pct": 0.745,
+      "change_4h_pct": -0.869,
+      "taker_buy_ratio_1m": 0.82,
+      "taker_buy_ratio_5m": 0.741,
+      "oi_delta_5m_pct": -0.02,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.211,
+      "range_4h_pct": 3.19,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.00578379,
+      "suggested_tp1": 0.00581432,
+      "suggested_tp2": 0.00583264,
+      "conviction_score": 1,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "STARUSDT",
       "base": "STAR",
