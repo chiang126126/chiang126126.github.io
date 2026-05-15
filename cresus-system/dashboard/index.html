@@ -579,6 +579,26 @@
     font-variant-numeric: tabular-nums;
     font-weight: 600;
   }
+  /* 置信分数 chip — 钻石信号置信度 (用琥珀色, 与绿/红 PnL 不冲突) */
+  .live-conv-chip {
+    display: inline-block;
+    font-size: 10px;
+    color: #ffd54f;
+    background: rgba(255,213,79,0.10);
+    border: 1px solid rgba(255,213,79,0.28);
+    border-radius: 3px;
+    padding: 1px 5px;
+    margin-left: 4px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+  /* 高置信 (5+): 加 glow 强调 */
+  .live-conv-chip.high {
+    color: #ffe082;
+    background: rgba(255,213,79,0.18);
+    border-color: rgba(255,213,79,0.5);
+    box-shadow: 0 0 6px rgba(255,213,79,0.18);
+  }
   /* ==== 折叠 section ==== */
   .live-collapsible {
     margin: 6px 0;
@@ -4752,11 +4772,16 @@ function renderLivePanel(data) {
       const mfeParts = buildMfeLine(t);
       const mfeLine = mfeParts.length
         ? `<br><span class="paper-mfe-line">最佳: ${mfeParts.join(' · ')}</span>` : '';
+      const cscore = t.conviction_score;
+      const convChip = (cscore != null)
+        ? `<span class="live-conv-chip ${cscore >= 5 ? 'high' : ''}" title="钻石信号置信分: ${cscore}">💎 ${cscore}</span>`
+        : '';
       body += `<div class="paper-trade-row dir-${dir}">
         <span>
           <strong>${escapeHtml(t.symbol || '?')}</strong>
           <span class="paper-day-dir ${dirCls}">${dir}</span>
           <span class="live-lev-chip">${lev}x</span>
+          ${convChip}
           ${t.is_dry_run ? '<span style="font-size:10px;color:#ffb84d;margin-left:4px">🟡DRY</span>' : '<span style="font-size:10px;color:#ff5252;margin-left:4px">🔴LIVE</span>'}
           <br><span style="font-size:11px;color:var(--text-dim)">
             入 ${liveFmtPrice(entry)} · 现 ${cur != null ? liveFmtPrice(cur) : '—'}
@@ -4813,11 +4838,16 @@ function renderLivePanel(data) {
           ? ` · <span style="color:#ffb74d">错失 +${regret.toFixed(2)}%</span>` : '';
         mfeLine = `<br><span class="paper-mfe-line">最佳: ${mfeParts.join(' · ')}${regretStr}</span>`;
       }
+      const cscoreC = t.conviction_score;
+      const convChipC = (cscoreC != null)
+        ? `<span class="live-conv-chip ${cscoreC >= 5 ? 'high' : ''}" title="钻石信号置信分: ${cscoreC}">💎 ${cscoreC}</span>`
+        : '';
       body += `<div class="paper-trade-row dir-${dir} ${winLossCls}">
         <span>
           <strong>${escapeHtml(t.symbol || '?')}</strong>
           <span class="paper-day-dir ${dir === 'LONG' ? 'long' : 'short'}">${dir}</span>
           <span class="live-lev-chip">${lev}x</span>
+          ${convChipC}
           ${t.is_dry_run ? '<span style="font-size:10px;color:#ffb84d;margin-left:4px">🟡DRY</span>' : '<span style="font-size:10px;color:#ff5252;margin-left:4px">🔴LIVE</span>'}
           <br><span style="font-size:11px;color:var(--text-dim)">
             ${liveFmtPrice(entry)} → ${liveFmtPrice(exit)}
@@ -4971,10 +5001,22 @@ function _liveDayStats(trades) {
     const r = t.close_reason || '?';
     reasonCounts[r] = (reasonCounts[r] || 0) + 1;
   }
+  // 按置信分布 + 每档胜率 (用于复盘哪些分档赚钱)
+  const scoreBuckets = {};
+  for (const t of trades) {
+    const s = t.conviction_score;
+    if (s == null) continue;
+    if (!scoreBuckets[s]) scoreBuckets[s] = { n: 0, wins: 0, losses: 0, pnl: 0 };
+    scoreBuckets[s].n++;
+    const p = Number(t.realized_pnl_usdt || 0);
+    scoreBuckets[s].pnl += p;
+    if (p >  0.01) scoreBuckets[s].wins++;
+    if (p < -0.01) scoreBuckets[s].losses++;
+  }
   const best  = trades.reduce((b, t) => (Number(t.realized_pnl_usdt || 0) > (b ? Number(b.realized_pnl_usdt || 0) : -Infinity)) ? t : b, null);
   const worst = trades.reduce((b, t) => (Number(t.realized_pnl_usdt || 0) < (b ? Number(b.realized_pnl_usdt || 0) :  Infinity)) ? t : b, null);
   return { n, wins, losses, scratch, winRate, totPnl, totFees,
-    longs, shorts, reasonCounts, best, worst };
+    longs, shorts, reasonCounts, scoreBuckets, best, worst };
 }
 
 function renderLiveDailyReview(closed) {
@@ -5099,6 +5141,22 @@ function _liveRenderSingleDay(byDate, allDates) {
       return `<span class="chip" title="${escapeHtml(meta.label)}">${meta.icon} ${c}</span>`;
     }).join("");
 
+  // 按置信分组的胜率/PnL chips (复盘哪一档分赚钱)
+  const scoreChips = Object.entries(stats.scoreBuckets || {})
+    .sort((a, b) => Number(b[0]) - Number(a[0]))   // 高分在前
+    .map(([s, v]) => {
+      const dec = v.wins + v.losses;
+      const wrTxt = dec > 0 ? Math.round(v.wins / dec * 100) + "%" : "—";
+      const wrColor = dec > 0 && v.wins / dec >= 0.5 ? "#00e676"
+                     : dec > 0 && v.wins / dec < 0.4 ? "#ff7373" : "var(--text)";
+      const pnlColor = v.pnl > 0 ? "#00e676" : (v.pnl < 0 ? "#ff5252" : "var(--text-dim)");
+      return `<span class="chip" title="置信 ${s} 分: ${v.n} 笔, ${v.wins}胜${v.losses}负, PnL ${liveFmtUsdt(v.pnl)}">
+        💎${s} <strong>×${v.n}</strong>
+        <span style="color:${wrColor};margin:0 3px">${wrTxt}</span>
+        <span style="color:${pnlColor};font-size:9.5px">${liveFmtUsdt(v.pnl)}</span>
+      </span>`;
+    }).join("");
+
   // 找最佳 / 最差 单笔
   const bestTrade  = stats.best;
   const worstTrade = stats.worst;
@@ -5159,6 +5217,12 @@ function _liveRenderSingleDay(byDate, allDates) {
       <div class="live-review-stat-line">
         <span class="live-review-stat-key">平仓原因</span>
         <span class="live-review-stat-val">${reasonChips}</span>
+      </div>` : ""}
+
+      ${scoreChips ? `
+      <div class="live-review-stat-line">
+        <span class="live-review-stat-key">置信分档</span>
+        <span class="live-review-stat-val">${scoreChips}</span>
       </div>` : ""}
 
       ${stats.totFees > 0 ? `
@@ -5225,11 +5289,16 @@ function _liveRenderSingleDay(byDate, allDates) {
       const cls = closeSlip > 5 ? 'bad' : (closeSlip < -5 ? 'good' : '');
       slipBits.push(`<span class="live-trade-slippage ${cls}">平${closeSlip >= 0 ? "+" : ""}${closeSlip.toFixed(1)}</span>`);
     }
+    const cscoreD = t.conviction_score;
+    const convChipD = (cscoreD != null)
+      ? `<span class="live-conv-chip ${cscoreD >= 5 ? 'high' : ''}" title="钻石信号置信分: ${cscoreD}">💎 ${cscoreD}</span>`
+      : '';
     return `<div class="paper-trade-row dir-${dir} ${winLossCls}" style="margin-bottom:3px">
       <span>
         <strong>${escapeHtml(t.symbol || '?')}</strong>
         <span class="paper-day-dir ${dir === 'LONG' ? 'long' : 'short'}">${dir}</span>
         <span class="live-lev-chip">${lev}x</span>
+        ${convChipD}
         <br><span style="font-size:11px;color:var(--text-dim)">
           ${liveFmtPrice(entry)} → ${liveFmtPrice(exit)}${fee > 0 ? ' · 费 -$' + fee.toFixed(3) : ''}${slipBits.length ? ' · ' + slipBits.join(' / ') : ''}
         </span>
