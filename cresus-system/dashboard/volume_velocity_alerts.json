@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-15T19:12:18.762044+00:00",
+  "updated_at": "2026-05-15T19:14:22.161910+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 11,
+  "alerts_count": 12,
   "alerts": [
+    {
+      "symbol": "STORJUSDT",
+      "base": "STORJ",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.1395,
+      "price_change_pct": 2.048,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 505598.0,
+      "volume_baseline_usdt": 70194.0,
+      "volume_ratio": 7.2,
+      "detected_at": "2026-05-15T19:13:31.046770+00:00",
+      "intensity": 2,
+      "change_5m_pct": -1.408,
+      "change_15m_pct": 3.781,
+      "change_1h_pct": 2.041,
+      "change_4h_pct": 28.795,
+      "taker_buy_ratio_1m": 0.402,
+      "taker_buy_ratio_5m": 0.443,
+      "oi_delta_5m_pct": 3.562,
+      "funding_rate_pct": -1.308,
+      "atr_pct": 1.347,
+      "range_4h_pct": 28.03,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.13574286,
+      "suggested_tp1": 0.14513571,
+      "suggested_tp2": 0.15077143,
+      "conviction_score": 0,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "ARPAUSDT",
       "base": "ARPA",
