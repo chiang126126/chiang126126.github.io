@@ -455,6 +455,111 @@ def check_position_reconciliation(
     }
 
 
+def _compute_live_stats(live_state: dict) -> dict:
+    """计算 dashboard 用的统计数字 (类似 paper trader 的 stats).
+
+    仅含 realized PnL — unrealized 由 dashboard 端按当前价计算.
+    """
+    closed = live_state.get("live_closed_trades") or []
+    opens = live_state.get("live_open_trades") or []
+
+    wins = [t for t in closed if (t.get("realized_pnl_usdt", 0) or 0) > 0.001]
+    losses = [t for t in closed if (t.get("realized_pnl_usdt", 0) or 0) < -0.001]
+    decisive = wins + losses
+    win_rate = (len(wins) / len(decisive)) if decisive else 0.0
+    total_pnl = sum(float(t.get("realized_pnl_usdt", 0) or 0) for t in closed)
+    avg_pnl = (total_pnl / len(closed)) if closed else 0.0
+    fees = sum(
+        float(t.get("fees_paid_usdt", 0) or 0)
+        for t in list(closed) + list(opens)
+    )
+    best_trade = max(
+        (float(t.get("realized_pnl_usdt", 0) or 0) for t in closed),
+        default=0.0,
+    )
+    worst_trade = min(
+        (float(t.get("realized_pnl_usdt", 0) or 0) for t in closed),
+        default=0.0,
+    )
+    deployed = sum(float(t.get("notional_usdt", 0) or 0) for t in opens)
+
+    return {
+        "total_trades": len(closed) + len(opens),
+        "open": len(opens),
+        "closed": len(closed),
+        "wins": len(wins),
+        "losses": len(losses),
+        "win_rate": round(win_rate, 3),
+        "total_pnl_usdt": round(total_pnl, 4),
+        "avg_pnl_usdt": round(avg_pnl, 4),
+        "best_trade_usdt": round(best_trade, 4),
+        "worst_trade_usdt": round(worst_trade, 4),
+        "fees_paid_usdt": round(fees, 4),
+        "starting_capital_usdt": LIVE_STARTING_CAPITAL_USDT,
+        "deployed_usdt": round(deployed, 2),
+        "free_capital_usdt": round(LIVE_STARTING_CAPITAL_USDT
+                                    - deployed + total_pnl, 2),
+        "max_concurrent_slots": LIVE_MAX_CONCURRENT,
+        "slots_used": len(opens),
+    }
+
+
+def publish_live_history(
+    live_state: dict, *,
+    risk: Optional[dict] = None,
+    recon: Optional[dict] = None,
+) -> bool:
+    """Phase 3.2.c: 发布对外可见的 live trades history (供 dashboard 读取).
+
+    类比 paper trader 的 _save_paper_history. 原子写 LIVE_HISTORY 文件.
+    Returns: True 若成功写入, False 失败.
+    """
+    stats = _compute_live_stats(live_state)
+    closed = sorted(
+        live_state.get("live_closed_trades") or [],
+        key=lambda t: t.get("closed_at", ""),
+        reverse=True,
+    )
+    payload = {
+        "version": STATE_VERSION,
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "session_started_at": live_state.get("session_started_at"),
+        "stats": stats,
+        "risk_status": risk or {
+            "block_new_opens": False, "reasons": [],
+            "daily_pnl": 0.0, "deployed_usdt": 0.0,
+        },
+        "reconciliation": recon or {
+            "ok": True, "mismatches": [], "api_failed": False,
+            "live_symbols": [], "exchange_symbols": [],
+        },
+        "open_trades": list(live_state.get("live_open_trades") or []),
+        "recent_closed": list(closed),
+        "config": {
+            "starting_capital_usdt": LIVE_STARTING_CAPITAL_USDT,
+            "notional_per_trade_usdt": LIVE_NOTIONAL_USDT,
+            "max_concurrent": LIVE_MAX_CONCURRENT,
+            "symbol_whitelist": list(LIVE_SYMBOL_WHITELIST),
+            "daily_dd_limit_usdt": LIVE_DAILY_DD_LIMIT_USDT,
+            "max_deploy_usdt": LIVE_MAX_DEPLOY_USDT,
+            "total_dd_limit_pct": LIVE_TOTAL_DD_LIMIT_PCT,
+            "mirror_max_age_sec": LIVE_MIRROR_MAX_AGE_SEC,
+        },
+    }
+    try:
+        LIVE_HISTORY.parent.mkdir(parents=True, exist_ok=True)
+        tmp = LIVE_HISTORY.with_suffix(".tmp")
+        tmp.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        tmp.replace(LIVE_HISTORY)
+        return True
+    except Exception as e:
+        log.error(f"publish_live_history failed: {e}")
+        return False
+
+
 def check_risk_gates(
     live_state: dict, now: datetime, *,
     client: Optional[BinanceClient] = None,
@@ -855,8 +960,14 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
     live["live_open_trades"] = still_open
     live.setdefault("live_closed_trades", []).extend(closed_now)
 
-    # 4. 持久化 state
+    # 4. 持久化私有 state
     save_live_state(live)
+
+    # 5. Phase 3.2.c: 发布对外 history (供 dashboard 读)
+    published = publish_live_history(live, risk=risk, recon=recon)
+    if not published:
+        log.warning("[live_trader] failed to publish live_trades_history.json")
+
     if mirrored_count > 0 or closed_now:
         log.info(
             f"[live_trader tick] +{mirrored_count} opened, "
