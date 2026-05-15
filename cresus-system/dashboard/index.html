@@ -309,16 +309,84 @@
     text-transform: uppercase;
   }
 
-  /* ==== Phase 8 实盘 04 panel — 绿色主题 (与 paper 一致) ==== */
+  /* ==== Phase 8 实盘 04 panel — 深翡翠主题, 与 paper 鲜翠绿明显差异化 ====
+     Paper 用 #00c853 / #66dd99 (亮鲜绿)
+     Live  用 #0d8043 / #1cbe72 (深 emerald, 更稳重严肃, 一眼分得清)
+     注: 正向 PnL 色 #00e676 / 负向 #ff5252 跨面板保留 (普世语义) */
   .live-panel {
-    border-left: 3px solid #00c853;
+    border-left: 4px solid #0d8043;
     background: linear-gradient(180deg,
-                rgba(0,200,83,0.035) 0%,
-                rgba(0,200,83,0.01) 100%);
+                rgba(13,128,67,0.06) 0%,
+                rgba(13,128,67,0.015) 100%);
+    box-shadow: inset 1px 0 0 rgba(13,128,67,0.15);
   }
   .live-panel h2 {
-    color: #66dd99;
+    color: #1cbe72;
+    text-shadow: 0 0 12px rgba(28,190,114,0.15);
   }
+  /* live-panel 内的 paper-stat 卡 — 4 张统计卡精致版 (Task 2) */
+  .live-panel .paper-stat {
+    background: linear-gradient(180deg,
+                rgba(13,128,67,0.05) 0%,
+                rgba(13,128,67,0.012) 100%);
+    border: 1px solid rgba(13,128,67,0.18);
+    border-radius: 9px;
+    padding: 10px 14px;
+    transition: border-color 0.2s, transform 0.15s;
+  }
+  .live-panel .paper-stat:hover {
+    border-color: rgba(28,190,114,0.4);
+    transform: translateY(-1px);
+  }
+  .live-panel .paper-stat .label {
+    font-size: 10.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  /* 胜率: 大字 + 三档颜色 (>=50 绿 / 40-50 中性 / <40 红) */
+  .live-panel .paper-stat .value.wr-good { color: #00e676; }
+  .live-panel .paper-stat .value.wr-mid  { color: #ffd54f; }
+  .live-panel .paper-stat .value.wr-bad  { color: #ff7373; }
+  /* 胜 / 负: 双色对比 */
+  .live-stat-wl {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .live-stat-wl .w { color: #00e676; font-weight: 700; font-size: 20px; }
+  .live-stat-wl .sep { color: var(--text-dim); opacity: 0.4; font-weight: 300; font-size: 18px; }
+  .live-stat-wl .l { color: #ff5252; font-weight: 700; font-size: 20px; }
+  /* 最佳 / 最差: 两行清晰栈式, 等宽数字, 同字号 */
+  .live-stat-bw {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-variant-numeric: tabular-nums;
+    font-size: 14px;
+  }
+  .live-stat-bw .b {
+    color: #00e676;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .live-stat-bw .b::before { content: "▲"; font-size: 8px; color: rgba(0,230,118,0.7); }
+  .live-stat-bw .w-row {
+    color: #ff5252;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .live-stat-bw .w-row::before { content: "▼"; font-size: 8px; color: rgba(255,82,82,0.7); }
+  /* 平均/笔: 强调色 + 字号 */
+  .live-panel .paper-stat .value.avg-up   { color: #00e676; }
+  .live-panel .paper-stat .value.avg-down { color: #ff7373; }
+  .live-panel .paper-stat .value.avg-flat { color: var(--text-dim); }
   /* Kill switch: armed 是常态绿色, triggered 才警告红 */
   .live-kill-status {
     display: flex;
@@ -332,8 +400,8 @@
     transition: all 0.25s ease;
   }
   .live-kill-status.armed {
-    background: linear-gradient(135deg, rgba(0,200,83,0.08), rgba(0,200,83,0.04));
-    border: 1px solid rgba(0,200,83,0.35);
+    background: linear-gradient(135deg, rgba(13,128,67,0.08), rgba(13,128,67,0.04));
+    border: 1px solid rgba(13,128,67,0.35);
     color: #00e676;
   }
   .live-kill-status.triggered {
@@ -388,9 +456,9 @@
     transition: border-color 0.2s, background 0.2s;
   }
   .live-config-cell:hover {
-    border-color: rgba(0,200,83,0.2);
+    border-color: rgba(13,128,67,0.2);
     background: linear-gradient(180deg,
-                rgba(0,200,83,0.04) 0%,
+                rgba(13,128,67,0.04) 0%,
                 rgba(255,255,255,0.015) 100%);
   }
   .live-config-cell .k {
@@ -423,10 +491,10 @@
   }
   .live-daily-card:hover {
     transform: translateY(-1px);
-    border-color: rgba(0,200,83,0.25);
-    box-shadow: 0 2px 8px rgba(0,200,83,0.08);
+    border-color: rgba(13,128,67,0.25);
+    box-shadow: 0 2px 8px rgba(13,128,67,0.08);
   }
-  .live-daily-card.up    { border-left: 3px solid #00c853; }
+  .live-daily-card.up    { border-left: 3px solid #0d8043; }
   .live-daily-card.down  { border-left: 3px solid #ff5252; }
   .live-daily-card.flat  { border-left: 3px solid rgba(255,255,255,0.15); }
   .live-daily-card .d-date {
@@ -476,12 +544,12 @@
   }
   .live-detail-table td.num { text-align: right; }
   .live-detail-table tbody tr:hover {
-    background: rgba(0,200,83,0.04);
+    background: rgba(13,128,67,0.04);
   }
   .live-detail-table tbody tr:last-child td { border-bottom: none; }
   .live-trade-slippage { font-size: 10px; color: var(--text-dim); }
   .live-trade-slippage.bad { color: #ff8888; }
-  .live-trade-slippage.good { color: #66dd99; }
+  .live-trade-slippage.good { color: #1cbe72; }
   /* 杠杆 chip — 紧凑显示 */
   .live-lev-chip {
     display: inline-block;
@@ -504,13 +572,13 @@
     list-style: none;
     padding: 8px 12px;
     background: linear-gradient(90deg,
-                rgba(0,200,83,0.05) 0%,
-                rgba(0,200,83,0.01) 100%);
-    border: 1px solid rgba(0,200,83,0.15);
+                rgba(13,128,67,0.05) 0%,
+                rgba(13,128,67,0.01) 100%);
+    border: 1px solid rgba(13,128,67,0.15);
     border-radius: 8px;
     font-weight: 600;
     font-size: 13px;
-    color: #66dd99;
+    color: #1cbe72;
     user-select: none;
     transition: all 0.2s;
   }
@@ -521,17 +589,17 @@
     margin-right: 6px;
     font-size: 9px;
     transition: transform 0.2s;
-    color: rgba(0,200,83,0.6);
+    color: rgba(13,128,67,0.6);
   }
   .live-collapsible[open] > summary::before { transform: rotate(90deg); }
   .live-collapsible[open] > summary {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
-    border-bottom: 1px solid rgba(0,200,83,0.05);
+    border-bottom: 1px solid rgba(13,128,67,0.05);
   }
   .live-collapsible > .live-collapsible-body {
     padding: 10px 4px 6px;
-    border: 1px solid rgba(0,200,83,0.1);
+    border: 1px solid rgba(13,128,67,0.1);
     border-top: none;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
@@ -560,8 +628,8 @@
   }
   .live-review-tab:hover { color: var(--text); background: rgba(255,255,255,0.04); }
   .live-review-tab.active {
-    background: rgba(0,200,83,0.16);
-    color: #66dd99;
+    background: rgba(13,128,67,0.16);
+    color: #1cbe72;
     font-weight: 600;
   }
 
@@ -588,7 +656,7 @@
     transition: background 0.15s;
     font-family: inherit;
   }
-  .live-review-nav-btn:hover:not(:disabled) { background: rgba(0,200,83,0.15); }
+  .live-review-nav-btn:hover:not(:disabled) { background: rgba(13,128,67,0.15); }
   .live-review-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
   .live-review-date-input {
     background: rgba(255,255,255,0.05);
@@ -601,16 +669,16 @@
     color-scheme: dark;
   }
   .live-review-jump-today {
-    background: rgba(0,200,83,0.12);
-    border: 1px solid rgba(0,200,83,0.3);
-    color: #66dd99;
+    background: rgba(13,128,67,0.12);
+    border: 1px solid rgba(13,128,67,0.3);
+    color: #1cbe72;
     font-size: 11px;
     padding: 5px 10px;
     border-radius: 5px;
     cursor: pointer;
     font-family: inherit;
   }
-  .live-review-jump-today:hover { background: rgba(0,200,83,0.2); }
+  .live-review-jump-today:hover { background: rgba(13,128,67,0.2); }
   .live-review-day-label {
     font-size: 12px;
     color: var(--text-dim);
@@ -620,8 +688,8 @@
 
   /* 当日 stats 卡 */
   .live-review-stats {
-    background: rgba(0,200,83,0.04);
-    border: 1px solid rgba(0,200,83,0.12);
+    background: rgba(13,128,67,0.04);
+    border: 1px solid rgba(13,128,67,0.12);
     border-radius: 7px;
     padding: 10px 12px;
     margin-bottom: 10px;
@@ -664,7 +732,7 @@
     font-size: 10.5px;
     background: rgba(255,255,255,0.05);
   }
-  .live-review-stat-val .chip.long  { background: rgba(0,200,83,0.12); color: #00e676; }
+  .live-review-stat-val .chip.long  { background: rgba(13,128,67,0.12); color: #00e676; }
   .live-review-stat-val .chip.short { background: rgba(255,82,82,0.12); color: #ff5252; }
 
   /* 单日明细折叠包裹 */
@@ -750,7 +818,7 @@
     transition: transform 0.1s, box-shadow 0.15s;
   }
   .live-heatmap-cell.has-data { color: var(--text); font-weight: 600; }
-  .live-heatmap-cell:hover { transform: scale(1.08); box-shadow: 0 1px 6px rgba(0,200,83,0.25); }
+  .live-heatmap-cell:hover { transform: scale(1.08); box-shadow: 0 1px 6px rgba(13,128,67,0.25); }
   .live-heatmap-legend {
     display: flex;
     align-items: center;
@@ -4524,25 +4592,41 @@ function renderLivePanel(data) {
           · 余额已为 NET (净额)
         </div>` : ''}
       </div>
-      <div class="paper-stat">
-        <div class="label">胜率</div>
-        <div class="value">${((stats.win_rate || 0) * 100).toFixed(0)}%</div>
-      </div>
-      <div class="paper-stat">
-        <div class="label">胜 / 负</div>
-        <div class="value">${stats.wins || 0} <span style="opacity:.6">/</span> ${stats.losses || 0}</div>
-      </div>
-      <div class="paper-stat">
-        <div class="label">平均/笔</div>
-        <div class="value ${(stats.avg_pnl_usdt || 0) >= 0 ? 'up' : 'down'}">${(stats.avg_pnl_usdt || 0) >= 0 ? '+' : ''}$${(stats.avg_pnl_usdt || 0).toFixed(3)}</div>
-      </div>
-      <div class="paper-stat">
-        <div class="label">最佳 / 最差</div>
-        <div class="value" style="font-size:13px">
-          <span class="up">+$${(stats.best_trade_usdt || 0).toFixed(2)}</span><br>
-          <span class="down">-$${Math.abs(stats.worst_trade_usdt || 0).toFixed(2)}</span>
+      ${(() => {
+        // 4 张 stats 卡: 字号 / 颜色 / 排版精雕
+        const wins   = stats.wins   || 0;
+        const losses = stats.losses || 0;
+        const wrPct  = (stats.win_rate || 0) * 100;
+        const wrCls  = wrPct >= 50 ? 'wr-good' : (wrPct < 40 ? 'wr-bad' : 'wr-mid');
+        const avg    = stats.avg_pnl_usdt || 0;
+        const avgCls = Math.abs(avg) < 0.001 ? 'avg-flat' : (avg > 0 ? 'avg-up' : 'avg-down');
+        const best   = stats.best_trade_usdt  || 0;
+        const worst  = stats.worst_trade_usdt || 0;
+        return `
+        <div class="paper-stat">
+          <div class="label">胜率</div>
+          <div class="value ${wrCls}">${wrPct.toFixed(0)}%</div>
         </div>
-      </div>
+        <div class="paper-stat">
+          <div class="label">胜 / 负</div>
+          <div class="value live-stat-wl">
+            <span class="w">${wins}</span>
+            <span class="sep">/</span>
+            <span class="l">${losses}</span>
+          </div>
+        </div>
+        <div class="paper-stat">
+          <div class="label">平均/笔</div>
+          <div class="value ${avgCls}">${avg >= 0 ? '+' : ''}$${avg.toFixed(3)}</div>
+        </div>
+        <div class="paper-stat">
+          <div class="label">最佳 / 最差</div>
+          <div class="value live-stat-bw">
+            <span class="b">+$${best.toFixed(2)}</span>
+            <span class="w-row">-$${Math.abs(worst).toFixed(2)}</span>
+          </div>
+        </div>`;
+      })()}
     </div>
   `;
 
@@ -5280,8 +5364,8 @@ function _liveRenderHeatmap(byDate, dates) {
       <div class="live-heatmap-legend-cell" style="background:rgba(255,82,82,0.7)"></div>
       <div class="live-heatmap-legend-cell" style="background:rgba(255,82,82,0.3)"></div>
       <div class="live-heatmap-legend-cell" style="background:rgba(255,255,255,0.06)"></div>
-      <div class="live-heatmap-legend-cell" style="background:rgba(0,200,83,0.3)"></div>
-      <div class="live-heatmap-legend-cell" style="background:rgba(0,200,83,0.7)"></div>
+      <div class="live-heatmap-legend-cell" style="background:rgba(13,128,67,0.3)"></div>
+      <div class="live-heatmap-legend-cell" style="background:rgba(13,128,67,0.7)"></div>
       <span>多</span>
       <span style="margin-left:12px">点击 → 跳到单日</span>
     </div>`;
