@@ -20,12 +20,13 @@ BOT="$HOME/cresus-bot"
 LOG="$BOT/logs/velocity_fast_sync.log"
 LOCK="$BOT/.velocity_fast_sync.lock"
 
-# 仅同步这 4 个 velocity 核心文件 (其他大文件交 sync_signals.sh 10min 周期)
+# 仅同步这 5 个 velocity 核心文件 (其他大文件交 sync_signals.sh 10min 周期)
 FILES=(
     "volume_velocity_alerts.json"
     "velocity_winrate.json"
     "paper_trades_history.json"
     "paper_shadow_history.json"
+    "live_trades_history.json"
 )
 
 # ====== 1. 自身并发锁 (orphan lock > 5min 强制清除) ======
