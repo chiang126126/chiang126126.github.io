@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-15T13:05:26.381423+00:00",
+  "generated_at": "2026-05-15T13:20:12.540820+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
@@ -229,9 +229,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 6,
-          "win_rate": 0.667,
-          "avg_outcome_pct": 0.97
+          "n": 7,
+          "win_rate": 0.571,
+          "avg_outcome_pct": 0.75
         },
         "60m": {
           "n": 6,
@@ -259,6 +259,11 @@
           "n": 6,
           "win_rate": 0.0,
           "avg_outcome_pct": -0.04
+        },
+        "240m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.35
         }
       }
     },
@@ -1766,9 +1771,9 @@
           "avg_outcome_pct": -1.04
         },
         "60m": {
-          "n": 7,
-          "win_rate": 0.286,
-          "avg_outcome_pct": -0.56
+          "n": 8,
+          "win_rate": 0.375,
+          "avg_outcome_pct": -0.29
         },
         "240m": {
           "n": 7,
@@ -1881,9 +1886,9 @@
           "avg_outcome_pct": -0.03
         },
         "240m": {
-          "n": 8,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 0.13
+          "n": 9,
+          "win_rate": 0.444,
+          "avg_outcome_pct": -0.04
         }
       }
     },
@@ -2343,9 +2348,9 @@
           "avg_outcome_pct": 2.37
         },
         "240m": {
-          "n": 9,
-          "win_rate": 0.667,
-          "avg_outcome_pct": 6.92
+          "n": 10,
+          "win_rate": 0.7,
+          "avg_outcome_pct": 9.26
         }
       }
     },
@@ -2426,9 +2431,9 @@
           "avg_outcome_pct": -0.48
         },
         "240m": {
-          "n": 6,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -1.45
+          "n": 7,
+          "win_rate": 0.429,
+          "avg_outcome_pct": -1.06
         }
       }
     },
@@ -2563,24 +2568,36 @@
           "avg_outcome_pct": -0.8
         }
       }
+    },
+    "COPPERUSDT|ignition|SHORT": {
+      "symbol": "COPPERUSDT",
+      "pred_type": "ignition",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": 0.07
+        }
+      }
     }
   },
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 1803,
-        "win_rate": 0.302,
-        "avg_outcome_pct": -0.03
+        "n": 1809,
+        "win_rate": 0.301,
+        "avg_outcome_pct": -0.04
       },
       "60m": {
-        "n": 1791,
-        "win_rate": 0.347,
+        "n": 1796,
+        "win_rate": 0.349,
         "avg_outcome_pct": -0.09
       },
       "240m": {
-        "n": 1722,
+        "n": 1732,
         "win_rate": 0.384,
-        "avg_outcome_pct": -0.27
+        "avg_outcome_pct": -0.26
       }
     },
     "quant_only": {}
