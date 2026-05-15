@@ -111,9 +111,19 @@ class TestEligibility(unittest.TestCase):
     def test_symbol_not_in_whitelist(self):
         trade = dict(self.recent_trade)
         trade["symbol"] = "DOGEUSDT"   # not in whitelist
-        ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
+        # 关闭 observation mode 才能测试白名单过滤
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", False):
+            ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
         self.assertFalse(ok)
         self.assertIn("whitelist", reason)
+
+    def test_observation_mode_bypasses_whitelist(self):
+        """Phase: LIVE_OBSERVATION_MODE=True 时跳过白名单 (但其他 filter 仍然生效)."""
+        trade = dict(self.recent_trade)
+        trade["symbol"] = "DOGEUSDT"   # not in whitelist
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
+        self.assertTrue(ok, f"observation mode 应跳过白名单, got: {reason}")
 
     def test_max_concurrent_reached(self):
         live = _empty_live_state()
@@ -300,8 +310,12 @@ class TestMainLoop(unittest.TestCase):
         self.assertIsNotNone(result["last_update"])
 
     def test_main_loop_filters_non_whitelisted_symbol(self):
-        """非白名单 symbol 不会被认为 eligible."""
+        """非白名单 symbol 不会被认为 eligible (需关 observation mode)."""
         from binance_client import BinanceClient
+        # 关掉 observation mode 才能测试白名单过滤
+        self._obs_patch = patch.object(live_trader, "LIVE_OBSERVATION_MODE", False)
+        self._obs_patch.start()
+        self.addCleanup(self._obs_patch.stop)
         client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
         now = datetime.now(timezone.utc)
         self._write_paper([{
