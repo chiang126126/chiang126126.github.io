@@ -65,6 +65,14 @@ LIVE_SYMBOL_WHITELIST = [              # Phase 6 第 1 周限主流币
 LIVE_MIRROR_MAX_AGE_SEC = 600          # 仅 mirror 10min 内开的 paper trade
                                        # (防止启动时把陈年 paper open 全部 mirror)
 
+# ⚠️ DRY-RUN 观察期标志 — 仅用于 testnet 观察 mirror lifecycle.
+# True 时:
+#   - 跳过 LIVE_SYMBOL_WHITELIST 检查 (接受 paper 所有 diamond signal)
+#   - 启动若同时带 --live 会被 hard reject (安全锁)
+#   - 每 tick 输出 warning 提醒
+# 实盘前必须改回 False!
+LIVE_OBSERVATION_MODE = True
+
 # Phase 3.3.a 风控参数 (实盘 $100 USDT 起始)
 LIVE_STARTING_CAPITAL_USDT = 100.0     # 实盘起始资金 (校准用)
 LIVE_DAILY_DD_LIMIT_USDT = 5.0         # 日亏 -$5 → block new opens
@@ -190,9 +198,9 @@ def is_eligible_for_mirror(
     # 1. 已 mirror 过
     if paper_id in live_state.get("mirrored_paper_ids", []):
         return False, "already mirrored"
-    # 2. Symbol 白名单
+    # 2. Symbol 白名单 (observation mode 下跳过, 让我们看 mirror 真实流程)
     sym = paper_trade.get("symbol", "")
-    if sym not in LIVE_SYMBOL_WHITELIST:
+    if not LIVE_OBSERVATION_MODE and sym not in LIVE_SYMBOL_WHITELIST:
         return False, f"symbol {sym} not in live whitelist {LIVE_SYMBOL_WHITELIST}"
     # 3. 并发上限
     current_open = len(live_state.get("live_open_trades", []))
@@ -816,6 +824,12 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
         f"client_dry_run={client.dry_run}"
     )
 
+    if LIVE_OBSERVATION_MODE:
+        log.warning(
+            "⚠️ LIVE_OBSERVATION_MODE=True: 跳过 symbol 白名单, "
+            "接受 paper 所有 diamond signal. 实盘前必须改回 False!"
+        )
+
     # Phase 3.3.a/b: 风控软+硬门检查
     risk = check_risk_gates(live, now, client=client)
     log.info(
@@ -1010,6 +1024,16 @@ def _cli_main() -> int:
     key, secret, env_testnet = load_credentials()
     use_testnet = not args.mainnet
     dry_run = not args.live
+
+    # 🛑 安全锁: LIVE_OBSERVATION_MODE + --live 互斥 (不允许观察模式 + 真钱)
+    if LIVE_OBSERVATION_MODE and not dry_run:
+        raise SystemExit(
+            "🛑 LIVE_OBSERVATION_MODE=True 时禁止 --live (真钱模式).\n"
+            "理由: 观察模式跳过 symbol 白名单, 接受所有 paper signal.\n"
+            "      实盘需要严格白名单, 两者互斥.\n"
+            "修复: 编辑 live_trader.py 把 LIVE_OBSERVATION_MODE 设为 False,\n"
+            "      然后重启 launchd."
+        )
 
     client = BinanceClient(key, secret, testnet=use_testnet, dry_run=dry_run)
     log.info(
