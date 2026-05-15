@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-15T09:50:36.619257+00:00",
+  "updated_at": "2026-05-15T09:52:42.693885+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 31,
+  "alerts_count": 32,
   "alerts": [
+    {
+      "symbol": "BILLUSDT",
+      "base": "BILL",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 0.21822,
+      "price_change_pct": -2.493,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 1351988.0,
+      "volume_baseline_usdt": 260990.0,
+      "volume_ratio": 5.18,
+      "detected_at": "2026-05-15T09:51:41.800662+00:00",
+      "intensity": 1,
+      "change_5m_pct": -2.491,
+      "change_15m_pct": -2.079,
+      "change_1h_pct": -4.54,
+      "change_4h_pct": 3.18,
+      "taker_buy_ratio_1m": 0.394,
+      "taker_buy_ratio_5m": 0.428,
+      "oi_delta_5m_pct": -0.88,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.846,
+      "range_4h_pct": 13.04,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.22191429,
+      "suggested_tp1": 0.21267857,
+      "suggested_tp2": 0.20713714,
+      "conviction_score": 0,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "HUMAUSDT",
       "base": "HUMA",
