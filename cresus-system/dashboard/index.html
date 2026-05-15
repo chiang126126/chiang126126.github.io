@@ -52,6 +52,7 @@
   #recent-signals-panel  { order: 23; }
   /* 第 3 层 (我的交易): 我赚多少? 持仓状态? 信号结构分布? */
   #paper-panel           { order: 30; }
+  #live-panel            { order: 30.5; }   /* 紧跟在 paper 后面 */
   #stats                 { order: 31; }
   #pnl-panel             { order: 32; }
   #positions-panel       { order: 33; }
@@ -306,6 +307,99 @@
     margin: 12px 0 8px;
     letter-spacing: 0.4px;
     text-transform: uppercase;
+  }
+
+  /* ==== Phase 8 实盘 04 panel — 红色警告主题 (区别于 paper) ==== */
+  .live-panel {
+    border-left: 3px solid #ff4444;
+    background: linear-gradient(180deg,
+                rgba(255,68,68,0.04) 0%,
+                rgba(255,68,68,0.01) 100%);
+  }
+  .live-panel h2 {
+    color: #ff8888;
+  }
+  .live-kill-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  .live-kill-status.armed {
+    background: rgba(0,200,83,0.08);
+    border: 1px solid rgba(0,200,83,0.3);
+    color: #00e676;
+  }
+  .live-kill-status.triggered {
+    background: rgba(255,68,68,0.12);
+    border: 1px solid rgba(255,68,68,0.5);
+    color: #ff5252;
+    animation: pulse-red 2s ease-in-out infinite;
+  }
+  @keyframes pulse-red {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,68,68,0.4); }
+    50%      { box-shadow: 0 0 8px 2px rgba(255,68,68,0.2); }
+  }
+  .live-kill-icon { font-size: 18px; }
+  .live-kill-detail {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-left: auto;
+    font-weight: 400;
+  }
+  .live-reason-line {
+    font-size: 11px;
+    color: #ffaa66;
+    padding: 4px 14px;
+    background: rgba(255,140,0,0.06);
+    border-left: 2px solid rgba(255,140,0,0.4);
+    margin-bottom: 4px;
+    border-radius: 0 4px 4px 0;
+  }
+  .live-recon-warning {
+    font-size: 11px;
+    color: #ffaa66;
+    padding: 8px 12px;
+    background: rgba(255,140,0,0.06);
+    border-radius: 6px;
+    margin-bottom: 10px;
+  }
+  .live-config-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+    font-size: 11px;
+    margin-top: 8px;
+  }
+  .live-config-cell {
+    background: rgba(255,255,255,0.02);
+    padding: 6px 10px;
+    border-radius: 4px;
+  }
+  .live-config-cell .k { color: var(--text-dim); font-size: 10px; }
+  .live-config-cell .v { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .live-trade-row {
+    display: grid;
+    grid-template-columns: 1fr 70px 70px 80px 24px;
+    gap: 6px;
+    padding: 4px 8px;
+    font-size: 11px;
+    align-items: center;
+    border-radius: 4px;
+  }
+  .live-trade-row:nth-child(even) { background: rgba(255,255,255,0.02); }
+  .live-trade-slippage { font-size: 10px; color: var(--text-dim); }
+  .live-trade-slippage.bad { color: #ff8888; }
+  .live-trade-slippage.good { color: #66dd99; }
+  @media (max-width: 720px) {
+    .live-kill-status { font-size: 12px; padding: 8px 10px; }
+    .live-kill-detail { display: none; }
+    .live-config-grid { grid-template-columns: 1fr 1fr; }
+    .live-trade-row { grid-template-columns: 1fr auto auto; gap: 4px; font-size: 10.5px; }
   }
   .paper-trade-row {
     display: grid;
@@ -2197,6 +2291,14 @@
     </div>
   </div>
 
+  <!-- Phase 3 实盘交易 (live_trader.py 镜像 paper 决策, 真实 Binance Futures) -->
+  <div class="panel live-panel" id="live-panel" style="display:none">
+    <h2>⚠️ 实盘交易 (LIVE MONEY) <span class="meta-inline" id="live-updated">—</span></h2>
+    <div class="panel-body" id="live-body">
+      <div class="empty">live_trader 尚未启动或未发布数据…</div>
+    </div>
+  </div>
+
   <div class="panel" id="positions-panel" style="display:none">
     <h2>📈 当前持仓 <span class="meta-inline" id="positions-count"></span></h2>
     <div id="positions-table"></div>
@@ -3976,6 +4078,161 @@ async function loadPnL() {
   }
 }
 
+// Phase 8: ⚠️ 实盘交易 04 panel (live_trader.py 镜像 paper 决策, 真实 Binance Futures)
+async function loadLiveTrades() {
+  try {
+    const res = await fetch("./live_trades_history.json?_=" + Date.now());
+    if (!res.ok) return;
+    const data = await res.json();
+    renderLivePanel(data);
+  } catch (e) {
+    console.warn("[live] load failed:", e);
+  }
+}
+
+function renderLivePanel(data) {
+  const stats = data.stats || {};
+  const risk = data.risk_status || {};
+  const recon = data.reconciliation || {};
+  const config = data.config || {};
+  const open = data.open_trades || [];
+  const closed = data.recent_closed || [];
+  const totalTrades = stats.total_trades || 0;
+
+  // 只在有真实活动时显示 (避免空状态干扰)
+  // 但保留: 即使空也显示, 让用户看到风控状态 + 配置
+  document.getElementById("live-panel").style.display = "";
+  document.getElementById("live-updated").textContent =
+    data.generated_at ? "更新于 " + new Date(data.generated_at).toLocaleString() : "—";
+
+  let body = "";
+
+  // ===== Account 状态卡 (类比 paper 但红色主题) =====
+  const accountBalance = (stats.starting_capital_usdt || 100)
+                          + (stats.total_pnl_usdt || 0);
+  const pnlPct = ((stats.total_pnl_usdt || 0) /
+                   (stats.starting_capital_usdt || 100)) * 100;
+  const pnlClass = (stats.total_pnl_usdt || 0) >= 0 ? "up" : "down";
+  body += `
+    <div class="paper-stats-grid">
+      <div class="paper-stat" style="grid-column: span 2">
+        <div class="label">实盘账户余额 (起始 $${(stats.starting_capital_usdt || 100).toFixed(0)})</div>
+        <div class="value ${pnlClass}">$${accountBalance.toFixed(2)}
+          <span style="font-size:13px;font-weight:500"> ${stats.total_pnl_usdt >= 0 ? '+' : ''}$${(stats.total_pnl_usdt || 0).toFixed(2)} · ${pnlPct >= 0 ? '+' : ''}${pnlPct.toFixed(2)}%</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:4px">
+          已分配 $${(stats.deployed_usdt || 0).toFixed(2)} · 可用 $${(stats.free_capital_usdt || 0).toFixed(2)} · 仓位 ${stats.slots_used || 0}/${stats.max_concurrent_slots || 3}
+          ${stats.fees_paid_usdt ? '· 已付手续费 $' + stats.fees_paid_usdt.toFixed(2) : ''}
+        </div>
+      </div>
+      <div class="paper-stat">
+        <div class="label">胜率</div>
+        <div class="value">${((stats.win_rate || 0) * 100).toFixed(0)}%</div>
+      </div>
+      <div class="paper-stat">
+        <div class="label">胜 / 负</div>
+        <div class="value">${stats.wins || 0} <span style="opacity:.6">/</span> ${stats.losses || 0}</div>
+      </div>
+      <div class="paper-stat">
+        <div class="label">平均/笔</div>
+        <div class="value ${(stats.avg_pnl_usdt || 0) >= 0 ? 'up' : 'down'}">${(stats.avg_pnl_usdt || 0) >= 0 ? '+' : ''}$${(stats.avg_pnl_usdt || 0).toFixed(3)}</div>
+      </div>
+      <div class="paper-stat">
+        <div class="label">最佳 / 最差</div>
+        <div class="value" style="font-size:13px">
+          <span class="up">+$${(stats.best_trade_usdt || 0).toFixed(2)}</span><br>
+          <span class="down">-$${Math.abs(stats.worst_trade_usdt || 0).toFixed(2)}</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // ===== Kill switch 状态 =====
+  const killTriggered = (risk.block_new_opens === true) ||
+                        (risk.reasons || []).some(r => r.includes("emergency"));
+  body += `
+    <div class="live-kill-status ${killTriggered ? 'triggered' : 'armed'}">
+      <span class="live-kill-icon">${killTriggered ? '⛔' : '🟢'}</span>
+      <span>${killTriggered ? 'KILL SWITCH TRIGGERED' : 'KILL SWITCH ARMED'}</span>
+      <span class="live-kill-detail">
+        Daily PnL ${(risk.daily_pnl || 0) >= 0 ? '+' : ''}$${(risk.daily_pnl || 0).toFixed(2)}
+        · Deployed $${(risk.deployed_usdt || 0).toFixed(2)}/$${config.max_deploy_usdt || 60}
+      </span>
+    </div>
+  `;
+  if (risk.block_new_opens && (risk.reasons || []).length > 0) {
+    for (const r of risk.reasons) {
+      body += `<div class="live-reason-line">🛑 ${escapeHtml(r)}</div>`;
+    }
+  }
+
+  // ===== Reconciliation 警告 =====
+  if (recon.ok === false && (recon.mismatches || []).length > 0) {
+    body += `<div class="live-recon-warning">
+      ⚠️ <strong>仓位对账失败 (${recon.mismatches.length} 处不符):</strong><br>
+      ${recon.mismatches.map(m => `&nbsp;&nbsp;[${m.kind}] ${escapeHtml(m.symbol)}: ${escapeHtml(m.message || '')}`).join('<br>')}
+    </div>`;
+  } else if (recon.api_failed) {
+    body += `<div class="live-recon-warning">⚠️ 本轮对账 API 调用失败 (下轮重试)</div>`;
+  }
+
+  // ===== 持仓中 =====
+  if (open.length > 0) {
+    body += `<div class="paper-section-title">持仓中 (${open.length})</div>`;
+    for (const t of open) {
+      const slip = t.slippage_bps || 0;
+      const slipClass = slip > 5 ? 'bad' : (slip < -5 ? 'good' : '');
+      body += `<div class="live-trade-row">
+        <span><strong>${escapeHtml(t.symbol || '?')}</strong>
+          <span class="paper-day-dir ${(t.side === 'BUY' ? 'long' : 'short')}">${t.direction || t.side || '?'}</span>
+          <span class="live-trade-slippage ${slipClass}">slip ${slip >= 0 ? '+' : ''}${slip.toFixed(1)}bps</span>
+        </span>
+        <span style="font-size:10px;color:var(--text-dim)">entry ${(t.avg_fill_price || 0).toFixed(2)}</span>
+        <span style="font-size:10px;color:#ff8888">SL ${(t.sl_price || 0).toFixed(2)}</span>
+        <span style="font-size:10px">Phase ${t.phase || 'A'}</span>
+        <span style="font-size:11px">${t.is_dry_run ? '🟡' : '🔴'}</span>
+      </div>`;
+    }
+  }
+
+  // ===== 最近 10 条已平仓 =====
+  if (closed.length > 0) {
+    body += `<div class="paper-section-title">最近 ${Math.min(closed.length, 10)} 条已平仓</div>`;
+    for (const t of closed.slice(0, 10)) {
+      const pnl = t.realized_pnl_usdt || 0;
+      const pnlClass = pnl > 0 ? 'up' : (pnl < 0 ? 'down' : '');
+      body += `<div class="live-trade-row">
+        <span><strong>${escapeHtml(t.symbol || '?')}</strong>
+          <span class="paper-day-dir ${(t.side === 'BUY' ? 'long' : 'short')}">${t.direction || t.side || ''}</span>
+        </span>
+        <span style="font-size:10px;color:var(--text-dim)">${(t.close_reason || '?').slice(0, 20)}</span>
+        <span class="paper-pnl ${pnlClass}" style="font-size:11px">${pnl >= 0 ? '+' : ''}$${pnl.toFixed(2)}</span>
+        <span style="font-size:10px;color:var(--text-dim)">${(t.closed_at || '').slice(11, 16)}</span>
+        <span></span>
+      </div>`;
+    }
+  }
+
+  // 完全空状态 (没开过任何交易) → 显示 DRY-RUN 提示 + 配置
+  if (totalTrades === 0) {
+    body += `<div class="paper-section-title">⏳ 等待 paper 触发白名单内 (${(config.symbol_whitelist || []).join('/')}) 钻石信号</div>`;
+  }
+
+  // ===== 配置 (always show) =====
+  body += `<div class="paper-section-title">配置</div>`;
+  body += `<div class="live-config-grid">
+    <div class="live-config-cell"><div class="k">起始资金</div><div class="v">$${config.starting_capital_usdt || 100}</div></div>
+    <div class="live-config-cell"><div class="k">每笔仓位</div><div class="v">$${config.notional_per_trade_usdt || 20}</div></div>
+    <div class="live-config-cell"><div class="k">最大并发</div><div class="v">${config.max_concurrent || 3}</div></div>
+    <div class="live-config-cell"><div class="k">部署上限</div><div class="v">$${config.max_deploy_usdt || 60}</div></div>
+    <div class="live-config-cell"><div class="k">日 DD 触发</div><div class="v" style="color:#ff8888">-$${config.daily_dd_limit_usdt || 5}</div></div>
+    <div class="live-config-cell"><div class="k">累计 DD kill</div><div class="v" style="color:#ff8888">-${config.total_dd_limit_pct || 5}%</div></div>
+    <div class="live-config-cell"><div class="k">白名单</div><div class="v" style="font-size:10px">${(config.symbol_whitelist || []).join(' / ')}</div></div>
+  </div>`;
+
+  document.getElementById("live-body").innerHTML = body;
+}
+
 // Phase 4: 💎 钻石信号模拟仓追踪
 async function loadPaperTrades() {
   try {
@@ -4971,7 +5228,7 @@ async function manualRefresh() {
   const btn = document.getElementById("refresh-btn");
   btn.classList.add("spinning");
   try {
-    await Promise.all([loadSignals(), loadPnL(), loadPrices(), loadPriceChange24h(), loadRegime(), loadRegimeHistory(), loadMacroEvents(), loadPrecogRadar(), loadVelocityRadar(), loadPaperTrades()]);
+    await Promise.all([loadSignals(), loadPnL(), loadPrices(), loadPriceChange24h(), loadRegime(), loadRegimeHistory(), loadMacroEvents(), loadPrecogRadar(), loadVelocityRadar(), loadPaperTrades(), loadLiveTrades()]);
   } finally {
     setTimeout(() => btn.classList.remove("spinning"), 300);
   }
@@ -5041,8 +5298,10 @@ setInterval(renderMacroPanel, 30_000);         // P21: 倒计时仅本地重算�
 setInterval(loadPrecogRadar, 5 * 60_000);      // P23: 预兆雷达 5min 刷新
 loadVelocityRadar();
 loadPaperTrades();
+loadLiveTrades();
 setInterval(loadVelocityRadar, 60_000);        // P27-X: 量能加速度 1m 刷新 (跟 scanner cron 同频)
 setInterval(loadPaperTrades, 60_000);          // Phase 4: 模拟仓 1m 刷新
+setInterval(loadLiveTrades, 60_000);           // Phase 8: 实盘交易 1m 刷新
 
 // 切回 tab 时立刻刷新关键面板,避免看陈旧数据
 document.addEventListener("visibilitychange", () => {
@@ -5051,6 +5310,7 @@ document.addEventListener("visibilitychange", () => {
     loadSignals();
     loadPnL();
     loadPaperTrades();
+    loadLiveTrades();
   }
 });
 
