@@ -623,6 +623,72 @@ class BinanceClient:
             params["origClientOrderId"] = client_order_id
         return self._signed_request("GET", "/fapi/v1/order", params)
 
+    def get_user_trades(
+        self,
+        symbol: str,
+        *,
+        order_id: Optional[int] = None,
+        limit: int = 500,
+    ) -> list:
+        """查询账户实际成交记录 (含真实 commission/手续费). 只读, 无 dry_run.
+
+        Binance Futures /fapi/v1/userTrades. 每条 fill 含 commission +
+        commissionAsset (USDT 或 BNB-discount 模式下 BNB).
+
+        order_id 给定时只返该订单的 fills, 否则返该 symbol 最近 N 条.
+        """
+        if limit < 1 or limit > 1000:
+            raise ValueError(f"limit 必须在 [1, 1000], got {limit}")
+        params = {"symbol": symbol.upper(), "limit": int(limit)}
+        if order_id is not None:
+            params["orderId"] = int(order_id)
+        result = self._signed_request("GET", "/fapi/v1/userTrades", params)
+        # API 返 list (空 list 合法 — 订单尚未 settle / 无该 symbol fill)
+        if not isinstance(result, list):
+            log.warning(f"get_user_trades unexpected resp type: {type(result)}")
+            return []
+        return result
+
+    def _actual_commission_usdt(
+        self, symbol: str, order_id: int,
+    ) -> Optional[float]:
+        """汇总指定订单的真实 commission (USDT). 返回 None 表示取不到 (调用方应 fallback).
+
+        BNB-discount (commissionAsset=BNB) 情况: 本版本暂不换算, 返回 None
+        让调用方 fallback 到估算. 实盘启用 BNB 折扣前再扩展.
+        """
+        try:
+            fills = self.get_user_trades(symbol, order_id=order_id)
+        except (BinanceError, ValueError) as e:
+            log.warning(
+                f"[fee] get_user_trades failed for "
+                f"{symbol} order_id={order_id}: {e}"
+            )
+            return None
+        if not fills:
+            log.warning(
+                f"[fee] no fills for {symbol} order_id={order_id} "
+                f"(订单未 settle 或 API 延迟?)"
+            )
+            return None
+        total = 0.0
+        for f in fills:
+            try:
+                asset = (f.get("commissionAsset") or "").upper()
+                comm = float(f.get("commission") or 0)
+            except (ValueError, TypeError):
+                continue
+            if asset == "USDT":
+                total += comm
+            else:
+                # 非 USDT 计费 (e.g. BNB-discount). 本版本不换算 → 整单回退估算.
+                log.warning(
+                    f"[fee] {symbol} order_id={order_id}: "
+                    f"commissionAsset={asset} (非 USDT), 暂不支持换算, 回退估算"
+                )
+                return None
+        return round(total, 6)
+
     # --- 账户配置 (启动前检查) ---
 
     def set_leverage(self, symbol: str, leverage: int,
@@ -838,6 +904,7 @@ class BinanceClient:
                 "sl_mode": "exchange" if use_exchange_sl else "client_side",
                 "opened_at": datetime.now(timezone.utc).isoformat(),
                 "fees_paid_usdt": 0.0,
+                "fees_are_actual": False,
                 "_dryRun": True,
             }
 
@@ -858,7 +925,14 @@ class BinanceClient:
         avg_fill_price = float(entry_resp.get("avgPrice") or 0)
         executed_qty = float(entry_resp.get("executedQty") or 0)
         cum_quote = float(entry_resp.get("cumQuote") or 0)
-        fee_estimate = round(cum_quote * 0.0004, 4)   # Binance Futures taker 0.04%
+        entry_order_id_int = int(entry_resp.get("orderId") or 0)
+        # 实际 commission — 调 /fapi/v1/userTrades. 失败回退到估算 (0.04% taker).
+        fee_estimate = round(cum_quote * 0.0004, 4)
+        actual_fee = None
+        if entry_order_id_int > 0:
+            actual_fee = self._actual_commission_usdt(symbol, entry_order_id_int)
+        entry_fee = actual_fee if actual_fee is not None else fee_estimate
+        fee_is_actual = actual_fee is not None
 
         if executed_qty <= 0:
             raise BinanceError(f"Entry executed_qty={executed_qty}, abnormal")
@@ -886,7 +960,8 @@ class BinanceClient:
                 "sl_client_id": None,
                 "sl_mode": "client_side",         # 标记上层用 polling
                 "opened_at": datetime.now(timezone.utc).isoformat(),
-                "fees_paid_usdt": fee_estimate,
+                "fees_paid_usdt": entry_fee,
+                "fees_are_actual": fee_is_actual,
             }
 
         log.info(
@@ -953,7 +1028,8 @@ class BinanceClient:
             "sl_client_id": sl_coid,
             "sl_mode": "exchange",
             "opened_at": datetime.now(timezone.utc).isoformat(),
-            "fees_paid_usdt": fee_estimate,
+            "fees_paid_usdt": entry_fee,
+            "fees_are_actual": fee_is_actual,
         }
         log.info(
             f"✓ open_position done: {symbol} {side} qty={executed_qty} "
@@ -1123,6 +1199,8 @@ class BinanceClient:
                 "entry_price": 0.0,
                 "avg_exit_price": 0.0,
                 "realized_pnl_usdt": 0.0,
+                "fees_paid_usdt": 0.0,
+                "fees_are_actual": False,
                 "close_order_id": -1,
                 "open_orders_canceled": 0,
                 "closed_at": datetime.now(timezone.utc).isoformat(),
@@ -1182,11 +1260,24 @@ class BinanceClient:
             dry_run=False,
         )
         exit_price = float(close_resp.get("avgPrice") or 0)
+        close_cum_quote = float(close_resp.get("cumQuote") or 0)
+        close_order_id_int = int(close_resp.get("orderId") or 0)
         # PnL: LONG = (exit - entry) * qty; SHORT = (entry - exit) * qty
         if side == "BUY":
             pnl = (exit_price - entry_price) * qty
         else:
             pnl = (entry_price - exit_price) * qty
+
+        # 实际 close commission (回退到估算)
+        close_fee_estimate = round(close_cum_quote * 0.0004, 4)
+        actual_close_fee = None
+        if close_order_id_int > 0:
+            actual_close_fee = self._actual_commission_usdt(
+                symbol, close_order_id_int,
+            )
+        close_fee = (actual_close_fee
+                     if actual_close_fee is not None else close_fee_estimate)
+        close_fee_is_actual = actual_close_fee is not None
 
         result = {
             "symbol": symbol,
@@ -1195,13 +1286,16 @@ class BinanceClient:
             "entry_price": entry_price,
             "avg_exit_price": exit_price,
             "realized_pnl_usdt": round(pnl, 4),
-            "close_order_id": int(close_resp.get("orderId") or 0),
+            "fees_paid_usdt": close_fee,
+            "fees_are_actual": close_fee_is_actual,
+            "close_order_id": close_order_id_int,
             "open_orders_canceled": canceled,
             "closed_at": datetime.now(timezone.utc).isoformat(),
         }
         log.info(
             f"✓ close_position done: {symbol} {side} qty={qty} "
-            f"entry={entry_price} exit={exit_price} pnl={pnl:+.4f}"
+            f"entry={entry_price} exit={exit_price} pnl={pnl:+.4f} "
+            f"fee={close_fee:.4f} ({'actual' if close_fee_is_actual else 'estimate'})"
         )
         return result
 

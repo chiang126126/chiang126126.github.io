@@ -4108,22 +4108,34 @@ function renderLivePanel(data) {
   let body = "";
 
   // ===== Account 状态卡 (类比 paper 但红色主题) =====
-  const accountBalance = (stats.starting_capital_usdt || 100)
-                          + (stats.total_pnl_usdt || 0);
-  const pnlPct = ((stats.total_pnl_usdt || 0) /
-                   (stats.starting_capital_usdt || 100)) * 100;
-  const pnlClass = (stats.total_pnl_usdt || 0) >= 0 ? "up" : "down";
+  // 余额展示已为 NET (扣除已实现手续费). net_pnl_usdt 由后端按 total_pnl - fees_realized
+  // 计算; 向后兼容: 旧数据没有 net_pnl_usdt 时回退到 total_pnl.
+  const startCap = stats.starting_capital_usdt || 100;
+  const grossPnl = stats.total_pnl_usdt || 0;
+  const netPnl = (stats.net_pnl_usdt != null) ? stats.net_pnl_usdt : grossPnl;
+  const feesRealized = stats.fees_realized_usdt != null
+                        ? stats.fees_realized_usdt
+                        : (stats.fees_paid_usdt || 0);
+  const feesAreActual = stats.fees_are_actual === true;
+  const accountBalance = startCap + netPnl;
+  const netPnlPct = (netPnl / startCap) * 100;
+  const pnlClass = netPnl >= 0 ? "up" : "down";
   body += `
     <div class="paper-stats-grid">
       <div class="paper-stat" style="grid-column: span 2">
-        <div class="label">实盘账户余额 (起始 $${(stats.starting_capital_usdt || 100).toFixed(0)})</div>
+        <div class="label">实盘账户余额 (起始 $${startCap.toFixed(0)})</div>
         <div class="value ${pnlClass}">$${accountBalance.toFixed(2)}
-          <span style="font-size:13px;font-weight:500"> ${stats.total_pnl_usdt >= 0 ? '+' : ''}$${(stats.total_pnl_usdt || 0).toFixed(2)} · ${pnlPct >= 0 ? '+' : ''}${pnlPct.toFixed(2)}%</span>
+          <span style="font-size:13px;font-weight:500"> ${netPnl >= 0 ? '+' : ''}$${netPnl.toFixed(2)} · ${netPnlPct >= 0 ? '+' : ''}${netPnlPct.toFixed(2)}%</span>
         </div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">
           已分配 $${(stats.deployed_usdt || 0).toFixed(2)} · 可用 $${(stats.free_capital_usdt || 0).toFixed(2)} · 仓位 ${stats.slots_used || 0}/${stats.max_concurrent_slots || 3}
-          ${stats.fees_paid_usdt ? '· 已付手续费 $' + stats.fees_paid_usdt.toFixed(2) : ''}
         </div>
+        ${feesRealized > 0 ? `
+        <div style="font-size:11px;color:var(--text-dim);margin-top:3px">
+          💸 已付手续费 <span style="color:#ff8a65">-$${feesRealized.toFixed(3)}</span>
+          <span style="opacity:0.7">(毛 ${grossPnl >= 0 ? '+' : ''}$${grossPnl.toFixed(2)} − 费 $${feesRealized.toFixed(3)} = 净 ${netPnl >= 0 ? '+' : ''}$${netPnl.toFixed(2)} · ${feesAreActual ? '✓ 实际' : '⚠ 估算'})</span>
+          · 余额已为 NET (净额)
+        </div>` : ''}
       </div>
       <div class="paper-stat">
         <div class="label">胜率</div>

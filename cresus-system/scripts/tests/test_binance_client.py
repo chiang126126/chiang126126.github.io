@@ -992,6 +992,86 @@ class TestClosePositionDryRun(unittest.TestCase):
 
 
 # ============================================================================
+# Phase 3.2.d: 真实 commission/手续费 (Binance /fapi/v1/userTrades)
+# ============================================================================
+
+class TestActualCommission(unittest.TestCase):
+    """_actual_commission_usdt 必须基于 Binance 真实 fill 的 commission, 不是估算."""
+
+    def setUp(self):
+        self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=False)
+
+    def test_sums_usdt_commission_across_fills(self):
+        fills = [
+            {"commission": "0.0040", "commissionAsset": "USDT"},
+            {"commission": "0.0035", "commissionAsset": "USDT"},
+            {"commission": "0.0001", "commissionAsset": "USDT"},
+        ]
+        with patch.object(self.client, "get_user_trades", return_value=fills):
+            fee = self.client._actual_commission_usdt("BTCUSDT", 12345)
+        self.assertAlmostEqual(fee, 0.0076, places=6)
+
+    def test_get_user_trades_passes_order_id(self):
+        with patch.object(self.client, "_signed_request",
+                          return_value=[]) as mock_req:
+            self.client.get_user_trades("BTCUSDT", order_id=999, limit=10)
+        args, kwargs = mock_req.call_args
+        method, path, params = args
+        self.assertEqual(method, "GET")
+        self.assertEqual(path, "/fapi/v1/userTrades")
+        self.assertEqual(params["symbol"], "BTCUSDT")
+        self.assertEqual(params["orderId"], 999)
+        self.assertEqual(params["limit"], 10)
+
+    def test_get_user_trades_rejects_invalid_limit(self):
+        with self.assertRaises(ValueError):
+            self.client.get_user_trades("BTCUSDT", limit=0)
+        with self.assertRaises(ValueError):
+            self.client.get_user_trades("BTCUSDT", limit=1001)
+
+    def test_bnb_commission_returns_none_for_fallback(self):
+        """BNB-discount 模式暂不支持换算 → 返 None 让上层回退估算."""
+        fills = [{"commission": "0.0001", "commissionAsset": "BNB"}]
+        with patch.object(self.client, "get_user_trades", return_value=fills):
+            fee = self.client._actual_commission_usdt("BTCUSDT", 1)
+        self.assertIsNone(fee)
+
+    def test_empty_fills_returns_none(self):
+        """API 延迟 / 订单未 settle → 没 fills → None (上层回退估算)."""
+        with patch.object(self.client, "get_user_trades", return_value=[]):
+            fee = self.client._actual_commission_usdt("BTCUSDT", 1)
+        self.assertIsNone(fee)
+
+    def test_api_error_returns_none(self):
+        """get_user_trades 抛异常 → 返 None (上层回退估算, 不让 close 失败)."""
+        with patch.object(self.client, "get_user_trades",
+                          side_effect=BinanceError("rate limit")):
+            fee = self.client._actual_commission_usdt("BTCUSDT", 1)
+        self.assertIsNone(fee)
+
+    def test_mixed_usdt_and_bnb_falls_back(self):
+        """任何一 fill 是非 USDT → 整单回退 (避免半精确)."""
+        fills = [
+            {"commission": "0.004", "commissionAsset": "USDT"},
+            {"commission": "0.001", "commissionAsset": "BNB"},
+        ]
+        with patch.object(self.client, "get_user_trades", return_value=fills):
+            fee = self.client._actual_commission_usdt("BTCUSDT", 1)
+        self.assertIsNone(fee)
+
+    def test_malformed_commission_value_skipped(self):
+        """坏值 fill 跳过 (不应让整次 close 崩)."""
+        fills = [
+            {"commission": "0.004", "commissionAsset": "USDT"},
+            {"commission": "abc", "commissionAsset": "USDT"},   # malformed → skipped
+            {"commission": "0.002", "commissionAsset": "USDT"},
+        ]
+        with patch.object(self.client, "get_user_trades", return_value=fills):
+            fee = self.client._actual_commission_usdt("BTCUSDT", 1)
+        self.assertAlmostEqual(fee, 0.006, places=6)
+
+
+# ============================================================================
 # Main
 # ============================================================================
 

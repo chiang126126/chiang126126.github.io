@@ -477,10 +477,20 @@ def _compute_live_stats(live_state: dict) -> dict:
     win_rate = (len(wins) / len(decisive)) if decisive else 0.0
     total_pnl = sum(float(t.get("realized_pnl_usdt", 0) or 0) for t in closed)
     avg_pnl = (total_pnl / len(closed)) if closed else 0.0
-    fees = sum(
-        float(t.get("fees_paid_usdt", 0) or 0)
-        for t in list(closed) + list(opens)
+    # 已实现费用 — 仅来自已平仓 (entry+close 都已记录)
+    fees_realized = sum(
+        float(t.get("fees_paid_usdt", 0) or 0) for t in closed
     )
+    # 未实现 (持仓中只产生 entry fee, close fee 还未发生)
+    fees_open = sum(
+        float(t.get("fees_paid_usdt", 0) or 0) for t in opens
+    )
+    fees_total = fees_realized + fees_open
+    net_pnl = total_pnl - fees_realized
+    fees_all_actual = all(
+        bool(t.get("fees_are_actual", False))
+        for t in list(closed) + list(opens)
+    ) if (closed or opens) else True
     best_trade = max(
         (float(t.get("realized_pnl_usdt", 0) or 0) for t in closed),
         default=0.0,
@@ -499,14 +509,18 @@ def _compute_live_stats(live_state: dict) -> dict:
         "losses": len(losses),
         "win_rate": round(win_rate, 3),
         "total_pnl_usdt": round(total_pnl, 4),
+        "net_pnl_usdt": round(net_pnl, 4),
         "avg_pnl_usdt": round(avg_pnl, 4),
         "best_trade_usdt": round(best_trade, 4),
         "worst_trade_usdt": round(worst_trade, 4),
-        "fees_paid_usdt": round(fees, 4),
+        "fees_paid_usdt": round(fees_total, 4),
+        "fees_realized_usdt": round(fees_realized, 4),
+        "fees_open_usdt": round(fees_open, 4),
+        "fees_are_actual": fees_all_actual,
         "starting_capital_usdt": LIVE_STARTING_CAPITAL_USDT,
         "deployed_usdt": round(deployed, 2),
         "free_capital_usdt": round(LIVE_STARTING_CAPITAL_USDT
-                                    - deployed + total_pnl, 2),
+                                    - deployed + net_pnl, 2),
         "max_concurrent_slots": LIVE_MAX_CONCURRENT,
         "slots_used": len(opens),
     }
@@ -713,6 +727,16 @@ def _try_mirror_close(
     closed["realized_pnl_usdt"] = float(result.get("realized_pnl_usdt") or 0)
     closed["close_order_id"] = result.get("close_order_id")
     closed["close_qty"] = float(result.get("qty_closed") or 0)
+
+    # 费用聚合: 开仓侧 (live_trade 已有) + 平仓侧 (来自 close 返回)
+    entry_fee = float(live_trade.get("fees_paid_usdt") or 0)
+    entry_fee_is_actual = bool(live_trade.get("fees_are_actual", False))
+    close_fee = float(result.get("fees_paid_usdt") or 0)
+    close_fee_is_actual = bool(result.get("fees_are_actual", False))
+    closed["entry_fees_usdt"] = round(entry_fee, 6)
+    closed["close_fees_usdt"] = round(close_fee, 6)
+    closed["fees_paid_usdt"] = round(entry_fee + close_fee, 6)
+    closed["fees_are_actual"] = entry_fee_is_actual and close_fee_is_actual
     return closed
 
 
@@ -796,6 +820,7 @@ def _try_mirror_open(
         "alert_type": paper_trade.get("alert_type"),
         "atr_pct": paper_trade.get("atr_pct"),
         "fees_paid_usdt": result.get("fees_paid_usdt", 0),
+        "fees_are_actual": bool(result.get("fees_are_actual", False)),
         "opened_at": result.get("opened_at"),
         "is_dry_run": bool(dry_run or result.get("_dryRun")),
     }

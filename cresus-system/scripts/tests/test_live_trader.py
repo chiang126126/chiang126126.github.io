@@ -710,6 +710,47 @@ class TestTryMirrorClose(unittest.TestCase):
             )
         self.assertIsNone(result)
 
+    def test_fee_aggregation_entry_plus_close(self):
+        """已平仓 trade 的 fees_paid_usdt = 开仓侧 + 平仓侧 (含真实 + 估算)."""
+        # 模拟开仓时已记录的实际手续费
+        live_trade_with_fee = dict(self.live_trade)
+        live_trade_with_fee["fees_paid_usdt"] = 0.008   # 开仓 actual
+        live_trade_with_fee["fees_are_actual"] = True
+        close_with_fee = dict(self.mock_close)
+        close_with_fee["fees_paid_usdt"] = 0.0075       # 平仓 actual
+        close_with_fee["fees_are_actual"] = True
+
+        with patch.object(self.client, "close_position",
+                          return_value=close_with_fee):
+            result = _try_mirror_close(
+                self.client, live_trade_with_fee,
+                reason="sl_breach_client", dry_run=True,
+            )
+        self.assertIsNotNone(result)
+        self.assertAlmostEqual(result["entry_fees_usdt"], 0.008, places=6)
+        self.assertAlmostEqual(result["close_fees_usdt"], 0.0075, places=6)
+        self.assertAlmostEqual(result["fees_paid_usdt"], 0.0155, places=6)
+        self.assertTrue(result["fees_are_actual"])
+
+    def test_fees_are_actual_false_if_either_side_estimated(self):
+        """开仓 actual 但平仓回退到估算 → fees_are_actual = False (混合)."""
+        live_trade_with_fee = dict(self.live_trade)
+        live_trade_with_fee["fees_paid_usdt"] = 0.008
+        live_trade_with_fee["fees_are_actual"] = True
+        close_with_fee = dict(self.mock_close)
+        close_with_fee["fees_paid_usdt"] = 0.0075
+        close_with_fee["fees_are_actual"] = False       # 平仓回退估算
+
+        with patch.object(self.client, "close_position",
+                          return_value=close_with_fee):
+            result = _try_mirror_close(
+                self.client, live_trade_with_fee,
+                reason="hit_sl", dry_run=True,
+            )
+        self.assertFalse(result["fees_are_actual"])
+        # 总额仍正确累加
+        self.assertAlmostEqual(result["fees_paid_usdt"], 0.0155, places=6)
+
 
 class TestMainLoopPhase32b(unittest.TestCase):
     """Phase 3.2.b: 三种 close 触发 + sync from paper."""
@@ -1624,8 +1665,47 @@ class TestComputeLiveStats(unittest.TestCase):
         self.assertEqual(s["open"], 2)
         self.assertEqual(s["slots_used"], 2)
         self.assertAlmostEqual(s["deployed_usdt"], 45.0, places=2)
-        # free = 100 - 45 + 0 = 55
+        # free = 100 - 45 + 0 (无已实现 PnL) = 55
         self.assertAlmostEqual(s["free_capital_usdt"], 55.0, places=2)
+
+    def test_net_pnl_and_fees_breakdown(self):
+        """net_pnl = total_pnl − fees_realized; free_capital 用 NET."""
+        state = _empty_live_state()
+        state["live_closed_trades"] = [
+            {"realized_pnl_usdt": 0.50,  "fees_paid_usdt": 0.015,
+             "fees_are_actual": True},
+            {"realized_pnl_usdt": -0.30, "fees_paid_usdt": 0.012,
+             "fees_are_actual": True},
+        ]
+        state["live_open_trades"] = [
+            {"notional_usdt": 20.0, "fees_paid_usdt": 0.008,
+             "fees_are_actual": True},
+        ]
+        s = _compute_live_stats(state)
+        # gross PnL (毛)
+        self.assertAlmostEqual(s["total_pnl_usdt"], 0.20, places=4)
+        # 已实现费用 (closed only)
+        self.assertAlmostEqual(s["fees_realized_usdt"], 0.027, places=6)
+        # 持仓中费用 (open only)
+        self.assertAlmostEqual(s["fees_open_usdt"], 0.008, places=6)
+        # 总费用
+        self.assertAlmostEqual(s["fees_paid_usdt"], 0.035, places=6)
+        # net = 0.20 − 0.027 = 0.173
+        self.assertAlmostEqual(s["net_pnl_usdt"], 0.173, places=4)
+        # free_capital = starting − deployed + net = 100 − 20 + 0.173 → round(2) = 80.17
+        self.assertAlmostEqual(s["free_capital_usdt"], 80.17, places=2)
+        self.assertTrue(s["fees_are_actual"])
+
+    def test_fees_are_actual_false_if_any_estimate(self):
+        state = _empty_live_state()
+        state["live_closed_trades"] = [
+            {"realized_pnl_usdt": 0.5, "fees_paid_usdt": 0.02,
+             "fees_are_actual": True},
+            {"realized_pnl_usdt": -0.3, "fees_paid_usdt": 0.02,
+             "fees_are_actual": False},
+        ]
+        s = _compute_live_stats(state)
+        self.assertFalse(s["fees_are_actual"])
 
 
 class TestPublishLiveHistory(unittest.TestCase):
