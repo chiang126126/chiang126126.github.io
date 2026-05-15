@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-15T02:14:36.462234+00:00",
+  "updated_at": "2026-05-15T02:16:41.197001+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 37,
+  "alerts_count": 38,
   "alerts": [
+    {
+      "symbol": "XANUSDT",
+      "base": "XAN",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 0.010981,
+      "price_change_pct": -2.148,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 76120.0,
+      "volume_baseline_usdt": 6412.0,
+      "volume_ratio": 11.87,
+      "detected_at": "2026-05-15T02:16:28.562828+00:00",
+      "intensity": 2,
+      "change_5m_pct": -1.615,
+      "change_15m_pct": -1.773,
+      "change_1h_pct": -0.586,
+      "change_4h_pct": 4.303,
+      "taker_buy_ratio_1m": 0.41,
+      "taker_buy_ratio_5m": 0.376,
+      "oi_delta_5m_pct": -0.456,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.602,
+      "range_4h_pct": 9.47,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.01108011,
+      "suggested_tp1": 0.01083234,
+      "suggested_tp2": 0.01068368,
+      "conviction_score": 0,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "HOLOUSDT",
       "base": "HOLO",
