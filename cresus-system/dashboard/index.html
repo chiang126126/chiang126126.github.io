@@ -2607,6 +2607,39 @@
 </style>
 </head>
 <body>
+<script>
+// URL query param handlers — 让 terminal 通过 open URL 触发本地状态重置.
+// 用法 (在 Mac terminal):
+//   open "https://chiang126126.github.io/cresus-system/dashboard/?reset_review=1"        清掉实盘+paper 复盘视图记忆
+//   open "https://chiang126126.github.io/cresus-system/dashboard/?reset_all=1"           清掉本站全部 localStorage
+// 处理后自动从 URL 移除参数, 避免下次刷新重复触发.
+(function() {
+  try {
+    const params = new URLSearchParams(location.search);
+    let touched = false;
+    if (params.get("reset_review") === "1") {
+      localStorage.removeItem("live_review_date");
+      localStorage.removeItem("live_review_view");
+      localStorage.removeItem("paper_review_date");
+      localStorage.removeItem("paper_review_view");
+      params.delete("reset_review");
+      touched = true;
+      console.log("[reset_review] cleared live + paper review state");
+    }
+    if (params.get("reset_all") === "1") {
+      localStorage.clear();
+      params.delete("reset_all");
+      touched = true;
+      console.log("[reset_all] cleared all localStorage");
+    }
+    if (touched) {
+      const q = params.toString();
+      history.replaceState(null, "",
+        location.pathname + (q ? "?" + q : "") + location.hash);
+    }
+  } catch (_) {}
+})();
+</script>
 <header>
   <h1>🤖 Crésus 交易系统</h1>
   <div class="meta">
