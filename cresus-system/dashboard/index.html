@@ -4728,43 +4728,10 @@ function renderLivePanel(data) {
     body += `<div class="live-recon-warning">⚠️ 本轮对账 API 调用失败 (下轮重试)</div>`;
   }
 
-  // Helpers: 智能小数 + 时长格式化 (与 paper 一致)
-  const liveFmtPrice = p => {
-    if (p == null || p === 0) return "—";
-    const n = Number(p);
-    if (!isFinite(n)) return "—";
-    if (n < 0.01)   return n.toPrecision(4);    // 0.0003719
-    if (n < 1)      return n.toPrecision(4);    // 0.03067
-    if (n < 100)    return n.toFixed(4);        // 99.5432
-    return n.toFixed(2);                         // 123456.78
-  };
-  const liveFmtUsdt = v => (v == null ? "—" : (v >= 0 ? "+$" : "-$") + Math.abs(v).toFixed(2));
-  const liveFmtPct  = v => (v == null ? "—" : (v >= 0 ? "+" : "") + v.toFixed(2) + "%");
-  const liveFmtHold = (fromIso, toIso) => {
-    if (!fromIso) return "—";
-    const start = new Date(fromIso).getTime();
-    const end = toIso ? new Date(toIso).getTime() : Date.now();
-    if (!isFinite(start) || !isFinite(end)) return "—";
-    const mins = Math.max(0, Math.floor((end - start) / 60000));
-    if (mins < 60) return mins + "min";
-    const h = Math.floor(mins / 60), m = mins % 60;
-    return h + "h" + (m > 0 ? m + "m" : "");
-  };
-  const LIVE_PHASE_LABEL = {
-    "A": "🅰 初始",
-    "B": "🛡 BE锁定",
-    "C": "🎯 trailing",
-  };
-  const LIVE_REASON_LABEL = {
-    "sl_breach_client": "🛑 SL 触发",
-    "paper:hit_sl":     "🛑 止损 (paper)",
-    "paper:hit_be_sl":  "⚖ BE 平仓",
-    "paper:hit_b_trail":"🛡 B Trail",
-    "paper:hit_trail":  "🚀 跟踪止盈",
-    "paper:hit_tp1":    "🎯 TP1",
-    "paper:hit_tp2":    "🎯 TP2",
-    "paper:timeout":    "⏱ 超时",
-  };
+  // helpers (liveFmtPrice / liveFmtUsdt / liveFmtPct / liveFmtHold) +
+  // LIVE_PHASE_LABEL / LIVE_REASON_LABEL 已提到全局 (见下方 "全局复盘 helpers" section),
+  // 以便 _liveRenderSingleDay / _liveRenderListView / _liveRenderHeatmap 这些
+  // module-level 函数也能访问. 之前定义在此处导致 ReferenceError 让复盘空白.
 
   const fmtMfePct = v => (v == null) ? null : ((v >= 0 ? '+' : '') + Number(v).toFixed(2) + '%');
   const buildMfeLine = (t) => {
@@ -4994,6 +4961,46 @@ function renderLivePanel(data) {
 
 // ===== 📅 每日复盘 v2 — 三视图: 单日深度 / 14天列表 / 月历热力 (实盘) =====
 
+// === 全局复盘 helpers (renderLivePanel + _liveRenderSingleDay/ListView/Heatmap 共用) ===
+// 注: 之前这些 helper 定义在 renderLivePanel 函数体内 (局部作用域), 全局 review fn
+//     调用就抛 ReferenceError, 导致整个复盘 body 空白. 现在提到 module-level.
+const liveFmtPrice = p => {
+  if (p == null || p === 0) return "—";
+  const n = Number(p);
+  if (!isFinite(n)) return "—";
+  if (n < 0.01)   return n.toPrecision(4);     // 0.0003719
+  if (n < 1)      return n.toPrecision(4);     // 0.03067
+  if (n < 100)    return n.toFixed(4);         // 99.5432
+  return n.toFixed(2);                          // 123456.78
+};
+const liveFmtUsdt = v => (v == null ? "—" : (v >= 0 ? "+$" : "-$") + Math.abs(v).toFixed(2));
+const liveFmtPct  = v => (v == null ? "—" : (v >= 0 ? "+" : "") + v.toFixed(2) + "%");
+const liveFmtHold = (fromIso, toIso) => {
+  if (!fromIso) return "—";
+  const start = new Date(fromIso).getTime();
+  const end = toIso ? new Date(toIso).getTime() : Date.now();
+  if (!isFinite(start) || !isFinite(end)) return "—";
+  const mins = Math.max(0, Math.floor((end - start) / 60000));
+  if (mins < 60) return mins + "min";
+  const h = Math.floor(mins / 60), m = mins % 60;
+  return h + "h" + (m > 0 ? m + "m" : "");
+};
+const LIVE_PHASE_LABEL = {
+  "A": "🅰 初始",
+  "B": "🛡 BE锁定",
+  "C": "🎯 trailing",
+};
+const LIVE_REASON_LABEL = {
+  "sl_breach_client": "🛑 SL 触发",
+  "paper:hit_sl":     "🛑 止损 (paper)",
+  "paper:hit_be_sl":  "⚖ BE 平仓",
+  "paper:hit_b_trail":"🛡 B Trail",
+  "paper:hit_trail":  "🚀 跟踪止盈",
+  "paper:hit_tp1":    "🎯 TP1",
+  "paper:hit_tp2":    "🎯 TP2",
+  "paper:timeout":    "⏱ 超时",
+};
+
 const LIVE_REASON_ICON = {
   "sl_breach_client": { icon: "🛑", label: "SL 触发" },
   "paper:hit_sl":     { icon: "🛑", label: "止损" },
@@ -5061,11 +5068,22 @@ function renderLiveDailyReview(closed) {
   // 首屏 body 同步预渲染 — 不依赖后续 init() 调用,
   // 防止 init 失败或时序错位导致 body 永远空白
   let firstBody = "";
+  let diagLines = [];
   try {
+    diagLines.push(`closed.length=${closed.length}`);
     const { byDate, dates } = _liveGroupByDate(closed);
     window._liveReviewIdx = { byDate, dates };   // 提前设, 供 click handlers 用
+    diagLines.push(`byDate keys=${JSON.stringify(Object.keys(byDate))}`);
+    diagLines.push(`dates=${JSON.stringify(dates)}`);
+    let storedDate = null, storedView = null;
+    try {
+      storedDate = localStorage.getItem("live_review_date");
+      storedView = localStorage.getItem("live_review_view");
+    } catch (_) {}
+    diagLines.push(`localStorage.live_review_date=${storedDate}, view=${storedView}`);
+    diagLines.push(`render view=${view}`);
     if (!byDate || Object.keys(byDate).length === 0) {
-      firstBody = `<div class="live-review-empty">📭 暂无可分析的交易数据</div>`;
+      firstBody = `<div class="live-review-empty">📭 暂无可分析的交易数据 (closed_at 字段缺失)</div>`;
     } else if (view === "single") {
       firstBody = _liveRenderSingleDay(byDate, dates);
     } else if (view === "list") {
@@ -5073,12 +5091,25 @@ function renderLiveDailyReview(closed) {
     } else if (view === "heatmap") {
       firstBody = _liveRenderHeatmap(byDate, dates);
     }
+    diagLines.push(`✓ firstBody.length=${firstBody.length}`);
   } catch (e) {
     console.error("[live-review] 首屏渲染失败:", e);
+    diagLines.push(`❌ EXCEPTION: ${e.message || e}`);
     firstBody = `<div class="live-review-empty" style="border:1px solid rgba(255,82,82,0.3);background:rgba(255,82,82,0.05)">
       ⚠️ 首屏渲染失败: <span style="color:#ff8888">${escapeHtml(e.message || String(e))}</span>
     </div>`;
   }
+
+  // 调试: 加 ?debug=1 到 URL 看页面内诊断信息. 关闭后正常.
+  let debugMode = false;
+  try { debugMode = new URLSearchParams(location.search).get("debug") === "1"; } catch (_) {}
+  const debugPanel = debugMode ? `
+    <div style="background:rgba(255,213,79,0.08);border:1px dashed rgba(255,213,79,0.35);border-radius:6px;padding:8px 12px;margin-bottom:10px;font-family:monospace;font-size:11px;color:#ffd54f;white-space:pre-wrap">
+      🔍 DEBUG (?debug=1):
+      ${diagLines.map(l => "· " + escapeHtml(l)).join("\n")}
+      · _liveReviewIdx set: ${!!window._liveReviewIdx}
+      · rendered at: ${new Date().toLocaleTimeString()}
+    </div>` : "";
 
   return `
     <details class="live-collapsible" open>
@@ -5088,6 +5119,7 @@ function renderLiveDailyReview(closed) {
                 onclick="event.preventDefault(); event.stopPropagation(); _liveReviewReset();">↻ 重置</button>
       </summary>
       <div class="live-collapsible-body">
+        ${debugPanel}
         <div class="live-review-tabs" id="live-review-tabs">
           <button class="live-review-tab ${view === "single"  ? "active" : ""}" data-view="single">📊 单日深度</button>
           <button class="live-review-tab ${view === "list"    ? "active" : ""}" data-view="list">📋 14天列表</button>
