@@ -1,47 +1,44 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-16T02:26:37.255578+00:00",
+  "generated_at": "2026-05-16T02:28:47.203743+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 22,
-    "open": 1,
-    "closed": 21,
+    "open": 0,
+    "closed": 22,
     "wins": 8,
-    "losses": 13,
-    "win_rate": 0.381,
-    "total_pnl_usdt": -0.9891,
-    "net_pnl_usdt": -1.2508,
-    "avg_pnl_usdt": -0.0471,
+    "losses": 14,
+    "win_rate": 0.364,
+    "total_pnl_usdt": -1.3239,
+    "net_pnl_usdt": -1.6058,
+    "avg_pnl_usdt": -0.0602,
     "best_trade_usdt": 1.7741,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 0.2717,
-    "fees_realized_usdt": 0.2617,
-    "fees_open_usdt": 0.01,
+    "fees_paid_usdt": 0.2819,
+    "fees_realized_usdt": 0.2819,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 19.95,
-    "free_capital_usdt": 78.79,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 98.39,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -0.7517,
-    "deployed_usdt": 19.95
+    "daily_pnl": -1.0865,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "AIOUSDT"
-    ],
-    "exchange_symbols": [
-      "AIOUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "AIOUSDT|SHORT|2026-05-16T01:57:39.309760+00:00",
       "trade_id": "L1778896659_AIOUSDT_S",
@@ -71,18 +68,26 @@
       "phase_a_mfe_pct": 0.056,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.009974,
+      "fees_paid_usdt": 0.020116,
       "fees_are_actual": true,
       "opened_at": "2026-05-16T01:58:38.750048+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.10672,
-      "current_price": 0.10921,
-      "unrealized_pnl_usdt": -0.3646,
-      "unrealized_pnl_pct": -1.828,
-      "last_price_check_at": "2026-05-16T02:26:35.107994+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.10945,
+      "unrealized_pnl_usdt": -0.4092,
+      "unrealized_pnl_pct": -2.051,
+      "last_price_check_at": "2026-05-16T02:27:07.420234+00:00",
+      "closed_at": "2026-05-16T02:27:43.708544+00:00",
+      "close_reason": "paper:hit_sl",
+      "avg_exit_price": 0.10905,
+      "realized_pnl_usdt": -0.3348,
+      "close_order_id": 104493666,
+      "close_qty": 186.0,
+      "close_expected_price": 0.10945,
+      "close_slippage_bps": -36.55,
+      "entry_fees_usdt": 0.009974,
+      "close_fees_usdt": 0.010142
+    },
     {
       "paper_id": "DYMUSDT|LONG|2026-05-16T02:08:16.312495+00:00",
       "trade_id": "L1778897296_DYMUSDT_L",
@@ -916,8 +921,8 @@
       "direction": "SHORT",
       "conviction_score": 7,
       "signal_at": "2026-05-16T02:02:17.013051+00:00",
-      "reason": "paper trade too old (1458s > 600s)",
-      "last_checked_at": "2026-05-16T02:26:35.107994+00:00"
+      "reason": "paper trade too old (1588s > 600s)",
+      "last_checked_at": "2026-05-16T02:28:45.338749+00:00"
     }
   ],
   "config": {
