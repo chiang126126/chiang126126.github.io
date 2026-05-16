@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-16T17:47:35.357181+00:00",
+  "updated_at": "2026-05-16T17:49:43.906280+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 19,
+  "alerts_count": 20,
   "alerts": [
+    {
+      "symbol": "TAUSDT",
+      "base": "TA",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.06029,
+      "price_change_pct": 1.073,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 255925.0,
+      "volume_baseline_usdt": 14702.0,
+      "volume_ratio": 17.41,
+      "detected_at": "2026-05-16T17:49:26.598634+00:00",
+      "intensity": 3,
+      "change_5m_pct": 1.569,
+      "change_15m_pct": 1.638,
+      "change_1h_pct": 2.19,
+      "change_4h_pct": 6.624,
+      "taker_buy_ratio_1m": 0.657,
+      "taker_buy_ratio_5m": 0.653,
+      "oi_delta_5m_pct": 0.067,
+      "funding_rate_pct": 0.0429,
+      "atr_pct": 0.4,
+      "range_4h_pct": 9.19,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.05992786,
+      "suggested_tp1": 0.06083321,
+      "suggested_tp2": 0.06137643,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "INXUSDT",
       "base": "INX",
