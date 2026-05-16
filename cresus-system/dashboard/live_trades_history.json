@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-16T09:53:15.106553+00:00",
+  "generated_at": "2026-05-16T09:54:56.611948+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 44,
@@ -28,21 +28,23 @@
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -1.3182,
-    "deployed_usdt": 59.84
+    "deployed_usdt": 79.8
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "CCUSDT",
       "AIOUSDT",
-      "ATAUSDT"
+      "ATAUSDT",
+      "AIAUSDT",
+      "CCUSDT"
     ],
     "exchange_symbols": [
-      "CCUSDT",
+      "AIOUSDT",
       "ATAUSDT",
-      "AIOUSDT"
+      "AIAUSDT",
+      "CCUSDT"
     ]
   },
   "open_trades": [
@@ -80,10 +82,10 @@
       "opened_at": "2026-05-16T07:16:00.220728+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.10086,
-      "current_price": 0.10133,
-      "unrealized_pnl_usdt": 0.4877,
-      "unrealized_pnl_pct": 2.445,
-      "last_price_check_at": "2026-05-16T09:53:08.765331+00:00"
+      "current_price": 0.10145,
+      "unrealized_pnl_usdt": 0.4646,
+      "unrealized_pnl_pct": 2.33,
+      "last_price_check_at": "2026-05-16T09:54:53.484802+00:00"
     },
     {
       "paper_id": "ATAUSDT|LONG|2026-05-16T09:41:30.049646+00:00",
@@ -119,10 +121,10 @@
       "opened_at": "2026-05-16T09:42:34.356286+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.00651,
-      "current_price": 0.00638,
-      "unrealized_pnl_usdt": 0.0,
-      "unrealized_pnl_pct": 0.0,
-      "last_price_check_at": "2026-05-16T09:53:08.765331+00:00"
+      "current_price": 0.00642,
+      "unrealized_pnl_usdt": 0.1256,
+      "unrealized_pnl_pct": 0.627,
+      "last_price_check_at": "2026-05-16T09:54:53.484802+00:00"
     },
     {
       "paper_id": "CCUSDT|SHORT|2026-05-16T09:43:16.863161+00:00",
@@ -158,10 +160,10 @@
       "opened_at": "2026-05-16T09:44:14.794406+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.15331,
-      "current_price": 0.1524,
-      "unrealized_pnl_usdt": 0.2064,
-      "unrealized_pnl_pct": 1.039,
-      "last_price_check_at": "2026-05-16T09:53:08.765331+00:00",
+      "current_price": 0.1525,
+      "unrealized_pnl_usdt": 0.1935,
+      "unrealized_pnl_pct": 0.974,
+      "last_price_check_at": "2026-05-16T09:54:53.484802+00:00",
       "phase_b_mfe_price": 0.15247,
       "phase_c_mfe_price": 0.15243
     },
@@ -199,10 +201,10 @@
       "opened_at": "2026-05-16T09:53:13.884289+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.05795,
-      "current_price": 0.05819,
-      "unrealized_pnl_usdt": 0.0069,
-      "unrealized_pnl_pct": 0.034,
-      "last_price_check_at": "2026-05-16T09:53:08.765331+00:00"
+      "current_price": 0.05839,
+      "unrealized_pnl_usdt": -0.0617,
+      "unrealized_pnl_pct": -0.309,
+      "last_price_check_at": "2026-05-16T09:54:53.484802+00:00"
     }
   ],
   "recent_closed": [
@@ -1971,17 +1973,7 @@
       "close_qty": 53792.0
     }
   ],
-  "missed_signals": [
-    {
-      "paper_id": "AIAUSDT|SHORT|2026-05-16T09:51:45.762533+00:00",
-      "symbol": "AIAUSDT",
-      "direction": "SHORT",
-      "conviction_score": 5,
-      "signal_at": "2026-05-16T09:52:26.051572+00:00",
-      "reason": "pre_slippage_too_high (+46.3bps > 30bps)",
-      "last_checked_at": "2026-05-16T09:52:34.920905+00:00"
-    }
-  ],
+  "missed_signals": [],
   "config": {
     "starting_capital_usdt": 100.0,
     "notional_per_trade_usdt": 20.0,
