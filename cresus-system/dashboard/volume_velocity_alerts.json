@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-16T19:25:58.632165+00:00",
+  "updated_at": "2026-05-16T19:28:04.938447+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 23,
+  "alerts_count": 24,
   "alerts": [
+    {
+      "symbol": "NAORISUSDT",
+      "base": "NAORIS",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.03686,
+      "price_change_pct": -0.7,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 156364.0,
+      "volume_baseline_usdt": 16230.0,
+      "volume_ratio": 9.63,
+      "detected_at": "2026-05-16T19:27:15.370636+00:00",
+      "intensity": 1,
+      "change_5m_pct": -1.623,
+      "change_15m_pct": -0.431,
+      "change_1h_pct": -3.296,
+      "change_4h_pct": -7.736,
+      "taker_buy_ratio_1m": 0.279,
+      "taker_buy_ratio_5m": 0.272,
+      "oi_delta_5m_pct": 0.091,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.674,
+      "range_4h_pct": 10.88,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.03735714,
+      "suggested_tp1": 0.03611429,
+      "suggested_tp2": 0.03536857,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "STARUSDT",
       "base": "STAR",
