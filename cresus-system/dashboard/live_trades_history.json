@@ -1,34 +1,34 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-16T08:55:42.328969+00:00",
+  "generated_at": "2026-05-16T08:57:22.772997+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 37,
-    "open": 3,
-    "closed": 34,
+    "open": 2,
+    "closed": 35,
     "wins": 12,
-    "losses": 22,
-    "win_rate": 0.353,
-    "total_pnl_usdt": -1.3458,
-    "net_pnl_usdt": -1.8146,
-    "avg_pnl_usdt": -0.0396,
+    "losses": 23,
+    "win_rate": 0.343,
+    "total_pnl_usdt": -1.5778,
+    "net_pnl_usdt": -2.0624,
+    "avg_pnl_usdt": -0.0451,
     "best_trade_usdt": 1.7741,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 0.4967,
-    "fees_realized_usdt": 0.4688,
-    "fees_open_usdt": 0.0279,
+    "fees_paid_usdt": 0.5046,
+    "fees_realized_usdt": 0.4846,
+    "fees_open_usdt": 0.0199,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 59.81,
-    "free_capital_usdt": 38.35,
+    "deployed_usdt": 39.89,
+    "free_capital_usdt": 58.03,
     "max_concurrent_slots": 4,
-    "slots_used": 3
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -1.1084,
-    "deployed_usdt": 59.81
+    "daily_pnl": -1.3404,
+    "deployed_usdt": 39.89
   },
   "reconciliation": {
     "ok": true,
@@ -36,13 +36,11 @@
     "api_failed": false,
     "live_symbols": [
       "AIOUSDT",
-      "STOUSDT",
-      "DODOXUSDT"
+      "STOUSDT"
     ],
     "exchange_symbols": [
-      "DODOXUSDT",
-      "STOUSDT",
-      "AIOUSDT"
+      "AIOUSDT",
+      "STOUSDT"
     ]
   },
   "open_trades": [
@@ -80,10 +78,10 @@
       "opened_at": "2026-05-16T07:16:00.220728+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.10086,
-      "current_price": 0.10275,
-      "unrealized_pnl_usdt": 0.215,
-      "unrealized_pnl_pct": 1.078,
-      "last_price_check_at": "2026-05-16T08:55:39.388023+00:00"
+      "current_price": 0.1027,
+      "unrealized_pnl_usdt": 0.2246,
+      "unrealized_pnl_pct": 1.126,
+      "last_price_check_at": "2026-05-16T08:57:20.267584+00:00"
     },
     {
       "paper_id": "STOUSDT|SHORT|2026-05-16T07:20:35.053874+00:00",
@@ -119,11 +117,13 @@
       "opened_at": "2026-05-16T07:20:45.413065+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.07296,
-      "current_price": 0.07312,
-      "unrealized_pnl_usdt": 0.0571,
-      "unrealized_pnl_pct": 0.286,
-      "last_price_check_at": "2026-05-16T08:55:39.388023+00:00"
-    },
+      "current_price": 0.07284,
+      "unrealized_pnl_usdt": 0.1333,
+      "unrealized_pnl_pct": 0.668,
+      "last_price_check_at": "2026-05-16T08:57:20.267584+00:00"
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "DODOXUSDT|LONG|2026-05-16T08:51:59.579153+00:00",
       "trade_id": "L1778921519_DODOXUS_L",
@@ -153,18 +153,26 @@
       "phase_a_mfe_pct": 0.0,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.007967,
+      "fees_paid_usdt": 0.015841,
       "fees_are_actual": true,
       "opened_at": "2026-05-16T08:52:23.173762+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.020008,
-      "current_price": 0.019257,
-      "unrealized_pnl_usdt": -0.0629,
-      "unrealized_pnl_pct": -0.316,
-      "last_price_check_at": "2026-05-16T08:55:39.388023+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.019198,
+      "unrealized_pnl_usdt": -0.1237,
+      "unrealized_pnl_pct": -0.621,
+      "last_price_check_at": "2026-05-16T08:56:12.498488+00:00",
+      "closed_at": "2026-05-16T08:56:17.216217+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.019093,
+      "realized_pnl_usdt": -0.232,
+      "close_order_id": 99317478,
+      "close_qty": 1031.0,
+      "close_expected_price": 0.01921514,
+      "close_slippage_bps": 63.56,
+      "entry_fees_usdt": 0.007967,
+      "close_fees_usdt": 0.007874
+    },
     {
       "paper_id": "SPKUSDT|SHORT|2026-05-16T07:14:52.253696+00:00",
       "trade_id": "L1778915692_SPKUSDT_S",
