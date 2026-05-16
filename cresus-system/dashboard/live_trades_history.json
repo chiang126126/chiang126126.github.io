@@ -1,50 +1,50 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-16T09:24:35.466055+00:00",
+  "generated_at": "2026-05-16T09:26:20.989798+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 39,
+    "total_trades": 40,
     "open": 4,
-    "closed": 35,
-    "wins": 12,
+    "closed": 36,
+    "wins": 13,
     "losses": 23,
-    "win_rate": 0.343,
-    "total_pnl_usdt": -1.5778,
-    "net_pnl_usdt": -2.0624,
-    "avg_pnl_usdt": -0.0451,
+    "win_rate": 0.361,
+    "total_pnl_usdt": -1.5638,
+    "net_pnl_usdt": -2.0683,
+    "avg_pnl_usdt": -0.0434,
     "best_trade_usdt": 1.7741,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 0.5243,
-    "fees_realized_usdt": 0.4846,
+    "fees_paid_usdt": 0.5443,
+    "fees_realized_usdt": 0.5045,
     "fees_open_usdt": 0.0397,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 79.47,
-    "free_capital_usdt": 18.42,
+    "deployed_usdt": 79.5,
+    "free_capital_usdt": 18.39,
     "max_concurrent_slots": 4,
     "slots_used": 4
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -1.3404,
-    "deployed_usdt": 79.47
+    "daily_pnl": -1.3264,
+    "deployed_usdt": 79.5
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "STOUSDT",
       "TIAUSDT",
-      "VIRTUALUSDT",
-      "AIOUSDT"
+      "STOUSDT",
+      "AIOUSDT",
+      "BERAUSDT"
     ],
     "exchange_symbols": [
-      "STOUSDT",
       "TIAUSDT",
+      "STOUSDT",
       "AIOUSDT",
-      "VIRTUALUSDT"
+      "BERAUSDT"
     ]
   },
   "open_trades": [
@@ -82,10 +82,10 @@
       "opened_at": "2026-05-16T07:16:00.220728+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.10086,
-      "current_price": 0.10192,
-      "unrealized_pnl_usdt": 0.3744,
-      "unrealized_pnl_pct": 1.877,
-      "last_price_check_at": "2026-05-16T09:24:31.810877+00:00"
+      "current_price": 0.10169,
+      "unrealized_pnl_usdt": 0.4186,
+      "unrealized_pnl_pct": 2.099,
+      "last_price_check_at": "2026-05-16T09:26:17.300588+00:00"
     },
     {
       "paper_id": "STOUSDT|SHORT|2026-05-16T07:20:35.053874+00:00",
@@ -121,10 +121,10 @@
       "opened_at": "2026-05-16T07:20:45.413065+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.07199,
-      "current_price": 0.07203,
-      "unrealized_pnl_usdt": 0.3536,
-      "unrealized_pnl_pct": 1.773,
-      "last_price_check_at": "2026-05-16T09:24:31.810877+00:00",
+      "current_price": 0.07197,
+      "unrealized_pnl_usdt": 0.3699,
+      "unrealized_pnl_pct": 1.855,
+      "last_price_check_at": "2026-05-16T09:26:17.300588+00:00",
       "phase_b_mfe_price": 0.07167
     },
     {
@@ -161,11 +161,52 @@
       "opened_at": "2026-05-16T09:20:34.223196+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.3982,
-      "current_price": 0.3999,
-      "unrealized_pnl_usdt": 0.0392,
-      "unrealized_pnl_pct": 0.2,
-      "last_price_check_at": "2026-05-16T09:24:31.810877+00:00"
+      "current_price": 0.3993,
+      "unrealized_pnl_usdt": 0.0686,
+      "unrealized_pnl_pct": 0.349,
+      "last_price_check_at": "2026-05-16T09:26:17.300588+00:00"
     },
+    {
+      "paper_id": "BERAUSDT|SHORT|2026-05-16T09:19:31.279185+00:00",
+      "trade_id": "L1778923171_BERAUSD_S",
+      "symbol": "BERAUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.3578,
+      "avg_fill_price": 0.358,
+      "slippage_bps": -5.59,
+      "qty": 55.8,
+      "notional_usdt": 19.9764,
+      "leverage": 3,
+      "risk_usdt": 0.0642,
+      "risk_pct": 0.321,
+      "mirror_latency_sec": 338.2,
+      "sl_price": 0.35915,
+      "tp1_price": 0.355775,
+      "tp2_price": 0.35375,
+      "phase": "A",
+      "entry_order_id": 126936689,
+      "entry_client_id": "cresus_L1778923171_BERAUSD_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.252,
+      "phase_a_mfe_pct": 0.363,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.009988,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-16T09:25:45.470176+00:00",
+      "is_dry_run": false,
+      "phase_a_mfe_price": 0.3565,
+      "current_price": 0.357,
+      "unrealized_pnl_usdt": 0.0558,
+      "unrealized_pnl_pct": 0.279,
+      "last_price_check_at": "2026-05-16T09:26:17.300588+00:00"
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "VIRTUALUSDT|SHORT|2026-05-16T09:19:20.045206+00:00",
       "trade_id": "L1778923160_VIRTUAL_S",
@@ -195,7 +236,7 @@
       "phase_a_mfe_pct": 0.66,
       "phase_b_mfe_pct": 0.66,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.009975,
+      "fees_paid_usdt": 0.019943,
       "fees_are_actual": true,
       "opened_at": "2026-05-16T09:20:37.811994+00:00",
       "is_dry_run": false,
@@ -204,10 +245,18 @@
       "unrealized_pnl_usdt": 0.014,
       "unrealized_pnl_pct": 0.07,
       "last_price_check_at": "2026-05-16T09:24:31.810877+00:00",
-      "phase_b_mfe_price": 0.7079
-    }
-  ],
-  "recent_closed": [
+      "phase_b_mfe_price": 0.7079,
+      "closed_at": "2026-05-16T09:25:10.732633+00:00",
+      "close_reason": "paper:hit_b_trail",
+      "avg_exit_price": 0.712,
+      "realized_pnl_usdt": 0.014,
+      "close_order_id": 115865589,
+      "close_qty": 28.0,
+      "close_expected_price": 0.712,
+      "close_slippage_bps": 0.0,
+      "entry_fees_usdt": 0.009975,
+      "close_fees_usdt": 0.009968
+    },
     {
       "paper_id": "DODOXUSDT|LONG|2026-05-16T08:51:59.579153+00:00",
       "trade_id": "L1778921519_DODOXUS_L",
@@ -1726,26 +1775,7 @@
       "close_qty": 53792.0
     }
   ],
-  "missed_signals": [
-    {
-      "paper_id": "BERAUSDT|SHORT|2026-05-16T09:19:31.279185+00:00",
-      "symbol": "BERAUSDT",
-      "direction": "SHORT",
-      "conviction_score": 5,
-      "signal_at": "2026-05-16T09:20:07.266394+00:00",
-      "reason": "max_concurrent reached (4/4)",
-      "last_checked_at": "2026-05-16T09:24:31.810877+00:00"
-    },
-    {
-      "paper_id": "PIPPINUSDT|SHORT|2026-05-16T09:19:33.588244+00:00",
-      "symbol": "PIPPINUSDT",
-      "direction": "SHORT",
-      "conviction_score": 5,
-      "signal_at": "2026-05-16T09:20:07.266394+00:00",
-      "reason": "max_concurrent reached (4/4)",
-      "last_checked_at": "2026-05-16T09:24:31.810877+00:00"
-    }
-  ],
+  "missed_signals": [],
   "config": {
     "starting_capital_usdt": 100.0,
     "notional_per_trade_usdt": 20.0,
