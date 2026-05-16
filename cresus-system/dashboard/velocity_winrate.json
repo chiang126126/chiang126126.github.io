@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-16T08:03:25.280997+00:00",
+  "generated_at": "2026-05-16T08:05:30.493890+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
@@ -786,9 +786,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 5,
-          "win_rate": 0.4,
-          "avg_outcome_pct": -2.07
+          "n": 6,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -2.23
         },
         "60m": {
           "n": 5,
@@ -5103,6 +5103,18 @@
           "n": 7,
           "win_rate": 0.286,
           "avg_outcome_pct": -1.59
+        }
+      }
+    },
+    "DUSKUSDT|sustained|SHORT": {
+      "symbol": "DUSKUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": 0.22
         }
       }
     },
