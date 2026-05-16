@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-16T08:45:40.680443+00:00",
+  "updated_at": "2026-05-16T08:47:58.991110+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 18,
+  "alerts_count": 19,
   "alerts": [
+    {
+      "symbol": "DODOXUSDT",
+      "base": "DODOX",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.020254,
+      "price_change_pct": 1.235,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 159900.0,
+      "volume_baseline_usdt": 30851.0,
+      "volume_ratio": 5.18,
+      "detected_at": "2026-05-16T08:47:56.234494+00:00",
+      "intensity": 1,
+      "change_5m_pct": 4.623,
+      "change_15m_pct": 7.599,
+      "change_1h_pct": 8.587,
+      "change_4h_pct": 8.356,
+      "taker_buy_ratio_1m": 0.54,
+      "taker_buy_ratio_5m": 0.518,
+      "oi_delta_5m_pct": 10.246,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 1.284,
+      "range_4h_pct": 9.27,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.01986389,
+      "suggested_tp1": 0.02083916,
+      "suggested_tp2": 0.02142432,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "GLMUSDT",
       "base": "GLM",
