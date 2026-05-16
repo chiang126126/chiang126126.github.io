@@ -5057,6 +5057,29 @@ function renderLiveDailyReview(closed) {
   let view = "single";
   try { view = localStorage.getItem("live_review_view") || "single"; } catch (_) {}
   if (!["single", "list", "heatmap"].includes(view)) view = "single";
+
+  // 首屏 body 同步预渲染 — 不依赖后续 init() 调用,
+  // 防止 init 失败或时序错位导致 body 永远空白
+  let firstBody = "";
+  try {
+    const { byDate, dates } = _liveGroupByDate(closed);
+    window._liveReviewIdx = { byDate, dates };   // 提前设, 供 click handlers 用
+    if (!byDate || Object.keys(byDate).length === 0) {
+      firstBody = `<div class="live-review-empty">📭 暂无可分析的交易数据</div>`;
+    } else if (view === "single") {
+      firstBody = _liveRenderSingleDay(byDate, dates);
+    } else if (view === "list") {
+      firstBody = _liveRenderListView(byDate, dates);
+    } else if (view === "heatmap") {
+      firstBody = _liveRenderHeatmap(byDate, dates);
+    }
+  } catch (e) {
+    console.error("[live-review] 首屏渲染失败:", e);
+    firstBody = `<div class="live-review-empty" style="border:1px solid rgba(255,82,82,0.3);background:rgba(255,82,82,0.05)">
+      ⚠️ 首屏渲染失败: <span style="color:#ff8888">${escapeHtml(e.message || String(e))}</span>
+    </div>`;
+  }
+
   return `
     <details class="live-collapsible" open>
       <summary>📅 每日复盘
@@ -5070,7 +5093,7 @@ function renderLiveDailyReview(closed) {
           <button class="live-review-tab ${view === "list"    ? "active" : ""}" data-view="list">📋 14天列表</button>
           <button class="live-review-tab ${view === "heatmap" ? "active" : ""}" data-view="heatmap">🔥 月历热力</button>
         </div>
-        <div id="live-review-body"></div>
+        <div id="live-review-body">${firstBody}</div>
       </div>
     </details>
   `;
@@ -5087,8 +5110,15 @@ function _liveReviewReset() {
 }
 
 function initLiveReviewInteractions(closed) {
-  const { byDate, dates } = _liveGroupByDate(closed);
-  window._liveReviewIdx = { byDate, dates };
+  try {
+    const { byDate, dates } = _liveGroupByDate(closed);
+    window._liveReviewIdx = { byDate, dates };
+    console.log("[live-review] init: dates =", dates,
+      "total trades =", Object.values(byDate).reduce((s, a) => s + a.length, 0));
+  } catch (e) {
+    console.error("[live-review] init: _liveGroupByDate failed:", e);
+    window._liveReviewIdx = { byDate: {}, dates: [] };
+  }
   const tabsEl = document.getElementById("live-review-tabs");
   if (tabsEl) {
     tabsEl.querySelectorAll(".live-review-tab").forEach(btn => {
@@ -5099,6 +5129,8 @@ function initLiveReviewInteractions(closed) {
         _liveRenderView(view);
       });
     });
+  } else {
+    console.warn("[live-review] live-review-tabs element not found");
   }
   let view = "single";
   try { view = localStorage.getItem("live_review_view") || "single"; } catch (_) {}
@@ -5108,19 +5140,41 @@ function initLiveReviewInteractions(closed) {
 
 function _liveRenderView(view) {
   const body = document.getElementById("live-review-body");
-  if (!body) return;
+  if (!body) {
+    console.warn("[live-review] live-review-body element MISSING — DOM not ready?");
+    return;
+  }
   const idx = window._liveReviewIdx || {};
   const { byDate, dates } = idx;
-  if (!byDate) return;
-  if (view === "single") {
-    body.innerHTML = _liveRenderSingleDay(byDate, dates);
-    _liveWireSingleDayHandlers();
-  } else if (view === "list") {
-    body.innerHTML = _liveRenderListView(byDate, dates);
-    _liveWireListHandlers();
-  } else if (view === "heatmap") {
-    body.innerHTML = _liveRenderHeatmap(byDate, dates);
-    _liveWireHeatmapHandlers();
+  // 防御: byDate 为 undefined/null OR 空对象 → 显示有意义的提示, 不静默
+  if (!byDate || Object.keys(byDate).length === 0) {
+    body.innerHTML = `<div class="live-review-empty">
+      📭 暂无可分析的交易数据
+      <br><span style="font-size:10px;opacity:0.7;margin-top:4px;display:inline-block">
+        (恢复条件: recent_closed 字段存在且有效 closed_at)
+      </span>
+    </div>`;
+    return;
+  }
+  try {
+    if (view === "single") {
+      body.innerHTML = _liveRenderSingleDay(byDate, dates);
+      _liveWireSingleDayHandlers();
+    } else if (view === "list") {
+      body.innerHTML = _liveRenderListView(byDate, dates);
+      _liveWireListHandlers();
+    } else if (view === "heatmap") {
+      body.innerHTML = _liveRenderHeatmap(byDate, dates);
+      _liveWireHeatmapHandlers();
+    }
+  } catch (e) {
+    console.error("[live-review] render '"+view+"' failed:", e);
+    body.innerHTML = `<div class="live-review-empty" style="border:1px solid rgba(255,82,82,0.3);background:rgba(255,82,82,0.05)">
+      ⚠️ 渲染失败: <span style="color:#ff8888">${escapeHtml(e.message || String(e))}</span>
+      <br><span style="font-size:10px;opacity:0.7;margin-top:4px;display:inline-block">
+        请按 ↻ 重置 按钮; 或开 DevTools Console 看完整堆栈
+      </span>
+    </div>`;
   }
 }
 
