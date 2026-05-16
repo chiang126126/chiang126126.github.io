@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-16T20:51:09.850218+00:00",
+  "generated_at": "2026-05-16T20:53:15.213003+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
@@ -5075,6 +5075,18 @@
         }
       }
     },
+    "ATAUSDT|sustained|SHORT": {
+      "symbol": "ATAUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.6,
+          "avg_outcome_pct": 1.26
+        }
+      }
+    },
     "TRUMPUSDT|burst|SHORT": {
       "symbol": "TRUMPUSDT",
       "alert_type": "burst",
@@ -5465,9 +5477,9 @@
           "avg_outcome_pct": 0.26
         },
         "240m": {
-          "n": 5,
-          "win_rate": 0.8,
-          "avg_outcome_pct": 2.85
+          "n": 6,
+          "win_rate": 0.667,
+          "avg_outcome_pct": 2.17
         }
       }
     },
