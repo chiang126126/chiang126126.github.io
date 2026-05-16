@@ -837,24 +837,64 @@
   .live-heatmap {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
-    max-width: 520px;
+    gap: 5px;
+    max-width: 760px;
     margin: 6px auto;
   }
   .live-heatmap-cell {
-    aspect-ratio: 1;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
+    aspect-ratio: 1.25;
+    border-radius: 6px;
+    padding: 5px 6px;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.04);
     cursor: pointer;
-    background: rgba(255,255,255,0.04);
-    color: var(--text-dim);
-    transition: transform 0.1s, box-shadow 0.15s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.12s, box-shadow 0.15s, border-color 0.15s;
+    overflow: hidden;
+    min-height: 52px;
   }
-  .live-heatmap-cell.has-data { color: var(--text); font-weight: 600; }
-  .live-heatmap-cell:hover { transform: scale(1.08); box-shadow: 0 1px 6px rgba(13,128,67,0.25); }
+  .live-heatmap-cell .day-num {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
+  .live-heatmap-cell .day-pnl {
+    font-size: 10.5px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    line-height: 1.05;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .live-heatmap-cell .day-pnl.up   { color: #00e676; }
+  .live-heatmap-cell .day-pnl.down { color: #ff5252; }
+  .live-heatmap-cell .day-trades {
+    font-size: 9.5px;
+    color: var(--text-dim);
+    text-align: right;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .live-heatmap-cell.empty {
+    opacity: 0.4;
+    cursor: default;
+  }
+  .live-heatmap-cell.empty .day-num { color: var(--text-dim); font-weight: 400; }
+  .live-heatmap-cell.empty .day-pnl { color: var(--text-dim); font-size: 13px; }
+  .live-heatmap-cell.empty:hover { transform: none; border-color: rgba(255,255,255,0.04); }
+  .live-heatmap-cell.today {
+    box-shadow: inset 0 0 0 2px rgba(28,190,114,0.55);
+  }
+  .live-heatmap-cell:not(.empty):hover {
+    transform: translateY(-1px);
+    border-color: rgba(28,190,114,0.45);
+    box-shadow: 0 2px 6px rgba(13,128,67,0.18);
+  }
   .live-heatmap-legend {
     display: flex;
     align-items: center;
@@ -862,7 +902,8 @@
     font-size: 10px;
     color: var(--text-dim);
     justify-content: center;
-    margin-top: 6px;
+    margin-top: 8px;
+    flex-wrap: wrap;
   }
   .live-heatmap-legend-cell {
     width: 14px; height: 14px; border-radius: 3px;
@@ -889,7 +930,11 @@
     .live-detail-table th.hide-mobile,
     .live-detail-table td.hide-mobile { display: none; }
     .live-review-tab { padding: 5px 9px; font-size: 11px; }
-    .live-heatmap { max-width: 100%; }
+    .live-heatmap { max-width: 100%; gap: 3px; }
+    .live-heatmap-cell { padding: 3px 4px; min-height: 44px; }
+    .live-heatmap-cell .day-num { font-size: 10px; }
+    .live-heatmap-cell .day-pnl { font-size: 9px; }
+    .live-heatmap-cell .day-trades { font-size: 8.5px; }
     .live-collapsible > summary { font-size: 12px; padding: 7px 10px; }
   }
   .paper-trade-row {
@@ -5541,29 +5586,48 @@ function _liveRenderListView(byDate, dates) {
 // ----- 月历热力 -----
 function _liveRenderHeatmap(byDate, dates) {
   if (!dates || dates.length === 0) {
-    return `<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px">📭 无历史交易日</div>`;
+    return `<div class="live-review-empty">📭 无历史交易日</div>`;
   }
   // 最近 28 天 = 4 周
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  const todayStr = today.toLocaleDateString("sv-SE");
   const days = [];
   for (let i = 27; i >= 0; i--) {
     const d = new Date(today.getTime() - i * 86400000);
     days.push(d.toLocaleDateString("sv-SE"));
   }
-  // 颜色梯度: 计算所有日 PnL 范围
-  const pnls = days.map(d => {
+  // 每日 PnL + 笔数 (供着色 + 显示)
+  const dailyInfo = days.map(d => {
     const dt = byDate[d];
-    return dt ? dt.reduce((s, t) => s + Number(t.realized_pnl_usdt || 0), 0) : null;
+    if (!dt) return { hasData: false, pnl: null, count: 0 };
+    const pnl = dt.reduce((s, t) => s + Number(t.realized_pnl_usdt || 0), 0);
+    return { hasData: true, pnl, count: dt.length };
   });
-  const valued = pnls.filter(v => v != null);
-  const maxAbs = valued.length ? Math.max(...valued.map(Math.abs)) : 1;
+  // 颜色强度按 PnL abs 归一化
+  const valued = dailyInfo.filter(d => d.pnl != null);
+  const maxAbs = valued.length ? Math.max(...valued.map(d => Math.abs(d.pnl)), 0.01) : 1;
   const colorFor = (v) => {
-    if (v == null) return "rgba(255,255,255,0.04)";
-    if (v === 0)   return "rgba(255,255,255,0.06)";
+    if (v == null) return "rgba(255,255,255,0.025)";
+    if (Math.abs(v) < 0.005) return "rgba(255,213,79,0.10)";  // ≈0 平淡黄
     const intensity = Math.min(Math.abs(v) / maxAbs, 1);
-    if (v > 0) return `rgba(0,200,83,${0.15 + intensity * 0.6})`;
-    return `rgba(255,82,82,${0.15 + intensity * 0.6})`;
+    if (v > 0) return `rgba(0,200,83,${0.12 + intensity * 0.55})`;
+    return `rgba(255,82,82,${0.12 + intensity * 0.55})`;
+  };
+  const borderFor = (v) => {
+    if (v == null) return "rgba(255,255,255,0.04)";
+    if (Math.abs(v) < 0.005) return "rgba(255,213,79,0.25)";
+    return v > 0 ? "rgba(0,200,83,0.35)" : "rgba(255,82,82,0.35)";
+  };
+  // 短 PnL 格式 (节省空间): >=1 显示整数, <1 显示 1 位小数
+  const shortPnl = (v) => {
+    if (v == null) return "";
+    const abs = Math.abs(v);
+    const sign = v >= 0 ? "+" : "-";
+    if (abs >= 100)   return sign + "$" + Math.round(abs);
+    if (abs >= 10)    return sign + "$" + abs.toFixed(1);
+    if (abs >= 1)     return sign + "$" + abs.toFixed(2);
+    return sign + "$" + abs.toFixed(2);
   };
 
   const weekdays = ["一","二","三","四","五","六","日"];
@@ -5575,34 +5639,44 @@ function _liveRenderHeatmap(byDate, dates) {
   const firstDay = new Date(days[0] + "T12:00:00");
   const firstDow = (firstDay.getDay() + 6) % 7;
   for (let i = 0; i < firstDow; i++) {
-    html += `<div class="live-heatmap-cell" style="background:transparent"></div>`;
+    html += `<div class="live-heatmap-cell empty" style="background:transparent;border:none"></div>`;
   }
   for (let i = 0; i < days.length; i++) {
     const d = days[i];
-    const v = pnls[i];
-    const dt = byDate[d];
-    const hasData = !!dt;
+    const info = dailyInfo[i];
     const dObj = new Date(d + "T12:00:00");
-    const label = dObj.getDate();
-    const tip = hasData
-      ? `${d}: ${liveFmtUsdt(v)} (${dt.length} 笔)`
-      : `${d}: 无交易`;
-    html += `<div class="live-heatmap-cell ${hasData ? 'has-data' : ''}"
-              style="background:${colorFor(v)}"
-              title="${tip}"
-              data-date="${d}"
-              ${hasData ? '' : 'data-empty="1"'}>${label}</div>`;
+    const dayNum = dObj.getDate();
+    const isToday = (d === todayStr);
+    if (!info.hasData) {
+      html += `<div class="live-heatmap-cell empty ${isToday ? 'today' : ''}"
+                data-date="${d}" data-empty="1"
+                title="${d}: 无交易">
+        <div class="day-num">${dayNum}</div>
+        <div class="day-pnl">—</div>
+      </div>`;
+    } else {
+      const pnlCls = info.pnl > 0.005 ? 'up' : (info.pnl < -0.005 ? 'down' : '');
+      const tip = `${d}: ${liveFmtUsdt(info.pnl)} · ${info.count} 笔 (点击查看明细)`;
+      html += `<div class="live-heatmap-cell has-data ${isToday ? 'today' : ''}"
+                style="background:${colorFor(info.pnl)};border-color:${borderFor(info.pnl)}"
+                title="${tip}"
+                data-date="${d}">
+        <div class="day-num">${dayNum}</div>
+        <div class="day-pnl ${pnlCls}">${shortPnl(info.pnl)}</div>
+        <div class="day-trades">${info.count}笔</div>
+      </div>`;
+    }
   }
   html += `</div>
     <div class="live-heatmap-legend">
-      <span>少</span>
-      <div class="live-heatmap-legend-cell" style="background:rgba(255,82,82,0.7)"></div>
+      <span>亏</span>
+      <div class="live-heatmap-legend-cell" style="background:rgba(255,82,82,0.65)"></div>
       <div class="live-heatmap-legend-cell" style="background:rgba(255,82,82,0.3)"></div>
-      <div class="live-heatmap-legend-cell" style="background:rgba(255,255,255,0.06)"></div>
-      <div class="live-heatmap-legend-cell" style="background:rgba(13,128,67,0.3)"></div>
-      <div class="live-heatmap-legend-cell" style="background:rgba(13,128,67,0.7)"></div>
-      <span>多</span>
-      <span style="margin-left:12px">点击 → 跳到单日</span>
+      <div class="live-heatmap-legend-cell" style="background:rgba(255,213,79,0.15)"></div>
+      <div class="live-heatmap-legend-cell" style="background:rgba(0,200,83,0.3)"></div>
+      <div class="live-heatmap-legend-cell" style="background:rgba(0,200,83,0.65)"></div>
+      <span>盈</span>
+      <span style="margin-left:12px">绿框=今日 · 点击格子→单日深度</span>
     </div>`;
   return html;
 }
