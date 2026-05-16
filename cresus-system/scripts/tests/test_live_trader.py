@@ -33,7 +33,9 @@ from live_trader import (  # noqa: E402
     load_paper_state, load_live_state, save_live_state,
     main_loop, _empty_live_state,
     _record_missed_signal, _prune_obsolete_missed,
+    _compute_pre_entry_slippage_bps,
     MISSED_SIGNALS_KEEP_LAST_N,
+    LIVE_MAX_ENTRY_SLIPPAGE_BPS,
     LIVE_SYMBOL_WHITELIST, LIVE_MAX_CONCURRENT, LIVE_MIRROR_MAX_AGE_SEC,
     LIVE_NOTIONAL_USDT, LIVE_MAX_DEPLOY_USDT, LIVE_DAILY_DD_LIMIT_USDT,
     LIVE_STARTING_CAPITAL_USDT, LIVE_TOTAL_DD_LIMIT_PCT,
@@ -742,6 +744,126 @@ class TestGetCurrentPrice(unittest.TestCase):
         with patch.object(self.client, "get_klines", return_value=[]):
             price = _get_current_price(self.client, "BTCUSDT")
         self.assertIsNone(price)
+
+
+class TestComputePreEntrySlippage(unittest.TestCase):
+    """Phase 4.A: 滑点护栏 — paper 信号价 → 当前价 的预滑点计算.
+
+    严格验证侧向 (LONG / SHORT) 归一化: 正 bps = 不利, 负 bps = 有利.
+    所有失败路径返回 None, 调用方应放行 (不拒绝交易).
+    """
+
+    def setUp(self):
+        self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+
+    def _kline(self, price):
+        return [[0, 0, 0, 0, str(price), 0, 0, 0, 0, 0, 0, 0]]
+
+    # --- 数值正确性 (核心: 不能算错符号, 否则会把"有利价"反向拒绝) ---
+
+    def test_long_current_higher_than_paper_is_unfavorable_positive_bps(self):
+        """LONG: 价格上涨 = 买贵 = 不利 = 正 bps."""
+        paper = {"symbol": "BTCUSDT", "direction": "LONG", "entry_price": 100.0}
+        with patch.object(self.client, "get_klines", return_value=self._kline(100.5)):
+            slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        self.assertIsNotNone(slip)
+        self.assertAlmostEqual(slip, 50.0, places=1)   # (0.5/100)*10000 = +50 bps
+
+    def test_long_current_lower_than_paper_is_favorable_negative_bps(self):
+        """LONG: 价格下跌 = 买便宜 = 有利 = 负 bps."""
+        paper = {"symbol": "BTCUSDT", "direction": "LONG", "entry_price": 100.0}
+        with patch.object(self.client, "get_klines", return_value=self._kline(99.5)):
+            slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        self.assertAlmostEqual(slip, -50.0, places=1)
+
+    def test_short_current_lower_than_paper_is_unfavorable_positive_bps(self):
+        """SHORT: 价格下跌 = 卖便宜 = 不利 = 正 bps."""
+        paper = {"symbol": "BTCUSDT", "direction": "SHORT", "entry_price": 100.0}
+        with patch.object(self.client, "get_klines", return_value=self._kline(99.5)):
+            slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        self.assertAlmostEqual(slip, 50.0, places=1)
+
+    def test_short_current_higher_than_paper_is_favorable_negative_bps(self):
+        """SHORT: 价格上涨 = 卖贵 = 有利 = 负 bps."""
+        paper = {"symbol": "BTCUSDT", "direction": "SHORT", "entry_price": 100.0}
+        with patch.object(self.client, "get_klines", return_value=self._kline(100.5)):
+            slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        self.assertAlmostEqual(slip, -50.0, places=1)
+
+    def test_extreme_slippage_656bps_matches_real_storj_case(self):
+        """复现实测 STORJ +656 bps 灾难场景."""
+        paper = {"symbol": "STORJUSDT", "direction": "LONG", "entry_price": 0.40}
+        # paper 0.40 → live current 0.40 × (1 + 0.0656) = 0.42624
+        with patch.object(self.client, "get_klines", return_value=self._kline(0.42624)):
+            slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        self.assertAlmostEqual(slip, 656.0, places=0)
+
+    # --- Fail-safe 路径 (这些必须返 None, 让调用方放行) ---
+
+    def test_returns_none_when_paper_entry_missing(self):
+        paper = {"symbol": "BTCUSDT", "direction": "LONG"}
+        slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        self.assertIsNone(slip)
+
+    def test_returns_none_when_paper_entry_zero(self):
+        paper = {"symbol": "BTCUSDT", "direction": "LONG", "entry_price": 0}
+        slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        self.assertIsNone(slip)
+
+    def test_returns_none_when_paper_entry_negative(self):
+        paper = {"symbol": "BTCUSDT", "direction": "LONG", "entry_price": -1.0}
+        slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        self.assertIsNone(slip)
+
+    def test_returns_none_when_symbol_missing(self):
+        paper = {"direction": "LONG", "entry_price": 100.0}
+        slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        self.assertIsNone(slip)
+
+    def test_returns_none_when_direction_invalid(self):
+        paper = {"symbol": "BTCUSDT", "direction": "HOLD", "entry_price": 100.0}
+        slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        self.assertIsNone(slip)
+
+    def test_returns_none_when_get_klines_fails(self):
+        paper = {"symbol": "BTCUSDT", "direction": "LONG", "entry_price": 100.0}
+        with patch.object(self.client, "get_klines",
+                          side_effect=BinanceError("network")):
+            slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        self.assertIsNone(slip)
+
+    def test_returns_none_when_klines_empty(self):
+        paper = {"symbol": "BTCUSDT", "direction": "LONG", "entry_price": 100.0}
+        with patch.object(self.client, "get_klines", return_value=[]):
+            slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        self.assertIsNone(slip)
+
+    def test_returns_none_when_current_price_zero(self):
+        paper = {"symbol": "BTCUSDT", "direction": "LONG", "entry_price": 100.0}
+        with patch.object(self.client, "get_klines", return_value=self._kline(0)):
+            slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        self.assertIsNone(slip)
+
+    def test_paper_entry_string_value_parsed(self):
+        """paper 字段有时是 string, 容错."""
+        paper = {"symbol": "BTCUSDT", "direction": "LONG", "entry_price": "100.0"}
+        with patch.object(self.client, "get_klines", return_value=self._kline(100.5)):
+            slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        self.assertAlmostEqual(slip, 50.0, places=1)
+
+    def test_paper_entry_malformed_string_returns_none(self):
+        paper = {"symbol": "BTCUSDT", "direction": "LONG", "entry_price": "abc"}
+        slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        self.assertIsNone(slip)
+
+    # --- 阈值常量合理性 ---
+
+    def test_threshold_is_reasonable(self):
+        """30 bps 是基于实测数据的合理阈值, 不应是 0 (拦截所有) 或天文数字."""
+        self.assertGreater(LIVE_MAX_ENTRY_SLIPPAGE_BPS, 5,
+                           "阈值太小会拦截正常市场波动")
+        self.assertLess(LIVE_MAX_ENTRY_SLIPPAGE_BPS, 200,
+                        "阈值太大失去保护意义")
 
 
 class TestTryMirrorClose(unittest.TestCase):
@@ -1768,6 +1890,187 @@ class TestMirrorIterationGuards(unittest.TestCase):
 
         # 应在 max_concurrent (4) OR cash reserve ($80) 早触发处停, 都是 4
         self.assertLessEqual(call_count[0], 4)
+
+    def test_slippage_gate_rejects_above_threshold(self):
+        """滑点护栏 (Phase 4.A): 预滑点 > 30 bps → 不调 open_position, 记 missed_signal."""
+        now = datetime.now(timezone.utc)
+        self._write_paper([{
+            "id": "BTCUSDT|LONG|2026-05-15T10:00:00+00:00",
+            "symbol": "BTCUSDT",
+            "direction": "LONG",
+            "entered_at": (now - timedelta(seconds=10)).isoformat(),
+            "entry_price": 100.0,
+            "sl": 95.0,
+        }])
+        # paper 100, 当前 101 → +100 bps 不利 → 应被拒
+        with patch.object(self.client, "open_position",
+                          return_value=self.mock_open_result) as mock_open, \
+             patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "101.0", 0, 0, 0, 0, 0, 0, 0]]):
+            result = main_loop(self.client, dry_run=True)
+        # 关键: open_position 必须未被调用 (避免开仓)
+        self.assertEqual(mock_open.call_count, 0)
+        self.assertEqual(len(result["live_open_trades"]), 0)
+        # paper_id 不应加入 mirrored_paper_ids (下 tick 还能重试)
+        self.assertNotIn("BTCUSDT|LONG|2026-05-15T10:00:00+00:00",
+                         result["mirrored_paper_ids"])
+        # missed_signal 记录
+        missed = result.get("missed_signals", [])
+        self.assertTrue(any("pre_slippage_too_high" in m.get("reason", "")
+                           for m in missed),
+                        f"应记 pre_slippage missed_signal, 实际: {[m.get('reason') for m in missed]}")
+
+    def test_slippage_gate_allows_below_threshold(self):
+        """预滑点 < 30 bps → 正常 mirror."""
+        now = datetime.now(timezone.utc)
+        self._write_paper([{
+            "id": "BTCUSDT|LONG|2026-05-15T10:00:00+00:00",
+            "symbol": "BTCUSDT",
+            "direction": "LONG",
+            "entered_at": (now - timedelta(seconds=10)).isoformat(),
+            "entry_price": 100.0,
+            "sl": 95.0,
+        }])
+        # paper 100, 当前 100.2 → +20 bps 在阈值内 → 应通过
+        with patch.object(self.client, "open_position",
+                          return_value=self.mock_open_result) as mock_open, \
+             patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "100.2", 0, 0, 0, 0, 0, 0, 0]]):
+            result = main_loop(self.client, dry_run=True)
+        self.assertEqual(mock_open.call_count, 1)
+        self.assertEqual(len(result["live_open_trades"]), 1)
+
+    def test_slippage_gate_allows_favorable_slippage(self):
+        """有利滑点 (负 bps) 不应被拒 — 即使绝对值大也应通过."""
+        now = datetime.now(timezone.utc)
+        self._write_paper([{
+            "id": "BTCUSDT|LONG|2026-05-15T10:00:00+00:00",
+            "symbol": "BTCUSDT",
+            "direction": "LONG",
+            "entered_at": (now - timedelta(seconds=10)).isoformat(),
+            "entry_price": 100.0,
+            "sl": 95.0,
+        }])
+        # LONG, 当前 99.0 → -100 bps 有利 (买便宜) → 应通过
+        with patch.object(self.client, "open_position",
+                          return_value=self.mock_open_result) as mock_open, \
+             patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "99.0", 0, 0, 0, 0, 0, 0, 0]]):
+            result = main_loop(self.client, dry_run=True)
+        self.assertEqual(mock_open.call_count, 1, "有利滑点不应被拒")
+
+    def test_slippage_gate_short_direction_correct(self):
+        """SHORT: 当前价上涨 = 有利 = 通过."""
+        now = datetime.now(timezone.utc)
+        self._write_paper([{
+            "id": "BTCUSDT|SHORT|2026-05-15T10:00:00+00:00",
+            "symbol": "BTCUSDT",
+            "direction": "SHORT",
+            "entered_at": (now - timedelta(seconds=10)).isoformat(),
+            "entry_price": 100.0,
+            "sl": 105.0,
+        }])
+        # SHORT, 当前 101 → -100 bps 有利 → 通过
+        short_open = dict(self.mock_open_result)
+        short_open["side"] = "SELL"
+        with patch.object(self.client, "open_position",
+                          return_value=short_open) as mock_open, \
+             patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "101.0", 0, 0, 0, 0, 0, 0, 0]]):
+            result = main_loop(self.client, dry_run=True)
+        self.assertEqual(mock_open.call_count, 1, "SHORT 有利滑点应通过")
+
+    def test_slippage_gate_short_direction_rejects_unfavorable(self):
+        """SHORT: 当前价下跌 = 不利 = 超阈值 → 拒."""
+        now = datetime.now(timezone.utc)
+        self._write_paper([{
+            "id": "BTCUSDT|SHORT|2026-05-15T10:00:00+00:00",
+            "symbol": "BTCUSDT",
+            "direction": "SHORT",
+            "entered_at": (now - timedelta(seconds=10)).isoformat(),
+            "entry_price": 100.0,
+            "sl": 105.0,
+        }])
+        # SHORT, 当前 99 → +100 bps 不利 → 拒
+        with patch.object(self.client, "open_position") as mock_open, \
+             patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "99.0", 0, 0, 0, 0, 0, 0, 0]]):
+            result = main_loop(self.client, dry_run=True)
+        self.assertEqual(mock_open.call_count, 0, "SHORT 不利滑点应被拒")
+
+    def test_slippage_gate_mixed_candidates_correctly_filtered(self):
+        """3 笔 candidate 混合: A 滑点小通过 / B 滑点大被拒 / C 滑点小通过.
+
+        最严的集成测试 — 验证 gate 不会"误杀邻居"或"漏过坏笔".
+        """
+        now = datetime.now(timezone.utc)
+        # 3 笔 paper, 都 entry_price=100, 但 get_klines 按 symbol 返不同价
+        trades = []
+        for sym in ["AAA", "BBB", "CCC"]:
+            trades.append({
+                "id": f"{sym}USDT|LONG|2026-05-15T10:00:0{trades and len(trades) or 0}+00:00",
+                "symbol": f"{sym}USDT",
+                "direction": "LONG",
+                "entered_at": (now - timedelta(seconds=10)).isoformat(),
+                "entry_price": 100.0,
+                "sl": 95.0,
+            })
+        self._write_paper(trades)
+
+        # AAA 当前 100.1 (+10 bps 通过) / BBB 当前 102 (+200 bps 拒) / CCC 当前 100.2 (+20 bps 通过)
+        def make_klines(symbol, **kw):
+            prices = {"AAAUSDT": "100.1", "BBBUSDT": "102.0", "CCCUSDT": "100.2"}
+            return [[0, 0, 0, 0, prices.get(symbol, "100.0"), 0, 0, 0, 0, 0, 0, 0]]
+
+        opened = []
+        def open_side_effect(symbol, side, **kw):
+            opened.append(symbol)
+            r = dict(self.mock_open_result)
+            r["symbol"] = symbol
+            return r
+
+        with patch.object(self.client, "open_position",
+                          side_effect=open_side_effect) as mock_open, \
+             patch.object(self.client, "get_klines",
+                          side_effect=make_klines):
+            result = main_loop(self.client, dry_run=True)
+
+        # 应只 mirror AAA 和 CCC, 拒绝 BBB
+        self.assertEqual(mock_open.call_count, 2,
+                         f"应 mirror 2 笔 (AAA, CCC), 实际 {mock_open.call_count}")
+        self.assertIn("AAAUSDT", opened)
+        self.assertIn("CCCUSDT", opened)
+        self.assertNotIn("BBBUSDT", opened, "BBB 滑点超阈值不应被 mirror")
+        # BBB 应在 missed_signals 里
+        missed_syms = [m.get("symbol") for m in result.get("missed_signals", [])
+                       if "pre_slippage_too_high" in m.get("reason", "")]
+        self.assertIn("BBBUSDT", missed_syms)
+        # AAA / CCC 应在 mirrored_paper_ids 中
+        self.assertEqual(len(result["live_open_trades"]), 2)
+
+    def test_slippage_gate_failsafe_when_get_klines_fails(self):
+        """关键 fail-safe: 取价失败 → 不拦截, 正常 mirror.
+
+        交易安全原则: 监控失败不应该阻止策略执行 (只能拒绝, 不能误开).
+        反之: 监控失败不应该阻止 mirror — 否则 API 抖动期间策略全停.
+        """
+        now = datetime.now(timezone.utc)
+        self._write_paper([{
+            "id": "BTCUSDT|LONG|2026-05-15T10:00:00+00:00",
+            "symbol": "BTCUSDT",
+            "direction": "LONG",
+            "entered_at": (now - timedelta(seconds=10)).isoformat(),
+            "entry_price": 100.0,
+            "sl": 95.0,
+        }])
+        with patch.object(self.client, "open_position",
+                          return_value=self.mock_open_result) as mock_open, \
+             patch.object(self.client, "get_klines",
+                          side_effect=BinanceError("network down")):
+            result = main_loop(self.client, dry_run=True)
+        # 取价失败时, mirror 应照常进行 (向后兼容)
+        self.assertEqual(mock_open.call_count, 1,
+                         "取价失败不应阻止 mirror (fail-safe)")
 
 
 # ============================================================================

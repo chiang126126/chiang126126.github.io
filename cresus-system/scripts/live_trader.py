@@ -84,6 +84,12 @@ LIVE_MAX_DEPLOY_USDT = 80.0            # 总部署上限 $80 (20% 现金保留, 
 # Phase 3.3.b 累计 DD kill switch
 LIVE_TOTAL_DD_LIMIT_PCT = 5.0          # 总回撤 5% → 自动写 emergency flag
 
+# Phase 4.A 滑点护栏 (alpha-coin 小币流动性差, 防止市价单灾难性进场)
+# 开仓前先取当前价, 算 paper 信号价 → 当前价 的预滑点 (positive bps = 不利).
+# 超阈值放弃 mirror, 记 missed_signal. 实测 5 天 16 笔配对数据显示:
+# 16 笔中 8 笔滑点 >30 bps (含 1 笔 +656 bps), 这些尾部事件方差极大.
+LIVE_MAX_ENTRY_SLIPPAGE_BPS = 30.0     # 预滑点上限. 超过放弃开仓.
+
 # Phase 3.3.a/b 控制文件 (在 ~/.cresus-*)
 PAUSE_FLAG_PATH = Path.home() / ".cresus-pause"
 EMERGENCY_STOP_PATH = Path.home() / ".cresus-emergency-stop"
@@ -622,6 +628,7 @@ def publish_live_history(
             "max_deploy_usdt": LIVE_MAX_DEPLOY_USDT,
             "total_dd_limit_pct": LIVE_TOTAL_DD_LIMIT_PCT,
             "mirror_max_age_sec": LIVE_MIRROR_MAX_AGE_SEC,
+            "max_entry_slippage_bps": LIVE_MAX_ENTRY_SLIPPAGE_BPS,
             "observation_mode": LIVE_OBSERVATION_MODE,
         },
     }
@@ -699,6 +706,37 @@ def _get_current_price(client: BinanceClient, symbol: str) -> Optional[float]:
     except (BinanceError, ValueError, IndexError, TypeError) as e:
         log.warning(f"[get_price] {symbol}: {type(e).__name__}: {e}")
         return None
+
+
+def _compute_pre_entry_slippage_bps(
+    client: BinanceClient, paper_trade: dict,
+) -> Optional[float]:
+    """计算 paper 信号价 → 当前实时价 的预滑点 (bps).
+
+    返回值约定:
+        正 bps = 不利 (开仓即吃亏)
+        负 bps = 有利 (价格朝我们方向走了)
+        None   = 无法计算 (字段缺 / API 失败 / 数据异常) → 调用方应"放行"不拒绝
+
+    侧向 (LONG / SHORT) 归一化:
+        LONG (BUY):  current > paper → 不利 (买贵了),  raw bps × +1
+        SHORT (SELL): current < paper → 不利 (卖便宜了), raw bps × -1
+    """
+    sym = (paper_trade.get("symbol") or "").upper()
+    direction = (paper_trade.get("direction") or "").upper()
+    if not sym or direction not in ("LONG", "SHORT"):
+        return None
+    try:
+        paper_entry = float(paper_trade.get("entry_price") or 0)
+    except (TypeError, ValueError):
+        return None
+    if paper_entry <= 0:
+        return None
+    current = _get_current_price(client, sym)
+    if current is None or current <= 0:
+        return None
+    side_sign = 1 if direction == "LONG" else -1
+    return (current - paper_entry) / paper_entry * 10000.0 * side_sign
 
 
 def _check_sl_breach(live_trade: dict, current_price: float) -> bool:
@@ -1106,6 +1144,23 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
                     f"[skip-during-iter-cash] {pt['symbol']}: "
                     f"deployed ${deployed_now:.0f} + ${LIVE_NOTIONAL_USDT} "
                     f"> cap ${LIVE_MAX_DEPLOY_USDT}"
+                )
+                continue
+
+            # 滑点护栏 (Phase 4.A): paper 信号价 → 当前价 预滑点检测.
+            # fail-safe: 取价失败 / 字段缺 → 返 None → 不拒绝, 按原流程开仓.
+            # 仅当能计算出 pre_slip 且超过阈值时才拒绝, 避免误杀.
+            pre_slip_bps = _compute_pre_entry_slippage_bps(client, pt)
+            if pre_slip_bps is not None and pre_slip_bps > LIVE_MAX_ENTRY_SLIPPAGE_BPS:
+                reason = (
+                    f"pre_slippage_too_high "
+                    f"(+{pre_slip_bps:.1f}bps > {LIVE_MAX_ENTRY_SLIPPAGE_BPS:.0f}bps)"
+                )
+                _record_missed_signal(live, pt, reason, now)
+                log.warning(
+                    f"[skip-mirror-slip] {pt['symbol']}: 预滑点 "
+                    f"+{pre_slip_bps:.1f}bps 超阈值 {LIVE_MAX_ENTRY_SLIPPAGE_BPS:.0f}bps, "
+                    f"放弃 mirror (paper_id={pt.get('id','')[:40]})"
                 )
                 continue
 
