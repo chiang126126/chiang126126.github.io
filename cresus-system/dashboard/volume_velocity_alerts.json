@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-16T22:50:06.087160+00:00",
+  "updated_at": "2026-05-16T22:52:09.645497+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 13,
+  "alerts_count": 14,
   "alerts": [
+    {
+      "symbol": "LYNUSDT",
+      "base": "LYN",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.0562,
+      "price_change_pct": 1.701,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 73104.0,
+      "volume_baseline_usdt": 10354.0,
+      "volume_ratio": 7.06,
+      "detected_at": "2026-05-16T22:51:39.550687+00:00",
+      "intensity": 1,
+      "change_5m_pct": 1.151,
+      "change_15m_pct": 1.59,
+      "change_1h_pct": 3.363,
+      "change_4h_pct": 12.368,
+      "taker_buy_ratio_1m": 0.504,
+      "taker_buy_ratio_5m": 0.581,
+      "oi_delta_5m_pct": -0.07,
+      "funding_rate_pct": 0.1509,
+      "atr_pct": 0.625,
+      "range_4h_pct": 13.06,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.05549714,
+      "suggested_tp1": 0.05725429,
+      "suggested_tp2": 0.05830857,
+      "conviction_score": 3,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "TAUSDT",
       "base": "TA",
