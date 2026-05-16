@@ -1,28 +1,28 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-16T14:34:36.196906+00:00",
+  "generated_at": "2026-05-16T14:36:51.479861+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 58,
-    "open": 2,
-    "closed": 56,
+    "open": 1,
+    "closed": 57,
     "wins": 18,
-    "losses": 38,
-    "win_rate": 0.321,
-    "total_pnl_usdt": -2.2813,
-    "net_pnl_usdt": -3.1595,
-    "avg_pnl_usdt": -0.0407,
+    "losses": 39,
+    "win_rate": 0.316,
+    "total_pnl_usdt": -2.3086,
+    "net_pnl_usdt": -3.2027,
+    "avg_pnl_usdt": -0.0405,
     "best_trade_usdt": 1.7741,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 0.8956,
-    "fees_realized_usdt": 0.8782,
-    "fees_open_usdt": 0.0174,
+    "fees_paid_usdt": 0.9035,
+    "fees_realized_usdt": 0.8941,
+    "fees_open_usdt": 0.0095,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 38.78,
-    "free_capital_usdt": 58.04,
+    "deployed_usdt": 18.95,
+    "free_capital_usdt": 77.84,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
@@ -35,12 +35,12 @@
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "GUAUSDT",
-      "NMRUSDT"
+      "NMRUSDT",
+      "GUAUSDT"
     ],
     "exchange_symbols": [
-      "GUAUSDT",
-      "NMRUSDT"
+      "NMRUSDT",
+      "GUAUSDT"
     ]
   },
   "open_trades": [
@@ -78,11 +78,13 @@
       "opened_at": "2026-05-16T14:14:38.756684+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 1.4299,
-      "current_price": 1.43376,
-      "unrealized_pnl_usdt": 0.3093,
-      "unrealized_pnl_pct": 1.632,
-      "last_price_check_at": "2026-05-16T14:34:33.329613+00:00"
-    },
+      "current_price": 1.4473,
+      "unrealized_pnl_usdt": 0.1332,
+      "unrealized_pnl_pct": 0.703,
+      "last_price_check_at": "2026-05-16T14:36:47.476548+00:00"
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "NMRUSDT|LONG|2026-05-16T14:25:31.139709+00:00",
       "trade_id": "L1778941531_NMRUSDT_L",
@@ -112,19 +114,27 @@
       "phase_a_mfe_pct": 0.54,
       "phase_b_mfe_pct": 0.54,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.007935,
+      "fees_paid_usdt": 0.015859,
       "fees_are_actual": true,
       "opened_at": "2026-05-16T14:26:20.456148+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 9.489,
-      "current_price": 9.489,
-      "unrealized_pnl_usdt": 0.0903,
-      "unrealized_pnl_pct": 0.455,
-      "last_price_check_at": "2026-05-16T14:34:33.329613+00:00",
-      "phase_b_mfe_price": 9.489
-    }
-  ],
-  "recent_closed": [
+      "current_price": 9.46,
+      "unrealized_pnl_usdt": 0.0294,
+      "unrealized_pnl_pct": 0.148,
+      "last_price_check_at": "2026-05-16T14:36:13.751585+00:00",
+      "phase_b_mfe_price": 9.489,
+      "closed_at": "2026-05-16T14:36:51.467153+00:00",
+      "close_reason": "paper:hit_b_trail",
+      "avg_exit_price": 9.433,
+      "realized_pnl_usdt": -0.0273,
+      "close_order_id": 135407803,
+      "close_qty": 2.1,
+      "close_expected_price": 9.46,
+      "close_slippage_bps": 28.54,
+      "entry_fees_usdt": 0.007935,
+      "close_fees_usdt": 0.007924
+    },
     {
       "paper_id": "BASUSDT|LONG|2026-05-16T13:48:53.526873+00:00",
       "trade_id": "L1778939333_BASUSDT_L",
@@ -2687,8 +2697,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-16T14:16:33.944313+00:00",
-      "reason": "paper trade too old (1079s > 600s)",
-      "last_checked_at": "2026-05-16T14:34:33.329613+00:00"
+      "reason": "paper trade too old (1214s > 600s)",
+      "last_checked_at": "2026-05-16T14:36:47.476548+00:00"
     }
   ],
   "config": {
