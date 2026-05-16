@@ -1,45 +1,43 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-16T02:18:29.901434+00:00",
+  "generated_at": "2026-05-16T02:20:39.630429+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 22,
-    "open": 2,
-    "closed": 20,
+    "open": 1,
+    "closed": 21,
     "wins": 8,
-    "losses": 12,
-    "win_rate": 0.4,
-    "total_pnl_usdt": -0.9721,
-    "net_pnl_usdt": -1.2138,
-    "avg_pnl_usdt": -0.0486,
+    "losses": 13,
+    "win_rate": 0.381,
+    "total_pnl_usdt": -0.9891,
+    "net_pnl_usdt": -1.2508,
+    "avg_pnl_usdt": -0.0471,
     "best_trade_usdt": 1.7741,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 0.2617,
-    "fees_realized_usdt": 0.2417,
-    "fees_open_usdt": 0.02,
+    "fees_paid_usdt": 0.2717,
+    "fees_realized_usdt": 0.2617,
+    "fees_open_usdt": 0.01,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 39.96,
-    "free_capital_usdt": 58.81,
+    "deployed_usdt": 19.95,
+    "free_capital_usdt": 78.79,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -0.7347,
-    "deployed_usdt": 39.96
+    "daily_pnl": -0.7517,
+    "deployed_usdt": 19.95
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "DYMUSDT",
       "AIOUSDT"
     ],
     "exchange_symbols": [
-      "DYMUSDT",
       "AIOUSDT"
     ]
   },
@@ -78,11 +76,13 @@
       "opened_at": "2026-05-16T01:58:38.750048+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.10672,
-      "current_price": 0.10828,
-      "unrealized_pnl_usdt": -0.1916,
-      "unrealized_pnl_pct": -0.96,
-      "last_price_check_at": "2026-05-16T02:18:27.413302+00:00"
-    },
+      "current_price": 0.10872,
+      "unrealized_pnl_usdt": -0.2734,
+      "unrealized_pnl_pct": -1.371,
+      "last_price_check_at": "2026-05-16T02:20:37.898507+00:00"
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "DYMUSDT|LONG|2026-05-16T02:08:16.312495+00:00",
       "trade_id": "L1778897296_DYMUSDT_L",
@@ -112,7 +112,7 @@
       "phase_a_mfe_pct": 0.254,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.010003,
+      "fees_paid_usdt": 0.019998,
       "fees_are_actual": true,
       "opened_at": "2026-05-16T02:09:02.070296+00:00",
       "is_dry_run": false,
@@ -120,10 +120,18 @@
       "current_price": 0.02359,
       "unrealized_pnl_usdt": 0.0425,
       "unrealized_pnl_pct": 0.212,
-      "last_price_check_at": "2026-05-16T02:18:27.413302+00:00"
-    }
-  ],
-  "recent_closed": [
+      "last_price_check_at": "2026-05-16T02:18:27.413302+00:00",
+      "closed_at": "2026-05-16T02:19:03.433121+00:00",
+      "close_reason": "paper:hit_sl",
+      "avg_exit_price": 0.02352,
+      "realized_pnl_usdt": -0.017,
+      "close_order_id": 113872852,
+      "close_qty": 849.9,
+      "close_expected_price": 0.02359,
+      "close_slippage_bps": 29.67,
+      "entry_fees_usdt": 0.010003,
+      "close_fees_usdt": 0.009995
+    },
     {
       "paper_id": "SAPIENUSDT|LONG|2026-05-16T02:08:13.903864+00:00",
       "trade_id": "L1778897293_SAPIENU_L",
@@ -908,8 +916,8 @@
       "direction": "SHORT",
       "conviction_score": 7,
       "signal_at": "2026-05-16T02:02:17.013051+00:00",
-      "reason": "paper trade too old (970s > 600s)",
-      "last_checked_at": "2026-05-16T02:18:27.413302+00:00"
+      "reason": "paper trade too old (1101s > 600s)",
+      "last_checked_at": "2026-05-16T02:20:37.898507+00:00"
     }
   ],
   "config": {
