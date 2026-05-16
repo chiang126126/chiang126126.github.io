@@ -1,28 +1,28 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-16T11:48:41.860275+00:00",
+  "generated_at": "2026-05-16T11:50:22.949641+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 47,
-    "open": 4,
-    "closed": 43,
+    "open": 3,
+    "closed": 44,
     "wins": 15,
-    "losses": 28,
-    "win_rate": 0.349,
-    "total_pnl_usdt": -1.2065,
-    "net_pnl_usdt": -1.8462,
-    "avg_pnl_usdt": -0.0281,
+    "losses": 29,
+    "win_rate": 0.341,
+    "total_pnl_usdt": -1.4677,
+    "net_pnl_usdt": -2.1271,
+    "avg_pnl_usdt": -0.0334,
     "best_trade_usdt": 1.7741,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 0.6756,
-    "fees_realized_usdt": 0.6397,
-    "fees_open_usdt": 0.0359,
+    "fees_paid_usdt": 0.6854,
+    "fees_realized_usdt": 0.6594,
+    "fees_open_usdt": 0.0259,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 79.77,
-    "free_capital_usdt": 18.35,
+    "deployed_usdt": 59.88,
+    "free_capital_usdt": 37.97,
     "max_concurrent_slots": 4,
-    "slots_used": 4
+    "slots_used": 3
   },
   "risk_status": {
     "block_new_opens": false,
@@ -35,15 +35,15 @@
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "CCUSDT",
       "DODOXUSDT",
       "SAPIENUSDT",
-      "ATAUSDT"
+      "ATAUSDT",
+      "CCUSDT"
     ],
     "exchange_symbols": [
-      "CCUSDT",
       "DODOXUSDT",
       "SAPIENUSDT",
+      "CCUSDT",
       "ATAUSDT"
     ]
   },
@@ -82,10 +82,10 @@
       "opened_at": "2026-05-16T09:42:34.356286+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.00651,
-      "current_price": 0.00629,
-      "unrealized_pnl_usdt": -0.2825,
-      "unrealized_pnl_pct": -1.411,
-      "last_price_check_at": "2026-05-16T11:48:38.340847+00:00"
+      "current_price": 0.00638,
+      "unrealized_pnl_usdt": 0.0,
+      "unrealized_pnl_pct": 0.0,
+      "last_price_check_at": "2026-05-16T11:50:18.654320+00:00"
     },
     {
       "paper_id": "CCUSDT|SHORT|2026-05-16T09:43:16.863161+00:00",
@@ -124,7 +124,7 @@
       "current_price": 0.1483,
       "unrealized_pnl_usdt": 0.7353,
       "unrealized_pnl_pct": 3.701,
-      "last_price_check_at": "2026-05-16T11:48:38.340847+00:00",
+      "last_price_check_at": "2026-05-16T11:50:18.654320+00:00",
       "phase_b_mfe_price": 0.15247,
       "phase_c_mfe_price": 0.14831
     },
@@ -162,11 +162,13 @@
       "opened_at": "2026-05-16T11:44:07.252621+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.02016,
-      "current_price": 0.019962,
-      "unrealized_pnl_usdt": -0.1411,
-      "unrealized_pnl_pct": -0.706,
-      "last_price_check_at": "2026-05-16T11:48:38.340847+00:00"
-    },
+      "current_price": 0.019903,
+      "unrealized_pnl_usdt": -0.1998,
+      "unrealized_pnl_pct": -1.0,
+      "last_price_check_at": "2026-05-16T11:50:18.654320+00:00"
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "SAPIENUSDT|LONG|2026-05-16T11:45:31.354533+00:00",
       "trade_id": "L1778931931_SAPIENU_L",
@@ -196,18 +198,26 @@
       "phase_a_mfe_pct": 0.167,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.009946,
+      "fees_paid_usdt": 0.019762,
       "fees_are_actual": true,
       "opened_at": "2026-05-16T11:45:52.510113+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.13166,
-      "current_price": 0.13069,
-      "unrealized_pnl_usdt": -0.1585,
-      "unrealized_pnl_pct": -0.797,
-      "last_price_check_at": "2026-05-16T11:48:38.340847+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.13037,
+      "unrealized_pnl_usdt": -0.2069,
+      "unrealized_pnl_pct": -1.04,
+      "last_price_check_at": "2026-05-16T11:49:45.353995+00:00",
+      "closed_at": "2026-05-16T11:50:22.937109+00:00",
+      "close_reason": "paper:hit_sl",
+      "avg_exit_price": 0.13001,
+      "realized_pnl_usdt": -0.2612,
+      "close_order_id": 85153698,
+      "close_qty": 151.0,
+      "close_expected_price": 0.13037,
+      "close_slippage_bps": 27.61,
+      "entry_fees_usdt": 0.009946,
+      "close_fees_usdt": 0.009816
+    },
     {
       "paper_id": "STABLEUSDT|LONG|2026-05-16T11:36:39.531457+00:00",
       "trade_id": "L1778931399_STABLEU_L",
