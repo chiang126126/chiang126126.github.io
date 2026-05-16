@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-16T00:35:18.160594+00:00",
+  "updated_at": "2026-05-16T00:37:22.720658+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 22,
+  "alerts_count": 23,
   "alerts": [
+    {
+      "symbol": "VVVUSDT",
+      "base": "VVV",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 13.616,
+      "price_change_pct": -0.613,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 139291.0,
+      "volume_baseline_usdt": 19424.0,
+      "volume_ratio": 7.17,
+      "detected_at": "2026-05-16T00:36:39.587460+00:00",
+      "intensity": 1,
+      "change_5m_pct": -1.047,
+      "change_15m_pct": -1.349,
+      "change_1h_pct": -2.094,
+      "change_4h_pct": -1.098,
+      "taker_buy_ratio_1m": 0.284,
+      "taker_buy_ratio_5m": 0.28,
+      "oi_delta_5m_pct": 0.005,
+      "funding_rate_pct": -0.0181,
+      "atr_pct": 0.201,
+      "range_4h_pct": 3.23,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 13.64342857,
+      "suggested_tp1": 13.57485714,
+      "suggested_tp2": 13.53371429,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "JELLYJELLYUSDT",
       "base": "JELLYJELLY",
