@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-16T04:40:33.330723+00:00",
+  "updated_at": "2026-05-16T04:42:40.278284+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 31,
+  "alerts_count": 32,
   "alerts": [
+    {
+      "symbol": "RECALLUSDT",
+      "base": "RECALL",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.06965,
+      "price_change_pct": 1.679,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 89881.0,
+      "volume_baseline_usdt": 14197.0,
+      "volume_ratio": 6.33,
+      "detected_at": "2026-05-16T04:42:09.963129+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.738,
+      "change_15m_pct": 1.531,
+      "change_1h_pct": 1.753,
+      "change_4h_pct": 9.186,
+      "taker_buy_ratio_1m": 0.336,
+      "taker_buy_ratio_5m": 0.502,
+      "oi_delta_5m_pct": 0.592,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.434,
+      "range_4h_pct": 8.94,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.06919679,
+      "suggested_tp1": 0.07032982,
+      "suggested_tp2": 0.07100964,
+      "conviction_score": 5,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "SKYAIUSDT",
       "base": "SKYAI",
