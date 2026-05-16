@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-16T01:58:04.317525+00:00",
+  "generated_at": "2026-05-16T02:00:15.743816+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 19,
-    "open": 0,
+    "total_trades": 20,
+    "open": 1,
     "closed": 19,
     "wins": 7,
     "losses": 12,
@@ -14,30 +14,74 @@
     "avg_pnl_usdt": -0.0513,
     "best_trade_usdt": 1.7741,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 0.2218,
+    "fees_paid_usdt": 0.2318,
     "fees_realized_usdt": 0.2218,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.01,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 98.8,
+    "deployed_usdt": 19.95,
+    "free_capital_usdt": 78.84,
     "max_concurrent_slots": 4,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -0.7381,
-    "deployed_usdt": 0
+    "deployed_usdt": 19.95
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "AIOUSDT"
+    ],
+    "exchange_symbols": [
+      "AIOUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "AIOUSDT|SHORT|2026-05-16T01:57:39.309760+00:00",
+      "trade_id": "L1778896659_AIOUSDT_S",
+      "symbol": "AIOUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.10678,
+      "avg_fill_price": 0.10725,
+      "slippage_bps": -44.02,
+      "qty": 186.0,
+      "notional_usdt": 19.9485,
+      "leverage": 3,
+      "risk_usdt": 0.4323,
+      "risk_pct": 2.167,
+      "mirror_latency_sec": 33.3,
+      "sl_price": 0.10957429,
+      "tp1_price": 0.10258857,
+      "tp2_price": 0.09839714,
+      "phase": "A",
+      "entry_order_id": 104475737,
+      "entry_client_id": "cresus_L1778896659_AIOUSDT_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 1.308,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.009974,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-16T01:58:38.750048+00:00",
+      "is_dry_run": false,
+      "phase_a_mfe_price": 0.10678,
+      "current_price": 0.10731,
+      "unrealized_pnl_usdt": -0.0112,
+      "unrealized_pnl_pct": -0.056,
+      "last_price_check_at": "2026-05-16T02:00:13.620570+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "STORJUSDT|LONG|2026-05-16T01:28:16.045511+00:00",
