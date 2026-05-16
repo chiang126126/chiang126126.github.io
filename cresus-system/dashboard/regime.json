@@ -1,32 +1,32 @@
 {
-  "ts": "2026-05-16T08:03:01.762443+00:00",
+  "ts": "2026-05-16T09:03:01.642681+00:00",
   "regime": "RISK_OFF",
   "regime_zh": "风险释放",
   "confidence": 68,
-  "judgment": "Alpha 池上涨币占比 8.6%，中位涨跌 -6.36%。 跌幅超过 3% 的币数 (458) 明显多于涨幅 (21)，市场偏空。 BTC 24h -2.94%，funding -0.0002%。 判定: 风险释放。",
+  "judgment": "Alpha 池上涨币占比 8.2%，中位涨跌 -6.16%。 跌幅超过 3% 的币数 (451) 明显多于涨幅 (18)，市场偏空。 BTC 24h -2.78%，funding 0.0001%。 判定: 风险释放。",
   "support": [
-    "Alpha 池 573 币样本中，上涨 49 个 (8.6%)，中位涨跌 -6.36%，平均涨跌 -5.84%",
-    "涨幅 >3% 的币 21 个，跌幅 >3% 的币 458 个；暴涨 >10% 有 8 个，暴跌 >10% 有 63 个",
-    "Binance BTCUSDT 当前约 78,300，24h 涨幅 -2.94%，24h 区间 78,000.40 - 80,730.00",
-    "BTCUSDT 永续 funding rate 为 -0.000002 (~-0.0002%)；Fear & Greed Index 为 31 (Fear)"
+    "Alpha 池 573 币样本中，上涨 47 个 (8.2%)，中位涨跌 -6.16%，平均涨跌 -5.62%",
+    "涨幅 >3% 的币 18 个，跌幅 >3% 的币 451 个；暴涨 >10% 有 9 个，暴跌 >10% 有 48 个",
+    "Binance BTCUSDT 当前约 78,350，24h 涨幅 -2.78%，24h 区间 78,000.40 - 80,730.00",
+    "BTCUSDT 永续 funding rate 为 0.000001 (~0.0001%)；Fear & Greed Index 为 31 (Fear)"
   ],
   "challenge": [
-    "当前条件较为明确，主要风险是后续数据快速变化"
+    "funding 0.0001% 仍为正，并未出现极端做多拥挤后的爆仓，可能只是暂时回调而非系统性风险释放"
   ],
   "metrics": {
     "alpha_pool_size": 573,
-    "rising_count": 49,
-    "rising_pct": 0.0855,
-    "median_change_pct": -6.36,
-    "average_change_pct": -5.84,
-    "pump_3pct_count": 21,
-    "dump_3pct_count": 458,
-    "extreme_pump_10pct_count": 8,
-    "extreme_dump_10pct_count": 63,
-    "btc_price": 78300.0,
-    "btc_change_24h_pct": -2.944,
+    "rising_count": 47,
+    "rising_pct": 0.082,
+    "median_change_pct": -6.16,
+    "average_change_pct": -5.62,
+    "pump_3pct_count": 18,
+    "dump_3pct_count": 451,
+    "extreme_pump_10pct_count": 9,
+    "extreme_dump_10pct_count": 48,
+    "btc_price": 78350.3,
+    "btc_change_24h_pct": -2.783,
     "btc_24h_range": "78,000.40 - 80,730.00",
-    "btc_funding_rate": -2.28e-06,
+    "btc_funding_rate": 8.4e-07,
     "fear_greed": 31,
     "fear_greed_classification": "Fear"
   },
