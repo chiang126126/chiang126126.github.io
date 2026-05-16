@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-16T17:02:33.845988+00:00",
+  "generated_at": "2026-05-16T17:04:49.361171+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 65,
-    "open": 2,
+    "total_trades": 66,
+    "open": 3,
     "closed": 63,
     "wins": 19,
     "losses": 44,
@@ -14,21 +14,21 @@
     "avg_pnl_usdt": -0.019,
     "best_trade_usdt": 2.0008,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 1.0314,
+    "fees_paid_usdt": 1.0414,
     "fees_realized_usdt": 1.0114,
-    "fees_open_usdt": 0.02,
+    "fees_open_usdt": 0.03,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 39.93,
-    "free_capital_usdt": 57.84,
+    "deployed_usdt": 59.92,
+    "free_capital_usdt": 37.85,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 3
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -0.9573,
-    "deployed_usdt": 39.93
+    "deployed_usdt": 59.92
   },
   "reconciliation": {
     "ok": true,
@@ -36,11 +36,13 @@
     "api_failed": false,
     "live_symbols": [
       "BASUSDT",
-      "HUSDT"
+      "HUSDT",
+      "FHEUSDT"
     ],
     "exchange_symbols": [
       "BASUSDT",
-      "HUSDT"
+      "HUSDT",
+      "FHEUSDT"
     ]
   },
   "open_trades": [
@@ -78,10 +80,10 @@
       "opened_at": "2026-05-16T16:17:30.948909+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.24537,
-      "current_price": 0.24134,
-      "unrealized_pnl_usdt": 0.0481,
-      "unrealized_pnl_pct": 0.241,
-      "last_price_check_at": "2026-05-16T17:02:30.816558+00:00"
+      "current_price": 0.24161,
+      "unrealized_pnl_usdt": 0.0705,
+      "unrealized_pnl_pct": 0.353,
+      "last_price_check_at": "2026-05-16T17:04:46.091456+00:00"
     },
     {
       "paper_id": "BASUSDT|SHORT|2026-05-16T16:45:00.218661+00:00",
@@ -117,10 +119,49 @@
       "opened_at": "2026-05-16T16:45:50.833431+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.022351,
-      "current_price": 0.022897,
-      "unrealized_pnl_usdt": -0.1917,
-      "unrealized_pnl_pct": -0.961,
-      "last_price_check_at": "2026-05-16T17:02:30.816558+00:00"
+      "current_price": 0.023076,
+      "unrealized_pnl_usdt": -0.3492,
+      "unrealized_pnl_pct": -1.751,
+      "last_price_check_at": "2026-05-16T17:04:46.091456+00:00"
+    },
+    {
+      "paper_id": "FHEUSDT|SHORT|2026-05-16T17:01:56.419301+00:00",
+      "trade_id": "L1778950916_FHEUSDT_S",
+      "symbol": "FHEUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.02605,
+      "avg_fill_price": 0.02613,
+      "slippage_bps": -30.71,
+      "qty": 765.0,
+      "notional_usdt": 19.98945,
+      "leverage": 3,
+      "risk_usdt": 0.1208,
+      "risk_pct": 0.604,
+      "mirror_latency_sec": 30.6,
+      "sl_price": 0.02628786,
+      "tp1_price": 0.02569321,
+      "tp2_price": 0.02533643,
+      "phase": "A",
+      "entry_order_id": 143662720,
+      "entry_client_id": "cresus_L1778950916_FHEUSDT_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.609,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.009995,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-16T17:03:08.435535+00:00",
+      "is_dry_run": false,
+      "phase_a_mfe_price": 0.02605,
+      "current_price": 0.02627,
+      "unrealized_pnl_usdt": -0.1071,
+      "unrealized_pnl_pct": -0.536,
+      "last_price_check_at": "2026-05-16T17:04:46.091456+00:00"
     }
   ],
   "recent_closed": [
@@ -3033,8 +3074,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-16T16:51:51.939728+00:00",
-      "reason": "paper trade too old (639s > 600s)",
-      "last_checked_at": "2026-05-16T17:02:30.816558+00:00"
+      "reason": "paper trade too old (774s > 600s)",
+      "last_checked_at": "2026-05-16T17:04:46.091456+00:00"
     }
   ],
   "config": {
