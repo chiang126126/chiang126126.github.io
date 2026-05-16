@@ -4848,10 +4848,12 @@ function renderLivePanel(data) {
     }
   }
 
-  // ===== 最近 10 条已平仓 =====
+  // ===== 最近 10 条已平仓 (可折叠) =====
   if (closed.length > 0) {
-    body += `<div class="paper-section-title">最近 ${Math.min(closed.length, 10)} 条已平仓</div>`;
-    for (const t of closed.slice(0, 10)) {
+    const closedShow = closed.slice(0, 10);
+    body += `<details class="live-collapsible" open><summary>📜 最近 ${closedShow.length} 条已平仓 <span style="font-size:10px;color:var(--text-dim);font-weight:normal;margin-left:6px">(共 ${closed.length} 条已平)</span></summary>
+      <div class="live-collapsible-body">`;
+    for (const t of closedShow) {
       const side = t.side || '';
       const dir = side === 'BUY' ? 'LONG' : (side === 'SELL' ? 'SHORT' : (t.direction || '?'));
       const pnlUsdt = Number(t.realized_pnl_usdt || 0);
@@ -4909,6 +4911,7 @@ function renderLivePanel(data) {
         <span class="paper-hold">${hold}</span>
       </div>`;
     }
+    body += `</div></details>`;
   }
 
   // ===== 🚫 错过的钻石信号 (paper 出钻石但 live 没 mirror, 诊断用) =====
