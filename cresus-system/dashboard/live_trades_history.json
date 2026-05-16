@@ -1,46 +1,44 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-16T13:35:19.115869+00:00",
+  "generated_at": "2026-05-16T13:37:00.175806+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 54,
-    "open": 2,
-    "closed": 52,
+    "open": 1,
+    "closed": 53,
     "wins": 18,
-    "losses": 34,
-    "win_rate": 0.346,
-    "total_pnl_usdt": -1.3248,
-    "net_pnl_usdt": -2.1275,
-    "avg_pnl_usdt": -0.0255,
+    "losses": 35,
+    "win_rate": 0.34,
+    "total_pnl_usdt": -1.6615,
+    "net_pnl_usdt": -2.484,
+    "avg_pnl_usdt": -0.0313,
     "best_trade_usdt": 1.7741,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 0.8207,
-    "fees_realized_usdt": 0.8027,
-    "fees_open_usdt": 0.018,
+    "fees_paid_usdt": 0.8305,
+    "fees_realized_usdt": 0.8225,
+    "fees_open_usdt": 0.008,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 40.0,
-    "free_capital_usdt": 57.86,
+    "deployed_usdt": 19.98,
+    "free_capital_usdt": 77.53,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -1.0874,
-    "deployed_usdt": 40.0
+    "daily_pnl": -1.4241,
+    "deployed_usdt": 19.98
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "DODOXUSDT",
-      "STABLEUSDT"
+      "DODOXUSDT"
     ],
     "exchange_symbols": [
-      "DODOXUSDT",
-      "STABLEUSDT"
+      "DODOXUSDT"
     ]
   },
   "open_trades": [
@@ -78,11 +76,13 @@
       "opened_at": "2026-05-16T12:28:24.845969+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.020423,
-      "current_price": 0.020013,
-      "unrealized_pnl_usdt": -0.0289,
-      "unrealized_pnl_pct": -0.145,
-      "last_price_check_at": "2026-05-16T13:35:16.236804+00:00"
-    },
+      "current_price": 0.020105,
+      "unrealized_pnl_usdt": 0.0628,
+      "unrealized_pnl_pct": 0.314,
+      "last_price_check_at": "2026-05-16T13:36:57.336141+00:00"
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "STABLEUSDT|LONG|2026-05-16T13:27:23.814116+00:00",
       "trade_id": "L1778938043_STABLEU_L",
@@ -112,18 +112,26 @@
       "phase_a_mfe_pct": 0.58,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.010008,
+      "fees_paid_usdt": 0.019847,
       "fees_are_actual": true,
       "opened_at": "2026-05-16T13:28:04.192555+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.03644,
-      "current_price": 0.03598,
-      "unrealized_pnl_usdt": -0.1546,
-      "unrealized_pnl_pct": -0.772,
-      "last_price_check_at": "2026-05-16T13:35:16.236804+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.03585,
+      "unrealized_pnl_usdt": -0.2263,
+      "unrealized_pnl_pct": -1.131,
+      "last_price_check_at": "2026-05-16T13:35:49.412058+00:00",
+      "closed_at": "2026-05-16T13:36:26.898470+00:00",
+      "close_reason": "paper:hit_sl",
+      "avg_exit_price": 0.03565,
+      "realized_pnl_usdt": -0.3367,
+      "close_order_id": 69465248,
+      "close_qty": 552.0,
+      "close_expected_price": 0.03585,
+      "close_slippage_bps": 55.79,
+      "entry_fees_usdt": 0.010008,
+      "close_fees_usdt": 0.009839
+    },
     {
       "paper_id": "FHEUSDT|LONG|2026-05-16T12:32:27.236920+00:00",
       "trade_id": "L1778934747_FHEUSDT_L",
@@ -2483,17 +2491,7 @@
       "close_qty": 53792.0
     }
   ],
-  "missed_signals": [
-    {
-      "paper_id": "RECALLUSDT|LONG|2026-05-16T12:29:32.506946+00:00",
-      "symbol": "RECALLUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-05-16T12:30:20.705184+00:00",
-      "reason": "paper trade too old (3896s > 600s)",
-      "last_checked_at": "2026-05-16T13:35:16.236804+00:00"
-    }
-  ],
+  "missed_signals": [],
   "config": {
     "starting_capital_usdt": 100.0,
     "notional_per_trade_usdt": 20.0,
