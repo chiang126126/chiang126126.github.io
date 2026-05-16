@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-16T03:51:10.308422+00:00",
+  "updated_at": "2026-05-16T03:53:13.234234+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 15,
+  "alerts_count": 16,
   "alerts": [
+    {
+      "symbol": "TRUTHUSDT",
+      "base": "TRUTH",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.019249,
+      "price_change_pct": 1.029,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 127736.0,
+      "volume_baseline_usdt": 22818.0,
+      "volume_ratio": 5.6,
+      "detected_at": "2026-05-16T03:52:26.452094+00:00",
+      "intensity": 1,
+      "change_5m_pct": 2.346,
+      "change_15m_pct": 2.308,
+      "change_1h_pct": 2.766,
+      "change_4h_pct": 2.064,
+      "taker_buy_ratio_1m": 0.607,
+      "taker_buy_ratio_5m": 0.668,
+      "oi_delta_5m_pct": 0.332,
+      "funding_rate_pct": 0.0068,
+      "atr_pct": 0.497,
+      "range_4h_pct": 10.86,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.01905771,
+      "suggested_tp1": 0.01953593,
+      "suggested_tp2": 0.01982286,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "WLFIUSDT",
       "base": "WLFI",
