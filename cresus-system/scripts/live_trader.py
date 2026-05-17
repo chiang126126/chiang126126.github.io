@@ -37,6 +37,7 @@ from __future__ import annotations
 import json
 import logging
 import time
+import hashlib    # Phase 4.D: A/B 分组用 MD5 (确定性, 跨进程一致)
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
@@ -109,6 +110,16 @@ LIVE_MAX_ENTRY_SLIPPAGE_BPS = 50.0     # 预滑点上限. 超过放弃开仓.
 # 距 MA25 >= +阈值% = up, <= -阈值% = down, 中间 = chop.
 # 不做交易决策, 仅供复盘按 regime 切分胜率/PnL.
 LIVE_BTC_REGIME_THRESHOLD_PCT = 0.5
+
+# Phase 4.D SL slippage 补偿 — A/B 测试
+# 问题: live 入场吃滑点后, paper_sl 离 live_entry 距离 < 离 paper_entry 距离,
+#       普通波动就触发 sl_breach. 实测 24 笔 (21%) 是 live SL 触发但 paper 同信号是
+#       hit_b_trail / hit_trail 盈利收 — 漏赚 ~$2.31 / 100 笔.
+# 方案: live_sl = paper_sl + (live_entry - paper_entry), 保持 SL 跟 actual entry
+#       的距离 = paper 设计距离. 兼容 LONG / SHORT 同公式.
+# A/B 测试 (启动期): 50/50 按 paper_id MD5 哈希分组, 确定性可复现.
+# 数据足够 (≥30 笔 each side) 后据实切换到 always.
+LIVE_SL_COMPENSATION_MODE = "ab"    # "off" | "ab" | "always"
 
 # Phase 3.3.a/b 控制文件 (在 ~/.cresus-*)
 PAUSE_FLAG_PATH = Path.home() / ".cresus-pause"
@@ -657,6 +668,7 @@ def publish_live_history(
             "total_dd_limit_pct": LIVE_TOTAL_DD_LIMIT_PCT,
             "mirror_max_age_sec": LIVE_MIRROR_MAX_AGE_SEC,
             "max_entry_slippage_bps": LIVE_MAX_ENTRY_SLIPPAGE_BPS,
+            "sl_compensation_mode": LIVE_SL_COMPENSATION_MODE,
             "observation_mode": LIVE_OBSERVATION_MODE,
         },
     }
@@ -767,6 +779,51 @@ def _compute_pre_entry_slippage_bps(
     return (current - paper_entry) / paper_entry * 10000.0 * side_sign
 
 
+def _ab_use_sl_compensation(paper_id: str, mode: str = None) -> bool:
+    """Phase 4.D SL 补偿 A/B 分组判定.
+
+    mode='off':    永远 False
+    mode='always': 永远 True
+    mode='ab':     按 paper_id MD5 哈希 50/50 分组 (确定性, 同 paper_id 总是同分组)
+
+    用 hashlib.md5 而非 Python 内置 hash() — 后者跨进程值不稳 (PYTHONHASHSEED).
+    确定性确保: 同一 paper trade 重启后仍属于同一组, 不会 mid-trade 切换逻辑.
+    """
+    if mode is None:
+        mode = LIVE_SL_COMPENSATION_MODE
+    if mode == "off":
+        return False
+    if mode == "always":
+        return True
+    if mode == "ab":
+        if not paper_id:
+            return False   # 无 paper_id 不分组, 走旧逻辑 (退路)
+        h = int(hashlib.md5(paper_id.encode("utf-8")).hexdigest(), 16)
+        return (h % 2) == 0
+    # 未知 mode → 安全退路: 不补偿 (旧行为)
+    log.warning(f"[ab-sl] unknown mode={mode!r}, fallback to off")
+    return False
+
+
+def _compute_compensated_sl(
+    paper_sl: float, live_entry: float, paper_entry: float,
+) -> Optional[float]:
+    """补偿后的 SL: live_sl = paper_sl + (live_entry - paper_entry).
+
+    保持 SL 跟 actual entry 的距离 = paper 设计距离.
+    Returns None 如任何输入异常 (caller 应 fallback 到原 paper_sl).
+    """
+    try:
+        psl = float(paper_sl)
+        le = float(live_entry)
+        pe = float(paper_entry)
+    except (TypeError, ValueError):
+        return None
+    if psl <= 0 or le <= 0 or pe <= 0:
+        return None
+    return psl + (le - pe)
+
+
 def _compute_btc_regime(client: BinanceClient) -> Optional[dict]:
     """计算当前 BTC 市场 regime (up / chop / down), 供 trade 开仓时打标签.
 
@@ -847,13 +904,19 @@ def _sync_live_with_paper(live_trade: dict, paper_open_trade: dict) -> bool:
     new_phase = paper_open_trade.get("phase")
     if new_sl is not None:
         try:
-            new_sl_f = float(new_sl)
-            if abs(new_sl_f - float(live_trade.get("sl_price", 0))) > 1e-9:
+            new_paper_sl = float(new_sl)
+            # 更新 paper 当前 SL 记录 (Phase 4.D)
+            live_trade["sl_paper_current"] = new_paper_sl
+            # Phase 4.D: 若此 trade 是 SL 补偿组, 应用 offset 计算 live SL
+            offset = float(live_trade.get("sl_compensation_offset") or 0)
+            new_live_sl = new_paper_sl + offset    # offset=0 时退化为旧行为
+            if abs(new_live_sl - float(live_trade.get("sl_price", 0))) > 1e-9:
                 old = live_trade.get("sl_price")
-                live_trade["sl_price"] = new_sl_f
+                live_trade["sl_price"] = new_live_sl
+                comp_note = f" (paper {new_paper_sl} + offset {offset:+.6f})" if offset != 0 else ""
                 log.info(
-                    f"[sl-sync] {live_trade['symbol']}: {old} → {new_sl_f} "
-                    f"(paper phase={new_phase})"
+                    f"[sl-sync] {live_trade['symbol']}: {old} → {new_live_sl} "
+                    f"(paper phase={new_phase}){comp_note}"
                 )
                 updated = True
         except (ValueError, TypeError):
@@ -1047,6 +1110,23 @@ def _try_mirror_open(
         except (ValueError, TypeError):
             pass
 
+    # Phase 4.D SL 补偿决策 (A/B 测试) — 在 live_trade 构造时一次性确定
+    # 整个 trade 生命周期保持同一分组 (paper_id 哈希确定).
+    sl_comp_enabled = _ab_use_sl_compensation(paper_id, LIVE_SL_COMPENSATION_MODE)
+    sl_comp_offset = 0.0
+    final_sl = float(result.get("sl_price", sl_price))   # 默认 = paper_sl
+    sl_paper_at_open = float(sl_price)                    # 记录原始 paper_sl
+    if sl_comp_enabled and actual_fill > 0 and paper_entry > 0:
+        compensated = _compute_compensated_sl(sl_price, actual_fill, paper_entry)
+        if compensated is not None and compensated > 0:
+            sl_comp_offset = round(actual_fill - paper_entry, 8)
+            final_sl = compensated
+            log.info(
+                f"[sl-comp] {sym} {side} paper_sl={sl_price:.6f} "
+                f"→ live_sl={final_sl:.6f} (offset {sl_comp_offset:+.6f}, "
+                f"slip {slippage_bps:+.1f}bps)"
+            )
+
     live_trade = {
         "paper_id": paper_id,
         "trade_id": trade_id,
@@ -1062,7 +1142,11 @@ def _try_mirror_open(
         "risk_usdt": round(risk_usdt, 4),
         "risk_pct": round(risk_pct, 3),
         "mirror_latency_sec": mirror_latency_sec,
-        "sl_price": result.get("sl_price", sl_price),
+        "sl_price": final_sl,                          # SL polling 实际用此值
+        "sl_paper_current": sl_paper_at_open,          # 当前 paper SL (sync 时更新)
+        "sl_compensation_enabled": sl_comp_enabled,    # A/B 分组标记
+        "sl_compensation_offset": sl_comp_offset,      # offset (B 组非 0; A 组 0)
+        "sl_compensation_mode": LIVE_SL_COMPENSATION_MODE,  # 部署时模式 (溯源用)
         "tp1_price": float(paper_trade.get("tp1") or 0),
         "tp2_price": float(paper_trade.get("tp2") or 0),
         "phase": "A",

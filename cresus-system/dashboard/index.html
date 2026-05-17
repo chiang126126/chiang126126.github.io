@@ -621,6 +621,28 @@
     border: 1px dashed rgba(255,255,255,0.12);
     font-weight: 500;
   }
+  /* Phase 4.D SL 补偿 A/B 分组 chip */
+  .live-ab-chip {
+    display: inline-block;
+    font-size: 10px;
+    border-radius: 4px;
+    padding: 1.5px 5px;
+    margin-left: 4px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+    vertical-align: middle;
+  }
+  .live-ab-chip.b {
+    color: #4fc3f7;
+    background: rgba(79,195,247,0.16);
+    border: 1px solid rgba(79,195,247,0.50);
+  }
+  .live-ab-chip.a {
+    color: #b3b8c2;
+    background: rgba(160,165,180,0.10);
+    border: 1px solid rgba(160,165,180,0.30);
+  }
   /* ==== 折叠 section ==== */
   .live-collapsible {
     margin: 6px 0;
@@ -5057,6 +5079,7 @@ function renderLivePanel(data) {
           <span class="live-lev-chip">${lev}x</span>
           ${convChip}
           ${liveRegimeChip(t.btc_regime_at_open)}
+          ${liveAbChip(t)}
           ${t.is_dry_run ? '<span style="font-size:10px;color:#ffb84d;margin-left:4px">🟡DRY</span>' : '<span style="font-size:10px;color:#ff5252;margin-left:4px">🔴LIVE</span>'}
           <br><span style="font-size:11px;color:var(--text-dim)">
             入 ${liveFmtPrice(entry)} · 现 ${cur != null ? liveFmtPrice(cur) : '—'}
@@ -5126,6 +5149,7 @@ function renderLivePanel(data) {
           <span class="live-lev-chip">${lev}x</span>
           ${convChipC}
           ${liveRegimeChip(t.btc_regime_at_open)}
+          ${liveAbChip(t)}
           ${t.is_dry_run ? '<span style="font-size:10px;color:#ffb84d;margin-left:4px">🟡DRY</span>' : '<span style="font-size:10px;color:#ff5252;margin-left:4px">🔴LIVE</span>'}
           <br><span style="font-size:11px;color:var(--text-dim)">
             ${liveFmtPrice(entry)} → ${liveFmtPrice(exit)}
@@ -5230,6 +5254,7 @@ function renderLivePanel(data) {
         <div class="live-config-cell"><div class="k">日 DD 触发</div><div class="v" style="color:#ff8888">-$${config.daily_dd_limit_usdt || 5}</div></div>
         <div class="live-config-cell"><div class="k">累计 DD kill</div><div class="v" style="color:#ff8888">-${config.total_dd_limit_pct || 5}%</div></div>
         <div class="live-config-cell" title="paper 信号价 → 当前价 的预滑点上限. 超过放弃 mirror, 防止小币流动性差导致的灾难性进场."><div class="k">滑点护栏</div><div class="v" style="color:#1cbe72">${config.max_entry_slippage_bps || 50} bps</div></div>
+        ${config.sl_compensation_mode ? `<div class="live-config-cell" title="SL slippage compensation: B 组 SL = paper_sl + 入场滑点, 保持距离不变. ab=50/50 测试 / always=全用 / off=全用旧逻辑"><div class="k">SL 补偿</div><div class="v" style="color:#4fc3f7">${config.sl_compensation_mode}</div></div>` : ''}
         ${(config.symbol_blacklist || []).length > 0 ? `<div class="live-config-cell" title="基于实盘历史 0 胜的 symbol, 优先级最高, 即使 OBS mode 也拒. 每周复盘时增删."><div class="k">黑名单</div><div class="v" style="font-size:11px;color:#ff8a65">${(config.symbol_blacklist || []).join(' / ')}</div></div>` : ''}
       </div>
     </div>
@@ -5288,6 +5313,17 @@ const LIVE_REASON_LABEL = {
 // Phase 4.C BTC regime chip (开仓时 snapshot) — 全局 helper, 多处复用.
 // 设计: emoji + 文字双标识, 跟 "💎5" 和 "🔴LIVE" 视觉层级一致.
 // 老数据 (Phase 4.C 部署前开仓) → 显示禁用 "—" chip, 让用户明确知道是历史数据非 bug.
+// Phase 4.D A/B 分组 chip (SL slippage compensation)
+function liveAbChip(t) {
+  // 没字段 (老 trade) → 不显示 chip
+  if (t.sl_compensation_enabled === undefined) return '';
+  if (t.sl_compensation_enabled === true) {
+    const offset = Number(t.sl_compensation_offset || 0);
+    return `<span class="live-ab-chip b" title="SL 补偿 B 组: SL = paper_sl + ${offset.toFixed(6)}">B 组</span>`;
+  }
+  return `<span class="live-ab-chip a" title="SL 补偿 A 组 (无补偿, 对照组)">A 组</span>`;
+}
+
 function liveRegimeChip(regime) {
   const meta = {
     up:   { icon: '📈', label: '上涨', cls: 'up'   },
@@ -5365,10 +5401,23 @@ function _liveDayStats(trades) {
     if (p >  0.01) regimeBuckets[r].wins++;
     if (p < -0.01) regimeBuckets[r].losses++;
   }
+  // Phase 4.D 按 A/B 分组 (SL slippage compensation 测试)
+  // 仅统计有 sl_compensation_enabled 字段的 trades (Phase 4.D 后开的)
+  const abBuckets = { A: { n: 0, wins: 0, losses: 0, pnl: 0 },
+                      B: { n: 0, wins: 0, losses: 0, pnl: 0 } };
+  for (const t of trades) {
+    if (t.sl_compensation_enabled === undefined) continue;
+    const k = t.sl_compensation_enabled ? 'B' : 'A';
+    abBuckets[k].n++;
+    const p = Number(t.realized_pnl_usdt || 0);
+    abBuckets[k].pnl += p;
+    if (p >  0.01) abBuckets[k].wins++;
+    if (p < -0.01) abBuckets[k].losses++;
+  }
   const best  = trades.reduce((b, t) => (Number(t.realized_pnl_usdt || 0) > (b ? Number(b.realized_pnl_usdt || 0) : -Infinity)) ? t : b, null);
   const worst = trades.reduce((b, t) => (Number(t.realized_pnl_usdt || 0) < (b ? Number(b.realized_pnl_usdt || 0) :  Infinity)) ? t : b, null);
   return { n, wins, losses, scratch, winRate, totPnl, totFees,
-    longs, shorts, reasonCounts, scoreBuckets, regimeBuckets, best, worst };
+    longs, shorts, reasonCounts, scoreBuckets, regimeBuckets, abBuckets, best, worst };
 }
 
 function renderLiveDailyReview(closed) {
@@ -5721,6 +5770,48 @@ function _liveRenderSingleDay(byDate, allDates) {
         return '';
       })()}
 
+      ${(() => {
+        // Phase 4.D A/B 对比 (SL slippage compensation 测试)
+        const ab = stats.abBuckets || {};
+        const A = ab.A || {n:0, wins:0, losses:0, pnl:0};
+        const B = ab.B || {n:0, wins:0, losses:0, pnl:0};
+        if (A.n === 0 && B.n === 0) return '';   // 老数据无 A/B 字段, 不显示
+        const fmtBucket = (label, v, cls) => {
+          const dec = v.wins + v.losses;
+          const wr = dec > 0 ? Math.round(v.wins / dec * 100) + '%' : '—';
+          const wrColor = dec > 0 && v.wins / dec >= 0.5 ? '#00e676'
+                          : dec > 0 && v.wins / dec < 0.4 ? '#ff7373' : 'var(--text)';
+          const pnlColor = v.pnl > 0 ? '#00e676' : (v.pnl < 0 ? '#ff5252' : 'var(--text-dim)');
+          return `<span class="chip" title="${label}: ${v.n} 笔, ${v.wins}胜${v.losses}负, PnL ${liveFmtUsdt(v.pnl)}">
+            <span class="live-ab-chip ${cls}" style="margin-left:0">${label}</span>
+            <strong style="margin-left:4px">×${v.n}</strong>
+            <span style="color:${wrColor};margin:0 3px">${wr}</span>
+            <span style="color:${pnlColor};font-size:9.5px">${liveFmtUsdt(v.pnl)}</span>
+          </span>`;
+        };
+        // 对比 verdict (仅在两组都有 ≥5 笔时)
+        let verdict = '';
+        if (A.n >= 5 && B.n >= 5) {
+          const A_avg = A.pnl / A.n;
+          const B_avg = B.pnl / B.n;
+          const diff = B_avg - A_avg;
+          const winnerCls = diff > 0 ? 'up' : (diff < 0 ? 'down' : '');
+          const winnerTxt = diff > 0 ? 'B 组 (补偿) 更好' : (diff < 0 ? 'A 组 (无补偿) 更好' : '相同');
+          verdict = ` <span style="font-size:10px;color:var(--text-dim);margin-left:8px">
+            avg 差 <span class="${winnerCls}">${diff >= 0 ? '+' : ''}${liveFmtUsdt(diff)}</span> · ${winnerTxt}</span>`;
+        } else {
+          verdict = ` <span style="font-size:10px;color:var(--text-dim);margin-left:8px">(样本不足 5/组, 数据观察中)</span>`;
+        }
+        return `<div class="live-review-stat-line">
+          <span class="live-review-stat-key" title="Phase 4.D SL 补偿 A/B 测试: B 组用 paper_sl + slip 补偿, A 组为对照">A/B 测试</span>
+          <span class="live-review-stat-val">
+            ${fmtBucket('A 组', A, 'a')}
+            ${fmtBucket('B 组', B, 'b')}
+            ${verdict}
+          </span>
+        </div>`;
+      })()}
+
       ${stats.totFees > 0 ? `
       <div class="live-review-stat-line">
         <span class="live-review-stat-key">费用</span>
@@ -5796,6 +5887,7 @@ function _liveRenderSingleDay(byDate, allDates) {
         <span class="live-lev-chip">${lev}x</span>
         ${convChipD}
         ${liveRegimeChip(t.btc_regime_at_open)}
+          ${liveAbChip(t)}
         <br><span style="font-size:11px;color:var(--text-dim)">
           ${liveFmtPrice(entry)} → ${liveFmtPrice(exit)}${fee > 0 ? ' · 费 -$' + fee.toFixed(3) : ''}${slipBits.length ? ' · ' + slipBits.join(' / ') : ''}
         </span>

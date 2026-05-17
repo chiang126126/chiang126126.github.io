@@ -35,9 +35,12 @@ from live_trader import (  # noqa: E402
     _record_missed_signal, _prune_obsolete_missed,
     _compute_pre_entry_slippage_bps,
     _compute_btc_regime,
+    _ab_use_sl_compensation,
+    _compute_compensated_sl,
     MISSED_SIGNALS_KEEP_LAST_N,
     LIVE_MAX_ENTRY_SLIPPAGE_BPS,
     LIVE_BTC_REGIME_THRESHOLD_PCT,
+    LIVE_SL_COMPENSATION_MODE,
     LIVE_SYMBOL_WHITELIST, LIVE_MAX_CONCURRENT, LIVE_MIRROR_MAX_AGE_SEC,
     LIVE_NOTIONAL_USDT, LIVE_MAX_DEPLOY_USDT, LIVE_DAILY_DD_LIMIT_USDT,
     LIVE_STARTING_CAPITAL_USDT, LIVE_TOTAL_DD_LIMIT_PCT,
@@ -827,6 +830,48 @@ class TestSyncLiveWithPaper(unittest.TestCase):
         _sync_live_with_paper(lt, paper)
         self.assertEqual(lt["sl_price"], 80000.0)
 
+    # === Phase 4.D: sync 时 SL 补偿延续 ===
+
+    def test_sync_b_group_applies_offset_to_new_paper_sl(self):
+        """B 组 (sl_compensation_offset != 0): paper 移 SL 时, live SL 应跟着移 + 保持 offset."""
+        # B 组 live_trade: paper_sl 95, live_entry 100.5, offset = +0.5
+        # 原始 live_sl = 95 + 0.5 = 95.5
+        lt = {
+            "symbol": "BTC", "sl_price": 95.5, "phase": "A",
+            "sl_paper_current": 95.0,
+            "sl_compensation_offset": 0.5,
+            "sl_compensation_enabled": True,
+        }
+        # paper 命中 TP1, SL 移到 BE (100)
+        paper = {"sl": 100.0, "phase": "B"}
+        updated = _sync_live_with_paper(lt, paper)
+        self.assertTrue(updated)
+        # 期望: live_sl = 100 (新 paper SL) + 0.5 (offset) = 100.5
+        self.assertAlmostEqual(lt["sl_price"], 100.5, places=6)
+        self.assertEqual(lt["sl_paper_current"], 100.0)
+        # offset 不应被改 (immutable 跟随 trade 生命周期)
+        self.assertAlmostEqual(lt["sl_compensation_offset"], 0.5, places=6)
+
+    def test_sync_a_group_no_offset_unchanged(self):
+        """A 组 (offset = 0): sync 行为跟旧逻辑一致."""
+        lt = {
+            "symbol": "BTC", "sl_price": 95.0, "phase": "A",
+            "sl_paper_current": 95.0,
+            "sl_compensation_offset": 0,
+            "sl_compensation_enabled": False,
+        }
+        paper = {"sl": 100.0, "phase": "B"}
+        _sync_live_with_paper(lt, paper)
+        self.assertAlmostEqual(lt["sl_price"], 100.0, places=6)   # 同 paper, 无 offset
+
+    def test_sync_offset_field_missing_treated_as_zero(self):
+        """老 trade 没有 sl_compensation_offset 字段 (Phase 4.D 之前的) - 应作 0 处理."""
+        lt = {"symbol": "BTC", "sl_price": 95.0, "phase": "A"}   # 无新字段
+        paper = {"sl": 96.0, "phase": "A"}
+        _sync_live_with_paper(lt, paper)
+        # 不崩, sl_price 跟随 paper (offset 默认 0)
+        self.assertAlmostEqual(lt["sl_price"], 96.0, places=6)
+
 
 class TestGetCurrentPrice(unittest.TestCase):
 
@@ -1129,6 +1174,141 @@ class TestComputeBtcRegime(unittest.TestCase):
         """0.5% 阈值合理: 太小会全 up/down (失去 chop 意义), 太大几乎全 chop."""
         self.assertGreaterEqual(LIVE_BTC_REGIME_THRESHOLD_PCT, 0.1)
         self.assertLessEqual(LIVE_BTC_REGIME_THRESHOLD_PCT, 2.0)
+
+
+class TestSlCompensation(unittest.TestCase):
+    """Phase 4.D: SL slippage compensation + A/B 分组.
+
+    严格验证:
+    - 数学正确性 (LONG/SHORT 同公式, 符号无误)
+    - A/B 分组确定性 (同 paper_id 总是同分组)
+    - mode='off'/'ab'/'always' 各自行为
+    - 边界 (字段缺/0/负)
+    - 不会引入开仓错误 (只调 SL 数值)
+    """
+
+    # === A/B 分组 ===
+
+    def test_ab_mode_off_always_false(self):
+        for pid in ['BTC|LONG|t1', 'X|SHORT|t', '', 'abc']:
+            self.assertFalse(_ab_use_sl_compensation(pid, "off"))
+
+    def test_ab_mode_always_always_true(self):
+        for pid in ['BTC|LONG|t1', 'X|SHORT|t', 'abc']:
+            self.assertTrue(_ab_use_sl_compensation(pid, "always"))
+
+    def test_ab_mode_ab_deterministic(self):
+        """同 paper_id 多次调用必须返回同样结果 (确定性)."""
+        pid = "STORJUSDT|LONG|2026-05-17T10:00:00+00:00"
+        results = [_ab_use_sl_compensation(pid, "ab") for _ in range(10)]
+        self.assertTrue(all(r == results[0] for r in results),
+                         "同 paper_id 必须确定性返回同样分组")
+
+    def test_ab_mode_ab_roughly_50_50(self):
+        """大样本验证 ab mode 接近 50/50 分布 (不严格但应在 30-70% 区间)."""
+        sample_ids = [f"SYM{i}|LONG|2026-05-{i:02d}T{i%24:02d}:00:00" for i in range(1, 1001)]
+        true_count = sum(1 for pid in sample_ids if _ab_use_sl_compensation(pid, "ab"))
+        ratio = true_count / len(sample_ids)
+        # MD5 hash 应该接近均匀; 1000 个样本 +-3% (chi-square 信赖区间)
+        self.assertGreater(ratio, 0.40, f"ratio {ratio:.3f} 偏低, 哈希分布异常")
+        self.assertLess(ratio, 0.60, f"ratio {ratio:.3f} 偏高, 哈希分布异常")
+
+    def test_ab_mode_empty_pid_returns_false(self):
+        """无 paper_id → 不分组, 走旧逻辑 (退路)."""
+        self.assertFalse(_ab_use_sl_compensation("", "ab"))
+        self.assertFalse(_ab_use_sl_compensation(None, "ab"))
+
+    def test_ab_mode_unknown_returns_false(self):
+        """未知 mode → 安全退路 (不补偿)."""
+        self.assertFalse(_ab_use_sl_compensation("any", "garbage"))
+
+    def test_default_mode_uses_config(self):
+        """不传 mode 时, 应使用 LIVE_SL_COMPENSATION_MODE 配置."""
+        pid = "BTC|LONG|x"
+        expected = _ab_use_sl_compensation(pid, LIVE_SL_COMPENSATION_MODE)
+        actual = _ab_use_sl_compensation(pid)
+        self.assertEqual(actual, expected)
+
+    # === 补偿数学 ===
+
+    def test_compute_long_unfavorable_slip(self):
+        """LONG: live 入场高 (不利) → SL 也加, 距离不变."""
+        # paper: entry 100, sl 95 (5% 距离)
+        # live: entry 100.5 (高 0.5%, 不利)
+        # 期望: live_sl = 95 + 0.5 = 95.5 (距离 5%, 不变)
+        sl = _compute_compensated_sl(95.0, 100.5, 100.0)
+        self.assertAlmostEqual(sl, 95.5, places=6)
+        # 距离不变性验证
+        self.assertAlmostEqual(100.5 - sl, 100.0 - 95.0, places=6)
+
+    def test_compute_long_favorable_slip(self):
+        """LONG: live 入场低 (有利) → SL 也减, 距离不变."""
+        sl = _compute_compensated_sl(95.0, 99.5, 100.0)
+        self.assertAlmostEqual(sl, 94.5, places=6)
+        # 仍然在 entry 下方 5%
+        self.assertAlmostEqual(99.5 - sl, 5.0, places=6)
+
+    def test_compute_short_unfavorable_slip(self):
+        """SHORT: paper_entry 100, paper_sl 105 (5% 上方). live entry 99.5 (低=不利 SHORT)."""
+        # 期望: live_sl = 105 + (99.5 - 100) = 104.5
+        # 距离不变: live_sl - live_entry = 104.5 - 99.5 = 5.0 ✓
+        sl = _compute_compensated_sl(105.0, 99.5, 100.0)
+        self.assertAlmostEqual(sl, 104.5, places=6)
+        self.assertAlmostEqual(sl - 99.5, 105.0 - 100.0, places=6)
+
+    def test_compute_short_favorable_slip(self):
+        """SHORT: live entry 100.5 (高=SHORT 有利)."""
+        # live_sl = 105 + 0.5 = 105.5; distance 105.5 - 100.5 = 5.0 ✓
+        sl = _compute_compensated_sl(105.0, 100.5, 100.0)
+        self.assertAlmostEqual(sl, 105.5, places=6)
+        self.assertAlmostEqual(sl - 100.5, 5.0, places=6)
+
+    def test_compute_no_slip(self):
+        """live_entry == paper_entry → SL 不变."""
+        sl = _compute_compensated_sl(95.0, 100.0, 100.0)
+        self.assertAlmostEqual(sl, 95.0, places=6)
+
+    def test_compute_extreme_storj_656bps(self):
+        """复现实测 STORJ +656 bps 进场 (gate 修复前发生过)."""
+        # paper 0.119, sl 0.113 (5% LONG 距离)
+        # live 0.119 * 1.0656 ≈ 0.126805
+        # adjusted: 0.113 + (0.126805 - 0.119) = 0.120805
+        sl = _compute_compensated_sl(0.113, 0.126805, 0.119)
+        self.assertAlmostEqual(sl, 0.120805, places=5)
+        # 距离仍 5% (从 live entry)
+        self.assertAlmostEqual(0.126805 - sl, 0.119 - 0.113, places=5)
+
+    # === Fail-safe (任何输入异常 → None, caller 退路) ===
+
+    def test_compute_negative_paper_sl(self):
+        self.assertIsNone(_compute_compensated_sl(-1, 100, 100))
+
+    def test_compute_zero_live_entry(self):
+        self.assertIsNone(_compute_compensated_sl(95, 0, 100))
+
+    def test_compute_zero_paper_entry(self):
+        self.assertIsNone(_compute_compensated_sl(95, 100, 0))
+
+    def test_compute_string_inputs_parsed(self):
+        """字段可能是字符串 (容错)."""
+        sl = _compute_compensated_sl("95", "100.5", "100")
+        self.assertAlmostEqual(sl, 95.5, places=6)
+
+    def test_compute_malformed_inputs_returns_none(self):
+        self.assertIsNone(_compute_compensated_sl("abc", 100, 100))
+        self.assertIsNone(_compute_compensated_sl(95, None, 100))
+
+    def test_compute_extreme_negative_result_passthrough(self):
+        """极端不可能情况: 大不利滑点 + 紧 SL → 计算结果 <= 0.
+        函数本身不过滤 (输入>0即接受), 但 _try_mirror_open 会检查 compensated > 0
+        再决定用 / fallback 到 paper_sl. 这是分层防御.
+        """
+        # paper 0.01 entry, 0.005 SL. live 进场 0.001 (极端不可能, 测试边界)
+        sl = _compute_compensated_sl(0.005, 0.001, 0.01)
+        self.assertIsNotNone(sl)
+        self.assertAlmostEqual(sl, -0.004, places=6)
+        # caller (_try_mirror_open) 应该看 sl > 0 失败 → fallback paper_sl
+        self.assertFalse(sl > 0, "caller 应该不用此值, fallback 到 paper_sl")
 
 
 class TestTryMirrorClose(unittest.TestCase):
@@ -2441,6 +2621,71 @@ class TestMirrorIterationGuards(unittest.TestCase):
         # live_trade 不应有 btc_* 字段
         lt = result["live_open_trades"][0]
         self.assertNotIn("btc_regime_at_open", lt)
+
+    def test_sl_compensation_in_mirror_open(self):
+        """Phase 4.D 集成: 当 paper_id 分到 B 组 (always for mode='always'), live_trade
+        的 sl_price 应该是补偿后的值, 含必要的 metadata 字段."""
+        now = datetime.now(timezone.utc)
+        self._write_paper([{
+            "id": "BTCUSDT|LONG|t_b_group",
+            "symbol": "BTCUSDT", "direction": "LONG",
+            "entered_at": (now - timedelta(seconds=10)).isoformat(),
+            "entry_price": 100.0, "sl": 95.0,   # paper SL 95
+        }])
+        # mock open 返回 fill 100.5 (高 0.5%, slip +50bps 在阈值 50 边界)
+        mock_open = {
+            "trade_id": "L1", "symbol": "BTCUSDT", "side": "BUY", "qty": 0.2,
+            "avg_fill_price": 100.5, "actual_notional": 20.0,
+            "entry_order_id": 1, "entry_client_id": "x",
+            "sl_price": 95.0,
+            "sl_side": "SELL", "sl_mode": "client_side",
+            "opened_at": now.isoformat(),
+            "fees_paid_usdt": 0, "_dryRun": True,
+        }
+        # 强制 always 模式 (B 组)
+        with patch.object(live_trader, "LIVE_SL_COMPENSATION_MODE", "always"), \
+             patch.object(self.client, "open_position",
+                          return_value=mock_open) as mock_op, \
+             patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "100.0", 0, 0, 0, 0, 0, 0, 0]]):
+            result = main_loop(self.client, dry_run=True)
+        self.assertEqual(mock_op.call_count, 1)
+        lt = result["live_open_trades"][0]
+        # 关键: SL 应该是 paper_sl(95) + slip(0.5) = 95.5
+        self.assertAlmostEqual(lt["sl_price"], 95.5, places=4)
+        self.assertTrue(lt["sl_compensation_enabled"])
+        self.assertAlmostEqual(lt["sl_compensation_offset"], 0.5, places=6)
+        self.assertEqual(lt["sl_compensation_mode"], "always")
+        self.assertAlmostEqual(lt["sl_paper_current"], 95.0, places=4)
+
+    def test_sl_compensation_mode_off_no_change(self):
+        """mode='off': SL 不应被改, 跟旧逻辑一致."""
+        now = datetime.now(timezone.utc)
+        self._write_paper([{
+            "id": "BTCUSDT|LONG|t_off",
+            "symbol": "BTCUSDT", "direction": "LONG",
+            "entered_at": (now - timedelta(seconds=10)).isoformat(),
+            "entry_price": 100.0, "sl": 95.0,
+        }])
+        mock_open = {
+            "trade_id": "L1", "symbol": "BTCUSDT", "side": "BUY", "qty": 0.2,
+            "avg_fill_price": 100.5, "actual_notional": 20.0,
+            "entry_order_id": 1, "entry_client_id": "x",
+            "sl_price": 95.0,
+            "sl_side": "SELL", "sl_mode": "client_side",
+            "opened_at": now.isoformat(),
+            "fees_paid_usdt": 0, "_dryRun": True,
+        }
+        with patch.object(live_trader, "LIVE_SL_COMPENSATION_MODE", "off"), \
+             patch.object(self.client, "open_position", return_value=mock_open), \
+             patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "100.0", 0, 0, 0, 0, 0, 0, 0]]):
+            result = main_loop(self.client, dry_run=True)
+        lt = result["live_open_trades"][0]
+        # SL 跟 paper 一致, 没补偿
+        self.assertAlmostEqual(lt["sl_price"], 95.0, places=4)
+        self.assertFalse(lt["sl_compensation_enabled"])
+        self.assertEqual(lt["sl_compensation_offset"], 0)
 
 
 # ============================================================================
