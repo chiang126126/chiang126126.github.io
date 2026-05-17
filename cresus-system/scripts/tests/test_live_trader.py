@@ -964,11 +964,43 @@ class TestComputePreEntrySlippage(unittest.TestCase):
     # --- 阈值常量合理性 ---
 
     def test_threshold_is_reasonable(self):
-        """30 bps 是基于实测数据的合理阈值, 不应是 0 (拦截所有) 或天文数字."""
+        """阈值是基于实测数据的合理值. 当前 v2: 50 bps (v1 为 30 bps).
+        不应是 0 (拦截所有) 或天文数字 (失去保护)."""
         self.assertGreater(LIVE_MAX_ENTRY_SLIPPAGE_BPS, 5,
                            "阈值太小会拦截正常市场波动")
         self.assertLess(LIVE_MAX_ENTRY_SLIPPAGE_BPS, 200,
-                        "阈值太大失去保护意义")
+                        "阈值太大失去保护意义 (200bps 已是 2% 灾难)")
+        # 当前 v2 值: 50 bps
+        self.assertEqual(LIVE_MAX_ENTRY_SLIPPAGE_BPS, 50.0,
+                         "v2: 复盘 116 笔后从 30 → 50, 减少误杀小滑点 trades")
+
+    def test_threshold_boundary_just_below(self):
+        """边界: pre_slip = 阈值 - 0.1 应通过 (严格 > 比较)."""
+        paper = {"symbol": "BTCUSDT", "direction": "LONG", "entry_price": 100.0}
+        # 算出让 pre_slip 恰好为 (阈值 - 0.1) 的 current
+        # pre_slip = (current - 100) / 100 * 10000 = thresh - 0.1
+        # current = 100 * (1 + (thresh - 0.1) / 10000)
+        target = LIVE_MAX_ENTRY_SLIPPAGE_BPS - 0.1
+        current = 100.0 * (1 + target / 10000)
+        with patch.object(self.client, "get_klines",
+                          return_value=[[0,0,0,0,str(current),0,0,0,0,0,0,0]]):
+            slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        self.assertAlmostEqual(slip, target, places=1)
+        # 调用方逻辑: slip > LIVE_MAX_ENTRY_SLIPPAGE_BPS → 拒. target < 阈值 → 通过.
+        self.assertFalse(slip > LIVE_MAX_ENTRY_SLIPPAGE_BPS,
+                         f"slip {slip} 应 <= 阈值 {LIVE_MAX_ENTRY_SLIPPAGE_BPS}, 不应拒")
+
+    def test_threshold_boundary_just_above(self):
+        """边界: pre_slip = 阈值 + 0.1 应被拒."""
+        paper = {"symbol": "BTCUSDT", "direction": "LONG", "entry_price": 100.0}
+        target = LIVE_MAX_ENTRY_SLIPPAGE_BPS + 0.1
+        current = 100.0 * (1 + target / 10000)
+        with patch.object(self.client, "get_klines",
+                          return_value=[[0,0,0,0,str(current),0,0,0,0,0,0,0]]):
+            slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        self.assertAlmostEqual(slip, target, places=1)
+        self.assertTrue(slip > LIVE_MAX_ENTRY_SLIPPAGE_BPS,
+                        f"slip {slip} 应 > 阈值 {LIVE_MAX_ENTRY_SLIPPAGE_BPS}, 应拒")
 
 
 class TestComputeBtcRegime(unittest.TestCase):
@@ -2125,7 +2157,7 @@ class TestMirrorIterationGuards(unittest.TestCase):
         self.assertLessEqual(call_count[0], 4)
 
     def test_slippage_gate_rejects_above_threshold(self):
-        """滑点护栏 (Phase 4.A): 预滑点 > 30 bps → 不调 open_position, 记 missed_signal."""
+        """滑点护栏 (Phase 4.A): 预滑点 > 阈值 (当前 50 bps) → 不调 open_position, 记 missed_signal."""
         now = datetime.now(timezone.utc)
         self._write_paper([{
             "id": "BTCUSDT|LONG|2026-05-15T10:00:00+00:00",
@@ -2154,7 +2186,7 @@ class TestMirrorIterationGuards(unittest.TestCase):
                         f"应记 pre_slippage missed_signal, 实际: {[m.get('reason') for m in missed]}")
 
     def test_slippage_gate_allows_below_threshold(self):
-        """预滑点 < 30 bps → 正常 mirror."""
+        """预滑点 < 阈值 → 正常 mirror."""
         now = datetime.now(timezone.utc)
         self._write_paper([{
             "id": "BTCUSDT|LONG|2026-05-15T10:00:00+00:00",

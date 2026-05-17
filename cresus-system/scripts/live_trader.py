@@ -94,9 +94,15 @@ LIVE_TOTAL_DD_LIMIT_PCT = 5.0          # 总回撤 5% → 自动写 emergency fl
 
 # Phase 4.A 滑点护栏 (alpha-coin 小币流动性差, 防止市价单灾难性进场)
 # 开仓前先取当前价, 算 paper 信号价 → 当前价 的预滑点 (positive bps = 不利).
-# 超阈值放弃 mirror, 记 missed_signal. 实测 5 天 16 笔配对数据显示:
-# 16 笔中 8 笔滑点 >30 bps (含 1 笔 +656 bps), 这些尾部事件方差极大.
-LIVE_MAX_ENTRY_SLIPPAGE_BPS = 30.0     # 预滑点上限. 超过放弃开仓.
+# 超阈值放弃 mirror, 记 missed_signal.
+#
+# 阈值演化:
+#   v1 (5/17 上线): 30 bps  ← 基于初期 16 笔配对数据保守值
+#   v2 (5/17 调整): 50 bps  ← 复盘 116 笔后发现 30 拒太严:
+#     17 笔被拦(38%), paper 上累计赚 $27 等比$1.35 漏赚,
+#     真正灾难性事件是 >100 bps (尤其 656 bps STORJ 单).
+#     50 bps 仍然过滤所有 >100 bps 极端事件, 同时少拒 30-50 区间的小滑点.
+LIVE_MAX_ENTRY_SLIPPAGE_BPS = 50.0     # 预滑点上限. 超过放弃开仓.
 
 # Phase 4.C BTC regime-aware 标签 (每笔 trade 开仓时记录当时 BTC 状态)
 # 用 1h K 线的 MA(25) 作 baseline (~24h 滚动均值, 匹配短线持仓视角).
