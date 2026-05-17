@@ -23,6 +23,12 @@ from .features.pool_router import route_to_pool
 from .features.safety_gate import evaluate_long_safety, evaluate_short_safety
 from .features.short_vacuum import detect_short_vacuum
 from .features.sizing import size_long_position, size_position, size_short_position
+from .features.strategies import (
+    plan_distribution,
+    plan_short_vacuum,
+    plan_support_collapse,
+    plan_trend_follow,
+)
 from .features.support_collapse import detect_support_collapse
 from .features.trend_follow import detect_trend_follow
 from .models import (
@@ -30,6 +36,7 @@ from .models import (
     ChipFeatures,
     DevWalletInfo,
     DivergenceSignal,
+    EntryType,
     HolderSnapshot,
     LiquidityInfo,
     OIStratification,
@@ -38,9 +45,11 @@ from .models import (
     PositionSize,
     SafetyReport,
     ShortVacuumSignal,
+    Side,
     SupportCollapseSignal,
     TimeSeriesPoint,
     TokenAuditInfo,
+    TradeIntent,
     TradeSimulationResult,
     TransferEdge,
     TrendFollowSignal,
@@ -67,6 +76,11 @@ __all__ = [
     "size_position",
     "size_long_position",
     "size_short_position",
+    # 策略 (L5)
+    "plan_trend_follow",
+    "plan_support_collapse",
+    "plan_short_vacuum",
+    "plan_distribution",
     # 数据模型 (L2)
     "Candle",
     "ChipFeatures",
@@ -87,6 +101,9 @@ __all__ = [
     "TrendFollowSignal",
     "SupportCollapseSignal",
     "ShortVacuumSignal",
-    # 数据模型 (仓位)
+    # 数据模型 (仓位 / 订单)
     "PositionSize",
+    "Side",
+    "EntryType",
+    "TradeIntent",
 ]

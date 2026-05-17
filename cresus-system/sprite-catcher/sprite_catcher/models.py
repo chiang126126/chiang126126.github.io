@@ -20,6 +20,18 @@ class Pool(str, Enum):
     BLACKLIST = "blacklist"    # 极端控盘 / 加速期 / 信号不可靠，完全跳过
 
 
+class Side(str, Enum):
+    """订单方向。"""
+    BUY = "buy"
+    SELL = "sell"
+
+
+class EntryType(str, Enum):
+    """入场方式。"""
+    MARKET = "market"          # 市价单
+    LIMIT = "limit"            # 限价单
+
+
 @dataclass(frozen=True)
 class HolderSnapshot:
     """单个持有人的快照。balance 用 Decimal 防浮点精度丢失。"""
@@ -209,3 +221,30 @@ class PositionSize:
     risk_usd: float                # 单笔预计最大亏损
     capped_by: str | None          # 哪条上限把仓位卡住了（None = 未被卡）
     reason: str                    # 计算细节的可读描述
+
+
+@dataclass(frozen=True)
+class TradeIntent:
+    """L5 策略层输出：一笔可执行的交易意图。
+
+    L6 执行层消费这个 intent，转成实际的交易所订单（OTOCO 或两段挂单）。
+    intent 本身没有"挂单时间""有效期"这些；L6 决定怎么挂。
+    """
+    strategy_id: str               # "trend_follow" / "support_collapse" / ...
+    symbol: str
+    side: Side
+    pool: Pool                     # 来源池，用于追溯
+
+    # 价格
+    entry_type: EntryType
+    entry_price: float             # MARKET 时是参考价；LIMIT 时是挂单价
+    stop_loss_price: float
+    take_profit_price: float | None  # None = 用 trailing stop（trend follow 风格）
+
+    # 仓位
+    sizing: PositionSize
+
+    # 元数据
+    signal_strength: float         # 0-1
+    max_holding_seconds: int
+    reasons: tuple[str, ...]

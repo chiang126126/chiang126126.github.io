@@ -34,7 +34,14 @@ L3 安全闸   ← 本目录 ★
    • 固定风险 + 单仓/总仓/杠杆三道上限   features/sizing.py
         │
         ▼
-L4 AI 评分 + L5 策略层 + L6 执行 + L7 组合层 + L8 复盘 ← 私仓 cresus-bot
+L5 策略层   ← 本目录 ★
+   • plan_trend_follow / plan_support_collapse /  features/strategies.py
+     plan_short_vacuum / plan_distribution
+   • 输入: pool + safety + signal + 市场状态
+   • 输出: TradeIntent (含 entry/SL/TP/sizing) 或 None
+        │
+        ▼
+L4 AI 评分 + L6 执行 + L7 组合层 + L8 复盘 ← 私仓 cresus-bot
 ```
 
 ## 设计原则
@@ -61,6 +68,7 @@ L4 AI 评分 + L5 策略层 + L6 执行 + L7 组合层 + L8 复盘 ← 私仓 cr
 | `short_vacuum.py` | 空头真空入场（Module B） |
 | `sizing.py` | 仓位计算（固定风险 + 三道上限） |
 | `indicators.py` | 通用技术指标（EMA / 连续上行根数） |
+| `strategies.py` | 策略编排（plan_* 函数 → TradeIntent） |
 
 ## 快速使用
 

@@ -301,6 +301,55 @@ capped_by      = winner 的名字（risk_based 时为 None）
 
 ---
 
+## `plan_trend_follow` / `plan_support_collapse` / `plan_short_vacuum` / `plan_distribution`
+
+**职责**：L5 策略层。把 池决策 + 安全闸 + 信号 + 市场状态 合成 `TradeIntent`，或返回 `None` 表示不入场。
+
+**公共前提**（每个策略都要过）：
+1. 池匹配该策略所属 module（trend_follow → FRIENDLY；其余三个 → OPERATOR）
+2. `safety.passed == True`
+3. 对应信号 `signal.detected == True`
+
+任一不过 → 返回 None。
+
+### 策略对照
+
+| 策略 | 池 | 方向 | SL 规则 | TP 规则 | 最长持仓 |
+|---|---|---|---|---|---|
+| trend_follow | FRIENDLY | BUY | max(EMA50×0.97, entry×0.92) | None（trailing）| 21 天 |
+| support_collapse | OPERATOR | SELL | peak × 1.02 | base × 0.85 | 72h |
+| short_vacuum | OPERATOR | SELL | spike_high × 1.015（紧）| entry × 0.97（快）| 12h |
+| distribution | OPERATOR | SELL | recent_high × 1.05（宽）| entry × 0.92（慢）| 48h |
+
+### 测试覆盖
+
+| 场景 | 测试 |
+|---|---|
+| 完整 baseline 触发 | `test_*_strategy_baseline` × 4 |
+| 池不匹配 → None | `test_tf_strategy_wrong_pool_returns_none` 等 + `test_all_strategies_reject_blacklist_pool` |
+| 安全闸未过 → None | `test_tf_strategy_safety_failed_returns_none` |
+| 信号未触发 → None | `test_*_strategy_signal_not_detected_returns_none` |
+| 安全闸 passed=True 但有 warnings 仍能开仓 | `test_all_strategies_pass_safety_warnings_through` |
+| 多头 SL 不会过紧（max_loss_pct 兜底）| `test_tf_strategy_sl_at_least_max_loss` |
+| 空头 peak ≤ current → None | `test_sc_strategy_peak_below_current_returns_none` |
+| 空头 TP 比 current 高 → None | `test_sc_strategy_tp_above_current_returns_none` |
+| 异常输入（peak=0 等）| `test_sc_strategy_zero_peak_returns_none` |
+| 持仓时长设计：vacuum < support_collapse, distribution | `test_sv_strategy_holding_time_is_shortest` |
+| SL 宽窄关系：distribution > short_vacuum | `test_dist_strategy_has_widest_sl` |
+
+**关键不变式**
+- 多头 `intent.stop_loss_price < entry_price`，空头 `> entry_price`
+- 多头 `take_profit_price is None`（用 trailing），空头有固定 TP
+- `intent.sizing.qty_quote_usd > 0`（被 sizing 卡到 0 时整个 intent 返 None）
+
+### 已知简化
+- 不做"信号组合"：例如同时触发 short_vacuum 和 distribution 时不会合并成一个 intent，而是分别返回两个，留给上层（L7 组合管理器）去选
+- 不做"加仓"：每次调用都是开新仓的决策，不会读已有持仓再决定加多少
+- `current_price` 假设是稳定可信的；现实中应叠加 L6 的"价格异常检测"
+- `recent_high` / `peak_price` / `spike_high` / `base_low` 由调用方算好传入；未来可以做一个 `market_context.py` 把这些从 candles 抽出
+
+---
+
 ## 整体审计反思
 
 ### 已修正的逻辑错误（实现过程中暴露的）

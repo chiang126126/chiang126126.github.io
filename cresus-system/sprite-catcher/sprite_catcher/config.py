@@ -76,6 +76,25 @@ B_MAX_SINGLE_POSITION_PCT = 0.01      # Module B 单仓 ≤ 1%
 B_MAX_PORTFOLIO_PCT = 0.20            # Module B 总仓 ≤ 20%
 B_MAX_LEVERAGE = 2.0                  # Module B 永续，上限 2x
 
+# === 策略层参数 (L5) ===
+# 多头：SL 不能更紧也不能更松
+A_TRENDFOLLOW_SL_EMA_DISCOUNT = 0.97      # SL = EMA50 × 0.97
+A_TRENDFOLLOW_SL_MAX_LOSS_PCT = 0.08      # 但不超过 -8%（保护极端情况）
+A_TRENDFOLLOW_MAX_HOLDING_DAYS = 21
+
+# 空头：三种信号 SL/TP 各不相同
+B_SUPPORT_COLLAPSE_SL_PEAK_PREMIUM = 0.02 # SL = peak × 1.02
+B_SUPPORT_COLLAPSE_TP_TO_BASE_DISCOUNT = 0.85  # TP = base × 0.85
+B_SUPPORT_COLLAPSE_MAX_HOLDING_HOURS = 72
+
+B_SHORT_VACUUM_SL_PREMIUM = 0.015         # SL = spike_high × 1.015（紧）
+B_SHORT_VACUUM_TP_PCT = 0.03              # TP = entry × 0.97（快进快出）
+B_SHORT_VACUUM_MAX_HOLDING_HOURS = 12
+
+B_DISTRIBUTION_SL_PREMIUM = 0.05          # SL = recent_high × 1.05（宽）
+B_DISTRIBUTION_TP_PCT = 0.08              # TP = entry × 0.92
+B_DISTRIBUTION_MAX_HOLDING_HOURS = 48
+
 # === 安全闸：空头池 (Module B) 要求 ===
 # 设计哲学：空头不太关心 dev 是否惯犯（你赌它跌）也不在乎 LP 锁不锁（LP 抽走对空头有利）；
 # 但要确保你能"卖空"和"买回平仓"，且流动性深到不会被轧爆。
