@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-17T21:11:19.191565+00:00",
+  "updated_at": "2026-05-17T21:13:22.875535+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 14,
+  "alerts_count": 15,
   "alerts": [
+    {
+      "symbol": "FIDAUSDT",
+      "base": "FIDA",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.01937,
+      "price_change_pct": 3.252,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 277310.0,
+      "volume_baseline_usdt": 36959.0,
+      "volume_ratio": 7.5,
+      "detected_at": "2026-05-17T21:12:30.126056+00:00",
+      "intensity": 2,
+      "change_5m_pct": 2.609,
+      "change_15m_pct": 2.174,
+      "change_1h_pct": 0.104,
+      "change_4h_pct": 15.528,
+      "taker_buy_ratio_1m": 0.475,
+      "taker_buy_ratio_5m": 0.544,
+      "oi_delta_5m_pct": 0.133,
+      "funding_rate_pct": -0.7101,
+      "atr_pct": 0.848,
+      "range_4h_pct": 21.17,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.01904143,
+      "suggested_tp1": 0.01986286,
+      "suggested_tp2": 0.02035571,
+      "conviction_score": 7,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "GWEIUSDT",
       "base": "GWEI",
