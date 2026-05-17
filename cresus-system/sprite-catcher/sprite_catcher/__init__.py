@@ -20,6 +20,7 @@ from .features.divergence import detect_distribution_divergence
 from .features.indicators import consecutive_up_bars, ema
 from .features.oi import stratify_oi
 from .features.pool_router import route_to_pool
+from .features.portfolio_manager import assess_market_regime, can_admit_intent
 from .features.safety_gate import evaluate_long_safety, evaluate_short_safety
 from .features.short_vacuum import detect_short_vacuum
 from .features.sizing import size_long_position, size_position, size_short_position
@@ -32,6 +33,8 @@ from .features.strategies import (
 from .features.support_collapse import detect_support_collapse
 from .features.trend_follow import detect_trend_follow
 from .models import (
+    AdmissionDecision,
+    AllocationCaps,
     Candle,
     ChipFeatures,
     DevWalletInfo,
@@ -39,10 +42,12 @@ from .models import (
     EntryType,
     HolderSnapshot,
     LiquidityInfo,
+    MarketRegime,
     OIStratification,
     Pool,
     PoolDecision,
     PositionSize,
+    RegimeAssessment,
     SafetyReport,
     ShortVacuumSignal,
     Side,
@@ -81,6 +86,9 @@ __all__ = [
     "plan_support_collapse",
     "plan_short_vacuum",
     "plan_distribution",
+    # 组合层 (L7)
+    "assess_market_regime",
+    "can_admit_intent",
     # 数据模型 (L2)
     "Candle",
     "ChipFeatures",
@@ -106,4 +114,9 @@ __all__ = [
     "Side",
     "EntryType",
     "TradeIntent",
+    # 数据模型 (L7 组合层)
+    "MarketRegime",
+    "AllocationCaps",
+    "RegimeAssessment",
+    "AdmissionDecision",
 ]

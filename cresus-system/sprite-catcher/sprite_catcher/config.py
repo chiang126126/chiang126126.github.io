@@ -95,6 +95,25 @@ B_DISTRIBUTION_SL_PREMIUM = 0.05          # SL = recent_high × 1.05（宽）
 B_DISTRIBUTION_TP_PCT = 0.08              # TP = entry × 0.92
 B_DISTRIBUTION_MAX_HOLDING_HOURS = 48
 
+# === L7 组合层 ===
+# 各 regime 下 Module A / B 占总资金的上限（注：A+B ≤ total，剩下是现金缓冲）
+REGIME_BULL_MODULE_A_PCT = 0.70           # 牛市多头宽
+REGIME_BULL_MODULE_B_PCT = 0.10           # 牛市空头窄（轧空风险）
+REGIME_BULL_TOTAL_PCT = 0.80
+
+REGIME_RANGE_MODULE_A_PCT = 0.50          # 震荡均衡
+REGIME_RANGE_MODULE_B_PCT = 0.30
+REGIME_RANGE_TOTAL_PCT = 0.70
+
+REGIME_BEAR_MODULE_A_PCT = 0.10           # 熊市多头窄
+REGIME_BEAR_MODULE_B_PCT = 0.40           # 熊市空头宽
+REGIME_BEAR_TOTAL_PCT = 0.50
+
+# Regime 判定阈值
+REGIME_BTC_EMA_PERIOD = 50                # BTC 1D 用 EMA50 判断牛熊
+REGIME_BULL_MC_MOMENTUM = 0.05            # 7d 总市值变化 ≥ +5%
+REGIME_BEAR_MC_MOMENTUM = -0.10           # 7d 总市值变化 ≤ -10%
+
 # === 安全闸：空头池 (Module B) 要求 ===
 # 设计哲学：空头不太关心 dev 是否惯犯（你赌它跌）也不在乎 LP 锁不锁（LP 抽走对空头有利）；
 # 但要确保你能"卖空"和"买回平仓"，且流动性深到不会被轧爆。

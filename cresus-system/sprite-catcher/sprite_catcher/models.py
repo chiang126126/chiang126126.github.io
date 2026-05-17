@@ -32,6 +32,13 @@ class EntryType(str, Enum):
     LIMIT = "limit"            # 限价单
 
 
+class MarketRegime(str, Enum):
+    """大盘态势分级。决定 L7 组合层给 Module A/B 的仓位上限。"""
+    BULL = "bull"              # 牛市：多头宽松、空头收紧
+    RANGE = "range"            # 震荡：均衡分配
+    BEAR = "bear"              # 熊市：空头宽松、多头收紧
+
+
 @dataclass(frozen=True)
 class HolderSnapshot:
     """单个持有人的快照。balance 用 Decimal 防浮点精度丢失。"""
@@ -248,3 +255,32 @@ class TradeIntent:
     signal_strength: float         # 0-1
     max_holding_seconds: int
     reasons: tuple[str, ...]
+
+
+# === L7 组合层 ===
+
+
+@dataclass(frozen=True)
+class AllocationCaps:
+    """某个 regime 下的仓位上限。"""
+    module_a_max_pct: float        # Module A 占总资金最大比例
+    module_b_max_pct: float        # Module B 占总资金最大比例
+    total_max_pct: float           # A+B 合计上限（≤ A+B 加总，留现金缓冲）
+    new_positions_allowed: bool    # 极端情况下可以禁开仓但允许平仓
+
+
+@dataclass(frozen=True)
+class RegimeAssessment:
+    """市场态势评估结果。"""
+    regime: MarketRegime
+    caps: AllocationCaps
+    btc_above_ema: bool            # BTC 1D close > EMA?
+    total_mc_momentum_7d: float    # 总市值 7d 变化（占比，非美元）
+    reasons: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class AdmissionDecision:
+    """L7 对单个 TradeIntent 的准入判断结果。"""
+    admitted: bool
+    reason: str | None             # 拒绝原因（admitted=False 时非空）
