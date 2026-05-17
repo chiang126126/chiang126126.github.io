@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-17T07:48:07.674223+00:00",
+  "generated_at": "2026-05-17T07:49:49.623664+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 94,
-    "open": 0,
+    "total_trades": 95,
+    "open": 1,
     "closed": 94,
     "wins": 34,
     "losses": 59,
@@ -14,15 +14,15 @@
     "avg_pnl_usdt": 0.0123,
     "best_trade_usdt": 2.0008,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 1.5942,
+    "fees_paid_usdt": 1.6042,
     "fees_realized_usdt": 1.5942,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.01,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 99.56,
+    "deployed_usdt": 20.0,
+    "free_capital_usdt": 79.55,
     "max_concurrent_slots": 4,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
@@ -37,7 +37,51 @@
     "live_symbols": [],
     "exchange_symbols": []
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "INXUSDT|LONG|2026-05-17T07:49:22.701423+00:00",
+      "trade_id": "L1779004162_INXUSDT_L",
+      "symbol": "INXUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.011343,
+      "avg_fill_price": 0.011342,
+      "slippage_bps": -0.88,
+      "qty": 1763.0,
+      "notional_usdt": 19.995946,
+      "leverage": 3,
+      "risk_usdt": 0.0477,
+      "risk_pct": 0.239,
+      "mirror_latency_sec": 6.6,
+      "sl_price": 0.01131493,
+      "tp1_price": 0.01138511,
+      "tp2_price": 0.01142721,
+      "phase": "A",
+      "entry_order_id": 61054747,
+      "entry_client_id": "cresus_L1779004162_INXUSDT_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.247,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.009998,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-17T07:49:49.336473+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 78113.7,
+      "btc_change_24h_at_open": -0.301,
+      "btc_pct_vs_ma25_at_open": 0.017,
+      "phase_a_mfe_price": 0.011343,
+      "current_price": 0.011342,
+      "unrealized_pnl_usdt": 0.0,
+      "unrealized_pnl_pct": 0.0,
+      "last_price_check_at": "2026-05-17T07:49:43.933880+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "ZEREBROUSDT|LONG|2026-05-17T05:32:38.598310+00:00",
@@ -4498,17 +4542,17 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-17T07:06:17.102284+00:00",
-      "reason": "paper trade too old (2508s > 600s)",
-      "last_checked_at": "2026-05-17T07:48:04.658384+00:00"
+      "reason": "paper trade too old (2607s > 600s)",
+      "last_checked_at": "2026-05-17T07:49:43.933880+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 78121.7,
-    "btc_ma25_1h": 78100.5,
-    "pct_vs_ma25": 0.027,
-    "change_24h_pct": -0.291,
-    "computed_at": "2026-05-17T07:48:07.665486+00:00"
+    "btc_price": 78113.7,
+    "btc_ma25_1h": 78100.18,
+    "pct_vs_ma25": 0.017,
+    "change_24h_pct": -0.301,
+    "computed_at": "2026-05-17T07:49:46.239186+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
