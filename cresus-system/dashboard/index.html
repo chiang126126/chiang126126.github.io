@@ -1586,8 +1586,9 @@
     display: flex; justify-content: space-between; align-items: center;
     padding: 18px 22px; border-bottom: 1px solid var(--border);
     background: var(--panel-2);
+    gap: 14px; flex-wrap: wrap;   /* 防窄屏标题与"更新于"挤压重叠 */
   }
-  .regime-title-row { display: flex; align-items: center; gap: 12px; }
+  .regime-title-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   .regime-brand {
     font-weight: 700; font-size: 15px;
     color: #d0d6e0; letter-spacing: 0.5px;
@@ -1664,30 +1665,51 @@
   .regime-timeline-header {
     display: flex; justify-content: space-between; align-items: center;
     margin-bottom: 8px; font-size: 12px; color: var(--text-dim);
+    gap: 12px; flex-wrap: wrap;
   }
   .regime-timeline {
-    display: grid; grid-template-columns: repeat(24, 1fr); gap: 2px;
-    height: 28px; margin-bottom: 8px;
+    display: grid; grid-template-columns: repeat(24, 1fr); gap: 3px;
+    height: 22px;
+    max-height: 22px;     /* 强制上限, 防止某些场景被拉伸成方块 */
+    margin-bottom: 2px;
   }
   .regime-tl-cell {
     border-radius: 3px; cursor: default; transition: opacity 0.15s;
     position: relative;
+    height: 22px;
+    min-height: 22px;
+    max-height: 22px;
   }
   .regime-tl-cell:hover { opacity: 0.7; }
   .regime-tl-cell:hover::after {
     content: attr(data-tip);
     position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
     background: #000; color: #fff; padding: 4px 8px; border-radius: 4px;
-    font-size: 11px; white-space: nowrap; z-index: 10; margin-bottom: 4px;
+    font-size: 11px; white-space: pre-line; z-index: 10; margin-bottom: 6px;
+    pointer-events: none;
   }
   /* Phase 2b: 真 24H timeline — gap 用虚线 + 透明背景, 避免与 #5a6478 盘整死水撞色 */
   .regime-tl-cell.empty {
     background: transparent;
-    border: 1.5px dashed rgba(255,255,255,0.22);
+    border: 1.5px dashed rgba(255,255,255,0.25);
     box-sizing: border-box;
   }
-  .regime-tl-cell.current {
-    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.45);
+  /* 24h 刻度行 — 标记 00 06 12 18 NOW 五个关键时点 */
+  .regime-timeline-scale {
+    display: grid; grid-template-columns: repeat(24, 1fr); gap: 3px;
+    font-size: 9.5px; color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 8px;
+    line-height: 1;
+  }
+  .regime-timeline-scale > span {
+    text-align: center;
+    visibility: hidden;
+    padding-top: 2px;
+  }
+  .regime-timeline-scale > span.tick { visibility: visible; }
+  .regime-timeline-scale > span.now {
+    color: #1cbe72; font-weight: 700;
   }
   /* UNKNOWN regime: 紫色, 跟所有已用色不撞 (fallback for unmapped regime types) */
   .regime-badge.unknown { color:#ce93f0; background:rgba(156,39,176,0.15); }
@@ -1699,7 +1721,9 @@
   .legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
   @media (max-width: 720px) {
     .regime-evidence-grid { grid-template-columns: 1fr; gap: 8px; }
-    .regime-timeline { grid-template-columns: repeat(12, 1fr); height: 22px; gap: 1px; }
+    .regime-timeline { grid-template-columns: repeat(24, 1fr); height: 16px; max-height: 16px; gap: 1.5px; }
+    .regime-tl-cell { height: 16px; min-height: 16px; max-height: 16px; }
+    .regime-timeline-scale { grid-template-columns: repeat(24, 1fr); gap: 1.5px; font-size: 8px; }
     .regime-header { padding: 12px 14px; flex-wrap: wrap; gap: 6px; }
     .regime-body { padding: 12px 14px; }
     .regime-judgment-block { padding: 10px 12px; margin-bottom: 10px; }
@@ -2874,6 +2898,7 @@
           <span class="regime-timeline-count" id="regime-timeline-count">— 个快照</span>
         </div>
         <div class="regime-timeline" id="regime-timeline"></div>
+        <div class="regime-timeline-scale" id="regime-timeline-scale"></div>
         <div class="regime-legend">
           <span class="legend-item"><span class="legend-dot" style="background:#00c853"></span>山寨行情</span>
           <span class="legend-item"><span class="legend-dot" style="background:#2196f3"></span>BTC 主导</span>
@@ -3827,6 +3852,20 @@ function renderRegimeTimeline() {
     + (gaps > 0 ? ` <span style="color:#ffb84d">· ${gaps} 小时缺数据</span>` : '')
     + ` · 总 ${regimeHistory.length} 个快照`;
 
+  // 24h 刻度行 (00 06 12 18 NOW). 即使 cells 为空也要渲染, 否则用户看不到时间参考.
+  const scaleEl = document.getElementById("regime-timeline-scale");
+  if (scaleEl) {
+    scaleEl.innerHTML = buckets.map((b, i) => {
+      const isNow = (i === 23);
+      // 每 6h 显示一格 + 末格 NOW
+      const showLabel = isNow || (i % 6 === 0 && i !== 18);  // 避免 18 跟 NOW 太近重叠
+      if (!showLabel) return '<span></span>';
+      const hr = String(new Date(b.start).getHours()).padStart(2, "0");
+      const lbl = isNow ? "NOW" : `${hr}:00`;
+      return `<span class="tick${isNow ? ' now' : ''}">${lbl}</span>`;
+    }).join("");
+  }
+
   if (filled === 0) {
     tl.innerHTML = '<div style="color:var(--text-dim);font-size:11px;grid-column:1/-1;text-align:center;padding:8px">还没有 24h 内的快照（需要至少 1 小时积累）</div>';
     return;
@@ -3838,9 +3877,10 @@ function renderRegimeTimeline() {
     return (pct ? (v * 100) : v).toFixed(digits) + (pct ? '%' : '');
   };
 
-  // 渲染 24 格
+  // 渲染 24 格 — 不再用 .current inset shadow (会跟 dashed empty 视觉冲突),
+  // 改用刻度行的 "NOW" 标签标记当前小时.
   tl.innerHTML = buckets.map((b, i) => {
-    const isCurrentHour = (i === 23);   // 最后一格 = 当前小时
+    const isCurrentHour = (i === 23);
     const hourLabel = new Date(b.start).toLocaleTimeString("zh-CN", {
       hour: "2-digit", minute: "2-digit", hour12: false,
     });
@@ -3857,12 +3897,12 @@ function renderRegimeTimeline() {
       const rp = fmtMetric(h.metrics?.rising_pct, true, 0);
       const mc = fmtMetric(h.metrics?.median_change_pct, false, 2);
       const tip = `${hourLabel}-${endLabel}${currentMark}\n快照 ${ts}\n${m.zh} (conf ${h.confidence ?? '—'})\n广度 ${rp} / 中位 ${mc}`;
-      return `<div class="regime-tl-cell${isCurrentHour ? ' current' : ''}"
+      return `<div class="regime-tl-cell"
                 style="background:${m.color}"
                 data-tip="${escapeHtml(tip)}"></div>`;
     } else {
       const tip = `${hourLabel}-${endLabel}${currentMark}\n无快照 (gap)`;
-      return `<div class="regime-tl-cell empty${isCurrentHour ? ' current' : ''}"
+      return `<div class="regime-tl-cell empty"
                 data-tip="${escapeHtml(tip)}"></div>`;
     }
   }).join("");
