@@ -62,5 +62,10 @@ Crésus
 - [docs/27-l4-ai-scoring-spec.md](docs/27-l4-ai-scoring-spec.md) — L4 AI 评分（JSON schema + prompt 模板）
 - [docs/28-l6-otoco-execution-spec.md](docs/28-l6-otoco-execution-spec.md) — L6 OTOCO 执行 + 看门狗
 - [docs/29-l8-review-walkforward-spec.md](docs/29-l8-review-walkforward-spec.md) — L8 walk-forward + AI 周报
+- [docs/30-sprite-catcher-playbook.md](docs/30-sprite-catcher-playbook.md) — **落地操作手册**（每步可复制粘贴）
 
-公仓代码：[`sprite-catcher/`](sprite-catcher/)（182 单元测试，零外部依赖）
+公仓代码：[`sprite-catcher/`](sprite-catcher/)（207 单元测试，零外部依赖）
+
+⚠️ 上线前必读：
+- [`sprite-catcher/AUDIT.md`](sprite-catcher/AUDIT.md) — 每个函数的正确性证明
+- [`sprite-catcher/AUDIT_FINDINGS.md`](sprite-catcher/AUDIT_FINDINGS.md) — 未决项 / 已知风险 / 私仓必读清单

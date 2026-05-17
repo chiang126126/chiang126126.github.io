@@ -14,6 +14,8 @@ L7 组合层：市场态势分级 + 仓位准入。
 两个都是纯函数；regime 转换没有滞后或滤波（v0 简化），调用方负责采样频率。
 """
 
+from datetime import timedelta
+
 from .. import config
 from ..models import (
     AdmissionDecision,
@@ -53,17 +55,40 @@ def _caps_for(regime: MarketRegime) -> AllocationCaps:
     )
 
 
-def _mc_momentum(history: list[TimeSeriesPoint], lookback_days: int) -> float:
-    """7d 总市值变化百分比。history 按时间升序，最后一个点是当前。"""
+def _mc_momentum(
+    history: list[TimeSeriesPoint], lookback_days: int
+) -> tuple[float, bool]:
+    """
+    返回 (动量百分比, 数据充足性)。
+
+    动量定义：以"最早覆盖到 lookback_days 之前的点"为基线。
+    如果没有任何点足够老（history 跨度 < lookback_days），返回 (0.0, False)
+    并由调用方决定怎么处理（一般不应判 BULL/BEAR）。
+
+    history 必须按 ts 升序。
+    """
     if len(history) < 2:
-        return 0.0
-    # 取最早可比较的点（≥ lookback_days 前）作为基线
-    # 简化：直接拿首尾两个点；调用方应保证 history 覆盖 lookback_days
-    base = history[0].value
-    now = history[-1].value
-    if base <= 0:
-        return 0.0
-    return (now - base) / base
+        return 0.0, False
+
+    now_point = history[-1]
+    cutoff = now_point.ts - timedelta(days=lookback_days)
+
+    # 找最早 ≤ cutoff 的点作为基线（即至少 lookback_days 之前）
+    baseline: TimeSeriesPoint | None = None
+    for p in history:
+        if p.ts <= cutoff:
+            baseline = p
+        else:
+            break
+
+    if baseline is None:
+        # history 全在 cutoff 之后，跨度不够
+        return 0.0, False
+
+    if baseline.value <= 0:
+        return 0.0, False
+
+    return (now_point.value - baseline.value) / baseline.value, True
 
 
 def assess_market_regime(
@@ -114,10 +139,17 @@ def assess_market_regime(
         f"close={btc_now:.0f},ema={ema_now:.0f}"
     )
 
-    mc_momentum = _mc_momentum(total_mc_history, lookback_days=7)
+    mc_momentum, mc_data_sufficient = _mc_momentum(
+        total_mc_history, lookback_days=7
+    )
     reasons.append(f"mc_7d_momentum={mc_momentum:+.3f}")
+    if not mc_data_sufficient:
+        reasons.append("mc_history_insufficient")
 
-    if btc_above_ema and mc_momentum >= bull_mc_momentum:
+    # mc 数据不足时禁止判 BULL/BEAR（防止 momentum=0 错被理解成"中性"）
+    if not mc_data_sufficient:
+        regime = MarketRegime.RANGE
+    elif btc_above_ema and mc_momentum >= bull_mc_momentum:
         regime = MarketRegime.BULL
     elif (not btc_above_ema) and mc_momentum <= bear_mc_momentum:
         regime = MarketRegime.BEAR
@@ -140,14 +172,26 @@ def can_admit_intent(
     equity_usd: float,
     module_a_value_usd: float,
     module_b_value_usd: float,
+    existing_exposure_by_symbol: dict[str, float] | None = None,
+    max_per_symbol_pct: float = 1.0,
 ) -> AdmissionDecision:
     """
     判断这笔新 intent 加进去会不会突破任一上限。
 
     检查顺序：
     1. caps.new_positions_allowed 必须为 True（系统级熔断时可关）
-    2. intent 所属的 Module 仓位上限
-    3. 总仓位上限
+    2. 单标的累计暴露上限（max_per_symbol_pct × equity）
+       防止 Module B 三套策略同时做空同一币种造成 3x 暴露
+    3. intent 所属的 Module 仓位上限
+    4. 总仓位上限
+
+    ⚠️ max_per_symbol_pct 默认 1.0（不限制），仅为了向后兼容旧调用方。
+    **生产代码必须传 0.03 (= 单标的累计暴露 ≤ 3% 总资金)**，
+    否则 Module B 三套策略可能同时做空同一币种造成 3x 风险暴露。
+
+    existing_exposure_by_symbol: symbol → 当前对该标的的 USD 累计名义暴露
+       （多空头都算正数；这是"风险暴露"而非"净头寸"）。
+       None 视为空 dict。
 
     Module 归属：FRIENDLY → A，OPERATOR → B；其它 pool 拒。
     """
@@ -165,6 +209,19 @@ def can_admit_intent(
     if add_usd <= 0:
         return AdmissionDecision(
             admitted=False, reason=f"intent_qty_non_positive:{add_usd}"
+        )
+
+    # 单标的暴露上限 (防 Module B 多策略同时做空同一币)
+    existing_exposure = (existing_exposure_by_symbol or {}).get(intent.symbol, 0.0)
+    new_symbol_exposure = existing_exposure + add_usd
+    symbol_cap = equity_usd * max_per_symbol_pct
+    if new_symbol_exposure > symbol_cap:
+        return AdmissionDecision(
+            admitted=False,
+            reason=(
+                f"per_symbol_cap_exceeded:{intent.symbol}:"
+                f"{new_symbol_exposure:.0f}>{symbol_cap:.0f}"
+            ),
         )
 
     if intent.pool is Pool.FRIENDLY:

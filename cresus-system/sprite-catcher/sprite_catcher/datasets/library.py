@@ -5,7 +5,7 @@
 按行追加新样本无需 schema 迁移。
 
 公开 API：
-- load_samples()           加载全部样本（按 listing_date 升序）
+- load_samples()           加载全部样本（按 rally_start_date 升序）
 - samples_by_label(label)  按标签筛选
 - samples_by_chain(chain)  按链筛选
 
@@ -33,7 +33,7 @@ def _parse_record(raw: dict) -> HistoricalSample:
     return HistoricalSample(
         token_symbol=raw["token_symbol"],
         chain=raw["chain"],
-        listing_date=datetime.fromisoformat(raw["listing_date"]),
+        rally_start_date=datetime.fromisoformat(raw["rally_start_date"]),
         peak_date=datetime.fromisoformat(raw["peak_date"]),
         end_of_window_date=datetime.fromisoformat(raw["end_of_window_date"]),
         base_low_usd=float(raw["base_low_usd"]),
@@ -57,7 +57,7 @@ def _parse_record(raw: dict) -> HistoricalSample:
 
 
 def load_samples(path: Path | None = None) -> list[HistoricalSample]:
-    """加载全部样本，按 listing_date 升序。"""
+    """加载全部样本，按 rally_start_date 升序。"""
     file = path or SAMPLES_FILE
     samples: list[HistoricalSample] = []
     with file.open("r", encoding="utf-8") as fp:
@@ -72,7 +72,7 @@ def load_samples(path: Path | None = None) -> list[HistoricalSample]:
                     f"{file}:{line_no}: invalid JSON — {e}"
                 ) from e
             samples.append(_parse_record(raw))
-    samples.sort(key=lambda s: s.listing_date)
+    samples.sort(key=lambda s: s.rally_start_date)
     return samples
 
 

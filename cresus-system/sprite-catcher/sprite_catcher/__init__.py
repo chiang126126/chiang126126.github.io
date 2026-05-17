@@ -18,7 +18,8 @@ I/O 通过 interfaces.py 中的 Protocol 注入。
 from .datasets.library import load_samples, samples_by_chain, samples_by_label
 from .features.chip import compute_chip_features, funder_dedupe
 from .features.divergence import detect_distribution_divergence
-from .features.indicators import consecutive_up_bars, ema
+from .features.freshness import StaleDataError, assert_fresh, is_fresh
+from .features.indicators import atr, consecutive_up_bars, ema, true_range
 from .features.oi import stratify_oi
 from .features.pool_router import route_to_pool
 from .features.portfolio_manager import assess_market_regime, can_admit_intent
@@ -81,6 +82,11 @@ __all__ = [
     # 工具
     "ema",
     "consecutive_up_bars",
+    "atr",
+    "true_range",
+    "is_fresh",
+    "assert_fresh",
+    "StaleDataError",
     "size_position",
     "size_long_position",
     "size_short_position",

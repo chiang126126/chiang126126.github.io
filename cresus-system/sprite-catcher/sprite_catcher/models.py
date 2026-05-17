@@ -306,7 +306,7 @@ class HistoricalSample:
     # 标识
     token_symbol: str
     chain: str                         # "BTC" / "ETH" / "SOL" / "BSC" / "BASE" / ...
-    listing_date: datetime             # 上主流 CEX 的日期
+    rally_start_date: datetime         # 本次可交易行情的起点（不是首次 CEX 上线）
     peak_date: datetime
     end_of_window_date: datetime       # 样本观察窗结束
 

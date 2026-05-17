@@ -3,7 +3,7 @@ datasets/library.py 测试。
 
 覆盖：
 - JSONL 加载 + 注释跳过
-- 按 listing_date 升序排序
+- 按 rally_start_date 升序排序
 - 按 label / chain 筛选
 - 三种 label 的样本都存在
 - 必填字段缺失抛错
@@ -36,10 +36,10 @@ def test_samples_file_loads():
     assert SampleLabel.AVOID in labels
 
 
-def test_samples_sorted_by_listing_date():
+def test_samples_sorted_by_rally_start_date():
     samples = load_samples()
     for i in range(1, len(samples)):
-        assert samples[i].listing_date >= samples[i - 1].listing_date
+        assert samples[i].rally_start_date >= samples[i - 1].rally_start_date
 
 
 def test_samples_by_label_friendly_includes_known_cases():
@@ -132,7 +132,7 @@ def test_parse_record_handles_null_optionals():
     raw = {
         "token_symbol": "X",
         "chain": "SOL",
-        "listing_date": "2024-01-01T00:00:00",
+        "rally_start_date": "2024-01-01T00:00:00",
         "peak_date": "2024-02-01T00:00:00",
         "end_of_window_date": "2024-03-01T00:00:00",
         "base_low_usd": 1.0,
@@ -161,7 +161,7 @@ def test_load_skips_comments_and_blank_lines(tmp_path: Path):
     f.write_text(
         "// header comment\n"
         "\n"
-        '{"token_symbol":"AAA","chain":"SOL","listing_date":"2024-01-01T00:00:00",'
+        '{"token_symbol":"AAA","chain":"SOL","rally_start_date":"2024-01-01T00:00:00",'
         '"peak_date":"2024-02-01T00:00:00","end_of_window_date":"2024-03-01T00:00:00",'
         '"base_low_usd":1.0,"peak_high_usd":10.0,"end_price_usd":5.0,'
         '"pump_multiplier":10.0,"sustained_pump_days":30,'
