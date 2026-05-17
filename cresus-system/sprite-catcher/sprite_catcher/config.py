@@ -35,3 +35,20 @@ FRIENDLY_MANIPULATION_CEILING = 40.0  # 友好池要求 manipulation_level < 40
 OPERATOR_MANIPULATION_FLOOR = 50.0    # 操纵池要求 manipulation_level ≥ 50
 MANIPULATION_LEVEL_EXTREME = 85.0     # > 85 拉黑（不做空，不做多）
 DAILY_PUMP_DANGER = 5.0               # 24h 涨幅 > 500% 视为加速期 → 拉黑
+
+# === 安全闸：多头池 (Module A) 要求 ===
+A_LP_LOCKED_PCT_MIN = 0.90            # LP 锁定 ≥ 90%
+A_LP_LOCK_DAYS_MIN = 180              # 锁定剩余 ≥ 6 个月
+A_LIQUIDITY_USD_MIN = 200_000.0       # 流动性下限
+A_POOL_AGE_DAYS_MIN = 14              # 池子至少 14 天，过滤极早期
+A_BUY_TAX_MAX = 0.05                  # 买入税 ≤ 5%
+A_SELL_TAX_MAX = 0.05                 # 卖出税 ≤ 5%
+A_TOP10_MAX = 0.30                    # top10 ≤ 30%（比分流的 20% 宽一点）
+
+# === 安全闸：空头池 (Module B) 要求 ===
+# 设计哲学：空头不太关心 dev 是否惯犯（你赌它跌）也不在乎 LP 锁不锁（LP 抽走对空头有利）；
+# 但要确保你能"卖空"和"买回平仓"，且流动性深到不会被轧爆。
+B_LIQUIDITY_USD_MIN = 500_000.0       # 空头需要更深流动性
+B_BUY_TAX_MAX = 0.10                  # 买回平仓税 ≤ 10%
+B_SELL_TAX_MAX = 0.10
+B_POOL_AGE_DAYS_MIN = 7               # 池子 ≥ 7 天（要先有过一次主升）

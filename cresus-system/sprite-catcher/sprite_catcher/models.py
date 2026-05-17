@@ -83,3 +83,59 @@ class PoolDecision:
     pool: Pool
     score: float                # 该池内的相对优先级（越大越优先）
     reasons: tuple[str, ...]    # 命中的规则列表，便于复盘
+
+
+# === L3 安全闸输入 ===
+
+
+@dataclass(frozen=True)
+class TokenAuditInfo:
+    """合约审计静态信息。
+
+    数据源：Binance Query Token Audit Skill / GoPlus / RugCheck。
+    任一布尔字段为 True 都可能触发拒绝（视池而定）。
+    """
+    mintable: bool
+    freezeable: bool
+    pausable: bool
+    has_blacklist: bool
+    owner_renounced: bool
+    owner_has_privileges: bool
+    buy_tax: float              # 0.0 - 1.0
+    sell_tax: float
+
+
+@dataclass(frozen=True)
+class LiquidityInfo:
+    """流动性 + LP 锁定 + 池子寿命。"""
+    liquidity_usd: float
+    lp_locked_pct: float        # 0.0 - 1.0
+    lp_lock_remaining_days: int
+    pool_age_days: int
+
+
+@dataclass(frozen=True)
+class DevWalletInfo:
+    """部署者钱包历史。"""
+    deployer_address: str
+    prior_deploys: int                # 历史部署过多少 token
+    has_rug_history: bool             # 是否有 rug 记录
+    best_prior_market_cap_usd: float  # 历史上最高 MC
+
+
+@dataclass(frozen=True)
+class TradeSimulationResult:
+    """模拟买入+卖出的结果，用来抓动态蜜罐。"""
+    can_buy: bool
+    can_sell: bool
+    effective_buy_tax: float    # 实际成交成本，包含税
+    effective_sell_tax: float
+    error: str | None = None
+
+
+@dataclass(frozen=True)
+class SafetyReport:
+    """L3 安全闸输出。"""
+    passed: bool
+    rejected_reasons: tuple[str, ...]   # passed=False 时非空
+    warnings: tuple[str, ...]            # 通过但策略层应注意

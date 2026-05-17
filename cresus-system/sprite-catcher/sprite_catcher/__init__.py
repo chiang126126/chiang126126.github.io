@@ -19,25 +19,34 @@ from .features.chip import compute_chip_features, funder_dedupe
 from .features.divergence import detect_distribution_divergence
 from .features.oi import stratify_oi
 from .features.pool_router import route_to_pool
+from .features.safety_gate import evaluate_long_safety, evaluate_short_safety
 from .models import (
     ChipFeatures,
+    DevWalletInfo,
     DivergenceSignal,
     HolderSnapshot,
+    LiquidityInfo,
     OIStratification,
     Pool,
     PoolDecision,
+    SafetyReport,
     TimeSeriesPoint,
+    TokenAuditInfo,
+    TradeSimulationResult,
     TransferEdge,
 )
 
 __all__ = [
-    # 计算函数
+    # 计算函数 (L2)
     "compute_chip_features",
     "funder_dedupe",
     "stratify_oi",
     "detect_distribution_divergence",
     "route_to_pool",
-    # 数据模型
+    # 计算函数 (L3)
+    "evaluate_long_safety",
+    "evaluate_short_safety",
+    # 数据模型 (L2)
     "ChipFeatures",
     "DivergenceSignal",
     "HolderSnapshot",
@@ -46,4 +55,10 @@ __all__ = [
     "PoolDecision",
     "TimeSeriesPoint",
     "TransferEdge",
+    # 数据模型 (L3)
+    "TokenAuditInfo",
+    "LiquidityInfo",
+    "DevWalletInfo",
+    "TradeSimulationResult",
+    "SafetyReport",
 ]

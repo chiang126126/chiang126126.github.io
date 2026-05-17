@@ -11,7 +11,15 @@
 
 from typing import Protocol
 
-from .models import HolderSnapshot, TimeSeriesPoint, TransferEdge
+from .models import (
+    DevWalletInfo,
+    HolderSnapshot,
+    LiquidityInfo,
+    TimeSeriesPoint,
+    TokenAuditInfo,
+    TradeSimulationResult,
+    TransferEdge,
+)
 
 
 class HolderProvider(Protocol):
@@ -69,3 +77,38 @@ class OIProvider(Protocol):
     def get_orderbook_large_order_ratio(self, symbol: str) -> float:
         """大单（金额 > 中位数 ×10）占订单簿挂单总数的比例。0-1。"""
         ...
+
+
+# === L3 安全闸数据源 ===
+
+
+class TokenAuditProvider(Protocol):
+    """合约审计静态信息（Binance Token Audit Skill / GoPlus / RugCheck）。"""
+
+    def get_token_audit(self, token: str) -> TokenAuditInfo: ...
+
+
+class LiquidityProvider(Protocol):
+    """流动性 + LP 锁定 + 池子寿命。"""
+
+    def get_liquidity_info(self, token: str) -> LiquidityInfo: ...
+
+
+class DevWalletProvider(Protocol):
+    """部署者钱包历史。生产实现需要长时间数据沉淀（dev 黑名单是滚动维护的）。"""
+
+    def get_dev_wallet_info(self, token: str) -> DevWalletInfo: ...
+
+
+class TradeSimulator(Protocol):
+    """模拟买入+卖出，抓动态蜜罐。
+
+    生产实现：
+    - Solana: 用 RPC simulateTransaction
+    - EVM: 用 eth_call + 本地 fork
+    - CEX: 不适用（CEX 不存在蜜罐）
+    """
+
+    def simulate_buy_then_sell(
+        self, token: str, amount_usd: float
+    ) -> TradeSimulationResult: ...
