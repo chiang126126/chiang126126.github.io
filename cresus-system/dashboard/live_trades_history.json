@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-17T20:56:20.430156+00:00",
+  "generated_at": "2026-05-17T20:58:34.378131+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 139,
-    "open": 0,
+    "total_trades": 140,
+    "open": 1,
     "closed": 139,
     "wins": 51,
     "losses": 87,
@@ -14,30 +14,82 @@
     "avg_pnl_usdt": 0.0332,
     "best_trade_usdt": 2.1605,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 2.4671,
+    "fees_paid_usdt": 2.475,
     "fees_realized_usdt": 2.4671,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.008,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 102.14,
+    "deployed_usdt": 19.88,
+    "free_capital_usdt": 82.25,
     "max_concurrent_slots": 4,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 4.6101,
-    "deployed_usdt": 0
+    "deployed_usdt": 19.88
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "ZECUSDT"
+    ],
+    "exchange_symbols": [
+      "ZECUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "ZECUSDT|LONG|2026-05-17T20:55:46.501041+00:00",
+      "trade_id": "L1779051346_ZECUSDT_L",
+      "symbol": "ZECUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 537.25,
+      "avg_fill_price": 537.34,
+      "slippage_bps": 1.68,
+      "qty": 0.037,
+      "notional_usdt": 19.88158,
+      "leverage": 3,
+      "risk_usdt": 0.0674,
+      "risk_pct": 0.339,
+      "mirror_latency_sec": 6.4,
+      "sl_price": 535.6071428600001,
+      "sl_paper_current": 535.51714286,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.09,
+      "sl_compensation_mode": "ab",
+      "tp1_price": 539.84928571,
+      "tp2_price": 542.44857143,
+      "phase": "A",
+      "entry_order_id": 1239750953,
+      "entry_client_id": "cresus_L1779051346_ZECUSDT_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.323,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.007953,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-17T20:56:55.577053+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 78239.0,
+      "btc_change_24h_at_open": 0.007,
+      "btc_pct_vs_ma25_at_open": 0.147,
+      "phase_a_mfe_price": 537.25,
+      "current_price": 537.41,
+      "unrealized_pnl_usdt": 0.0026,
+      "unrealized_pnl_pct": 0.013,
+      "last_price_check_at": "2026-05-17T20:58:32.303803+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "VVVUSDT|LONG|2026-05-17T18:59:16.905352+00:00",
@@ -6971,17 +7023,17 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-17T18:56:02.861190+00:00",
-      "reason": "paper trade too old (7215s > 600s)",
-      "last_checked_at": "2026-05-17T20:56:17.898758+00:00"
+      "reason": "paper trade too old (7349s > 600s)",
+      "last_checked_at": "2026-05-17T20:58:32.303803+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 78241.5,
+    "btc_price": 78241.6,
     "btc_ma25_1h": 78124.2,
     "pct_vs_ma25": 0.15,
-    "change_24h_pct": 0.01,
-    "computed_at": "2026-05-17T20:56:20.377594+00:00"
+    "change_24h_pct": 0.011,
+    "computed_at": "2026-05-17T20:58:34.087313+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
