@@ -166,10 +166,13 @@
   .elevator-btn.macro       { border-color: #40a9ff; color: #40a9ff; }
   .elevator-btn.opportunity { border-color: #b37feb; color: #b37feb; }
   .elevator-btn.my-trades   { border-color: #00c853; color: #00c853; }
+  /* 77 实盘交易: 深翡翠 (匹配 .live-panel 主题, 跟 #00c853 鲜翠绿差异化) */
+  .elevator-btn.live        { border-color: #0d8043; color: #1cbe72; }
   /* 滚动到对应分区时高亮 */
   .elevator-btn.macro.active       { background: linear-gradient(135deg,#40a9ff,#1890ff); color: #fff; box-shadow: 0 0 16px rgba(64,169,255,0.55); }
   .elevator-btn.opportunity.active { background: linear-gradient(135deg,#b37feb,#9254de); color: #fff; box-shadow: 0 0 16px rgba(179,127,235,0.55); }
   .elevator-btn.my-trades.active   { background: linear-gradient(135deg,#00e676,#00c853); color: #003a16; box-shadow: 0 0 16px rgba(0,200,83,0.55); }
+  .elevator-btn.live.active        { background: linear-gradient(135deg,#1cbe72,#0d8043); color: #fff; box-shadow: 0 0 16px rgba(13,128,67,0.55); }
   /* 锚点跳转时给顶部留余量,避免被 header 挡 */
   .section-marker { scroll-margin-top: 12px; }
   @media (max-width: 720px) {
@@ -319,6 +322,7 @@
                 rgba(13,128,67,0.06) 0%,
                 rgba(13,128,67,0.015) 100%);
     box-shadow: inset 1px 0 0 rgba(13,128,67,0.15);
+    scroll-margin-top: 16px;     /* 电梯按钮 "77" 跳转时, 上方留余量 */
   }
   /* 标题栏: 深翡翠渐变背景, 与 paper 浅翠绿明显差异 */
   .live-panel h2 {
@@ -2799,6 +2803,7 @@
   <a href="#section-macro"       class="elevator-btn macro"       title="01 宏观环境">01</a>
   <a href="#section-opportunity" class="elevator-btn opportunity" title="02 交易机会">02</a>
   <a href="#section-my-trades"   class="elevator-btn my-trades"   title="03 我的交易">03</a>
+  <a href="#live-panel"          class="elevator-btn live"        title="77 实盘交易 (LIVE MONEY)">77</a>
 </nav>
 
 <main>
@@ -7236,6 +7241,7 @@ document.addEventListener("visibilitychange", () => {
     { id: "section-macro",       cls: "macro" },
     { id: "section-opportunity", cls: "opportunity" },
     { id: "section-my-trades",   cls: "my-trades" },
+    { id: "live-panel",          cls: "live" },      // 77 实盘交易
   ];
   const buttons = {};
   sections.forEach(s => {
