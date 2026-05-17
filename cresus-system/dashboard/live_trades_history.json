@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-17T01:23:44.724008+00:00",
+  "generated_at": "2026-05-17T01:25:29.795018+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 81,
-    "open": 2,
+    "total_trades": 82,
+    "open": 3,
     "closed": 79,
     "wins": 26,
     "losses": 53,
@@ -14,33 +14,35 @@
     "avg_pnl_usdt": 0.0009,
     "best_trade_usdt": 2.0008,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 1.326,
+    "fees_paid_usdt": 1.336,
     "fees_realized_usdt": 1.3079,
-    "fees_open_usdt": 0.0181,
+    "fees_open_usdt": 0.0281,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 40.18,
-    "free_capital_usdt": 58.57,
+    "deployed_usdt": 60.17,
+    "free_capital_usdt": 38.56,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 3
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 0.0719,
-    "deployed_usdt": 40.18
+    "deployed_usdt": 60.17
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
+      "SPORTFUNUSDT",
       "ATAUSDT",
-      "SPORTFUNUSDT"
+      "FHEUSDT"
     ],
     "exchange_symbols": [
+      "SPORTFUNUSDT",
       "ATAUSDT",
-      "SPORTFUNUSDT"
+      "FHEUSDT"
     ]
   },
   "open_trades": [
@@ -72,18 +74,18 @@
       "atr_pct": 0.443,
       "phase_a_mfe_pct": 1.631,
       "phase_b_mfe_pct": 2.447,
-      "phase_c_mfe_pct": 4.731,
+      "phase_c_mfe_pct": 4.894,
       "fees_paid_usdt": 0.007998,
       "fees_are_actual": true,
       "opened_at": "2026-05-17T00:43:28.906634+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.00603,
-      "current_price": 0.00584,
-      "unrealized_pnl_usdt": 0.946,
-      "unrealized_pnl_pct": 4.731,
-      "last_price_check_at": "2026-05-17T01:23:41.957584+00:00",
+      "current_price": 0.00583,
+      "unrealized_pnl_usdt": 0.9786,
+      "unrealized_pnl_pct": 4.894,
+      "last_price_check_at": "2026-05-17T01:25:26.738467+00:00",
       "phase_b_mfe_price": 0.00598,
-      "phase_c_mfe_price": 0.00584
+      "phase_c_mfe_price": 0.00583
     },
     {
       "paper_id": "SPORTFUNUSDT|SHORT|2026-05-17T01:12:53.911173+00:00",
@@ -111,18 +113,57 @@
       "conviction_score": 5,
       "alert_type": "sustained",
       "atr_pct": 1.484,
-      "phase_a_mfe_pct": 0.502,
+      "phase_a_mfe_pct": 0.636,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.01009,
       "fees_are_actual": true,
       "opened_at": "2026-05-17T01:13:49.159776+00:00",
       "is_dry_run": false,
-      "phase_a_mfe_price": 0.05944,
-      "current_price": 0.05942,
-      "unrealized_pnl_usdt": 0.2747,
-      "unrealized_pnl_pct": 1.361,
-      "last_price_check_at": "2026-05-17T01:23:41.957584+00:00"
+      "phase_a_mfe_price": 0.05936,
+      "current_price": 0.05925,
+      "unrealized_pnl_usdt": 0.3317,
+      "unrealized_pnl_pct": 1.643,
+      "last_price_check_at": "2026-05-17T01:25:26.738467+00:00"
+    },
+    {
+      "paper_id": "FHEUSDT|SHORT|2026-05-17T01:23:13.693445+00:00",
+      "trade_id": "L1778980993_FHEUSDT_S",
+      "symbol": "FHEUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.0263,
+      "avg_fill_price": 0.02638,
+      "slippage_bps": -30.42,
+      "qty": 758.0,
+      "notional_usdt": 19.99604,
+      "leverage": 3,
+      "risk_usdt": 0.1643,
+      "risk_pct": 0.822,
+      "mirror_latency_sec": 26.4,
+      "sl_price": 0.02659679,
+      "tp1_price": 0.02585482,
+      "tp2_price": 0.02540964,
+      "phase": "A",
+      "entry_order_id": 143913746,
+      "entry_client_id": "cresus_L1778980993_FHEUSDT_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.752,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.009998,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-17T01:24:19.561941+00:00",
+      "is_dry_run": false,
+      "phase_a_mfe_price": 0.0263,
+      "current_price": 0.02643,
+      "unrealized_pnl_usdt": -0.0379,
+      "unrealized_pnl_pct": -0.19,
+      "last_price_check_at": "2026-05-17T01:25:26.738467+00:00"
     }
   ],
   "recent_closed": [
@@ -3829,8 +3870,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-17T00:08:53.548620+00:00",
-      "reason": "paper trade too old (4488s > 600s)",
-      "last_checked_at": "2026-05-17T01:23:41.957584+00:00"
+      "reason": "paper trade too old (4593s > 600s)",
+      "last_checked_at": "2026-05-17T01:25:26.738467+00:00"
     },
     {
       "paper_id": "STARUSDT|SHORT|2026-05-17T01:04:28.826832+00:00",
@@ -3838,8 +3879,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-17T01:04:44.355873+00:00",
-      "reason": "paper trade too old (1138s > 600s)",
-      "last_checked_at": "2026-05-17T01:23:41.957584+00:00"
+      "reason": "paper trade too old (1242s > 600s)",
+      "last_checked_at": "2026-05-17T01:25:26.738467+00:00"
     }
   ],
   "config": {
