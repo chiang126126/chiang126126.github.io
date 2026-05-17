@@ -1,45 +1,43 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-17T15:17:07.693373+00:00",
+  "generated_at": "2026-05-17T15:19:20.472470+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 123,
-    "open": 2,
-    "closed": 121,
+    "open": 1,
+    "closed": 122,
     "wins": 45,
-    "losses": 75,
-    "win_rate": 0.375,
-    "total_pnl_usdt": 2.618,
-    "net_pnl_usdt": 0.4993,
-    "avg_pnl_usdt": 0.0216,
+    "losses": 76,
+    "win_rate": 0.372,
+    "total_pnl_usdt": 2.6157,
+    "net_pnl_usdt": 0.477,
+    "avg_pnl_usdt": 0.0214,
     "best_trade_usdt": 2.0008,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 2.1387,
-    "fees_realized_usdt": 2.1187,
-    "fees_open_usdt": 0.02,
+    "fees_paid_usdt": 2.1487,
+    "fees_realized_usdt": 2.1387,
+    "fees_open_usdt": 0.01,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 39.97,
-    "free_capital_usdt": 60.51,
+    "deployed_usdt": 20.0,
+    "free_capital_usdt": 80.47,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 2.6173,
-    "deployed_usdt": 39.97
+    "daily_pnl": 2.615,
+    "deployed_usdt": 20.0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "POWERUSDT",
       "FHEUSDT"
     ],
     "exchange_symbols": [
-      "POWERUSDT",
       "FHEUSDT"
     ]
   },
@@ -82,13 +80,15 @@
       "btc_change_24h_at_open": -0.1,
       "btc_pct_vs_ma25_at_open": -0.149,
       "phase_a_mfe_price": 0.03085,
-      "current_price": 0.0324,
-      "unrealized_pnl_usdt": 1.7085,
-      "unrealized_pnl_pct": 8.543,
-      "last_price_check_at": "2026-05-17T15:17:04.707714+00:00",
+      "current_price": 0.03303,
+      "unrealized_pnl_usdt": 2.1306,
+      "unrealized_pnl_pct": 10.653,
+      "last_price_check_at": "2026-05-17T15:19:18.365781+00:00",
       "phase_b_mfe_price": 0.03178,
       "phase_c_mfe_price": 0.03254
-    },
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "POWERUSDT|LONG|2026-05-17T15:06:35.686279+00:00",
       "trade_id": "L1779030395_POWERUS_L",
@@ -118,7 +118,7 @@
       "phase_a_mfe_pct": 1.343,
       "phase_b_mfe_pct": 1.366,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.009983,
+      "fees_paid_usdt": 0.019965,
       "fees_are_actual": true,
       "opened_at": "2026-05-17T15:06:56.681920+00:00",
       "is_dry_run": false,
@@ -131,10 +131,18 @@
       "unrealized_pnl_usdt": 0.1748,
       "unrealized_pnl_pct": 0.875,
       "last_price_check_at": "2026-05-17T15:17:04.707714+00:00",
-      "phase_b_mfe_price": 0.08906
-    }
-  ],
-  "recent_closed": [
+      "phase_b_mfe_price": 0.08906,
+      "closed_at": "2026-05-17T15:17:42.639118+00:00",
+      "close_reason": "paper:hit_b_trail",
+      "avg_exit_price": 0.08795,
+      "realized_pnl_usdt": -0.0023,
+      "close_order_id": 129462361,
+      "close_qty": 227.0,
+      "close_expected_price": 0.08873,
+      "close_slippage_bps": 87.91,
+      "entry_fees_usdt": 0.009983,
+      "close_fees_usdt": 0.009982
+    },
     {
       "paper_id": "MAGMAUSDT|LONG|2026-05-17T14:24:11.373907+00:00",
       "trade_id": "L1779027851_MAGMAUS_L",
@@ -6040,11 +6048,11 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 77961.1,
-    "btc_ma25_1h": 78127.35,
-    "pct_vs_ma25": -0.213,
-    "change_24h_pct": -0.311,
-    "computed_at": "2026-05-17T15:17:07.072277+00:00"
+    "btc_price": 77941.7,
+    "btc_ma25_1h": 78126.57,
+    "pct_vs_ma25": -0.237,
+    "change_24h_pct": -0.336,
+    "computed_at": "2026-05-17T15:19:20.185936+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
@@ -6064,7 +6072,7 @@
     "max_deploy_usdt": 80.0,
     "total_dd_limit_pct": 5.0,
     "mirror_max_age_sec": 600,
-    "max_entry_slippage_bps": 30.0,
+    "max_entry_slippage_bps": 50.0,
     "observation_mode": true
   }
 }
