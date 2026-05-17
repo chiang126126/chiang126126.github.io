@@ -3,7 +3,7 @@
 > 这份是给你（项目主）的"具体下一步该做什么"的步骤清单。
 > 每一段命令都可以直接复制运行。每个阶段做完前**不要**进入下一阶段。
 >
-> 风险提示已在 [`sprite-catcher/AUDIT_FINDINGS.md`](../sprite-catcher/AUDIT_FINDINGS.md) 列清。
+> 风险提示已在 [`../AUDIT_FINDINGS.md`](../AUDIT_FINDINGS.md) 列清。
 > **任何一条 SEVERE 没解决前，不上实盘**。
 
 ---
@@ -13,13 +13,24 @@
 确认 sprite-catcher 在你本地能跑通。
 
 ```bash
-cd ~/path/to/chiang126126.github.io/cresus-system/sprite-catcher
+# 1. 克隆仓库（如果还没克隆）
+cd ~
+git clone https://github.com/chiang126126/chiang126126.github.io.git
+cd chiang126126.github.io
+git checkout claude/analyze-crypto-dashboard-OT0ts
 
-# 装最小依赖
-python3 -m pip install --user pytest
+# 2. 进入 sprite-catcher 目录
+cd sprite-catcher
+pwd
+# 应该看到: /Users/你/chiang126126.github.io/sprite-catcher
 
-# 全套测试
-python3 -m pytest -v
+# 3. 建项目独立 venv (推荐 Python 3.11)
+python3.11 -m venv .venv
+source .venv/bin/activate
+
+# 4. 装 pytest 并跑全套测试
+pip install pytest
+pytest -v
 
 # 预期最后一行：
 # ============================= 207 passed in 0.XXs ==============================
@@ -27,78 +38,97 @@ python3 -m pytest -v
 
 如果有失败，**立即停下**，把错误贴回来一起 debug。不要带着失败的测试往下走。
 
+> 💡 以后每次回到这个项目工作：`cd sprite-catcher && source .venv/bin/activate`
+
 ---
 
 ## 阶段 1 · 完善样本库（1–2 天，最关键的一件事）
 
-`samples.jsonl` 里 22 个样本的价格是研究估算，**直接用它跑回测会校准出错误的阈值**。
-必须用真实数据替换。
+`sprite_catcher/datasets/samples.jsonl` 里 22 个样本的价格是研究估算，
+**直接用它跑回测会校准出错误的阈值**。必须用真实数据替换。
 
 ### 1.1 准备数据脚本（不入公仓，本地用）
 
-新建文件 `~/sprite-catcher-tools/refine_samples.py`：
+在 sprite-catcher 之外某个目录建脚本（**不要**放进 git）：
+
+```bash
+mkdir -p ~/sprite-tools
+cd ~/sprite-tools
+```
+
+新建 `refine_samples.py`：
 
 ```python
 """
-从 CoinGecko 拉取每个样本时间窗内的真实 OHLCV，校准 base_low / peak_high。
+从 CoinGecko 拉取每个样本时间窗内的真实 OHLCV，
+校准 base_low / peak_high / pump_multiplier。
 免费 API 限频 30 req/min，22 个样本 ≈ 1 分钟跑完。
 """
 import json
 import time
 import urllib.request
+from datetime import datetime
 from pathlib import Path
 
-SAMPLES_PATH = Path("~/path/to/sprite-catcher/sprite_catcher/datasets/samples.jsonl").expanduser()
+SAMPLES_PATH = Path.home() / "chiang126126.github.io/sprite-catcher/sprite_catcher/datasets/samples.jsonl"
+
 COINGECKO_IDS = {
     "DOGE": "dogecoin", "SHIB": "shiba-inu", "ORDI": "ordinals",
     "WIF": "dogwifcoin", "PEPE": "pepe", "POPCAT": "popcat",
-    "BOME": "book-of-meme", "BONK": "bonk", "VIRTUAL": "virtual-protocol",
-    "AI16Z": "ai16z", "GOAT": "goatseus-maximus",
+    "BOME": "book-of-meme", "BONK": "bonk",
+    "VIRTUAL": "virtual-protocol", "AI16Z": "ai16z",
+    "GOAT": "goatseus-maximus",
     "MYX": "myx-finance", "COAI": "chainopera-ai",
-    # AIA/ZKJ/KOGE/RAVE/LAB 可能要查 CMC 或 Bitget API，
-    # 私仓里维护一份完整 mapping
+    # AIA/ZKJ/KOGE/RAVE/LAB 可能要查 CMC 或 Bitget API
 }
 
-def fetch_range(coin_id, from_ts, to_ts):
+def fetch_range(coin_id: str, from_ts: int, to_ts: int) -> dict:
     url = (f"https://api.coingecko.com/api/v3/coins/{coin_id}/market_chart/range"
            f"?vs_currency=usd&from={from_ts}&to={to_ts}")
     with urllib.request.urlopen(url) as r:
         return json.loads(r.read())
 
-# 逐行读取 -> 拉数据 -> 校准 base_low/peak_high -> 写回
-# (具体实现略；不要把这个脚本提交到 git，含 API mapping 是私仓的事)
+# TODO: 逐行读 SAMPLES_PATH -> 拉数据 -> 找窗口内 min low / max high
+# -> 校准 base_low_usd / peak_high_usd / pump_multiplier -> 写回
 ```
 
-**不要把这个脚本和真实数据一起提进公仓**——会让 samples.jsonl 看起来权威但其实只是某个时刻的快照。让它留在你本地。
+**不要把这个脚本和真实数据一起提进公仓**——用过即丢，保持公仓 samples.jsonl 是"研究种子"，
+真实校准在私仓里维护。
 
 ### 1.2 补齐缺失字段
 
-按 [`AUDIT_FINDINGS.md`](../sprite-catcher/AUDIT_FINDINGS.md) M1 提到的：
+按 [`../AUDIT_FINDINGS.md`](../AUDIT_FINDINGS.md) M1 提到的：
 
-- `top10_share_at_peak`：从链上扫（Solana 用 Helius `getTokenLargestAccounts`，EVM 用 Etherscan 的 holders API）
+- `top10_share_at_peak`：从链上扫
+  - Solana 用 Helius `getTokenLargestAccounts`
+  - EVM 用 Etherscan 的 holders API
 - `binance_oi_share_at_peak`：从 CoinGlass 历史 API 拿（要付费账户，免费 tier 数据有限）
 - `vol_oi_ratio_at_peak`：自己算 = `24h_vol / open_interest`
 
 补齐之后，回到测试：
 
 ```bash
-cd ~/path/to/sprite-catcher
-python3 -m pytest tests/test_datasets.py -v
+cd ~/chiang126126.github.io/sprite-catcher
+source .venv/bin/activate
+pytest tests/test_datasets.py -v
 # 应该仍然 14 passed
 ```
 
 ---
 
-## 阶段 2 · 建私仓 cresus-bot（半天）
+## 阶段 2 · 建私仓 sprite-bot（半天）
 
 公仓 sprite-catcher 是纯计算 + spec。所有涉及 API key / LLM 调用 / 实盘下单的代码都进私仓。
+
+⚠️ **私仓必须是新建的 `sprite-bot`，不要和 Crésus 的 `cresus-bot` 混用**——这是"完全平行"
+设计的核心点：账户、密钥、部署都独立。
 
 ### 2.1 建仓 + 装 sprite-catcher
 
 ```bash
-# 你的 GitHub 上建 private repo: cresus-bot
-gh repo create chiang126126/cresus-bot --private --clone
-cd cresus-bot
+# GitHub 上建 private repo: sprite-bot
+gh repo create chiang126126/sprite-bot --private --clone
+cd sprite-bot
 
 # 基础结构
 mkdir -p {src/sprite_bot,tests,config,data}
@@ -116,9 +146,9 @@ data/secrets/
 EOF
 
 # venv + 安装 sprite-catcher (editable, 这样改公仓代码立即生效)
-python3 -m venv .venv
+python3.11 -m venv .venv
 source .venv/bin/activate
-pip install -e ../chiang126126.github.io/cresus-system/sprite-catcher
+pip install -e ~/chiang126126.github.io/sprite-catcher
 pip install httpx websockets python-binance solders helius-sdk anthropic pydantic
 ```
 
@@ -142,7 +172,7 @@ COINGLASS_API_KEY=
 # LLM
 ANTHROPIC_API_KEY=
 
-# Telegram (/halt 用)
+# Telegram (/halt 用) — 用一个 sprite-bot 专属 chat，不要复用 cresus-bot 的
 TELEGRAM_BOT_TOKEN=
 TELEGRAM_CHAT_ID=
 
@@ -162,16 +192,20 @@ cp .env.example .env
 - ❌ Enable Margin（除非明确需要）
 - IP 白名单：只列你的 VPS 出口 IP
 
+⚠️ **强烈建议为 sprite-bot 创建一个独立的 Binance 子账户**，与 cresus-bot 物理隔离：
+- 子账户单独充值（限定本月交易额度）
+- 子账户单独的 API key
+- 主账户的资金作为"母账户"留在硬件钱包，不参与交易
+
 ---
 
 ## 阶段 3 · 实现 4 个 Protocol（3–5 天）
 
-按 sprite-catcher 的 `interfaces.py`，私仓实现这 4 个 Protocol：
+按 sprite-catcher 的 `sprite_catcher/interfaces.py`，私仓实现这些 Protocol：
 
 ```
 src/sprite_bot/
 ├── providers/
-│   ├── binance_holder_provider.py       # HolderProvider (现货可能不支持，留接口)
 │   ├── helius_holder_provider.py        # HolderProvider for Solana
 │   ├── helius_transfer_provider.py      # TransferProvider
 │   ├── cex_wallet_registry.py            # CEXWalletRegistry (硬编码常见 CEX 热钱包)
@@ -194,7 +228,8 @@ src/sprite_bot/
 
 ### 3.2 烟雾测试样本
 
-第一个集成测试：用真实 Helius 拉 `ORDI` 的 holders，调用公仓的 `compute_chip_features`，验证 top10_share 与你阶段 1 补齐的 samples.jsonl 一致（±5%）。
+第一个集成测试：用真实 Helius 拉 `ORDI` 的 holders，调用公仓的 `compute_chip_features`，
+验证 top10_share 与你阶段 1 补齐的 samples.jsonl 一致（±5%）。
 
 跑通了 = providers 接对了；跑不通 = 接错了或公仓有 bug。
 
@@ -210,7 +245,8 @@ from sprite_catcher import (
     compute_chip_features, stratify_oi, route_to_pool,
     evaluate_long_safety, detect_trend_follow,
     plan_trend_follow, can_admit_intent,
-    load_samples, SampleLabel,
+    load_samples, SampleLabel, Pool,
+    assert_fresh,
 )
 
 samples = load_samples()
@@ -219,12 +255,18 @@ for sample in samples:
     for ts in daily_range(sample.rally_start_date, sample.peak_date):
         # 1. 拉 T 时刻的链上 + CEX 数据（从你本地存档拉）
         snapshot = load_snapshot(sample.token_symbol, ts)
-        
+
+        # 1.5 数据新鲜度检查（assert_fresh 来自 sprite-catcher）
+        try:
+            assert_fresh(snapshot.oi_series, now=ts, max_age_seconds=3600, label="oi")
+        except StaleDataError:
+            continue   # 跳过陈旧数据
+
         # 2. 走完整管道
         chip = compute_chip_features(...)
         oi = stratify_oi(...)
         decision = route_to_pool(chip, oi, daily_pump_pct=snapshot.daily_pump)
-        
+
         if decision.pool == Pool.FRIENDLY:
             safety = evaluate_long_safety(...)
             signal = detect_trend_follow(...)
@@ -240,14 +282,15 @@ for sample in samples:
                 )
                 if admission.admitted:
                     portfolio.open(intent)
-        
+
         portfolio.tick(ts)  # 更新持仓盈亏、触发 SL/TP
-    
+
     # 每个 sample 跑完打分
     print(sample.token_symbol, portfolio.pnl_for(sample))
 ```
 
-**重点**：你需要"T 时刻可见的链上快照"。如果你只有现在的快照，就只能跑近期样本——这就是 survivorship bias 的根源。
+**重点**：你需要"T 时刻可见的链上快照"。如果你只有现在的快照，就只能跑近期样本——
+这就是 survivorship bias 的根源。
 
 **最低标准**：拿真实 OHLCV 跑出每个友好样本的 PnL 模拟，确认胜率/盈亏比与阶段 5 的门槛对得上。
 
@@ -257,7 +300,7 @@ for sample in samples:
 
 私仓加一个 `paper_broker.py`：消费 TradeIntent，按当前盘口模拟成交（含真实滑点 + 真实手续费 0.1%）。
 
-**升级到实盘的硬门槛**（见 [`docs/29-l8-review-walkforward-spec.md`](./29-l8-review-walkforward-spec.md)）：
+**升级到实盘的硬门槛**（见 [`l8-walkforward.md`](./l8-walkforward.md)）：
 
 - [ ] profit_factor ≥ 1.5
 - [ ] win_rate ≥ 45%
@@ -274,14 +317,13 @@ for sample in samples:
 
 ## 阶段 6 · 小额实盘（30 天，1/10 仓位）
 
-```python
+```yaml
 # config/live.yaml
 trading_mode: live
 position_size_multiplier: 0.1   # 设计仓位 × 1/10
 max_open_positions: 5
 modules_enabled:
   - module_a_trend_follow
-  - module_a_breakout       # 后续加
   # Module B 暂不开，等熟悉一遍多头
 ```
 
@@ -300,7 +342,7 @@ modules_enabled:
 
 - 仓位 ratio 从 1/10 → 1/3（第 31–60 天）→ 1（第 61 天+）
 - Module B 上线：先只用 `support_collapse`（最慢最稳）跑 30 天，再加 vacuum/distribution
-- 每周复盘 + AI 周报（见 [`docs/29-l8-review-walkforward-spec.md`](./29-l8-review-walkforward-spec.md)）
+- 每周复盘 + AI 周报（见 [`l8-walkforward.md`](./l8-walkforward.md)）
 
 ---
 
@@ -310,7 +352,7 @@ modules_enabled:
 |---|---|---|
 | 0 验证 | 5 min | `pytest` 207 passed |
 | 1 完善样本 | 1–2 天 | samples.jsonl 真实数据 |
-| 2 建私仓 | 半天 | cresus-bot + .env + pip install -e |
+| 2 建私仓 sprite-bot | 半天 | 私仓 + .env + pip install -e |
 | 3 实现 Protocol | 3–5 天 | 4 个 provider + 烟雾测试 |
 | 4 历史回放 | 5–7 天 | backtest.py + 22 样本回放报告 |
 | 5 Paper Trade | 30 天 | 升级门槛达标 |
@@ -334,3 +376,4 @@ modules_enabled:
 - 加杠杆超过 spec 写的（Module A 0x；Module B 上限 2x）
 - 把 Simple Earn 当冷库
 - 信任 AI 输出的金额/方向（永远走确定性代码）
+- 让 sprite-bot 和 cresus-bot 共享子账户或密钥

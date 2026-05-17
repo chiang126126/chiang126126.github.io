@@ -1,14 +1,17 @@
 # 精灵捕手 · Sprite Catcher
 
-Crésus 体系下专门做"妖币"的特征工程层（L2）。
+专门做"妖币"的自动化交易体系——多源信号 + 双模块（多头现货 + 空头永续）+ 严格风控。
 
-> 本目录只包含**纯计算 + 纯接口**的参考实现，不含任何 API 密钥、不发起任何交易。
-> 真正接 Binance / Helius / Bitquery 的数据源在私仓 `cresus-bot` 里实现 Protocol 即可。
+> 本仓库（公开）只放**纯计算 + 纯接口**的参考实现，不含任何 API 密钥、不发起任何交易。
+> 真正接 Binance / Helius / Bitquery 的数据源在配套私仓 `sprite-bot` 实现 Protocol 即可。
+>
+> 与同 repo 下的 [`../cresus-system/`](../cresus-system/) **完全独立**：不互相 import、
+> 不共享文件、不共享部署。两者可以独立运行、独立部署、独立托管资金。
 
 ## 模块定位
 
 ```
-L1 数据采集 (CEX × 多家 + 链上)            ← 私仓 cresus-bot
+L1 数据采集 (CEX × 多家 + 链上)            ← 私仓 sprite-bot
         │
         ▼
 L2 特征工程   ← 本目录 ★
@@ -41,7 +44,7 @@ L5 策略层   ← 本目录 ★
    • 输出: TradeIntent (含 entry/SL/TP/sizing) 或 None
         │
         ▼
-L4 AI 评分 + L6 执行 + L7 组合层 + L8 复盘 ← 私仓 cresus-bot
+L4 AI 评分 + L6 执行 + L7 组合层 + L8 复盘 ← 私仓 sprite-bot
 ```
 
 ## 设计原则
@@ -106,7 +109,9 @@ if sig.detected:
 ## 运行测试
 
 ```bash
-cd cresus-system/sprite-catcher
+cd sprite-catcher
+python3.11 -m venv .venv
+source .venv/bin/activate
 pip install -e ".[dev]"
 pytest -v
 ```
@@ -117,3 +122,17 @@ pytest -v
 
 每个函数的边界条件、出错路径、关键不变式都在 `tests/` 里有对应测试。
 详见 [`AUDIT.md`](./AUDIT.md)。
+
+## 文档索引
+
+| 文件 | 内容 |
+|---|---|
+| [`docs/overview.md`](docs/overview.md) | 总览 + 公仓/私仓分工 |
+| [`docs/playbook.md`](docs/playbook.md) | **落地操作手册**（7 阶段，每步可复制粘贴）|
+| [`docs/l4-ai-scoring.md`](docs/l4-ai-scoring.md) | L4 AI 评分（JSON schema + prompt 模板）|
+| [`docs/l6-otoco-execution.md`](docs/l6-otoco-execution.md) | L6 OTOCO 执行 + 看门狗 |
+| [`docs/l8-walkforward.md`](docs/l8-walkforward.md) | L8 walk-forward + AI 周报 |
+| [`AUDIT.md`](AUDIT.md) | 每个函数的正确性证明 |
+| [`AUDIT_FINDINGS.md`](AUDIT_FINDINGS.md) | 未决项 / 已知风险 / 私仓必读清单 |
+
+**新手第一步**：直接看 [`docs/playbook.md`](docs/playbook.md)。

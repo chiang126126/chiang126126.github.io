@@ -99,7 +99,7 @@
 
 ### H5 · 没有 funding rate 反噬保护（Module B 专属）
 
-**症状**：spec doc 28 提到 funding > 0.1% 减仓 50%，但 L6 实现是私仓的事；公仓的 plan_short_* 都没把 funding 作为入场考量。
+**症状**：[`docs/l6-otoco-execution.md`](docs/l6-otoco-execution.md) 提到 funding > 0.1% 减仓 50%，但 L6 实现是私仓的事；公仓的 plan_short_* 都没把 funding 作为入场考量。
 
 **应对**：私仓 L6 在持仓监控循环里查 funding，触发后调用减仓函数。
 

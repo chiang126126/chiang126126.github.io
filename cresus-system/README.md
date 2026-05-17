@@ -20,8 +20,10 @@ Crésus
 **这个 public 仓库**存放：
 - 📚 `obsidian-vault/` — 共享知识库（可公开，无密钥）
 - 📖 `docs/` — 搭建 / 运维指南
-- 🧪 `sprite-catcher/` — 妖币特征工程 L2 参考实现（纯计算 + 单测，零外部依赖）
 - 🎛️ 未来的面板前端（P5 阶段）
+
+> 💡 仓库根目录还有一个独立项目 [`../sprite-catcher/`](../sprite-catcher/)——
+> 专门做妖币的自动化交易体系，**与 Crésus 完全平行、互不依赖**（独立私仓、独立账户）。
 
 **另一个 private 仓库**（后续创建）存放：
 - 🤖 自动扫币 bot 的所有代码
@@ -54,18 +56,7 @@ Crésus
 8. [docs/04-setup-deepseek-api.md](docs/04-setup-deepseek-api.md) — 建 DeepSeek（P3 前）
 9. [docs/07-vps-hosting.md](docs/07-vps-hosting.md) — 决定部署位置（P5 前）
 
-## 精灵捕手 Sprite Catcher（妖币专项体系）
+---
 
-公仓参考实现 + 私仓 spec：
-
-- [docs/26-sprite-catcher-overview.md](docs/26-sprite-catcher-overview.md) — 总览 + 公私仓分工
-- [docs/27-l4-ai-scoring-spec.md](docs/27-l4-ai-scoring-spec.md) — L4 AI 评分（JSON schema + prompt 模板）
-- [docs/28-l6-otoco-execution-spec.md](docs/28-l6-otoco-execution-spec.md) — L6 OTOCO 执行 + 看门狗
-- [docs/29-l8-review-walkforward-spec.md](docs/29-l8-review-walkforward-spec.md) — L8 walk-forward + AI 周报
-- [docs/30-sprite-catcher-playbook.md](docs/30-sprite-catcher-playbook.md) — **落地操作手册**（每步可复制粘贴）
-
-公仓代码：[`sprite-catcher/`](sprite-catcher/)（207 单元测试，零外部依赖）
-
-⚠️ 上线前必读：
-- [`sprite-catcher/AUDIT.md`](sprite-catcher/AUDIT.md) — 每个函数的正确性证明
-- [`sprite-catcher/AUDIT_FINDINGS.md`](sprite-catcher/AUDIT_FINDINGS.md) — 未决项 / 已知风险 / 私仓必读清单
+> 📌 妖币专项体系（与 Crésus 完全独立）移到了仓库根目录的
+> [`../sprite-catcher/`](../sprite-catcher/)，包含自己的代码、文档、私仓 spec。
