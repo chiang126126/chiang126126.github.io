@@ -4933,6 +4933,7 @@ function renderLivePanel(data) {
     const classifyReason = (r) => {
       const s = r || '';
       if (s.includes('pre_slippage_too_high'))return { label: '🛡 滑点护栏拦截',      color: '#1cbe72' };
+      if (s.includes('blacklist'))            return { label: '⛔ symbol 黑名单',     color: '#ff8a65' };
       if (s.includes('open_failed'))          return { label: '🔁 开仓失败重试',     color: '#ffb84d' };
       if (s.includes('risk_gate'))            return { label: '🛑 风控阻断',         color: '#ff5252' };
       if (s.includes('max_concurrent'))       return { label: '🔒 并发已满',         color: '#ffb84d' };
@@ -4998,6 +4999,7 @@ function renderLivePanel(data) {
         <div class="live-config-cell"><div class="k">日 DD 触发</div><div class="v" style="color:#ff8888">-$${config.daily_dd_limit_usdt || 5}</div></div>
         <div class="live-config-cell"><div class="k">累计 DD kill</div><div class="v" style="color:#ff8888">-${config.total_dd_limit_pct || 5}%</div></div>
         <div class="live-config-cell" title="paper 信号价 → 当前价 的预滑点上限. 超过放弃 mirror, 防止小币流动性差导致的灾难性进场."><div class="k">滑点护栏</div><div class="v" style="color:#1cbe72">${config.max_entry_slippage_bps || 30} bps</div></div>
+        ${(config.symbol_blacklist || []).length > 0 ? `<div class="live-config-cell" title="基于实盘历史 0 胜的 symbol, 优先级最高, 即使 OBS mode 也拒. 每周复盘时增删."><div class="k">黑名单</div><div class="v" style="font-size:11px;color:#ff8a65">${(config.symbol_blacklist || []).join(' / ')}</div></div>` : ''}
       </div>
     </div>
   </details>`;

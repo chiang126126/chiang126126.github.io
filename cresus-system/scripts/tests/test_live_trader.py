@@ -129,6 +129,77 @@ class TestEligibility(unittest.TestCase):
             ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
         self.assertTrue(ok, f"observation mode 应跳过白名单, got: {reason}")
 
+    # === Phase 4.B 黑名单测试 ===
+
+    def test_blacklist_blocks_in_observation_mode(self):
+        """黑名单优先级最高 — 即使 OBS mode 跳过白名单, 黑名单仍然拒."""
+        trade = dict(self.recent_trade)
+        trade["symbol"] = "DODOXUSDT"   # 黑名单成员
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
+        self.assertFalse(ok, "OBS mode 不应允许黑名单 symbol")
+        self.assertIn("blacklist", reason)
+
+    def test_blacklist_blocks_in_strict_whitelist_mode(self):
+        """关 OBS mode 后黑名单仍生效."""
+        trade = dict(self.recent_trade)
+        trade["symbol"] = "NMRUSDT"
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", False):
+            ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
+        self.assertFalse(ok)
+        # 注意: 这里命中黑名单先于白名单 (黑名单 reason 不是 whitelist)
+        self.assertIn("blacklist", reason)
+
+    def test_blacklist_priority_before_whitelist(self):
+        """如果一个 symbol 既不在白名单又在黑名单, 应优先报黑名单."""
+        trade = dict(self.recent_trade)
+        trade["symbol"] = "DODOXUSDT"   # 黑名单且不在白名单
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", False):
+            ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
+        self.assertFalse(ok)
+        self.assertIn("blacklist", reason)
+        self.assertNotIn("whitelist", reason)   # 黑名单先, 白名单不应被报
+
+    def test_non_blacklist_symbol_still_allowed(self):
+        """回归: 非黑名单 symbol 在 OBS mode 下应通过 symbol filter."""
+        trade = dict(self.recent_trade)
+        trade["symbol"] = "FAKEUSDT"  # 既不在白名单也不在黑名单
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
+        self.assertTrue(ok, f"非黑名单 symbol OBS mode 应通过, got: {reason}")
+
+    def test_whitelist_symbols_not_in_blacklist(self):
+        """sanity: 主白名单 (BTC/ETH/SOL) 绝不应该在黑名单里."""
+        from live_trader import LIVE_SYMBOL_BLACKLIST, LIVE_SYMBOL_WHITELIST
+        for sym in LIVE_SYMBOL_WHITELIST:
+            self.assertNotIn(sym, LIVE_SYMBOL_BLACKLIST,
+                             f"白名单核心 {sym} 不应进黑名单 (配置错误)")
+
+    def test_blacklist_is_list_of_strings(self):
+        """sanity: 黑名单格式正确."""
+        from live_trader import LIVE_SYMBOL_BLACKLIST
+        for s in LIVE_SYMBOL_BLACKLIST:
+            self.assertIsInstance(s, str)
+            self.assertTrue(s.endswith("USDT"),
+                            f"{s} 不是 USDT 结尾, 可能是配置错误")
+
+    def test_blacklist_case_insensitive_on_paper_symbol(self):
+        """防御: paper 若意外传小写/混合大小写 symbol, 黑名单仍能匹配.
+
+        审计发现的 bug: 之前直接用原始字符串比较, "dodoxusdt" in ["DODOXUSDT"]
+        会失败 → 黑名单 symbol 在 OBS mode 下被误 mirror.
+        修复: is_eligible_for_mirror 内部对 sym 做 .upper() 规范化.
+        """
+        trade = dict(self.recent_trade)
+        # 三种 case 变体都应该被拦截
+        for case in ("dodoxusdt", "DodoXUSDT", "DODOXUSDT"):
+            trade["symbol"] = case
+            with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+                ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
+            self.assertFalse(ok,
+                f"symbol='{case}' 应被黑名单拦截, 但 ok={ok} reason={reason}")
+            self.assertIn("blacklist", reason)
+
     def test_max_concurrent_reached(self):
         live = _empty_live_state()
         live["live_open_trades"] = [{} for _ in range(LIVE_MAX_CONCURRENT)]
@@ -2071,6 +2142,31 @@ class TestMirrorIterationGuards(unittest.TestCase):
         # 取价失败时, mirror 应照常进行 (向后兼容)
         self.assertEqual(mock_open.call_count, 1,
                          "取价失败不应阻止 mirror (fail-safe)")
+
+    def test_blacklist_blocks_in_main_loop(self):
+        """Phase 4.B 集成: main_loop 中遇到黑名单 symbol 必须 skip + 不调 open_position."""
+        now = datetime.now(timezone.utc)
+        # 写一笔黑名单 symbol 的 paper trade
+        self._write_paper([{
+            "id": "DODOXUSDT|LONG|2026-05-17T10:00:00+00:00",
+            "symbol": "DODOXUSDT",   # 黑名单成员
+            "direction": "LONG",
+            "entered_at": (now - timedelta(seconds=10)).isoformat(),
+            "entry_price": 1.0, "sl": 0.95,
+        }])
+        with patch.object(self.client, "open_position") as mock_open, \
+             patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "1.0", 0, 0, 0, 0, 0, 0, 0]]):
+            result = main_loop(self.client, dry_run=True)
+        self.assertEqual(mock_open.call_count, 0, "黑名单 symbol 不应被开仓")
+        self.assertEqual(len(result["live_open_trades"]), 0)
+        # paper_id 不应进 mirrored_paper_ids (但 missed_signal 处也不应记)
+        # 实际上 is_eligible_for_mirror 返 False 后, _record_missed_signal 会被调用
+        # (但 "in live blacklist" 不在 "already mirrored" 噪音过滤中, 应该被记)
+        missed = result.get("missed_signals", [])
+        self.assertTrue(any("blacklist" in m.get("reason", "")
+                           for m in missed),
+                        f"应记 blacklist missed_signal, 实际: {[m.get('reason') for m in missed]}")
 
 
 # ============================================================================

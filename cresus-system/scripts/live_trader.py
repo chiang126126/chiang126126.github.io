@@ -68,6 +68,14 @@ LIVE_SYMBOL_WHITELIST = [              # Phase 6 第 1 周限主流币
 LIVE_MIRROR_MAX_AGE_SEC = 600          # 仅 mirror 10min 内开的 paper trade
                                        # (防止启动时把陈年 paper open 全部 mirror)
 
+# Phase 4.B 黑名单 (基于实盘历史 0 胜率的 symbol, 每周复盘时增删).
+# 黑名单优先级最高 — 即使 OBS mode 跳过白名单, 黑名单仍然拒绝.
+# 复审时间: 2026-05-17 (89 笔实盘数据), 仅加 n≥4 且 0 胜的 symbol.
+LIVE_SYMBOL_BLACKLIST = [
+    "DODOXUSDT",   # 4 笔 0 胜, 累计 -$0.69
+    "NMRUSDT",     # 4 笔 0 胜, 累计 -$0.37
+]
+
 # ⚠️ DRY-RUN 观察期标志 — 仅用于 testnet 观察 mirror lifecycle.
 # True 时:
 #   - 跳过 LIVE_SYMBOL_WHITELIST 检查 (接受 paper 所有 diamond signal)
@@ -251,8 +259,13 @@ def is_eligible_for_mirror(
     # 1. 已 mirror 过
     if paper_id in live_state.get("mirrored_paper_ids", []):
         return False, "already mirrored"
-    # 2. Symbol 白名单 (observation mode 下跳过, 让我们看 mirror 真实流程)
-    sym = paper_trade.get("symbol", "")
+    # Symbol 规范化为大写, 避免黑/白名单 case-sensitive 比较失败.
+    # paper 通常用大写, 但防御性规范化更稳 (与 _compute_pre_entry_slippage_bps 一致).
+    sym = (paper_trade.get("symbol") or "").upper()
+    # 2a. Symbol 黑名单 (Phase 4.B) — 优先于一切 symbol filter, 即使 OBS mode 也拒.
+    if sym in LIVE_SYMBOL_BLACKLIST:
+        return False, f"symbol {sym} in live blacklist (历史 0 胜)"
+    # 2b. Symbol 白名单 (observation mode 下跳过, 让我们看 mirror 真实流程)
     if not LIVE_OBSERVATION_MODE and sym not in LIVE_SYMBOL_WHITELIST:
         return False, f"symbol {sym} not in live whitelist {LIVE_SYMBOL_WHITELIST}"
     # 3. 并发上限
@@ -624,6 +637,7 @@ def publish_live_history(
             "leverage": LIVE_LEVERAGE,
             "max_concurrent": LIVE_MAX_CONCURRENT,
             "symbol_whitelist": list(LIVE_SYMBOL_WHITELIST),
+            "symbol_blacklist": list(LIVE_SYMBOL_BLACKLIST),
             "daily_dd_limit_usdt": LIVE_DAILY_DD_LIMIT_USDT,
             "max_deploy_usdt": LIVE_MAX_DEPLOY_USDT,
             "total_dd_limit_pct": LIVE_TOTAL_DD_LIMIT_PCT,
