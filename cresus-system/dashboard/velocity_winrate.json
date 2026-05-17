@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-17T15:08:50.218964+00:00",
+  "generated_at": "2026-05-17T15:10:56.166391+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
@@ -7404,6 +7404,18 @@
         }
       }
     },
+    "STORJUSDT|burst|SHORT": {
+      "symbol": "STORJUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -0.87
+        }
+      }
+    },
     "ORCAUSDT|sustained|LONG": {
       "symbol": "ORCAUSDT",
       "alert_type": "sustained",
@@ -7503,6 +7515,11 @@
           "n": 5,
           "win_rate": 0.4,
           "avg_outcome_pct": -0.54
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.76
         }
       }
     }
