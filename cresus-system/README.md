@@ -53,3 +53,14 @@ Crésus
 7. [docs/05-grok-distillation-guide.md](docs/05-grok-distillation-guide.md) — 启动 KOL 蒸馏
 8. [docs/04-setup-deepseek-api.md](docs/04-setup-deepseek-api.md) — 建 DeepSeek（P3 前）
 9. [docs/07-vps-hosting.md](docs/07-vps-hosting.md) — 决定部署位置（P5 前）
+
+## 精灵捕手 Sprite Catcher（妖币专项体系）
+
+公仓参考实现 + 私仓 spec：
+
+- [docs/26-sprite-catcher-overview.md](docs/26-sprite-catcher-overview.md) — 总览 + 公私仓分工
+- [docs/27-l4-ai-scoring-spec.md](docs/27-l4-ai-scoring-spec.md) — L4 AI 评分（JSON schema + prompt 模板）
+- [docs/28-l6-otoco-execution-spec.md](docs/28-l6-otoco-execution-spec.md) — L6 OTOCO 执行 + 看门狗
+- [docs/29-l8-review-walkforward-spec.md](docs/29-l8-review-walkforward-spec.md) — L8 walk-forward + AI 周报
+
+公仓代码：[`sprite-catcher/`](sprite-catcher/)（182 单元测试，零外部依赖）
