@@ -599,6 +599,18 @@
     border-color: rgba(255,213,79,0.5);
     box-shadow: 0 0 6px rgba(255,213,79,0.18);
   }
+  /* BTC regime mini-chip (开仓时 snapshot) */
+  .live-regime-chip {
+    display: inline-block;
+    font-size: 10px;
+    border-radius: 3px;
+    padding: 1px 5px;
+    margin-left: 4px;
+    font-weight: 600;
+  }
+  .live-regime-chip.up   { color: #00e676; background: rgba(0,230,118,0.10); border: 1px solid rgba(0,230,118,0.30); }
+  .live-regime-chip.down { color: #ff5252; background: rgba(255,82,82,0.10); border: 1px solid rgba(255,82,82,0.30); }
+  .live-regime-chip.chop { color: #ffd54f; background: rgba(255,213,79,0.10); border: 1px solid rgba(255,213,79,0.30); }
   /* ==== 折叠 section ==== */
   .live-collapsible {
     margin: 6px 0;
@@ -4757,6 +4769,30 @@ function renderLivePanel(data) {
       </span>
     </div>
   `;
+
+  // ===== Phase 4.C 当前 BTC regime 状态条 =====
+  const btcR = data.btc_regime_now;
+  if (btcR && btcR.regime) {
+    const regimeMeta = {
+      up:   { icon: '📈', label: '上涨', color: '#00e676', bg: 'rgba(0,200,83,0.10)', border: 'rgba(0,200,83,0.35)' },
+      down: { icon: '📉', label: '下跌', color: '#ff5252', bg: 'rgba(255,82,82,0.10)', border: 'rgba(255,82,82,0.35)' },
+      chop: { icon: '➡️', label: '震荡', color: '#ffd54f', bg: 'rgba(255,213,79,0.10)', border: 'rgba(255,213,79,0.35)' },
+    }[btcR.regime] || { icon: '?', label: btcR.regime, color: '#9aa4b8', bg: 'rgba(255,255,255,0.03)', border: 'rgba(255,255,255,0.08)' };
+    body += `
+      <div title="BTC 1h MA(25) baseline 判断的当前市场 regime; 每笔新开仓会打 snapshot 标签供按 regime 复盘"
+           style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:8px;margin-bottom:10px;
+                  background:${regimeMeta.bg};border:1px solid ${regimeMeta.border};
+                  font-size:12px;flex-wrap:wrap">
+        <span style="font-size:16px">${regimeMeta.icon}</span>
+        <span style="font-weight:700;color:${regimeMeta.color}">BTC ${regimeMeta.label}</span>
+        <span style="color:var(--text-dim);font-variant-numeric:tabular-nums">$${(btcR.btc_price || 0).toLocaleString()}</span>
+        <span style="color:var(--text-dim);font-size:11px">
+          vs MA25 <span style="color:${regimeMeta.color};font-weight:600">${btcR.pct_vs_ma25 >= 0 ? '+' : ''}${(btcR.pct_vs_ma25 || 0).toFixed(2)}%</span>
+          · 24h <span style="color:${(btcR.change_24h_pct || 0) >= 0 ? '#00e676' : '#ff5252'};font-weight:600">${(btcR.change_24h_pct || 0) >= 0 ? '+' : ''}${(btcR.change_24h_pct || 0).toFixed(2)}%</span>
+        </span>
+      </div>
+    `;
+  }
   if (risk.block_new_opens && (risk.reasons || []).length > 0) {
     for (const r of risk.reasons) {
       body += `<div class="live-reason-line">🛑 ${escapeHtml(r)}</div>`;
@@ -4827,6 +4863,7 @@ function renderLivePanel(data) {
           <span class="paper-day-dir ${dirCls}">${dir}</span>
           <span class="live-lev-chip">${lev}x</span>
           ${convChip}
+          ${liveRegimeChip(t.btc_regime_at_open)}
           ${t.is_dry_run ? '<span style="font-size:10px;color:#ffb84d;margin-left:4px">🟡DRY</span>' : '<span style="font-size:10px;color:#ff5252;margin-left:4px">🔴LIVE</span>'}
           <br><span style="font-size:11px;color:var(--text-dim)">
             入 ${liveFmtPrice(entry)} · 现 ${cur != null ? liveFmtPrice(cur) : '—'}
@@ -4895,6 +4932,7 @@ function renderLivePanel(data) {
           <span class="paper-day-dir ${dir === 'LONG' ? 'long' : 'short'}">${dir}</span>
           <span class="live-lev-chip">${lev}x</span>
           ${convChipC}
+          ${liveRegimeChip(t.btc_regime_at_open)}
           ${t.is_dry_run ? '<span style="font-size:10px;color:#ffb84d;margin-left:4px">🟡DRY</span>' : '<span style="font-size:10px;color:#ff5252;margin-left:4px">🔴LIVE</span>'}
           <br><span style="font-size:11px;color:var(--text-dim)">
             ${liveFmtPrice(entry)} → ${liveFmtPrice(exit)}
@@ -5054,6 +5092,18 @@ const LIVE_REASON_LABEL = {
   "paper:timeout":    "⏱ 超时",
 };
 
+// Phase 4.C BTC regime chip (开仓时 snapshot) — 全局 helper, 多处复用
+function liveRegimeChip(regime) {
+  if (!regime) return '';
+  const meta = {
+    up:   { icon: '📈', cls: 'up'   },
+    down: { icon: '📉', cls: 'down' },
+    chop: { icon: '➡️', cls: 'chop' },
+  }[regime];
+  if (!meta) return '';
+  return `<span class="live-regime-chip ${meta.cls}" title="开仓时 BTC ${regime}">${meta.icon}</span>`;
+}
+
 const LIVE_REASON_ICON = {
   "sl_breach_client": { icon: "🛑", label: "SL 触发" },
   "paper:hit_sl":     { icon: "🛑", label: "止损" },
@@ -5106,10 +5156,22 @@ function _liveDayStats(trades) {
     if (p >  0.01) scoreBuckets[s].wins++;
     if (p < -0.01) scoreBuckets[s].losses++;
   }
+  // Phase 4.C 按 BTC regime 分组 (复盘策略在不同市场状态的表现)
+  const regimeBuckets = {};
+  for (const t of trades) {
+    const r = t.btc_regime_at_open;
+    if (!r) continue;
+    if (!regimeBuckets[r]) regimeBuckets[r] = { n: 0, wins: 0, losses: 0, pnl: 0 };
+    regimeBuckets[r].n++;
+    const p = Number(t.realized_pnl_usdt || 0);
+    regimeBuckets[r].pnl += p;
+    if (p >  0.01) regimeBuckets[r].wins++;
+    if (p < -0.01) regimeBuckets[r].losses++;
+  }
   const best  = trades.reduce((b, t) => (Number(t.realized_pnl_usdt || 0) > (b ? Number(b.realized_pnl_usdt || 0) : -Infinity)) ? t : b, null);
   const worst = trades.reduce((b, t) => (Number(t.realized_pnl_usdt || 0) < (b ? Number(b.realized_pnl_usdt || 0) :  Infinity)) ? t : b, null);
   return { n, wins, losses, scratch, winRate, totPnl, totFees,
-    longs, shorts, reasonCounts, scoreBuckets, best, worst };
+    longs, shorts, reasonCounts, scoreBuckets, regimeBuckets, best, worst };
 }
 
 function renderLiveDailyReview(closed) {
@@ -5343,6 +5405,30 @@ function _liveRenderSingleDay(byDate, allDates) {
       </span>`;
     }).join("");
 
+  // Phase 4.C 按 BTC regime 分组 chips — 复盘策略在不同市场状态下表现
+  const regimeOrder = ['up', 'chop', 'down'];
+  const regimeMetaMap = {
+    up:   { icon: '📈', label: '上涨' },
+    down: { icon: '📉', label: '下跌' },
+    chop: { icon: '➡️', label: '震荡' },
+  };
+  const regimeChips = regimeOrder
+    .filter(k => stats.regimeBuckets && stats.regimeBuckets[k])
+    .map(k => {
+      const v = stats.regimeBuckets[k];
+      const meta = regimeMetaMap[k];
+      const dec = v.wins + v.losses;
+      const wrTxt = dec > 0 ? Math.round(v.wins / dec * 100) + "%" : "—";
+      const wrColor = dec > 0 && v.wins / dec >= 0.5 ? "#00e676"
+                     : dec > 0 && v.wins / dec < 0.4 ? "#ff7373" : "var(--text)";
+      const pnlColor = v.pnl > 0 ? "#00e676" : (v.pnl < 0 ? "#ff5252" : "var(--text-dim)");
+      return `<span class="chip" title="BTC ${meta.label} 时开仓: ${v.n} 笔, ${v.wins}胜${v.losses}负, PnL ${liveFmtUsdt(v.pnl)}">
+        ${meta.icon}${meta.label} <strong>×${v.n}</strong>
+        <span style="color:${wrColor};margin:0 3px">${wrTxt}</span>
+        <span style="color:${pnlColor};font-size:9.5px">${liveFmtUsdt(v.pnl)}</span>
+      </span>`;
+    }).join("");
+
   // 找最佳 / 最差 单笔
   const bestTrade  = stats.best;
   const worstTrade = stats.worst;
@@ -5409,6 +5495,12 @@ function _liveRenderSingleDay(byDate, allDates) {
       <div class="live-review-stat-line">
         <span class="live-review-stat-key">置信分档</span>
         <span class="live-review-stat-val">${scoreChips}</span>
+      </div>` : ""}
+
+      ${regimeChips ? `
+      <div class="live-review-stat-line">
+        <span class="live-review-stat-key">BTC 状态</span>
+        <span class="live-review-stat-val">${regimeChips}</span>
       </div>` : ""}
 
       ${stats.totFees > 0 ? `
@@ -5485,6 +5577,7 @@ function _liveRenderSingleDay(byDate, allDates) {
         <span class="paper-day-dir ${dir === 'LONG' ? 'long' : 'short'}">${dir}</span>
         <span class="live-lev-chip">${lev}x</span>
         ${convChipD}
+        ${liveRegimeChip(t.btc_regime_at_open)}
         <br><span style="font-size:11px;color:var(--text-dim)">
           ${liveFmtPrice(entry)} → ${liveFmtPrice(exit)}${fee > 0 ? ' · 费 -$' + fee.toFixed(3) : ''}${slipBits.length ? ' · ' + slipBits.join(' / ') : ''}
         </span>

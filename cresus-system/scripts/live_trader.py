@@ -98,6 +98,12 @@ LIVE_TOTAL_DD_LIMIT_PCT = 5.0          # 总回撤 5% → 自动写 emergency fl
 # 16 笔中 8 笔滑点 >30 bps (含 1 笔 +656 bps), 这些尾部事件方差极大.
 LIVE_MAX_ENTRY_SLIPPAGE_BPS = 30.0     # 预滑点上限. 超过放弃开仓.
 
+# Phase 4.C BTC regime-aware 标签 (每笔 trade 开仓时记录当时 BTC 状态)
+# 用 1h K 线的 MA(25) 作 baseline (~24h 滚动均值, 匹配短线持仓视角).
+# 距 MA25 >= +阈值% = up, <= -阈值% = down, 中间 = chop.
+# 不做交易决策, 仅供复盘按 regime 切分胜率/PnL.
+LIVE_BTC_REGIME_THRESHOLD_PCT = 0.5
+
 # Phase 3.3.a/b 控制文件 (在 ~/.cresus-*)
 PAUSE_FLAG_PATH = Path.home() / ".cresus-pause"
 EMERGENCY_STOP_PATH = Path.home() / ".cresus-emergency-stop"
@@ -631,6 +637,8 @@ def publish_live_history(
             key=lambda m: m.get("last_checked_at", ""),
             reverse=True,
         ),
+        # Phase 4.C 当前 BTC regime (最近一次 main_loop tick 计算的 snapshot)
+        "btc_regime_now": live_state.get("_btc_regime_now"),
         "config": {
             "starting_capital_usdt": LIVE_STARTING_CAPITAL_USDT,
             "notional_per_trade_usdt": LIVE_NOTIONAL_USDT,
@@ -751,6 +759,57 @@ def _compute_pre_entry_slippage_bps(
         return None
     side_sign = 1 if direction == "LONG" else -1
     return (current - paper_entry) / paper_entry * 10000.0 * side_sign
+
+
+def _compute_btc_regime(client: BinanceClient) -> Optional[dict]:
+    """计算当前 BTC 市场 regime (up / chop / down), 供 trade 开仓时打标签.
+
+    用 BTCUSDT 1h K 线 MA(25) 作 baseline (~24h 滚动均值, 匹配短线视角):
+        current vs MA25 >= +LIVE_BTC_REGIME_THRESHOLD_PCT %  → up
+        current vs MA25 <= -LIVE_BTC_REGIME_THRESHOLD_PCT %  → down
+        其他                                                  → chop
+
+    返回 dict (含 regime + 上下文供复盘), 任何失败返 None (调用方应忽略, 不阻止 mirror).
+
+    本函数不做交易决策, 不影响 gate 行为 — 纯观察标签.
+    """
+    try:
+        klines = client.get_klines("BTCUSDT", interval="1h", limit=25)
+    except (BinanceError, ValueError) as e:
+        log.warning(f"[btc-regime] get_klines failed: {type(e).__name__}: {e}")
+        return None
+    if not klines or len(klines) < 25:
+        log.warning(f"[btc-regime] insufficient klines: {len(klines) if klines else 0}/25")
+        return None
+    try:
+        closes = [float(k[4]) for k in klines]
+    except (ValueError, IndexError, TypeError) as e:
+        log.warning(f"[btc-regime] klines parse failed: {e}")
+        return None
+    current = closes[-1]
+    if current <= 0:
+        return None
+    ma25 = sum(closes) / len(closes)
+    if ma25 <= 0:
+        return None
+    pct_vs_ma = (current - ma25) / ma25 * 100.0
+    # 24h change: 用 25 根 1h 的首根 close (≈ 24h 前) vs 当前
+    first = closes[0]
+    change_24h_pct = ((current - first) / first * 100.0) if first > 0 else 0.0
+    if pct_vs_ma >= LIVE_BTC_REGIME_THRESHOLD_PCT:
+        regime = "up"
+    elif pct_vs_ma <= -LIVE_BTC_REGIME_THRESHOLD_PCT:
+        regime = "down"
+    else:
+        regime = "chop"
+    return {
+        "regime": regime,
+        "btc_price": round(current, 2),
+        "btc_ma25_1h": round(ma25, 2),
+        "pct_vs_ma25": round(pct_vs_ma, 3),
+        "change_24h_pct": round(change_24h_pct, 3),
+        "computed_at": datetime.now(timezone.utc).isoformat(),
+    }
 
 
 def _check_sl_breach(live_trade: dict, current_price: float) -> bool:
@@ -882,11 +941,17 @@ def _try_mirror_open(
     paper_trade: dict,
     *,
     dry_run: bool,
+    btc_regime: Optional[dict] = None,
 ) -> Optional[dict]:
     """实际 mirror paper trade → live. Plan B (client-side SL).
 
     Returns: 新的 live trade dict (添加到 live_open_trades 用), 失败返回 None.
     异常完全捕获 (不让单笔失败让 loop 崩).
+
+    Args:
+        btc_regime: 可选; 由 main_loop 每 tick 调一次 _compute_btc_regime 传入,
+                    会被打到 live_trade["btc_regime_at_open"] 等字段供复盘.
+                    None 时不打标签 (向后兼容).
     """
     paper_id = paper_trade.get("id", "")
     sym = paper_trade.get("symbol", "")
@@ -1011,6 +1076,13 @@ def _try_mirror_open(
         "opened_at": opened_at_iso,
         "is_dry_run": bool(dry_run or result.get("_dryRun")),
     }
+    # Phase 4.C BTC regime 标签 (开仓时刻 snapshot, 供复盘按 regime 切分).
+    # 仅在 main_loop 传入时打, None 不打 (向后兼容旧数据).
+    if isinstance(btc_regime, dict) and btc_regime.get("regime"):
+        live_trade["btc_regime_at_open"] = btc_regime["regime"]
+        live_trade["btc_price_at_open"] = btc_regime.get("btc_price")
+        live_trade["btc_change_24h_at_open"] = btc_regime.get("change_24h_pct")
+        live_trade["btc_pct_vs_ma25_at_open"] = btc_regime.get("pct_vs_ma25")
     return live_trade
 
 
@@ -1075,6 +1147,19 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
             log.debug(f"[recon] API failed, skipped reconciliation this tick")
         else:
             log.debug(f"[recon] OK ({len(recon['live_symbols'])} symbols matched)")
+
+    # Phase 4.C BTC regime 取样 — 本 tick 内所有 mirror_open 共享同一 snapshot.
+    # 单次 1h kline 调用, 节省 API. 失败返 None → trade 不打 regime 标签 (不阻止 mirror).
+    btc_regime_snapshot = _compute_btc_regime(client)
+    if btc_regime_snapshot:
+        live["_btc_regime_now"] = btc_regime_snapshot   # 供 publish 展示
+        log.info(
+            f"[btc-regime] {btc_regime_snapshot['regime']:>4s}  "
+            f"price=${btc_regime_snapshot['btc_price']:.0f}  "
+            f"vs MA25 {btc_regime_snapshot['pct_vs_ma25']:+.2f}%  "
+            f"24h {btc_regime_snapshot['change_24h_pct']:+.2f}%"
+        )
+    # 注: snapshot 为 None 时保留旧值 (上次成功的 regime), 避免 dashboard 闪烁
 
     # 1. 找 eligible candidates (即使风控触发也走 eligibility 检查, 便于日志一致)
     mirror_candidates = []
@@ -1178,7 +1263,8 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
                 )
                 continue
 
-            new_trade = _try_mirror_open(client, pt, dry_run=dry_run)
+            new_trade = _try_mirror_open(client, pt, dry_run=dry_run,
+                                          btc_regime=btc_regime_snapshot)
             if new_trade is None:
                 # 失败不永久 blacklist — 改为记录 missed signal, 下 tick 重试.
                 # 之前直接加 mirrored_paper_ids 导致 set_leverage 临时失败 / API 超时

@@ -34,8 +34,10 @@ from live_trader import (  # noqa: E402
     main_loop, _empty_live_state,
     _record_missed_signal, _prune_obsolete_missed,
     _compute_pre_entry_slippage_bps,
+    _compute_btc_regime,
     MISSED_SIGNALS_KEEP_LAST_N,
     LIVE_MAX_ENTRY_SLIPPAGE_BPS,
+    LIVE_BTC_REGIME_THRESHOLD_PCT,
     LIVE_SYMBOL_WHITELIST, LIVE_MAX_CONCURRENT, LIVE_MIRROR_MAX_AGE_SEC,
     LIVE_NOTIONAL_USDT, LIVE_MAX_DEPLOY_USDT, LIVE_DAILY_DD_LIMIT_USDT,
     LIVE_STARTING_CAPITAL_USDT, LIVE_TOTAL_DD_LIMIT_PCT,
@@ -558,6 +560,38 @@ class TestTryMirrorOpen(unittest.TestCase):
             r = _try_mirror_open(self.client, paper_t, dry_run=True)
         self.assertAlmostEqual(r["mirror_latency_sec"], 30.0, places=0)
 
+    def test_btc_regime_recorded_when_provided(self):
+        """Phase 4.C: 传入 btc_regime 时, live_trade 应有 4 个 btc_* 字段."""
+        regime_snap = {
+            "regime": "up", "btc_price": 80000.0, "btc_ma25_1h": 79500.0,
+            "pct_vs_ma25": 0.63, "change_24h_pct": 1.2,
+            "computed_at": "2026-05-17T10:00:00+00:00",
+        }
+        with patch.object(self.client, "open_position",
+                          return_value=self.mock_open_result):
+            r = _try_mirror_open(self.client, self.paper_trade,
+                                  dry_run=True, btc_regime=regime_snap)
+        self.assertEqual(r["btc_regime_at_open"], "up")
+        self.assertEqual(r["btc_price_at_open"], 80000.0)
+        self.assertEqual(r["btc_change_24h_at_open"], 1.2)
+        self.assertEqual(r["btc_pct_vs_ma25_at_open"], 0.63)
+
+    def test_btc_regime_omitted_when_none(self):
+        """向后兼容: 不传 btc_regime (或 None) 不应出现 btc_* 字段."""
+        with patch.object(self.client, "open_position",
+                          return_value=self.mock_open_result):
+            r = _try_mirror_open(self.client, self.paper_trade,
+                                  dry_run=True)   # 不传
+        self.assertNotIn("btc_regime_at_open", r)
+
+    def test_btc_regime_malformed_dict_silently_ignored(self):
+        """传入空 dict 或缺 regime 字段 → 也不应崩, 不打标签."""
+        with patch.object(self.client, "open_position",
+                          return_value=self.mock_open_result):
+            r = _try_mirror_open(self.client, self.paper_trade,
+                                  dry_run=True, btc_regime={})
+        self.assertNotIn("btc_regime_at_open", r)
+
     def test_mirror_missing_sl_field(self):
         """Paper 缺关键字段 → 返回 None."""
         bad_paper = dict(self.paper_trade)
@@ -935,6 +969,134 @@ class TestComputePreEntrySlippage(unittest.TestCase):
                            "阈值太小会拦截正常市场波动")
         self.assertLess(LIVE_MAX_ENTRY_SLIPPAGE_BPS, 200,
                         "阈值太大失去保护意义")
+
+
+class TestComputeBtcRegime(unittest.TestCase):
+    """Phase 4.C: BTC regime 计算 (1h MA25 baseline).
+
+    分类:
+      pct_vs_ma25 >= +threshold → up
+      pct_vs_ma25 <= -threshold → down
+      其他                       → chop
+    fail-safe: API 失败 / 数据不足 / 异常值 → None (不阻止 mirror).
+    """
+
+    def setUp(self):
+        self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+
+    def _kline_set(self, closes):
+        """造 25 根 1h kline, 给定 close 价 list."""
+        return [[0, 0, 0, 0, str(c), 0, 0, 0, 0, 0, 0, 0] for c in closes]
+
+    # --- 三种 regime 正确性 ---
+
+    def test_up_regime(self):
+        """current 高于 MA25 ≥ +0.5% → up."""
+        # 24 根 100, 最后一根 101 → MA25 ≈ 100.04, current 101 → +0.96%
+        closes = [100.0] * 24 + [101.0]
+        with patch.object(self.client, "get_klines",
+                          return_value=self._kline_set(closes)):
+            r = _compute_btc_regime(self.client)
+        self.assertIsNotNone(r)
+        self.assertEqual(r["regime"], "up")
+        self.assertGreater(r["pct_vs_ma25"], 0.5)
+
+    def test_down_regime(self):
+        closes = [100.0] * 24 + [99.0]
+        with patch.object(self.client, "get_klines",
+                          return_value=self._kline_set(closes)):
+            r = _compute_btc_regime(self.client)
+        self.assertEqual(r["regime"], "down")
+        self.assertLess(r["pct_vs_ma25"], -0.5)
+
+    def test_chop_regime(self):
+        """current 跟 MA25 接近 → chop."""
+        # 全 100 → current=100, MA25=100, pct=0
+        closes = [100.0] * 25
+        with patch.object(self.client, "get_klines",
+                          return_value=self._kline_set(closes)):
+            r = _compute_btc_regime(self.client)
+        self.assertEqual(r["regime"], "chop")
+        self.assertAlmostEqual(r["pct_vs_ma25"], 0.0, places=3)
+
+    def test_chop_boundary_just_below_threshold(self):
+        """pct = 0.4% < 0.5% 阈值 → 仍 chop."""
+        # ma25 = ~100, current 需要使 pct = 0.4%
+        # 24 个 100 + 1 个 X, MA = (2400 + X) / 25
+        # (X - MA) / MA = 0.004 → 解出
+        # X = MA × 1.004 = (2400 + X) / 25 × 1.004
+        # 25 X = (2400 + X) × 1.004
+        # 25 X - 1.004 X = 2410 (approx)
+        # 23.996 X = 2409.6
+        # X ≈ 100.42
+        closes = [100.0] * 24 + [100.4]
+        with patch.object(self.client, "get_klines",
+                          return_value=self._kline_set(closes)):
+            r = _compute_btc_regime(self.client)
+        self.assertEqual(r["regime"], "chop", f"0.4% < 0.5% 阈值应判 chop, 实际 {r}")
+
+    # --- 真实 BTC 场景 ---
+
+    def test_user_actual_btc_correction_scenario(self):
+        """复现用户 5/17 截图: BTC $78,197 vs MA25 $79,068 → -1.1% → down."""
+        # 24 根均价 79068, 最后一根 78197 → ma ≈ 79133, pct ≈ -1.18%
+        closes = [79068.0] * 24 + [78197.0]
+        with patch.object(self.client, "get_klines",
+                          return_value=self._kline_set(closes)):
+            r = _compute_btc_regime(self.client)
+        self.assertEqual(r["regime"], "down", f"用户 5/17 场景应是 down, 实际 {r}")
+        self.assertLess(r["pct_vs_ma25"], -1.0)
+
+    def test_returns_context_fields(self):
+        """返回 dict 必须包含完整 context 供复盘."""
+        closes = [80000.0] * 24 + [80500.0]
+        with patch.object(self.client, "get_klines",
+                          return_value=self._kline_set(closes)):
+            r = _compute_btc_regime(self.client)
+        for field in ("regime", "btc_price", "btc_ma25_1h",
+                      "pct_vs_ma25", "change_24h_pct", "computed_at"):
+            self.assertIn(field, r, f"缺字段 {field}")
+        self.assertEqual(r["btc_price"], 80500.0)
+        # 24h change: (80500 - 80000) / 80000 * 100 = +0.625
+        self.assertAlmostEqual(r["change_24h_pct"], 0.625, places=2)
+
+    # --- Fail-safe 路径 ---
+
+    def test_api_error_returns_none(self):
+        with patch.object(self.client, "get_klines",
+                          side_effect=BinanceError("rate limit")):
+            r = _compute_btc_regime(self.client)
+        self.assertIsNone(r)
+
+    def test_empty_klines_returns_none(self):
+        with patch.object(self.client, "get_klines", return_value=[]):
+            r = _compute_btc_regime(self.client)
+        self.assertIsNone(r)
+
+    def test_insufficient_klines_returns_none(self):
+        """< 25 根 → None (要求完整 24h baseline)."""
+        with patch.object(self.client, "get_klines",
+                          return_value=self._kline_set([100.0] * 10)):
+            r = _compute_btc_regime(self.client)
+        self.assertIsNone(r)
+
+    def test_malformed_kline_returns_none(self):
+        with patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "not_a_number"] * 25]):
+            r = _compute_btc_regime(self.client)
+        self.assertIsNone(r)
+
+    def test_zero_price_returns_none(self):
+        """全 0 价 → None (避免除以 0)."""
+        with patch.object(self.client, "get_klines",
+                          return_value=self._kline_set([0] * 25)):
+            r = _compute_btc_regime(self.client)
+        self.assertIsNone(r)
+
+    def test_threshold_constant_reasonable(self):
+        """0.5% 阈值合理: 太小会全 up/down (失去 chop 意义), 太大几乎全 chop."""
+        self.assertGreaterEqual(LIVE_BTC_REGIME_THRESHOLD_PCT, 0.1)
+        self.assertLessEqual(LIVE_BTC_REGIME_THRESHOLD_PCT, 2.0)
 
 
 class TestTryMirrorClose(unittest.TestCase):
@@ -2167,6 +2329,86 @@ class TestMirrorIterationGuards(unittest.TestCase):
         self.assertTrue(any("blacklist" in m.get("reason", "")
                            for m in missed),
                         f"应记 blacklist missed_signal, 实际: {[m.get('reason') for m in missed]}")
+
+    def test_btc_regime_propagates_to_live_trade_in_main_loop(self):
+        """Phase 4.C 集成: main_loop 调 _compute_btc_regime → 写入 _btc_regime_now
+        → _try_mirror_open 收到 → live_trade 含 btc_regime_at_open 等字段."""
+        now = datetime.now(timezone.utc)
+        self._write_paper([{
+            "id": "ARCUSDT|LONG|2026-05-17T10:00:00+00:00",
+            "symbol": "ARCUSDT",
+            "direction": "LONG",
+            "entered_at": (now - timedelta(seconds=10)).isoformat(),
+            "entry_price": 0.07, "sl": 0.066,
+        }])
+        # mock 一个 regime snapshot — 模拟 BTC 上涨场景
+        fake_regime = {
+            "regime": "up", "btc_price": 80500.0, "btc_ma25_1h": 80000.0,
+            "pct_vs_ma25": 0.625, "change_24h_pct": 1.5,
+            "computed_at": now.isoformat(),
+        }
+        # mock open_position 返回合理 result
+        mock_open = {
+            "trade_id": "L1_ARC_L", "symbol": "ARCUSDT",
+            "side": "BUY", "qty": 285, "avg_fill_price": 0.07,
+            "actual_notional": 20.0, "entry_order_id": 1,
+            "entry_client_id": "x", "sl_price": 0.066,
+            "sl_side": "SELL", "sl_mode": "client_side",
+            "opened_at": now.isoformat(),
+            "fees_paid_usdt": 0, "_dryRun": True,
+        }
+        with patch.object(live_trader, "_compute_btc_regime",
+                          return_value=fake_regime) as mock_regime, \
+             patch.object(self.client, "open_position",
+                          return_value=mock_open) as mock_open_call, \
+             patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "0.07", 0, 0, 0, 0, 0, 0, 0]]):
+            result = main_loop(self.client, dry_run=True)
+        # _compute_btc_regime 必须被 main_loop 调用 (即使 paper 为空也调)
+        self.assertGreaterEqual(mock_regime.call_count, 1)
+        # 持仓应增加 1
+        self.assertEqual(len(result["live_open_trades"]), 1)
+        lt = result["live_open_trades"][0]
+        # 关键: 4 个 btc 字段都应正确写入
+        self.assertEqual(lt.get("btc_regime_at_open"), "up")
+        self.assertEqual(lt.get("btc_price_at_open"), 80500.0)
+        self.assertEqual(lt.get("btc_change_24h_at_open"), 1.5)
+        self.assertEqual(lt.get("btc_pct_vs_ma25_at_open"), 0.625)
+        # _btc_regime_now 也应写到 state (供 publish_live_history 读)
+        self.assertEqual(result.get("_btc_regime_now", {}).get("regime"), "up")
+
+    def test_btc_regime_failure_does_not_block_mirror(self):
+        """Fail-safe: _compute_btc_regime 失败 (返 None) 不应阻止 mirror,
+        live_trade 也不应有 btc_* 字段 (向后兼容)."""
+        now = datetime.now(timezone.utc)
+        self._write_paper([{
+            "id": "ARCUSDT|LONG|2026-05-17T10:00:00+00:00",
+            "symbol": "ARCUSDT",
+            "direction": "LONG",
+            "entered_at": (now - timedelta(seconds=10)).isoformat(),
+            "entry_price": 0.07, "sl": 0.066,
+        }])
+        mock_open = {
+            "trade_id": "L1", "symbol": "ARCUSDT", "side": "BUY", "qty": 285,
+            "avg_fill_price": 0.07, "actual_notional": 20.0,
+            "entry_order_id": 1, "entry_client_id": "x", "sl_price": 0.066,
+            "sl_side": "SELL", "sl_mode": "client_side",
+            "opened_at": now.isoformat(),
+            "fees_paid_usdt": 0, "_dryRun": True,
+        }
+        with patch.object(live_trader, "_compute_btc_regime",
+                          return_value=None), \
+             patch.object(self.client, "open_position",
+                          return_value=mock_open) as mock_open_call, \
+             patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "0.07", 0, 0, 0, 0, 0, 0, 0]]):
+            result = main_loop(self.client, dry_run=True)
+        # mirror 仍应进行
+        self.assertEqual(mock_open_call.call_count, 1, "regime 失败不应阻止 mirror")
+        self.assertEqual(len(result["live_open_trades"]), 1)
+        # live_trade 不应有 btc_* 字段
+        lt = result["live_open_trades"][0]
+        self.assertNotIn("btc_regime_at_open", lt)
 
 
 # ============================================================================
