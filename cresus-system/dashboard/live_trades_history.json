@@ -1,45 +1,43 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-17T19:30:49.771175+00:00",
+  "generated_at": "2026-05-17T19:32:30.766554+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 139,
-    "open": 2,
-    "closed": 137,
-    "wins": 49,
+    "open": 1,
+    "closed": 138,
+    "wins": 50,
     "losses": 87,
-    "win_rate": 0.36,
-    "total_pnl_usdt": 4.0908,
-    "net_pnl_usdt": 1.6636,
-    "avg_pnl_usdt": 0.0299,
+    "win_rate": 0.365,
+    "total_pnl_usdt": 4.2318,
+    "net_pnl_usdt": 1.7849,
+    "avg_pnl_usdt": 0.0307,
     "best_trade_usdt": 2.1605,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 2.447,
-    "fees_realized_usdt": 2.4272,
-    "fees_open_usdt": 0.0198,
+    "fees_paid_usdt": 2.4569,
+    "fees_realized_usdt": 2.4469,
+    "fees_open_usdt": 0.01,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 39.6,
-    "free_capital_usdt": 62.04,
+    "deployed_usdt": 19.98,
+    "free_capital_usdt": 81.79,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 4.0901,
-    "deployed_usdt": 39.6
+    "daily_pnl": 4.2311,
+    "deployed_usdt": 19.98
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "HYPEUSDT",
       "VVVUSDT"
     ],
     "exchange_symbols": [
-      "HYPEUSDT",
       "VVVUSDT"
     ]
   },
@@ -76,7 +74,7 @@
       "atr_pct": 0.456,
       "phase_a_mfe_pct": 0.693,
       "phase_b_mfe_pct": 1.739,
-      "phase_c_mfe_pct": 2.688,
+      "phase_c_mfe_pct": 2.771,
       "fees_paid_usdt": 0.009991,
       "fees_are_actual": true,
       "opened_at": "2026-05-17T19:00:40.373816+00:00",
@@ -86,13 +84,15 @@
       "btc_change_24h_at_open": -0.095,
       "btc_pct_vs_ma25_at_open": 0.059,
       "phase_a_mfe_price": 14.535,
-      "current_price": 14.787,
-      "unrealized_pnl_usdt": 0.4237,
-      "unrealized_pnl_pct": 2.12,
-      "last_price_check_at": "2026-05-17T19:30:46.630017+00:00",
+      "current_price": 14.8,
+      "unrealized_pnl_usdt": 0.4416,
+      "unrealized_pnl_pct": 2.21,
+      "last_price_check_at": "2026-05-17T19:32:28.245825+00:00",
       "phase_b_mfe_price": 14.686,
-      "phase_c_mfe_price": 14.823
-    },
+      "phase_c_mfe_price": 14.835
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "HYPEUSDT|LONG|2026-05-17T19:03:23.571356+00:00",
       "trade_id": "L1779044603_HYPEUSD_L",
@@ -126,7 +126,7 @@
       "phase_a_mfe_pct": 0.84,
       "phase_b_mfe_pct": 1.285,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.00981,
+      "fees_paid_usdt": 0.019691,
       "fees_are_actual": true,
       "opened_at": "2026-05-17T19:04:37.793022+00:00",
       "is_dry_run": false,
@@ -135,14 +135,22 @@
       "btc_change_24h_at_open": -0.087,
       "btc_pct_vs_ma25_at_open": 0.066,
       "phase_a_mfe_price": 45.969,
-      "current_price": 45.996,
-      "unrealized_pnl_usdt": 0.1582,
-      "unrealized_pnl_pct": 0.807,
-      "last_price_check_at": "2026-05-17T19:30:46.630017+00:00",
-      "phase_b_mfe_price": 46.172
-    }
-  ],
-  "recent_closed": [
+      "current_price": 45.924,
+      "unrealized_pnl_usdt": 0.1273,
+      "unrealized_pnl_pct": 0.649,
+      "last_price_check_at": "2026-05-17T19:31:20.019358+00:00",
+      "phase_b_mfe_price": 46.172,
+      "closed_at": "2026-05-17T19:31:57.990502+00:00",
+      "close_reason": "paper:hit_b_trail",
+      "avg_exit_price": 45.956,
+      "realized_pnl_usdt": 0.141,
+      "close_order_id": 175562054,
+      "close_qty": 0.43,
+      "close_expected_price": 45.924,
+      "close_slippage_bps": -6.97,
+      "entry_fees_usdt": 0.00981,
+      "close_fees_usdt": 0.009881
+    },
     {
       "paper_id": "SPACEUSDT|SHORT|2026-05-17T18:34:29.378915+00:00",
       "trade_id": "L1779042869_SPACEUS_S",
@@ -6958,8 +6966,17 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-17T18:56:02.861190+00:00",
-      "reason": "paper trade too old (2084s > 600s)",
-      "last_checked_at": "2026-05-17T19:30:46.630017+00:00"
+      "reason": "paper trade too old (2185s > 600s)",
+      "last_checked_at": "2026-05-17T19:32:28.245825+00:00"
+    },
+    {
+      "paper_id": "OPENUSDT|LONG|2026-05-17T19:30:39.917925+00:00",
+      "symbol": "OPENUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-05-17T19:31:33.211177+00:00",
+      "reason": "open_failed (retry next tick)",
+      "last_checked_at": "2026-05-17T19:32:28.245825+00:00"
     }
   ],
   "btc_regime_now": {
@@ -6968,7 +6985,7 @@
     "btc_ma25_1h": 78117.68,
     "pct_vs_ma25": 0.108,
     "change_24h_pct": -0.043,
-    "computed_at": "2026-05-17T19:30:49.148190+00:00"
+    "computed_at": "2026-05-17T19:32:29.907332+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
