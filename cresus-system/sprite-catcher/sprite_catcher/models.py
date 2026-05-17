@@ -284,3 +284,49 @@ class AdmissionDecision:
     """L7 对单个 TradeIntent 的准入判断结果。"""
     admitted: bool
     reason: str | None             # 拒绝原因（admitted=False 时非空）
+
+
+# === 历史样本（训练 / 回测） ===
+
+
+class SampleLabel(str, Enum):
+    """历史样本的标签——决定它属于哪类妖币。"""
+    FRIENDLY_LONG = "friendly_long"    # 适合 Module A 做多
+    OPERATOR_SHORT = "operator_short"  # 适合 Module B 做空
+    AVOID = "avoid"                    # 两边都不做（爆炸过快 / 死亡螺旋 / 即砸）
+
+
+@dataclass(frozen=True)
+class HistoricalSample:
+    """
+    单个妖币的样本快照，用于回测和阈值校准。
+
+    所有时间字段必须是 UTC ISO8601；数据缺失用 None 而不是 0。
+    """
+    # 标识
+    token_symbol: str
+    chain: str                         # "BTC" / "ETH" / "SOL" / "BSC" / "BASE" / ...
+    listing_date: datetime             # 上主流 CEX 的日期
+    peak_date: datetime
+    end_of_window_date: datetime       # 样本观察窗结束
+
+    # 关键价格（USD）
+    base_low_usd: float
+    peak_high_usd: float
+    end_price_usd: float | None        # None = 仍在交易，未到结束
+
+    # 派生指标
+    pump_multiplier: float             # peak / base
+    sustained_pump_days: int           # 趋势可读时长
+    max_drawdown_during_pump: float    # 主升期间最大回撤（占比）
+
+    # 庄家指纹（拿不到的字段用 None）
+    top10_share_at_peak: float | None
+    binance_oi_share_at_peak: float | None
+    vol_oi_ratio_at_peak: float | None
+
+    # 标签
+    label: SampleLabel
+    operator_archetype: str | None     # "MYX_SQUEEZE" / "COAI_CONTROL" / "LAB_INSIDER" / None
+    notes: str
+    sources: tuple[str, ...]           # 资料链接

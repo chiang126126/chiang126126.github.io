@@ -15,6 +15,7 @@
 I/O 通过 interfaces.py 中的 Protocol 注入。
 """
 
+from .datasets.library import load_samples, samples_by_chain, samples_by_label
 from .features.chip import compute_chip_features, funder_dedupe
 from .features.divergence import detect_distribution_divergence
 from .features.indicators import consecutive_up_bars, ema
@@ -40,6 +41,7 @@ from .models import (
     DevWalletInfo,
     DivergenceSignal,
     EntryType,
+    HistoricalSample,
     HolderSnapshot,
     LiquidityInfo,
     MarketRegime,
@@ -49,6 +51,7 @@ from .models import (
     PositionSize,
     RegimeAssessment,
     SafetyReport,
+    SampleLabel,
     ShortVacuumSignal,
     Side,
     SupportCollapseSignal,
@@ -89,6 +92,10 @@ __all__ = [
     # 组合层 (L7)
     "assess_market_regime",
     "can_admit_intent",
+    # 历史样本库
+    "load_samples",
+    "samples_by_label",
+    "samples_by_chain",
     # 数据模型 (L2)
     "Candle",
     "ChipFeatures",
@@ -119,4 +126,7 @@ __all__ = [
     "AllocationCaps",
     "RegimeAssessment",
     "AdmissionDecision",
+    # 数据模型 (历史样本)
+    "SampleLabel",
+    "HistoricalSample",
 ]

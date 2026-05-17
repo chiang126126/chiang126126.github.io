@@ -18,6 +18,9 @@ dev = ["pytest>=8.0"]
 include = ["sprite_catcher*"]
 exclude = ["tests*"]
 
+[tool.setuptools.package-data]
+"sprite_catcher.datasets" = ["*.jsonl"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
