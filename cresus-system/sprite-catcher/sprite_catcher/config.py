@@ -58,6 +58,24 @@ SV_OI_DROP_THRESHOLD = 0.15           # OI 下降 ≥ 15%
 SV_WICK_THRESHOLD = 0.03              # 单根上影线 / close ≥ 3%
 SV_MIN_RECENT_PUMP_PCT = 0.20         # 前置拉盘 ≥ 20%
 
+# === 趋势跟随信号 (Module A) ===
+TF_EMA_FAST = 20                      # 快 EMA 周期
+TF_EMA_SLOW = 50                      # 慢 EMA 周期
+TF_MIN_EMA_UP_BARS = 3                # EMA20 至少连续向上 N 根
+TF_DAILY_BREAKOUT_LOOKBACK = 20       # 1D 突破前 N 日高点
+TF_MIN_HOLDERS_GROWTH_7D = 0.30       # 7d 持有人增速阈值（可选输入）
+
+# === 仓位计算默认值 ===
+A_RISK_PER_TRADE_PCT = 0.01           # Module A 单笔风险 1%
+A_MAX_SINGLE_POSITION_PCT = 0.02      # Module A 单仓 ≤ 2% 总资金
+A_MAX_PORTFOLIO_PCT = 0.70            # Module A 总仓 ≤ 70%
+A_MAX_LEVERAGE = 1.0                  # Module A 现货不加杠杆
+
+B_RISK_PER_TRADE_PCT = 0.005          # Module B 单笔风险 0.5%（空头更严）
+B_MAX_SINGLE_POSITION_PCT = 0.01      # Module B 单仓 ≤ 1%
+B_MAX_PORTFOLIO_PCT = 0.20            # Module B 总仓 ≤ 20%
+B_MAX_LEVERAGE = 2.0                  # Module B 永续，上限 2x
+
 # === 安全闸：空头池 (Module B) 要求 ===
 # 设计哲学：空头不太关心 dev 是否惯犯（你赌它跌）也不在乎 LP 锁不锁（LP 抽走对空头有利）；
 # 但要确保你能"卖空"和"买回平仓"，且流动性深到不会被轧爆。

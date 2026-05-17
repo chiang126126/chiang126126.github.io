@@ -17,11 +17,14 @@ I/O 通过 interfaces.py 中的 Protocol 注入。
 
 from .features.chip import compute_chip_features, funder_dedupe
 from .features.divergence import detect_distribution_divergence
+from .features.indicators import consecutive_up_bars, ema
 from .features.oi import stratify_oi
 from .features.pool_router import route_to_pool
 from .features.safety_gate import evaluate_long_safety, evaluate_short_safety
 from .features.short_vacuum import detect_short_vacuum
+from .features.sizing import size_long_position, size_position, size_short_position
 from .features.support_collapse import detect_support_collapse
+from .features.trend_follow import detect_trend_follow
 from .models import (
     Candle,
     ChipFeatures,
@@ -32,6 +35,7 @@ from .models import (
     OIStratification,
     Pool,
     PoolDecision,
+    PositionSize,
     SafetyReport,
     ShortVacuumSignal,
     SupportCollapseSignal,
@@ -39,6 +43,7 @@ from .models import (
     TokenAuditInfo,
     TradeSimulationResult,
     TransferEdge,
+    TrendFollowSignal,
 )
 
 __all__ = [
@@ -51,9 +56,17 @@ __all__ = [
     # 计算函数 (L3)
     "evaluate_long_safety",
     "evaluate_short_safety",
+    # 入场信号 (Module A)
+    "detect_trend_follow",
     # 入场信号 (Module B)
     "detect_support_collapse",
     "detect_short_vacuum",
+    # 工具
+    "ema",
+    "consecutive_up_bars",
+    "size_position",
+    "size_long_position",
+    "size_short_position",
     # 数据模型 (L2)
     "Candle",
     "ChipFeatures",
@@ -70,7 +83,10 @@ __all__ = [
     "DevWalletInfo",
     "TradeSimulationResult",
     "SafetyReport",
-    # 数据模型 (Module B 信号)
+    # 数据模型 (信号)
+    "TrendFollowSignal",
     "SupportCollapseSignal",
     "ShortVacuumSignal",
+    # 数据模型 (仓位)
+    "PositionSize",
 ]

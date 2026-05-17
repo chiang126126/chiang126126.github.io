@@ -176,3 +176,36 @@ class ShortVacuumSignal:
     oi_drop_pct: float             # OI 下降百分比
     max_wick_ratio: float          # 窗口内最大上影线比例
     recent_pump_pct: float         # 前置拉盘幅度
+
+
+# === Module A 入场信号 ===
+
+
+@dataclass(frozen=True)
+class TrendFollowSignal:
+    """趋势跟随信号：多头多周期共振 + 持有人增速。"""
+    detected: bool
+    strength: float
+    reason: str
+    ema20: float
+    ema50: float
+    ema20_up_bars: int             # EMA20 连续向上的根数
+    daily_breakout: bool           # 是否突破日线 N 日高点
+    holders_growth_pct: float      # 7d 持有人增速（可选输入）
+
+
+# === 仓位计算 ===
+
+
+@dataclass(frozen=True)
+class PositionSize:
+    """单笔仓位计算结果。
+
+    qty_quote_usd 是仓位的 USD 名义价值（notional），不是占用的保证金。
+    leverage 是 notional / equity 的比值；现货应 ≤ 1，永续可 > 1。
+    """
+    qty_quote_usd: float
+    leverage: float
+    risk_usd: float                # 单笔预计最大亏损
+    capped_by: str | None          # 哪条上限把仓位卡住了（None = 未被卡）
+    reason: str                    # 计算细节的可读描述

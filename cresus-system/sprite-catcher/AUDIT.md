@@ -148,16 +148,180 @@ slope = (4×20 − 6×10) / (4×14 − 36) = 20/20 = 1 ✓
 
 ---
 
+## `evaluate_long_safety` / `evaluate_short_safety`
+
+**职责**：策略下单前的一票否决关。多头/空头规则不同，所以拆成两个入口。
+
+### 多头 (Module A) 通过条件
+| 项 | 阈值 (config) | 测试 |
+|---|---|---|
+| 合约一票否决（mintable/freezeable/pausable/blacklist） | 全为 False | `test_long_rejects_mintable` + parametrized |
+| owner 危险 = renounced=False ∧ has_privileges=True | 拒绝 | `test_long_owner_dangerous_rejected` |
+| owner 仅 renounced=False（无权限）| 通过 | `test_long_owner_not_renounced_but_no_privileges_passes` |
+| buy_tax / sell_tax | ≤ 5% | `test_long_rejects_high_taxes` |
+| LP 锁定 | ≥ 90% & 剩余 ≥ 180d | `test_long_rejects_lp_*` |
+| 流动性 | ≥ $200k | `test_long_rejects_thin_liquidity` |
+| 池子年龄 | ≥ 14d | `test_long_rejects_young_pool` |
+| top10 | ≤ 30% | `test_long_rejects_concentrated_chip` |
+| dev 历史 | 无 rug 记录 | `test_long_rejects_dev_rug_history` |
+| 模拟试卖 | 买和卖都成功（若提供）| `test_long_rejects_honeypot_cannot_sell` |
+
+### 空头 (Module B) 通过条件
+| 项 | 阈值 | 测试 |
+|---|---|---|
+| has_futures_market | 必须 True | `test_short_rejects_no_futures` |
+| 合约一票否决 | 同多头 | `test_short_audit_one_veto_still_applies` |
+| buy/sell_tax | ≤ 10%（比多头宽）| `test_short_higher_tax_tolerance` |
+| 流动性 | ≥ $500k（比多头深）| `test_short_higher_liquidity_floor` |
+| 池子年龄 | ≥ 7d（要先有顶可空）| `test_short_pool_age_lower_threshold` |
+| 蜜罐 | 仍要检查 | `test_short_honeypot_kills` |
+| LP 锁 / dev / top10 | 不检查 | `test_short_does_not_check_lp_lock` + `test_short_does_not_check_chip_concentration` |
+
+**关键不变式**
+- 所有失败原因 *全部* 进 `rejected_reasons`，不做 short-circuit ⇒ `test_long_multiple_failures_all_reported`
+- 多头审计签名不含某些参数等于"该规则对空头不适用"的设计承诺 ⇒ `test_short_does_not_check_chip_concentration` 用 inspect 反向验证
+
+---
+
+## `detect_support_collapse`
+
+**职责**：支撑崩塌信号。pump ≥ 40% → peak 后 ≥ 4 根 → 跌破派发区低点 + 放量。
+
+| 输入条件 | 输出 | 测试 |
+|---|---|---|
+| 数据不足 | `insufficient_data` | `test_sc_insufficient_data` |
+| 横盘市场（无 pump） | `pump_too_small` | `test_sc_no_pump_returns_pump_too_small` |
+| peak 在当前或刚发生 | `peak_too_recent` | `test_sc_peak_too_recent` |
+| 派发区支撑没破 | `support_holds:close=X>=Y` | `test_sc_support_holds` |
+| 破位但缩量 | `volume_too_low:vol_ratio` | `test_sc_volume_too_low` |
+| pump < 40% | `pump_too_small:pct` | `test_sc_pump_too_small` |
+| 全条件满足 | `SUPPORT_COLLAPSE` (strength > 0) | `test_sc_full_trigger` |
+| base_low ≤ 0（坏数据）| `invalid_base_low` | `test_sc_invalid_base_low` |
+| 历史量中位 = 0 | `zero_median_volume` | `test_sc_zero_median_volume` |
+
+**已知简化**
+- 派发区"支撑"定义为 peak 后所有 low 的最小值；更精细做法是用 swing low 识别
+- 量能用中位数；可改 EMA 或 ATR 加权
+- 不区分时间段（用户可改 `pump_lookback_bars` 调）
+
+---
+
+## `detect_short_vacuum`
+
+**职责**：插针清算空头 + OI 骤降 → 庄失去拉抬动力。
+
+| 输入条件 | 输出 | 测试 |
+|---|---|---|
+| OI 序列 < 2 点 | `oi_series_too_short` | `test_sv_oi_series_too_short` |
+| 价格序列 < 2 点 | `price_series_too_short` | `test_sv_price_series_too_short` |
+| 1m K 线 < window | `not_enough_candles` | `test_sv_not_enough_candles` |
+| OI 下降 < 15% | `oi_drop_too_small:pct` | `test_sv_oi_drop_too_small` |
+| 窗口内无上影 ≥ 3% | `no_significant_wick:ratio` | `test_sv_no_wick` |
+| 前置 pump < 20% | `no_recent_pump:pct` | `test_sv_no_recent_pump` |
+| 全条件满足 | `SHORT_VACUUM` | `test_sv_full_trigger` |
+| oi_start ≤ 0 | `oi_start_non_positive` | `test_sv_oi_start_zero` |
+| price_low ≤ 0 | `price_low_non_positive` | `test_sv_price_low_zero` |
+
+**strength 单调性**：OI 下降幅度越大，strength 越大（其它条件相同时）⇒ `test_sv_strength_monotonic_in_oi_drop`
+
+**已知简化**（v0）
+- OI 下降未区分"主力 OI"还是"follow OI"。理论上应该是"follow OI 在跌、operator OI 还在"——这种才是真正的真空。需要先用 `stratify_oi` 拿到 OI 分层结果再喂入
+- "插针"用 max(open, close) 算上影；更严的版本可以同时看 wick 占整根 K 线的比例
+
+---
+
+## `ema` / `consecutive_up_bars`
+
+**职责**：被多个信号模块复用的纯数学指标工具。
+
+`ema(values, period)`：
+- 第一个值用前 period 个值的 SMA 做种子 ⇒ `test_ema_seed_is_sma`
+- 后续按 α = 2/(period+1) 递推 ⇒ `test_ema_smoothing_factor`
+- period ≤ 0 抛错 ⇒ `test_ema_invalid_period`
+- 输入长度 < period 返回空 ⇒ `test_ema_too_few_values`
+- 常量输入返回常量 ⇒ `test_ema_constant_series`
+- 递增输入产出递增 ⇒ `test_ema_monotonic_for_monotonic_input`
+
+`consecutive_up_bars(values)`：从末尾向前数连续严格递增根数。
+- 完整参数化测试覆盖 8 种 case ⇒ `test_consecutive_up_bars`
+
+---
+
+## `detect_trend_follow`
+
+**职责**：Module A 主力多头入场信号。4H 多头排列 + EMA 持续向上 + 1D 突破 + 持有人增速。
+
+| 输入条件 | 输出 | 测试 |
+|---|---|---|
+| 4H 不够 50 + N 根 | `insufficient_4h_data` | `test_tf_insufficient_4h` |
+| 1D 不够 N+1 根 | `insufficient_1d_data` | `test_tf_insufficient_1d` |
+| price < EMA20 或 EMA20 < EMA50 | `not_bullish_stack:...` | `test_tf_not_bullish_stack` |
+| EMA20 未连续向上 ≥ 3 根 | `ema20_not_rising:bars=N` | （隐式覆盖于 baseline）|
+| 1D 未突破前 20 日高点 | `no_daily_breakout:...` | `test_tf_no_daily_breakout` |
+| 持有人增速 < 30% | `holders_growth_too_low:pct` | `test_tf_holders_growth_too_low` |
+| 持有人输入 = None | 不阻塞但 strength × 0.7 | `test_tf_holders_none_does_not_block` |
+| 全条件满足 | `TREND_FOLLOW` | `test_tf_full_trigger` |
+
+**关键不变式**：触发时 price > EMA20 > EMA50 ⇒ `test_tf_ema_relations_correct`
+
+---
+
+## `size_position` / `size_long_position` / `size_short_position`
+
+**职责**：基于固定风险 + 三道上限计算单笔仓位。
+
+**核心公式**
+```
+risk_usd       = equity × risk_per_trade_pct
+risk_per_unit  = |entry - sl| / entry
+risk_based_qty = risk_usd / risk_per_unit
+
+single_cap     = equity × max_single_position_pct × max_leverage
+portfolio_cap  = equity × max_portfolio_pct − open_position_value_usd
+leverage_cap   = equity × max_leverage
+
+final_qty      = min(risk_based, single_cap, portfolio_cap, leverage_cap)
+capped_by      = winner 的名字（risk_based 时为 None）
+```
+
+| 场景 | 期望 | 测试 |
+|---|---|---|
+| 风险-based 是最小 | capped_by=None | `test_sizing_risk_based` |
+| 单仓上限卡 | capped_by="single_position_cap" | `test_sizing_capped_by_single_position` |
+| 总仓上限卡（已开仓占用预算）| capped_by="portfolio_cap" | `test_sizing_capped_by_portfolio` |
+| 杠杆上限卡（spot, 风险密度极小）| capped_by="leverage_cap" 或同等 | `test_sizing_capped_by_leverage` |
+| 已开仓恰好等于预算 | qty=0, capped_by="portfolio_cap" | `test_sizing_portfolio_already_full` |
+| short 方向（sl 在 entry 上方）| 与 long 同密度时 qty 相同 | `test_sizing_works_for_short_direction` |
+| Module B 2x 杠杆 | leverage ≤ 2 | `test_sizing_short_with_leverage_2x` |
+| equity ≤ 0 / entry ≤ 0 / sl ≤ 0 / sl == entry / max_leverage < 1 | ValueError | `test_sizing_*_raises` |
+
+**默认 wrapper**：
+- `size_long_position`：用 A_* 系列默认值（1% risk, 2% single, 70% portfolio, 1x）
+- `size_short_position`：用 B_* 系列（0.5% risk, 1% single, 20% portfolio, 2x）
+
+---
+
 ## 整体审计反思
 
 ### 已修正的逻辑错误（实现过程中暴露的）
 1. **NaN 当 0 处理**导致"数据缺失"被错误判定为"操纵存在" → `stratify_oi` 已加 `corr_available` 标志。
+2. **测试构造时漏算 `recent` 切片窗口**，导致 `invalid_base_low` 防御实际未被测试覆盖 → 已修正测试数据。
 
 ### 已知简化（v0 故意留的）
 1. `_find_funder` 单线 BFS，没按金额加权 → 多源资金的 holder 可能错判 funder。
 2. `_linear_slope` 不返回 R²，没法判断"斜率显著性" → 真实生产应改为带 p-value 的回归。
-3. `detect_distribution_divergence` 用整段窗口的 OLS 斜率 → 对突变不敏感（例如最后 1h 的剧烈转向会被前 5h 的平稳稀释）。
+3. `detect_distribution_divergence` 用整段窗口的 OLS 斜率 → 对突变不敏感。
 4. `_pearson_of_diff` 用等步长假设 → 时间戳必须严格对齐，缺一个点都会失败而非插值。
+5. `detect_short_vacuum` 看的是总 OI，没有区分"主力 OI 还在 / follow OI 在跌" → 理想是与 `stratify_oi` 串联。
+6. `detect_support_collapse` 用 peak 后所有 low 的最小值作支撑参考 → 真实策略应该用 swing low / 上升通道下沿。
+7. `ema` 用 SMA 做种子 → 与 TradingView/Binance 的 EMA 在最初几根上有小差异，长期收敛。
+
+### 仍需在 L4+ 处理（不在本仓库公开实现）
+- AI 评分层与确定性下单代码的隔离（OTOCO 参数禁止读取 LLM 输出）
+- OTOCO 挂单实现 + 三级熔断 + Telegram /halt
+- 跨所 OI 归一化（USDT-M vs Coin-M 计价不一致）
+- 历史快照存档（防 survivorship bias）
+- 时钟同步监控（chrony + offset > 500ms 报警）
 
 ### 安全 / 风格
 - 全部公开 API 都是 `frozen=True` dataclass → 下游不能意外篡改。

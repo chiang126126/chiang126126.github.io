@@ -14,11 +14,27 @@ L1 数据采集 (CEX × 多家 + 链上)            ← 私仓 cresus-bot
 L2 特征工程   ← 本目录 ★
    • 筹码集中度 + Funder 去重         features/chip.py
    • OI 分层 (主力 / Follow)          features/oi.py
-   • 三层背离 (价 / OI / 持有人)       features/divergence.py
    • 候选池分流                       features/pool_router.py
         │
         ▼
-L3 安全闸 + L4 AI 评分 + L5 策略层 …
+L3 安全闸   ← 本目录 ★
+   • 多头审计 (LP锁/dev/年龄/top10)    features/safety_gate.py
+   • 空头审计 (流动性/期货市场/蜜罐)    features/safety_gate.py
+        │
+        ▼
+入场信号（Module A 多头）  ← 本目录 ★
+   • 趋势跟随                          features/trend_follow.py
+入场信号（Module B 空头）  ← 本目录 ★
+   • 支撑崩塌                          features/support_collapse.py
+   • 空头真空                          features/short_vacuum.py
+   • 聪明钱撤退（三层背离）             features/divergence.py
+        │
+        ▼
+仓位计算   ← 本目录 ★
+   • 固定风险 + 单仓/总仓/杠杆三道上限   features/sizing.py
+        │
+        ▼
+L4 AI 评分 + L5 策略层 + L6 执行 + L7 组合层 + L8 复盘 ← 私仓 cresus-bot
 ```
 
 ## 设计原则
@@ -37,8 +53,14 @@ L3 安全闸 + L4 AI 评分 + L5 策略层 …
 |---|---|
 | `chip.py` | 筹码集中度 |
 | `oi.py` | OI 分层 + 操纵分 |
-| `divergence.py` | 价/OI/持有人 三层背离（"聪明钱撤退"信号）|
+| `divergence.py` | 价/OI/持有人 三层背离（聪明钱撤退） |
 | `pool_router.py` | 候选池分流（友好池 / 操纵池 / 中性 / 拉黑）|
+| `safety_gate.py` | 多头/空头 安全审计 |
+| `trend_follow.py` | 趋势跟随入场（Module A 主力） |
+| `support_collapse.py` | 支撑崩塌入场（Module B） |
+| `short_vacuum.py` | 空头真空入场（Module B） |
+| `sizing.py` | 仓位计算（固定风险 + 三道上限） |
+| `indicators.py` | 通用技术指标（EMA / 连续上行根数） |
 
 ## 快速使用
 
