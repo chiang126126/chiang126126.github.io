@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-17T20:00:51.578432+00:00",
+  "updated_at": "2026-05-17T20:02:55.237103+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 25,
+  "alerts_count": 26,
   "alerts": [
+    {
+      "symbol": "ZECUSDT",
+      "base": "ZEC",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 531.25,
+      "price_change_pct": 0.774,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 8796482.0,
+      "volume_baseline_usdt": 686506.0,
+      "volume_ratio": 12.81,
+      "detected_at": "2026-05-17T20:01:55.464251+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.784,
+      "change_15m_pct": 1.261,
+      "change_1h_pct": 1.304,
+      "change_4h_pct": 2.939,
+      "taker_buy_ratio_1m": 0.678,
+      "taker_buy_ratio_5m": 0.628,
+      "oi_delta_5m_pct": 0.025,
+      "funding_rate_pct": 0.0021,
+      "atr_pct": 0.29,
+      "range_4h_pct": 3.69,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 529.70857143,
+      "suggested_tp1": 533.56214286,
+      "suggested_tp2": 535.87428571,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "HANAUSDT",
       "base": "HANA",
