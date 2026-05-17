@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-17T10:29:09.291422+00:00",
+  "generated_at": "2026-05-17T10:31:24.331322+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 106,
-    "open": 1,
+    "total_trades": 107,
+    "open": 2,
     "closed": 105,
     "wins": 39,
     "losses": 65,
@@ -14,33 +14,33 @@
     "avg_pnl_usdt": 0.0203,
     "best_trade_usdt": 2.0008,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 1.8134,
+    "fees_paid_usdt": 1.8234,
     "fees_realized_usdt": 1.8035,
-    "fees_open_usdt": 0.0099,
+    "fees_open_usdt": 0.0199,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 19.87,
-    "free_capital_usdt": 80.44,
+    "deployed_usdt": 39.88,
+    "free_capital_usdt": 60.43,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 2.2893,
-    "deployed_usdt": 39.87
+    "daily_pnl": 2.1293,
+    "deployed_usdt": 39.88
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "KITEUSDT",
-      "ATOMUSDT"
+      "SPACEUSDT",
+      "KITEUSDT"
     ],
     "exchange_symbols": [
-      "KITEUSDT",
-      "ATOMUSDT"
+      "SPACEUSDT",
+      "KITEUSDT"
     ]
   },
   "open_trades": [
@@ -82,12 +82,55 @@
       "btc_change_24h_at_open": 0.35,
       "btc_pct_vs_ma25_at_open": 0.135,
       "phase_a_mfe_price": 0.21896,
-      "current_price": 0.21966,
-      "unrealized_pnl_usdt": 0.1174,
-      "unrealized_pnl_pct": 0.591,
-      "last_price_check_at": "2026-05-17T10:29:04.634487+00:00",
+      "current_price": 0.21945,
+      "unrealized_pnl_usdt": 0.0983,
+      "unrealized_pnl_pct": 0.495,
+      "last_price_check_at": "2026-05-17T10:31:21.596461+00:00",
       "phase_b_mfe_price": 0.21988,
       "phase_c_mfe_price": 0.21988
+    },
+    {
+      "paper_id": "SPACEUSDT|LONG|2026-05-17T10:29:56.108400+00:00",
+      "trade_id": "L1779013796_SPACEUS_L",
+      "symbol": "SPACEUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.008044,
+      "avg_fill_price": 0.00806,
+      "slippage_bps": 19.89,
+      "qty": 2482.0,
+      "notional_usdt": 20.00492,
+      "leverage": 3,
+      "risk_usdt": 0.2783,
+      "risk_pct": 1.391,
+      "mirror_latency_sec": 36.1,
+      "sl_price": 0.00794786,
+      "tp1_price": 0.00818821,
+      "tp2_price": 0.00833243,
+      "phase": "A",
+      "entry_order_id": 73461373,
+      "entry_client_id": "cresus_L1779013796_SPACEUS_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.598,
+      "phase_a_mfe_pct": 0.149,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.010002,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-17T10:30:50.465666+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 78465.4,
+      "btc_change_24h_at_open": 0.701,
+      "btc_pct_vs_ma25_at_open": 0.471,
+      "phase_a_mfe_price": 0.008056,
+      "current_price": 0.008064,
+      "unrealized_pnl_usdt": 0.0099,
+      "unrealized_pnl_pct": 0.05,
+      "last_price_check_at": "2026-05-17T10:31:21.596461+00:00"
     }
   ],
   "recent_closed": [
@@ -5139,8 +5182,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-17T09:52:43.461334+00:00",
-      "reason": "paper trade too old (2181s > 600s)",
-      "last_checked_at": "2026-05-17T10:29:04.634487+00:00"
+      "reason": "paper trade too old (2318s > 600s)",
+      "last_checked_at": "2026-05-17T10:31:21.596461+00:00"
     },
     {
       "paper_id": "OPENUSDT|LONG|2026-05-17T10:10:52.681679+00:00",
@@ -5148,8 +5191,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-17T10:11:29.642832+00:00",
-      "reason": "paper trade too old (1055s > 600s)",
-      "last_checked_at": "2026-05-17T10:29:04.634487+00:00"
+      "reason": "paper trade too old (1192s > 600s)",
+      "last_checked_at": "2026-05-17T10:31:21.596461+00:00"
     }
   ],
   "btc_regime_now": {
@@ -5158,7 +5201,7 @@
     "btc_ma25_1h": 78097.25,
     "pct_vs_ma25": 0.471,
     "change_24h_pct": 0.701,
-    "computed_at": "2026-05-17T10:29:06.794795+00:00"
+    "computed_at": "2026-05-17T10:31:23.746406+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
