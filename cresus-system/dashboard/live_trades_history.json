@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-17T10:18:57.571721+00:00",
+  "generated_at": "2026-05-17T10:21:17.591862+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 105,
-    "open": 3,
+    "total_trades": 106,
+    "open": 4,
     "closed": 102,
     "wins": 39,
     "losses": 62,
@@ -14,21 +14,21 @@
     "avg_pnl_usdt": 0.0268,
     "best_trade_usdt": 2.0008,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 1.7757,
+    "fees_paid_usdt": 1.7857,
     "fees_realized_usdt": 1.7477,
-    "fees_open_usdt": 0.028,
+    "fees_open_usdt": 0.0379,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 59.91,
-    "free_capital_usdt": 41.05,
+    "deployed_usdt": 79.89,
+    "free_capital_usdt": 21.06,
     "max_concurrent_slots": 4,
-    "slots_used": 3
+    "slots_used": 4
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 2.7355,
-    "deployed_usdt": 59.91
+    "deployed_usdt": 79.89
   },
   "reconciliation": {
     "ok": true,
@@ -36,13 +36,15 @@
     "api_failed": false,
     "live_symbols": [
       "KITEUSDT",
-      "SPORTFUNUSDT",
-      "ATOMUSDT"
+      "ATOMUSDT",
+      "DOGSUSDT",
+      "SPORTFUNUSDT"
     ],
     "exchange_symbols": [
-      "KITEUSDT",
+      "ATOMUSDT",
       "SPORTFUNUSDT",
-      "ATOMUSDT"
+      "KITEUSDT",
+      "DOGSUSDT"
     ]
   },
   "open_trades": [
@@ -61,7 +63,7 @@
       "risk_usdt": 0.0827,
       "risk_pct": 0.416,
       "mirror_latency_sec": 21.2,
-      "sl_price": 0.21869414999999998,
+      "sl_price": 0.2188335725,
       "tp1_price": 0.21895893,
       "tp2_price": 0.21985786,
       "phase": "B",
@@ -73,7 +75,7 @@
       "alert_type": "sustained",
       "atr_pct": 0.275,
       "phase_a_mfe_pct": 0.413,
-      "phase_b_mfe_pct": 0.706,
+      "phase_b_mfe_pct": 0.77,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.009936,
       "fees_are_actual": true,
@@ -84,11 +86,11 @@
       "btc_change_24h_at_open": 0.35,
       "btc_pct_vs_ma25_at_open": 0.135,
       "phase_a_mfe_price": 0.21896,
-      "current_price": 0.21952,
-      "unrealized_pnl_usdt": 0.1046,
-      "unrealized_pnl_pct": 0.527,
-      "last_price_check_at": "2026-05-17T10:18:53.857025+00:00",
-      "phase_b_mfe_price": 0.2196
+      "current_price": 0.21942,
+      "unrealized_pnl_usdt": 0.0955,
+      "unrealized_pnl_pct": 0.481,
+      "last_price_check_at": "2026-05-17T10:21:14.370008+00:00",
+      "phase_b_mfe_price": 0.21974
     },
     {
       "paper_id": "SPORTFUNUSDT|LONG|2026-05-17T10:13:14.253836+00:00",
@@ -128,10 +130,10 @@
       "btc_change_24h_at_open": 0.463,
       "btc_pct_vs_ma25_at_open": 0.243,
       "phase_a_mfe_price": 0.06603,
-      "current_price": 0.06499,
-      "unrealized_pnl_usdt": -0.153,
-      "unrealized_pnl_pct": -0.763,
-      "last_price_check_at": "2026-05-17T10:18:53.857025+00:00"
+      "current_price": 0.06493,
+      "unrealized_pnl_usdt": -0.1714,
+      "unrealized_pnl_pct": -0.855,
+      "last_price_check_at": "2026-05-17T10:21:14.370008+00:00"
     },
     {
       "paper_id": "ATOMUSDT|LONG|2026-05-17T10:14:47.969157+00:00",
@@ -171,10 +173,53 @@
       "btc_change_24h_at_open": 0.625,
       "btc_pct_vs_ma25_at_open": 0.399,
       "phase_a_mfe_price": 2.125,
-      "current_price": 2.124,
-      "unrealized_pnl_usdt": -0.0094,
-      "unrealized_pnl_pct": -0.047,
-      "last_price_check_at": "2026-05-17T10:18:53.857025+00:00"
+      "current_price": 2.121,
+      "unrealized_pnl_usdt": -0.0376,
+      "unrealized_pnl_pct": -0.188,
+      "last_price_check_at": "2026-05-17T10:21:14.370008+00:00"
+    },
+    {
+      "paper_id": "DOGSUSDT|LONG|2026-05-17T10:19:21.590477+00:00",
+      "trade_id": "L1779013161_DOGSUSD_L",
+      "symbol": "DOGSUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 5.76e-05,
+      "avg_fill_price": 5.769e-05,
+      "slippage_bps": 15.63,
+      "qty": 346320.0,
+      "notional_usdt": 19.9792008,
+      "leverage": 3,
+      "risk_usdt": 0.1074,
+      "risk_pct": 0.537,
+      "mirror_latency_sec": 15.1,
+      "sl_price": 5.738e-05,
+      "tp1_price": 5.793e-05,
+      "tp2_price": 5.825e-05,
+      "phase": "A",
+      "entry_order_id": 260504176,
+      "entry_client_id": "cresus_L1779013161_DOGSUSD_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.377,
+      "phase_a_mfe_pct": 0.26,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.00999,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-17T10:20:08.294225+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 78385.7,
+      "btc_change_24h_at_open": 0.599,
+      "btc_pct_vs_ma25_at_open": 0.373,
+      "phase_a_mfe_price": 5.775e-05,
+      "current_price": 5.784e-05,
+      "unrealized_pnl_usdt": 0.0519,
+      "unrealized_pnl_pct": 0.26,
+      "last_price_check_at": "2026-05-17T10:21:14.370008+00:00"
     }
   ],
   "recent_closed": [
@@ -5067,8 +5112,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-17T09:52:43.461334+00:00",
-      "reason": "paper trade too old (1570s > 600s)",
-      "last_checked_at": "2026-05-17T10:18:53.857025+00:00"
+      "reason": "max_concurrent reached (4/4)",
+      "last_checked_at": "2026-05-17T10:21:14.370008+00:00"
     },
     {
       "paper_id": "OPENUSDT|LONG|2026-05-17T10:10:52.681679+00:00",
@@ -5076,17 +5121,17 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-17T10:11:29.642832+00:00",
-      "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-05-17T10:18:53.857025+00:00"
+      "reason": "max_concurrent reached (4/4)",
+      "last_checked_at": "2026-05-17T10:21:14.370008+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 78405.7,
-    "btc_ma25_1h": 78094.86,
-    "pct_vs_ma25": 0.398,
-    "change_24h_pct": 0.624,
-    "computed_at": "2026-05-17T10:18:56.014582+00:00"
+    "btc_price": 78384.6,
+    "btc_ma25_1h": 78094.02,
+    "pct_vs_ma25": 0.372,
+    "change_24h_pct": 0.597,
+    "computed_at": "2026-05-17T10:21:15.916643+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
