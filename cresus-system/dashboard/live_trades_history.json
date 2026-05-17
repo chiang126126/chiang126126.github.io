@@ -1,28 +1,28 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-17T13:39:17.047753+00:00",
+  "generated_at": "2026-05-17T13:41:03.531119+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 116,
-    "open": 1,
-    "closed": 115,
-    "wins": 41,
+    "open": 0,
+    "closed": 116,
+    "wins": 42,
     "losses": 73,
-    "win_rate": 0.36,
-    "total_pnl_usdt": 1.0371,
-    "net_pnl_usdt": -0.9614,
-    "avg_pnl_usdt": 0.009,
+    "win_rate": 0.365,
+    "total_pnl_usdt": 1.3287,
+    "net_pnl_usdt": -0.6899,
+    "avg_pnl_usdt": 0.0115,
     "best_trade_usdt": 2.0008,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 2.0085,
-    "fees_realized_usdt": 1.9985,
-    "fees_open_usdt": 0.01,
+    "fees_paid_usdt": 2.0186,
+    "fees_realized_usdt": 2.0186,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 20.0,
-    "free_capital_usdt": 79.03,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 99.31,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
@@ -41,7 +41,8 @@
       "QUSDT"
     ]
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "QUSDT|LONG|2026-05-17T13:15:38.298015+00:00",
       "trade_id": "L1779023738_QUSDT_L",
@@ -71,7 +72,7 @@
       "phase_a_mfe_pct": 4.001,
       "phase_b_mfe_pct": 4.001,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.009999,
+      "fees_paid_usdt": 0.020144,
       "fees_are_actual": true,
       "opened_at": "2026-05-17T13:16:46.245926+00:00",
       "is_dry_run": false,
@@ -80,14 +81,22 @@
       "btc_change_24h_at_open": 0.355,
       "btc_pct_vs_ma25_at_open": 0.142,
       "phase_a_mfe_price": 0.025577,
-      "current_price": 0.02524,
-      "unrealized_pnl_usdt": 0.4455,
-      "unrealized_pnl_pct": 2.228,
-      "last_price_check_at": "2026-05-17T13:39:11.528367+00:00",
-      "phase_b_mfe_price": 0.025577
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.02505,
+      "unrealized_pnl_usdt": 0.2916,
+      "unrealized_pnl_pct": 1.458,
+      "last_price_check_at": "2026-05-17T13:40:57.027716+00:00",
+      "phase_b_mfe_price": 0.025577,
+      "closed_at": "2026-05-17T13:41:03.521649+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.02505,
+      "realized_pnl_usdt": 0.2916,
+      "close_order_id": 112654794,
+      "close_qty": 810.0,
+      "close_expected_price": 0.025146155434999998,
+      "close_slippage_bps": 38.24,
+      "entry_fees_usdt": 0.009999,
+      "close_fees_usdt": 0.010145
+    },
     {
       "paper_id": "KAIAUSDT|LONG|2026-05-17T11:29:45.319274+00:00",
       "trade_id": "L1779017385_KAIAUSD_L",
@@ -5673,8 +5682,8 @@
       "direction": "LONG",
       "conviction_score": 7,
       "signal_at": "2026-05-17T13:22:19.951488+00:00",
-      "reason": "paper trade too old (1012s > 600s)",
-      "last_checked_at": "2026-05-17T13:39:11.528367+00:00"
+      "reason": "paper trade too old (1117s > 600s)",
+      "last_checked_at": "2026-05-17T13:40:57.027716+00:00"
     },
     {
       "paper_id": "PIEVERSEUSDT|LONG|2026-05-17T13:38:20.772330+00:00",
@@ -5683,16 +5692,16 @@
       "conviction_score": 5,
       "signal_at": "2026-05-17T13:38:57.672629+00:00",
       "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-05-17T13:39:11.528367+00:00"
+      "last_checked_at": "2026-05-17T13:40:57.027716+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 78285.5,
-    "btc_ma25_1h": 78135.62,
-    "pct_vs_ma25": 0.192,
-    "change_24h_pct": 0.407,
-    "computed_at": "2026-05-17T13:39:13.721460+00:00"
+    "btc_price": 78266.3,
+    "btc_ma25_1h": 78134.86,
+    "pct_vs_ma25": 0.168,
+    "change_24h_pct": 0.383,
+    "computed_at": "2026-05-17T13:40:59.174551+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
