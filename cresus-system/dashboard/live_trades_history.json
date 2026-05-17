@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-17T15:10:55.931676+00:00",
+  "generated_at": "2026-05-17T15:13:10.510533+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 123,
@@ -36,13 +36,13 @@
     "api_failed": false,
     "live_symbols": [
       "POWERUSDT",
-      "MAGMAUSDT",
-      "FHEUSDT"
+      "FHEUSDT",
+      "MAGMAUSDT"
     ],
     "exchange_symbols": [
       "POWERUSDT",
-      "MAGMAUSDT",
-      "FHEUSDT"
+      "FHEUSDT",
+      "MAGMAUSDT"
     ]
   },
   "open_trades": [
@@ -74,7 +74,7 @@
       "atr_pct": 1.032,
       "phase_a_mfe_pct": 3.143,
       "phase_b_mfe_pct": 6.252,
-      "phase_c_mfe_pct": 6.319,
+      "phase_c_mfe_pct": 8.793,
       "fees_paid_usdt": 0.01,
       "fees_are_actual": true,
       "opened_at": "2026-05-17T14:25:18.215182+00:00",
@@ -84,12 +84,12 @@
       "btc_change_24h_at_open": -0.1,
       "btc_pct_vs_ma25_at_open": -0.149,
       "phase_a_mfe_price": 0.03085,
-      "current_price": 0.03187,
-      "unrealized_pnl_usdt": 1.3534,
-      "unrealized_pnl_pct": 6.767,
-      "last_price_check_at": "2026-05-17T15:10:52.793800+00:00",
+      "current_price": 0.0325,
+      "unrealized_pnl_usdt": 1.7755,
+      "unrealized_pnl_pct": 8.878,
+      "last_price_check_at": "2026-05-17T15:13:07.297390+00:00",
       "phase_b_mfe_price": 0.03178,
-      "phase_c_mfe_price": 0.0318
+      "phase_c_mfe_price": 0.03254
     },
     {
       "paper_id": "MAGMAUSDT|LONG|2026-05-17T14:24:11.373907+00:00",
@@ -129,10 +129,10 @@
       "btc_change_24h_at_open": -0.1,
       "btc_pct_vs_ma25_at_open": -0.149,
       "phase_a_mfe_price": 0.26653,
-      "current_price": 0.26878,
-      "unrealized_pnl_usdt": 0.7454,
-      "unrealized_pnl_pct": 3.736,
-      "last_price_check_at": "2026-05-17T15:10:52.793800+00:00",
+      "current_price": 0.26905,
+      "unrealized_pnl_usdt": 0.7662,
+      "unrealized_pnl_pct": 3.84,
+      "last_price_check_at": "2026-05-17T15:13:07.297390+00:00",
       "phase_b_mfe_price": 0.27105
     },
     {
@@ -150,10 +150,10 @@
       "risk_usdt": 0.1616,
       "risk_pct": 0.809,
       "mirror_latency_sec": 11.3,
-      "sl_price": 0.08724821,
+      "sl_price": 0.08786,
       "tp1_price": 0.08877768,
       "tp2_price": 0.08969536,
-      "phase": "A",
+      "phase": "B",
       "entry_order_id": 129456678,
       "entry_client_id": "cresus_L1779030395_POWERUS_L_E",
       "sl_order_id": null,
@@ -161,8 +161,8 @@
       "conviction_score": 5,
       "alert_type": "sustained",
       "atr_pct": 0.464,
-      "phase_a_mfe_pct": 0.08,
-      "phase_b_mfe_pct": null,
+      "phase_a_mfe_pct": 1.343,
+      "phase_b_mfe_pct": 1.343,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.009983,
       "fees_are_actual": true,
@@ -172,11 +172,12 @@
       "btc_price_at_open": 78047.0,
       "btc_change_24h_at_open": -0.201,
       "btc_pct_vs_ma25_at_open": -0.107,
-      "phase_a_mfe_price": 0.08793,
-      "current_price": 0.08821,
-      "unrealized_pnl_usdt": 0.0568,
-      "unrealized_pnl_pct": 0.284,
-      "last_price_check_at": "2026-05-17T15:10:52.793800+00:00"
+      "phase_a_mfe_price": 0.08904,
+      "current_price": 0.08878,
+      "unrealized_pnl_usdt": 0.1861,
+      "unrealized_pnl_pct": 0.932,
+      "last_price_check_at": "2026-05-17T15:13:07.297390+00:00",
+      "phase_b_mfe_price": 0.08904
     }
   ],
   "recent_closed": [
@@ -6028,24 +6029,14 @@
       "close_qty": 53792.0
     }
   ],
-  "missed_signals": [
-    {
-      "paper_id": "DUSKUSDT|LONG|2026-05-17T14:28:15.184764+00:00",
-      "symbol": "DUSKUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-05-17T14:28:53.584205+00:00",
-      "reason": "paper trade too old (2519s > 600s)",
-      "last_checked_at": "2026-05-17T15:10:52.793800+00:00"
-    }
-  ],
+  "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 78069.2,
-    "btc_ma25_1h": 78131.67,
-    "pct_vs_ma25": -0.08,
-    "change_24h_pct": -0.172,
-    "computed_at": "2026-05-17T15:10:55.056378+00:00"
+    "btc_price": 78055.6,
+    "btc_ma25_1h": 78131.13,
+    "pct_vs_ma25": -0.097,
+    "change_24h_pct": -0.19,
+    "computed_at": "2026-05-17T15:13:09.313634+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
