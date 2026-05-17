@@ -1,46 +1,44 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-17T11:40:34.186290+00:00",
+  "generated_at": "2026-05-17T11:42:48.936910+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 112,
-    "open": 2,
-    "closed": 110,
+    "open": 1,
+    "closed": 111,
     "wins": 40,
-    "losses": 69,
-    "win_rate": 0.367,
-    "total_pnl_usdt": 1.5236,
-    "net_pnl_usdt": -0.3753,
-    "avg_pnl_usdt": 0.0139,
+    "losses": 70,
+    "win_rate": 0.364,
+    "total_pnl_usdt": 1.4904,
+    "net_pnl_usdt": -0.4284,
+    "avg_pnl_usdt": 0.0134,
     "best_trade_usdt": 2.0008,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 1.9188,
-    "fees_realized_usdt": 1.8989,
-    "fees_open_usdt": 0.02,
+    "fees_paid_usdt": 1.9288,
+    "fees_realized_usdt": 1.9188,
+    "fees_open_usdt": 0.01,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 39.95,
-    "free_capital_usdt": 59.65,
+    "deployed_usdt": 20.01,
+    "free_capital_usdt": 79.56,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 1.5229,
-    "deployed_usdt": 39.95
+    "daily_pnl": 1.4897,
+    "deployed_usdt": 20.01
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "KAIAUSDT",
-      "CLANKERUSDT"
+      "KAIAUSDT"
     ],
     "exchange_symbols": [
-      "KAIAUSDT",
-      "CLANKERUSDT"
+      "KAIAUSDT"
     ]
   },
   "open_trades": [
@@ -70,7 +68,7 @@
       "conviction_score": 5,
       "alert_type": "sustained",
       "atr_pct": 0.495,
-      "phase_a_mfe_pct": 0.25,
+      "phase_a_mfe_pct": 0.365,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.010003,
@@ -81,12 +79,14 @@
       "btc_price_at_open": 78308.5,
       "btc_change_24h_at_open": 0.326,
       "btc_pct_vs_ma25_at_open": 0.253,
-      "phase_a_mfe_price": 0.05217,
+      "phase_a_mfe_price": 0.05223,
       "current_price": 0.0522,
       "unrealized_pnl_usdt": 0.0384,
       "unrealized_pnl_pct": 0.192,
-      "last_price_check_at": "2026-05-17T11:40:31.471777+00:00"
-    },
+      "last_price_check_at": "2026-05-17T11:42:45.618966+00:00"
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "CLANKERUSDT|SHORT|2026-05-17T11:36:36.636334+00:00",
       "trade_id": "L1779017796_CLANKER_S",
@@ -102,10 +102,10 @@
       "risk_usdt": 0.0794,
       "risk_pct": 0.398,
       "mirror_latency_sec": 36.5,
-      "sl_price": 24.12571429,
+      "sl_price": 24.04,
       "tp1_price": 23.91142857,
       "tp2_price": 23.78285714,
-      "phase": "A",
+      "phase": "B",
       "entry_order_id": 83596726,
       "entry_client_id": "cresus_L1779017796_CLANKER_S_E",
       "sl_order_id": null,
@@ -113,10 +113,10 @@
       "conviction_score": 5,
       "alert_type": "sustained",
       "atr_pct": 0.357,
-      "phase_a_mfe_pct": 0.333,
-      "phase_b_mfe_pct": null,
+      "phase_a_mfe_pct": 0.624,
+      "phase_b_mfe_pct": 0.624,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.009972,
+      "fees_paid_usdt": 0.019961,
       "fees_are_actual": true,
       "opened_at": "2026-05-17T11:37:15.574233+00:00",
       "is_dry_run": false,
@@ -124,14 +124,23 @@
       "btc_price_at_open": 78311.9,
       "btc_change_24h_at_open": 0.33,
       "btc_pct_vs_ma25_at_open": 0.257,
-      "phase_a_mfe_price": 23.96,
-      "current_price": 23.91,
-      "unrealized_pnl_usdt": 0.0996,
-      "unrealized_pnl_pct": 0.499,
-      "last_price_check_at": "2026-05-17T11:40:31.471777+00:00"
-    }
-  ],
-  "recent_closed": [
+      "phase_a_mfe_price": 23.89,
+      "current_price": 24.05,
+      "unrealized_pnl_usdt": -0.0166,
+      "unrealized_pnl_pct": -0.083,
+      "last_price_check_at": "2026-05-17T11:42:10.680043+00:00",
+      "phase_b_mfe_price": 23.89,
+      "closed_at": "2026-05-17T11:42:15.445326+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 24.07,
+      "realized_pnl_usdt": -0.0332,
+      "close_order_id": 83599401,
+      "close_qty": 0.83,
+      "close_expected_price": 24.04,
+      "close_slippage_bps": 12.48,
+      "entry_fees_usdt": 0.009972,
+      "close_fees_usdt": 0.009989
+    },
     {
       "paper_id": "MAGMAUSDT|LONG|2026-05-17T11:01:18.457622+00:00",
       "trade_id": "L1779015678_MAGMAUS_L",
@@ -5445,11 +5454,11 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 78350.0,
-    "btc_ma25_1h": 78112.47,
-    "pct_vs_ma25": 0.304,
-    "change_24h_pct": 0.379,
-    "computed_at": "2026-05-17T11:40:33.617846+00:00"
+    "btc_price": 78365.0,
+    "btc_ma25_1h": 78113.07,
+    "pct_vs_ma25": 0.323,
+    "change_24h_pct": 0.398,
+    "computed_at": "2026-05-17T11:42:48.641265+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
