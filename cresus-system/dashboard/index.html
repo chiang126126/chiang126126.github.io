@@ -4932,6 +4932,39 @@ function renderLivePanel(data) {
           <span style="opacity:0.7">(毛 ${grossPnl >= 0 ? '+' : ''}$${grossPnl.toFixed(2)} − 费 $${feesRealized.toFixed(3)} = 净 ${netPnl >= 0 ? '+' : ''}$${netPnl.toFixed(2)} · ${feesAreActual ? '✓ 实际' : '⚠ 估算'})</span>
           · 余额已为 NET (净额)
         </div>` : ''}
+        ${(() => {
+          // Phase 4.D: A/B 余额贡献明细 (账户余额 = 老数据 + A 组 + B 组)
+          const closedT = data.recent_closed || [];
+          const openT = data.open_trades || [];
+          let oldCnt = 0, oldNet = 0, aCnt = 0, aNet = 0, bCnt = 0, bNet = 0;
+          let aOpen = 0, bOpen = 0;
+          for (const t of closedT) {
+            const pnl = Number(t.realized_pnl_usdt || 0);
+            const fee = Number(t.fees_paid_usdt || 0);
+            const net = pnl - fee;
+            if (t.sl_compensation_enabled === undefined) { oldCnt++; oldNet += net; }
+            else if (t.sl_compensation_enabled) { bCnt++; bNet += net; }
+            else { aCnt++; aNet += net; }
+          }
+          for (const t of openT) {
+            if (t.sl_compensation_enabled === true) bOpen++;
+            else if (t.sl_compensation_enabled === false) aOpen++;
+          }
+          // 只在有 A/B 数据时才显示明细 (否则隐藏)
+          if (aCnt + bCnt + aOpen + bOpen === 0) return '';
+          const fmtNet = v => (v >= 0 ? '+' : '−') + '$' + Math.abs(v).toFixed(2);
+          const cls = v => v > 0.005 ? 'up' : (v < -0.005 ? 'down' : '');
+          const aStr = `📊 A 组 (${aCnt}${aOpen ? `, ${aOpen}持仓` : ''}): <span class="${cls(aNet)}">${fmtNet(aNet)}</span>`;
+          const bStr = `🧪 B 组 (${bCnt}${bOpen ? `, ${bOpen}持仓` : ''}): <span class="${cls(bNet)}">${fmtNet(bNet)}</span>`;
+          const oldStr = oldCnt > 0
+            ? `💰 老数据 (${oldCnt}): <span class="${cls(oldNet)}">${fmtNet(oldNet)}</span>`
+            : '';
+          return `
+            <div title="账户余额 = 老数据 + A 组 + B 组 实时合计. A 组无 SL 补偿 (对照), B 组用 paper_sl + entry_slip 补偿."
+                 style="font-size:11px;color:var(--text-dim);margin-top:4px;line-height:1.5">
+              余额构成: ${oldStr}${oldStr ? '  ·  ' : ''}${aStr}  ·  ${bStr}
+            </div>`;
+        })()}
       </div>
       ${(() => {
         // 4 张 stats 卡: 字号 / 颜色 / 排版精雕
