@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-17T02:13:14.912671+00:00",
+  "generated_at": "2026-05-17T02:15:32.230964+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 83,
-    "open": 2,
+    "total_trades": 84,
+    "open": 3,
     "closed": 81,
     "wins": 26,
     "losses": 55,
@@ -14,33 +14,35 @@
     "avg_pnl_usdt": -0.0038,
     "best_trade_usdt": 2.0008,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 1.3662,
+    "fees_paid_usdt": 1.3762,
     "fees_realized_usdt": 1.3481,
-    "fees_open_usdt": 0.0181,
+    "fees_open_usdt": 0.0281,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 40.18,
-    "free_capital_usdt": 58.15,
+    "deployed_usdt": 60.21,
+    "free_capital_usdt": 38.1,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 3
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -0.3107,
-    "deployed_usdt": 40.18
+    "deployed_usdt": 60.21
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "SPORTFUNUSDT",
-      "ATAUSDT"
+      "ATAUSDT",
+      "KAIAUSDT",
+      "SPORTFUNUSDT"
     ],
     "exchange_symbols": [
-      "SPORTFUNUSDT",
-      "ATAUSDT"
+      "ATAUSDT",
+      "KAIAUSDT",
+      "SPORTFUNUSDT"
     ]
   },
   "open_trades": [
@@ -72,18 +74,18 @@
       "atr_pct": 0.443,
       "phase_a_mfe_pct": 1.631,
       "phase_b_mfe_pct": 2.447,
-      "phase_c_mfe_pct": 5.873,
+      "phase_c_mfe_pct": 6.199,
       "fees_paid_usdt": 0.007998,
       "fees_are_actual": true,
       "opened_at": "2026-05-17T00:43:28.906634+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.00603,
-      "current_price": 0.00576,
-      "unrealized_pnl_usdt": 1.2069,
-      "unrealized_pnl_pct": 6.036,
-      "last_price_check_at": "2026-05-17T02:13:12.628413+00:00",
+      "current_price": 0.00575,
+      "unrealized_pnl_usdt": 1.2396,
+      "unrealized_pnl_pct": 6.199,
+      "last_price_check_at": "2026-05-17T02:15:29.650851+00:00",
       "phase_b_mfe_price": 0.00598,
-      "phase_c_mfe_price": 0.00577
+      "phase_c_mfe_price": 0.00575
     },
     {
       "paper_id": "SPORTFUNUSDT|SHORT|2026-05-17T01:12:53.911173+00:00",
@@ -119,10 +121,49 @@
       "opened_at": "2026-05-17T01:13:49.159776+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.05844,
-      "current_price": 0.059,
-      "unrealized_pnl_usdt": 0.4154,
-      "unrealized_pnl_pct": 2.058,
-      "last_price_check_at": "2026-05-17T02:13:12.628413+00:00"
+      "current_price": 0.05894,
+      "unrealized_pnl_usdt": 0.4355,
+      "unrealized_pnl_pct": 2.158,
+      "last_price_check_at": "2026-05-17T02:15:29.650851+00:00"
+    },
+    {
+      "paper_id": "KAIAUSDT|LONG|2026-05-17T02:13:22.677533+00:00",
+      "trade_id": "L1778984002_KAIAUSD_L",
+      "symbol": "KAIAUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.04838,
+      "avg_fill_price": 0.0484,
+      "slippage_bps": 4.13,
+      "qty": 414.0,
+      "notional_usdt": 20.0376,
+      "leverage": 3,
+      "risk_usdt": 0.1316,
+      "risk_pct": 0.657,
+      "mirror_latency_sec": 25.0,
+      "sl_price": 0.04808214,
+      "tp1_price": 0.04882679,
+      "tp2_price": 0.04927357,
+      "phase": "A",
+      "entry_order_id": 122414929,
+      "entry_client_id": "cresus_L1778984002_KAIAUSD_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.41,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.010019,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-17T02:13:51.536920+00:00",
+      "is_dry_run": false,
+      "phase_a_mfe_price": 0.04838,
+      "current_price": 0.0483,
+      "unrealized_pnl_usdt": -0.0414,
+      "unrealized_pnl_pct": -0.207,
+      "last_price_check_at": "2026-05-17T02:15:29.650851+00:00"
     }
   ],
   "recent_closed": [
@@ -3927,8 +3968,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-17T01:41:26.325337+00:00",
-      "reason": "paper trade too old (1906s > 600s)",
-      "last_checked_at": "2026-05-17T02:13:12.628413+00:00"
+      "reason": "paper trade too old (2043s > 600s)",
+      "last_checked_at": "2026-05-17T02:15:29.650851+00:00"
     }
   ],
   "config": {
