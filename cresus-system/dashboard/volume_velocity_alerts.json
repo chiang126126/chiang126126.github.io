@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-17T06:53:54.504782+00:00",
+  "updated_at": "2026-05-17T06:55:57.685032+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 15,
+  "alerts_count": 16,
   "alerts": [
+    {
+      "symbol": "SPKUSDT",
+      "base": "SPK",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.03075,
+      "price_change_pct": 0.622,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 64117.0,
+      "volume_baseline_usdt": 3233.0,
+      "volume_ratio": 19.84,
+      "detected_at": "2026-05-17T06:55:44.328420+00:00",
+      "intensity": 1,
+      "change_5m_pct": 1.084,
+      "change_15m_pct": 0.951,
+      "change_1h_pct": 0.786,
+      "change_4h_pct": 1.018,
+      "taker_buy_ratio_1m": 0.694,
+      "taker_buy_ratio_5m": 0.715,
+      "oi_delta_5m_pct": 0.122,
+      "funding_rate_pct": -0.0053,
+      "atr_pct": 0.158,
+      "range_4h_pct": 1.3,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.03070143,
+      "suggested_tp1": 0.03082286,
+      "suggested_tp2": 0.03089571,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "AIOUSDT",
       "base": "AIO",
