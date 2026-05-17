@@ -1680,6 +1680,17 @@
     background: #000; color: #fff; padding: 4px 8px; border-radius: 4px;
     font-size: 11px; white-space: nowrap; z-index: 10; margin-bottom: 4px;
   }
+  /* Phase 2b: 真 24H timeline — gap 用虚线 + 透明背景, 避免与 #5a6478 盘整死水撞色 */
+  .regime-tl-cell.empty {
+    background: transparent;
+    border: 1.5px dashed rgba(255,255,255,0.22);
+    box-sizing: border-box;
+  }
+  .regime-tl-cell.current {
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.45);
+  }
+  /* UNKNOWN regime: 紫色, 跟所有已用色不撞 (fallback for unmapped regime types) */
+  .regime-badge.unknown { color:#ce93f0; background:rgba(156,39,176,0.15); }
   .regime-legend {
     display: flex; flex-wrap: wrap; gap: 14px; margin-top: 6px;
     font-size: 11px; color: var(--text-dim);
@@ -2869,6 +2880,8 @@
           <span class="legend-item"><span class="legend-dot" style="background:#ff1744"></span>风险释放</span>
           <span class="legend-item"><span class="legend-dot" style="background:#ff9800"></span>拉砸风险</span>
           <span class="legend-item"><span class="legend-dot" style="background:#5a6478"></span>盘整死水</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#9c27b0"></span>未知</span>
+          <span class="legend-item"><span class="legend-dot" style="background:transparent;border:1.5px dashed rgba(255,255,255,0.45);box-sizing:border-box"></span>无数据</span>
         </div>
       </div>
     </div>
@@ -2975,6 +2988,8 @@ const REGIME_META = {
   RISK_OFF:           { zh: "风险释放", color: "#ff1744", cls: "risk-off"     },
   PUMP_AND_DUMP_RISK: { zh: "拉砸风险", color: "#ff9800", cls: "pump-dump"    },
   RANGE_BORING:       { zh: "盘整死水", color: "#5a6478", cls: "range-boring" },
+  // fallback: 未知 regime (旧数据或新加 regime 未映射) — 紫色, 不撞已用色
+  UNKNOWN:            { zh: "未知",     color: "#9c27b0", cls: "unknown"     },
 };
 
 async function loadRegime() {
@@ -3701,7 +3716,8 @@ const REGIME_AGE_DEAD_MIN  = 180;   // > 180min 严重过期 (生成器多半挂
 
 function renderRegimeCard() {
   if (!regimeData) return;
-  const meta = REGIME_META[regimeData.regime] || REGIME_META.RANGE_BORING;
+  // fallback 到 UNKNOWN (而非 RANGE_BORING), 避免新 regime 类型 silent 错归为"盘整死水"
+  const meta = REGIME_META[regimeData.regime] || REGIME_META.UNKNOWN;
   document.getElementById("regime-panel").style.display = "";
 
   // 容错: 所有字段 || fallback, 防 undefined 字面显示
@@ -3770,23 +3786,85 @@ function renderRegimeCard() {
 }
 
 function renderRegimeTimeline() {
+  // Phase 2b: 真 24H 时间轴 — 24 格, 每格 = 1 小时.
+  // 该小时有 snapshot → 实色填充 (按 regime); 无 snapshot → 虚线空格 (gap).
+  // 这样:
+  //  - 标题"24H"名副其实
+  //  - 生成器停几小时立刻可见 (N 个虚线格)
+  //  - 不再依赖"最近 24 个 snapshot"造成跨度不可控
   const tl = document.getElementById("regime-timeline");
   const cnt = document.getElementById("regime-timeline-count");
-  if (!regimeHistory.length) {
-    tl.innerHTML = '<div style="color:var(--text-dim);font-size:11px;grid-column:1/-1;text-align:center;padding:8px">还没有历史快照（需要至少 1 小时积累）</div>';
-    cnt.textContent = "0 个快照";
+
+  // 按 clock hour 对齐: 当前小时 + 过去 23 小时 = 24 格
+  const nowH = new Date();
+  nowH.setMinutes(0, 0, 0);   // 当前小时的整点开始
+  const nowHourMs = nowH.getTime();
+  const HOUR_MS = 3600 * 1000;
+  const buckets = [];
+  for (let i = 23; i >= 0; i--) {
+    const start = nowHourMs - i * HOUR_MS;
+    const end   = start + HOUR_MS;
+    buckets.push({ start, end, snapshot: null });
+  }
+
+  // 把 history snapshot 分配到对应小时桶 (该桶若有多个, 保留最新的)
+  for (const h of regimeHistory) {
+    if (!h.ts) continue;
+    const t = new Date(h.ts).getTime();
+    if (isNaN(t) || t < buckets[0].start || t >= buckets[buckets.length - 1].end) continue;
+    const idx = Math.floor((t - buckets[0].start) / HOUR_MS);
+    if (idx < 0 || idx >= 24) continue;
+    const b = buckets[idx];
+    if (!b.snapshot || t > new Date(b.snapshot.ts).getTime()) {
+      b.snapshot = h;
+    }
+  }
+
+  const filled = buckets.filter(b => b.snapshot).length;
+  const gaps   = 24 - filled;
+  // 让用户一眼看出"24h 内有多少小时有数据"
+  cnt.innerHTML = `${filled}/24 小时有数据`
+    + (gaps > 0 ? ` <span style="color:#ffb84d">· ${gaps} 小时缺数据</span>` : '')
+    + ` · 总 ${regimeHistory.length} 个快照`;
+
+  if (filled === 0) {
+    tl.innerHTML = '<div style="color:var(--text-dim);font-size:11px;grid-column:1/-1;text-align:center;padding:8px">还没有 24h 内的快照（需要至少 1 小时积累）</div>';
     return;
   }
-  // 取最近 24 个快照（按时间降序后倒回，让最早的在最左）
-  const sorted = [...regimeHistory].sort((a,b) => new Date(a.ts) - new Date(b.ts));
-  const last24 = sorted.slice(-24);
-  cnt.textContent = `${regimeHistory.length} 个快照（显示最近 24 个）`;
 
-  tl.innerHTML = last24.map(h => {
-    const m = REGIME_META[h.regime] || REGIME_META.RANGE_BORING;
-    const t = new Date(h.ts).toLocaleString("zh-CN", {hour12:false, month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit"});
-    const tip = `${t}\n${m.zh} (conf ${h.confidence})\n广度 ${(h.metrics?.rising_pct*100 || 0).toFixed(0)}% / 中位 ${(h.metrics?.median_change_pct || 0).toFixed(2)}%`;
-    return `<div class="regime-tl-cell" style="background:${m.color}" data-tip="${escapeHtml(tip)}"></div>`;
+  // metrics 显示助手: 区分 "真 0%" 和 "缺数据"
+  const fmtMetric = (v, pct, digits) => {
+    if (v == null || isNaN(v)) return '—';
+    return (pct ? (v * 100) : v).toFixed(digits) + (pct ? '%' : '');
+  };
+
+  // 渲染 24 格
+  tl.innerHTML = buckets.map((b, i) => {
+    const isCurrentHour = (i === 23);   // 最后一格 = 当前小时
+    const hourLabel = new Date(b.start).toLocaleTimeString("zh-CN", {
+      hour: "2-digit", minute: "2-digit", hour12: false,
+    });
+    const endLabel = new Date(b.end).toLocaleTimeString("zh-CN", {
+      hour: "2-digit", minute: "2-digit", hour12: false,
+    });
+    const currentMark = isCurrentHour ? " (当前小时)" : "";
+    if (b.snapshot) {
+      const h = b.snapshot;
+      const m = REGIME_META[h.regime] || REGIME_META.UNKNOWN;
+      const ts = new Date(h.ts).toLocaleString("zh-CN", {
+        hour12: false, month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit",
+      });
+      const rp = fmtMetric(h.metrics?.rising_pct, true, 0);
+      const mc = fmtMetric(h.metrics?.median_change_pct, false, 2);
+      const tip = `${hourLabel}-${endLabel}${currentMark}\n快照 ${ts}\n${m.zh} (conf ${h.confidence ?? '—'})\n广度 ${rp} / 中位 ${mc}`;
+      return `<div class="regime-tl-cell${isCurrentHour ? ' current' : ''}"
+                style="background:${m.color}"
+                data-tip="${escapeHtml(tip)}"></div>`;
+    } else {
+      const tip = `${hourLabel}-${endLabel}${currentMark}\n无快照 (gap)`;
+      return `<div class="regime-tl-cell empty${isCurrentHour ? ' current' : ''}"
+                data-tip="${escapeHtml(tip)}"></div>`;
+    }
   }).join("");
 }
 
