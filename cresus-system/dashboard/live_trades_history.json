@@ -1,28 +1,28 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-17T15:35:25.109247+00:00",
+  "generated_at": "2026-05-17T15:37:39.923993+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 125,
-    "open": 3,
-    "closed": 122,
+    "open": 2,
+    "closed": 123,
     "wins": 45,
-    "losses": 76,
-    "win_rate": 0.372,
-    "total_pnl_usdt": 2.6157,
-    "net_pnl_usdt": 0.477,
-    "avg_pnl_usdt": 0.0214,
+    "losses": 77,
+    "win_rate": 0.369,
+    "total_pnl_usdt": 2.0464,
+    "net_pnl_usdt": -0.1121,
+    "avg_pnl_usdt": 0.0166,
     "best_trade_usdt": 2.0008,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 2.1687,
-    "fees_realized_usdt": 2.1387,
-    "fees_open_usdt": 0.03,
+    "fees_paid_usdt": 2.1784,
+    "fees_realized_usdt": 2.1585,
+    "fees_open_usdt": 0.02,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 60.01,
-    "free_capital_usdt": 40.44,
+    "deployed_usdt": 39.98,
+    "free_capital_usdt": 59.89,
     "max_concurrent_slots": 4,
-    "slots_used": 3
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
@@ -35,14 +35,14 @@
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
+      "FHEUSDT",
       "SPACEUSDT",
-      "KAITOUSDT",
-      "FHEUSDT"
+      "KAITOUSDT"
     ],
     "exchange_symbols": [
+      "FHEUSDT",
       "SPACEUSDT",
-      "KAITOUSDT",
-      "FHEUSDT"
+      "KAITOUSDT"
     ]
   },
   "open_trades": [
@@ -84,10 +84,10 @@
       "btc_change_24h_at_open": -0.1,
       "btc_pct_vs_ma25_at_open": -0.149,
       "phase_a_mfe_price": 0.03085,
-      "current_price": 0.03355,
-      "unrealized_pnl_usdt": 2.479,
-      "unrealized_pnl_pct": 12.395,
-      "last_price_check_at": "2026-05-17T15:35:22.013028+00:00",
+      "current_price": 0.0333,
+      "unrealized_pnl_usdt": 2.3115,
+      "unrealized_pnl_pct": 11.558,
+      "last_price_check_at": "2026-05-17T15:37:35.466204+00:00",
       "phase_b_mfe_price": 0.03178,
       "phase_c_mfe_price": 0.03382
     },
@@ -129,11 +129,13 @@
       "btc_change_24h_at_open": -0.333,
       "btc_pct_vs_ma25_at_open": -0.234,
       "phase_a_mfe_price": 0.5183,
-      "current_price": 0.5121,
-      "unrealized_pnl_usdt": 0.1454,
-      "unrealized_pnl_pct": 0.728,
-      "last_price_check_at": "2026-05-17T15:35:22.013028+00:00"
-    },
+      "current_price": 0.5133,
+      "unrealized_pnl_usdt": 0.1926,
+      "unrealized_pnl_pct": 0.964,
+      "last_price_check_at": "2026-05-17T15:37:35.466204+00:00"
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "SPACEUSDT|LONG|2026-05-17T15:31:23.188320+00:00",
       "trade_id": "L1779031883_SPACEUS_L",
@@ -163,7 +165,7 @@
       "phase_a_mfe_pct": 0.798,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.010013,
+      "fees_paid_usdt": 0.019742,
       "fees_are_actual": true,
       "opened_at": "2026-05-17T15:34:18.586400+00:00",
       "is_dry_run": false,
@@ -172,13 +174,21 @@
       "btc_change_24h_at_open": -0.267,
       "btc_pct_vs_ma25_at_open": -0.17,
       "phase_a_mfe_price": 0.008847,
-      "current_price": 0.008758,
-      "unrealized_pnl_usdt": -0.1633,
-      "unrealized_pnl_pct": -0.815,
-      "last_price_check_at": "2026-05-17T15:35:22.013028+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.008579,
+      "unrealized_pnl_usdt": -0.5693,
+      "unrealized_pnl_pct": -2.843,
+      "last_price_check_at": "2026-05-17T15:37:35.466204+00:00",
+      "closed_at": "2026-05-17T15:37:39.914366+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.008579,
+      "realized_pnl_usdt": -0.5693,
+      "close_order_id": 73633046,
+      "close_qty": 2268.0,
+      "close_expected_price": 0.00862629,
+      "close_slippage_bps": 54.82,
+      "entry_fees_usdt": 0.010013,
+      "close_fees_usdt": 0.009729
+    },
     {
       "paper_id": "POWERUSDT|LONG|2026-05-17T15:06:35.686279+00:00",
       "trade_id": "L1779030395_POWERUS_L",
@@ -6138,11 +6148,11 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 78004.5,
-    "btc_ma25_1h": 78129.08,
-    "pct_vs_ma25": -0.159,
-    "change_24h_pct": -0.255,
-    "computed_at": "2026-05-17T15:35:24.236823+00:00"
+    "btc_price": 77986.4,
+    "btc_ma25_1h": 78128.36,
+    "pct_vs_ma25": -0.182,
+    "change_24h_pct": -0.278,
+    "computed_at": "2026-05-17T15:37:37.432868+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
