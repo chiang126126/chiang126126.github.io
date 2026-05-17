@@ -603,14 +603,24 @@
   .live-regime-chip {
     display: inline-block;
     font-size: 10px;
-    border-radius: 3px;
-    padding: 1px 5px;
+    border-radius: 4px;
+    padding: 1.5px 6px;
     margin-left: 4px;
-    font-weight: 600;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+    vertical-align: middle;
   }
-  .live-regime-chip.up   { color: #00e676; background: rgba(0,230,118,0.10); border: 1px solid rgba(0,230,118,0.30); }
-  .live-regime-chip.down { color: #ff5252; background: rgba(255,82,82,0.10); border: 1px solid rgba(255,82,82,0.30); }
-  .live-regime-chip.chop { color: #ffd54f; background: rgba(255,213,79,0.10); border: 1px solid rgba(255,213,79,0.30); }
+  .live-regime-chip.up   { color: #00e676; background: rgba(0,230,118,0.18);  border: 1px solid rgba(0,230,118,0.50); }
+  .live-regime-chip.down { color: #ff5252; background: rgba(255,82,82,0.18);  border: 1px solid rgba(255,82,82,0.50); }
+  .live-regime-chip.chop { color: #ffd54f; background: rgba(255,213,79,0.18); border: 1px solid rgba(255,213,79,0.50); }
+  /* 老数据 (Phase 4.C 部署前开仓) 无 regime → 显示禁用样式, 不留疑惑 */
+  .live-regime-chip.none {
+    color: #6e7787;
+    background: rgba(255,255,255,0.025);
+    border: 1px dashed rgba(255,255,255,0.12);
+    font-weight: 500;
+  }
   /* ==== 折叠 section ==== */
   .live-collapsible {
     margin: 6px 0;
@@ -5275,16 +5285,20 @@ const LIVE_REASON_LABEL = {
   "paper:timeout":    "⏱ 超时",
 };
 
-// Phase 4.C BTC regime chip (开仓时 snapshot) — 全局 helper, 多处复用
+// Phase 4.C BTC regime chip (开仓时 snapshot) — 全局 helper, 多处复用.
+// 设计: emoji + 文字双标识, 跟 "💎5" 和 "🔴LIVE" 视觉层级一致.
+// 老数据 (Phase 4.C 部署前开仓) → 显示禁用 "—" chip, 让用户明确知道是历史数据非 bug.
 function liveRegimeChip(regime) {
-  if (!regime) return '';
   const meta = {
-    up:   { icon: '📈', cls: 'up'   },
-    down: { icon: '📉', cls: 'down' },
-    chop: { icon: '➡️', cls: 'chop' },
+    up:   { icon: '📈', label: '上涨', cls: 'up'   },
+    down: { icon: '📉', label: '下跌', cls: 'down' },
+    chop: { icon: '➡️', label: '震荡', cls: 'chop' },
   }[regime];
-  if (!meta) return '';
-  return `<span class="live-regime-chip ${meta.cls}" title="开仓时 BTC ${regime}">${meta.icon}</span>`;
+  if (meta) {
+    return `<span class="live-regime-chip ${meta.cls}" title="开仓时 BTC ${meta.label}">${meta.icon} ${meta.label}</span>`;
+  }
+  // 无 regime 数据 (老 trade 或后端取价失败) — 显示禁用 chip
+  return `<span class="live-regime-chip none" title="此 trade 开仓时未记录 BTC regime (Phase 4.C 部署前 或 取价失败)">— 无数据</span>`;
 }
 
 const LIVE_REASON_ICON = {
@@ -5680,11 +5694,32 @@ function _liveRenderSingleDay(byDate, allDates) {
         <span class="live-review-stat-val">${scoreChips}</span>
       </div>` : ""}
 
-      ${regimeChips ? `
-      <div class="live-review-stat-line">
-        <span class="live-review-stat-key">BTC 状态</span>
-        <span class="live-review-stat-val">${regimeChips}</span>
-      </div>` : ""}
+      ${(() => {
+        // 统计本日有 regime 标签的 trade 数 (Phase 4.C 之后开仓)
+        const totalToday = stats.n;
+        const withRegime = Object.values(stats.regimeBuckets || {})
+                                  .reduce((s, v) => s + v.n, 0);
+        const noRegime = totalToday - withRegime;
+        if (regimeChips) {
+          // 有 Phase 4.C 后的数据 → 展示分布 + 提示有多少老数据被忽略
+          const oldNote = noRegime > 0
+            ? ` <span style="font-size:10px;color:var(--text-dim);margin-left:6px" title="${noRegime} 笔在 Phase 4.C (BTC regime 标签上线) 之前开仓, 无 regime 数据">+${noRegime} 笔老数据</span>`
+            : '';
+          return `<div class="live-review-stat-line">
+            <span class="live-review-stat-key">BTC 状态</span>
+            <span class="live-review-stat-val">${regimeChips}${oldNote}</span>
+          </div>`;
+        } else if (totalToday > 0) {
+          // 本日全无 regime (老数据) → 也显示行, 让用户明确 "不是 bug 是历史数据"
+          return `<div class="live-review-stat-line">
+            <span class="live-review-stat-key">BTC 状态</span>
+            <span class="live-review-stat-val" style="color:var(--text-dim);font-size:11px">
+              <em>本日 ${totalToday} 笔均在 Phase 4.C 之前开仓, 无 regime 数据</em>
+            </span>
+          </div>`;
+        }
+        return '';
+      })()}
 
       ${stats.totFees > 0 ? `
       <div class="live-review-stat-line">
