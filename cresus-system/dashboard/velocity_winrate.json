@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-17T15:23:39.462460+00:00",
+  "generated_at": "2026-05-17T15:25:44.694469+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
@@ -7176,6 +7176,11 @@
           "n": 5,
           "win_rate": 0.6,
           "avg_outcome_pct": 1.44
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.6,
+          "avg_outcome_pct": 2.39
         }
       }
     },
@@ -7489,6 +7494,18 @@
         }
       }
     },
+    "OPENUSDT|burst|LONG": {
+      "symbol": "OPENUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.01
+        }
+      }
+    },
     "KAIAUSDT|sustained|LONG": {
       "symbol": "KAIAUSDT",
       "alert_type": "sustained",
@@ -7537,6 +7554,18 @@
           "n": 5,
           "win_rate": 0.4,
           "avg_outcome_pct": 0.76
+        }
+      }
+    },
+    "MAGMAUSDT|sustained|LONG": {
+      "symbol": "MAGMAUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.6,
+          "avg_outcome_pct": 0.79
         }
       }
     }
