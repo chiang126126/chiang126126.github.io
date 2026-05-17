@@ -1,33 +1,33 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-17T01:07:05.035711+00:00",
+  "generated_at": "2026-05-17T01:09:18.377089+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 80,
-    "open": 3,
-    "closed": 77,
+    "open": 2,
+    "closed": 78,
     "wins": 25,
-    "losses": 52,
-    "win_rate": 0.325,
-    "total_pnl_usdt": 0.0397,
-    "net_pnl_usdt": -1.2282,
-    "avg_pnl_usdt": 0.0005,
+    "losses": 53,
+    "win_rate": 0.321,
+    "total_pnl_usdt": -0.2268,
+    "net_pnl_usdt": -1.5146,
+    "avg_pnl_usdt": -0.0029,
     "best_trade_usdt": 2.0008,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 1.2959,
-    "fees_realized_usdt": 1.2679,
-    "fees_open_usdt": 0.028,
+    "fees_paid_usdt": 1.3058,
+    "fees_realized_usdt": 1.2878,
+    "fees_open_usdt": 0.018,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 60.0,
-    "free_capital_usdt": 38.74,
+    "deployed_usdt": 40.0,
+    "free_capital_usdt": 58.46,
     "max_concurrent_slots": 4,
-    "slots_used": 3
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 0.039,
+    "daily_pnl": -0.2275,
     "deployed_usdt": 40.0
   },
   "reconciliation": {
@@ -35,12 +35,12 @@
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "ATAUSDT",
-      "TAUSDT"
+      "TAUSDT",
+      "ATAUSDT"
     ],
     "exchange_symbols": [
-      "ATAUSDT",
-      "TAUSDT"
+      "TAUSDT",
+      "ATAUSDT"
     ]
   },
   "open_trades": [
@@ -78,10 +78,10 @@
       "opened_at": "2026-05-17T00:43:26.699996+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.06427,
-      "current_price": 0.06421,
-      "unrealized_pnl_usdt": 0.2836,
-      "unrealized_pnl_pct": 1.418,
-      "last_price_check_at": "2026-05-17T01:06:58.296211+00:00"
+      "current_price": 0.06384,
+      "unrealized_pnl_usdt": 0.1667,
+      "unrealized_pnl_pct": 0.833,
+      "last_price_check_at": "2026-05-17T01:09:15.554421+00:00"
     },
     {
       "paper_id": "ATAUSDT|SHORT|2026-05-17T00:42:49.908311+00:00",
@@ -117,13 +117,15 @@
       "opened_at": "2026-05-17T00:43:28.906634+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.00603,
-      "current_price": 0.00596,
-      "unrealized_pnl_usdt": 0.5545,
-      "unrealized_pnl_pct": 2.773,
-      "last_price_check_at": "2026-05-17T01:06:58.296211+00:00",
+      "current_price": 0.00595,
+      "unrealized_pnl_usdt": 0.5872,
+      "unrealized_pnl_pct": 2.936,
+      "last_price_check_at": "2026-05-17T01:09:15.554421+00:00",
       "phase_b_mfe_price": 0.00598,
       "phase_c_mfe_price": 0.00591
-    },
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "AIAUSDT|LONG|2026-05-17T01:05:54.188633+00:00",
       "trade_id": "L1778979954_AIAUSDT_L",
@@ -153,18 +155,26 @@
       "phase_a_mfe_pct": 0.0,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.010001,
+      "fees_paid_usdt": 0.019869,
       "fees_are_actual": true,
       "opened_at": "2026-05-17T01:07:04.075700+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.075,
-      "current_price": 0.0746,
-      "unrealized_pnl_usdt": -0.0092,
-      "unrealized_pnl_pct": -0.046,
-      "last_price_check_at": "2026-05-17T01:06:58.296211+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.07366,
+      "unrealized_pnl_usdt": -0.2612,
+      "unrealized_pnl_pct": -1.306,
+      "last_price_check_at": "2026-05-17T01:08:08.109275+00:00",
+      "closed_at": "2026-05-17T01:08:12.255847+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.07364,
+      "realized_pnl_usdt": -0.2665,
+      "close_order_id": 75501690,
+      "close_qty": 268.0,
+      "close_expected_price": 0.07380714,
+      "close_slippage_bps": 22.65,
+      "entry_fees_usdt": 0.010001,
+      "close_fees_usdt": 0.009868
+    },
     {
       "paper_id": "ORCAUSDT|LONG|2026-05-17T00:05:54.283461+00:00",
       "trade_id": "L1778976354_ORCAUSD_L",
@@ -3769,8 +3779,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-17T00:08:53.548620+00:00",
-      "reason": "paper trade too old (3485s > 600s)",
-      "last_checked_at": "2026-05-17T01:06:58.296211+00:00"
+      "reason": "paper trade too old (3622s > 600s)",
+      "last_checked_at": "2026-05-17T01:09:15.554421+00:00"
     },
     {
       "paper_id": "STARUSDT|SHORT|2026-05-17T01:04:28.826832+00:00",
@@ -3779,7 +3789,7 @@
       "conviction_score": 5,
       "signal_at": "2026-05-17T01:04:44.355873+00:00",
       "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-05-17T01:06:58.296211+00:00"
+      "last_checked_at": "2026-05-17T01:09:15.554421+00:00"
     }
   ],
   "config": {
