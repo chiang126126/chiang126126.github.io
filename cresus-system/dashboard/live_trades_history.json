@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-17T18:45:38.268506+00:00",
+  "generated_at": "2026-05-17T18:47:20.140624+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 135,
-    "open": 1,
+    "total_trades": 136,
+    "open": 2,
     "closed": 134,
     "wins": 49,
     "losses": 84,
@@ -14,31 +14,33 @@
     "avg_pnl_usdt": 0.0371,
     "best_trade_usdt": 2.1605,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 2.381,
+    "fees_paid_usdt": 2.389,
     "fees_realized_usdt": 2.3711,
-    "fees_open_usdt": 0.01,
+    "fees_open_usdt": 0.018,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 19.98,
-    "free_capital_usdt": 82.62,
+    "deployed_usdt": 39.88,
+    "free_capital_usdt": 62.7,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 4.9726,
-    "deployed_usdt": 19.98
+    "deployed_usdt": 39.88
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "SPACEUSDT"
+      "SPACEUSDT",
+      "DUSKUSDT"
     ],
     "exchange_symbols": [
-      "SPACEUSDT"
+      "SPACEUSDT",
+      "DUSKUSDT"
     ]
   },
   "open_trades": [
@@ -84,10 +86,57 @@
       "btc_change_24h_at_open": -0.115,
       "btc_pct_vs_ma25_at_open": -0.008,
       "phase_a_mfe_price": 0.008072,
-      "current_price": 0.008089,
-      "unrealized_pnl_usdt": -0.0371,
-      "unrealized_pnl_pct": -0.186,
-      "last_price_check_at": "2026-05-17T18:45:35.815962+00:00"
+      "current_price": 0.008107,
+      "unrealized_pnl_usdt": -0.0816,
+      "unrealized_pnl_pct": -0.409,
+      "last_price_check_at": "2026-05-17T18:47:17.697880+00:00"
+    },
+    {
+      "paper_id": "DUSKUSDT|SHORT|2026-05-17T18:44:54.069215+00:00",
+      "trade_id": "L1779043494_DUSKUSD_S",
+      "symbol": "DUSKUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.15341,
+      "avg_fill_price": 0.15433,
+      "slippage_bps": -59.97,
+      "qty": 129.0,
+      "notional_usdt": 19.90891,
+      "leverage": 3,
+      "risk_usdt": 0.1543,
+      "risk_pct": 0.775,
+      "mirror_latency_sec": 31.7,
+      "sl_price": 0.15644607,
+      "sl_paper_current": 0.15552607,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.00092,
+      "sl_compensation_mode": "ab",
+      "tp1_price": 0.15023589,
+      "tp2_price": 0.14706179,
+      "phase": "A",
+      "entry_order_id": 107045591,
+      "entry_client_id": "cresus_L1779043494_DUSKUSD_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.92,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.007964,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-17T18:46:13.672678+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 78100.1,
+      "btc_change_24h_at_open": -0.127,
+      "btc_pct_vs_ma25_at_open": -0.019,
+      "phase_a_mfe_price": 0.15341,
+      "current_price": 0.154,
+      "unrealized_pnl_usdt": 0.0426,
+      "unrealized_pnl_pct": 0.214,
+      "last_price_check_at": "2026-05-17T18:47:17.697880+00:00"
     }
   ],
   "recent_closed": [
@@ -6731,11 +6780,11 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 78100.1,
-    "btc_ma25_1h": 78115.15,
-    "pct_vs_ma25": -0.019,
-    "change_24h_pct": -0.127,
-    "computed_at": "2026-05-17T18:45:37.975861+00:00"
+    "btc_price": 78087.8,
+    "btc_ma25_1h": 78114.66,
+    "pct_vs_ma25": -0.034,
+    "change_24h_pct": -0.143,
+    "computed_at": "2026-05-17T18:47:19.475854+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
