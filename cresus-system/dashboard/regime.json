@@ -1,32 +1,33 @@
 {
-  "ts": "2026-05-17T05:03:01.893823+00:00",
+  "ts": "2026-05-17T06:03:01.309270+00:00",
   "regime": "RISK_OFF",
   "regime_zh": "风险释放",
   "confidence": 50,
-  "judgment": "Alpha 池上涨币占比 21.1%，中位涨跌 -1.70%。 跌幅超过 3% 的币数 (132) 明显多于涨幅 (38)，市场偏空。 BTC 24h -1.01%，funding 0.0037%。 判定: 风险释放。",
+  "judgment": "Alpha 池上涨币占比 21.6%，中位涨跌 -1.54%。 跌幅超过 3% 的币数 (119) 明显多于涨幅 (36)，市场偏空。 BTC 24h -1.10%，funding 0.0028%。 判定: 风险释放。",
   "support": [
-    "Alpha 池 573 币样本中，上涨 121 个 (21.1%)，中位涨跌 -1.70%，平均涨跌 -1.49%",
-    "涨幅 >3% 的币 38 个，跌幅 >3% 的币 132 个；暴涨 >10% 有 6 个，暴跌 >10% 有 12 个",
-    "Binance BTCUSDT 当前约 78,125，24h 涨幅 -1.01%，24h 区间 77,601.80 - 79,012.90",
-    "BTCUSDT 永续 funding rate 为 0.000037 (~0.0037%)；Fear & Greed Index 为 27 (Fear)"
+    "Alpha 池 573 币样本中，上涨 124 个 (21.6%)，中位涨跌 -1.54%，平均涨跌 -1.38%",
+    "涨幅 >3% 的币 36 个，跌幅 >3% 的币 119 个；暴涨 >10% 有 7 个，暴跌 >10% 有 9 个",
+    "Binance BTCUSDT 当前约 78,128，24h 涨幅 -1.10%，24h 区间 77,601.80 - 79,009.70",
+    "BTCUSDT 永续 funding rate 为 0.000028 (~0.0028%)；Fear & Greed Index 为 27 (Fear)"
   ],
   "challenge": [
-    "funding 0.0037% 仍为正，并未出现极端做多拥挤后的爆仓，可能只是暂时回调而非系统性风险释放"
+    "funding 0.0028% 仍为正，并未出现极端做多拥挤后的爆仓，可能只是暂时回调而非系统性风险释放",
+    "暴跌 >10% 仅 9 个，市场尚未出现广泛恐慌性抛售特征"
   ],
   "metrics": {
     "alpha_pool_size": 573,
-    "rising_count": 121,
-    "rising_pct": 0.2112,
-    "median_change_pct": -1.7,
-    "average_change_pct": -1.49,
-    "pump_3pct_count": 38,
-    "dump_3pct_count": 132,
-    "extreme_pump_10pct_count": 6,
-    "extreme_dump_10pct_count": 12,
-    "btc_price": 78124.6,
-    "btc_change_24h_pct": -1.012,
-    "btc_24h_range": "77,601.80 - 79,012.90",
-    "btc_funding_rate": 3.688e-05,
+    "rising_count": 124,
+    "rising_pct": 0.2164,
+    "median_change_pct": -1.54,
+    "average_change_pct": -1.38,
+    "pump_3pct_count": 36,
+    "dump_3pct_count": 119,
+    "extreme_pump_10pct_count": 7,
+    "extreme_dump_10pct_count": 9,
+    "btc_price": 78128.0,
+    "btc_change_24h_pct": -1.097,
+    "btc_24h_range": "77,601.80 - 79,009.70",
+    "btc_funding_rate": 2.772e-05,
     "fear_greed": 27,
     "fear_greed_classification": "Fear"
   },
