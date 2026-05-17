@@ -45,6 +45,19 @@ A_BUY_TAX_MAX = 0.05                  # 买入税 ≤ 5%
 A_SELL_TAX_MAX = 0.05                 # 卖出税 ≤ 5%
 A_TOP10_MAX = 0.30                    # top10 ≤ 30%（比分流的 20% 宽一点）
 
+# === 支撑崩塌信号 ===
+SC_PUMP_LOOKBACK_BARS = 24            # 在过去多少根 K 线里找 peak
+SC_MIN_PUMP_PCT = 0.40                # 从 base low 到 peak 至少涨 40%
+SC_MIN_BARS_SINCE_PEAK = 4            # peak 后至少 N 根 K 线才考虑
+SC_VOLUME_MULTIPLIER = 1.5            # 破位 K 线量能要 ≥ 历史中位 × 1.5
+SC_VOLUME_LOOKBACK = 20               # 中位量参考窗
+
+# === 空头真空信号 ===
+SV_WINDOW_MINUTES = 30                # 观察窗（OI 骤降通常在 30min 内）
+SV_OI_DROP_THRESHOLD = 0.15           # OI 下降 ≥ 15%
+SV_WICK_THRESHOLD = 0.03              # 单根上影线 / close ≥ 3%
+SV_MIN_RECENT_PUMP_PCT = 0.20         # 前置拉盘 ≥ 20%
+
 # === 安全闸：空头池 (Module B) 要求 ===
 # 设计哲学：空头不太关心 dev 是否惯犯（你赌它跌）也不在乎 LP 锁不锁（LP 抽走对空头有利）；
 # 但要确保你能"卖空"和"买回平仓"，且流动性深到不会被轧爆。

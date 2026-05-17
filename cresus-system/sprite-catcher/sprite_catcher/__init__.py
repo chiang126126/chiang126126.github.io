@@ -20,7 +20,10 @@ from .features.divergence import detect_distribution_divergence
 from .features.oi import stratify_oi
 from .features.pool_router import route_to_pool
 from .features.safety_gate import evaluate_long_safety, evaluate_short_safety
+from .features.short_vacuum import detect_short_vacuum
+from .features.support_collapse import detect_support_collapse
 from .models import (
+    Candle,
     ChipFeatures,
     DevWalletInfo,
     DivergenceSignal,
@@ -30,6 +33,8 @@ from .models import (
     Pool,
     PoolDecision,
     SafetyReport,
+    ShortVacuumSignal,
+    SupportCollapseSignal,
     TimeSeriesPoint,
     TokenAuditInfo,
     TradeSimulationResult,
@@ -46,7 +51,11 @@ __all__ = [
     # 计算函数 (L3)
     "evaluate_long_safety",
     "evaluate_short_safety",
+    # 入场信号 (Module B)
+    "detect_support_collapse",
+    "detect_short_vacuum",
     # 数据模型 (L2)
+    "Candle",
     "ChipFeatures",
     "DivergenceSignal",
     "HolderSnapshot",
@@ -61,4 +70,7 @@ __all__ = [
     "DevWalletInfo",
     "TradeSimulationResult",
     "SafetyReport",
+    # 数据模型 (Module B 信号)
+    "SupportCollapseSignal",
+    "ShortVacuumSignal",
 ]

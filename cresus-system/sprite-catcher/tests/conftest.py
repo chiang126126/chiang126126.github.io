@@ -10,7 +10,12 @@ from decimal import Decimal
 
 import pytest
 
-from sprite_catcher.models import HolderSnapshot, TimeSeriesPoint, TransferEdge
+from sprite_catcher.models import (
+    Candle,
+    HolderSnapshot,
+    TimeSeriesPoint,
+    TransferEdge,
+)
 
 
 class FakeCEXRegistry:
@@ -128,6 +133,32 @@ def make_holders():
         return [
             HolderSnapshot(address=addr, balance=Decimal(str(bal)))
             for addr, bal in pairs
+        ]
+
+    return _factory
+
+
+@pytest.fixture
+def make_candles(base_ts):
+    """
+    工厂：批量生成 Candle。每个 tuple 是 (open, high, low, close, volume)。
+    时间戳从 base_ts 开始，按 step（默认 1 min）递增。
+    """
+
+    def _factory(
+        ohlcv: list[tuple[float, float, float, float, float]],
+        step: timedelta = timedelta(minutes=1),
+    ) -> list[Candle]:
+        return [
+            Candle(
+                ts=base_ts + i * step,
+                open=o,
+                high=h,
+                low=l,
+                close=c,
+                volume=v,
+            )
+            for i, (o, h, l, c, v) in enumerate(ohlcv)
         ]
 
     return _factory

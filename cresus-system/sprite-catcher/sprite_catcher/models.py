@@ -42,6 +42,17 @@ class TimeSeriesPoint:
 
 
 @dataclass(frozen=True)
+class Candle:
+    """OHLCV K 线（可以是任意周期，1m / 5m / 1h / 4h ...）。"""
+    ts: datetime
+    open: float
+    high: float
+    low: float
+    close: float
+    volume: float
+
+
+@dataclass(frozen=True)
 class ChipFeatures:
     """筹码集中度特征。"""
     top10_share: float          # top10 持仓 / 流通供应量
@@ -139,3 +150,29 @@ class SafetyReport:
     passed: bool
     rejected_reasons: tuple[str, ...]   # passed=False 时非空
     warnings: tuple[str, ...]            # 通过但策略层应注意
+
+
+# === Module B 入场信号 ===
+
+
+@dataclass(frozen=True)
+class SupportCollapseSignal:
+    """支撑崩塌信号：庄拉完后 K 线结构破位。"""
+    detected: bool
+    strength: float                # 0-1
+    reason: str
+    pump_pct: float                # base → peak 涨幅
+    bars_since_peak: int           # peak 到 current 的距离
+    support_level: float           # 用来判断破位的支撑参考价
+    volume_ratio: float            # 当前量 / 历史中位量
+
+
+@dataclass(frozen=True)
+class ShortVacuumSignal:
+    """空头真空信号：插针清算空头 + OI 骤降。"""
+    detected: bool
+    strength: float
+    reason: str
+    oi_drop_pct: float             # OI 下降百分比
+    max_wick_ratio: float          # 窗口内最大上影线比例
+    recent_pump_pct: float         # 前置拉盘幅度
