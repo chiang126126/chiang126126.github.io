@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-17T03:05:04.037326+00:00",
+  "generated_at": "2026-05-17T03:06:45.596626+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 85,
-    "open": 2,
+    "total_trades": 86,
+    "open": 3,
     "closed": 83,
     "wins": 27,
     "losses": 55,
@@ -14,33 +14,35 @@
     "avg_pnl_usdt": 0.0088,
     "best_trade_usdt": 2.0008,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 1.4038,
+    "fees_paid_usdt": 1.4138,
     "fees_realized_usdt": 1.3837,
-    "fees_open_usdt": 0.0201,
+    "fees_open_usdt": 0.0301,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 40.18,
-    "free_capital_usdt": 59.15,
+    "deployed_usdt": 60.15,
+    "free_capital_usdt": 39.17,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 3
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 0.7331,
-    "deployed_usdt": 40.18
+    "deployed_usdt": 60.15
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
+      "KAIAUSDT",
       "SPORTFUNUSDT",
       "AIOUSDT"
     ],
     "exchange_symbols": [
-      "SPORTFUNUSDT",
-      "AIOUSDT"
+      "KAIAUSDT",
+      "AIOUSDT",
+      "SPORTFUNUSDT"
     ]
   },
   "open_trades": [
@@ -78,10 +80,10 @@
       "opened_at": "2026-05-17T01:13:49.159776+00:00",
       "is_dry_run": false,
       "phase_a_mfe_price": 0.05769,
-      "current_price": 0.05795,
-      "unrealized_pnl_usdt": 0.7672,
-      "unrealized_pnl_pct": 3.801,
-      "last_price_check_at": "2026-05-17T03:05:01.478647+00:00",
+      "current_price": 0.05802,
+      "unrealized_pnl_usdt": 0.7437,
+      "unrealized_pnl_pct": 3.685,
+      "last_price_check_at": "2026-05-17T03:06:42.754008+00:00",
       "phase_b_mfe_price": 0.0576
     },
     {
@@ -99,10 +101,10 @@
       "risk_usdt": 0.1542,
       "risk_pct": 0.771,
       "mirror_latency_sec": 36.5,
-      "sl_price": 0.10333679,
+      "sl_price": 0.10445,
       "tp1_price": 0.10611982,
       "tp2_price": 0.10778964,
-      "phase": "A",
+      "phase": "B",
       "entry_order_id": 105237420,
       "entry_client_id": "cresus_L1778986036_AIOUSDT_L_E",
       "sl_order_id": null,
@@ -110,18 +112,58 @@
       "conviction_score": 5,
       "alert_type": "sustained",
       "atr_pct": 0.711,
-      "phase_a_mfe_pct": 1.35,
-      "phase_b_mfe_pct": null,
+      "phase_a_mfe_pct": 1.819,
+      "phase_b_mfe_pct": 1.819,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.009997,
       "fees_are_actual": true,
       "opened_at": "2026-05-17T02:48:09.690234+00:00",
       "is_dry_run": false,
-      "phase_a_mfe_price": 0.10586,
-      "current_price": 0.10553,
-      "unrealized_pnl_usdt": 0.2669,
-      "unrealized_pnl_pct": 1.335,
-      "last_price_check_at": "2026-05-17T03:05:01.478647+00:00"
+      "phase_a_mfe_price": 0.10635,
+      "current_price": 0.10462,
+      "unrealized_pnl_usdt": 0.0922,
+      "unrealized_pnl_pct": 0.461,
+      "last_price_check_at": "2026-05-17T03:06:42.754008+00:00",
+      "phase_b_mfe_price": 0.10635
+    },
+    {
+      "paper_id": "KAIAUSDT|LONG|2026-05-17T03:04:58.694596+00:00",
+      "trade_id": "L1778987098_KAIAUSD_L",
+      "symbol": "KAIAUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.04935,
+      "avg_fill_price": 0.0492,
+      "slippage_bps": -30.4,
+      "qty": 406.0,
+      "notional_usdt": 19.9752,
+      "leverage": 3,
+      "risk_usdt": 0.0713,
+      "risk_pct": 0.357,
+      "mirror_latency_sec": 29.6,
+      "sl_price": 0.04902429,
+      "tp1_price": 0.04983857,
+      "tp2_price": 0.05032714,
+      "phase": "A",
+      "entry_order_id": 122446344,
+      "entry_client_id": "cresus_L1778987098_KAIAUSD_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.44,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.009988,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-17T03:05:38.756923+00:00",
+      "is_dry_run": false,
+      "phase_a_mfe_price": 0.04935,
+      "current_price": 0.0491,
+      "unrealized_pnl_usdt": -0.0406,
+      "unrealized_pnl_pct": -0.203,
+      "last_price_check_at": "2026-05-17T03:06:42.754008+00:00"
     }
   ],
   "recent_closed": [
@@ -4027,17 +4069,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-17T02:54:11.719494+00:00",
-      "reason": "paper trade too old (650s > 600s)",
-      "last_checked_at": "2026-05-17T03:05:01.478647+00:00"
-    },
-    {
-      "paper_id": "IRYSUSDT|SHORT|2026-05-17T02:53:15.081358+00:00",
-      "symbol": "IRYSUSDT",
-      "direction": "SHORT",
-      "conviction_score": 6,
-      "signal_at": "2026-05-17T02:54:11.719494+00:00",
-      "reason": "paper trade too old (650s > 600s)",
-      "last_checked_at": "2026-05-17T03:05:01.478647+00:00"
+      "reason": "paper trade too old (751s > 600s)",
+      "last_checked_at": "2026-05-17T03:06:42.754008+00:00"
     }
   ],
   "config": {
