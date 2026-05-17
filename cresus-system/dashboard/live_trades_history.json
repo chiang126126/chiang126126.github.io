@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-17T23:48:24.272805+00:00",
+  "generated_at": "2026-05-17T23:50:38.995662+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 145,
@@ -25,24 +25,28 @@
     "slots_used": 4
   },
   "risk_status": {
-    "block_new_opens": false,
-    "reasons": [],
+    "block_new_opens": true,
+    "reasons": [
+      "deployed $81.06 >= cap $80.00 (20% 现金保留触发)"
+    ],
     "daily_pnl": 8.496,
-    "deployed_usdt": 59.83
+    "deployed_usdt": 81.06
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
+      "INXUSDT",
+      "ETHUSDT",
       "IPUSDT",
-      "TRADOORUSDT",
-      "INXUSDT"
+      "TRADOORUSDT"
     ],
     "exchange_symbols": [
+      "INXUSDT",
+      "ETHUSDT",
       "IPUSDT",
-      "TRADOORUSDT",
-      "INXUSDT"
+      "TRADOORUSDT"
     ]
   },
   "open_trades": [
@@ -76,7 +80,7 @@
       "conviction_score": 5,
       "alert_type": "sustained",
       "atr_pct": 0.783,
-      "phase_a_mfe_pct": 0.254,
+      "phase_a_mfe_pct": 0.318,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.009985,
@@ -87,11 +91,11 @@
       "btc_price_at_open": 77352.0,
       "btc_change_24h_at_open": -1.022,
       "btc_pct_vs_ma25_at_open": -0.942,
-      "phase_a_mfe_price": 0.4712,
-      "current_price": 0.471,
-      "unrealized_pnl_usdt": -0.0,
-      "unrealized_pnl_pct": -0.0,
-      "last_price_check_at": "2026-05-17T23:48:17.959570+00:00"
+      "phase_a_mfe_price": 0.4709,
+      "current_price": 0.47,
+      "unrealized_pnl_usdt": 0.0424,
+      "unrealized_pnl_pct": 0.212,
+      "last_price_check_at": "2026-05-17T23:50:35.063067+00:00"
     },
     {
       "paper_id": "TRADOORUSDT|SHORT|2026-05-17T23:43:35.013737+00:00",
@@ -135,10 +139,10 @@
       "btc_change_24h_at_open": -1.022,
       "btc_pct_vs_ma25_at_open": -0.942,
       "phase_a_mfe_price": 0.5953,
-      "current_price": 0.607,
-      "unrealized_pnl_usdt": -0.132,
-      "unrealized_pnl_pct": -0.663,
-      "last_price_check_at": "2026-05-17T23:48:17.959570+00:00"
+      "current_price": 0.61,
+      "unrealized_pnl_usdt": -0.231,
+      "unrealized_pnl_pct": -1.161,
+      "last_price_check_at": "2026-05-17T23:50:35.063067+00:00"
     },
     {
       "paper_id": "INXUSDT|SHORT|2026-05-17T23:43:29.645479+00:00",
@@ -182,10 +186,10 @@
       "btc_change_24h_at_open": -0.975,
       "btc_pct_vs_ma25_at_open": -0.898,
       "phase_a_mfe_price": 0.010573,
-      "current_price": 0.010596,
-      "unrealized_pnl_usdt": -0.0453,
-      "unrealized_pnl_pct": -0.227,
-      "last_price_check_at": "2026-05-17T23:48:17.959570+00:00"
+      "current_price": 0.010595,
+      "unrealized_pnl_usdt": -0.0434,
+      "unrealized_pnl_pct": -0.218,
+      "last_price_check_at": "2026-05-17T23:50:35.063067+00:00"
     },
     {
       "paper_id": "ETHUSDT|SHORT|2026-05-17T23:45:38.098290+00:00",
@@ -229,10 +233,10 @@
       "btc_change_24h_at_open": -0.836,
       "btc_pct_vs_ma25_at_open": -0.763,
       "phase_a_mfe_price": 2120.1,
-      "current_price": 2123.03,
-      "unrealized_pnl_usdt": -0.0,
-      "unrealized_pnl_pct": -0.0,
-      "last_price_check_at": "2026-05-17T23:48:17.959570+00:00"
+      "current_price": 2123.54,
+      "unrealized_pnl_usdt": -0.0051,
+      "unrealized_pnl_pct": -0.024,
+      "last_price_check_at": "2026-05-17T23:50:35.063067+00:00"
     }
   ],
   "recent_closed": [
@@ -7279,40 +7283,22 @@
   ],
   "missed_signals": [
     {
-      "paper_id": "NAORISUSDT|SHORT|2026-05-17T23:19:24.429620+00:00",
-      "symbol": "NAORISUSDT",
-      "direction": "SHORT",
-      "conviction_score": 5,
-      "signal_at": "2026-05-17T23:20:03.565347+00:00",
-      "reason": "paper trade too old (1694s > 600s)",
-      "last_checked_at": "2026-05-17T23:48:17.959570+00:00"
-    },
-    {
       "paper_id": "STARUSDT|SHORT|2026-05-17T23:43:31.993211+00:00",
       "symbol": "STARUSDT",
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-17T23:44:34.966390+00:00",
-      "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-05-17T23:48:17.959570+00:00"
-    },
-    {
-      "paper_id": "ETHUSDT|SHORT|2026-05-17T23:45:38.098290+00:00",
-      "symbol": "ETHUSDT",
-      "direction": "SHORT",
-      "conviction_score": 5,
-      "signal_at": "2026-05-17T23:47:21.879540+00:00",
-      "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-05-17T23:47:42.605907+00:00"
+      "reason": "max_concurrent reached (4/4)",
+      "last_checked_at": "2026-05-17T23:50:35.063067+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 77497.4,
-    "btc_ma25_1h": 78093.34,
-    "pct_vs_ma25": -0.763,
-    "change_24h_pct": -0.836,
-    "computed_at": "2026-05-17T23:48:20.499042+00:00"
+    "btc_price": 77650.0,
+    "btc_ma25_1h": 78099.44,
+    "pct_vs_ma25": -0.575,
+    "change_24h_pct": -0.64,
+    "computed_at": "2026-05-17T23:50:37.402390+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
