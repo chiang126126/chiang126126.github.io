@@ -1605,7 +1605,28 @@
   .regime-badge.pump-dump    { color:#ff9800; background:rgba(255,152,0,0.15); }
   .regime-badge.range-boring { color:#9aa3b3; background:rgba(154,163,179,0.15); }
   .regime-meta { color: var(--text-dim); font-size: 12px; }
-  .regime-update { color: var(--text-dim); font-size: 12px; }
+  .regime-update { color: var(--text-dim); font-size: 12px; transition: color 0.2s; }
+  /* 数据新鲜度警告 — regime 设计 1h 更新一次:
+     fresh (≤75 min): 灰色 (默认)
+     stale (75-180 min): 琥珀色, 生成器可能延迟
+     dead (>180 min): 红色, 生成器多半挂了 */
+  .regime-update.stale {
+    color: #ffb84d;
+    background: rgba(255,184,77,0.10);
+    border: 1px solid rgba(255,184,77,0.28);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .regime-update.dead {
+    color: #ff5252;
+    background: rgba(255,82,82,0.12);
+    border: 1px solid rgba(255,82,82,0.40);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    animation: pulse-red 2s ease-in-out infinite;
+  }
 
   .regime-body { padding: 18px 22px; }
   .regime-section-label {
@@ -3674,31 +3695,75 @@ function toggleRegimeJudgment() {
   }
 }
 
+// Regime 新鲜度阈值 (基于生成器 1h 更新一次的设计)
+const REGIME_AGE_STALE_MIN = 75;    // > 75min 偏旧 (设计 60min, 给 15min 容差)
+const REGIME_AGE_DEAD_MIN  = 180;   // > 180min 严重过期 (生成器多半挂了)
+
 function renderRegimeCard() {
   if (!regimeData) return;
   const meta = REGIME_META[regimeData.regime] || REGIME_META.RANGE_BORING;
   document.getElementById("regime-panel").style.display = "";
 
+  // 容错: 所有字段 || fallback, 防 undefined 字面显示
+  const conf = regimeData.confidence != null ? regimeData.confidence : "—";
+  const judgment = regimeData.judgment || "—";
+  const regimeZh = meta.zh || regimeData.regime_zh || "未知";
+
   const badge = document.getElementById("regime-badge");
-  badge.className = "regime-badge " + meta.cls;
-  badge.textContent = `${meta.zh} · conf ${regimeData.confidence}`;
+  badge.className = "regime-badge " + (meta.cls || "");
+  badge.textContent = `${regimeZh} · conf ${conf}`;
 
   document.getElementById("regime-meta").textContent = "";
-  const updTs = new Date(regimeData.ts);
-  const ageMin = Math.floor((Date.now() - updTs.getTime()) / 60000);
-  document.getElementById("regime-update").textContent =
-    `更新于 ${updTs.toLocaleString("zh-CN", {hour12:false})} · ${ageMin}m 前`;
 
-  document.getElementById("regime-judgment").textContent = regimeData.judgment;
+  // 数据新鲜度判定 (设计 1h 更新一次)
+  const updateEl = document.getElementById("regime-update");
+  if (regimeData.ts) {
+    const updTs = new Date(regimeData.ts);
+    if (!isNaN(updTs.getTime())) {
+      const ageMin = Math.floor((Date.now() - updTs.getTime()) / 60000);
+      // 三档颜色 + icon 提示
+      let staleCls = "", staleIcon = "";
+      if (ageMin > REGIME_AGE_DEAD_MIN) {
+        staleCls = "dead";
+        staleIcon = "🚨 ";
+      } else if (ageMin > REGIME_AGE_STALE_MIN) {
+        staleCls = "stale";
+        staleIcon = "⚠ ";
+      }
+      updateEl.className = "regime-update" + (staleCls ? " " + staleCls : "");
+      const ageStr = ageMin >= 60
+        ? `${Math.floor(ageMin/60)}h${String(ageMin%60).padStart(2,"0")}m`
+        : `${ageMin}m`;
+      const tip = ageMin > REGIME_AGE_DEAD_MIN
+        ? ` · 数据生成器可能停了, 检查 Mac launchd`
+        : ageMin > REGIME_AGE_STALE_MIN
+          ? ` · 生成器延迟 (设计 1h 间隔)`
+          : "";
+      updateEl.textContent = `${staleIcon}更新于 ${updTs.toLocaleString("zh-CN", {hour12:false})} · ${ageStr} 前${tip}`;
+      updateEl.title = ageMin > REGIME_AGE_STALE_MIN
+        ? `数据已 ${ageStr} 未更新. regime 设计 1h 间隔, 超过 ${REGIME_AGE_STALE_MIN}min 偏旧, 超过 ${REGIME_AGE_DEAD_MIN}min 严重过期.`
+        : "";
+    } else {
+      updateEl.textContent = "— (时间戳无效)";
+      updateEl.className = "regime-update stale";
+    }
+  } else {
+    updateEl.textContent = "— (缺时间戳)";
+    updateEl.className = "regime-update stale";
+  }
+
+  document.getElementById("regime-judgment").textContent = judgment;
   // 手机端: 文字超过~3行时显示展开按钮
   const isMobile = window.matchMedia("(max-width: 720px)").matches;
   const toggle = document.getElementById("regime-judgment-toggle");
-  if (toggle) toggle.style.display = (isMobile && (regimeData.judgment || "").length > 60) ? "" : "none";
+  if (toggle) toggle.style.display = (isMobile && judgment.length > 60) ? "" : "none";
 
   const supList = document.getElementById("regime-support-list");
-  supList.innerHTML = (regimeData.support || []).map(s => `<li>${escapeHtml(s)}</li>`).join("");
+  supList.innerHTML = (regimeData.support || []).map(s => `<li>${escapeHtml(s)}</li>`).join("")
+                       || `<li style="color:var(--text-dim);font-style:italic">—</li>`;
   const chList = document.getElementById("regime-challenge-list");
-  chList.innerHTML = (regimeData.challenge || []).map(s => `<li>${escapeHtml(s)}</li>`).join("");
+  chList.innerHTML = (regimeData.challenge || []).map(s => `<li>${escapeHtml(s)}</li>`).join("")
+                       || `<li style="color:var(--text-dim);font-style:italic">—</li>`;
 
   const tagsBox = document.getElementById("regime-tags");
   tagsBox.innerHTML = (regimeData.tags || []).map(t => `<span class="regime-tag">${escapeHtml(t)}</span>`).join("");
