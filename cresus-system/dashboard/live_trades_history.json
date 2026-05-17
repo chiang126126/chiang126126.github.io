@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-17T15:33:42.923982+00:00",
+  "generated_at": "2026-05-17T15:35:25.109247+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 124,
-    "open": 2,
+    "total_trades": 125,
+    "open": 3,
     "closed": 122,
     "wins": 45,
     "losses": 76,
@@ -14,31 +14,33 @@
     "avg_pnl_usdt": 0.0214,
     "best_trade_usdt": 2.0008,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 2.1587,
+    "fees_paid_usdt": 2.1687,
     "fees_realized_usdt": 2.1387,
-    "fees_open_usdt": 0.02,
+    "fees_open_usdt": 0.03,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 39.98,
-    "free_capital_usdt": 60.48,
+    "deployed_usdt": 60.01,
+    "free_capital_usdt": 40.44,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 3
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 2.615,
-    "deployed_usdt": 39.98
+    "deployed_usdt": 60.01
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
+      "SPACEUSDT",
       "KAITOUSDT",
       "FHEUSDT"
     ],
     "exchange_symbols": [
+      "SPACEUSDT",
       "KAITOUSDT",
       "FHEUSDT"
     ]
@@ -82,10 +84,10 @@
       "btc_change_24h_at_open": -0.1,
       "btc_pct_vs_ma25_at_open": -0.149,
       "phase_a_mfe_price": 0.03085,
-      "current_price": 0.03357,
-      "unrealized_pnl_usdt": 2.4924,
-      "unrealized_pnl_pct": 12.462,
-      "last_price_check_at": "2026-05-17T15:33:39.768613+00:00",
+      "current_price": 0.03355,
+      "unrealized_pnl_usdt": 2.479,
+      "unrealized_pnl_pct": 12.395,
+      "last_price_check_at": "2026-05-17T15:35:22.013028+00:00",
       "phase_b_mfe_price": 0.03178,
       "phase_c_mfe_price": 0.03382
     },
@@ -127,10 +129,53 @@
       "btc_change_24h_at_open": -0.333,
       "btc_pct_vs_ma25_at_open": -0.234,
       "phase_a_mfe_price": 0.5183,
-      "current_price": 0.5111,
-      "unrealized_pnl_usdt": 0.1061,
-      "unrealized_pnl_pct": 0.531,
-      "last_price_check_at": "2026-05-17T15:33:39.768613+00:00"
+      "current_price": 0.5121,
+      "unrealized_pnl_usdt": 0.1454,
+      "unrealized_pnl_pct": 0.728,
+      "last_price_check_at": "2026-05-17T15:35:22.013028+00:00"
+    },
+    {
+      "paper_id": "SPACEUSDT|LONG|2026-05-17T15:31:23.188320+00:00",
+      "trade_id": "L1779031883_SPACEUS_L",
+      "symbol": "SPACEUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.008777,
+      "avg_fill_price": 0.00883,
+      "slippage_bps": 60.39,
+      "qty": 2268.0,
+      "notional_usdt": 20.02644,
+      "leverage": 3,
+      "risk_usdt": 0.462,
+      "risk_pct": 2.307,
+      "mirror_latency_sec": 133.3,
+      "sl_price": 0.00862629,
+      "tp1_price": 0.00900307,
+      "tp2_price": 0.00922914,
+      "phase": "A",
+      "entry_order_id": 73630923,
+      "entry_client_id": "cresus_L1779031883_SPACEUS_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.859,
+      "phase_a_mfe_pct": 0.798,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.010013,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-17T15:34:18.586400+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 77995.6,
+      "btc_change_24h_at_open": -0.267,
+      "btc_pct_vs_ma25_at_open": -0.17,
+      "phase_a_mfe_price": 0.008847,
+      "current_price": 0.008758,
+      "unrealized_pnl_usdt": -0.1633,
+      "unrealized_pnl_pct": -0.815,
+      "last_price_check_at": "2026-05-17T15:35:22.013028+00:00"
     }
   ],
   "recent_closed": [
@@ -6090,24 +6135,14 @@
       "close_qty": 53792.0
     }
   ],
-  "missed_signals": [
-    {
-      "paper_id": "SPACEUSDT|LONG|2026-05-17T15:31:23.188320+00:00",
-      "symbol": "SPACEUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-05-17T15:32:05.335477+00:00",
-      "reason": "pre_slippage_too_high (+51.3bps > 50bps)",
-      "last_checked_at": "2026-05-17T15:33:39.768613+00:00"
-    }
-  ],
+  "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
     "btc_price": 78004.5,
     "btc_ma25_1h": 78129.08,
     "pct_vs_ma25": -0.159,
     "change_24h_pct": -0.255,
-    "computed_at": "2026-05-17T15:33:42.055522+00:00"
+    "computed_at": "2026-05-17T15:35:24.236823+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
