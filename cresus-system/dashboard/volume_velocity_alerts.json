@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-18T23:13:41.920422+00:00",
+  "updated_at": "2026-05-18T23:16:17.067536+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 19,
+  "alerts_count": 20,
   "alerts": [
+    {
+      "symbol": "KITEUSDT",
+      "base": "KITE",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.23612,
+      "price_change_pct": -0.69,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 193801.0,
+      "volume_baseline_usdt": 30453.0,
+      "volume_ratio": 6.36,
+      "detected_at": "2026-05-18T23:15:15.932712+00:00",
+      "intensity": 1,
+      "change_5m_pct": -1.236,
+      "change_15m_pct": -1.187,
+      "change_1h_pct": -1.405,
+      "change_4h_pct": 1.664,
+      "taker_buy_ratio_1m": 0.235,
+      "taker_buy_ratio_5m": 0.255,
+      "oi_delta_5m_pct": -0.037,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.338,
+      "range_4h_pct": 4.62,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.23691857,
+      "suggested_tp1": 0.23492214,
+      "suggested_tp2": 0.23372429,
+      "conviction_score": 3,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "ENJUSDT",
       "base": "ENJ",
