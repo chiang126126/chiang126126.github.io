@@ -1,47 +1,44 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-18T15:51:05.766713+00:00",
+  "generated_at": "2026-05-18T15:53:22.149071+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 157,
-    "open": 1,
-    "closed": 156,
+    "open": 0,
+    "closed": 157,
     "wins": 56,
-    "losses": 99,
-    "win_rate": 0.361,
-    "total_pnl_usdt": 7.761,
-    "net_pnl_usdt": 4.9765,
-    "avg_pnl_usdt": 0.0498,
+    "losses": 100,
+    "win_rate": 0.359,
+    "total_pnl_usdt": 7.0751,
+    "net_pnl_usdt": 4.271,
+    "avg_pnl_usdt": 0.0451,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 2.7945,
-    "fees_realized_usdt": 2.7845,
-    "fees_open_usdt": 0.01,
+    "fees_paid_usdt": 2.8041,
+    "fees_realized_usdt": 2.8041,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 20.0,
-    "free_capital_usdt": 84.97,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 104.27,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -0.8951,
-    "deployed_usdt": 19.96
+    "daily_pnl": -0.8848,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "ATAUSDT"
-    ],
-    "exchange_symbols": [
-      "ATAUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "HANAUSDT|LONG|2026-05-18T15:50:02.573979+00:00",
       "trade_id": "L1779119402_HANAUSD_L",
@@ -75,7 +72,7 @@
       "phase_a_mfe_pct": 0.0,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.01,
+      "fees_paid_usdt": 0.019657,
       "fees_are_actual": true,
       "opened_at": "2026-05-18T15:51:03.364035+00:00",
       "is_dry_run": false,
@@ -84,13 +81,21 @@
       "btc_change_24h_at_open": -2.165,
       "btc_pct_vs_ma25_at_open": -1.318,
       "phase_a_mfe_price": 0.03149,
-      "current_price": 0.0312,
-      "unrealized_pnl_usdt": 0.0,
-      "unrealized_pnl_pct": 0.0,
-      "last_price_check_at": "2026-05-18T15:50:57.893666+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.03019,
+      "unrealized_pnl_usdt": -0.6474,
+      "unrealized_pnl_pct": -3.237,
+      "last_price_check_at": "2026-05-18T15:52:08.337076+00:00",
+      "closed_at": "2026-05-18T15:52:13.046548+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.03013,
+      "realized_pnl_usdt": -0.6859,
+      "close_order_id": 269366415,
+      "close_qty": 641.0,
+      "close_expected_price": 0.03084643,
+      "close_slippage_bps": 232.26,
+      "entry_fees_usdt": 0.01,
+      "close_fees_usdt": 0.009657
+    },
     {
       "paper_id": "ATAUSDT|SHORT|2026-05-18T04:56:45.207600+00:00",
       "trade_id": "L1779080205_ATAUSDT_S",
@@ -7991,14 +7996,24 @@
       "close_qty": 53792.0
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "MLNUSDT|LONG|2026-05-18T15:52:33.532604+00:00",
+      "symbol": "MLNUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-05-18T15:52:56.260303+00:00",
+      "reason": "open_failed (retry next tick)",
+      "last_checked_at": "2026-05-18T15:53:18.013295+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 76318.0,
-    "btc_ma25_1h": 77337.33,
-    "pct_vs_ma25": -1.318,
-    "change_24h_pct": -2.165,
-    "computed_at": "2026-05-18T15:51:00.245644+00:00"
+    "btc_price": 76320.0,
+    "btc_ma25_1h": 77337.41,
+    "pct_vs_ma25": -1.316,
+    "change_24h_pct": -2.163,
+    "computed_at": "2026-05-18T15:53:19.825134+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
