@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-18T21:39:36.926343+00:00",
+  "generated_at": "2026-05-18T21:48:58.925232+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 161,
@@ -57,8 +57,8 @@
       "risk_usdt": 0.1681,
       "risk_pct": 0.84,
       "mirror_latency_sec": 29.2,
-      "sl_price": 0.4047,
-      "sl_paper_current": 0.4047,
+      "sl_price": 0.406566586,
+      "sl_paper_current": 0.406566586,
       "sl_compensation_enabled": false,
       "sl_compensation_offset": 0.0,
       "sl_compensation_mode": "ab",
@@ -84,10 +84,10 @@
       "btc_change_24h_at_open": -1.864,
       "btc_pct_vs_ma25_at_open": -0.059,
       "phase_a_mfe_price": 0.4087,
-      "current_price": 0.4075,
-      "unrealized_pnl_usdt": 0.0739,
-      "unrealized_pnl_pct": 0.369,
-      "last_price_check_at": "2026-05-18T21:39:32.483601+00:00",
+      "current_price": 0.4072,
+      "unrealized_pnl_usdt": 0.0592,
+      "unrealized_pnl_pct": 0.296,
+      "last_price_check_at": "2026-05-18T21:48:55.867759+00:00",
       "phase_b_mfe_price": 0.4087
     }
   ],
@@ -8227,17 +8227,26 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-18T21:35:39.465696+00:00",
+      "reason": "paper trade too old (796s > 600s)",
+      "last_checked_at": "2026-05-18T21:48:55.867759+00:00"
+    },
+    {
+      "paper_id": "CFGUSDT|LONG|2026-05-18T21:47:48.782721+00:00",
+      "symbol": "CFGUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-05-18T21:48:23.777842+00:00",
       "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-05-18T21:39:32.483601+00:00"
+      "last_checked_at": "2026-05-18T21:48:55.867759+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 76991.0,
-    "btc_ma25_1h": 76995.09,
-    "pct_vs_ma25": -0.005,
-    "change_24h_pct": -1.809,
-    "computed_at": "2026-05-18T21:39:34.305240+00:00"
+    "btc_price": 76988.9,
+    "btc_ma25_1h": 76995.01,
+    "pct_vs_ma25": -0.008,
+    "change_24h_pct": -1.812,
+    "computed_at": "2026-05-18T21:48:57.874183+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
