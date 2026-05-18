@@ -1,17 +1,17 @@
 {
-  "generated_at": "2026-05-18T23:33:16.988572+00:00",
+  "generated_at": "2026-05-18T23:35:53.803375+00:00",
   "stats": {
     "total_trades": 1524,
-    "open": 3,
-    "closed": 1521,
+    "open": 2,
+    "closed": 1522,
     "wins": 496,
     "losses": 928,
-    "scratches": 97,
+    "scratches": 98,
     "win_rate": 0.348,
     "avg_pnl_pct": 0.188,
     "best_trade": 24.03,
     "worst_trade": -5.58,
-    "total_usdt_pnl": 571.09,
+    "total_usdt_pnl": 570.98,
     "verdict": "❌ 负向 EV (μ +0.19% / 胜率 34%) — 保持 shadow 不开真仓",
     "verdict_class": "negative",
     "hypothetical_notional_usdt": 200.0,
@@ -20,7 +20,7 @@
       "hit_be_sl": 16,
       "hit_trail": 307,
       "timeout": 36,
-      "hit_b_trail": 244
+      "hit_b_trail": 245
     },
     "oi_subset": {
       "oi_match": {
@@ -30,10 +30,10 @@
         "avg_pct": 0.169
       },
       "oi_mismatch": {
-        "n": 336,
+        "n": 337,
         "wins": 118,
-        "win_rate": 0.351,
-        "avg_pct": 0.253
+        "win_rate": 0.35,
+        "avg_pct": 0.252
       },
       "no_oi_data": {
         "n": 0,
@@ -57,14 +57,14 @@
       "range_4h_pct": 5.5,
       "vol_mult_used": 1.5,
       "entry_price": 2.398,
-      "sl": 2.3778905999999997,
+      "sl": 2.37587116,
       "tp1": 2.37469643,
       "tp2": 2.35139286,
       "entered_at": "2026-05-18T22:41:33.012565+00:00",
-      "current_price": 2.36,
-      "unrealized_pnl_pct": 1.585,
+      "current_price": 2.353,
+      "unrealized_pnl_pct": 1.877,
       "notional_usdt": 200.0,
-      "unrealized_usdt_pnl": 3.17,
+      "unrealized_usdt_pnl": 3.75,
       "funding_rate_pct": 0.0189,
       "oi_delta_5m_pct": -0.668,
       "oi_matches_direction": true,
@@ -77,12 +77,12 @@
       "phase": "B",
       "tp1_hit_at": "2026-05-18T23:21:17.981446+00:00",
       "tp2_hit_at": null,
-      "high_water_mark": 2.355,
+      "high_water_mark": 2.353,
       "trailing_sl": null,
       "phase_a_mfe_price": 2.369,
       "phase_a_mfe_pct": 1.209,
-      "phase_b_mfe_price": 2.355,
-      "phase_b_mfe_pct": 1.793
+      "phase_b_mfe_price": 2.353,
+      "phase_b_mfe_pct": 1.877
     },
     {
       "id": "shadow|ZEREBROUSDT|SHORT|2026-05-18T22:41:19.070662+00:00",
@@ -97,14 +97,14 @@
       "range_4h_pct": 4.21,
       "vol_mult_used": 1.0,
       "entry_price": 0.022449,
-      "sl": 0.022449,
+      "sl": 0.022439486499999998,
       "tp1": 0.02230864,
       "tp2": 0.02216829,
       "entered_at": "2026-05-18T22:41:33.012565+00:00",
-      "current_price": 0.0223,
-      "unrealized_pnl_pct": 0.664,
+      "current_price": 0.022376,
+      "unrealized_pnl_pct": 0.325,
       "notional_usdt": 200.0,
-      "unrealized_usdt_pnl": 1.33,
+      "unrealized_usdt_pnl": 0.65,
       "funding_rate_pct": -0.0035,
       "oi_delta_5m_pct": -0.076,
       "oi_matches_direction": true,
@@ -123,7 +123,9 @@
       "phase_a_mfe_pct": 0.664,
       "phase_b_mfe_price": 0.0223,
       "phase_b_mfe_pct": 0.664
-    },
+    }
+  ],
+  "recent_closed": [
     {
       "id": "shadow|EDGEUSDT|LONG|2026-05-18T23:04:30.133665+00:00",
       "shadow": true,
@@ -141,10 +143,10 @@
       "tp1": 1.32046071,
       "tp2": 1.33232143,
       "entered_at": "2026-05-18T23:04:55.541483+00:00",
-      "current_price": 1.3165,
-      "unrealized_pnl_pct": 0.604,
+      "current_price": 1.3062,
+      "unrealized_pnl_pct": -0.183,
       "notional_usdt": 200.0,
-      "unrealized_usdt_pnl": 1.21,
+      "unrealized_usdt_pnl": -0.37,
       "funding_rate_pct": 0.0365,
       "oi_delta_5m_pct": -0.153,
       "oi_matches_direction": false,
@@ -162,10 +164,17 @@
       "phase_a_mfe_price": 1.3209,
       "phase_a_mfe_pct": 0.94,
       "phase_b_mfe_price": 1.3209,
-      "phase_b_mfe_pct": 0.94
-    }
-  ],
-  "recent_closed": [
+      "phase_b_mfe_pct": 0.94,
+      "closed_at": "2026-05-18T23:35:52.510467+00:00",
+      "close_price": 1.30892273925,
+      "close_reason": "hit_b_trail",
+      "gross_pnl_pct": 0.025,
+      "fee_pct": 0.08,
+      "fee_usdt": 0.16,
+      "realized_pnl_pct": -0.055,
+      "realized_usdt_pnl": -0.11,
+      "hold_time_min": 30.9
+    },
     {
       "id": "shadow|ATAUSDT|SHORT|2026-05-18T22:58:21.434810+00:00",
       "shadow": true,
