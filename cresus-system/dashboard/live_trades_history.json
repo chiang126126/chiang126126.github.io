@@ -1,47 +1,92 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-18T02:13:34.395841+00:00",
+  "generated_at": "2026-05-18T02:15:48.756794+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 151,
+    "total_trades": 152,
     "open": 1,
-    "closed": 150,
+    "closed": 151,
     "wins": 55,
-    "losses": 94,
-    "win_rate": 0.369,
-    "total_pnl_usdt": 8.3032,
-    "net_pnl_usdt": 5.6263,
-    "avg_pnl_usdt": 0.0554,
+    "losses": 95,
+    "win_rate": 0.367,
+    "total_pnl_usdt": 8.0488,
+    "net_pnl_usdt": 5.3518,
+    "avg_pnl_usdt": 0.0533,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 2.6869,
-    "fees_realized_usdt": 2.6769,
+    "fees_paid_usdt": 2.707,
+    "fees_realized_usdt": 2.697,
     "fees_open_usdt": 0.01,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 19.97,
-    "free_capital_usdt": 85.65,
+    "deployed_usdt": 19.98,
+    "free_capital_usdt": 85.36,
     "max_concurrent_slots": 4,
     "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 0.3433,
-    "deployed_usdt": 19.97
+    "daily_pnl": 0.0889,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "IPUSDT"
-    ],
-    "exchange_symbols": [
-      "IPUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
   "open_trades": [
+    {
+      "paper_id": "BIOUSDT|LONG|2026-05-18T02:14:53.574640+00:00",
+      "trade_id": "L1779070493_BIOUSDT_L",
+      "symbol": "BIOUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.03893,
+      "avg_fill_price": 0.03887,
+      "slippage_bps": -15.41,
+      "qty": 514.0,
+      "notional_usdt": 19.97918,
+      "leverage": 3,
+      "risk_usdt": 0.0821,
+      "risk_pct": 0.411,
+      "mirror_latency_sec": 18.2,
+      "sl_price": 0.03871036,
+      "sl_paper_current": 0.03871036,
+      "sl_compensation_enabled": false,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "ab",
+      "tp1_price": 0.03925946,
+      "tp2_price": 0.03958893,
+      "phase": "A",
+      "entry_order_id": 133052459,
+      "entry_client_id": "cresus_L1779070493_BIOUSDT_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.376,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.00999,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-18T02:15:48.460701+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 77110.0,
+      "btc_change_24h_at_open": -0.967,
+      "btc_pct_vs_ma25_at_open": -1.126,
+      "phase_a_mfe_price": 0.03893,
+      "current_price": 0.03888,
+      "unrealized_pnl_usdt": 0.0051,
+      "unrealized_pnl_pct": 0.026,
+      "last_price_check_at": "2026-05-18T02:15:43.938506+00:00"
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "IPUSDT|SHORT|2026-05-17T23:43:30.808688+00:00",
       "trade_id": "L1779061410_IPUSDT_S",
@@ -75,7 +120,7 @@
       "phase_a_mfe_pct": 0.466,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.009985,
+      "fees_paid_usdt": 0.020097,
       "fees_are_actual": true,
       "opened_at": "2026-05-17T23:44:48.802894+00:00",
       "is_dry_run": false,
@@ -84,13 +129,21 @@
       "btc_change_24h_at_open": -1.022,
       "btc_pct_vs_ma25_at_open": -0.942,
       "phase_a_mfe_price": 0.4702,
-      "current_price": 0.476,
-      "unrealized_pnl_usdt": -0.212,
-      "unrealized_pnl_pct": -1.062,
-      "last_price_check_at": "2026-05-18T02:13:31.932138+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.477,
+      "unrealized_pnl_usdt": -0.2544,
+      "unrealized_pnl_pct": -1.274,
+      "last_price_check_at": "2026-05-18T02:14:04.564658+00:00",
+      "closed_at": "2026-05-18T02:14:07.913811+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.477,
+      "realized_pnl_usdt": -0.2544,
+      "close_order_id": 117129126,
+      "close_qty": 42.4,
+      "close_expected_price": 0.47655,
+      "close_slippage_bps": 9.44,
+      "entry_fees_usdt": 0.009985,
+      "close_fees_usdt": 0.010112
+    },
     {
       "paper_id": "BCHUSDT|SHORT|2026-05-18T01:35:05.672998+00:00",
       "trade_id": "L1779068105_BCHUSDT_S",
@@ -7655,17 +7708,17 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-17T23:44:34.966390+00:00",
-      "reason": "paper trade too old (8937s > 600s)",
-      "last_checked_at": "2026-05-18T02:13:31.932138+00:00"
+      "reason": "paper trade too old (9069s > 600s)",
+      "last_checked_at": "2026-05-18T02:15:43.938506+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 77124.5,
-    "btc_ma25_1h": 77988.5,
-    "pct_vs_ma25": -1.108,
-    "change_24h_pct": -0.948,
-    "computed_at": "2026-05-18T02:13:33.694530+00:00"
+    "btc_price": 77110.0,
+    "btc_ma25_1h": 77987.92,
+    "pct_vs_ma25": -1.126,
+    "change_24h_pct": -0.967,
+    "computed_at": "2026-05-18T02:15:45.572632+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
