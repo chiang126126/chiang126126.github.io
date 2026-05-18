@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-18T00:45:41.387462+00:00",
+  "generated_at": "2026-05-18T00:47:55.560194+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 147,
-    "open": 1,
+    "total_trades": 148,
+    "open": 2,
     "closed": 146,
     "wins": 54,
     "losses": 91,
@@ -14,15 +14,15 @@
     "avg_pnl_usdt": 0.0534,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 2.6118,
+    "fees_paid_usdt": 2.6218,
     "fees_realized_usdt": 2.6018,
-    "fees_open_usdt": 0.01,
+    "fees_open_usdt": 0.02,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 19.97,
-    "free_capital_usdt": 85.22,
+    "deployed_usdt": 39.97,
+    "free_capital_usdt": 65.21,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
@@ -84,10 +84,57 @@
       "btc_change_24h_at_open": -1.022,
       "btc_pct_vs_ma25_at_open": -0.942,
       "phase_a_mfe_price": 0.4707,
-      "current_price": 0.474,
-      "unrealized_pnl_usdt": -0.1272,
-      "unrealized_pnl_pct": -0.637,
-      "last_price_check_at": "2026-05-18T00:45:38.234499+00:00"
+      "current_price": 0.475,
+      "unrealized_pnl_usdt": -0.1696,
+      "unrealized_pnl_pct": -0.849,
+      "last_price_check_at": "2026-05-18T00:47:49.656126+00:00"
+    },
+    {
+      "paper_id": "BABYUSDT|SHORT|2026-05-18T00:43:49.935981+00:00",
+      "trade_id": "L1779065029_BABYUSD_S",
+      "symbol": "BABYUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.01797,
+      "avg_fill_price": 0.01795,
+      "slippage_bps": 11.13,
+      "qty": 1114.0,
+      "notional_usdt": 19.9963,
+      "leverage": 3,
+      "risk_usdt": 0.417,
+      "risk_pct": 2.085,
+      "mirror_latency_sec": 219.8,
+      "sl_price": 0.01832429,
+      "sl_paper_current": 0.01832429,
+      "sl_compensation_enabled": false,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "ab",
+      "tp1_price": 0.01743857,
+      "tp2_price": 0.01690714,
+      "phase": "A",
+      "entry_order_id": 113928284,
+      "entry_client_id": "cresus_L1779065029_BABYUSD_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.986,
+      "phase_a_mfe_pct": 2.003,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.009998,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-18T00:47:54.565293+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 77027.3,
+      "btc_change_24h_at_open": -1.242,
+      "btc_pct_vs_ma25_at_open": -1.307,
+      "phase_a_mfe_price": 0.01761,
+      "current_price": 0.01795,
+      "unrealized_pnl_usdt": -0.0,
+      "unrealized_pnl_pct": -0.0,
+      "last_price_check_at": "2026-05-18T00:47:49.656126+00:00"
     }
   ],
   "recent_closed": [
@@ -7425,8 +7472,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-17T23:44:34.966390+00:00",
-      "reason": "paper trade too old (3663s > 600s)",
-      "last_checked_at": "2026-05-18T00:45:38.234499+00:00"
+      "reason": "paper trade too old (3795s > 600s)",
+      "last_checked_at": "2026-05-18T00:47:49.656126+00:00"
     },
     {
       "paper_id": "BABYUSDT|SHORT|2026-05-18T00:43:49.935981+00:00",
@@ -7434,17 +7481,17 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-18T00:44:14.766457+00:00",
-      "reason": "pre_slippage_too_high (+72.3bps > 50bps)",
-      "last_checked_at": "2026-05-18T00:45:38.234499+00:00"
+      "reason": "pre_slippage_too_high (+89.0bps > 50bps)",
+      "last_checked_at": "2026-05-18T00:47:16.967392+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 77004.5,
-    "btc_ma25_1h": 78046.35,
-    "pct_vs_ma25": -1.335,
-    "change_24h_pct": -1.271,
-    "computed_at": "2026-05-18T00:45:40.389754+00:00"
+    "btc_price": 77027.3,
+    "btc_ma25_1h": 78047.26,
+    "pct_vs_ma25": -1.307,
+    "change_24h_pct": -1.242,
+    "computed_at": "2026-05-18T00:47:51.652574+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
