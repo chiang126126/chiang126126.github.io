@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-18T22:58:25.592080+00:00",
+  "updated_at": "2026-05-18T23:00:37.075902+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 12,
+  "alerts_count": 13,
   "alerts": [
+    {
+      "symbol": "CRCLUSDT",
+      "base": "CRCL",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 112.5,
+      "price_change_pct": 0.815,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 588448.0,
+      "volume_baseline_usdt": 10059.0,
+      "volume_ratio": 58.5,
+      "detected_at": "2026-05-18T22:59:35.499035+00:00",
+      "intensity": 2,
+      "change_5m_pct": 1.076,
+      "change_15m_pct": 1.103,
+      "change_1h_pct": 0.922,
+      "change_4h_pct": 4.651,
+      "taker_buy_ratio_1m": 0.436,
+      "taker_buy_ratio_5m": 0.43,
+      "oi_delta_5m_pct": 0.06,
+      "funding_rate_pct": 0.0101,
+      "atr_pct": 0.117,
+      "range_4h_pct": 4.42,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 112.36857143,
+      "suggested_tp1": 112.69714286,
+      "suggested_tp2": 112.89428571,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "ATAUSDT",
       "base": "ATA",
