@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-19T02:46:20.281059+00:00",
+  "generated_at": "2026-05-19T02:48:02.716028+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 177,
-    "open": 2,
+    "total_trades": 178,
+    "open": 3,
     "closed": 175,
     "wins": 61,
     "losses": 112,
@@ -14,31 +14,33 @@
     "avg_pnl_usdt": 0.0299,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 3.1544,
+    "fees_paid_usdt": 3.1624,
     "fees_realized_usdt": 3.1344,
-    "fees_open_usdt": 0.02,
+    "fees_open_usdt": 0.028,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 39.96,
-    "free_capital_usdt": 62.13,
+    "deployed_usdt": 59.95,
+    "free_capital_usdt": 42.13,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 3
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -0.7196,
-    "deployed_usdt": 39.96
+    "deployed_usdt": 59.95
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
+      "STORJUSDT",
       "RONINUSDT",
       "TAKEUSDT"
     ],
     "exchange_symbols": [
+      "STORJUSDT",
       "RONINUSDT",
       "TAKEUSDT"
     ]
@@ -86,10 +88,10 @@
       "btc_change_24h_at_open": -0.18,
       "btc_pct_vs_ma25_at_open": -0.276,
       "phase_a_mfe_price": 0.1121,
-      "current_price": 0.1142,
-      "unrealized_pnl_usdt": -0.0175,
-      "unrealized_pnl_pct": -0.088,
-      "last_price_check_at": "2026-05-19T02:46:18.319581+00:00"
+      "current_price": 0.1144,
+      "unrealized_pnl_usdt": -0.0525,
+      "unrealized_pnl_pct": -0.263,
+      "last_price_check_at": "2026-05-19T02:47:59.817240+00:00"
     },
     {
       "paper_id": "TAKEUSDT|SHORT|2026-05-19T02:36:41.784822+00:00",
@@ -134,10 +136,57 @@
       "btc_pct_vs_ma25_at_open": -0.158,
       "phase_a_mfe_price": 0.02212,
       "phase_b_mfe_price": 0.02212,
-      "current_price": 0.02223,
-      "unrealized_pnl_usdt": -0.0722,
-      "unrealized_pnl_pct": -0.361,
-      "last_price_check_at": "2026-05-19T02:46:18.319581+00:00"
+      "current_price": 0.02226,
+      "unrealized_pnl_usdt": -0.0992,
+      "unrealized_pnl_pct": -0.497,
+      "last_price_check_at": "2026-05-19T02:47:59.817240+00:00"
+    },
+    {
+      "paper_id": "STORJUSDT|LONG|2026-05-19T02:46:47.937518+00:00",
+      "trade_id": "L1779158807_STORJUS_L",
+      "symbol": "STORJUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.1169,
+      "avg_fill_price": 0.1169,
+      "slippage_bps": 0.0,
+      "qty": 171.0,
+      "notional_usdt": 19.9899,
+      "leverage": 3,
+      "risk_usdt": 0.1319,
+      "risk_pct": 0.66,
+      "mirror_latency_sec": 17.5,
+      "sl_price": 0.11612857,
+      "sl_paper_current": 0.11612857,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "ab",
+      "tp1_price": 0.11805714,
+      "tp2_price": 0.11921429,
+      "phase": "A",
+      "entry_order_id": 139456357,
+      "entry_client_id": "cresus_L1779158807_STORJUS_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.44,
+      "phase_a_mfe_pct": 0.171,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.007996,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-19T02:47:28.692222+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 76740.8,
+      "btc_change_24h_at_open": -0.057,
+      "btc_pct_vs_ma25_at_open": -0.158,
+      "phase_a_mfe_price": 0.1171,
+      "current_price": 0.117,
+      "unrealized_pnl_usdt": 0.0171,
+      "unrealized_pnl_pct": 0.086,
+      "last_price_check_at": "2026-05-19T02:47:59.817240+00:00"
     }
   ],
   "recent_closed": [
@@ -9137,11 +9186,11 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 76736.7,
-    "btc_ma25_1h": 76862.25,
-    "pct_vs_ma25": -0.163,
+    "btc_price": 76736.3,
+    "btc_ma25_1h": 76862.23,
+    "pct_vs_ma25": -0.164,
     "change_24h_pct": -0.063,
-    "computed_at": "2026-05-19T02:46:19.669424+00:00"
+    "computed_at": "2026-05-19T02:48:01.854801+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
