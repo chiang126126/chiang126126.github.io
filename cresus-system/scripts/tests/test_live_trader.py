@@ -1311,6 +1311,234 @@ class TestSlCompensation(unittest.TestCase):
         self.assertFalse(sl > 0, "caller 应该不用此值, fallback 到 paper_sl")
 
 
+class TestAbGroup(unittest.TestCase):
+    """Phase 4.E: A/B/C 三组分配 (paper_id MD5 mod 3)."""
+
+    def test_deterministic(self):
+        """同一 paper_id 永远返回同一组."""
+        pid = "BTCUSDT|LONG|2026-05-15T10:00:00+00:00"
+        g1 = live_trader._ab_group(pid)
+        g2 = live_trader._ab_group(pid)
+        self.assertEqual(g1, g2)
+        self.assertIn(g1, ("A", "B", "C"))
+
+    def test_empty_paper_id_defaults_to_a(self):
+        """空 paper_id 退路 = 'A' (基线, 不启用任何实验)."""
+        self.assertEqual(live_trader._ab_group(""), "A")
+        self.assertEqual(live_trader._ab_group(None), "A")
+
+    def test_distribution_balanced(self):
+        """1000 个 paper_id 哈希应大致 1/3 分布 (容差 ±10%)."""
+        from collections import Counter
+        ids = [f"SYM{i}USDT|LONG|2026-05-{i%30+1:02d}T{i%24:02d}:00:00+00:00"
+               for i in range(1000)]
+        counts = Counter(live_trader._ab_group(pid) for pid in ids)
+        # 每组期望 333 ± 90 (3 sigma 内)
+        for g in ("A", "B", "C"):
+            self.assertGreater(counts[g], 250, f"{g} 组样本太少: {counts[g]}")
+            self.assertLess(counts[g], 420, f"{g} 组样本太多: {counts[g]}")
+
+    def test_different_ids_can_differ(self):
+        """至少有 2 个不同 paper_id 落在不同组 (sanity)."""
+        groups = set()
+        for i in range(30):
+            groups.add(live_trader._ab_group(f"X{i}USDT|LONG|T+00:00"))
+        self.assertGreaterEqual(len(groups), 2, "30 个 id 应能覆盖至少 2 组")
+
+
+class TestAbUseWickFilter(unittest.TestCase):
+    """Phase 4.E: wick filter A/B/C 启用判定."""
+
+    def test_off_mode_never_enables(self):
+        self.assertFalse(live_trader._ab_use_wick_filter("any", mode="off"))
+
+    def test_always_mode_always_enables(self):
+        self.assertTrue(live_trader._ab_use_wick_filter("any", mode="always"))
+        self.assertTrue(live_trader._ab_use_wick_filter("", mode="always"))
+
+    def test_abc_only_c_group(self):
+        """abc mode: 只有 C 组返 True, A/B 返 False."""
+        for i in range(60):
+            pid = f"S{i}|LONG|T+00:00"
+            g = live_trader._ab_group(pid)
+            r = live_trader._ab_use_wick_filter(pid, mode="abc")
+            if g == "C":
+                self.assertTrue(r, f"{pid} 应该 C 组 = True")
+            else:
+                self.assertFalse(r, f"{pid} 应该 {g} 组 = False")
+
+    def test_empty_paper_id_safe_path(self):
+        """空 paper_id 在 abc 模式下也安全 (返 False = 不过滤, 等同 A 组)."""
+        # _ab_group("") == "A", 所以 abc 模式 wick=False
+        self.assertFalse(live_trader._ab_use_wick_filter("", mode="abc"))
+
+    def test_unknown_mode_safe_fallback(self):
+        """未知 mode → 返 False (不启用, 等同退路)."""
+        self.assertFalse(live_trader._ab_use_wick_filter("any", mode="xyz"))
+
+
+class TestSlBreachWickFilter(unittest.TestCase):
+    """Phase 4.E: _check_sl_breach 在 wick_filter_enabled=True 时要求连续 N
+    次 breach 才触发. 关键测试:
+    - off (legacy): instant trigger 不变
+    - on, 单次 breach: 不触发, 计数 +1
+    - on, 连续 2 次: 触发
+    - on, breach 后回归: 计数清零, 后续单次再 breach 不触发
+    """
+
+    def test_filter_off_instant_trigger_long(self):
+        """A/B 组 (wick_filter_enabled=False) 行为不变 — 单次 breach 即触发."""
+        lt = {"side": "BUY", "sl_price": 80000.0, "wick_filter_enabled": False}
+        self.assertTrue(_check_sl_breach(lt, 79000.0))
+        # 计数器应保持 0 (从未累计过)
+        self.assertEqual(lt.get("sl_breach_count", 0), 0)
+
+    def test_filter_off_no_field_legacy_behavior(self):
+        """老 trade 没有 wick_filter_enabled 字段 = 默认 instant trigger."""
+        lt = {"side": "BUY", "sl_price": 80000.0}
+        self.assertTrue(_check_sl_breach(lt, 79000.0))
+
+    def test_filter_on_single_breach_no_trigger(self):
+        """C 组: 第一次 breach 仅累计, 不触发."""
+        lt = {"side": "BUY", "sl_price": 80000.0, "wick_filter_enabled": True,
+              "sl_breach_count": 0,
+              "wick_filter_min_breaches": 2}
+        result = _check_sl_breach(lt, 79000.0)
+        self.assertFalse(result, "首次 breach 不应触发")
+        self.assertEqual(lt["sl_breach_count"], 1)
+
+    def test_filter_on_two_consecutive_triggers(self):
+        """C 组: 连续 2 次 breach → 触发."""
+        lt = {"side": "BUY", "sl_price": 80000.0, "wick_filter_enabled": True,
+              "sl_breach_count": 0,
+              "wick_filter_min_breaches": 2}
+        self.assertFalse(_check_sl_breach(lt, 79000.0))  # 第 1 次
+        self.assertEqual(lt["sl_breach_count"], 1)
+        self.assertTrue(_check_sl_breach(lt, 78500.0))   # 第 2 次, 触发
+        self.assertEqual(lt["sl_breach_count"], 2)
+
+    def test_filter_on_breach_then_recover_resets_count(self):
+        """C 组: breach 1 次后价格回到 SL 外, 计数应清零."""
+        lt = {"side": "BUY", "sl_price": 80000.0, "wick_filter_enabled": True,
+              "sl_breach_count": 0,
+              "wick_filter_min_breaches": 2}
+        self.assertFalse(_check_sl_breach(lt, 79000.0))   # 第 1 次 breach
+        self.assertEqual(lt["sl_breach_count"], 1)
+        self.assertFalse(_check_sl_breach(lt, 80500.0))   # 回到 SL 外, 清零
+        self.assertEqual(lt["sl_breach_count"], 0)
+        # 再次 breach 应该重新累计 (第 1 次, 不触发)
+        self.assertFalse(_check_sl_breach(lt, 79000.0))
+        self.assertEqual(lt["sl_breach_count"], 1)
+
+    def test_filter_on_short_direction(self):
+        """C 组 SHORT 方向: current ≥ sl 是 breach. 同样需要连续 2 次."""
+        lt = {"side": "SELL", "sl_price": 80000.0, "wick_filter_enabled": True,
+              "sl_breach_count": 0,
+              "wick_filter_min_breaches": 2}
+        self.assertFalse(_check_sl_breach(lt, 81000.0))   # 第 1 次
+        self.assertTrue(_check_sl_breach(lt, 81500.0))    # 第 2 次, 触发
+
+    def test_filter_on_custom_threshold_3(self):
+        """C 组若 wick_filter_min_breaches=3, 需 3 次才触发."""
+        lt = {"side": "BUY", "sl_price": 80000.0, "wick_filter_enabled": True,
+              "sl_breach_count": 0,
+              "wick_filter_min_breaches": 3}
+        self.assertFalse(_check_sl_breach(lt, 79000.0))   # 1
+        self.assertFalse(_check_sl_breach(lt, 79000.0))   # 2
+        self.assertTrue(_check_sl_breach(lt, 79000.0))    # 3, 触发
+
+    def test_filter_default_min_breaches_from_config(self):
+        """C 组若没 wick_filter_min_breaches 字段, fallback 到全局常数."""
+        lt = {"side": "BUY", "sl_price": 80000.0, "wick_filter_enabled": True,
+              "sl_breach_count": 0}   # 注意: 无 wick_filter_min_breaches
+        # LIVE_WICK_FILTER_MIN_BREACHES 默认 2, 所以行为同 2 次触发
+        self.assertFalse(_check_sl_breach(lt, 79000.0))
+        self.assertTrue(_check_sl_breach(lt, 79000.0))
+
+    def test_filter_no_breach_does_not_change_count(self):
+        """C 组: 非 breach 调用不影响已有 0 计数."""
+        lt = {"side": "BUY", "sl_price": 80000.0, "wick_filter_enabled": True,
+              "sl_breach_count": 0,
+              "wick_filter_min_breaches": 2}
+        self.assertFalse(_check_sl_breach(lt, 81000.0))
+        self.assertEqual(lt["sl_breach_count"], 0)
+
+
+class TestSyncResetsBreachCount(unittest.TestCase):
+    """Phase 4.E: 当 _sync_live_with_paper 更新 SL 时, 应清零 sl_breach_count
+    (旧 breach 证据对新 SL 失效)."""
+
+    def test_sl_change_resets_count(self):
+        lt = {"symbol": "BTC", "sl_price": 80000.0, "phase": "A",
+              "sl_breach_count": 1,         # C 组累积了 1 次 breach
+              "wick_filter_enabled": True}
+        paper = {"sl": 79000.0, "phase": "B"}
+        updated = live_trader._sync_live_with_paper(lt, paper)
+        self.assertTrue(updated)
+        self.assertEqual(lt["sl_price"], 79000.0)
+        self.assertEqual(lt["sl_breach_count"], 0, "SL 移动后计数应清零")
+
+    def test_no_sl_change_keeps_count(self):
+        """SL 没变 (同步无变化), 计数不应被错误清零."""
+        lt = {"symbol": "BTC", "sl_price": 80000.0, "phase": "A",
+              "sl_breach_count": 1,
+              "wick_filter_enabled": True}
+        paper = {"sl": 80000.0, "phase": "A"}   # 完全相同
+        live_trader._sync_live_with_paper(lt, paper)
+        self.assertEqual(lt["sl_breach_count"], 1, "SL 未变, 计数保持")
+
+
+class TestPhase4EIntegration(unittest.TestCase):
+    """Phase 4.E 完整链路: _ab_group → _ab_use_wick_filter → live_trade 字段
+    → _check_sl_breach 行为一致."""
+
+    def test_c_group_paper_id_wick_filter_active(self):
+        """选一个 C 组 paper_id, 验证整条链路启用 wick filter."""
+        # 寻找一个落在 C 组的 paper_id
+        c_pid = None
+        for i in range(100):
+            candidate = f"TEST{i}|LONG|2026-05-15T10:00:00+00:00"
+            if live_trader._ab_group(candidate) == "C":
+                c_pid = candidate
+                break
+        self.assertIsNotNone(c_pid, "100 个 id 居然没找到 C 组? 哈希分布异常")
+
+        # 链路 1: _ab_use_wick_filter 应该返 True
+        self.assertTrue(
+            live_trader._ab_use_wick_filter(c_pid, mode="abc"),
+            "C 组应该启用 wick filter"
+        )
+        # 链路 2: 同时不启用 SL 补偿 (C 组无补偿)
+        self.assertFalse(
+            live_trader._ab_use_sl_compensation(c_pid, mode="abc"),
+            "C 组不应启用 SL 补偿"
+        )
+
+    def test_b_group_paper_id_compensation_only(self):
+        """选一个 B 组 paper_id, 验证只启用补偿不启用 wick filter."""
+        b_pid = None
+        for i in range(100):
+            candidate = f"TEST{i}|LONG|2026-05-15T10:00:00+00:00"
+            if live_trader._ab_group(candidate) == "B":
+                b_pid = candidate
+                break
+        self.assertIsNotNone(b_pid)
+        self.assertTrue(live_trader._ab_use_sl_compensation(b_pid, mode="abc"))
+        self.assertFalse(live_trader._ab_use_wick_filter(b_pid, mode="abc"))
+
+    def test_a_group_paper_id_neither(self):
+        """选一个 A 组 paper_id, 既不补偿也不过滤 (基线)."""
+        a_pid = None
+        for i in range(100):
+            candidate = f"TEST{i}|LONG|2026-05-15T10:00:00+00:00"
+            if live_trader._ab_group(candidate) == "A":
+                a_pid = candidate
+                break
+        self.assertIsNotNone(a_pid)
+        self.assertFalse(live_trader._ab_use_sl_compensation(a_pid, mode="abc"))
+        self.assertFalse(live_trader._ab_use_wick_filter(a_pid, mode="abc"))
+
+
 class TestTryMirrorClose(unittest.TestCase):
 
     def setUp(self):
@@ -2228,7 +2456,12 @@ class TestMirrorIterationGuards(unittest.TestCase):
         self.assertEqual(len(result["live_open_trades"]), 4)
 
     def test_same_symbol_blocks_within_iteration(self):
-        """Paper 有 POLYX LONG + POLYX SHORT 同时 open → 只 mirror 第一笔."""
+        """Paper 有 POLYX LONG + POLYX SHORT 同时 open → 只 mirror 第一笔.
+
+        测试本意: 同 symbol blocking, 跟 SL 触发逻辑无关. 因此 patch
+        _check_sl_breach=False 隔离, 避免 Phase 4.D 补偿 / Phase 4.E wick
+        filter 等正交逻辑干扰.
+        """
         now = datetime.now(timezone.utc)
         trades = [
             {
@@ -2255,10 +2488,11 @@ class TestMirrorIterationGuards(unittest.TestCase):
             return r
 
         with patch.object(self.client, "open_position",
-                          side_effect=make_result):
-            with patch.object(self.client, "get_klines",
-                              return_value=[[0, 0, 0, 0, "1.0", 0, 0, 0, 0, 0, 0, 0]]):
-                result = main_loop(self.client, dry_run=True)
+                          side_effect=make_result), \
+             patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "1.0", 0, 0, 0, 0, 0, 0, 0]]), \
+             patch.object(live_trader, "_check_sl_breach", return_value=False):
+            result = main_loop(self.client, dry_run=True)
 
         # ⚠️ Bug fix: 同 symbol 即使不同方向, 也只能开 1 笔
         self.assertEqual(call_count[0], 1,
@@ -2686,6 +2920,69 @@ class TestMirrorIterationGuards(unittest.TestCase):
         self.assertAlmostEqual(lt["sl_price"], 95.0, places=4)
         self.assertFalse(lt["sl_compensation_enabled"])
         self.assertEqual(lt["sl_compensation_offset"], 0)
+
+    def test_phase_4e_wick_filter_in_mirror_open(self):
+        """Phase 4.E 集成: 当 paper_id 分到 C 组 (always mode), live_trade
+        的 wick_filter_enabled=True, sl_breach_count=0."""
+        now = datetime.now(timezone.utc)
+        self._write_paper([{
+            "id": "BTCUSDT|LONG|t_c_wick",
+            "symbol": "BTCUSDT", "direction": "LONG",
+            "entered_at": (now - timedelta(seconds=10)).isoformat(),
+            "entry_price": 100.0, "sl": 95.0,
+        }])
+        mock_open = {
+            "trade_id": "L1", "symbol": "BTCUSDT", "side": "BUY", "qty": 0.2,
+            "avg_fill_price": 100.5, "actual_notional": 20.0,
+            "entry_order_id": 1, "entry_client_id": "x",
+            "sl_price": 95.0,
+            "sl_side": "SELL", "sl_mode": "client_side",
+            "opened_at": now.isoformat(),
+            "fees_paid_usdt": 0, "_dryRun": True,
+        }
+        # 强制 wick filter always 模式, 补偿 off (避免污染)
+        with patch.object(live_trader, "LIVE_SL_WICK_FILTER_MODE", "always"), \
+             patch.object(live_trader, "LIVE_SL_COMPENSATION_MODE", "off"), \
+             patch.object(self.client, "open_position", return_value=mock_open), \
+             patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "100.0", 0, 0, 0, 0, 0, 0, 0]]):
+            result = main_loop(self.client, dry_run=True)
+        lt = result["live_open_trades"][0]
+        self.assertTrue(lt["wick_filter_enabled"], "always 模式应启用 wick filter")
+        self.assertEqual(lt["sl_breach_count"], 0, "初始计数应为 0")
+        self.assertEqual(lt["wick_filter_min_breaches"],
+                         live_trader.LIVE_WICK_FILTER_MIN_BREACHES)
+        self.assertEqual(lt["wick_filter_mode"], "always")
+        # 补偿 off, 所以 sl 不补偿
+        self.assertAlmostEqual(lt["sl_price"], 95.0, places=4)
+
+    def test_phase_4e_wick_filter_mode_off_no_field_change(self):
+        """mode='off': wick_filter_enabled=False, 老 trade 行为."""
+        now = datetime.now(timezone.utc)
+        self._write_paper([{
+            "id": "BTCUSDT|LONG|t_wick_off",
+            "symbol": "BTCUSDT", "direction": "LONG",
+            "entered_at": (now - timedelta(seconds=10)).isoformat(),
+            "entry_price": 100.0, "sl": 95.0,
+        }])
+        mock_open = {
+            "trade_id": "L1", "symbol": "BTCUSDT", "side": "BUY", "qty": 0.2,
+            "avg_fill_price": 100.5, "actual_notional": 20.0,
+            "entry_order_id": 1, "entry_client_id": "x",
+            "sl_price": 95.0,
+            "sl_side": "SELL", "sl_mode": "client_side",
+            "opened_at": now.isoformat(),
+            "fees_paid_usdt": 0, "_dryRun": True,
+        }
+        with patch.object(live_trader, "LIVE_SL_WICK_FILTER_MODE", "off"), \
+             patch.object(live_trader, "LIVE_SL_COMPENSATION_MODE", "off"), \
+             patch.object(self.client, "open_position", return_value=mock_open), \
+             patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "100.0", 0, 0, 0, 0, 0, 0, 0]]):
+            result = main_loop(self.client, dry_run=True)
+        lt = result["live_open_trades"][0]
+        self.assertFalse(lt["wick_filter_enabled"])
+        self.assertIsNone(lt["wick_filter_min_breaches"])
 
 
 # ============================================================================

@@ -117,9 +117,23 @@ LIVE_BTC_REGIME_THRESHOLD_PCT = 0.5
 #       hit_b_trail / hit_trail 盈利收 — 漏赚 ~$2.31 / 100 笔.
 # 方案: live_sl = paper_sl + (live_entry - paper_entry), 保持 SL 跟 actual entry
 #       的距离 = paper 设计距离. 兼容 LONG / SHORT 同公式.
-# A/B 测试 (启动期): 50/50 按 paper_id MD5 哈希分组, 确定性可复现.
+# A/B 测试 (启动期): 按 paper_id MD5 哈希分组, 确定性可复现.
 # 数据足够 (≥30 笔 each side) 后据实切换到 always.
-LIVE_SL_COMPENSATION_MODE = "ab"    # "off" | "ab" | "always"
+# Phase 4.E (2026-05-19): 升级到 3-arm (A/B/C), 加 wick filter 组. B 组保留补偿测试.
+LIVE_SL_COMPENSATION_MODE = "abc"   # "off" | "ab" (legacy 2-arm) | "abc" (Phase 4.E) | "always"
+
+# Phase 4.E SL Wick 过滤 (2026-05-19)
+# ==========================================
+# 数据驱动: 200 笔实盘里 47 笔(24%) 是 "live SL 触发但 paper 走到 trail/b_trail",
+#         漏赚 ~$5.50. 其中 66% 的 live_sl == paper_sl, 即 SL 值正确但触发时机偏激.
+# 根因: live 用 1m kline close 做 SL 检测, 30s 轮询能捕捉到 wick (闪针), 而 paper
+#       (不同价源 / 频率) 看不见这种瞬时 wick.
+# 方案: C 组对 SL breach 要求"连续 N 次轮询都越 SL"才触发 (默认 N=2, 即需价格在
+#       SL 外停留 ≥ ~30s). 单次 wick 不再触发.
+# A/B/C 测试: A=无补偿无过滤(基线), B=补偿无过滤(Phase 4.D), C=无补偿有过滤(Phase 4.E).
+#   每组 ~1/3, 用同一 paper_id MD5 → 0/1/2 分配.
+LIVE_SL_WICK_FILTER_MODE = "abc"    # "off" | "abc" | "always"
+LIVE_WICK_FILTER_MIN_BREACHES = 2   # 需要连续 N 次轮询都 breach 才触发 SL
 
 # Phase 3.3.a/b 控制文件 (在 ~/.cresus-*)
 PAUSE_FLAG_PATH = Path.home() / ".cresus-pause"
@@ -669,6 +683,8 @@ def publish_live_history(
             "mirror_max_age_sec": LIVE_MIRROR_MAX_AGE_SEC,
             "max_entry_slippage_bps": LIVE_MAX_ENTRY_SLIPPAGE_BPS,
             "sl_compensation_mode": LIVE_SL_COMPENSATION_MODE,
+            "wick_filter_mode": LIVE_SL_WICK_FILTER_MODE,
+            "wick_filter_min_breaches": LIVE_WICK_FILTER_MIN_BREACHES,
             "observation_mode": LIVE_OBSERVATION_MODE,
         },
     }
@@ -779,15 +795,29 @@ def _compute_pre_entry_slippage_bps(
     return (current - paper_entry) / paper_entry * 10000.0 * side_sign
 
 
+def _ab_group(paper_id: str) -> str:
+    """Phase 4.E: paper_id 哈希到 'A'/'B'/'C' 三组 (各 ~1/3, MD5 mod 3 确定性).
+
+    用途: 让多个独立特性 (compensation / wick filter / 未来扩展) 共享同一组别,
+    保证统计上不会产生 2x2 交叉污染.
+
+    Returns: 'A' | 'B' | 'C'. 空 paper_id 返 'A' (基线安全退路).
+    """
+    if not paper_id:
+        return "A"
+    h = int(hashlib.md5(paper_id.encode("utf-8")).hexdigest(), 16)
+    return ["A", "B", "C"][h % 3]
+
+
 def _ab_use_sl_compensation(paper_id: str, mode: str = None) -> bool:
-    """Phase 4.D SL 补偿 A/B 分组判定.
+    """Phase 4.D SL 补偿启用判定.
 
     mode='off':    永远 False
     mode='always': 永远 True
-    mode='ab':     按 paper_id MD5 哈希 50/50 分组 (确定性, 同 paper_id 总是同分组)
+    mode='ab':     legacy 2-arm — MD5 50/50 分组 (兼容 Phase 4.D 老数据)
+    mode='abc':    Phase 4.E 3-arm — B 组启用补偿, A/C 组不启用
 
     用 hashlib.md5 而非 Python 内置 hash() — 后者跨进程值不稳 (PYTHONHASHSEED).
-    确定性确保: 同一 paper trade 重启后仍属于同一组, 不会 mid-trade 切换逻辑.
     """
     if mode is None:
         mode = LIVE_SL_COMPENSATION_MODE
@@ -797,11 +827,34 @@ def _ab_use_sl_compensation(paper_id: str, mode: str = None) -> bool:
         return True
     if mode == "ab":
         if not paper_id:
-            return False   # 无 paper_id 不分组, 走旧逻辑 (退路)
+            return False
         h = int(hashlib.md5(paper_id.encode("utf-8")).hexdigest(), 16)
         return (h % 2) == 0
-    # 未知 mode → 安全退路: 不补偿 (旧行为)
+    if mode == "abc":
+        return _ab_group(paper_id) == "B"
     log.warning(f"[ab-sl] unknown mode={mode!r}, fallback to off")
+    return False
+
+
+def _ab_use_wick_filter(paper_id: str, mode: str = None) -> bool:
+    """Phase 4.E: SL wick 过滤启用判定 (C 组).
+
+    mode='off':    永远 False (legacy 行为)
+    mode='always': 永远 True
+    mode='abc':    Phase 4.E 3-arm — C 组启用过滤, A/B 组不启用
+
+    启用后, _check_sl_breach 要求连续 LIVE_WICK_FILTER_MIN_BREACHES 次轮询
+    都越 SL 才返回 True. 单次 wick 不再触发.
+    """
+    if mode is None:
+        mode = LIVE_SL_WICK_FILTER_MODE
+    if mode == "off":
+        return False
+    if mode == "always":
+        return True
+    if mode == "abc":
+        return _ab_group(paper_id) == "C"
+    log.warning(f"[ab-wick] unknown mode={mode!r}, fallback to off")
     return False
 
 
@@ -879,6 +932,10 @@ def _check_sl_breach(live_trade: dict, current_price: float) -> bool:
     """检查当前价是否触 SL.
     LONG (side=BUY): current ≤ sl 触发
     SHORT (side=SELL): current ≥ sl 触发
+
+    Phase 4.E: 若 wick_filter_enabled, 要求连续 LIVE_WICK_FILTER_MIN_BREACHES 次
+    轮询都越 SL 才返回 True. 计数器 'sl_breach_count' 持久化在 live_trade 上
+    (跟随 ~/cresus-bot/.live_trades.json 存档), 非 breach 时清零.
     """
     sl = live_trade.get("sl_price")
     if sl is None:
@@ -886,10 +943,31 @@ def _check_sl_breach(live_trade: dict, current_price: float) -> bool:
     sl = float(sl)
     side = live_trade.get("side", "").upper()
     if side == "BUY":
-        return current_price <= sl
+        breach = current_price <= sl
     elif side == "SELL":
-        return current_price >= sl
-    return False
+        breach = current_price >= sl
+    else:
+        return False
+
+    # Phase 4.E: C 组用 wick filter, A/B 组保持旧行为 (instant trigger)
+    if not live_trade.get("wick_filter_enabled"):
+        # 清零计数 (一致性: 即使没启用过滤, 也保证 sl_breach_count 字段不残留)
+        if "sl_breach_count" in live_trade and live_trade["sl_breach_count"] != 0:
+            live_trade["sl_breach_count"] = 0
+        return breach
+
+    # C 组逻辑: 累计连续 breach 次数
+    cnt = int(live_trade.get("sl_breach_count") or 0)
+    if breach:
+        cnt += 1
+        live_trade["sl_breach_count"] = cnt
+        min_n = int(live_trade.get("wick_filter_min_breaches") or LIVE_WICK_FILTER_MIN_BREACHES)
+        return cnt >= min_n
+    else:
+        # 非 breach: 计数器清零 (单次 wick 之后回归, 不该累积"半 breach"状态)
+        if cnt != 0:
+            live_trade["sl_breach_count"] = 0
+        return False
 
 
 def _sync_live_with_paper(live_trade: dict, paper_open_trade: dict) -> bool:
@@ -913,6 +991,9 @@ def _sync_live_with_paper(live_trade: dict, paper_open_trade: dict) -> bool:
             if abs(new_live_sl - float(live_trade.get("sl_price", 0))) > 1e-9:
                 old = live_trade.get("sl_price")
                 live_trade["sl_price"] = new_live_sl
+                # Phase 4.E: SL 移动后, 之前的 breach 计数失效, 清零
+                if live_trade.get("sl_breach_count"):
+                    live_trade["sl_breach_count"] = 0
                 comp_note = f" (paper {new_paper_sl} + offset {offset:+.6f})" if offset != 0 else ""
                 log.info(
                     f"[sl-sync] {live_trade['symbol']}: {old} → {new_live_sl} "
@@ -1110,9 +1191,11 @@ def _try_mirror_open(
         except (ValueError, TypeError):
             pass
 
-    # Phase 4.D SL 补偿决策 (A/B 测试) — 在 live_trade 构造时一次性确定
-    # 整个 trade 生命周期保持同一分组 (paper_id 哈希确定).
+    # Phase 4.D SL 补偿 + Phase 4.E Wick 过滤决策 (A/B/C 测试)
+    # 在 live_trade 构造时一次性确定, 整个 trade 生命周期保持同一分组.
     sl_comp_enabled = _ab_use_sl_compensation(paper_id, LIVE_SL_COMPENSATION_MODE)
+    wick_filter_enabled = _ab_use_wick_filter(paper_id, LIVE_SL_WICK_FILTER_MODE)
+    ab_group = _ab_group(paper_id)   # 'A' / 'B' / 'C' — 记录用
     sl_comp_offset = 0.0
     final_sl = float(result.get("sl_price", sl_price))   # 默认 = paper_sl
     sl_paper_at_open = float(sl_price)                    # 记录原始 paper_sl
@@ -1126,6 +1209,11 @@ def _try_mirror_open(
                 f"→ live_sl={final_sl:.6f} (offset {sl_comp_offset:+.6f}, "
                 f"slip {slippage_bps:+.1f}bps)"
             )
+    if wick_filter_enabled:
+        log.info(
+            f"[wick-filter] {sym} {side} group=C, 启用 wick 过滤 "
+            f"(需 ≥{LIVE_WICK_FILTER_MIN_BREACHES} 次连续 breach 才触发 SL)"
+        )
 
     live_trade = {
         "paper_id": paper_id,
@@ -1144,9 +1232,16 @@ def _try_mirror_open(
         "mirror_latency_sec": mirror_latency_sec,
         "sl_price": final_sl,                          # SL polling 实际用此值
         "sl_paper_current": sl_paper_at_open,          # 当前 paper SL (sync 时更新)
-        "sl_compensation_enabled": sl_comp_enabled,    # A/B 分组标记
-        "sl_compensation_offset": sl_comp_offset,      # offset (B 组非 0; A 组 0)
+        "sl_compensation_enabled": sl_comp_enabled,    # B 组标记 (Phase 4.D)
+        "sl_compensation_offset": sl_comp_offset,      # offset (B 组非 0; A/C 组 0)
         "sl_compensation_mode": LIVE_SL_COMPENSATION_MODE,  # 部署时模式 (溯源用)
+        # Phase 4.E: Wick filter 字段
+        "wick_filter_enabled": wick_filter_enabled,    # C 组标记
+        "wick_filter_min_breaches": LIVE_WICK_FILTER_MIN_BREACHES if wick_filter_enabled else None,
+        "wick_filter_mode": LIVE_SL_WICK_FILTER_MODE,  # 部署时模式 (溯源用)
+        "sl_breach_count": 0,                          # 连续 breach 计数器 (C 组用)
+        "ab_group": ab_group,                          # 'A' / 'B' / 'C' 显式记录
+
         "tp1_price": float(paper_trade.get("tp1") or 0),
         "tp2_price": float(paper_trade.get("tp2") or 0),
         "phase": "A",

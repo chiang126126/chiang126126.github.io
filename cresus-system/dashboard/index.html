@@ -697,6 +697,12 @@
     background: rgba(160,165,180,0.10);
     border: 1px solid rgba(160,165,180,0.30);
   }
+  /* Phase 4.E: C 组 (wick filter) — 紫色 */
+  .live-ab-chip.c {
+    color: #ce93f0;
+    background: rgba(156,39,176,0.18);
+    border: 1px solid rgba(156,39,176,0.55);
+  }
   /* ==== 折叠 section ==== */
   .live-collapsible {
     margin: 6px 0;
@@ -5069,36 +5075,45 @@ function renderLivePanel(data) {
           · 余额已为 NET (净额)
         </div>` : ''}
         ${(() => {
-          // Phase 4.D: A/B 余额贡献明细 (账户余额 = 老数据 + A 组 + B 组)
+          // Phase 4.D+4.E: A/B/C 余额贡献明细 (账户余额 = 老数据 + A 组 + B 组 + C 组)
           const closedT = data.recent_closed || [];
           const openT = data.open_trades || [];
-          let oldCnt = 0, oldNet = 0, aCnt = 0, aNet = 0, bCnt = 0, bNet = 0;
-          let aOpen = 0, bOpen = 0;
+          const G = { old: {n:0, net:0}, A: {n:0, net:0}, B: {n:0, net:0}, C: {n:0, net:0} };
+          const Op = { A:0, B:0, C:0 };
+          // 分组规则: 优先用 ab_group (Phase 4.E), fallback sl_compensation_enabled
+          const grp = t => {
+            if (t.ab_group === 'A' || t.ab_group === 'B' || t.ab_group === 'C') return t.ab_group;
+            if (t.sl_compensation_enabled === undefined) return 'old';
+            return t.sl_compensation_enabled ? 'B' : 'A';
+          };
           for (const t of closedT) {
             const pnl = Number(t.realized_pnl_usdt || 0);
             const fee = Number(t.fees_paid_usdt || 0);
             const net = pnl - fee;
-            if (t.sl_compensation_enabled === undefined) { oldCnt++; oldNet += net; }
-            else if (t.sl_compensation_enabled) { bCnt++; bNet += net; }
-            else { aCnt++; aNet += net; }
+            const g = grp(t);
+            G[g].n++; G[g].net += net;
           }
           for (const t of openT) {
-            if (t.sl_compensation_enabled === true) bOpen++;
-            else if (t.sl_compensation_enabled === false) aOpen++;
+            const g = grp(t);
+            if (g === 'A' || g === 'B' || g === 'C') Op[g]++;
           }
-          // 只在有 A/B 数据时才显示明细 (否则隐藏)
-          if (aCnt + bCnt + aOpen + bOpen === 0) return '';
+          // 只在有 A/B/C 数据时才显示
+          if (G.A.n + G.B.n + G.C.n + Op.A + Op.B + Op.C === 0) return '';
           const fmtNet = v => (v >= 0 ? '+' : '−') + '$' + Math.abs(v).toFixed(2);
           const cls = v => v > 0.005 ? 'up' : (v < -0.005 ? 'down' : '');
-          const aStr = `📊 A 组 (${aCnt}${aOpen ? `, ${aOpen}持仓` : ''}): <span class="${cls(aNet)}">${fmtNet(aNet)}</span>`;
-          const bStr = `🧪 B 组 (${bCnt}${bOpen ? `, ${bOpen}持仓` : ''}): <span class="${cls(bNet)}">${fmtNet(bNet)}</span>`;
-          const oldStr = oldCnt > 0
-            ? `💰 老数据 (${oldCnt}): <span class="${cls(oldNet)}">${fmtNet(oldNet)}</span>`
-            : '';
+          const mkStr = (emoji, label, g, op) => {
+            const openSuffix = op ? `, ${op}持仓` : '';
+            return `${emoji} ${label} (${g.n}${openSuffix}): <span class="${cls(g.net)}">${fmtNet(g.net)}</span>`;
+          };
+          const parts = [];
+          if (G.old.n > 0) parts.push(`💰 老数据 (${G.old.n}): <span class="${cls(G.old.net)}">${fmtNet(G.old.net)}</span>`);
+          if (G.A.n + Op.A > 0) parts.push(mkStr('📊', 'A 组', G.A, Op.A));
+          if (G.B.n + Op.B > 0) parts.push(mkStr('🧪', 'B 组', G.B, Op.B));
+          if (G.C.n + Op.C > 0) parts.push(mkStr('🔬', 'C 组', G.C, Op.C));
           return `
-            <div title="账户余额 = 老数据 + A 组 + B 组 实时合计. A 组无 SL 补偿 (对照), B 组用 paper_sl + entry_slip 补偿."
+            <div title="账户余额 = 老数据 + A/B/C 组 实时合计. A=基线 / B=SL 补偿 (Phase 4.D) / C=wick filter (Phase 4.E)"
                  style="font-size:11px;color:var(--text-dim);margin-top:4px;line-height:1.5">
-              余额构成: ${oldStr}${oldStr ? '  ·  ' : ''}${aStr}  ·  ${bStr}
+              余额构成: ${parts.join('  ·  ')}
             </div>`;
         })()}
       </div>
@@ -5423,7 +5438,8 @@ function renderLivePanel(data) {
         <div class="live-config-cell"><div class="k">日 DD 触发</div><div class="v" style="color:#ff8888">-$${config.daily_dd_limit_usdt || 5}</div></div>
         <div class="live-config-cell"><div class="k">累计 DD kill</div><div class="v" style="color:#ff8888">-${config.total_dd_limit_pct || 5}%</div></div>
         <div class="live-config-cell" title="paper 信号价 → 当前价 的预滑点上限. 超过放弃 mirror, 防止小币流动性差导致的灾难性进场."><div class="k">滑点护栏</div><div class="v" style="color:#1cbe72">${config.max_entry_slippage_bps || 50} bps</div></div>
-        ${config.sl_compensation_mode ? `<div class="live-config-cell" title="SL slippage compensation: B 组 SL = paper_sl + 入场滑点, 保持距离不变. ab=50/50 测试 / always=全用 / off=全用旧逻辑"><div class="k">SL 补偿</div><div class="v" style="color:#4fc3f7">${config.sl_compensation_mode}</div></div>` : ''}
+        ${config.sl_compensation_mode ? `<div class="live-config-cell" title="SL slippage compensation: B 组 SL = paper_sl + 入场滑点, 保持距离不变. ab=2-arm / abc=3-arm / always / off"><div class="k">SL 补偿 (B)</div><div class="v" style="color:#4fc3f7">${config.sl_compensation_mode}</div></div>` : ''}
+        ${config.wick_filter_mode ? `<div class="live-config-cell" title="Phase 4.E wick filter: C 组要求连续 N 次轮询都越 SL 才触发, 抵抗瞬时 wick. abc=3-arm / always / off"><div class="k">Wick 过滤 (C)</div><div class="v" style="color:#ce93f0">${config.wick_filter_mode}${config.wick_filter_min_breaches ? ` × ${config.wick_filter_min_breaches}` : ''}</div></div>` : ''}
         ${(config.symbol_blacklist || []).length > 0 ? `<div class="live-config-cell" title="基于实盘历史 0 胜的 symbol, 优先级最高, 即使 OBS mode 也拒. 每周复盘时增删."><div class="k">黑名单</div><div class="v" style="font-size:11px;color:#ff8a65">${(config.symbol_blacklist || []).join(' / ')}</div></div>` : ''}
       </div>
     </div>
@@ -5482,15 +5498,32 @@ const LIVE_REASON_LABEL = {
 // Phase 4.C BTC regime chip (开仓时 snapshot) — 全局 helper, 多处复用.
 // 设计: emoji + 文字双标识, 跟 "💎5" 和 "🔴LIVE" 视觉层级一致.
 // 老数据 (Phase 4.C 部署前开仓) → 显示禁用 "—" chip, 让用户明确知道是历史数据非 bug.
-// Phase 4.D A/B 分组 chip (SL slippage compensation)
+// Phase 4.D + 4.E A/B/C 分组 chip
+// Phase 4.E (2026-05-19): 升级 3-arm 测试
+//   A 组 = 无补偿无 wick filter (基线)
+//   B 组 = 有补偿无 wick filter (Phase 4.D)
+//   C 组 = 无补偿有 wick filter (Phase 4.E, 抵抗瞬时 wick 误触 SL)
 function liveAbChip(t) {
-  // 没字段 (老 trade) → 不显示 chip
+  // 优先用显式 ab_group 字段 (Phase 4.E 新)
+  const g = t.ab_group;
+  if (g === 'C') {
+    const n = t.wick_filter_min_breaches || 2;
+    return `<span class="live-ab-chip c" title="C 组: wick filter 需连续 ${n} 次 breach 才触发 SL">C 组</span>`;
+  }
+  if (g === 'B') {
+    const offset = Number(t.sl_compensation_offset || 0);
+    return `<span class="live-ab-chip b" title="B 组: SL 补偿 = paper_sl + ${offset.toFixed(6)}">B 组</span>`;
+  }
+  if (g === 'A') {
+    return `<span class="live-ab-chip a" title="A 组: 基线 (无补偿无 wick filter)">A 组</span>`;
+  }
+  // Fallback: 老 trade 没 ab_group 字段, 用 sl_compensation_enabled 推断
   if (t.sl_compensation_enabled === undefined) return '';
   if (t.sl_compensation_enabled === true) {
     const offset = Number(t.sl_compensation_offset || 0);
-    return `<span class="live-ab-chip b" title="SL 补偿 B 组: SL = paper_sl + ${offset.toFixed(6)}">B 组</span>`;
+    return `<span class="live-ab-chip b" title="B 组 (老数据): SL 补偿 = paper_sl + ${offset.toFixed(6)}">B 组</span>`;
   }
-  return `<span class="live-ab-chip a" title="SL 补偿 A 组 (无补偿, 对照组)">A 组</span>`;
+  return `<span class="live-ab-chip a" title="A 组 (老数据, 无补偿)">A 组</span>`;
 }
 
 function liveRegimeChip(regime) {
