@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-19T05:17:20.178164+00:00",
+  "generated_at": "2026-05-19T05:19:33.020099+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 184,
-    "open": 2,
+    "total_trades": 185,
+    "open": 3,
     "closed": 182,
     "wins": 65,
     "losses": 115,
@@ -14,33 +14,35 @@
     "avg_pnl_usdt": 0.0294,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 3.2877,
+    "fees_paid_usdt": 3.2977,
     "fees_realized_usdt": 3.2697,
-    "fees_open_usdt": 0.018,
+    "fees_open_usdt": 0.028,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 40.0,
-    "free_capital_usdt": 62.06,
+    "deployed_usdt": 60.0,
+    "free_capital_usdt": 42.06,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 3
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -0.6059,
-    "deployed_usdt": 40.0
+    "deployed_usdt": 60.0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "PLAYUSDT",
-      "INJUSDT"
+      "INJUSDT",
+      "DOGSUSDT",
+      "PLAYUSDT"
     ],
     "exchange_symbols": [
-      "PLAYUSDT",
-      "INJUSDT"
+      "INJUSDT",
+      "DOGSUSDT",
+      "PLAYUSDT"
     ]
   },
   "open_trades": [
@@ -86,10 +88,10 @@
       "btc_change_24h_at_open": -0.221,
       "btc_pct_vs_ma25_at_open": -0.029,
       "phase_a_mfe_price": 0.09725,
-      "current_price": 0.09736,
-      "unrealized_pnl_usdt": 0.151,
-      "unrealized_pnl_pct": 0.754,
-      "last_price_check_at": "2026-05-19T05:17:17.417836+00:00"
+      "current_price": 0.0973,
+      "unrealized_pnl_usdt": 0.1632,
+      "unrealized_pnl_pct": 0.815,
+      "last_price_check_at": "2026-05-19T05:19:30.957942+00:00"
     },
     {
       "paper_id": "INJUSDT|SHORT|2026-05-19T04:31:20.262212+00:00",
@@ -106,8 +108,8 @@
       "risk_usdt": 0.1252,
       "risk_pct": 0.626,
       "mirror_latency_sec": 24.7,
-      "sl_price": 5.125,
-      "sl_paper_current": 5.127,
+      "sl_price": 5.07962998,
+      "sl_paper_current": 5.08162998,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": -0.002,
       "sl_compensation_mode": "ab",
@@ -122,7 +124,7 @@
       "alert_type": "sustained",
       "atr_pct": 0.391,
       "phase_a_mfe_pct": 1.19,
-      "phase_b_mfe_pct": 1.19,
+      "phase_b_mfe_pct": 1.463,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.007995,
       "fees_are_actual": true,
@@ -133,11 +135,58 @@
       "btc_change_24h_at_open": -0.314,
       "btc_pct_vs_ma25_at_open": -0.119,
       "phase_a_mfe_price": 5.066,
-      "current_price": 5.059,
-      "unrealized_pnl_usdt": 0.2574,
-      "unrealized_pnl_pct": 1.288,
-      "last_price_check_at": "2026-05-19T05:17:17.417836+00:00",
-      "phase_b_mfe_price": 5.066
+      "current_price": 5.05,
+      "unrealized_pnl_usdt": 0.2925,
+      "unrealized_pnl_pct": 1.463,
+      "last_price_check_at": "2026-05-19T05:19:30.957942+00:00",
+      "phase_b_mfe_price": 5.052
+    },
+    {
+      "paper_id": "DOGSUSDT|SHORT|2026-05-19T05:17:49.394341+00:00",
+      "trade_id": "L1779167869_DOGSUSD_S",
+      "symbol": "DOGSUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 5.568e-05,
+      "avg_fill_price": 5.576e-05,
+      "slippage_bps": -14.37,
+      "qty": 358615.0,
+      "notional_usdt": 19.9963724,
+      "leverage": 3,
+      "risk_usdt": 0.1076,
+      "risk_pct": 0.538,
+      "mirror_latency_sec": 35.5,
+      "sl_price": 5.606e-05,
+      "sl_paper_current": 5.606e-05,
+      "sl_compensation_enabled": false,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "ab",
+      "tp1_price": 5.511e-05,
+      "tp2_price": 5.454e-05,
+      "phase": "A",
+      "entry_order_id": 262794706,
+      "entry_client_id": "cresus_L1779167869_DOGSUSD_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.455,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.009998,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-19T05:18:59.842032+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 76791.5,
+      "btc_change_24h_at_open": -0.128,
+      "btc_pct_vs_ma25_at_open": -0.071,
+      "phase_a_mfe_price": 5.568e-05,
+      "current_price": 5.573e-05,
+      "unrealized_pnl_usdt": 0.0108,
+      "unrealized_pnl_pct": 0.054,
+      "last_price_check_at": "2026-05-19T05:19:30.957942+00:00"
     }
   ],
   "recent_closed": [
@@ -9541,11 +9590,11 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 76800.0,
-    "btc_ma25_1h": 76846.7,
-    "pct_vs_ma25": -0.061,
-    "change_24h_pct": -0.117,
-    "computed_at": "2026-05-19T05:17:19.585038+00:00"
+    "btc_price": 76791.0,
+    "btc_ma25_1h": 76846.34,
+    "pct_vs_ma25": -0.072,
+    "change_24h_pct": -0.129,
+    "computed_at": "2026-05-19T05:19:32.146000+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
