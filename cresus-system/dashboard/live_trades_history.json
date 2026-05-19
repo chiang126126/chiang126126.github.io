@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-19T14:07:47.141338+00:00",
+  "generated_at": "2026-05-19T14:09:57.647637+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 216,
@@ -27,22 +27,20 @@
   "risk_status": {
     "block_new_opens": true,
     "reasons": [
-      "daily realized PnL $-5.08 <= -$5.00 (49 closed trades since 2026-05-19T00:00Z)"
+      "daily realized PnL $-5.41 <= -$5.00 (50 closed trades since 2026-05-19T00:00Z)"
     ],
-    "daily_pnl": -5.0757,
-    "deployed_usdt": 39.5
+    "daily_pnl": -5.4076,
+    "deployed_usdt": 19.93
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "SKYAIUSDT",
-      "SIRENUSDT"
+      "SKYAIUSDT"
     ],
     "exchange_symbols": [
-      "SKYAIUSDT",
-      "SIRENUSDT"
+      "SKYAIUSDT"
     ]
   },
   "open_trades": [
@@ -88,10 +86,10 @@
       "btc_change_24h_at_open": -0.192,
       "btc_pct_vs_ma25_at_open": -0.022,
       "phase_a_mfe_price": 0.29807,
-      "current_price": 0.29537,
-      "unrealized_pnl_usdt": -0.1373,
-      "unrealized_pnl_pct": -0.689,
-      "last_price_check_at": "2026-05-19T14:07:42.730840+00:00"
+      "current_price": 0.29533,
+      "unrealized_pnl_usdt": -0.14,
+      "unrealized_pnl_pct": -0.703,
+      "last_price_check_at": "2026-05-19T14:09:55.571728+00:00"
     }
   ],
   "recent_closed": [
@@ -11391,17 +11389,26 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-19T13:40:35.738807+00:00",
-      "reason": "paper trade too old (1627s > 600s)",
-      "last_checked_at": "2026-05-19T14:07:42.730840+00:00"
+      "reason": "paper trade too old (1760s > 600s)",
+      "last_checked_at": "2026-05-19T14:09:55.571728+00:00"
+    },
+    {
+      "paper_id": "ENJUSDT|LONG|2026-05-19T14:07:36.256844+00:00",
+      "symbol": "ENJUSDT",
+      "direction": "LONG",
+      "conviction_score": 7,
+      "signal_at": "2026-05-19T14:08:17.361291+00:00",
+      "reason": "risk_gate: daily realized PnL $-5.41 <= -$5.00 (50 closed trades since 2026-05-19T00:00Z)",
+      "last_checked_at": "2026-05-19T14:09:55.571728+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 76776.9,
-    "btc_ma25_1h": 76806.31,
-    "pct_vs_ma25": -0.038,
-    "change_24h_pct": 0.525,
-    "computed_at": "2026-05-19T14:07:44.711420+00:00"
+    "btc_price": 76729.1,
+    "btc_ma25_1h": 76804.4,
+    "pct_vs_ma25": -0.098,
+    "change_24h_pct": 0.462,
+    "computed_at": "2026-05-19T14:09:57.328873+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
