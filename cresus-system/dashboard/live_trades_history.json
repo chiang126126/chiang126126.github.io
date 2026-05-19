@@ -1,49 +1,46 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-19T14:13:50.226376+00:00",
+  "generated_at": "2026-05-19T14:16:03.332845+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 216,
-    "open": 1,
-    "closed": 215,
+    "open": 0,
+    "closed": 216,
     "wins": 72,
-    "losses": 141,
-    "win_rate": 0.338,
-    "total_pnl_usdt": 0.5502,
-    "net_pnl_usdt": -3.3563,
-    "avg_pnl_usdt": 0.0026,
+    "losses": 142,
+    "win_rate": 0.336,
+    "total_pnl_usdt": 0.3338,
+    "net_pnl_usdt": -3.5926,
+    "avg_pnl_usdt": 0.0015,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 3.9165,
-    "fees_realized_usdt": 3.9065,
-    "fees_open_usdt": 0.01,
+    "fees_paid_usdt": 3.9264,
+    "fees_realized_usdt": 3.9264,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 19.93,
-    "free_capital_usdt": 76.71,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 96.41,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": true,
     "reasons": [
-      "daily realized PnL $-5.41 <= -$5.00 (50 closed trades since 2026-05-19T00:00Z)"
+      "daily realized PnL $-5.62 <= -$5.00 (51 closed trades since 2026-05-19T00:00Z)"
     ],
-    "daily_pnl": -5.4076,
-    "deployed_usdt": 19.93
+    "daily_pnl": -5.624,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "SKYAIUSDT"
-    ],
-    "exchange_symbols": [
-      "SKYAIUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "SKYAIUSDT|LONG|2026-05-19T13:35:29.970587+00:00",
       "trade_id": "L1779197729_SKYAIUS_L",
@@ -77,7 +74,7 @@
       "phase_a_mfe_pct": 0.0,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.009964,
+      "fees_paid_usdt": 0.019819,
       "fees_are_actual": true,
       "opened_at": "2026-05-19T13:36:45.230708+00:00",
       "is_dry_run": false,
@@ -86,13 +83,21 @@
       "btc_change_24h_at_open": -0.192,
       "btc_pct_vs_ma25_at_open": -0.022,
       "phase_a_mfe_price": 0.29807,
-      "current_price": 0.29541,
-      "unrealized_pnl_usdt": -0.1347,
-      "unrealized_pnl_pct": -0.676,
-      "last_price_check_at": "2026-05-19T14:13:47.327261+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.29428,
+      "unrealized_pnl_usdt": -0.2104,
+      "unrealized_pnl_pct": -1.056,
+      "last_price_check_at": "2026-05-19T14:15:26.351591+00:00",
+      "closed_at": "2026-05-19T14:15:31.756328+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.29419,
+      "realized_pnl_usdt": -0.2164,
+      "close_order_id": 106442016,
+      "close_qty": 67.0,
+      "close_expected_price": 0.29451714,
+      "close_slippage_bps": 11.11,
+      "entry_fees_usdt": 0.009964,
+      "close_fees_usdt": 0.009855
+    },
     {
       "paper_id": "SIRENUSDT|LONG|2026-05-19T13:48:26.322042+00:00",
       "trade_id": "L1779198506_SIRENUS_L",
@@ -11389,8 +11394,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-19T13:40:35.738807+00:00",
-      "reason": "paper trade too old (1992s > 600s)",
-      "last_checked_at": "2026-05-19T14:13:47.327261+00:00"
+      "reason": "paper trade too old (2126s > 600s)",
+      "last_checked_at": "2026-05-19T14:16:01.962445+00:00"
     },
     {
       "paper_id": "ENJUSDT|LONG|2026-05-19T14:07:36.256844+00:00",
@@ -11398,8 +11403,8 @@
       "direction": "LONG",
       "conviction_score": 7,
       "signal_at": "2026-05-19T14:08:17.361291+00:00",
-      "reason": "risk_gate: daily realized PnL $-5.41 <= -$5.00 (50 closed trades since 2026-05-19T00:00Z)",
-      "last_checked_at": "2026-05-19T14:13:47.327261+00:00"
+      "reason": "risk_gate: daily realized PnL $-5.62 <= -$5.00 (51 closed trades since 2026-05-19T00:00Z)",
+      "last_checked_at": "2026-05-19T14:16:01.962445+00:00"
     },
     {
       "paper_id": "INTCUSDT|SHORT|2026-05-19T14:09:30.906202+00:00",
@@ -11407,17 +11412,17 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-19T14:10:25.600455+00:00",
-      "reason": "risk_gate: daily realized PnL $-5.41 <= -$5.00 (50 closed trades since 2026-05-19T00:00Z)",
-      "last_checked_at": "2026-05-19T14:13:47.327261+00:00"
+      "reason": "risk_gate: daily realized PnL $-5.62 <= -$5.00 (51 closed trades since 2026-05-19T00:00Z)",
+      "last_checked_at": "2026-05-19T14:16:01.962445+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 76701.6,
-    "btc_ma25_1h": 76803.3,
-    "pct_vs_ma25": -0.132,
-    "change_24h_pct": 0.426,
-    "computed_at": "2026-05-19T14:13:49.908663+00:00"
+    "btc_price": 76699.8,
+    "btc_ma25_1h": 76803.23,
+    "pct_vs_ma25": -0.135,
+    "change_24h_pct": 0.424,
+    "computed_at": "2026-05-19T14:16:03.316570+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
