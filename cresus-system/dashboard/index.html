@@ -1770,20 +1770,15 @@
   .regime-timeline {
     display: grid; grid-template-columns: repeat(24, 1fr); gap: 3px;
     height: 22px;
-    max-height: 22px;     /* 强制上限, 防止某些场景被拉伸成方块 */
-    margin-bottom: 2px;
+    margin-bottom: 8px;
   }
   .regime-tl-cell {
     border-radius: 3px; cursor: default; transition: opacity 0.15s;
     position: relative;
-    height: 22px;
-    min-height: 22px;
-    max-height: 22px;
-    /* 关键: 所有 cell 统一 border-box + 1.5px transparent 边框占位.
-       这样 filled / empty cell 的 outer 盒尺寸完全一致, 只是边框颜色/样式不同.
-       (之前 box-sizing 仅在 .empty 上, 跟 filled 的 content-box 撞出高度错乱) */
-    box-sizing: border-box;
-    border: 1.5px solid transparent;
+    /* 高度由 .regime-timeline 的 height (22px) 通过 grid stretch 决定.
+       不再设 height/min-height/max-height/border/box-sizing — 这些组合在
+       不同浏览器下会触发盒模型不一致, 导致 filled vs empty cell 高度错乱.
+       (用户已反馈多次"虚线格变形 / 挤压文字") */
   }
   .regime-tl-cell:hover { opacity: 0.7; }
   .regime-tl-cell:hover::after {
@@ -1793,11 +1788,17 @@
     font-size: 11px; white-space: pre-line; z-index: 10; margin-bottom: 6px;
     pointer-events: none;
   }
-  /* 空格只改边框颜色/样式, 不动 box-sizing 和 border-width (从父类继承) */
+  /* 空格: 用对角线条纹背景代替 dashed border, 完全规避边框 / box-sizing 坑.
+     filled cell 用纯色 background, empty cell 用 striped background —
+     两者都只通过 background 属性表达, 盒尺寸完全一样. */
   .regime-tl-cell.empty {
-    background: transparent;
-    border-color: rgba(255,255,255,0.25);
-    border-style: dashed;
+    background: repeating-linear-gradient(
+      45deg,
+      rgba(255,255,255,0.05),
+      rgba(255,255,255,0.05) 4px,
+      rgba(255,255,255,0.13) 4px,
+      rgba(255,255,255,0.13) 8px
+    );
   }
   /* 24h 刻度行 — 标记 00 06 12 18 NOW 五个关键时点 */
   .regime-timeline-scale {
@@ -1826,8 +1827,8 @@
   .legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
   @media (max-width: 720px) {
     .regime-evidence-grid { grid-template-columns: 1fr; gap: 8px; }
-    .regime-timeline { grid-template-columns: repeat(24, 1fr); height: 16px; max-height: 16px; gap: 1.5px; }
-    .regime-tl-cell { height: 16px; min-height: 16px; max-height: 16px; }
+    .regime-timeline { grid-template-columns: repeat(24, 1fr); height: 16px; gap: 1.5px; }
+    /* .regime-tl-cell 不再设独立 height — 通过 grid stretch 到 16px */
     .regime-timeline-scale { grid-template-columns: repeat(24, 1fr); gap: 1.5px; font-size: 8px; }
     .regime-header { padding: 12px 14px; flex-wrap: wrap; gap: 6px; }
     .regime-body { padding: 12px 14px; }
@@ -3012,7 +3013,7 @@
           <span class="legend-item"><span class="legend-dot" style="background:#ff9800"></span>拉砸风险</span>
           <span class="legend-item"><span class="legend-dot" style="background:#5a6478"></span>盘整死水</span>
           <span class="legend-item"><span class="legend-dot" style="background:#9c27b0"></span>未知</span>
-          <span class="legend-item"><span class="legend-dot" style="background:transparent;border:1.5px dashed rgba(255,255,255,0.45);box-sizing:border-box"></span>无数据</span>
+          <span class="legend-item"><span class="legend-dot" style="background:repeating-linear-gradient(45deg,rgba(255,255,255,0.05),rgba(255,255,255,0.05) 2px,rgba(255,255,255,0.30) 2px,rgba(255,255,255,0.30) 4px)"></span>无数据</span>
         </div>
       </div>
     </div>
