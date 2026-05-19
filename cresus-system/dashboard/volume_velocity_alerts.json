@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-19T10:41:30.379510+00:00",
+  "updated_at": "2026-05-19T10:43:39.274906+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 18,
+  "alerts_count": 19,
   "alerts": [
+    {
+      "symbol": "BANANAS31USDT",
+      "base": "BANANAS31",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.009729,
+      "price_change_pct": -0.552,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 14792.0,
+      "volume_baseline_usdt": 2055.0,
+      "volume_ratio": 7.2,
+      "detected_at": "2026-05-19T10:43:15.619153+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.236,
+      "change_15m_pct": -0.338,
+      "change_1h_pct": -0.471,
+      "change_4h_pct": -1.038,
+      "taker_buy_ratio_1m": 0.215,
+      "taker_buy_ratio_5m": 0.434,
+      "oi_delta_5m_pct": 0.034,
+      "funding_rate_pct": -0.0004,
+      "atr_pct": 0.207,
+      "range_4h_pct": 4.2,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.00974914,
+      "suggested_tp1": 0.00969879,
+      "suggested_tp2": 0.00966857,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "CLOUSDT",
       "base": "CLO",
