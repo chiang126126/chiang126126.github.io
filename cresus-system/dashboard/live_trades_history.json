@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-19T13:35:02.289723+00:00",
+  "generated_at": "2026-05-19T13:37:19.807496+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 213,
-    "open": 0,
+    "total_trades": 214,
+    "open": 1,
     "closed": 213,
     "wins": 72,
     "losses": 139,
@@ -14,30 +14,82 @@
     "avg_pnl_usdt": 0.0072,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 3.8678,
+    "fees_paid_usdt": 3.8777,
     "fees_realized_usdt": 3.8678,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.01,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 97.66,
+    "deployed_usdt": 19.93,
+    "free_capital_usdt": 77.73,
     "max_concurrent_slots": 4,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -4.4272,
-    "deployed_usdt": 0
+    "deployed_usdt": 19.93
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "SKYAIUSDT"
+    ],
+    "exchange_symbols": [
+      "SKYAIUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "SKYAIUSDT|LONG|2026-05-19T13:35:29.970587+00:00",
+      "trade_id": "L1779197729_SKYAIUS_L",
+      "symbol": "SKYAIUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.29807,
+      "avg_fill_price": 0.29742,
+      "slippage_bps": -21.81,
+      "qty": 67.0,
+      "notional_usdt": 19.92714,
+      "leverage": 3,
+      "risk_usdt": 0.1945,
+      "risk_pct": 0.976,
+      "mirror_latency_sec": 33.5,
+      "sl_price": 0.29451714,
+      "sl_paper_current": 0.29451714,
+      "sl_compensation_enabled": false,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "ab",
+      "tp1_price": 0.30339929,
+      "tp2_price": 0.30872857,
+      "phase": "A",
+      "entry_order_id": 106409915,
+      "entry_client_id": "cresus_L1779197729_SKYAIUS_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.795,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.009964,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-19T13:36:45.230708+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 76794.1,
+      "btc_change_24h_at_open": -0.192,
+      "btc_pct_vs_ma25_at_open": -0.022,
+      "phase_a_mfe_price": 0.29807,
+      "current_price": 0.29731,
+      "unrealized_pnl_usdt": -0.0074,
+      "unrealized_pnl_pct": -0.037,
+      "last_price_check_at": "2026-05-19T13:37:15.709555+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "DEXEUSDT|LONG|2026-05-19T13:20:56.672532+00:00",
@@ -11222,16 +11274,34 @@
       "conviction_score": 5,
       "signal_at": "2026-05-19T13:34:03.014412+00:00",
       "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-05-19T13:34:59.285947+00:00"
+      "last_checked_at": "2026-05-19T13:37:15.709555+00:00"
+    },
+    {
+      "paper_id": "SNDKUSDT|LONG|2026-05-19T13:35:09.765751+00:00",
+      "symbol": "SNDKUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-05-19T13:36:11.757652+00:00",
+      "reason": "open_failed (retry next tick)",
+      "last_checked_at": "2026-05-19T13:37:15.709555+00:00"
+    },
+    {
+      "paper_id": "MUUSDT|LONG|2026-05-19T13:35:11.230433+00:00",
+      "symbol": "MUUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-05-19T13:36:11.757652+00:00",
+      "reason": "open_failed (retry next tick)",
+      "last_checked_at": "2026-05-19T13:37:15.709555+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 76803.1,
-    "btc_ma25_1h": 76811.68,
-    "pct_vs_ma25": -0.011,
-    "change_24h_pct": -0.181,
-    "computed_at": "2026-05-19T13:35:01.674415+00:00"
+    "btc_price": 76843.1,
+    "btc_ma25_1h": 76813.28,
+    "pct_vs_ma25": 0.039,
+    "change_24h_pct": -0.129,
+    "computed_at": "2026-05-19T13:37:17.628673+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
