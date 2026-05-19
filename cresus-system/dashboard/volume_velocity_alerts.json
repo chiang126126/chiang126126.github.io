@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-19T10:52:14.285999+00:00",
+  "updated_at": "2026-05-19T10:54:24.546161+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 22,
+  "alerts_count": 23,
   "alerts": [
+    {
+      "symbol": "MBOXUSDT",
+      "base": "MBOX",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.01193,
+      "price_change_pct": -2.133,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 323614.0,
+      "volume_baseline_usdt": 32466.0,
+      "volume_ratio": 9.97,
+      "detected_at": "2026-05-19T10:53:38.073673+00:00",
+      "intensity": 2,
+      "change_5m_pct": -2.058,
+      "change_15m_pct": -1.245,
+      "change_1h_pct": -1.896,
+      "change_4h_pct": -9.78,
+      "taker_buy_ratio_1m": 0.309,
+      "taker_buy_ratio_5m": 0.398,
+      "oi_delta_5m_pct": 0.094,
+      "funding_rate_pct": -0.127,
+      "atr_pct": 0.683,
+      "range_4h_pct": 11.32,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.01209286,
+      "suggested_tp1": 0.01168571,
+      "suggested_tp2": 0.01144143,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "RIVERUSDT",
       "base": "RIVER",
