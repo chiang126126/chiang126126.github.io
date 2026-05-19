@@ -340,6 +340,56 @@
     margin-left: 10px;
     text-shadow: none;
   }
+  /* live 数据新鲜度 — 设计 30s 更新一次 (launchd StartInterval=30):
+     fresh (≤5 min)  : 灰色 (默认)
+     stale (5-30 min): 琥珀色, sync 链路可能延迟
+     dead  (>30 min) : 红色脉动, live_trader 或 sync 多半挂了 */
+  .live-panel h2 .meta-inline.stale {
+    color: #ffb84d;
+    background: rgba(255,184,77,0.10);
+    border: 1px solid rgba(255,184,77,0.28);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .live-panel h2 .meta-inline.dead {
+    color: #ff5252;
+    background: rgba(255,82,82,0.12);
+    border: 1px solid rgba(255,82,82,0.40);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    animation: pulse-red 2s ease-in-out infinite;
+  }
+  /* 顶部"数据停滞"横幅 — 仅在 stale/dead 时显示 */
+  .live-stale-banner {
+    margin: 12px 0 16px;
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+  .live-stale-banner.stale {
+    background: rgba(255,184,77,0.10);
+    border: 1px solid rgba(255,184,77,0.35);
+    color: #ffb84d;
+  }
+  .live-stale-banner.dead {
+    background: rgba(255,82,82,0.12);
+    border: 1px solid rgba(255,82,82,0.50);
+    color: #ff7373;
+    animation: pulse-red 2s ease-in-out infinite;
+  }
+  .live-stale-banner .ttl {
+    font-size: 15px; font-weight: 700; margin-bottom: 4px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .live-stale-banner .gap-big {
+    font-size: 22px; font-weight: 800; letter-spacing: 0.3px;
+  }
+  .live-stale-banner .hint {
+    color: var(--text-dim); font-size: 12px; margin-top: 6px;
+  }
   /* live-panel 内的 paper-stat 卡 — 4 张统计卡精致版 (Task 2) */
   .live-panel .paper-stat {
     background: linear-gradient(180deg,
@@ -1610,6 +1660,20 @@
   .pnl-negative { color: var(--red); }
 
   .meta-inline { font-size: 12px; color: var(--text-dim); font-weight: normal; margin-left: 8px; }
+  /* 通用数据新鲜度状态 — 复用同套阈值 (5min stale / 30min dead) */
+  .meta-inline.stale {
+    color: #ffb84d;
+    background: rgba(255,184,77,0.10);
+    border: 1px solid rgba(255,184,77,0.28);
+    padding: 2px 8px; border-radius: 4px; font-weight: 600;
+  }
+  .meta-inline.dead {
+    color: #ff5252;
+    background: rgba(255,82,82,0.12);
+    border: 1px solid rgba(255,82,82,0.40);
+    padding: 2px 8px; border-radius: 4px; font-weight: 700;
+    animation: pulse-red 2s ease-in-out infinite;
+  }
 
   .pnl-cell { font-variant-numeric: tabular-nums; font-weight: 600; }
 
@@ -4903,10 +4967,45 @@ function renderLivePanel(data) {
   // 只在有真实活动时显示 (避免空状态干扰)
   // 但保留: 即使空也显示, 让用户看到风控状态 + 配置
   document.getElementById("live-panel").style.display = "";
-  document.getElementById("live-updated").textContent =
-    data.generated_at ? "更新于 " + new Date(data.generated_at).toLocaleString() : "—";
 
-  let body = "";
+  // 数据新鲜度判定 — live_trader 设计 30s 更新一次 (launchd StartInterval=30)
+  // 阈值: ≤5min fresh / 5-30min stale (sync 延迟) / >30min dead (live_trader 或 sync 挂了)
+  const LIVE_STALE_MIN = 5;
+  const LIVE_DEAD_MIN = 30;
+  const updEl = document.getElementById("live-updated");
+  let staleBanner = "";
+  if (data.generated_at) {
+    const upd = new Date(data.generated_at);
+    const ageMin = Math.floor((Date.now() - upd.getTime()) / 60000);
+    let cls = "", icon = "";
+    if (ageMin > LIVE_DEAD_MIN) { cls = "dead"; icon = "🚨 "; }
+    else if (ageMin > LIVE_STALE_MIN) { cls = "stale"; icon = "⚠ "; }
+    updEl.className = "meta-inline" + (cls ? " " + cls : "");
+    const ageStr = ageMin >= 60
+      ? `${Math.floor(ageMin/60)}h${String(ageMin%60).padStart(2,"0")}m`
+      : `${ageMin}m`;
+    updEl.textContent = `${icon}更新于 ${upd.toLocaleString("zh-CN", {hour12:false})} · ${ageStr} 前`;
+    updEl.title = cls
+      ? `live_trader 设计每 30s 更新, 已 ${ageStr} 无新数据. 请检查 Mac launchd 或 sync 链路.`
+      : "";
+    if (cls) {
+      const ttl = cls === "dead" ? "🚨 实盘数据已停滞" : "⚠️ 实盘数据有延迟";
+      const hint = cls === "dead"
+        ? "live_trader 设计每 30s 写一次. 距上次更新超过 30 分钟, 几乎可以确定 live_trader 进程或 sync 链路已停. 请上 Mac 执行: <code>launchctl list | grep cresus</code> · <code>tail ~/cresus-bot/logs/live_trader.log</code> · 检查 velocity_fast_sync.sh 是否在跑."
+        : "live_trader 设计每 30s 写一次. 当前延迟在 5-30 分钟之间, 可能 sync 暂时滞后, 几分钟内若不恢复请检查 launchd / 网络.";
+      staleBanner = `
+        <div class="live-stale-banner ${cls}">
+          <div class="ttl">${ttl}<span class="gap-big">${ageStr}</span><span style="font-size:12px;font-weight:500;opacity:0.85">未收到新数据</span></div>
+          <div>最后写入: ${upd.toLocaleString("zh-CN", {hour12:false})}  ·  下面所有数字都是这个时间点的快照, 不代表当前账户状态.</div>
+          <div class="hint">${hint}</div>
+        </div>`;
+    }
+  } else {
+    updEl.className = "meta-inline dead";
+    updEl.textContent = "🚨 缺时间戳";
+  }
+
+  let body = staleBanner;
 
   // ===== Account 状态卡 (类比 paper 但红色主题) =====
   // 余额展示已为 NET (扣除已实现手续费). net_pnl_usdt 由后端按 total_pnl - fees_realized
@@ -6181,8 +6280,19 @@ function renderPaperPanel(data, shadowData) {
   document.getElementById("paper-panel").style.display = "";
   const upd = new Date(data.generated_at);
   const ageM = Math.floor((Date.now() - upd.getTime()) / 60_000);
-  document.getElementById("paper-updated").textContent =
-    `${ageM}m 前 · ${stats.open || 0} 持仓 · ${stats.closed || 0} 已平`;
+  // paper 生成器设计 30s 间隔, 复用 live 同套阈值 (5min stale / 30min dead)
+  const paperUpdEl = document.getElementById("paper-updated");
+  let paperCls = "", paperIcon = "";
+  if (ageM > 30) { paperCls = "dead"; paperIcon = "🚨 "; }
+  else if (ageM > 5) { paperCls = "stale"; paperIcon = "⚠ "; }
+  const ageStr = ageM >= 60
+    ? `${Math.floor(ageM/60)}h${String(ageM%60).padStart(2,"0")}m`
+    : `${ageM}m`;
+  paperUpdEl.className = "meta-inline" + (paperCls ? " " + paperCls : "");
+  paperUpdEl.textContent = `${paperIcon}${ageStr} 前 · ${stats.open || 0} 持仓 · ${stats.closed || 0} 已平`;
+  paperUpdEl.title = paperCls
+    ? `paper 生成器设计每 30s 更新, 已 ${ageStr} 无新数据. 请检查 Mac launchd 或 sync 链路.`
+    : "";
 
   const fmtPct = v => (v == null ? "—" : (v > 0 ? "+" : "") + v.toFixed(2) + "%");
   const fmtPrice = p => {
