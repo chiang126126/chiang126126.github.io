@@ -1,44 +1,46 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-19T09:59:09.659894+00:00",
+  "generated_at": "2026-05-19T10:01:24.162141+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 199,
-    "open": 2,
-    "closed": 197,
+    "open": 1,
+    "closed": 198,
     "wins": 67,
-    "losses": 128,
-    "win_rate": 0.344,
-    "total_pnl_usdt": 2.2791,
-    "net_pnl_usdt": -1.2856,
-    "avg_pnl_usdt": 0.0116,
+    "losses": 129,
+    "win_rate": 0.342,
+    "total_pnl_usdt": 2.1629,
+    "net_pnl_usdt": -1.4177,
+    "avg_pnl_usdt": 0.0109,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 3.5827,
-    "fees_realized_usdt": 3.5647,
-    "fees_open_usdt": 0.018,
+    "fees_paid_usdt": 3.5906,
+    "fees_realized_usdt": 3.5806,
+    "fees_open_usdt": 0.01,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 39.95,
-    "free_capital_usdt": 58.74,
+    "deployed_usdt": 19.97,
+    "free_capital_usdt": 78.6,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -3.6787,
-    "deployed_usdt": 19.97
+    "deployed_usdt": 39.95
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "SPACEUSDT"
+      "SPACEUSDT",
+      "STORJUSDT"
     ],
     "exchange_symbols": [
-      "SPACEUSDT"
+      "SPACEUSDT",
+      "STORJUSDT"
     ]
   },
   "open_trades": [
@@ -84,11 +86,13 @@
       "btc_change_24h_at_open": 0.141,
       "btc_pct_vs_ma25_at_open": 0.31,
       "phase_a_mfe_price": 0.008646,
-      "current_price": 0.008794,
-      "unrealized_pnl_usdt": 0.1286,
-      "unrealized_pnl_pct": 0.644,
-      "last_price_check_at": "2026-05-19T09:59:03.803328+00:00"
-    },
+      "current_price": 0.00869,
+      "unrealized_pnl_usdt": 0.3632,
+      "unrealized_pnl_pct": 1.819,
+      "last_price_check_at": "2026-05-19T10:01:19.698384+00:00"
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "STORJUSDT|LONG|2026-05-19T09:57:54.207035+00:00",
       "trade_id": "L1779184674_STORJUS_L",
@@ -122,7 +126,7 @@
       "phase_a_mfe_pct": 0.0,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.007995,
+      "fees_paid_usdt": 0.015943,
       "fees_are_actual": true,
       "opened_at": "2026-05-19T09:59:09.062318+00:00",
       "is_dry_run": false,
@@ -131,13 +135,21 @@
       "btc_change_24h_at_open": -0.135,
       "btc_pct_vs_ma25_at_open": -0.08,
       "phase_a_mfe_price": 0.1205,
-      "current_price": 0.1204,
-      "unrealized_pnl_usdt": 0.0,
-      "unrealized_pnl_pct": 0.0,
-      "last_price_check_at": "2026-05-19T09:59:03.803328+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.1198,
+      "unrealized_pnl_usdt": -0.0996,
+      "unrealized_pnl_pct": -0.498,
+      "last_price_check_at": "2026-05-19T10:00:46.263532+00:00",
+      "closed_at": "2026-05-19T10:01:24.124889+00:00",
+      "close_reason": "paper:hit_sl",
+      "avg_exit_price": 0.1197,
+      "realized_pnl_usdt": -0.1162,
+      "close_order_id": 139658903,
+      "close_qty": 166.0,
+      "close_expected_price": 0.1198,
+      "close_slippage_bps": 8.35,
+      "entry_fees_usdt": 0.007995,
+      "close_fees_usdt": 0.007948
+    },
     {
       "paper_id": "GUAUSDT|SHORT|2026-05-19T09:33:13.579440+00:00",
       "trade_id": "L1779183193_GUAUSDT_S",
@@ -10397,11 +10409,11 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 76798.0,
-    "btc_ma25_1h": 76859.17,
+    "btc_price": 76792.9,
+    "btc_ma25_1h": 76854.47,
     "pct_vs_ma25": -0.08,
-    "change_24h_pct": -0.135,
-    "computed_at": "2026-05-19T09:59:05.990127+00:00"
+    "change_24h_pct": 0.014,
+    "computed_at": "2026-05-19T10:01:21.645096+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
