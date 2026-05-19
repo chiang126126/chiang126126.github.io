@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-19T11:52:10.813664+00:00",
+  "generated_at": "2026-05-19T11:54:24.954053+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 201,
-    "open": 0,
+    "total_trades": 202,
+    "open": 1,
     "closed": 201,
     "wins": 69,
     "losses": 130,
@@ -14,15 +14,15 @@
     "avg_pnl_usdt": 0.0115,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 3.641,
+    "fees_paid_usdt": 3.651,
     "fees_realized_usdt": 3.641,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.01,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 98.66,
+    "deployed_usdt": 19.96,
+    "free_capital_usdt": 78.69,
     "max_concurrent_slots": 4,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
@@ -37,7 +37,55 @@
     "live_symbols": [],
     "exchange_symbols": []
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "MAGMAUSDT|LONG|2026-05-19T11:53:30.837286+00:00",
+      "trade_id": "L1779191610_MAGMAUS_L",
+      "symbol": "MAGMAUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.26988,
+      "avg_fill_price": 0.26974,
+      "slippage_bps": -5.19,
+      "qty": 74.0,
+      "notional_usdt": 19.96076,
+      "leverage": 3,
+      "risk_usdt": 0.1662,
+      "risk_pct": 0.833,
+      "mirror_latency_sec": 28.2,
+      "sl_price": 0.26735392999999996,
+      "sl_paper_current": 0.26749393,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -0.00014,
+      "sl_compensation_mode": "ab",
+      "tp1_price": 0.27345911,
+      "tp2_price": 0.27703821,
+      "phase": "A",
+      "entry_order_id": 73743590,
+      "entry_client_id": "cresus_L1779191610_MAGMAUS_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.589,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.00998,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-19T11:54:24.624899+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 76705.4,
+      "btc_change_24h_at_open": -0.708,
+      "btc_pct_vs_ma25_at_open": -0.196,
+      "phase_a_mfe_price": 0.26988,
+      "current_price": 0.26965,
+      "unrealized_pnl_usdt": -0.0067,
+      "unrealized_pnl_pct": -0.033,
+      "last_price_check_at": "2026-05-19T11:54:19.119293+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "SKYAIUSDT|SHORT|2026-05-19T10:55:55.652563+00:00",
@@ -10533,17 +10581,17 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-19T11:43:20.794915+00:00",
-      "reason": "pre_slippage_too_high (+97.7bps > 50bps)",
-      "last_checked_at": "2026-05-19T11:52:08.624140+00:00"
+      "reason": "paper trade too old (658s > 600s)",
+      "last_checked_at": "2026-05-19T11:54:19.119293+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 76690.3,
-    "btc_ma25_1h": 76855.54,
-    "pct_vs_ma25": -0.215,
-    "change_24h_pct": -0.727,
-    "computed_at": "2026-05-19T11:52:10.434461+00:00"
+    "btc_price": 76705.4,
+    "btc_ma25_1h": 76856.15,
+    "pct_vs_ma25": -0.196,
+    "change_24h_pct": -0.708,
+    "computed_at": "2026-05-19T11:54:21.345568+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
