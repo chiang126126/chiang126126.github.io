@@ -1791,12 +1791,10 @@
     font-size: 11px; white-space: pre-line; z-index: 10; margin-bottom: 6px;
     pointer-events: none;
   }
-  /* Phase 2b: 真 24H timeline — gap 用 solid translucent + dashed border, 始终可见 */
+  /* Phase 2b: 真 24H timeline — gap 用淡虚线 + 透明背景, 避免与 #5a6478 盘整死水撞色 */
   .regime-tl-cell.empty {
-    /* solid translucent 背景: 在深色 panel 上始终能勾出 cell 形状, 不会"消失" */
-    background: rgba(255,255,255,0.045);
-    /* 1px dashed @ 32% — 比填色格的 10% 实线略强, 视觉上"虚化"但清晰可辨 */
-    border: 1px dashed rgba(255,255,255,0.32);
+    background: transparent;
+    border: 1px dashed rgba(255,255,255,0.18);  /* 比填色格更淡, 让它"退到后景" */
   }
   /* 24h 刻度行 — 标记 6 个刻度 + NOW */
   .regime-timeline-scale {
@@ -3020,7 +3018,7 @@
           <span class="legend-item"><span class="legend-dot" style="background:#ff9800"></span>拉砸风险</span>
           <span class="legend-item"><span class="legend-dot" style="background:#5a6478"></span>盘整死水</span>
           <span class="legend-item"><span class="legend-dot" style="background:#9c27b0"></span>未知</span>
-          <span class="legend-item"><span class="legend-dot" style="background:rgba(255,255,255,0.045);border:1px dashed rgba(255,255,255,0.45);box-sizing:border-box"></span>无数据</span>
+          <span class="legend-item"><span class="legend-dot" style="background:transparent;border:1px dashed rgba(255,255,255,0.40);box-sizing:border-box"></span>无数据</span>
         </div>
       </div>
     </div>
