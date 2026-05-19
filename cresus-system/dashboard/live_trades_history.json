@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-19T04:44:51.871230+00:00",
+  "generated_at": "2026-05-19T04:47:04.380857+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 184,
@@ -39,8 +39,8 @@
       "INJUSDT"
     ],
     "exchange_symbols": [
-      "PLAYUSDT",
-      "INJUSDT"
+      "INJUSDT",
+      "PLAYUSDT"
     ]
   },
   "open_trades": [
@@ -86,10 +86,10 @@
       "btc_change_24h_at_open": -0.221,
       "btc_pct_vs_ma25_at_open": -0.029,
       "phase_a_mfe_price": 0.09741,
-      "current_price": 0.09782,
-      "unrealized_pnl_usdt": 0.0571,
-      "unrealized_pnl_pct": 0.285,
-      "last_price_check_at": "2026-05-19T04:44:49.256532+00:00"
+      "current_price": 0.09815,
+      "unrealized_pnl_usdt": -0.0102,
+      "unrealized_pnl_pct": -0.051,
+      "last_price_check_at": "2026-05-19T04:47:01.642120+00:00"
     },
     {
       "paper_id": "INJUSDT|SHORT|2026-05-19T04:31:20.262212+00:00",
@@ -133,10 +133,10 @@
       "btc_change_24h_at_open": -0.314,
       "btc_pct_vs_ma25_at_open": -0.119,
       "phase_a_mfe_price": 5.126,
-      "current_price": 5.131,
-      "unrealized_pnl_usdt": -0.0234,
-      "unrealized_pnl_pct": -0.117,
-      "last_price_check_at": "2026-05-19T04:44:49.256532+00:00"
+      "current_price": 5.136,
+      "unrealized_pnl_usdt": -0.0429,
+      "unrealized_pnl_pct": -0.215,
+      "last_price_check_at": "2026-05-19T04:47:01.642120+00:00"
     }
   ],
   "recent_closed": [
@@ -9537,14 +9537,24 @@
       "close_qty": 53792.0
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "STARUSDT|LONG|2026-05-19T04:44:26.422794+00:00",
+      "symbol": "STARUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-05-19T04:44:52.870786+00:00",
+      "reason": "open_failed (retry next tick)",
+      "last_checked_at": "2026-05-19T04:47:01.642120+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 76805.7,
-    "btc_ma25_1h": 76851.75,
-    "pct_vs_ma25": -0.06,
-    "change_24h_pct": -0.253,
-    "computed_at": "2026-05-19T04:44:51.276007+00:00"
+    "btc_price": 76856.3,
+    "btc_ma25_1h": 76853.77,
+    "pct_vs_ma25": 0.003,
+    "change_24h_pct": -0.187,
+    "computed_at": "2026-05-19T04:47:03.072847+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
