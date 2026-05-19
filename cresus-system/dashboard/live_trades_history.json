@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-19T02:35:53.746951+00:00",
+  "generated_at": "2026-05-19T02:38:07.807363+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 176,
-    "open": 2,
+    "total_trades": 177,
+    "open": 3,
     "closed": 174,
     "wins": 61,
     "losses": 111,
@@ -14,21 +14,21 @@
     "avg_pnl_usdt": 0.0315,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 3.1347,
+    "fees_paid_usdt": 3.1447,
     "fees_realized_usdt": 3.1149,
-    "fees_open_usdt": 0.0198,
+    "fees_open_usdt": 0.0298,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 39.68,
-    "free_capital_usdt": 62.66,
+    "deployed_usdt": 59.66,
+    "free_capital_usdt": 42.68,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 3
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -0.5196,
-    "deployed_usdt": 59.7
+    "daily_pnl": -0.4746,
+    "deployed_usdt": 59.66
   },
   "reconciliation": {
     "ok": true,
@@ -37,12 +37,12 @@
     "live_symbols": [
       "ONDOUSDT",
       "RONINUSDT",
-      "KAITOUSDT"
+      "TAKEUSDT"
     ],
     "exchange_symbols": [
       "ONDOUSDT",
       "RONINUSDT",
-      "KAITOUSDT"
+      "TAKEUSDT"
     ]
   },
   "open_trades": [
@@ -76,7 +76,7 @@
       "conviction_score": 7,
       "alert_type": "sustained",
       "atr_pct": 1.076,
-      "phase_a_mfe_pct": 0.0,
+      "phase_a_mfe_pct": 0.709,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.009989,
@@ -87,11 +87,11 @@
       "btc_price_at_open": 76646.7,
       "btc_change_24h_at_open": -0.18,
       "btc_pct_vs_ma25_at_open": -0.276,
-      "phase_a_mfe_price": 0.1129,
-      "current_price": 0.113,
-      "unrealized_pnl_usdt": 0.1926,
-      "unrealized_pnl_pct": 0.964,
-      "last_price_check_at": "2026-05-19T02:35:49.061630+00:00"
+      "phase_a_mfe_price": 0.1121,
+      "current_price": 0.1126,
+      "unrealized_pnl_usdt": 0.2626,
+      "unrealized_pnl_pct": 1.315,
+      "last_price_check_at": "2026-05-19T02:38:04.710783+00:00"
     },
     {
       "paper_id": "ONDOUSDT|LONG|2026-05-19T02:20:59.667354+00:00",
@@ -135,10 +135,58 @@
       "btc_change_24h_at_open": -0.052,
       "btc_pct_vs_ma25_at_open": -0.153,
       "phase_a_mfe_price": 0.3956,
-      "current_price": 0.3926,
-      "unrealized_pnl_usdt": -0.075,
-      "unrealized_pnl_pct": -0.381,
-      "last_price_check_at": "2026-05-19T02:35:49.061630+00:00"
+      "current_price": 0.3934,
+      "unrealized_pnl_usdt": -0.035,
+      "unrealized_pnl_pct": -0.178,
+      "last_price_check_at": "2026-05-19T02:38:04.710783+00:00"
+    },
+    {
+      "paper_id": "TAKEUSDT|SHORT|2026-05-19T02:36:41.784822+00:00",
+      "trade_id": "L1779158201_TAKEUSD_S",
+      "symbol": "TAKEUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.0226,
+      "avg_fill_price": 0.02215,
+      "slippage_bps": 199.12,
+      "qty": 902.0,
+      "notional_usdt": 19.9793,
+      "leverage": 3,
+      "risk_usdt": 0.4059,
+      "risk_pct": 2.032,
+      "mirror_latency_sec": 16.5,
+      "sl_price": 0.0226,
+      "sl_paper_current": 0.0226,
+      "sl_compensation_enabled": false,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "ab",
+      "tp1_price": 0.02229946,
+      "tp2_price": 0.02199893,
+      "phase": "B",
+      "entry_order_id": 102770649,
+      "entry_client_id": "cresus_L1779158201_TAKEUSD_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.591,
+      "phase_a_mfe_pct": 2.124,
+      "phase_b_mfe_pct": 2.124,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.00999,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-19T02:37:01.524235+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 76741.1,
+      "btc_change_24h_at_open": -0.057,
+      "btc_pct_vs_ma25_at_open": -0.158,
+      "phase_a_mfe_price": 0.02212,
+      "phase_b_mfe_price": 0.02212,
+      "current_price": 0.02211,
+      "unrealized_pnl_usdt": 0.0361,
+      "unrealized_pnl_pct": 0.181,
+      "last_price_check_at": "2026-05-19T02:38:04.710783+00:00"
     }
   ],
   "recent_closed": [
@@ -9081,11 +9129,11 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 76768.1,
-    "btc_ma25_1h": 76863.5,
-    "pct_vs_ma25": -0.124,
-    "change_24h_pct": -0.022,
-    "computed_at": "2026-05-19T02:35:51.263364+00:00"
+    "btc_price": 76752.9,
+    "btc_ma25_1h": 76862.9,
+    "pct_vs_ma25": -0.143,
+    "change_24h_pct": -0.042,
+    "computed_at": "2026-05-19T02:38:06.917191+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
