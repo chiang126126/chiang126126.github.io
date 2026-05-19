@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-19T20:20:05.689409+00:00",
+  "updated_at": "2026-05-19T20:22:17.871376+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 13,
+  "alerts_count": 14,
   "alerts": [
+    {
+      "symbol": "BANANAS31USDT",
+      "base": "BANANAS31",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.011032,
+      "price_change_pct": 2.271,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 314471.0,
+      "volume_baseline_usdt": 7472.0,
+      "volume_ratio": 42.09,
+      "detected_at": "2026-05-19T20:21:53.364104+00:00",
+      "intensity": 2,
+      "change_5m_pct": 1.873,
+      "change_15m_pct": 3.047,
+      "change_1h_pct": 3.576,
+      "change_4h_pct": 11.61,
+      "taker_buy_ratio_1m": 0.654,
+      "taker_buy_ratio_5m": 0.617,
+      "oi_delta_5m_pct": -0.152,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.816,
+      "range_4h_pct": 12.95,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.010852,
+      "suggested_tp1": 0.011302,
+      "suggested_tp2": 0.011572,
+      "conviction_score": 3,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "GENIUSUSDT",
       "base": "GENIUS",
