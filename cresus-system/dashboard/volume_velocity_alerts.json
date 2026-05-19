@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-19T20:30:58.072609+00:00",
+  "updated_at": "2026-05-19T20:33:10.510705+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 14,
+  "alerts_count": 15,
   "alerts": [
+    {
+      "symbol": "EDENUSDT",
+      "base": "EDEN",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.07847,
+      "price_change_pct": -4.083,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 2382553.0,
+      "volume_baseline_usdt": 359541.0,
+      "volume_ratio": 6.63,
+      "detected_at": "2026-05-19T20:32:03.667676+00:00",
+      "intensity": 1,
+      "change_5m_pct": -4.412,
+      "change_15m_pct": -3.124,
+      "change_1h_pct": -6.646,
+      "change_4h_pct": 2.768,
+      "taker_buy_ratio_1m": 0.36,
+      "taker_buy_ratio_5m": 0.429,
+      "oi_delta_5m_pct": 0.277,
+      "funding_rate_pct": -0.0098,
+      "atr_pct": 1.111,
+      "range_4h_pct": 25.07,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.08021286,
+      "suggested_tp1": 0.07585571,
+      "suggested_tp2": 0.07324143,
+      "conviction_score": 1,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "ALGOUSDT",
       "base": "ALGO",
