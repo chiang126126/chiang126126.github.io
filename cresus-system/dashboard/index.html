@@ -1761,6 +1761,16 @@
     border-radius: 4px; padding: 3px 8px; font-size: 11px;
     color: var(--text-dim); font-family: monospace;
   }
+  /* === 24H REGIME 时间线 V2 (2026-05-19 完全重做) ===
+     设计目标: 根除所有盒模型脆弱性
+     - flexbox + flex:1 1 0 → 24 个 cell 强制等宽 (grid template-columns 在某些
+       浏览器/分辨率下会有 sub-pixel 偏差)
+     - 完全不用 border, 也不用 box-sizing → 杜绝盒模型不一致
+     - cell 不设独立 height, 通过 flex stretch 自动跟容器同高
+     - 空格用 background-image 对角条纹, 跟填色格仅 background 属性区分,
+       盒尺寸完全相同
+     - 容器加 2px padding + 微底色, 形成"托盘"视觉, 比裸排更精致
+     - 当前小时用 inset box-shadow 翠绿光环标记, 不影响盒尺寸 */
   .regime-timeline-block { margin-top: 14px; }
   .regime-timeline-header {
     display: flex; justify-content: space-between; align-items: center;
@@ -1768,19 +1778,25 @@
     gap: 12px; flex-wrap: wrap;
   }
   .regime-timeline {
-    display: grid; grid-template-columns: repeat(24, 1fr); gap: 3px;
-    height: 22px;
-    margin-bottom: 8px;
+    display: flex;
+    width: 100%;
+    height: 26px;
+    gap: 2px;
+    padding: 2px;
+    background: rgba(255,255,255,0.025);
+    border-radius: 5px;
+    box-sizing: border-box;
+    margin-bottom: 6px;
   }
   .regime-tl-cell {
-    border-radius: 3px; cursor: default; transition: opacity 0.15s;
+    flex: 1 1 0;
+    min-width: 0;
+    border-radius: 2px;
+    cursor: default;
+    transition: filter 0.15s;
     position: relative;
-    /* 高度由 .regime-timeline 的 height (22px) 通过 grid stretch 决定.
-       不再设 height/min-height/max-height/border/box-sizing — 这些组合在
-       不同浏览器下会触发盒模型不一致, 导致 filled vs empty cell 高度错乱.
-       (用户已反馈多次"虚线格变形 / 挤压文字") */
   }
-  .regime-tl-cell:hover { opacity: 0.7; }
+  .regime-tl-cell:hover { filter: brightness(1.25); }
   .regime-tl-cell:hover::after {
     content: attr(data-tip);
     position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
@@ -1788,27 +1804,36 @@
     font-size: 11px; white-space: pre-line; z-index: 10; margin-bottom: 6px;
     pointer-events: none;
   }
-  /* 空格: 用对角线条纹背景代替 dashed border, 完全规避边框 / box-sizing 坑.
-     filled cell 用纯色 background, empty cell 用 striped background —
-     两者都只通过 background 属性表达, 盒尺寸完全一样. */
+  /* 空格: background-color + background-image (对角条纹) 叠加. 与填色格仅
+     background 差异, 盒尺寸完全一致 */
   .regime-tl-cell.empty {
-    background: repeating-linear-gradient(
-      45deg,
-      rgba(255,255,255,0.05),
-      rgba(255,255,255,0.05) 4px,
-      rgba(255,255,255,0.13) 4px,
-      rgba(255,255,255,0.13) 8px
+    background-color: rgba(255,255,255,0.04);
+    background-image: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 3px,
+      rgba(255,255,255,0.18) 3px,
+      rgba(255,255,255,0.18) 5px
     );
   }
-  /* 24h 刻度行 — 标记 00 06 12 18 NOW 五个关键时点 */
+  /* 当前小时: inset shadow 翠绿光环 (不影响盒尺寸) */
+  .regime-tl-cell.current {
+    box-shadow: inset 0 0 0 1.5px rgba(28,190,114,0.85);
+  }
+  /* 时刻轴 — flex 跟 cell 同步, 标签居中对齐到对应 cell */
   .regime-timeline-scale {
-    display: grid; grid-template-columns: repeat(24, 1fr); gap: 3px;
-    font-size: 9.5px; color: var(--text-dim);
+    display: flex;
+    padding: 0 2px;
+    gap: 2px;
+    font-size: 10px;
+    color: var(--text-dim);
     font-variant-numeric: tabular-nums;
+    line-height: 1.2;
     margin-bottom: 8px;
-    line-height: 1;
   }
   .regime-timeline-scale > span {
+    flex: 1 1 0;
+    min-width: 0;
     text-align: center;
     visibility: hidden;
     padding-top: 2px;
@@ -1824,12 +1849,11 @@
     font-size: 11px; color: var(--text-dim);
   }
   .legend-item { display: inline-flex; align-items: center; gap: 5px; }
-  .legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
   @media (max-width: 720px) {
     .regime-evidence-grid { grid-template-columns: 1fr; gap: 8px; }
-    .regime-timeline { grid-template-columns: repeat(24, 1fr); height: 16px; gap: 1.5px; }
-    /* .regime-tl-cell 不再设独立 height — 通过 grid stretch 到 16px */
-    .regime-timeline-scale { grid-template-columns: repeat(24, 1fr); gap: 1.5px; font-size: 8px; }
+    .regime-timeline { height: 20px; gap: 1.5px; padding: 1.5px; }
+    .regime-timeline-scale { gap: 1.5px; font-size: 9px; padding: 0 1.5px; }
     .regime-header { padding: 12px 14px; flex-wrap: wrap; gap: 6px; }
     .regime-body { padding: 12px 14px; }
     .regime-judgment-block { padding: 10px 12px; margin-bottom: 10px; }
@@ -1854,6 +1878,7 @@
     .regime-timeline-block { margin-top: 8px; }
     .regime-timeline-header { font-size: 10px; margin-bottom: 4px; }
     .regime-legend { gap: 8px; font-size: 9px; }
+    .legend-dot { width: 10px; height: 10px; }
   }
 
   /* P19 信号状态机 + 距现价% */
@@ -3013,7 +3038,7 @@
           <span class="legend-item"><span class="legend-dot" style="background:#ff9800"></span>拉砸风险</span>
           <span class="legend-item"><span class="legend-dot" style="background:#5a6478"></span>盘整死水</span>
           <span class="legend-item"><span class="legend-dot" style="background:#9c27b0"></span>未知</span>
-          <span class="legend-item"><span class="legend-dot" style="background:repeating-linear-gradient(45deg,rgba(255,255,255,0.05),rgba(255,255,255,0.05) 2px,rgba(255,255,255,0.30) 2px,rgba(255,255,255,0.30) 4px)"></span>无数据</span>
+          <span class="legend-item"><span class="legend-dot" style="background-color:rgba(255,255,255,0.04);background-image:repeating-linear-gradient(-45deg,transparent,transparent 2px,rgba(255,255,255,0.40) 2px,rgba(255,255,255,0.40) 4px)"></span>无数据</span>
         </div>
       </div>
     </div>
@@ -3984,10 +4009,11 @@ function renderRegimeTimeline() {
     return (pct ? (v * 100) : v).toFixed(digits) + (pct ? '%' : '');
   };
 
-  // 渲染 24 格 — 不再用 .current inset shadow (会跟 dashed empty 视觉冲突),
-  // 改用刻度行的 "NOW" 标签标记当前小时.
+  // V2: 渲染 24 格 — 重新启用 .current inset shadow 标记当前小时
+  // (新设计的空格用对角条纹背景, 与 inset shadow 视觉不冲突, 可以共存)
   tl.innerHTML = buckets.map((b, i) => {
     const isCurrentHour = (i === 23);
+    const cur = isCurrentHour ? " current" : "";
     const hourLabel = new Date(b.start).toLocaleTimeString("zh-CN", {
       hour: "2-digit", minute: "2-digit", hour12: false,
     });
@@ -4004,12 +4030,12 @@ function renderRegimeTimeline() {
       const rp = fmtMetric(h.metrics?.rising_pct, true, 0);
       const mc = fmtMetric(h.metrics?.median_change_pct, false, 2);
       const tip = `${hourLabel}-${endLabel}${currentMark}\n快照 ${ts}\n${m.zh} (conf ${h.confidence ?? '—'})\n广度 ${rp} / 中位 ${mc}`;
-      return `<div class="regime-tl-cell"
+      return `<div class="regime-tl-cell${cur}"
                 style="background:${m.color}"
                 data-tip="${escapeHtml(tip)}"></div>`;
     } else {
       const tip = `${hourLabel}-${endLabel}${currentMark}\n无快照 (gap)`;
-      return `<div class="regime-tl-cell empty"
+      return `<div class="regime-tl-cell empty${cur}"
                 data-tip="${escapeHtml(tip)}"></div>`;
     }
   }).join("");
