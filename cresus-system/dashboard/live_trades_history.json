@@ -1,47 +1,43 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-19T13:24:36.214684+00:00",
+  "generated_at": "2026-05-19T13:26:49.239132+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 213,
-    "open": 2,
-    "closed": 211,
+    "open": 1,
+    "closed": 212,
     "wins": 72,
-    "losses": 137,
-    "win_rate": 0.344,
-    "total_pnl_usdt": 1.6427,
-    "net_pnl_usdt": -2.1892,
-    "avg_pnl_usdt": 0.0078,
+    "losses": 138,
+    "win_rate": 0.343,
+    "total_pnl_usdt": 1.5846,
+    "net_pnl_usdt": -2.2632,
+    "avg_pnl_usdt": 0.0075,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 3.8499,
-    "fees_realized_usdt": 3.8319,
-    "fees_open_usdt": 0.0179,
+    "fees_paid_usdt": 3.8578,
+    "fees_realized_usdt": 3.8478,
+    "fees_open_usdt": 0.01,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 39.88,
-    "free_capital_usdt": 57.92,
+    "deployed_usdt": 19.96,
+    "free_capital_usdt": 77.76,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -3.9941,
-    "deployed_usdt": 59.33
+    "daily_pnl": -4.3732,
+    "deployed_usdt": 19.96
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "ESPORTSUSDT",
-      "STXUSDT",
       "DEXEUSDT"
     ],
     "exchange_symbols": [
-      "ESPORTSUSDT",
-      "STXUSDT",
       "DEXEUSDT"
     ]
   },
@@ -88,11 +84,13 @@
       "btc_change_24h_at_open": -0.207,
       "btc_pct_vs_ma25_at_open": -0.037,
       "phase_a_mfe_price": 14.077,
-      "current_price": 14.065,
-      "unrealized_pnl_usdt": 0.0085,
-      "unrealized_pnl_pct": 0.043,
-      "last_price_check_at": "2026-05-19T13:24:30.640295+00:00"
-    },
+      "current_price": 14.048,
+      "unrealized_pnl_usdt": -0.0156,
+      "unrealized_pnl_pct": -0.078,
+      "last_price_check_at": "2026-05-19T13:26:46.197434+00:00"
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "STXUSDT|LONG|2026-05-19T13:23:08.507655+00:00",
       "trade_id": "L1779196988_STXUSDT_L",
@@ -126,7 +124,7 @@
       "phase_a_mfe_pct": 0.0,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.007965,
+      "fees_paid_usdt": 0.015906,
       "fees_are_actual": true,
       "opened_at": "2026-05-19T13:23:26.353657+00:00",
       "is_dry_run": false,
@@ -135,13 +133,21 @@
       "btc_change_24h_at_open": -0.231,
       "btc_pct_vs_ma25_at_open": -0.059,
       "phase_a_mfe_price": 0.2399,
-      "current_price": 0.24,
-      "unrealized_pnl_usdt": 0.0083,
-      "unrealized_pnl_pct": 0.042,
-      "last_price_check_at": "2026-05-19T13:24:30.640295+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.2395,
+      "unrealized_pnl_usdt": -0.0332,
+      "unrealized_pnl_pct": -0.167,
+      "last_price_check_at": "2026-05-19T13:25:06.433115+00:00",
+      "closed_at": "2026-05-19T13:25:43.900056+00:00",
+      "close_reason": "paper:hit_sl",
+      "avg_exit_price": 0.2392,
+      "realized_pnl_usdt": -0.0581,
+      "close_order_id": 111315337,
+      "close_qty": 83.0,
+      "close_expected_price": 0.2395,
+      "close_slippage_bps": 12.53,
+      "entry_fees_usdt": 0.007965,
+      "close_fees_usdt": 0.007941
+    },
     {
       "paper_id": "ESPORTSUSDT|SHORT|2026-05-19T13:10:10.829161+00:00",
       "trade_id": "L1779196210_ESPORTS_S",
@@ -11203,24 +11209,14 @@
       "close_qty": 53792.0
     }
   ],
-  "missed_signals": [
-    {
-      "paper_id": "BLUAIUSDT|SHORT|2026-05-19T13:03:36.247168+00:00",
-      "symbol": "BLUAIUSDT",
-      "direction": "SHORT",
-      "conviction_score": 5,
-      "signal_at": "2026-05-19T13:04:18.414101+00:00",
-      "reason": "paper trade too old (1212s > 600s)",
-      "last_checked_at": "2026-05-19T13:24:30.640295+00:00"
-    }
-  ],
+  "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 76771.2,
-    "btc_ma25_1h": 76810.4,
-    "pct_vs_ma25": -0.051,
-    "change_24h_pct": -0.222,
-    "computed_at": "2026-05-19T13:24:32.843067+00:00"
+    "btc_price": 76730.0,
+    "btc_ma25_1h": 76808.75,
+    "pct_vs_ma25": -0.103,
+    "change_24h_pct": -0.276,
+    "computed_at": "2026-05-19T13:26:48.907695+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
