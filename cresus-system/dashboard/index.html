@@ -1769,16 +1769,19 @@
   }
   .regime-timeline {
     display: grid; grid-template-columns: repeat(24, 1fr); gap: 3px;
-    height: 22px;
-    max-height: 22px;     /* 强制上限, 防止某些场景被拉伸成方块 */
+    height: 24px;
+    max-height: 24px;     /* 强制上限, 防止某些场景被拉伸成方块 */
     margin-bottom: 2px;
   }
   .regime-tl-cell {
     border-radius: 3px; cursor: default; transition: opacity 0.15s;
     position: relative;
-    height: 22px;
-    min-height: 22px;
-    max-height: 22px;
+    height: 24px;
+    min-height: 24px;
+    max-height: 24px;
+    box-sizing: border-box;
+    /* 填色格也加细描边, 视觉密度跟空格保持一致 (否则空格抢戏) */
+    border: 1px solid rgba(255,255,255,0.10);
   }
   .regime-tl-cell:hover { opacity: 0.7; }
   .regime-tl-cell:hover::after {
@@ -1788,13 +1791,12 @@
     font-size: 11px; white-space: pre-line; z-index: 10; margin-bottom: 6px;
     pointer-events: none;
   }
-  /* Phase 2b: 真 24H timeline — gap 用虚线 + 透明背景, 避免与 #5a6478 盘整死水撞色 */
+  /* Phase 2b: 真 24H timeline — gap 用淡虚线 + 透明背景, 避免与 #5a6478 盘整死水撞色 */
   .regime-tl-cell.empty {
     background: transparent;
-    border: 1.5px dashed rgba(255,255,255,0.25);
-    box-sizing: border-box;
+    border: 1px dashed rgba(255,255,255,0.18);  /* 比填色格更淡, 让它"退到后景" */
   }
-  /* 24h 刻度行 — 标记 00 06 12 18 NOW 五个关键时点 */
+  /* 24h 刻度行 — 标记 6 个刻度 + NOW */
   .regime-timeline-scale {
     display: grid; grid-template-columns: repeat(24, 1fr); gap: 3px;
     font-size: 9.5px; color: var(--text-dim);
@@ -1811,6 +1813,15 @@
   .regime-timeline-scale > span.now {
     color: #1cbe72; font-weight: 700;
   }
+  /* "X 小时缺数据" — 醒目的 chip 而不是 inline 文字 */
+  .regime-timeline-gap-chip {
+    display: inline-block;
+    padding: 1px 7px; margin-left: 2px;
+    border-radius: 3px; font-weight: 600; font-size: 11px;
+    color: #ffb84d;
+    background: rgba(255,184,77,0.10);
+    border: 1px solid rgba(255,184,77,0.28);
+  }
   /* UNKNOWN regime: 紫色, 跟所有已用色不撞 (fallback for unmapped regime types) */
   .regime-badge.unknown { color:#ce93f0; background:rgba(156,39,176,0.15); }
   .regime-legend {
@@ -1821,8 +1832,8 @@
   .legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
   @media (max-width: 720px) {
     .regime-evidence-grid { grid-template-columns: 1fr; gap: 8px; }
-    .regime-timeline { grid-template-columns: repeat(24, 1fr); height: 16px; max-height: 16px; gap: 1.5px; }
-    .regime-tl-cell { height: 16px; min-height: 16px; max-height: 16px; }
+    .regime-timeline { grid-template-columns: repeat(24, 1fr); height: 18px; max-height: 18px; gap: 1.5px; }
+    .regime-tl-cell { height: 18px; min-height: 18px; max-height: 18px; }
     .regime-timeline-scale { grid-template-columns: repeat(24, 1fr); gap: 1.5px; font-size: 8px; }
     .regime-header { padding: 12px 14px; flex-wrap: wrap; gap: 6px; }
     .regime-body { padding: 12px 14px; }
@@ -3007,7 +3018,7 @@
           <span class="legend-item"><span class="legend-dot" style="background:#ff9800"></span>拉砸风险</span>
           <span class="legend-item"><span class="legend-dot" style="background:#5a6478"></span>盘整死水</span>
           <span class="legend-item"><span class="legend-dot" style="background:#9c27b0"></span>未知</span>
-          <span class="legend-item"><span class="legend-dot" style="background:transparent;border:1.5px dashed rgba(255,255,255,0.45);box-sizing:border-box"></span>无数据</span>
+          <span class="legend-item"><span class="legend-dot" style="background:transparent;border:1px dashed rgba(255,255,255,0.40);box-sizing:border-box"></span>无数据</span>
         </div>
       </div>
     </div>
@@ -3950,16 +3961,16 @@ function renderRegimeTimeline() {
   const gaps   = 24 - filled;
   // 让用户一眼看出"24h 内有多少小时有数据"
   cnt.innerHTML = `${filled}/24 小时有数据`
-    + (gaps > 0 ? ` <span style="color:#ffb84d">· ${gaps} 小时缺数据</span>` : '')
+    + (gaps > 0 ? ` · <span class="regime-timeline-gap-chip">⚠ ${gaps}h 缺数据</span>` : '')
     + ` · 总 ${regimeHistory.length} 个快照`;
 
-  // 24h 刻度行 (00 06 12 18 NOW). 即使 cells 为空也要渲染, 否则用户看不到时间参考.
+  // 24h 刻度行 — 5 个均匀刻度 (i=0,6,12,18) + NOW (i=23).
+  // 18 跟 NOW 隔 5 格 (~20% 宽度), 完全够放, 不会重叠.
   const scaleEl = document.getElementById("regime-timeline-scale");
   if (scaleEl) {
     scaleEl.innerHTML = buckets.map((b, i) => {
       const isNow = (i === 23);
-      // 每 6h 显示一格 + 末格 NOW
-      const showLabel = isNow || (i % 6 === 0 && i !== 18);  // 避免 18 跟 NOW 太近重叠
+      const showLabel = isNow || (i % 6 === 0);  // 0, 6, 12, 18, 23(NOW) = 5 个刻度
       if (!showLabel) return '<span></span>';
       const hr = String(new Date(b.start).getHours()).padStart(2, "0");
       const lbl = isNow ? "NOW" : `${hr}:00`;
