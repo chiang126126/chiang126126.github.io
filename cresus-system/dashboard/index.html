@@ -1779,6 +1779,11 @@
     height: 22px;
     min-height: 22px;
     max-height: 22px;
+    /* 关键: 所有 cell 统一 border-box + 1.5px transparent 边框占位.
+       这样 filled / empty cell 的 outer 盒尺寸完全一致, 只是边框颜色/样式不同.
+       (之前 box-sizing 仅在 .empty 上, 跟 filled 的 content-box 撞出高度错乱) */
+    box-sizing: border-box;
+    border: 1.5px solid transparent;
   }
   .regime-tl-cell:hover { opacity: 0.7; }
   .regime-tl-cell:hover::after {
@@ -1788,11 +1793,11 @@
     font-size: 11px; white-space: pre-line; z-index: 10; margin-bottom: 6px;
     pointer-events: none;
   }
-  /* Phase 2b: 真 24H timeline — gap 用虚线 + 透明背景, 避免与 #5a6478 盘整死水撞色 */
+  /* 空格只改边框颜色/样式, 不动 box-sizing 和 border-width (从父类继承) */
   .regime-tl-cell.empty {
     background: transparent;
-    border: 1.5px dashed rgba(255,255,255,0.25);
-    box-sizing: border-box;
+    border-color: rgba(255,255,255,0.25);
+    border-style: dashed;
   }
   /* 24h 刻度行 — 标记 00 06 12 18 NOW 五个关键时点 */
   .regime-timeline-scale {
