@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-19T01:20:06.535748+00:00",
+  "generated_at": "2026-05-19T01:22:19.692133+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 172,
-    "open": 1,
+    "total_trades": 173,
+    "open": 2,
     "closed": 171,
     "wins": 59,
     "losses": 110,
@@ -14,31 +14,33 @@
     "avg_pnl_usdt": 0.0328,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 3.0651,
+    "fees_paid_usdt": 3.0751,
     "fees_realized_usdt": 3.0551,
-    "fees_open_usdt": 0.01,
+    "fees_open_usdt": 0.02,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 19.98,
-    "free_capital_usdt": 82.56,
+    "deployed_usdt": 40.01,
+    "free_capital_usdt": 62.52,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -0.3513,
-    "deployed_usdt": 19.98
+    "deployed_usdt": 40.01
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "COOKIEUSDT"
+      "COOKIEUSDT",
+      "RONINUSDT"
     ],
     "exchange_symbols": [
-      "COOKIEUSDT"
+      "COOKIEUSDT",
+      "RONINUSDT"
     ]
   },
   "open_trades": [
@@ -72,7 +74,7 @@
       "conviction_score": 5,
       "alert_type": "sustained",
       "atr_pct": 0.42,
-      "phase_a_mfe_pct": 0.604,
+      "phase_a_mfe_pct": 0.769,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.009992,
@@ -83,11 +85,58 @@
       "btc_price_at_open": 77172.1,
       "btc_change_24h_at_open": 0.162,
       "btc_pct_vs_ma25_at_open": 0.363,
-      "phase_a_mfe_price": 0.01809,
-      "current_price": 0.01809,
-      "unrealized_pnl_usdt": 0.1752,
-      "unrealized_pnl_pct": 0.877,
-      "last_price_check_at": "2026-05-19T01:20:04.824847+00:00"
+      "phase_a_mfe_price": 0.01806,
+      "current_price": 0.01805,
+      "unrealized_pnl_usdt": 0.219,
+      "unrealized_pnl_pct": 1.096,
+      "last_price_check_at": "2026-05-19T01:22:16.904485+00:00"
+    },
+    {
+      "paper_id": "RONINUSDT|LONG|2026-05-19T01:20:22.776971+00:00",
+      "trade_id": "L1779153622_RONINUS_L",
+      "symbol": "RONINUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.1231,
+      "avg_fill_price": 0.1224,
+      "slippage_bps": -56.86,
+      "qty": 163.6,
+      "notional_usdt": 20.02464,
+      "leverage": 3,
+      "risk_usdt": 0.3225,
+      "risk_pct": 1.611,
+      "mirror_latency_sec": 27.4,
+      "sl_price": 0.11972856999999999,
+      "sl_paper_current": 0.12042857,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -0.0007,
+      "sl_compensation_mode": "ab",
+      "tp1_price": 0.12710714,
+      "tp2_price": 0.13111429,
+      "phase": "A",
+      "entry_order_id": 99034467,
+      "entry_client_id": "cresus_L1779153622_RONINUS_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 1.085,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.010012,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-19T01:21:46.080299+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 76952.8,
+      "btc_change_24h_at_open": -0.172,
+      "btc_pct_vs_ma25_at_open": 0.085,
+      "phase_a_mfe_price": 0.1231,
+      "current_price": 0.1221,
+      "unrealized_pnl_usdt": -0.0491,
+      "unrealized_pnl_pct": -0.245,
+      "last_price_check_at": "2026-05-19T01:22:16.904485+00:00"
     }
   ],
   "recent_closed": [
@@ -8857,11 +8906,11 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 76959.4,
-    "btc_ma25_1h": 76887.36,
-    "pct_vs_ma25": 0.094,
-    "change_24h_pct": -0.164,
-    "computed_at": "2026-05-19T01:20:06.208507+00:00"
+    "btc_price": 76987.1,
+    "btc_ma25_1h": 76888.47,
+    "pct_vs_ma25": 0.128,
+    "change_24h_pct": -0.128,
+    "computed_at": "2026-05-19T01:22:19.092455+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
