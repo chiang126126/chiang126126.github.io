@@ -22,9 +22,6 @@ Crésus
 - 📖 `docs/` — 搭建 / 运维指南
 - 🎛️ 未来的面板前端（P5 阶段）
 
-> 💡 仓库根目录还有一个独立项目 [`../sprite-catcher/`](../sprite-catcher/)——
-> 专门做妖币的自动化交易体系，**与 Crésus 完全平行、互不依赖**（独立私仓、独立账户）。
-
 **另一个 private 仓库**（后续创建）存放：
 - 🤖 自动扫币 bot 的所有代码
 - 🔑 `.env`（API 密钥，绝不进 git）
@@ -56,7 +53,4 @@ Crésus
 8. [docs/04-setup-deepseek-api.md](docs/04-setup-deepseek-api.md) — 建 DeepSeek（P3 前）
 9. [docs/07-vps-hosting.md](docs/07-vps-hosting.md) — 决定部署位置（P5 前）
 
----
 
-> 📌 妖币专项体系（与 Crésus 完全独立）移到了仓库根目录的
-> [`../sprite-catcher/`](../sprite-catcher/)，包含自己的代码、文档、私仓 spec。
