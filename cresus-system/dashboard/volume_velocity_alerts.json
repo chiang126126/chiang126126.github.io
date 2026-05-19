@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-19T05:01:39.077042+00:00",
+  "updated_at": "2026-05-19T05:03:44.532704+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 34,
+  "alerts_count": 35,
   "alerts": [
+    {
+      "symbol": "MUSDT",
+      "base": "M",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 3.447,
+      "price_change_pct": 1.997,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 64097.0,
+      "volume_baseline_usdt": 3895.0,
+      "volume_ratio": 16.46,
+      "detected_at": "2026-05-19T05:03:41.029926+00:00",
+      "intensity": 1,
+      "change_5m_pct": 1.959,
+      "change_15m_pct": 1.73,
+      "change_1h_pct": 3.446,
+      "change_4h_pct": 4.376,
+      "taker_buy_ratio_1m": 0.627,
+      "taker_buy_ratio_5m": 0.707,
+      "oi_delta_5m_pct": -0.006,
+      "funding_rate_pct": 0.0236,
+      "atr_pct": 0.481,
+      "range_4h_pct": 7.69,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 3.42211071,
+      "suggested_tp1": 3.48433393,
+      "suggested_tp2": 3.52166786,
+      "conviction_score": 3,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "MUSDT",
       "base": "M",
