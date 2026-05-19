@@ -1,46 +1,46 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-19T13:20:34.463609+00:00",
+  "generated_at": "2026-05-19T13:22:51.694504+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 211,
+    "total_trades": 212,
     "open": 2,
-    "closed": 209,
+    "closed": 210,
     "wins": 72,
-    "losses": 135,
-    "win_rate": 0.348,
-    "total_pnl_usdt": 2.454,
-    "net_pnl_usdt": -1.339,
-    "avg_pnl_usdt": 0.0117,
+    "losses": 136,
+    "win_rate": 0.346,
+    "total_pnl_usdt": 1.9637,
+    "net_pnl_usdt": -1.8486,
+    "avg_pnl_usdt": 0.0094,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 3.8125,
-    "fees_realized_usdt": 3.793,
-    "fees_open_usdt": 0.0195,
+    "fees_paid_usdt": 3.832,
+    "fees_realized_usdt": 3.8123,
+    "fees_open_usdt": 0.0197,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 39.06,
-    "free_capital_usdt": 59.58,
+    "deployed_usdt": 39.42,
+    "free_capital_usdt": 58.71,
     "max_concurrent_slots": 4,
     "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -3.5038,
-    "deployed_usdt": 39.06
+    "daily_pnl": -3.9941,
+    "deployed_usdt": 39.42
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "SIRENUSDT",
-      "ESPORTSUSDT"
+      "ESPORTSUSDT",
+      "DEXEUSDT"
     ],
     "exchange_symbols": [
-      "SIRENUSDT",
-      "ESPORTSUSDT"
+      "ESPORTSUSDT",
+      "DEXEUSDT"
     ]
   },
   "open_trades": [
@@ -86,11 +86,60 @@
       "btc_change_24h_at_open": -0.131,
       "btc_pct_vs_ma25_at_open": 0.036,
       "phase_a_mfe_price": 0.6698,
-      "current_price": 0.6753,
-      "unrealized_pnl_usdt": -0.1305,
-      "unrealized_pnl_pct": -0.671,
-      "last_price_check_at": "2026-05-19T13:20:32.324125+00:00"
+      "current_price": 0.68066,
+      "unrealized_pnl_usdt": -0.2859,
+      "unrealized_pnl_pct": -1.47,
+      "last_price_check_at": "2026-05-19T13:22:49.133273+00:00"
     },
+    {
+      "paper_id": "DEXEUSDT|LONG|2026-05-19T13:20:56.672532+00:00",
+      "trade_id": "L1779196856_DEXEUSD_L",
+      "symbol": "DEXEUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 14.048,
+      "avg_fill_price": 14.059,
+      "slippage_bps": 7.83,
+      "qty": 1.42,
+      "notional_usdt": 19.96378,
+      "leverage": 3,
+      "risk_usdt": 0.0674,
+      "risk_pct": 0.338,
+      "mirror_latency_sec": 32.0,
+      "sl_price": 14.022499999999999,
+      "sl_paper_current": 14.0115,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.011,
+      "sl_compensation_mode": "ab",
+      "tp1_price": 14.10275,
+      "tp2_price": 14.1575,
+      "phase": "A",
+      "entry_order_id": 142148975,
+      "entry_client_id": "cresus_L1779196856_DEXEUSD_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.26,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.009982,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-19T13:21:42.671834+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 76782.7,
+      "btc_change_24h_at_open": -0.207,
+      "btc_pct_vs_ma25_at_open": -0.037,
+      "phase_a_mfe_price": 14.048,
+      "current_price": 14.069,
+      "unrealized_pnl_usdt": 0.0142,
+      "unrealized_pnl_pct": 0.071,
+      "last_price_check_at": "2026-05-19T13:22:49.133273+00:00"
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "SIRENUSDT|LONG|2026-05-19T13:16:24.420090+00:00",
       "trade_id": "L1779196584_SIRENUS_L",
@@ -124,7 +173,7 @@
       "phase_a_mfe_pct": 0.071,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.009804,
+      "fees_paid_usdt": 0.019362,
       "fees_are_actual": true,
       "opened_at": "2026-05-19T13:17:12.375043+00:00",
       "is_dry_run": false,
@@ -133,13 +182,21 @@
       "btc_change_24h_at_open": -0.148,
       "btc_pct_vs_ma25_at_open": 0.02,
       "phase_a_mfe_price": 0.5622,
-      "current_price": 0.5525,
-      "unrealized_pnl_usdt": -0.2698,
-      "unrealized_pnl_pct": -1.376,
-      "last_price_check_at": "2026-05-19T13:20:32.324125+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.5469,
+      "unrealized_pnl_usdt": -0.4658,
+      "unrealized_pnl_pct": -2.376,
+      "last_price_check_at": "2026-05-19T13:22:13.763133+00:00",
+      "closed_at": "2026-05-19T13:22:18.593237+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.5462,
+      "realized_pnl_usdt": -0.4903,
+      "close_order_id": 112780267,
+      "close_qty": 35.0,
+      "close_expected_price": 0.5484100000000001,
+      "close_slippage_bps": 40.3,
+      "entry_fees_usdt": 0.009804,
+      "close_fees_usdt": 0.009558
+    },
     {
       "paper_id": "SAHARAUSDT|LONG|2026-05-19T12:57:12.077044+00:00",
       "trade_id": "L1779195432_SAHARAU_L",
@@ -11094,17 +11151,17 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-19T13:04:18.414101+00:00",
-      "reason": "paper trade too old (974s > 600s)",
-      "last_checked_at": "2026-05-19T13:20:32.324125+00:00"
+      "reason": "paper trade too old (1111s > 600s)",
+      "last_checked_at": "2026-05-19T13:22:49.133273+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 76811.3,
-    "btc_ma25_1h": 76812.0,
-    "pct_vs_ma25": -0.001,
-    "change_24h_pct": -0.17,
-    "computed_at": "2026-05-19T13:20:33.865371+00:00"
+    "btc_price": 76782.7,
+    "btc_ma25_1h": 76810.86,
+    "pct_vs_ma25": -0.037,
+    "change_24h_pct": -0.207,
+    "computed_at": "2026-05-19T13:22:51.117434+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
