@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-20T02:47:29.492768+00:00",
+  "updated_at": "2026-05-20T02:49:47.187625+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 36,
+  "alerts_count": 37,
   "alerts": [
+    {
+      "symbol": "FIDAUSDT",
+      "base": "FIDA",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.02285,
+      "price_change_pct": 2.1,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 194462.0,
+      "volume_baseline_usdt": 38035.0,
+      "volume_ratio": 5.11,
+      "detected_at": "2026-05-20T02:48:47.307901+00:00",
+      "intensity": 1,
+      "change_5m_pct": 1.873,
+      "change_15m_pct": 2.147,
+      "change_1h_pct": 6.53,
+      "change_4h_pct": 9.387,
+      "taker_buy_ratio_1m": 0.5,
+      "taker_buy_ratio_5m": 0.501,
+      "oi_delta_5m_pct": 0.993,
+      "funding_rate_pct": -0.0338,
+      "atr_pct": 0.71,
+      "range_4h_pct": 9.41,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.02260679,
+      "suggested_tp1": 0.02321482,
+      "suggested_tp2": 0.02357964,
+      "conviction_score": 5,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "FHEUSDT",
       "base": "FHE",
