@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-20T08:36:13.337000+00:00",
+  "generated_at": "2026-05-20T08:38:30.441947+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 233,
-    "open": 2,
+    "total_trades": 234,
+    "open": 3,
     "closed": 231,
     "wins": 77,
     "losses": 152,
@@ -14,31 +14,33 @@
     "avg_pnl_usdt": -0.0023,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 4.2266,
+    "fees_paid_usdt": 4.2366,
     "fees_realized_usdt": 4.2087,
-    "fees_open_usdt": 0.0179,
+    "fees_open_usdt": 0.0279,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 39.83,
-    "free_capital_usdt": 55.42,
+    "deployed_usdt": 59.83,
+    "free_capital_usdt": 35.41,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 3
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -0.8541,
-    "deployed_usdt": 39.83
+    "deployed_usdt": 59.83
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
+      "AXLUSDT",
       "NILUSDT",
       "KITEUSDT"
     ],
     "exchange_symbols": [
+      "AXLUSDT",
       "NILUSDT",
       "KITEUSDT"
     ]
@@ -94,7 +96,7 @@
       "current_price": 0.0524,
       "unrealized_pnl_usdt": -0.0,
       "unrealized_pnl_pct": -0.0,
-      "last_price_check_at": "2026-05-20T08:36:10.498147+00:00"
+      "last_price_check_at": "2026-05-20T08:38:27.361640+00:00"
     },
     {
       "paper_id": "KITEUSDT|SHORT|2026-05-20T08:03:23.701048+00:00",
@@ -143,10 +145,62 @@
       "btc_change_24h_at_open": 0.275,
       "btc_pct_vs_ma25_at_open": 0.506,
       "phase_a_mfe_price": 0.2269,
-      "current_price": 0.22859,
-      "unrealized_pnl_usdt": -0.0487,
-      "unrealized_pnl_pct": -0.246,
-      "last_price_check_at": "2026-05-20T08:36:10.498147+00:00"
+      "current_price": 0.22849,
+      "unrealized_pnl_usdt": -0.04,
+      "unrealized_pnl_pct": -0.202,
+      "last_price_check_at": "2026-05-20T08:38:27.361640+00:00"
+    },
+    {
+      "paper_id": "AXLUSDT|LONG|2026-05-20T08:37:03.598108+00:00",
+      "trade_id": "L1779266223_AXLUSDT_L",
+      "symbol": "AXLUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.06087,
+      "avg_fill_price": 0.0609,
+      "slippage_bps": 4.93,
+      "qty": 328.4,
+      "notional_usdt": 19.99956,
+      "leverage": 3,
+      "risk_usdt": 0.1228,
+      "risk_pct": 0.614,
+      "mirror_latency_sec": 15.0,
+      "sl_price": 0.06052607,
+      "sl_paper_current": 0.06052607,
+      "sl_compensation_enabled": false,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "abc",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 2,
+      "wick_filter_mode": "abc",
+      "sl_breach_count": 0,
+      "ab_group": "C",
+      "tp1_price": 0.06138589,
+      "tp2_price": 0.06190179,
+      "phase": "A",
+      "entry_order_id": 111151349,
+      "entry_client_id": "cresus_L1779266223_AXLUSDT_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.377,
+      "phase_a_mfe_pct": 0.066,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.01,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-20T08:37:22.082861+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "up",
+      "btc_price_at_open": 77320.7,
+      "btc_change_24h_at_open": 0.378,
+      "btc_pct_vs_ma25_at_open": 0.604,
+      "phase_a_mfe_price": 0.06091,
+      "current_price": 0.0611,
+      "unrealized_pnl_usdt": 0.0657,
+      "unrealized_pnl_pct": 0.328,
+      "last_price_check_at": "2026-05-20T08:38:27.361640+00:00"
     }
   ],
   "recent_closed": [
@@ -12443,17 +12497,17 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-20T06:48:58.710190+00:00",
-      "reason": "paper trade too old (6432s > 600s)",
-      "last_checked_at": "2026-05-20T08:36:10.498147+00:00"
+      "reason": "paper trade too old (6569s > 600s)",
+      "last_checked_at": "2026-05-20T08:38:27.361640+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 77320.7,
-    "btc_ma25_1h": 76856.62,
-    "pct_vs_ma25": 0.604,
-    "change_24h_pct": 0.378,
-    "computed_at": "2026-05-20T08:36:12.675581+00:00"
+    "btc_price": 77304.4,
+    "btc_ma25_1h": 76855.97,
+    "pct_vs_ma25": 0.583,
+    "change_24h_pct": 0.356,
+    "computed_at": "2026-05-20T08:38:29.551038+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
