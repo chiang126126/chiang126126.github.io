@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-20T21:58:08.971927+00:00",
+  "updated_at": "2026-05-20T22:00:34.169774+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 12,
+  "alerts_count": 13,
   "alerts": [
+    {
+      "symbol": "SAPIENUSDT",
+      "base": "SAPIEN",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.11255,
+      "price_change_pct": -1.098,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 55106.0,
+      "volume_baseline_usdt": 3426.0,
+      "volume_ratio": 16.08,
+      "detected_at": "2026-05-20T22:00:26.141436+00:00",
+      "intensity": 3,
+      "change_5m_pct": -0.986,
+      "change_15m_pct": -0.864,
+      "change_1h_pct": 0.42,
+      "change_4h_pct": -3.243,
+      "taker_buy_ratio_1m": 0.146,
+      "taker_buy_ratio_5m": 0.202,
+      "oi_delta_5m_pct": -0.251,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.264,
+      "range_4h_pct": 5.0,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.11299571,
+      "suggested_tp1": 0.11188143,
+      "suggested_tp2": 0.11121286,
+      "conviction_score": 3,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "PUMPBTCUSDT",
       "base": "PUMPBTC",
