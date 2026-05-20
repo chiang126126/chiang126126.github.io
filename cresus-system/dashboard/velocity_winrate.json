@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T14:04:15.806072+00:00",
+  "generated_at": "2026-05-20T14:06:26.762214+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
@@ -97,9 +97,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 9,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -0.42
+          "n": 10,
+          "win_rate": 0.4,
+          "avg_outcome_pct": -0.32
         },
         "60m": {
           "n": 9,
@@ -5097,6 +5097,18 @@
         }
       }
     },
+    "AMDUSDT|sustained|LONG": {
+      "symbol": "AMDUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -1.07
+        }
+      }
+    },
     "INTCUSDT|sustained|LONG": {
       "symbol": "INTCUSDT",
       "alert_type": "sustained",
@@ -6942,6 +6954,18 @@
           "n": 11,
           "win_rate": 0.727,
           "avg_outcome_pct": 8.05
+        }
+      }
+    },
+    "COINUSDT|sustained|SHORT": {
+      "symbol": "COINUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.6
         }
       }
     },
