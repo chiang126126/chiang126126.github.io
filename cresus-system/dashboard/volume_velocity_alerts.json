@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-20T05:08:54.607194+00:00",
+  "updated_at": "2026-05-20T05:11:05.939341+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 19,
+  "alerts_count": 20,
   "alerts": [
+    {
+      "symbol": "USELESSUSDT",
+      "base": "USELESS",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.0602,
+      "price_change_pct": 0.635,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 26127.0,
+      "volume_baseline_usdt": 2447.0,
+      "volume_ratio": 10.68,
+      "detected_at": "2026-05-20T05:10:51.030078+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.753,
+      "change_15m_pct": 1.023,
+      "change_1h_pct": 1.414,
+      "change_4h_pct": 1.74,
+      "taker_buy_ratio_1m": 0.487,
+      "taker_buy_ratio_5m": 0.489,
+      "oi_delta_5m_pct": 0.192,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.26,
+      "range_4h_pct": 3.46,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.06004357,
+      "suggested_tp1": 0.06043464,
+      "suggested_tp2": 0.06066929,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "TRUTHUSDT",
       "base": "TRUTH",
