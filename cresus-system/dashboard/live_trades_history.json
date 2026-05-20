@@ -1,47 +1,44 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-20T02:37:29.990706+00:00",
+  "generated_at": "2026-05-20T02:39:39.199652+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 222,
-    "open": 1,
-    "closed": 221,
-    "wins": 72,
+    "open": 0,
+    "closed": 222,
+    "wins": 73,
     "losses": 147,
-    "win_rate": 0.329,
-    "total_pnl_usdt": -0.9249,
-    "net_pnl_usdt": -4.947,
-    "avg_pnl_usdt": -0.0042,
+    "win_rate": 0.332,
+    "total_pnl_usdt": -0.7677,
+    "net_pnl_usdt": -4.8099,
+    "avg_pnl_usdt": -0.0035,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 4.0321,
-    "fees_realized_usdt": 4.0221,
-    "fees_open_usdt": 0.01,
+    "fees_paid_usdt": 4.0422,
+    "fees_realized_usdt": 4.0422,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 20.0,
-    "free_capital_usdt": 75.04,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 95.19,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -1.2587,
-    "deployed_usdt": 20.0
+    "daily_pnl": -1.1015,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "KAIAUSDT"
-    ],
-    "exchange_symbols": [
-      "KAIAUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "KAIAUSDT|LONG|2026-05-20T02:07:10.202755+00:00",
       "trade_id": "L1779242830_KAIAUSD_L",
@@ -80,7 +77,7 @@
       "phase_a_mfe_pct": 1.199,
       "phase_b_mfe_pct": 1.475,
       "phase_c_mfe_pct": 1.809,
-      "fees_paid_usdt": 0.010002,
+      "fees_paid_usdt": 0.020082,
       "fees_are_actual": true,
       "opened_at": "2026-05-20T02:07:40.513719+00:00",
       "is_dry_run": false,
@@ -89,15 +86,23 @@
       "btc_change_24h_at_open": 0.237,
       "btc_pct_vs_ma25_at_open": -0.06,
       "phase_a_mfe_price": 0.05147,
-      "current_price": 0.0515,
-      "unrealized_pnl_usdt": 0.2358,
-      "unrealized_pnl_pct": 1.179,
-      "last_price_check_at": "2026-05-20T02:37:27.904185+00:00",
+      "current_price": 0.0513,
+      "unrealized_pnl_usdt": 0.1572,
+      "unrealized_pnl_pct": 0.786,
+      "last_price_check_at": "2026-05-20T02:38:31.706289+00:00",
       "phase_b_mfe_price": 0.05161,
-      "phase_c_mfe_price": 0.05178
-    }
-  ],
-  "recent_closed": [
+      "phase_c_mfe_price": 0.05178,
+      "closed_at": "2026-05-20T02:38:35.081601+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.0513,
+      "realized_pnl_usdt": 0.1572,
+      "close_order_id": 125270072,
+      "close_qty": 393.0,
+      "close_expected_price": 0.051370531850000005,
+      "close_slippage_bps": 13.73,
+      "entry_fees_usdt": 0.010002,
+      "close_fees_usdt": 0.01008
+    },
     {
       "paper_id": "VVVUSDT|SHORT|2026-05-20T01:46:45.435159+00:00",
       "trade_id": "L1779241605_VVVUSDT_S",
@@ -11761,17 +11766,17 @@
       "direction": "SHORT",
       "conviction_score": 6,
       "signal_at": "2026-05-20T02:05:20.765959+00:00",
-      "reason": "paper trade too old (1927s > 600s)",
-      "last_checked_at": "2026-05-20T02:37:27.904185+00:00"
+      "reason": "paper trade too old (2056s > 600s)",
+      "last_checked_at": "2026-05-20T02:39:37.033508+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 76629.2,
-    "btc_ma25_1h": 76806.23,
-    "pct_vs_ma25": -0.23,
-    "change_24h_pct": 0.059,
-    "computed_at": "2026-05-20T02:37:29.559297+00:00"
+    "btc_price": 76635.0,
+    "btc_ma25_1h": 76806.46,
+    "pct_vs_ma25": -0.223,
+    "change_24h_pct": 0.067,
+    "computed_at": "2026-05-20T02:39:39.173888+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
