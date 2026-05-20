@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-20T19:49:25.794629+00:00",
+  "updated_at": "2026-05-20T19:51:36.424009+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 40,
+  "alerts_count": 41,
   "alerts": [
+    {
+      "symbol": "HANAUSDT",
+      "base": "HANA",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.03503,
+      "price_change_pct": 0.922,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 23110.0,
+      "volume_baseline_usdt": 4109.0,
+      "volume_ratio": 5.62,
+      "detected_at": "2026-05-20T19:51:23.045610+00:00",
+      "intensity": 1,
+      "change_5m_pct": 1.498,
+      "change_15m_pct": 3.283,
+      "change_1h_pct": 4.571,
+      "change_4h_pct": 6.435,
+      "taker_buy_ratio_1m": 0.755,
+      "taker_buy_ratio_5m": 0.692,
+      "oi_delta_5m_pct": -0.1,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.414,
+      "range_4h_pct": 7.14,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.0348125,
+      "suggested_tp1": 0.03535625,
+      "suggested_tp2": 0.0356825,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "DYMUSDT",
       "base": "DYM",
