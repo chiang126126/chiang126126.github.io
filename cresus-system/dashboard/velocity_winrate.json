@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T10:09:37.715803+00:00",
+  "generated_at": "2026-05-20T10:11:54.409013+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
@@ -6472,9 +6472,9 @@
           "avg_outcome_pct": 0.44
         },
         "240m": {
-          "n": 8,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 0.58
+          "n": 9,
+          "win_rate": 0.556,
+          "avg_outcome_pct": 1.14
         }
       }
     },
@@ -9692,6 +9692,18 @@
         }
       }
     },
+    "SPACEUSDT|sustained|SHORT": {
+      "symbol": "SPACEUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.46
+        }
+      }
+    },
     "FIDAUSDT|sustained|SHORT": {
       "symbol": "FIDAUSDT",
       "alert_type": "sustained",
@@ -9992,6 +10004,18 @@
           "n": 5,
           "win_rate": 0.6,
           "avg_outcome_pct": 0.62
+        }
+      }
+    },
+    "FOGOUSDT|burst|LONG": {
+      "symbol": "FOGOUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.6,
+          "avg_outcome_pct": -0.98
         }
       }
     }
