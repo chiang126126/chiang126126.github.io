@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-20T22:50:43.935535+00:00",
+  "updated_at": "2026-05-20T22:52:48.513327+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 18,
+  "alerts_count": 19,
   "alerts": [
+    {
+      "symbol": "SAHARAUSDT",
+      "base": "SAHARA",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.03642,
+      "price_change_pct": -0.709,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 248228.0,
+      "volume_baseline_usdt": 21490.0,
+      "volume_ratio": 11.55,
+      "detected_at": "2026-05-20T22:52:06.463622+00:00",
+      "intensity": 1,
+      "change_5m_pct": -1.461,
+      "change_15m_pct": -1.938,
+      "change_1h_pct": -2.28,
+      "change_4h_pct": -2.489,
+      "taker_buy_ratio_1m": 0.286,
+      "taker_buy_ratio_5m": 0.255,
+      "oi_delta_5m_pct": -0.097,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.339,
+      "range_4h_pct": 6.89,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.03660536,
+      "suggested_tp1": 0.03614196,
+      "suggested_tp2": 0.03586393,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "MORPHOUSDT",
       "base": "MORPHO",
