@@ -1,46 +1,44 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-20T06:19:18.297425+00:00",
+  "generated_at": "2026-05-20T06:20:56.759141+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 228,
-    "open": 2,
-    "closed": 226,
+    "open": 1,
+    "closed": 227,
     "wins": 74,
-    "losses": 150,
-    "win_rate": 0.33,
-    "total_pnl_usdt": -0.8391,
-    "net_pnl_usdt": -4.9613,
-    "avg_pnl_usdt": -0.0037,
+    "losses": 151,
+    "win_rate": 0.329,
+    "total_pnl_usdt": -1.0311,
+    "net_pnl_usdt": -5.1692,
+    "avg_pnl_usdt": -0.0045,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 4.1402,
-    "fees_realized_usdt": 4.1222,
-    "fees_open_usdt": 0.018,
+    "fees_paid_usdt": 4.1481,
+    "fees_realized_usdt": 4.1381,
+    "fees_open_usdt": 0.01,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 39.96,
-    "free_capital_usdt": 55.06,
+    "deployed_usdt": 19.99,
+    "free_capital_usdt": 74.83,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -1.1729,
-    "deployed_usdt": 39.96
+    "daily_pnl": -1.3649,
+    "deployed_usdt": 19.99
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "FHEUSDT",
-      "NEARUSDT"
+      "FHEUSDT"
     ],
     "exchange_symbols": [
-      "FHEUSDT",
-      "NEARUSDT"
+      "FHEUSDT"
     ]
   },
   "open_trades": [
@@ -59,8 +57,8 @@
       "risk_usdt": 0.1504,
       "risk_pct": 0.752,
       "mirror_latency_sec": 29.3,
-      "sl_price": 0.02860296375,
-      "sl_paper_current": 0.02860296375,
+      "sl_price": 0.02865257,
+      "sl_paper_current": 0.02865257,
       "sl_compensation_enabled": false,
       "sl_compensation_offset": 0.0,
       "sl_compensation_mode": "abc",
@@ -71,7 +69,7 @@
       "ab_group": "C",
       "tp1_price": 0.02850268,
       "tp2_price": 0.02883536,
-      "phase": "B",
+      "phase": "C",
       "entry_order_id": 146673260,
       "entry_client_id": "cresus_L1779255200_FHEUSDT_L_E",
       "sl_order_id": null,
@@ -80,8 +78,8 @@
       "alert_type": "sustained",
       "atr_pct": 0.525,
       "phase_a_mfe_pct": 1.278,
-      "phase_b_mfe_pct": 2.343,
-      "phase_c_mfe_pct": null,
+      "phase_b_mfe_pct": 2.52,
+      "phase_c_mfe_pct": 2.52,
       "fees_paid_usdt": 0.009997,
       "fees_are_actual": true,
       "opened_at": "2026-05-20T05:33:53.719907+00:00",
@@ -91,12 +89,15 @@
       "btc_change_24h_at_open": 0.445,
       "btc_pct_vs_ma25_at_open": 0.512,
       "phase_a_mfe_price": 0.02853,
-      "current_price": 0.02881,
-      "unrealized_pnl_usdt": 0.4615,
-      "unrealized_pnl_pct": 2.308,
-      "last_price_check_at": "2026-05-20T06:19:15.699519+00:00",
-      "phase_b_mfe_price": 0.02883
-    },
+      "current_price": 0.02884,
+      "unrealized_pnl_usdt": 0.4828,
+      "unrealized_pnl_pct": 2.415,
+      "last_price_check_at": "2026-05-20T06:20:54.773808+00:00",
+      "phase_b_mfe_price": 0.02888,
+      "phase_c_mfe_price": 0.02888
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "NEARUSDT|LONG|2026-05-20T06:01:17.117183+00:00",
       "trade_id": "L1779256877_NEARUSD_L",
@@ -135,7 +136,7 @@
       "phase_a_mfe_pct": 0.542,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.007987,
+      "fees_paid_usdt": 0.015897,
       "fees_are_actual": true,
       "opened_at": "2026-05-20T06:02:51.940215+00:00",
       "is_dry_run": false,
@@ -147,10 +148,18 @@
       "current_price": 1.65,
       "unrealized_pnl_usdt": -0.168,
       "unrealized_pnl_pct": -0.841,
-      "last_price_check_at": "2026-05-20T06:19:15.699519+00:00"
-    }
-  ],
-  "recent_closed": [
+      "last_price_check_at": "2026-05-20T06:19:48.507534+00:00",
+      "closed_at": "2026-05-20T06:20:24.548294+00:00",
+      "close_reason": "paper:hit_sl",
+      "avg_exit_price": 1.648,
+      "realized_pnl_usdt": -0.192,
+      "close_order_id": 253942739,
+      "close_qty": 12.0,
+      "close_expected_price": 1.65,
+      "close_slippage_bps": 12.12,
+      "entry_fees_usdt": 0.007987,
+      "close_fees_usdt": 0.00791
+    },
     {
       "paper_id": "FIDAUSDT|LONG|2026-05-20T05:12:21.326970+00:00",
       "trade_id": "L1779253941_FIDAUSD_L",
@@ -12128,8 +12137,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-20T03:14:14.079012+00:00",
-      "reason": "paper trade too old (11102s > 600s)",
-      "last_checked_at": "2026-05-20T06:19:15.699519+00:00"
+      "reason": "paper trade too old (11201s > 600s)",
+      "last_checked_at": "2026-05-20T06:20:54.773808+00:00"
     },
     {
       "paper_id": "BASEDUSDT|LONG|2026-05-20T04:59:45.177828+00:00",
@@ -12137,17 +12146,17 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-20T05:00:12.217489+00:00",
-      "reason": "paper trade too old (4743s > 600s)",
-      "last_checked_at": "2026-05-20T06:19:15.699519+00:00"
+      "reason": "paper trade too old (4843s > 600s)",
+      "last_checked_at": "2026-05-20T06:20:54.773808+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 77242.0,
-    "btc_ma25_1h": 76837.14,
-    "pct_vs_ma25": 0.527,
-    "change_24h_pct": 0.284,
-    "computed_at": "2026-05-20T06:19:17.702321+00:00"
+    "btc_price": 77276.1,
+    "btc_ma25_1h": 76838.5,
+    "pct_vs_ma25": 0.57,
+    "change_24h_pct": 0.328,
+    "computed_at": "2026-05-20T06:20:56.445264+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
