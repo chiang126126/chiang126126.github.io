@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-20T16:19:31.704948+00:00",
+  "generated_at": "2026-05-20T16:21:16.401992+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 263,
-    "open": 2,
+    "total_trades": 264,
+    "open": 3,
     "closed": 261,
     "wins": 87,
     "losses": 172,
@@ -14,33 +14,35 @@
     "avg_pnl_usdt": -0.0087,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 4.8005,
+    "fees_paid_usdt": 4.8105,
     "fees_realized_usdt": 4.7805,
-    "fees_open_usdt": 0.02,
+    "fees_open_usdt": 0.03,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 39.99,
-    "free_capital_usdt": 52.95,
+    "deployed_usdt": 60.04,
+    "free_capital_usdt": 32.88,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 3
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -2.5975,
-    "deployed_usdt": 39.99
+    "deployed_usdt": 60.04
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "DOGSUSDT",
-      "BERAUSDT"
+      "BERAUSDT",
+      "NAORISUSDT",
+      "DOGSUSDT"
     ],
     "exchange_symbols": [
-      "DOGSUSDT",
-      "BERAUSDT"
+      "BERAUSDT",
+      "NAORISUSDT",
+      "DOGSUSDT"
     ]
   },
   "open_trades": [
@@ -91,10 +93,10 @@
       "btc_change_24h_at_open": 0.698,
       "btc_pct_vs_ma25_at_open": 0.421,
       "phase_a_mfe_price": 0.399,
-      "current_price": 0.398,
-      "unrealized_pnl_usdt": 0.1518,
-      "unrealized_pnl_pct": 0.759,
-      "last_price_check_at": "2026-05-20T16:19:28.293710+00:00",
+      "current_price": 0.397,
+      "unrealized_pnl_usdt": 0.1012,
+      "unrealized_pnl_pct": 0.506,
+      "last_price_check_at": "2026-05-20T16:21:13.382420+00:00",
       "phase_b_mfe_price": 0.3992
     },
     {
@@ -132,7 +134,7 @@
       "conviction_score": 5,
       "alert_type": "sustained",
       "atr_pct": 0.397,
-      "phase_a_mfe_pct": 0.0,
+      "phase_a_mfe_pct": 0.034,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.01,
@@ -143,11 +145,63 @@
       "btc_price_at_open": 77348.8,
       "btc_change_24h_at_open": 0.638,
       "btc_pct_vs_ma25_at_open": 0.364,
-      "phase_a_mfe_price": 5.818e-05,
-      "current_price": 5.819e-05,
-      "unrealized_pnl_usdt": 0.0551,
-      "unrealized_pnl_pct": 0.276,
-      "last_price_check_at": "2026-05-20T16:19:28.293710+00:00"
+      "phase_a_mfe_price": 5.82e-05,
+      "current_price": 5.782e-05,
+      "unrealized_pnl_usdt": -0.0724,
+      "unrealized_pnl_pct": -0.362,
+      "last_price_check_at": "2026-05-20T16:21:13.382420+00:00"
+    },
+    {
+      "paper_id": "NAORISUSDT|LONG|2026-05-20T16:20:03.708908+00:00",
+      "trade_id": "L1779294003_NAORISU_L",
+      "symbol": "NAORISUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.03523,
+      "avg_fill_price": 0.03531,
+      "slippage_bps": 22.71,
+      "qty": 568.0,
+      "notional_usdt": 20.05608,
+      "leverage": 3,
+      "risk_usdt": 0.1566,
+      "risk_pct": 0.781,
+      "mirror_latency_sec": 34.0,
+      "sl_price": 0.03503429,
+      "sl_paper_current": 0.03503429,
+      "sl_compensation_enabled": false,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "abc",
+      "wick_filter_enabled": false,
+      "wick_filter_min_breaches": null,
+      "wick_filter_mode": "abc",
+      "sl_breach_count": 0,
+      "ab_group": "A",
+      "tp1_price": 0.03552357,
+      "tp2_price": 0.03581714,
+      "phase": "A",
+      "entry_order_id": 131511592,
+      "entry_client_id": "cresus_L1779294003_NAORISU_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.556,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.010028,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-20T16:20:41.768711+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 77333.0,
+      "btc_change_24h_at_open": 0.617,
+      "btc_pct_vs_ma25_at_open": 0.345,
+      "phase_a_mfe_price": 0.03523,
+      "current_price": 0.03519,
+      "unrealized_pnl_usdt": -0.0682,
+      "unrealized_pnl_pct": -0.34,
+      "last_price_check_at": "2026-05-20T16:21:13.382420+00:00"
     }
   ],
   "recent_closed": [
@@ -14315,11 +14369,11 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 77333.0,
-    "btc_ma25_1h": 77067.35,
-    "pct_vs_ma25": 0.345,
-    "change_24h_pct": 0.617,
-    "computed_at": "2026-05-20T16:19:31.069218+00:00"
+    "btc_price": 77331.0,
+    "btc_ma25_1h": 77067.27,
+    "pct_vs_ma25": 0.342,
+    "change_24h_pct": 0.615,
+    "computed_at": "2026-05-20T16:21:15.491382+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
