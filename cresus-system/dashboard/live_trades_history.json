@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-20T13:21:24.300268+00:00",
+  "generated_at": "2026-05-20T13:23:43.091753+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 248,
-    "open": 2,
+    "total_trades": 249,
+    "open": 3,
     "closed": 246,
     "wins": 82,
     "losses": 162,
@@ -14,33 +14,35 @@
     "avg_pnl_usdt": 0.0021,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 4.5147,
+    "fees_paid_usdt": 4.5247,
     "fees_realized_usdt": 4.4947,
-    "fees_open_usdt": 0.02,
+    "fees_open_usdt": 0.03,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 39.98,
-    "free_capital_usdt": 56.03,
+    "deployed_usdt": 59.9,
+    "free_capital_usdt": 36.1,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 3
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 0.1934,
-    "deployed_usdt": 39.98
+    "deployed_usdt": 59.9
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "PUMPBTCUSDT",
-      "INXUSDT"
+      "PLAYUSDT",
+      "INXUSDT",
+      "PUMPBTCUSDT"
     ],
     "exchange_symbols": [
+      "INXUSDT",
       "PUMPBTCUSDT",
-      "INXUSDT"
+      "PLAYUSDT"
     ]
   },
   "open_trades": [
@@ -91,10 +93,10 @@
       "btc_change_24h_at_open": 0.778,
       "btc_pct_vs_ma25_at_open": 0.496,
       "phase_a_mfe_price": 0.010164,
-      "current_price": 0.010199,
-      "unrealized_pnl_usdt": -0.0039,
-      "unrealized_pnl_pct": -0.02,
-      "last_price_check_at": "2026-05-20T13:21:21.024338+00:00"
+      "current_price": 0.01022,
+      "unrealized_pnl_usdt": -0.0451,
+      "unrealized_pnl_pct": -0.226,
+      "last_price_check_at": "2026-05-20T13:23:38.675720+00:00"
     },
     {
       "paper_id": "PUMPBTCUSDT|LONG|2026-05-20T13:20:28.031928+00:00",
@@ -143,10 +145,62 @@
       "btc_change_24h_at_open": 0.776,
       "btc_pct_vs_ma25_at_open": 0.586,
       "phase_a_mfe_price": 0.0149,
-      "current_price": 0.01488,
-      "unrealized_pnl_usdt": 0.0134,
-      "unrealized_pnl_pct": 0.067,
-      "last_price_check_at": "2026-05-20T13:21:21.024338+00:00"
+      "current_price": 0.01479,
+      "unrealized_pnl_usdt": -0.1075,
+      "unrealized_pnl_pct": -0.538,
+      "last_price_check_at": "2026-05-20T13:23:38.675720+00:00"
+    },
+    {
+      "paper_id": "PLAYUSDT|LONG|2026-05-20T13:21:36.174558+00:00",
+      "trade_id": "L1779283296_PLAYUSD_L",
+      "symbol": "PLAYUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.16809,
+      "avg_fill_price": 0.16879,
+      "slippage_bps": 41.64,
+      "qty": 118.0,
+      "notional_usdt": 19.91722,
+      "leverage": 3,
+      "risk_usdt": 0.4366,
+      "risk_pct": 2.192,
+      "mirror_latency_sec": 24.2,
+      "sl_price": 0.16509,
+      "sl_paper_current": 0.16509,
+      "sl_compensation_enabled": false,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "abc",
+      "wick_filter_enabled": false,
+      "wick_filter_min_breaches": null,
+      "wick_filter_mode": "abc",
+      "sl_breach_count": 0,
+      "ab_group": "A",
+      "tp1_price": 0.17259,
+      "tp2_price": 0.17709,
+      "phase": "A",
+      "entry_order_id": 136070851,
+      "entry_client_id": "cresus_L1779283296_PLAYUSD_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.892,
+      "phase_a_mfe_pct": 0.535,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.009959,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-20T13:23:07.399147+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "up",
+      "btc_price_at_open": 77452.3,
+      "btc_change_24h_at_open": 0.804,
+      "btc_pct_vs_ma25_at_open": 0.613,
+      "phase_a_mfe_price": 0.16899,
+      "current_price": 0.16823,
+      "unrealized_pnl_usdt": -0.0661,
+      "unrealized_pnl_pct": -0.332,
+      "last_price_check_at": "2026-05-20T13:23:38.675720+00:00"
     }
   ],
   "recent_closed": [
@@ -13378,11 +13432,11 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 77452.0,
-    "btc_ma25_1h": 76980.31,
+    "btc_price": 77452.4,
+    "btc_ma25_1h": 76980.33,
     "pct_vs_ma25": 0.613,
     "change_24h_pct": 0.804,
-    "computed_at": "2026-05-20T13:21:23.658837+00:00"
+    "computed_at": "2026-05-20T13:23:41.845286+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
