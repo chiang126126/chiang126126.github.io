@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-20T18:54:19.208662+00:00",
+  "updated_at": "2026-05-20T18:56:28.847451+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 21,
+  "alerts_count": 22,
   "alerts": [
+    {
+      "symbol": "ZENUSDT",
+      "base": "ZEN",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 6.54,
+      "price_change_pct": -0.517,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 484403.0,
+      "volume_baseline_usdt": 19528.0,
+      "volume_ratio": 24.81,
+      "detected_at": "2026-05-20T18:55:49.418947+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.517,
+      "change_15m_pct": -0.578,
+      "change_1h_pct": -0.969,
+      "change_4h_pct": 0.276,
+      "taker_buy_ratio_1m": 0.244,
+      "taker_buy_ratio_5m": 0.289,
+      "oi_delta_5m_pct": 0.13,
+      "funding_rate_pct": 0.008,
+      "atr_pct": 0.298,
+      "range_4h_pct": 4.51,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 6.5595,
+      "suggested_tp1": 6.51075,
+      "suggested_tp2": 6.4815,
+      "conviction_score": 1,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "KAITOUSDT",
       "base": "KAITO",
