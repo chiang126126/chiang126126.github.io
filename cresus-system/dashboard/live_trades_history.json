@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-20T05:11:34.464505+00:00",
+  "generated_at": "2026-05-20T05:13:44.976698+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 225,
-    "open": 0,
+    "total_trades": 226,
+    "open": 1,
     "closed": 225,
     "wins": 73,
     "losses": 150,
@@ -14,15 +14,15 @@
     "avg_pnl_usdt": -0.0052,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 4.1021,
+    "fees_paid_usdt": 4.1121,
     "fees_realized_usdt": 4.1021,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.01,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 94.72,
+    "deployed_usdt": 20.01,
+    "free_capital_usdt": 74.7,
     "max_concurrent_slots": 4,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
@@ -37,7 +37,60 @@
     "live_symbols": [],
     "exchange_symbols": []
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "FIDAUSDT|LONG|2026-05-20T05:12:21.326970+00:00",
+      "trade_id": "L1779253941_FIDAUSD_L",
+      "symbol": "FIDAUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.02527,
+      "avg_fill_price": 0.02539,
+      "slippage_bps": 47.49,
+      "qty": 788.0,
+      "notional_usdt": 20.00732,
+      "leverage": 3,
+      "risk_usdt": 0.5122,
+      "risk_pct": 2.56,
+      "mirror_latency_sec": 16.8,
+      "sl_price": 0.02474,
+      "sl_paper_current": 0.02474,
+      "sl_compensation_enabled": false,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "abc",
+      "wick_filter_enabled": false,
+      "wick_filter_min_breaches": null,
+      "wick_filter_mode": "abc",
+      "sl_breach_count": 0,
+      "ab_group": "A",
+      "tp1_price": 0.026065,
+      "tp2_price": 0.02686,
+      "phase": "A",
+      "entry_order_id": 102340068,
+      "entry_client_id": "cresus_L1779253941_FIDAUSD_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 1.049,
+      "phase_a_mfe_pct": 0.435,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.010004,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-20T05:13:44.031740+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 76994.4,
+      "btc_change_24h_at_open": 0.154,
+      "btc_pct_vs_ma25_at_open": 0.232,
+      "phase_a_mfe_price": 0.02538,
+      "current_price": 0.02537,
+      "unrealized_pnl_usdt": -0.0158,
+      "unrealized_pnl_pct": -0.079,
+      "last_price_check_at": "2026-05-20T05:13:39.484699+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "SAGAUSDT|LONG|2026-05-20T04:52:57.122460+00:00",
@@ -11953,8 +12006,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-20T03:14:14.079012+00:00",
-      "reason": "paper trade too old (7039s > 600s)",
-      "last_checked_at": "2026-05-20T05:11:33.319298+00:00"
+      "reason": "paper trade too old (7165s > 600s)",
+      "last_checked_at": "2026-05-20T05:13:39.484699+00:00"
     },
     {
       "paper_id": "BASEDUSDT|LONG|2026-05-20T04:59:45.177828+00:00",
@@ -11962,17 +12015,26 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-20T05:00:12.217489+00:00",
-      "reason": "paper trade too old (681s > 600s)",
-      "last_checked_at": "2026-05-20T05:11:33.319298+00:00"
+      "reason": "paper trade too old (807s > 600s)",
+      "last_checked_at": "2026-05-20T05:13:39.484699+00:00"
+    },
+    {
+      "paper_id": "PHAROSUSDT|LONG|2026-05-20T05:12:36.558152+00:00",
+      "symbol": "PHAROSUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-05-20T05:13:27.202091+00:00",
+      "reason": "open_failed (retry next tick)",
+      "last_checked_at": "2026-05-20T05:13:39.484699+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 76901.5,
-    "btc_ma25_1h": 76812.27,
-    "pct_vs_ma25": 0.116,
-    "change_24h_pct": 0.033,
-    "computed_at": "2026-05-20T05:11:34.439073+00:00"
+    "btc_price": 76994.4,
+    "btc_ma25_1h": 76815.99,
+    "pct_vs_ma25": 0.232,
+    "change_24h_pct": 0.154,
+    "computed_at": "2026-05-20T05:13:41.422272+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
