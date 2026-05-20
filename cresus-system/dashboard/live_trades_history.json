@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-20T16:55:43.835941+00:00",
+  "generated_at": "2026-05-20T16:58:00.063120+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 266,
-    "open": 1,
+    "total_trades": 267,
+    "open": 2,
     "closed": 265,
     "wins": 89,
     "losses": 174,
@@ -14,31 +14,33 @@
     "avg_pnl_usdt": -0.0087,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 4.8664,
+    "fees_paid_usdt": 4.8764,
     "fees_realized_usdt": 4.8564,
-    "fees_open_usdt": 0.01,
+    "fees_open_usdt": 0.02,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 19.98,
-    "free_capital_usdt": 72.84,
+    "deployed_usdt": 40.01,
+    "free_capital_usdt": 52.8,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -2.6429,
-    "deployed_usdt": 19.98
+    "deployed_usdt": 40.01
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "PUMPBTCUSDT"
+      "PUMPBTCUSDT",
+      "FIDAUSDT"
     ],
     "exchange_symbols": [
-      "PUMPBTCUSDT"
+      "PUMPBTCUSDT",
+      "FIDAUSDT"
     ]
   },
   "open_trades": [
@@ -89,10 +91,62 @@
       "btc_change_24h_at_open": 0.547,
       "btc_pct_vs_ma25_at_open": 0.277,
       "phase_a_mfe_price": 0.01506,
-      "current_price": 0.01487,
-      "unrealized_pnl_usdt": -0.1467,
-      "unrealized_pnl_pct": -0.734,
-      "last_price_check_at": "2026-05-20T16:55:41.578671+00:00"
+      "current_price": 0.01489,
+      "unrealized_pnl_usdt": -0.1201,
+      "unrealized_pnl_pct": -0.601,
+      "last_price_check_at": "2026-05-20T16:57:57.467942+00:00"
+    },
+    {
+      "paper_id": "FIDAUSDT|LONG|2026-05-20T16:55:37.178552+00:00",
+      "trade_id": "L1779296137_FIDAUSD_L",
+      "symbol": "FIDAUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.03063,
+      "avg_fill_price": 0.03039,
+      "slippage_bps": -78.35,
+      "qty": 659.0,
+      "notional_usdt": 20.02701,
+      "leverage": 3,
+      "risk_usdt": 0.2561,
+      "risk_pct": 1.279,
+      "mirror_latency_sec": 38.1,
+      "sl_price": 0.02976143,
+      "sl_paper_current": 0.03000143,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -0.00024,
+      "sl_compensation_mode": "abc",
+      "wick_filter_enabled": false,
+      "wick_filter_min_breaches": null,
+      "wick_filter_mode": "abc",
+      "sl_breach_count": 0,
+      "ab_group": "B",
+      "tp1_price": 0.03157286,
+      "tp2_price": 0.03251571,
+      "phase": "A",
+      "entry_order_id": 102851640,
+      "entry_client_id": "cresus_L1779296137_FIDAUSD_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 8,
+      "alert_type": "sustained",
+      "atr_pct": 1.026,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.010013,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-20T16:57:26.542698+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 77265.4,
+      "btc_change_24h_at_open": 0.53,
+      "btc_pct_vs_ma25_at_open": 0.261,
+      "phase_a_mfe_price": 0.03063,
+      "current_price": 0.03039,
+      "unrealized_pnl_usdt": 0.0,
+      "unrealized_pnl_pct": 0.0,
+      "last_price_check_at": "2026-05-20T16:57:57.467942+00:00"
     }
   ],
   "recent_closed": [
@@ -14510,11 +14564,11 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 77277.4,
-    "btc_ma25_1h": 77065.12,
-    "pct_vs_ma25": 0.275,
-    "change_24h_pct": 0.545,
-    "computed_at": "2026-05-20T16:55:43.528654+00:00"
+    "btc_price": 77242.1,
+    "btc_ma25_1h": 77063.71,
+    "pct_vs_ma25": 0.231,
+    "change_24h_pct": 0.499,
+    "computed_at": "2026-05-20T16:57:59.465291+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
