@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-20T12:33:47.010545+00:00",
+  "updated_at": "2026-05-20T12:35:59.931472+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 25,
+  "alerts_count": 26,
   "alerts": [
+    {
+      "symbol": "USELESSUSDT",
+      "base": "USELESS",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.06501,
+      "price_change_pct": 0.635,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 124447.0,
+      "volume_baseline_usdt": 13753.0,
+      "volume_ratio": 9.05,
+      "detected_at": "2026-05-20T12:35:39.530114+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.666,
+      "change_15m_pct": 1.832,
+      "change_1h_pct": 1.848,
+      "change_4h_pct": 3.42,
+      "taker_buy_ratio_1m": 0.454,
+      "taker_buy_ratio_5m": 0.461,
+      "oi_delta_5m_pct": 1.065,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.454,
+      "range_4h_pct": 4.08,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.064715,
+      "suggested_tp1": 0.0654525,
+      "suggested_tp2": 0.065895,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "DUSKUSDT",
       "base": "DUSK",
