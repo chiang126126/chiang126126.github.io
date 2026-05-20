@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-20T00:39:06.834474+00:00",
+  "updated_at": "2026-05-20T00:41:19.311277+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 32,
+  "alerts_count": 33,
   "alerts": [
+    {
+      "symbol": "PYTHUSDT",
+      "base": "PYTH",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.03974,
+      "price_change_pct": 0.684,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 131221.0,
+      "volume_baseline_usdt": 16110.0,
+      "volume_ratio": 8.15,
+      "detected_at": "2026-05-20T00:40:41.286811+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.887,
+      "change_15m_pct": 1.401,
+      "change_1h_pct": 1.478,
+      "change_4h_pct": 3.51,
+      "taker_buy_ratio_1m": 0.779,
+      "taker_buy_ratio_5m": 0.76,
+      "oi_delta_5m_pct": -0.308,
+      "funding_rate_pct": -0.0037,
+      "atr_pct": 0.342,
+      "range_4h_pct": 3.52,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.03960429,
+      "suggested_tp1": 0.03994357,
+      "suggested_tp2": 0.04014714,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "MAGMAUSDT",
       "base": "MAGMA",
