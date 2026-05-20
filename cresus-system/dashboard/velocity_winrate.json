@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T14:44:23.895397+00:00",
+  "generated_at": "2026-05-20T14:46:30.843197+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
@@ -5185,6 +5185,18 @@
         }
       }
     },
+    "EIGENUSDT|burst|LONG": {
+      "symbol": "EIGENUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.6,
+          "avg_outcome_pct": 0.35
+        }
+      }
+    },
     "MUUSDT|sustained|LONG": {
       "symbol": "MUUSDT",
       "alert_type": "sustained",
@@ -8129,9 +8141,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 10,
-          "win_rate": 0.3,
-          "avg_outcome_pct": 0.0
+          "n": 11,
+          "win_rate": 0.364,
+          "avg_outcome_pct": 0.18
         },
         "60m": {
           "n": 10,
@@ -8354,9 +8366,9 @@
           "avg_outcome_pct": -1.04
         },
         "60m": {
-          "n": 8,
-          "win_rate": 0.25,
-          "avg_outcome_pct": -1.34
+          "n": 9,
+          "win_rate": 0.222,
+          "avg_outcome_pct": -1.32
         },
         "240m": {
           "n": 8,
