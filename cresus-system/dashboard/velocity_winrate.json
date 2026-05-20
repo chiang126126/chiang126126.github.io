@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T03:14:13.147882+00:00",
+  "generated_at": "2026-05-20T03:16:21.353824+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
@@ -1857,9 +1857,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 18,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.1
+          "n": 19,
+          "win_rate": 0.368,
+          "avg_outcome_pct": 0.18
         },
         "60m": {
           "n": 18,
@@ -8966,6 +8966,18 @@
           "n": 5,
           "win_rate": 0.6,
           "avg_outcome_pct": 0.24
+        }
+      }
+    },
+    "KAITOUSDT|burst|LONG": {
+      "symbol": "KAITOUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -0.07
         }
       }
     },
