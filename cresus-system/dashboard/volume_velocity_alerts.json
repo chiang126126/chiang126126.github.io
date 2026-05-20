@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-20T00:03:53.627355+00:00",
+  "updated_at": "2026-05-20T00:06:07.260254+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 20,
+  "alerts_count": 21,
   "alerts": [
+    {
+      "symbol": "EWYUSDT",
+      "base": "EWY",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 170.84,
+      "price_change_pct": -1.94,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 650838.0,
+      "volume_baseline_usdt": 55039.0,
+      "volume_ratio": 11.83,
+      "detected_at": "2026-05-20T00:05:08.349778+00:00",
+      "intensity": 1,
+      "change_5m_pct": -1.744,
+      "change_15m_pct": -2.138,
+      "change_1h_pct": -1.998,
+      "change_4h_pct": -1.868,
+      "taker_buy_ratio_1m": 0.41,
+      "taker_buy_ratio_5m": 0.428,
+      "oi_delta_5m_pct": 0.02,
+      "funding_rate_pct": 0.0,
+      "atr_pct": 0.265,
+      "range_4h_pct": 2.94,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 171.29285714,
+      "suggested_tp1": 170.16071429,
+      "suggested_tp2": 169.48142857,
+      "conviction_score": 3,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "SPKUSDT",
       "base": "SPK",
