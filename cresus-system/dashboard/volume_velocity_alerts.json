@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-20T12:42:46.783850+00:00",
+  "updated_at": "2026-05-20T12:44:53.808029+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 23,
+  "alerts_count": 24,
   "alerts": [
+    {
+      "symbol": "DEXEUSDT",
+      "base": "DEXE",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 14.099,
+      "price_change_pct": 0.614,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 45102.0,
+      "volume_baseline_usdt": 2096.0,
+      "volume_ratio": 21.51,
+      "detected_at": "2026-05-20T12:44:49.109045+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.492,
+      "change_15m_pct": 0.514,
+      "change_1h_pct": 0.758,
+      "change_4h_pct": 1.141,
+      "taker_buy_ratio_1m": 0.829,
+      "taker_buy_ratio_5m": 0.808,
+      "oi_delta_5m_pct": -0.004,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.093,
+      "range_4h_pct": 1.56,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 14.08592857,
+      "suggested_tp1": 14.11860714,
+      "suggested_tp2": 14.13821429,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "USELESSUSDT",
       "base": "USELESS",
