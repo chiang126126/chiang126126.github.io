@@ -46,6 +46,19 @@ _BURN_OR_CONTRACT: frozenset[str] = frozenset({
 })
 
 
+class NullTransferProvider:
+    """
+    空实现的 TransferProvider。
+
+    当没有链上转账 API 时使用。BFS 在第一跳就拿不到入金来源，
+    funder_dedupe 会把每个持有人视为"自己是 funder"，
+    cluster_factor 结果约等于 1（无聚类）——保守但不会崩溃。
+    """
+
+    def get_incoming_transfers(self, address: str, *, limit: int = 10):
+        return []
+
+
 class StaticCEXWalletRegistry:
     """
     实现 sprite_catcher.interfaces.CEXWalletRegistry。

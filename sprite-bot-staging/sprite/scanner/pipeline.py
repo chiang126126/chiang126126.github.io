@@ -46,7 +46,7 @@ from sprite_catcher.models import (
 )
 
 from sprite.l1_data.binance import BinanceFuturesOIProvider, get_candles
-from sprite.l1_data.cex_wallets import StaticCEXWalletRegistry
+from sprite.l1_data.cex_wallets import NullTransferProvider, StaticCEXWalletRegistry
 from sprite.l1_data.goplus import (
     GoPlusDevWalletProvider,
     GoPlusHolderProvider,
@@ -62,6 +62,7 @@ _audit_provider = GoPlusTokenAuditProvider()
 _liquidity_provider = GoPlusLiquidityProvider()
 _dev_provider = GoPlusDevWalletProvider()
 _holder_provider = GoPlusHolderProvider()
+_transfer_provider = NullTransferProvider()   # v0 无 BFS；cluster_factor ≈ 1
 _cex_registry = StaticCEXWalletRegistry()
 
 _CAPS = AllocationCaps(
@@ -114,17 +115,21 @@ def run(
 
     # ── 步骤 2：L2 筹码特征（简化版） ─────────────────────────────────────────
     try:
-        chip = compute_chip_features(token_id, _holder_provider, None, _cex_registry)
+        chip = compute_chip_features(token_id, _holder_provider, _transfer_provider, _cex_registry)
     except Exception as e:
         log.warning("%s: L2 chip 失败（可跳过）: %s", futures_symbol, e)
         chip = None  # chip 不可用时继续，用 OI 做主要指标
 
     # ── 步骤 3：候选池分流 ────────────────────────────────────────────────────
+    if chip is None:
+        # chip 拿不到时无法做池分类，只能跳过该币
+        return _reject("chip_unavailable")
+
     try:
         pool_decision = route_to_pool(
             chip=chip,
             oi=oi_strat,
-            daily_pump_pct=daily_pump_pct / 100.0,  # route_to_pool 期望小数
+            daily_pump_pct=daily_pump_pct / 100.0,  # route_to_pool 期望 1.0=+100%
         )
     except Exception as e:
         log.warning("%s: pool_router 失败: %s", futures_symbol, e)
