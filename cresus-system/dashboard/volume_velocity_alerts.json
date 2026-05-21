@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-21T08:42:48.134882+00:00",
+  "updated_at": "2026-05-21T08:44:56.475378+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 34,
+  "alerts_count": 35,
   "alerts": [
+    {
+      "symbol": "MITOUSDT",
+      "base": "MITO",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.04621,
+      "price_change_pct": 2.257,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 78362.0,
+      "volume_baseline_usdt": 7888.0,
+      "volume_ratio": 9.93,
+      "detected_at": "2026-05-21T08:44:31.363756+00:00",
+      "intensity": 2,
+      "change_5m_pct": 2.664,
+      "change_15m_pct": 3.909,
+      "change_1h_pct": 4.662,
+      "change_4h_pct": 17.834,
+      "taker_buy_ratio_1m": 0.438,
+      "taker_buy_ratio_5m": 0.518,
+      "oi_delta_5m_pct": 0.995,
+      "funding_rate_pct": -1.1316,
+      "atr_pct": 1.306,
+      "range_4h_pct": 16.32,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.04500286,
+      "suggested_tp1": 0.04802071,
+      "suggested_tp2": 0.04983143,
+      "conviction_score": 7,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "UAIUSDT",
       "base": "UAI",
