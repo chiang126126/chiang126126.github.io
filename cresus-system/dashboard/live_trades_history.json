@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-21T11:37:59.308275+00:00",
+  "generated_at": "2026-05-21T11:40:12.462330+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 322,
-    "open": 0,
+    "total_trades": 323,
+    "open": 1,
     "closed": 322,
     "wins": 111,
     "losses": 209,
@@ -14,30 +14,87 @@
     "avg_pnl_usdt": 0.0001,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 5.9013,
+    "fees_paid_usdt": 5.9113,
     "fees_realized_usdt": 5.9013,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.01,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 94.14,
+    "deployed_usdt": 19.98,
+    "free_capital_usdt": 74.15,
     "max_concurrent_slots": 4,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 4.3224,
-    "deployed_usdt": 0
+    "deployed_usdt": 19.98
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "MITOUSDT"
+    ],
+    "exchange_symbols": [
+      "MITOUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "MITOUSDT|LONG|2026-05-21T11:38:32.860427+00:00",
+      "trade_id": "L1779363512_MITOUSD_L",
+      "symbol": "MITOUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.05074,
+      "avg_fill_price": 0.05019,
+      "slippage_bps": -108.4,
+      "qty": 398.0,
+      "notional_usdt": 19.97562,
+      "leverage": 3,
+      "risk_usdt": 0.0864,
+      "risk_pct": 0.433,
+      "mirror_latency_sec": 20.7,
+      "sl_price": 0.04942286,
+      "sl_paper_current": 0.04997286,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -0.00055,
+      "sl_compensation_mode": "abc",
+      "wick_filter_enabled": false,
+      "wick_filter_min_breaches": null,
+      "wick_filter_mode": "abc",
+      "sl_breach_count": 0,
+      "ab_group": "B",
+      "tp1_price": 0.05189071,
+      "tp2_price": 0.05304143,
+      "phase": "A",
+      "entry_order_id": 142250788,
+      "entry_client_id": "cresus_L1779363512_MITOUSD_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 7,
+      "alert_type": "sustained",
+      "atr_pct": 0.756,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.009988,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-21T11:39:39.214075+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 77322.0,
+      "btc_change_24h_at_open": -0.064,
+      "btc_pct_vs_ma25_at_open": -0.35,
+      "phase_a_mfe_price": 0.05074,
+      "current_price": 0.05029,
+      "unrealized_pnl_usdt": 0.0398,
+      "unrealized_pnl_pct": 0.199,
+      "last_price_check_at": "2026-05-21T11:40:09.762090+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "PROVEUSDT|LONG|2026-05-21T10:58:23.392785+00:00",
@@ -18018,7 +18075,7 @@
     "btc_ma25_1h": 77591.1,
     "pct_vs_ma25": -0.435,
     "change_24h_pct": -0.152,
-    "computed_at": "2026-05-21T11:37:59.273557+00:00"
+    "computed_at": "2026-05-21T11:40:12.156905+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
