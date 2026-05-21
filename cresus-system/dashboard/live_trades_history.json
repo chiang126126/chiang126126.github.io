@@ -1,47 +1,44 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-21T10:54:43.484247+00:00",
+  "generated_at": "2026-05-21T10:56:54.489996+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 321,
-    "open": 1,
-    "closed": 320,
+    "open": 0,
+    "closed": 321,
     "wins": 111,
-    "losses": 207,
-    "win_rate": 0.349,
-    "total_pnl_usdt": 0.6906,
-    "net_pnl_usdt": -5.171,
-    "avg_pnl_usdt": 0.0022,
+    "losses": 208,
+    "win_rate": 0.348,
+    "total_pnl_usdt": 0.4226,
+    "net_pnl_usdt": -5.4588,
+    "avg_pnl_usdt": 0.0013,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 5.8716,
-    "fees_realized_usdt": 5.8616,
-    "fees_open_usdt": 0.01,
+    "fees_paid_usdt": 5.8814,
+    "fees_realized_usdt": 5.8814,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 19.94,
-    "free_capital_usdt": 74.88,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 94.54,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 4.9756,
-    "deployed_usdt": 19.94
+    "daily_pnl": 4.7076,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "AIAUSDT"
-    ],
-    "exchange_symbols": [
-      "AIAUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "AIAUSDT|LONG|2026-05-21T09:41:25.083793+00:00",
       "trade_id": "L1779356485_AIAUSDT_L",
@@ -80,7 +77,7 @@
       "phase_a_mfe_pct": 1.922,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.009972,
+      "fees_paid_usdt": 0.01981,
       "fees_are_actual": true,
       "opened_at": "2026-05-21T09:42:10.488302+00:00",
       "is_dry_run": false,
@@ -92,10 +89,18 @@
       "current_price": 0.05713,
       "unrealized_pnl_usdt": -0.0626,
       "unrealized_pnl_pct": -0.314,
-      "last_price_check_at": "2026-05-21T10:54:41.205217+00:00"
-    }
-  ],
-  "recent_closed": [
+      "last_price_check_at": "2026-05-21T10:54:41.205217+00:00",
+      "closed_at": "2026-05-21T10:55:18.164548+00:00",
+      "close_reason": "paper:hit_sl",
+      "avg_exit_price": 0.05654,
+      "realized_pnl_usdt": -0.268,
+      "close_order_id": 79059915,
+      "close_qty": 348.0,
+      "close_expected_price": 0.05713,
+      "close_slippage_bps": 103.27,
+      "entry_fees_usdt": 0.009972,
+      "close_fees_usdt": 0.009838
+    },
     {
       "paper_id": "SIRENUSDT|SHORT|2026-05-21T10:32:52.855612+00:00",
       "trade_id": "L1779359572_SIRENUS_S",
@@ -17951,8 +17956,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-21T10:33:23.714645+00:00",
-      "reason": "paper trade too old (1277s > 600s)",
-      "last_checked_at": "2026-05-21T10:54:41.205217+00:00"
+      "reason": "paper trade too old (1408s > 600s)",
+      "last_checked_at": "2026-05-21T10:56:52.126704+00:00"
     },
     {
       "paper_id": "OPGUSDT|SHORT|2026-05-21T10:41:39.816070+00:00",
@@ -17960,17 +17965,17 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-21T10:42:05.384945+00:00",
-      "reason": "paper trade too old (756s > 600s)",
-      "last_checked_at": "2026-05-21T10:54:41.205217+00:00"
+      "reason": "paper trade too old (887s > 600s)",
+      "last_checked_at": "2026-05-21T10:56:52.126704+00:00"
     }
   ],
   "btc_regime_now": {
-    "regime": "chop",
-    "btc_price": 77311.2,
-    "btc_ma25_1h": 77604.21,
-    "pct_vs_ma25": -0.378,
-    "change_24h_pct": -0.215,
-    "computed_at": "2026-05-21T10:54:43.145622+00:00"
+    "regime": "down",
+    "btc_price": 77209.4,
+    "btc_ma25_1h": 77600.14,
+    "pct_vs_ma25": -0.504,
+    "change_24h_pct": -0.347,
+    "computed_at": "2026-05-21T10:56:54.456393+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
