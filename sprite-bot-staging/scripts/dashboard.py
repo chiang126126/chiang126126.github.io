@@ -45,6 +45,25 @@ REFRESH_S = 30
 DAILY_HELIUS_LIMIT = 3300
 CEX_STARTING_CAPITAL = 200.0
 
+_STRATEGY_ABBR: dict[str, str] = {
+    "trend_follow":      "trend↑",
+    "support_collapse":  "s.collapse",
+    "short_vacuum":      "vacuum",
+    "distribution":      "distrib",
+    "plan_trend_follow": "trend↑",
+    "plan_support_collapse": "s.collapse",
+    "plan_short_vacuum": "vacuum",
+    "plan_distribution": "distrib",
+}
+
+def _abbr_strategy(s: str) -> str:
+    return _STRATEGY_ABBR.get(s, s[:11] + ("…" if len(s) > 11 else ""))
+
+
+def _fmt_ts(ts: str) -> str:
+    """从 ISO 时间串提取 HH:MM，兼容空字符串。"""
+    return ts[11:16] if len(ts) >= 16 else ts
+
 
 # ── CEX helpers ───────────────────────────────────────────────────────────────
 
@@ -163,12 +182,11 @@ st.markdown("""
 .col-hdr {
     font-size: 1.05rem;
     font-weight: 800;
-    padding: 0.4rem 0.7rem;
-    border-radius: 6px;
+    padding: 0.35rem 0 0.35rem 0.75rem;
     margin-bottom: 0.6rem;
 }
-.col-hdr-sol { background: linear-gradient(90deg,#1a1a2e,#16213e); border-left: 3px solid #7c83fd; }
-.col-hdr-cex { background: linear-gradient(90deg,#1a2e1a,#16321e); border-left: 3px solid #52d97a; }
+.col-hdr-sol { border-left: 4px solid #7c83fd; }
+.col-hdr-cex { border-left: 4px solid #52d97a; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -207,7 +225,7 @@ with h_sol:
 
 with h_cex:
     cex_dot  = "🟢" if cex_status.get("running") else "🔴"
-    cex_last = cex_status.get("last_update_at", "—")
+    cex_last = _fmt_ts(cex_status.get("last_update_at", "—"))
     st.markdown(f"📈 {cex_dot} CEX scan &nbsp; `{cex_last}`", unsafe_allow_html=True)
 
 with h_time:
@@ -280,8 +298,16 @@ with sol_col:
             })
         rows.sort(key=lambda r: float(r["持仓"].rstrip("h")), reverse=True)
         tbl_h = min(38 * len(rows) + 40, 220)
-        st.dataframe(pd.DataFrame(rows), use_container_width=True,
-                     hide_index=True, height=tbl_h)
+        st.dataframe(
+            pd.DataFrame(rows),
+            use_container_width=True, hide_index=True, height=tbl_h,
+            column_config={
+                "Mint":  st.column_config.TextColumn(width="small"),
+                "P&L%":  st.column_config.TextColumn(width="small"),
+                "P&L$":  st.column_config.TextColumn(width="small"),
+                "持仓":  st.column_config.TextColumn(width="small"),
+            },
+        )
     else:
         st.caption("暂无持仓。")
 
@@ -297,11 +323,19 @@ with sol_col:
                 "P&L%":  f"{pnl_pct:+.1f}%",
                 "P&L$":  f"${t.get('pnl_usd', 0):+.2f}",
                 "原因":  t.get("exit_reason", "?"),
-                "时间":  t.get("ts", "")[-8:],   # 只显示 HH:MM:SS
+                "时间":  _fmt_ts(t.get("ts", "")),
             })
         tbl_h = min(38 * len(rows) + 40, 260)
-        st.dataframe(pd.DataFrame(rows), use_container_width=True,
-                     hide_index=True, height=tbl_h)
+        st.dataframe(
+            pd.DataFrame(rows),
+            use_container_width=True, hide_index=True, height=tbl_h,
+            column_config={
+                "P&L%": st.column_config.TextColumn(width="small"),
+                "P&L$": st.column_config.TextColumn(width="small"),
+                "原因": st.column_config.TextColumn(width="small"),
+                "时间": st.column_config.TextColumn(width="small"),
+            },
+        )
     else:
         st.caption("暂无平仓记录。")
 
@@ -356,17 +390,28 @@ with cex_col:
             rows.append({
                 "Symbol":  p.get("symbol", "?"),
                 "方向":    "🟢多" if side == "long" else "🔴空",
-                "策略":    p.get("strategy_id", "?"),
+                "策略":    _abbr_strategy(p.get("strategy_id", "?")),
                 "入场":    f"{p.get('entry_price', 0):.5g}",
                 "止损":    f"{p.get('stop_loss', 0):.5g}",
-                "止盈":    f"{tp_raw:.5g}" if tp_raw else "trailing",
+                "止盈":    f"{tp_raw:.5g}" if tp_raw is not None else "trailing",
                 "仓位$":   f"${p.get('qty_usd', 0):.0f}",
                 "持仓":    f"{hold_h:.1f}h",
             })
         rows.sort(key=lambda r: float(r["持仓"].rstrip("h")), reverse=True)
         tbl_h = min(38 * len(rows) + 40, 220)
-        st.dataframe(pd.DataFrame(rows), use_container_width=True,
-                     hide_index=True, height=tbl_h)
+        st.dataframe(
+            pd.DataFrame(rows),
+            use_container_width=True, hide_index=True, height=tbl_h,
+            column_config={
+                "方向":   st.column_config.TextColumn(width="small"),
+                "策略":   st.column_config.TextColumn(width="small"),
+                "入场":   st.column_config.TextColumn(width="small"),
+                "止损":   st.column_config.TextColumn(width="small"),
+                "止盈":   st.column_config.TextColumn(width="small"),
+                "仓位$":  st.column_config.TextColumn(width="small"),
+                "持仓":   st.column_config.TextColumn(width="small"),
+            },
+        )
     else:
         st.caption("暂无 CEX 持仓。")
 
@@ -381,15 +426,27 @@ with cex_col:
             rows.append({
                 "Symbol":  t.get("symbol", "?"),
                 "方向":    "🟢多" if side == "long" else "🔴空",
-                "策略":    t.get("strategy_id", "?"),
+                "策略":    _abbr_strategy(t.get("strategy_id", "?")),
                 "P&L%":    f"{pnl_pct:+.1f}%",
                 "P&L$":    f"${t.get('pnl_usd', 0):+.2f}",
                 "原因":    t.get("exit_reason", "?"),
                 "持仓":    f"{t.get('hold_hours', 0):.1f}h",
+                "时间":    _fmt_ts(t.get("ts", "")),
             })
         tbl_h = min(38 * len(rows) + 40, 260)
-        st.dataframe(pd.DataFrame(rows), use_container_width=True,
-                     hide_index=True, height=tbl_h)
+        st.dataframe(
+            pd.DataFrame(rows),
+            use_container_width=True, hide_index=True, height=tbl_h,
+            column_config={
+                "方向":  st.column_config.TextColumn(width="small"),
+                "策略":  st.column_config.TextColumn(width="small"),
+                "P&L%": st.column_config.TextColumn(width="small"),
+                "P&L$": st.column_config.TextColumn(width="small"),
+                "原因":  st.column_config.TextColumn(width="small"),
+                "持仓":  st.column_config.TextColumn(width="small"),
+                "时间":  st.column_config.TextColumn(width="small"),
+            },
+        )
     else:
         st.caption("暂无 CEX 平仓记录。")
 
