@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-21T14:18:52.210185+00:00",
+  "updated_at": "2026-05-21T14:20:59.355313+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 71,
+  "alerts_count": 72,
   "alerts": [
+    {
+      "symbol": "NVDAUSDT",
+      "base": "NVDA",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 220.34,
+      "price_change_pct": -1.673,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 1398394.0,
+      "volume_baseline_usdt": 119529.0,
+      "volume_ratio": 11.7,
+      "detected_at": "2026-05-21T14:20:02.821479+00:00",
+      "intensity": 1,
+      "change_5m_pct": -1.467,
+      "change_15m_pct": -1.986,
+      "change_1h_pct": -0.911,
+      "change_4h_pct": -2.391,
+      "taker_buy_ratio_1m": 0.318,
+      "taker_buy_ratio_5m": 0.359,
+      "oi_delta_5m_pct": -0.151,
+      "funding_rate_pct": 0.0453,
+      "atr_pct": 0.335,
+      "range_4h_pct": 3.51,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 221.07857143,
+      "suggested_tp1": 219.23214286,
+      "suggested_tp2": 218.12428571,
+      "conviction_score": 5,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "QUSDT",
       "base": "Q",

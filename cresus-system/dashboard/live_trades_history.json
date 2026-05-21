@@ -1,28 +1,28 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-21T14:20:11.114712+00:00",
+  "generated_at": "2026-05-21T14:22:31.321667+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 331,
-    "open": 1,
-    "closed": 330,
+    "open": 0,
+    "closed": 331,
     "wins": 113,
-    "losses": 215,
-    "win_rate": 0.345,
-    "total_pnl_usdt": -0.0971,
-    "net_pnl_usdt": -6.1579,
-    "avg_pnl_usdt": -0.0003,
+    "losses": 216,
+    "win_rate": 0.343,
+    "total_pnl_usdt": -0.3465,
+    "net_pnl_usdt": -6.427,
+    "avg_pnl_usdt": -0.001,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 6.0706,
-    "fees_realized_usdt": 6.0608,
-    "fees_open_usdt": 0.0098,
+    "fees_paid_usdt": 6.0806,
+    "fees_realized_usdt": 6.0806,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 19.58,
-    "free_capital_usdt": 74.25,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 93.57,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
@@ -41,7 +41,8 @@
       "CYSUSDT"
     ]
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "CYSUSDT|SHORT|2026-05-21T13:45:22.857940+00:00",
       "trade_id": "L1779371122_CYSUSDT_S",
@@ -80,7 +81,7 @@
       "phase_a_mfe_pct": 0.86,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.009791,
+      "fees_paid_usdt": 0.019707,
       "fees_are_actual": true,
       "opened_at": "2026-05-21T13:46:07.298490+00:00",
       "is_dry_run": false,
@@ -89,13 +90,21 @@
       "btc_change_24h_at_open": -0.446,
       "btc_pct_vs_ma25_at_open": -0.972,
       "phase_a_mfe_price": 0.4495,
-      "current_price": 0.455,
-      "unrealized_pnl_usdt": 0.0172,
-      "unrealized_pnl_pct": 0.088,
-      "last_price_check_at": "2026-05-21T14:20:08.184466+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.461,
+      "unrealized_pnl_usdt": -0.2408,
+      "unrealized_pnl_pct": -1.23,
+      "last_price_check_at": "2026-05-21T14:22:23.810899+00:00",
+      "closed_at": "2026-05-21T14:22:31.286606+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.4612,
+      "realized_pnl_usdt": -0.2494,
+      "close_order_id": 83356643,
+      "close_qty": 43.0,
+      "close_expected_price": 0.4605,
+      "close_slippage_bps": 15.2,
+      "entry_fees_usdt": 0.009791,
+      "close_fees_usdt": 0.009916
+    },
     {
       "paper_id": "TAGUSDT|LONG|2026-05-21T13:07:28.993514+00:00",
       "trade_id": "L1779368848_TAGUSDT_L",
@@ -18567,14 +18576,24 @@
       "close_qty": 53792.0
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "NVDAUSDT|SHORT|2026-05-21T14:20:02.821479+00:00",
+      "symbol": "NVDAUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-05-21T14:20:59.835245+00:00",
+      "reason": "open_failed (retry next tick)",
+      "last_checked_at": "2026-05-21T14:22:23.810899+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 76895.7,
-    "btc_ma25_1h": 77556.32,
-    "pct_vs_ma25": -0.852,
-    "change_24h_pct": -0.679,
-    "computed_at": "2026-05-21T14:20:10.799019+00:00"
+    "btc_price": 76889.2,
+    "btc_ma25_1h": 77556.06,
+    "pct_vs_ma25": -0.86,
+    "change_24h_pct": -0.687,
+    "computed_at": "2026-05-21T14:22:26.597263+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
