@@ -1327,16 +1327,26 @@ class TestAbGroup(unittest.TestCase):
         self.assertEqual(live_trader._ab_group(""), "A")
         self.assertEqual(live_trader._ab_group(None), "A")
 
-    def test_distribution_balanced(self):
-        """1000 个 paper_id 哈希应大致 1/3 分布 (容差 ±10%)."""
+    def test_distribution_balanced_n4(self):
+        """1000 个 paper_id 哈希 (mod 4 默认) 应大致 1/4 分布 (容差 ±15%)."""
         from collections import Counter
         ids = [f"SYM{i}USDT|LONG|2026-05-{i%30+1:02d}T{i%24:02d}:00:00+00:00"
                for i in range(1000)]
         counts = Counter(live_trader._ab_group(pid) for pid in ids)
-        # 每组期望 333 ± 90 (3 sigma 内)
+        # 每组期望 250 ± 50 (考虑离散分布的 3 sigma)
+        for g in ("A", "B", "C", "D"):
+            self.assertGreater(counts[g], 200, f"{g} 组样本太少: {counts[g]}")
+            self.assertLess(counts[g], 320, f"{g} 组样本太多: {counts[g]}")
+
+    def test_distribution_balanced_n3(self):
+        """显式 n_groups=3 时, 1000 个 paper_id 应大致 1/3 分布 (Phase 4.E 兼容)."""
+        from collections import Counter
+        ids = [f"SYM{i}USDT|LONG|2026-05-{i%30+1:02d}T{i%24:02d}:00:00+00:00"
+               for i in range(1000)]
+        counts = Counter(live_trader._ab_group(pid, n_groups=3) for pid in ids)
         for g in ("A", "B", "C"):
-            self.assertGreater(counts[g], 250, f"{g} 组样本太少: {counts[g]}")
-            self.assertLess(counts[g], 420, f"{g} 组样本太多: {counts[g]}")
+            self.assertGreater(counts[g], 280, f"{g} 组样本太少: {counts[g]}")
+            self.assertLess(counts[g], 400, f"{g} 组样本太多: {counts[g]}")
 
     def test_different_ids_can_differ(self):
         """至少有 2 个不同 paper_id 落在不同组 (sanity)."""
@@ -1357,15 +1367,26 @@ class TestAbUseWickFilter(unittest.TestCase):
         self.assertTrue(live_trader._ab_use_wick_filter("", mode="always"))
 
     def test_abc_only_c_group(self):
-        """abc mode: 只有 C 组返 True, A/B 返 False."""
+        """abc mode (n=3): 只有 C 组返 True, A/B 返 False."""
         for i in range(60):
             pid = f"S{i}|LONG|T+00:00"
-            g = live_trader._ab_group(pid)
+            g = live_trader._ab_group(pid, n_groups=3)
             r = live_trader._ab_use_wick_filter(pid, mode="abc")
             if g == "C":
                 self.assertTrue(r, f"{pid} 应该 C 组 = True")
             else:
                 self.assertFalse(r, f"{pid} 应该 {g} 组 = False")
+
+    def test_abcd_only_c_group(self):
+        """abcd mode (n=4, Phase 4.F 默认): 只有 C 组返 True, A/B/D 返 False."""
+        for i in range(80):
+            pid = f"S{i}|LONG|T+00:00"
+            g = live_trader._ab_group(pid, n_groups=4)
+            r = live_trader._ab_use_wick_filter(pid, mode="abcd")
+            if g == "C":
+                self.assertTrue(r, f"{pid} (g={g}) 应该 wick=True")
+            else:
+                self.assertFalse(r, f"{pid} (g={g}) 应该 wick=False")
 
     def test_empty_paper_id_safe_path(self):
         """空 paper_id 在 abc 模式下也安全 (返 False = 不过滤, 等同 A 组)."""
@@ -1489,37 +1510,31 @@ class TestSyncResetsBreachCount(unittest.TestCase):
 
 
 class TestPhase4EIntegration(unittest.TestCase):
-    """Phase 4.E 完整链路: _ab_group → _ab_use_wick_filter → live_trade 字段
-    → _check_sl_breach 行为一致."""
+    """Phase 4.E/4.F 完整链路: _ab_group → _ab_use_* → live_trade 字段
+    → _check_sl_breach / regime gate 行为一致.
+
+    注: 用显式 n_groups=3 搜对应 group, 然后用 mode='abc' 测试 (Phase 4.E 兼容).
+    Phase 4.F 见 TestPhase4FIntegration.
+    """
 
     def test_c_group_paper_id_wick_filter_active(self):
-        """选一个 C 组 paper_id, 验证整条链路启用 wick filter."""
-        # 寻找一个落在 C 组的 paper_id
+        """选一个 C 组 paper_id (n=3), 验证整条链路启用 wick filter."""
         c_pid = None
         for i in range(100):
             candidate = f"TEST{i}|LONG|2026-05-15T10:00:00+00:00"
-            if live_trader._ab_group(candidate) == "C":
+            if live_trader._ab_group(candidate, n_groups=3) == "C":
                 c_pid = candidate
                 break
-        self.assertIsNotNone(c_pid, "100 个 id 居然没找到 C 组? 哈希分布异常")
-
-        # 链路 1: _ab_use_wick_filter 应该返 True
-        self.assertTrue(
-            live_trader._ab_use_wick_filter(c_pid, mode="abc"),
-            "C 组应该启用 wick filter"
-        )
-        # 链路 2: 同时不启用 SL 补偿 (C 组无补偿)
-        self.assertFalse(
-            live_trader._ab_use_sl_compensation(c_pid, mode="abc"),
-            "C 组不应启用 SL 补偿"
-        )
+        self.assertIsNotNone(c_pid)
+        self.assertTrue(live_trader._ab_use_wick_filter(c_pid, mode="abc"))
+        self.assertFalse(live_trader._ab_use_sl_compensation(c_pid, mode="abc"))
 
     def test_b_group_paper_id_compensation_only(self):
-        """选一个 B 组 paper_id, 验证只启用补偿不启用 wick filter."""
+        """选一个 B 组 paper_id (n=3), 验证只启用补偿不启用 wick filter."""
         b_pid = None
         for i in range(100):
             candidate = f"TEST{i}|LONG|2026-05-15T10:00:00+00:00"
-            if live_trader._ab_group(candidate) == "B":
+            if live_trader._ab_group(candidate, n_groups=3) == "B":
                 b_pid = candidate
                 break
         self.assertIsNotNone(b_pid)
@@ -1527,16 +1542,168 @@ class TestPhase4EIntegration(unittest.TestCase):
         self.assertFalse(live_trader._ab_use_wick_filter(b_pid, mode="abc"))
 
     def test_a_group_paper_id_neither(self):
-        """选一个 A 组 paper_id, 既不补偿也不过滤 (基线)."""
+        """选一个 A 组 paper_id (n=3), 既不补偿也不过滤 (基线)."""
         a_pid = None
         for i in range(100):
             candidate = f"TEST{i}|LONG|2026-05-15T10:00:00+00:00"
-            if live_trader._ab_group(candidate) == "A":
+            if live_trader._ab_group(candidate, n_groups=3) == "A":
                 a_pid = candidate
                 break
         self.assertIsNotNone(a_pid)
         self.assertFalse(live_trader._ab_use_sl_compensation(a_pid, mode="abc"))
         self.assertFalse(live_trader._ab_use_wick_filter(a_pid, mode="abc"))
+
+
+class TestShouldBlockForRegime(unittest.TestCase):
+    """Phase 4.F: _should_block_for_regime 核心规则.
+
+    规则: down + LONG → True. 其余 → False.
+    """
+
+    def test_down_long_blocked(self):
+        self.assertTrue(live_trader._should_block_for_regime("LONG", "down"))
+
+    def test_down_short_allowed(self):
+        self.assertFalse(live_trader._should_block_for_regime("SHORT", "down"))
+
+    def test_up_long_allowed(self):
+        self.assertFalse(live_trader._should_block_for_regime("LONG", "up"))
+
+    def test_up_short_allowed(self):
+        self.assertFalse(live_trader._should_block_for_regime("SHORT", "up"))
+
+    def test_chop_long_allowed(self):
+        self.assertFalse(live_trader._should_block_for_regime("LONG", "chop"))
+
+    def test_chop_short_allowed(self):
+        self.assertFalse(live_trader._should_block_for_regime("SHORT", "chop"))
+
+    def test_none_regime_allowed(self):
+        """regime=None (取价失败) → 不应误拦, 让 trade 通过其它 gate."""
+        self.assertFalse(live_trader._should_block_for_regime("LONG", None))
+        self.assertFalse(live_trader._should_block_for_regime("SHORT", None))
+
+    def test_empty_direction_safe(self):
+        """direction 空字符串 → 不拦 (其它 gate 会处理)."""
+        self.assertFalse(live_trader._should_block_for_regime("", "down"))
+
+    def test_case_insensitive(self):
+        """方向 / regime 大小写都接受."""
+        self.assertTrue(live_trader._should_block_for_regime("long", "DOWN"))
+        self.assertTrue(live_trader._should_block_for_regime("Long", "Down"))
+
+
+class TestAbUseRegimeGate(unittest.TestCase):
+    """Phase 4.F: _ab_use_regime_gate 启用判定."""
+
+    def test_off_never_enabled(self):
+        self.assertFalse(live_trader._ab_use_regime_gate("any", mode="off"))
+
+    def test_always_always_enabled(self):
+        self.assertTrue(live_trader._ab_use_regime_gate("any", mode="always"))
+        self.assertTrue(live_trader._ab_use_regime_gate("", mode="always"))
+
+    def test_abcd_only_d_group(self):
+        """abcd mode: 只有 D 组返 True."""
+        for i in range(80):
+            pid = f"X{i}|LONG|T+00:00"
+            g = live_trader._ab_group(pid, n_groups=4)
+            r = live_trader._ab_use_regime_gate(pid, mode="abcd")
+            if g == "D":
+                self.assertTrue(r, f"{pid} (g={g}) 应该 D 组 = True")
+            else:
+                self.assertFalse(r, f"{pid} (g={g}) 应该 {g} 组 = False")
+
+    def test_empty_paper_id_safe(self):
+        """空 paper_id 在 abcd 模式下退路 = False (≡ A 组, 不启用 gate)."""
+        self.assertFalse(live_trader._ab_use_regime_gate("", mode="abcd"))
+
+    def test_unknown_mode_safe_fallback(self):
+        self.assertFalse(live_trader._ab_use_regime_gate("any", mode="xyz"))
+
+
+class TestIsEligibleRegimeGate(unittest.TestCase):
+    """Phase 4.F: is_eligible_for_mirror 在传 btc_regime 时, D 组应用 regime gate."""
+
+    def setUp(self):
+        self.now = datetime.now(timezone.utc)
+        self.live_state = {
+            "mirrored_paper_ids": [],
+            "live_open_trades": [],
+        }
+        # 找一个 D 组 paper_id
+        self.d_pid = None
+        for i in range(100):
+            cand = f"X{i}USDT|LONG|2026-05-15T10:00:00+00:00"
+            if live_trader._ab_group(cand, n_groups=4) == "D":
+                self.d_pid = cand
+                break
+        # 找一个 A 组 paper_id 作对照
+        self.a_pid = None
+        for i in range(100):
+            cand = f"A{i}USDT|LONG|2026-05-15T10:00:00+00:00"
+            if live_trader._ab_group(cand, n_groups=4) == "A":
+                self.a_pid = cand
+                break
+
+    def _make_trade(self, pid, direction="LONG"):
+        return {
+            "id": pid,
+            "symbol": "BTCUSDT",   # 在白名单内
+            "direction": direction,
+            "entered_at": (self.now - timedelta(seconds=10)).isoformat(),
+            "entry_price": 80000.0,
+            "sl": 79000.0,
+        }
+
+    def test_d_group_down_long_blocked(self):
+        """D 组 + down regime + LONG → 拒绝 mirror."""
+        pt = self._make_trade(self.d_pid, "LONG")
+        ok, reason = live_trader.is_eligible_for_mirror(
+            pt, self.live_state, self.now, btc_regime="down"
+        )
+        self.assertFalse(ok)
+        self.assertIn("regime gate", reason)
+
+    def test_d_group_down_short_allowed(self):
+        """D 组 + down regime + SHORT → 允许 (gate 只拒 LONG)."""
+        pt = self._make_trade(self.d_pid, "SHORT")
+        ok, reason = live_trader.is_eligible_for_mirror(
+            pt, self.live_state, self.now, btc_regime="down"
+        )
+        self.assertTrue(ok, f"D + down + SHORT 应允许, reason={reason}")
+
+    def test_d_group_up_long_allowed(self):
+        """D 组 + up regime + LONG → 允许 (gate 只在 down)."""
+        pt = self._make_trade(self.d_pid, "LONG")
+        ok, _ = live_trader.is_eligible_for_mirror(
+            pt, self.live_state, self.now, btc_regime="up"
+        )
+        self.assertTrue(ok)
+
+    def test_a_group_down_long_allowed(self):
+        """A 组 (基线) + down regime + LONG → 允许 (A 不启用 gate)."""
+        pt = self._make_trade(self.a_pid, "LONG")
+        ok, _ = live_trader.is_eligible_for_mirror(
+            pt, self.live_state, self.now, btc_regime="down"
+        )
+        self.assertTrue(ok)
+
+    def test_no_btc_regime_arg_backward_compat(self):
+        """不传 btc_regime → 不应触发 regime gate (向后兼容)."""
+        pt = self._make_trade(self.d_pid, "LONG")
+        ok, _ = live_trader.is_eligible_for_mirror(
+            pt, self.live_state, self.now,   # 不传 btc_regime
+        )
+        self.assertTrue(ok, "不传 btc_regime 应该跳过 gate")
+
+    def test_btc_regime_none_no_gate(self):
+        """btc_regime=None (取价失败) → 不应误拦 D 组."""
+        pt = self._make_trade(self.d_pid, "LONG")
+        ok, _ = live_trader.is_eligible_for_mirror(
+            pt, self.live_state, self.now, btc_regime=None
+        )
+        self.assertTrue(ok, "regime=None 应该跳过 gate, 避免取价失败时误拦")
 
 
 class TestTryMirrorClose(unittest.TestCase):
@@ -2983,6 +3150,130 @@ class TestMirrorIterationGuards(unittest.TestCase):
         lt = result["live_open_trades"][0]
         self.assertFalse(lt["wick_filter_enabled"])
         self.assertIsNone(lt["wick_filter_min_breaches"])
+
+    def test_phase_4f_regime_gate_blocks_down_long_in_main_loop(self):
+        """Phase 4.F 集成: D 组 + down regime + LONG → main_loop 不 mirror,
+        而是记录 missed_signal."""
+        now = datetime.now(timezone.utc)
+        # 找 D 组 paper_id
+        d_pid = None
+        for i in range(100):
+            cand = f"BTCUSDT|LONG|d_{i}|2026-05-21T10:00:00+00:00"
+            if live_trader._ab_group(cand, n_groups=4) == "D":
+                d_pid = cand
+                break
+        self.assertIsNotNone(d_pid)
+        self._write_paper([{
+            "id": d_pid, "symbol": "BTCUSDT", "direction": "LONG",
+            "entered_at": (now - timedelta(seconds=10)).isoformat(),
+            "entry_price": 80000.0, "sl": 79000.0,
+        }])
+        # Mock BTC kline 触发 down regime (close 远低于 MA25)
+        # 简化: mock _compute_btc_regime 直接返 down
+        with patch.object(live_trader, "LIVE_REGIME_GATE_MODE", "always"), \
+             patch.object(live_trader, "LIVE_SL_COMPENSATION_MODE", "off"), \
+             patch.object(live_trader, "LIVE_SL_WICK_FILTER_MODE", "off"), \
+             patch.object(live_trader, "_compute_btc_regime", return_value={
+                 "regime": "down", "btc_price": 70000.0,
+                 "btc_ma25_1h": 75000.0, "pct_vs_ma25": -6.67,
+                 "change_24h_pct": -5.0, "computed_at": now.isoformat(),
+             }), \
+             patch.object(self.client, "open_position") as mock_op, \
+             patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "80000.0", 0, 0, 0, 0, 0, 0, 0]]):
+            result = main_loop(self.client, dry_run=True)
+        # 不应 mirror
+        self.assertEqual(mock_op.call_count, 0,
+                         "regime gate 应该拒绝, open_position 不该被调")
+        # missed_signal 应该有 regime gate 原因
+        missed = result.get("missed_signals", [])
+        self.assertTrue(
+            any("regime gate" in m.get("reason", "") for m in missed),
+            f"应记 regime gate missed, 实际: {[m.get('reason') for m in missed]}"
+        )
+
+    def test_phase_4f_regime_gate_allows_down_short(self):
+        """Phase 4.F 集成: D 组 + down regime + SHORT → main_loop 允许 mirror."""
+        now = datetime.now(timezone.utc)
+        d_pid = None
+        for i in range(100):
+            cand = f"ETHUSDT|SHORT|d_{i}|2026-05-21T10:00:00+00:00"
+            if live_trader._ab_group(cand, n_groups=4) == "D":
+                d_pid = cand
+                break
+        self.assertIsNotNone(d_pid)
+        self._write_paper([{
+            "id": d_pid, "symbol": "ETHUSDT", "direction": "SHORT",
+            "entered_at": (now - timedelta(seconds=10)).isoformat(),
+            "entry_price": 3000.0, "sl": 3100.0,
+        }])
+        mock_open = {
+            "trade_id": "L1", "symbol": "ETHUSDT", "side": "SELL", "qty": 0.01,
+            "avg_fill_price": 3000.0, "actual_notional": 20.0,
+            "entry_order_id": 1, "entry_client_id": "x",
+            "sl_price": 3100.0, "sl_side": "BUY", "sl_mode": "client_side",
+            "opened_at": now.isoformat(),
+            "fees_paid_usdt": 0, "_dryRun": True,
+        }
+        with patch.object(live_trader, "LIVE_REGIME_GATE_MODE", "always"), \
+             patch.object(live_trader, "LIVE_SL_COMPENSATION_MODE", "off"), \
+             patch.object(live_trader, "LIVE_SL_WICK_FILTER_MODE", "off"), \
+             patch.object(live_trader, "_compute_btc_regime", return_value={
+                 "regime": "down", "btc_price": 70000.0,
+                 "btc_ma25_1h": 75000.0, "pct_vs_ma25": -6.67,
+                 "change_24h_pct": -5.0, "computed_at": now.isoformat(),
+             }), \
+             patch.object(self.client, "open_position", return_value=mock_open), \
+             patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "3000.0", 0, 0, 0, 0, 0, 0, 0]]):
+            result = main_loop(self.client, dry_run=True)
+        # 应 mirror
+        self.assertEqual(len(result["live_open_trades"]), 1,
+                         "down + SHORT 应该允许 mirror")
+        lt = result["live_open_trades"][0]
+        self.assertTrue(lt["regime_gate_enabled"], "D 组 regime_gate_enabled=True")
+        self.assertEqual(lt["btc_regime_at_open"], "down")
+
+    def test_phase_4f_d_group_record_field_when_no_block(self):
+        """D 组在 up regime LONG 不触发 gate, 但 live_trade['regime_gate_enabled']=True."""
+        now = datetime.now(timezone.utc)
+        d_pid = None
+        for i in range(100):
+            cand = f"BTCUSDT|LONG|up_{i}|2026-05-21T10:00:00+00:00"
+            if live_trader._ab_group(cand, n_groups=4) == "D":
+                d_pid = cand
+                break
+        self.assertIsNotNone(d_pid)
+        self._write_paper([{
+            "id": d_pid, "symbol": "BTCUSDT", "direction": "LONG",
+            "entered_at": (now - timedelta(seconds=10)).isoformat(),
+            "entry_price": 80000.0, "sl": 79000.0,
+        }])
+        mock_open = {
+            "trade_id": "L1", "symbol": "BTCUSDT", "side": "BUY", "qty": 0.2,
+            "avg_fill_price": 80000.0, "actual_notional": 20.0,
+            "entry_order_id": 1, "entry_client_id": "x",
+            "sl_price": 79000.0, "sl_side": "SELL", "sl_mode": "client_side",
+            "opened_at": now.isoformat(),
+            "fees_paid_usdt": 0, "_dryRun": True,
+        }
+        # up regime + LONG: gate 不触发
+        with patch.object(live_trader, "LIVE_REGIME_GATE_MODE", "always"), \
+             patch.object(live_trader, "LIVE_SL_COMPENSATION_MODE", "off"), \
+             patch.object(live_trader, "LIVE_SL_WICK_FILTER_MODE", "off"), \
+             patch.object(live_trader, "_compute_btc_regime", return_value={
+                 "regime": "up", "btc_price": 85000.0,
+                 "btc_ma25_1h": 80000.0, "pct_vs_ma25": +6.25,
+                 "change_24h_pct": +5.0, "computed_at": now.isoformat(),
+             }), \
+             patch.object(self.client, "open_position", return_value=mock_open), \
+             patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "80000.0", 0, 0, 0, 0, 0, 0, 0]]):
+            result = main_loop(self.client, dry_run=True)
+        self.assertEqual(len(result["live_open_trades"]), 1)
+        lt = result["live_open_trades"][0]
+        self.assertTrue(lt["regime_gate_enabled"], "D 组应记 regime_gate_enabled=True")
+        self.assertEqual(lt["regime_gate_mode"], "always")
 
 
 # ============================================================================

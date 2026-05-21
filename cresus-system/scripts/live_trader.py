@@ -120,7 +120,7 @@ LIVE_BTC_REGIME_THRESHOLD_PCT = 0.5
 # A/B 测试 (启动期): 按 paper_id MD5 哈希分组, 确定性可复现.
 # 数据足够 (≥30 笔 each side) 后据实切换到 always.
 # Phase 4.E (2026-05-19): 升级到 3-arm (A/B/C), 加 wick filter 组. B 组保留补偿测试.
-LIVE_SL_COMPENSATION_MODE = "abc"   # "off" | "ab" (legacy 2-arm) | "abc" (Phase 4.E) | "always"
+# Phase 4.F (2026-05-21): 升级到 4-arm (A/B/C/D), 加 regime gate. 配置见下方.
 
 # Phase 4.E SL Wick 过滤 (2026-05-19)
 # ==========================================
@@ -132,8 +132,22 @@ LIVE_SL_COMPENSATION_MODE = "abc"   # "off" | "ab" (legacy 2-arm) | "abc" (Phase
 #       SL 外停留 ≥ ~30s). 单次 wick 不再触发.
 # A/B/C 测试: A=无补偿无过滤(基线), B=补偿无过滤(Phase 4.D), C=无补偿有过滤(Phase 4.E).
 #   每组 ~1/3, 用同一 paper_id MD5 → 0/1/2 分配.
-LIVE_SL_WICK_FILTER_MODE = "abc"    # "off" | "abc" | "always"
+LIVE_SL_WICK_FILTER_MODE = "abcd"   # "off" | "abc" (3-arm) | "abcd" (Phase 4.F) | "always"
 LIVE_WICK_FILTER_MIN_BREACHES = 2   # 需要连续 N 次轮询都 breach 才触发 SL
+
+# Phase 4.F Regime Gate (2026-05-21)
+# ==========================================
+# 数据驱动: 333 笔实盘里 down regime LONG 10 笔 0 胜 0% (-$3.14, 人均 -$0.314),
+#         显著差于 down SHORT (20% 胜率, -$0.071/笔), t-test p=0.042.
+# 论据: paper 自己的 RISK_OFF 时段 SHORT 人均 +$0.126 也远好于 LONG +$0.037,
+#       证实 BTC 下跌时 SHORT 是更优方向. paper 信号生成器未做此过滤.
+# 方案: D 组对 paper 信号加 regime gate — 当 btc_regime=down 且 direction=LONG,
+#       拒绝 mirror. 防御性, 永不误开仓.
+# A/B/C/D 测试: A=基线, B=补偿, C=wick filter, D=regime gate. 每组 ~1/4 (MD5 mod 4).
+LIVE_REGIME_GATE_MODE = "abcd"      # "off" | "abcd" | "always"
+
+# 升级 SL 补偿 / wick filter 到 4-arm 一致 (B/C 分别对应)
+LIVE_SL_COMPENSATION_MODE = "abcd"  # "off" | "ab" (legacy 2-arm) | "abc" (3-arm) | "abcd" (Phase 4.F) | "always"
 
 # Phase 3.3.a/b 控制文件 (在 ~/.cresus-*)
 PAUSE_FLAG_PATH = Path.home() / ".cresus-pause"
@@ -286,8 +300,17 @@ def _trade_age_sec(paper_trade: dict, now: datetime) -> Optional[float]:
 
 def is_eligible_for_mirror(
     paper_trade: dict, live_state: dict, now: datetime,
+    btc_regime: Optional[str] = None,
 ) -> tuple:
     """检查 paper trade 是否应在 live mirror.
+
+    Args:
+        paper_trade: paper 信号
+        live_state: live 当前状态
+        now: 当前时刻
+        btc_regime: 可选, 当前 BTC regime ('up'/'chop'/'down'). 用于 Phase 4.F
+                    regime gate (仅对 D 组启用). 不传则跳过此 gate (向后兼容).
+
     Returns (eligible: bool, reason: str).
     """
     paper_id = paper_trade.get("id", "")
@@ -324,6 +347,12 @@ def is_eligible_for_mirror(
     direction = paper_trade.get("direction", "").upper()
     if direction not in ("LONG", "SHORT"):
         return False, f"invalid direction {direction!r}"
+    # 7. Phase 4.F regime gate (仅对 D 组启用, 当前规则: down + LONG 拒)
+    # 只在 btc_regime 提供时才检查; 测试 / 旧调用不带此参数时跳过 (向后兼容)
+    if btc_regime is not None and _ab_use_regime_gate(paper_id, LIVE_REGIME_GATE_MODE):
+        if _should_block_for_regime(direction, btc_regime):
+            return False, (f"regime gate (D 组): {btc_regime} regime + {direction} "
+                          f"被拒 (数据驱动: down+LONG 历史 0/10 胜)")
     return True, "ok"
 
 
@@ -685,6 +714,7 @@ def publish_live_history(
             "sl_compensation_mode": LIVE_SL_COMPENSATION_MODE,
             "wick_filter_mode": LIVE_SL_WICK_FILTER_MODE,
             "wick_filter_min_breaches": LIVE_WICK_FILTER_MIN_BREACHES,
+            "regime_gate_mode": LIVE_REGIME_GATE_MODE,
             "observation_mode": LIVE_OBSERVATION_MODE,
         },
     }
@@ -795,18 +825,51 @@ def _compute_pre_entry_slippage_bps(
     return (current - paper_entry) / paper_entry * 10000.0 * side_sign
 
 
-def _ab_group(paper_id: str) -> str:
-    """Phase 4.E: paper_id 哈希到 'A'/'B'/'C' 三组 (各 ~1/3, MD5 mod 3 确定性).
+def _ab_group(paper_id: str, n_groups: int = 4) -> str:
+    """Phase 4.E/4.F: paper_id 哈希到 A/B/C/D 多组 (MD5 mod n).
 
-    用途: 让多个独立特性 (compensation / wick filter / 未来扩展) 共享同一组别,
-    保证统计上不会产生 2x2 交叉污染.
+    n_groups=3: Phase 4.E (A/B/C), 各 ~1/3
+    n_groups=4: Phase 4.F 默认 (A/B/C/D), 各 ~1/4
 
-    Returns: 'A' | 'B' | 'C'. 空 paper_id 返 'A' (基线安全退路).
+    用途: 让多个独立特性共享同一组别系统, 保证统计上不会产生交叉污染.
+    A 永远是基线, B/C/D 各承载一个独立特性.
+
+    Returns: 'A' | 'B' | 'C' | 'D'. 空 paper_id 返 'A' (基线安全退路).
     """
     if not paper_id:
         return "A"
+    if n_groups < 1 or n_groups > 4:
+        n_groups = 4
     h = int(hashlib.md5(paper_id.encode("utf-8")).hexdigest(), 16)
-    return ["A", "B", "C"][h % 3]
+    return ["A", "B", "C", "D"][h % n_groups]
+
+
+def _should_block_for_regime(direction: str, regime: Optional[str]) -> bool:
+    """Phase 4.F regime gate 核心规则.
+
+    Args:
+        direction: paper trade 方向, 'LONG' / 'SHORT' (会 upper())
+        regime: 当前 BTC regime, 'up' / 'chop' / 'down' / None
+
+    Returns:
+        True 表示该 (regime, direction) 组合应该被拒绝 mirror.
+
+    当前规则:
+        - down + LONG  → True  (block, 数据驱动: 0/10 胜率 p=0.042)
+        - 其余组合     → False
+
+    设计原则:
+        - 单功能: 只判规则, 不查 A/B/C/D 分组 (由 caller 判定是否该应用此规则)
+        - 防御性: 永远只能拒绝, 不能误开仓
+        - 易扩展: 未来若数据证明 chop+SHORT 也该拒, 只需改这一处
+    """
+    if not regime or not direction:
+        return False
+    d = direction.upper()
+    r = regime.lower()
+    if r == "down" and d == "LONG":
+        return True
+    return False
 
 
 def _ab_use_sl_compensation(paper_id: str, mode: str = None) -> bool:
@@ -831,17 +894,20 @@ def _ab_use_sl_compensation(paper_id: str, mode: str = None) -> bool:
         h = int(hashlib.md5(paper_id.encode("utf-8")).hexdigest(), 16)
         return (h % 2) == 0
     if mode == "abc":
-        return _ab_group(paper_id) == "B"
+        return _ab_group(paper_id, n_groups=3) == "B"
+    if mode == "abcd":
+        return _ab_group(paper_id, n_groups=4) == "B"
     log.warning(f"[ab-sl] unknown mode={mode!r}, fallback to off")
     return False
 
 
 def _ab_use_wick_filter(paper_id: str, mode: str = None) -> bool:
-    """Phase 4.E: SL wick 过滤启用判定 (C 组).
+    """Phase 4.E/4.F: SL wick 过滤启用判定 (C 组).
 
     mode='off':    永远 False (legacy 行为)
     mode='always': 永远 True
-    mode='abc':    Phase 4.E 3-arm — C 组启用过滤, A/B 组不启用
+    mode='abc':    Phase 4.E 3-arm — C 组启用过滤
+    mode='abcd':   Phase 4.F 4-arm — C 组启用过滤 (D 组转用 regime gate)
 
     启用后, _check_sl_breach 要求连续 LIVE_WICK_FILTER_MIN_BREACHES 次轮询
     都越 SL 才返回 True. 单次 wick 不再触发.
@@ -853,8 +919,32 @@ def _ab_use_wick_filter(paper_id: str, mode: str = None) -> bool:
     if mode == "always":
         return True
     if mode == "abc":
-        return _ab_group(paper_id) == "C"
+        return _ab_group(paper_id, n_groups=3) == "C"
+    if mode == "abcd":
+        return _ab_group(paper_id, n_groups=4) == "C"
     log.warning(f"[ab-wick] unknown mode={mode!r}, fallback to off")
+    return False
+
+
+def _ab_use_regime_gate(paper_id: str, mode: str = None) -> bool:
+    """Phase 4.F: BTC regime gate 启用判定 (D 组).
+
+    mode='off':    永远 False (legacy / 不启用)
+    mode='always': 永远 True (全员启用 gate, 适合数据足够后切换)
+    mode='abcd':   4-arm — D 组启用 regime gate, A/B/C 组不启用
+
+    启用后, is_eligible_for_mirror 会在 _should_block_for_regime 返 True 时
+    拒绝该 trade. 当前规则: down regime + LONG 被拒.
+    """
+    if mode is None:
+        mode = LIVE_REGIME_GATE_MODE
+    if mode == "off":
+        return False
+    if mode == "always":
+        return True
+    if mode == "abcd":
+        return _ab_group(paper_id, n_groups=4) == "D"
+    log.warning(f"[ab-regime] unknown mode={mode!r}, fallback to off")
     return False
 
 
@@ -1191,11 +1281,14 @@ def _try_mirror_open(
         except (ValueError, TypeError):
             pass
 
-    # Phase 4.D SL 补偿 + Phase 4.E Wick 过滤决策 (A/B/C 测试)
+    # Phase 4.D + 4.E + 4.F: A/B/C/D 4-arm 测试
     # 在 live_trade 构造时一次性确定, 整个 trade 生命周期保持同一分组.
+    # 注: trade 走到这里说明已通过 is_eligible_for_mirror, 所以 D 组 regime gate
+    #     如果该拒已经拒了; 这里只是记录"曾经分到了 D 组"作为统计标签.
     sl_comp_enabled = _ab_use_sl_compensation(paper_id, LIVE_SL_COMPENSATION_MODE)
     wick_filter_enabled = _ab_use_wick_filter(paper_id, LIVE_SL_WICK_FILTER_MODE)
-    ab_group = _ab_group(paper_id)   # 'A' / 'B' / 'C' — 记录用
+    regime_gate_enabled = _ab_use_regime_gate(paper_id, LIVE_REGIME_GATE_MODE)
+    ab_group = _ab_group(paper_id)   # 'A' / 'B' / 'C' / 'D' — 记录用
     sl_comp_offset = 0.0
     final_sl = float(result.get("sl_price", sl_price))   # 默认 = paper_sl
     sl_paper_at_open = float(sl_price)                    # 记录原始 paper_sl
@@ -1213,6 +1306,11 @@ def _try_mirror_open(
         log.info(
             f"[wick-filter] {sym} {side} group=C, 启用 wick 过滤 "
             f"(需 ≥{LIVE_WICK_FILTER_MIN_BREACHES} 次连续 breach 才触发 SL)"
+        )
+    if regime_gate_enabled:
+        log.info(
+            f"[regime-gate] {sym} {side} group=D, 启用 regime gate "
+            f"(规则: down + LONG 被拒, 但本笔已通过 = 非 down 或非 LONG)"
         )
 
     live_trade = {
@@ -1240,7 +1338,10 @@ def _try_mirror_open(
         "wick_filter_min_breaches": LIVE_WICK_FILTER_MIN_BREACHES if wick_filter_enabled else None,
         "wick_filter_mode": LIVE_SL_WICK_FILTER_MODE,  # 部署时模式 (溯源用)
         "sl_breach_count": 0,                          # 连续 breach 计数器 (C 组用)
-        "ab_group": ab_group,                          # 'A' / 'B' / 'C' 显式记录
+        # Phase 4.F: Regime gate 字段
+        "regime_gate_enabled": regime_gate_enabled,    # D 组标记
+        "regime_gate_mode": LIVE_REGIME_GATE_MODE,     # 部署时模式 (溯源用)
+        "ab_group": ab_group,                          # 'A' / 'B' / 'C' / 'D' 显式记录
 
         "tp1_price": float(paper_trade.get("tp1") or 0),
         "tp2_price": float(paper_trade.get("tp2") or 0),
@@ -1347,10 +1448,12 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
     # 注: snapshot 为 None 时保留旧值 (上次成功的 regime), 避免 dashboard 闪烁
 
     # 1. 找 eligible candidates (即使风控触发也走 eligibility 检查, 便于日志一致)
+    # Phase 4.F: 传 btc_regime 给 is_eligible_for_mirror, 让 D 组的 regime gate 生效
+    current_regime = btc_regime_snapshot.get("regime") if btc_regime_snapshot else None
     mirror_candidates = []
     skip_log = []
     for pt in paper_open:
-        eligible, reason = is_eligible_for_mirror(pt, live, now)
+        eligible, reason = is_eligible_for_mirror(pt, live, now, btc_regime=current_regime)
         if eligible:
             mirror_candidates.append(pt)
         else:
@@ -1412,7 +1515,8 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
                 continue
 
             # Re-check eligibility 用最新 live state (含本轮已 mirror 的)
-            eligible, reason = is_eligible_for_mirror(pt, live, now)
+            # Phase 4.F: 同样传 btc_regime
+            eligible, reason = is_eligible_for_mirror(pt, live, now, btc_regime=current_regime)
             if not eligible:
                 log.debug(f"[skip-during-iter] {pt['symbol']}: {reason}")
                 # 不加 mirrored_paper_ids — 下 tick 状态变化后可以重试
