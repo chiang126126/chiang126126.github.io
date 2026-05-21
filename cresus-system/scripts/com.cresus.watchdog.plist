@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.cresus.watchdog</string>
+
+    <!-- Phase 4.F cresus-watchdog.sh: 每分钟检查 live_trader / velocity_fast_sync
+         是否在跑. 数据文件 > 5min 未更新 = 异常. 连续 2 次失败自动 kickstart.
+
+         设计目的: 减少 39% 漏单率 (其中 62% 归因 Mac launchd / 进程意外停).
+
+         部署:
+           cp com.cresus.watchdog.plist ~/Library/LaunchAgents/
+           launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.cresus.watchdog.plist
+           launchctl enable gui/$(id -u)/com.cresus.watchdog -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/mangzi/chiang126126.github.io/cresus-system/scripts/cresus-watchdog.sh</string>
+    </array>
+
+    <!-- 每 60 秒检查一次 -->
+    <key>StartInterval</key>
+    <integer>60</integer>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!-- 工作目录无所谓 (脚本只依赖 $HOME), 仍然设一下 -->
+    <key>WorkingDirectory</key>
+    <string>/Users/mangzi</string>
+
+    <!-- launchd 本身的输出 (脚本内部已写自己的 watchdog.log) -->
+    <key>StandardOutPath</key>
+    <string>/Users/mangzi/cresus-bot/logs/watchdog-launchd.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/mangzi/cresus-bot/logs/watchdog-launchd.log</string>
+</dict>
+</plist>

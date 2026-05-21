@@ -188,6 +188,29 @@ class TestEligibility(unittest.TestCase):
             self.assertTrue(s.endswith("USDT"),
                             f"{s} 不是 USDT 结尾, 可能是配置错误")
 
+    def test_phase_4f_new_blacklist_members(self):
+        """Phase 4.F (5/21 复盘): PLAY/GUA/STABLE 都已加入黑名单.
+
+        数据依据 (333 笔实盘):
+          PLAYUSDT:   4 笔 0 胜, 净 -$2.75
+          GUAUSDT:    3 笔 0 胜, 净 -$1.74
+          STABLEUSDT: 5 笔 0 胜, 净 -$1.08
+        全部 n≥3 0 胜, 超过黑名单标准.
+        """
+        from live_trader import LIVE_SYMBOL_BLACKLIST
+        for sym in ("PLAYUSDT", "GUAUSDT", "STABLEUSDT"):
+            self.assertIn(sym, LIVE_SYMBOL_BLACKLIST, f"{sym} 应已加入黑名单")
+
+    def test_blacklist_new_members_block_mirror(self):
+        """Phase 4.F 新加成员实测拦截."""
+        for sym in ("PLAYUSDT", "GUAUSDT", "STABLEUSDT"):
+            trade = dict(self.recent_trade)
+            trade["symbol"] = sym
+            with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+                ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
+            self.assertFalse(ok, f"{sym} 应被黑名单拦截")
+            self.assertIn("blacklist", reason)
+
     def test_blacklist_case_insensitive_on_paper_symbol(self):
         """防御: paper 若意外传小写/混合大小写 symbol, 黑名单仍能匹配.
 
@@ -1009,15 +1032,21 @@ class TestComputePreEntrySlippage(unittest.TestCase):
     # --- 阈值常量合理性 ---
 
     def test_threshold_is_reasonable(self):
-        """阈值是基于实测数据的合理值. 当前 v2: 50 bps (v1 为 30 bps).
-        不应是 0 (拦截所有) 或天文数字 (失去保护)."""
+        """阈值是基于实测数据的合理值. 当前 v3: 100 bps.
+        不应是 0 (拦截所有) 或天文数字 (失去保护).
+
+        阈值演化:
+          v1 (5/17): 30 bps
+          v2 (5/17): 50 bps — 116 笔后调整, 减少误杀小滑点
+          v3 (5/21): 100 bps — 333 笔后再放宽, 实测高滑点反而赚钱
+        """
         self.assertGreater(LIVE_MAX_ENTRY_SLIPPAGE_BPS, 5,
                            "阈值太小会拦截正常市场波动")
-        self.assertLess(LIVE_MAX_ENTRY_SLIPPAGE_BPS, 200,
-                        "阈值太大失去保护意义 (200bps 已是 2% 灾难)")
-        # 当前 v2 值: 50 bps
-        self.assertEqual(LIVE_MAX_ENTRY_SLIPPAGE_BPS, 50.0,
-                         "v2: 复盘 116 笔后从 30 → 50, 减少误杀小滑点 trades")
+        self.assertLess(LIVE_MAX_ENTRY_SLIPPAGE_BPS, 500,
+                        "阈值太大失去保护意义 (>500bps = 5% 灾难)")
+        # 当前 v3 值: 100 bps
+        self.assertEqual(LIVE_MAX_ENTRY_SLIPPAGE_BPS, 100.0,
+                         "v3: 333 笔后从 50 → 100, 高滑点组实测人均 +$0.040")
 
     def test_threshold_boundary_just_below(self):
         """边界: pre_slip = 阈值 - 0.1 应通过 (严格 > 比较)."""
@@ -2738,7 +2767,7 @@ class TestMirrorIterationGuards(unittest.TestCase):
         self.assertLessEqual(call_count[0], 4)
 
     def test_slippage_gate_rejects_above_threshold(self):
-        """滑点护栏 (Phase 4.A): 预滑点 > 阈值 (当前 50 bps) → 不调 open_position, 记 missed_signal."""
+        """滑点护栏 (Phase 4.A v3): 预滑点 > 阈值 (当前 100 bps) → 不调 open_position, 记 missed_signal."""
         now = datetime.now(timezone.utc)
         self._write_paper([{
             "id": "BTCUSDT|LONG|2026-05-15T10:00:00+00:00",
@@ -2748,11 +2777,11 @@ class TestMirrorIterationGuards(unittest.TestCase):
             "entry_price": 100.0,
             "sl": 95.0,
         }])
-        # paper 100, 当前 101 → +100 bps 不利 → 应被拒
+        # paper 100, 当前 102 → +200 bps 不利 → 应被拒 (>100bps 阈值)
         with patch.object(self.client, "open_position",
                           return_value=self.mock_open_result) as mock_open, \
              patch.object(self.client, "get_klines",
-                          return_value=[[0, 0, 0, 0, "101.0", 0, 0, 0, 0, 0, 0, 0]]):
+                          return_value=[[0, 0, 0, 0, "102.0", 0, 0, 0, 0, 0, 0, 0]]):
             result = main_loop(self.client, dry_run=True)
         # 关键: open_position 必须未被调用 (避免开仓)
         self.assertEqual(mock_open.call_count, 0)
@@ -2827,7 +2856,7 @@ class TestMirrorIterationGuards(unittest.TestCase):
         self.assertEqual(mock_open.call_count, 1, "SHORT 有利滑点应通过")
 
     def test_slippage_gate_short_direction_rejects_unfavorable(self):
-        """SHORT: 当前价下跌 = 不利 = 超阈值 → 拒."""
+        """SHORT: 当前价下跌 = 不利 = 超阈值 (v3 100bps) → 拒."""
         now = datetime.now(timezone.utc)
         self._write_paper([{
             "id": "BTCUSDT|SHORT|2026-05-15T10:00:00+00:00",
@@ -2837,10 +2866,10 @@ class TestMirrorIterationGuards(unittest.TestCase):
             "entry_price": 100.0,
             "sl": 105.0,
         }])
-        # SHORT, 当前 99 → +100 bps 不利 → 拒
+        # SHORT, 当前 98 → +200 bps 不利 → 拒 (>100bps 阈值)
         with patch.object(self.client, "open_position") as mock_open, \
              patch.object(self.client, "get_klines",
-                          return_value=[[0, 0, 0, 0, "99.0", 0, 0, 0, 0, 0, 0, 0]]):
+                          return_value=[[0, 0, 0, 0, "98.0", 0, 0, 0, 0, 0, 0, 0]]):
             result = main_loop(self.client, dry_run=True)
         self.assertEqual(mock_open.call_count, 0, "SHORT 不利滑点应被拒")
 
