@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-21T22:51:48.919974+00:00",
+  "updated_at": "2026-05-21T22:54:06.364834+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 14,
+  "alerts_count": 15,
   "alerts": [
+    {
+      "symbol": "BANANAS31USDT",
+      "base": "BANANAS31",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.012785,
+      "price_change_pct": -0.583,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 166241.0,
+      "volume_baseline_usdt": 5622.0,
+      "volume_ratio": 29.57,
+      "detected_at": "2026-05-21T22:53:19.108531+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.807,
+      "change_15m_pct": -1.243,
+      "change_1h_pct": -2.173,
+      "change_4h_pct": -2.09,
+      "taker_buy_ratio_1m": 0.201,
+      "taker_buy_ratio_5m": 0.232,
+      "oi_delta_5m_pct": 0.052,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.208,
+      "range_4h_pct": 3.02,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.01281164,
+      "suggested_tp1": 0.01274504,
+      "suggested_tp2": 0.01270507,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "EDGEUSDT",
       "base": "EDGE",
