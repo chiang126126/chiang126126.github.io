@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-21T21:18:51.889269+00:00",
+  "updated_at": "2026-05-21T21:21:03.792649+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 11,
+  "alerts_count": 12,
   "alerts": [
+    {
+      "symbol": "XPLUSDT",
+      "base": "XPL",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.092,
+      "price_change_pct": 1.545,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 123834.0,
+      "volume_baseline_usdt": 22514.0,
+      "volume_ratio": 5.5,
+      "detected_at": "2026-05-21T21:20:20.064367+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.546,
+      "change_15m_pct": 1.77,
+      "change_1h_pct": 1.996,
+      "change_4h_pct": 4.903,
+      "taker_buy_ratio_1m": 0.723,
+      "taker_buy_ratio_5m": 0.634,
+      "oi_delta_5m_pct": 0.464,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.311,
+      "range_4h_pct": 5.11,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.09157143,
+      "suggested_tp1": 0.09264286,
+      "suggested_tp2": 0.09328571,
+      "conviction_score": 5,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "PLAYUSDT",
       "base": "PLAY",
