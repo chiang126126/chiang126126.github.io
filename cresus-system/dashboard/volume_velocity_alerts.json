@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-21T11:01:47.882447+00:00",
+  "updated_at": "2026-05-21T11:04:05.861739+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 72,
+  "alerts_count": 73,
   "alerts": [
+    {
+      "symbol": "USARUSDT",
+      "base": "USAR",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 23.21,
+      "price_change_pct": 2.608,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 33206.0,
+      "volume_baseline_usdt": 3509.0,
+      "volume_ratio": 9.46,
+      "detected_at": "2026-05-21T11:04:02.984192+00:00",
+      "intensity": 2,
+      "change_5m_pct": 2.747,
+      "change_15m_pct": 2.339,
+      "change_1h_pct": 1.444,
+      "change_4h_pct": 2.611,
+      "taker_buy_ratio_1m": 0.421,
+      "taker_buy_ratio_5m": 0.543,
+      "oi_delta_5m_pct": -0.163,
+      "funding_rate_pct": -0.0073,
+      "atr_pct": 0.582,
+      "range_4h_pct": 5.3,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 23.0075,
+      "suggested_tp1": 23.51375,
+      "suggested_tp2": 23.8175,
+      "conviction_score": 3,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "USARUSDT",
       "base": "USAR",
