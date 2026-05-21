@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-21T21:04:23.298652+00:00",
+  "generated_at": "2026-05-21T21:06:35.589888+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 351,
-    "open": 0,
+    "total_trades": 352,
+    "open": 1,
     "closed": 351,
     "wins": 120,
     "losses": 229,
@@ -14,30 +14,89 @@
     "avg_pnl_usdt": -0.0028,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 6.4246,
+    "fees_paid_usdt": 6.4346,
     "fees_realized_usdt": 6.4246,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.01,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 92.58,
+    "deployed_usdt": 20.02,
+    "free_capital_usdt": 72.55,
     "max_concurrent_slots": 4,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 3.2918,
-    "deployed_usdt": 0
+    "deployed_usdt": 20.02
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "PLUMEUSDT"
+    ],
+    "exchange_symbols": [
+      "PLUMEUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "PLUMEUSDT|LONG|2026-05-21T21:05:04.894859+00:00",
+      "trade_id": "L1779397504_PLUMEUS_L",
+      "symbol": "PLUMEUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.01469,
+      "avg_fill_price": 0.0147,
+      "slippage_bps": 6.81,
+      "qty": 1362.0,
+      "notional_usdt": 20.0214,
+      "leverage": 3,
+      "risk_usdt": 0.2588,
+      "risk_pct": 1.293,
+      "mirror_latency_sec": 24.8,
+      "sl_price": 0.01451,
+      "sl_paper_current": 0.01451,
+      "sl_compensation_enabled": false,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "abcd",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 2,
+      "wick_filter_mode": "abcd",
+      "sl_breach_count": 0,
+      "regime_gate_enabled": false,
+      "regime_gate_mode": "abcd",
+      "ab_group": "C",
+      "tp1_price": 0.01496,
+      "tp2_price": 0.01523,
+      "phase": "A",
+      "entry_order_id": 109924914,
+      "entry_client_id": "cresus_L1779397504_PLUMEUS_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.613,
+      "phase_a_mfe_pct": 0.068,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.010011,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-21T21:06:02.790569+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 77721.1,
+      "btc_change_24h_at_open": 0.324,
+      "btc_pct_vs_ma25_at_open": 0.194,
+      "phase_a_mfe_price": 0.0147,
+      "current_price": 0.01475,
+      "unrealized_pnl_usdt": 0.0681,
+      "unrealized_pnl_pct": 0.34,
+      "last_price_check_at": "2026-05-21T21:06:33.333476+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "FOGOUSDT|LONG|2026-05-21T20:11:20.564827+00:00",
@@ -19855,11 +19914,11 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 77728.1,
-    "btc_ma25_1h": 77570.86,
-    "pct_vs_ma25": 0.203,
-    "change_24h_pct": 0.333,
-    "computed_at": "2026-05-21T21:04:23.251574+00:00"
+    "btc_price": 77740.7,
+    "btc_ma25_1h": 77571.36,
+    "pct_vs_ma25": 0.218,
+    "change_24h_pct": 0.349,
+    "computed_at": "2026-05-21T21:06:35.245967+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
