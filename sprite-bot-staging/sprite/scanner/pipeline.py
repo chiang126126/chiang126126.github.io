@@ -25,8 +25,6 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 
 from sprite_catcher import (
-    assess_market_regime,
-    can_admit_intent,
     compute_chip_features,
     evaluate_long_safety,
     evaluate_short_safety,
@@ -40,7 +38,6 @@ from sprite_catcher.features.strategies import (
     plan_trend_follow,
 )
 from sprite_catcher.models import (
-    AllocationCaps,
     Pool,
     TradeIntent,
 )
@@ -65,11 +62,7 @@ _holder_provider = GoPlusHolderProvider()
 _transfer_provider = NullTransferProvider()   # v0 无 BFS；cluster_factor ≈ 1
 _cex_registry = StaticCEXWalletRegistry()
 
-_CAPS = AllocationCaps(
-    max_position_pct=0.10,   # 单仓不超过账户 10%
-    max_total_pct=0.40,      # 总仓不超过账户 40%
-    max_leverage=3.0,
-)
+_MAX_OPEN_POSITIONS = int(os.getenv("MAX_OPEN_POSITIONS", "5"))
 
 
 @dataclass
@@ -216,19 +209,13 @@ def run(
             pool=pool.value, scanned_at=now,
         )
 
-    # ── 步骤 6：L7 组合准入控制 ───────────────────────────────────────────────
-    regime = assess_market_regime(oi_strat)
-    admission = can_admit_intent(
-        intent=intent,
-        open_intents=open_intents,
-        regime=regime,
-        caps=_CAPS,
-    )
-    if not admission.admitted:
-        log.info("%s: L7 准入拒绝: %s", futures_symbol, admission.rejection_reason)
+    # ── 步骤 6：简化版 L7 准入（v0：只检查开仓数上限）────────────────────────
+    # assess_market_regime 需要 BTC 1D K 线 + 总市值历史，v0 暂不接入
+    if len(open_intents) >= _MAX_OPEN_POSITIONS:
+        log.info("%s: L7 拒绝（持仓已满 %d）", futures_symbol, _MAX_OPEN_POSITIONS)
         return PipelineResult(
             symbol=futures_symbol, token_id=token_id,
-            intent=None, rejection_reason=f"l7_admission: {admission.rejection_reason}",
+            intent=None, rejection_reason=f"l7_max_positions:{_MAX_OPEN_POSITIONS}",
             pool=pool.value, scanned_at=now,
         )
 
