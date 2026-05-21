@@ -211,28 +211,22 @@ cex_pnl_df  = compute_cex_pnl_curve(cex_closed, CEX_STARTING_CAPITAL)
 cex_scan    = load_cex_scan_stats(DATA_DIR / "cex_scans", days=1)
 
 
-# ── 单行 Header ───────────────────────────────────────────────────────────────
+# ── Header：标题 + 刷新时间 ───────────────────────────────────────────────────
 
-h_title, h_sol, h_cex, h_time = st.columns([2, 3, 3, 1])
-
+h_title, h_time = st.columns([9, 1])
 with h_title:
     st.markdown("### ⚡ Sprite Catcher")
-
-with h_sol:
-    sol_scan_ind  = daemon_status_indicator(sol_scan_status,  name="Sol-scan",  stale_threshold_s=4 * 3600)
-    sol_paper_ind = daemon_status_indicator(sol_paper_status, name="Sol-paper", stale_threshold_s=5 * 60)
-    st.markdown(f"🌙 {sol_scan_ind} &nbsp; {sol_paper_ind}", unsafe_allow_html=True)
-
-with h_cex:
-    cex_dot  = "🟢" if cex_status.get("running") else "🔴"
-    cex_last = _fmt_ts(cex_status.get("last_update_at", "—"))
-    st.markdown(f"📈 {cex_dot} CEX scan &nbsp; `{cex_last}`", unsafe_allow_html=True)
-
 with h_time:
     st.caption(f"🕐 {datetime.now().strftime('%H:%M:%S')}")
     st.caption(f"↻ {REFRESH_S}s")
 
 st.markdown("---")
+
+# 预计算状态文本（供各栏顶部使用）
+sol_scan_ind  = daemon_status_indicator(sol_scan_status,  name="Sol-scan",  stale_threshold_s=4 * 3600)
+sol_paper_ind = daemon_status_indicator(sol_paper_status, name="Sol-paper", stale_threshold_s=5 * 60)
+cex_dot  = "🟢" if cex_status.get("running") else "🔴"
+cex_last = _fmt_ts(cex_status.get("last_update_at", "—"))
 
 
 # ── 左右双栏 ─────────────────────────────────────────────────────────────────
@@ -246,6 +240,7 @@ sol_col, cex_col = st.columns(2, gap="large")
 
 with sol_col:
     st.markdown('<div class="col-hdr col-hdr-sol">🌙 Solana · Memecoins</div>', unsafe_allow_html=True)
+    st.markdown(f"{sol_scan_ind} &nbsp;&nbsp; {sol_paper_ind}", unsafe_allow_html=True)
 
     # ── KPI 两行各 3 格 ───────────────────────────────────────────────────────
     roi_pct    = kpis["roi_pct"] * 100
@@ -347,6 +342,7 @@ with sol_col:
 with cex_col:
     st.markdown('<div class="col-hdr col-hdr-cex">📈 CEX · Futures (Binance USDT-M)</div>',
                 unsafe_allow_html=True)
+    st.markdown(f"{cex_dot} CEX scan &nbsp; · &nbsp; 最近更新 `{cex_last}`", unsafe_allow_html=True)
 
     # ── KPI 两行各 3 格 ───────────────────────────────────────────────────────
     roi = cex_kpis["roi_pct"] * 100
