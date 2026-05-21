@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-21T17:34:38.861468+00:00",
+  "generated_at": "2026-05-21T17:36:19.974321+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 342,
-    "open": 1,
+    "total_trades": 343,
+    "open": 2,
     "closed": 341,
     "wins": 117,
     "losses": 222,
@@ -14,33 +14,33 @@
     "avg_pnl_usdt": -0.0001,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 6.2807,
+    "fees_paid_usdt": 6.2907,
     "fees_realized_usdt": 6.2707,
-    "fees_open_usdt": 0.01,
+    "fees_open_usdt": 0.02,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 20.0,
-    "free_capital_usdt": 73.68,
+    "deployed_usdt": 39.99,
+    "free_capital_usdt": 53.68,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 4.234,
-    "deployed_usdt": 39.92
+    "daily_pnl": 4.2488,
+    "deployed_usdt": 39.99
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "NEIROUSDT",
-      "ARKMUSDT"
+      "MONUSDT",
+      "NEIROUSDT"
     ],
     "exchange_symbols": [
-      "NEIROUSDT",
-      "ARKMUSDT"
+      "MONUSDT",
+      "NEIROUSDT"
     ]
   },
   "open_trades": [
@@ -93,10 +93,64 @@
       "btc_change_24h_at_open": 0.041,
       "btc_pct_vs_ma25_at_open": 0.009,
       "phase_a_mfe_price": 0.00010261,
-      "current_price": 0.0001025,
-      "unrealized_pnl_usdt": 0.0784,
-      "unrealized_pnl_pct": 0.392,
-      "last_price_check_at": "2026-05-21T17:34:35.602950+00:00"
+      "current_price": 0.0001027,
+      "unrealized_pnl_usdt": 0.1175,
+      "unrealized_pnl_pct": 0.588,
+      "last_price_check_at": "2026-05-21T17:36:17.544403+00:00"
+    },
+    {
+      "paper_id": "MONUSDT|LONG|2026-05-21T17:34:19.316221+00:00",
+      "trade_id": "L1779384859_MONUSDT_L",
+      "symbol": "MONUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.02903,
+      "avg_fill_price": 0.02902,
+      "slippage_bps": -3.44,
+      "qty": 689.0,
+      "notional_usdt": 19.99478,
+      "leverage": 3,
+      "risk_usdt": 0.0979,
+      "risk_pct": 0.49,
+      "mirror_latency_sec": 25.5,
+      "sl_price": 0.02887786,
+      "sl_paper_current": 0.02887786,
+      "sl_compensation_enabled": false,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "abcd",
+      "wick_filter_enabled": false,
+      "wick_filter_min_breaches": null,
+      "wick_filter_mode": "abcd",
+      "sl_breach_count": 0,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "abcd",
+      "ab_group": "D",
+      "tp1_price": 0.02925821,
+      "tp2_price": 0.02948643,
+      "phase": "A",
+      "entry_order_id": 111605532,
+      "entry_client_id": "cresus_L1779384859_MONUSDT_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.349,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.009997,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-21T17:35:13.869778+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 77924.8,
+      "btc_change_24h_at_open": 0.512,
+      "btc_pct_vs_ma25_at_open": 0.461,
+      "phase_a_mfe_price": 0.02903,
+      "current_price": 0.02913,
+      "unrealized_pnl_usdt": 0.0758,
+      "unrealized_pnl_pct": 0.379,
+      "last_price_check_at": "2026-05-21T17:36:17.544403+00:00"
     }
   ],
   "recent_closed": [
@@ -19276,17 +19330,17 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-21T16:59:18.799658+00:00",
-      "reason": "paper trade too old (2117s > 600s)",
-      "last_checked_at": "2026-05-21T17:34:35.602950+00:00"
+      "reason": "paper trade too old (2219s > 600s)",
+      "last_checked_at": "2026-05-21T17:36:17.544403+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 77948.3,
-    "btc_ma25_1h": 77568.28,
-    "pct_vs_ma25": 0.49,
-    "change_24h_pct": 0.542,
-    "computed_at": "2026-05-21T17:34:37.000050+00:00"
+    "btc_price": 77903.6,
+    "btc_ma25_1h": 77566.49,
+    "pct_vs_ma25": 0.435,
+    "change_24h_pct": 0.484,
+    "computed_at": "2026-05-21T17:36:19.351387+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
