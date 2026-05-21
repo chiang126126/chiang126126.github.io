@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-21T01:25:38.457056+00:00",
+  "updated_at": "2026-05-21T01:27:55.860219+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 15,
+  "alerts_count": 16,
   "alerts": [
+    {
+      "symbol": "BANANAS31USDT",
+      "base": "BANANAS31",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.013667,
+      "price_change_pct": 0.53,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 80814.0,
+      "volume_baseline_usdt": 14752.0,
+      "volume_ratio": 5.48,
+      "detected_at": "2026-05-21T01:26:56.971486+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.877,
+      "change_15m_pct": 0.936,
+      "change_1h_pct": -0.487,
+      "change_4h_pct": 1.437,
+      "taker_buy_ratio_1m": 0.644,
+      "taker_buy_ratio_5m": 0.66,
+      "oi_delta_5m_pct": 0.014,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.318,
+      "range_4h_pct": 5.66,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.01360186,
+      "suggested_tp1": 0.01376471,
+      "suggested_tp2": 0.01386243,
+      "conviction_score": 3,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "SAPIENUSDT",
       "base": "SAPIEN",
