@@ -1,47 +1,44 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-21T04:47:32.404033+00:00",
+  "generated_at": "2026-05-21T04:49:45.288455+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 300,
-    "open": 1,
-    "closed": 299,
+    "open": 0,
+    "closed": 300,
     "wins": 104,
-    "losses": 193,
-    "win_rate": 0.35,
-    "total_pnl_usdt": -3.0676,
-    "net_pnl_usdt": -8.5519,
-    "avg_pnl_usdt": -0.0103,
+    "losses": 194,
+    "win_rate": 0.349,
+    "total_pnl_usdt": -3.2951,
+    "net_pnl_usdt": -8.7993,
+    "avg_pnl_usdt": -0.011,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 5.4943,
-    "fees_realized_usdt": 5.4843,
-    "fees_open_usdt": 0.01,
+    "fees_paid_usdt": 5.5042,
+    "fees_realized_usdt": 5.5042,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 20.06,
-    "free_capital_usdt": 71.38,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 91.2,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 1.2174,
-    "deployed_usdt": 20.06
+    "daily_pnl": 0.9899,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "1000CHEEMSUSDT"
-    ],
-    "exchange_symbols": [
-      "1000CHEEMSUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "1000CHEEMSUSDT|LONG|2026-05-21T04:12:47.262699+00:00",
       "trade_id": "L1779336767_1000CHE_L",
@@ -80,7 +77,7 @@
       "phase_a_mfe_pct": 0.506,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.010029,
+      "fees_paid_usdt": 0.019944,
       "fees_are_actual": true,
       "opened_at": "2026-05-21T04:13:36.722275+00:00",
       "is_dry_run": false,
@@ -89,13 +86,21 @@
       "btc_change_24h_at_open": 1.677,
       "btc_pct_vs_ma25_at_open": 0.687,
       "phase_a_mfe_price": 0.0007351,
-      "current_price": 0.000728,
-      "unrealized_pnl_usdt": -0.1014,
-      "unrealized_pnl_pct": -0.506,
-      "last_price_check_at": "2026-05-21T04:47:29.853888+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.0007245,
+      "unrealized_pnl_usdt": -0.1974,
+      "unrealized_pnl_pct": -0.984,
+      "last_price_check_at": "2026-05-21T04:49:08.764288+00:00",
+      "closed_at": "2026-05-21T04:49:13.316947+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.0007234,
+      "realized_pnl_usdt": -0.2275,
+      "close_order_id": 82064418,
+      "close_qty": 27412.0,
+      "close_expected_price": 0.00072555,
+      "close_slippage_bps": 29.63,
+      "entry_fees_usdt": 0.010029,
+      "close_fees_usdt": 0.009915
+    },
     {
       "paper_id": "DASHUSDT|LONG|2026-05-21T03:23:43.982829+00:00",
       "trade_id": "L1779333823_DASHUSD_L",
@@ -16631,14 +16636,24 @@
       "close_qty": 53792.0
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "OPGUSDT|LONG|2026-05-21T04:47:29.094822+00:00",
+      "symbol": "OPGUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-05-21T04:47:49.366572+00:00",
+      "reason": "open_failed (retry next tick)",
+      "last_checked_at": "2026-05-21T04:49:43.573290+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 77958.6,
-    "btc_ma25_1h": 77499.46,
-    "pct_vs_ma25": 0.592,
-    "change_24h_pct": 1.577,
-    "computed_at": "2026-05-21T04:47:32.103372+00:00"
+    "btc_price": 77960.7,
+    "btc_ma25_1h": 77499.55,
+    "pct_vs_ma25": 0.595,
+    "change_24h_pct": 1.58,
+    "computed_at": "2026-05-21T04:49:44.685142+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
