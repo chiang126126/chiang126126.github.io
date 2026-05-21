@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-21T13:45:30.118959+00:00",
+  "generated_at": "2026-05-21T13:47:15.681192+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 329,
-    "open": 3,
+    "total_trades": 330,
+    "open": 4,
     "closed": 326,
     "wins": 111,
     "losses": 213,
@@ -14,21 +14,21 @@
     "avg_pnl_usdt": -0.0029,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 6.0107,
+    "fees_paid_usdt": 6.0205,
     "fees_realized_usdt": 5.9807,
-    "fees_open_usdt": 0.03,
+    "fees_open_usdt": 0.0397,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 59.9,
-    "free_capital_usdt": 33.13,
+    "deployed_usdt": 79.48,
+    "free_capital_usdt": 13.53,
     "max_concurrent_slots": 4,
-    "slots_used": 3
+    "slots_used": 4
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 3.3238,
-    "deployed_usdt": 59.9
+    "deployed_usdt": 79.48
   },
   "reconciliation": {
     "ok": true,
@@ -37,12 +37,14 @@
     "live_symbols": [
       "MITOUSDT",
       "STABLEUSDT",
-      "TAGUSDT"
+      "TAGUSDT",
+      "CYSUSDT"
     ],
     "exchange_symbols": [
       "MITOUSDT",
       "STABLEUSDT",
-      "TAGUSDT"
+      "TAGUSDT",
+      "CYSUSDT"
     ]
   },
   "open_trades": [
@@ -61,8 +63,8 @@
       "risk_usdt": 0.2866,
       "risk_pct": 1.437,
       "mirror_latency_sec": 35.2,
-      "sl_price": 0.0445900486,
-      "sl_paper_current": 0.0445000486,
+      "sl_price": 0.0443471002,
+      "sl_paper_current": 0.0442571002,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": 9e-05,
       "sl_compensation_mode": "abc",
@@ -82,7 +84,7 @@
       "alert_type": "sustained",
       "atr_pct": 0.819,
       "phase_a_mfe_pct": 2.602,
-      "phase_b_mfe_pct": 3.065,
+      "phase_b_mfe_pct": 3.594,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.009974,
       "fees_are_actual": true,
@@ -93,11 +95,11 @@
       "btc_change_24h_at_open": -0.412,
       "btc_pct_vs_ma25_at_open": -0.406,
       "phase_a_mfe_price": 0.04417,
-      "current_price": 0.04382,
-      "unrealized_pnl_usdt": 0.7112,
-      "unrealized_pnl_pct": 3.565,
-      "last_price_check_at": "2026-05-21T13:45:26.606666+00:00",
-      "phase_b_mfe_price": 0.04396
+      "current_price": 0.04411,
+      "unrealized_pnl_usdt": 0.5839,
+      "unrealized_pnl_pct": 2.927,
+      "last_price_check_at": "2026-05-21T13:47:12.515634+00:00",
+      "phase_b_mfe_price": 0.04372
     },
     {
       "paper_id": "TAGUSDT|LONG|2026-05-21T13:07:28.993514+00:00",
@@ -146,10 +148,10 @@
       "btc_change_24h_at_open": 0.215,
       "btc_pct_vs_ma25_at_open": -0.341,
       "phase_a_mfe_price": 0.0012344,
-      "current_price": 0.0012484,
-      "unrealized_pnl_usdt": 0.7924,
-      "unrealized_pnl_pct": 3.964,
-      "last_price_check_at": "2026-05-21T13:45:26.606666+00:00",
+      "current_price": 0.0012528,
+      "unrealized_pnl_usdt": 0.8657,
+      "unrealized_pnl_pct": 4.33,
+      "last_price_check_at": "2026-05-21T13:47:12.515634+00:00",
       "phase_b_mfe_price": 0.0012404,
       "phase_c_mfe_price": 0.0012573
     },
@@ -203,7 +205,59 @@
       "current_price": 0.03438,
       "unrealized_pnl_usdt": -0.0466,
       "unrealized_pnl_pct": -0.233,
-      "last_price_check_at": "2026-05-21T13:45:26.606666+00:00"
+      "last_price_check_at": "2026-05-21T13:47:12.515634+00:00"
+    },
+    {
+      "paper_id": "CYSUSDT|SHORT|2026-05-21T13:45:22.857940+00:00",
+      "trade_id": "L1779371122_CYSUSDT_S",
+      "symbol": "CYSUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.4534,
+      "avg_fill_price": 0.4554,
+      "slippage_bps": -44.11,
+      "qty": 43.0,
+      "notional_usdt": 19.5822,
+      "leverage": 3,
+      "risk_usdt": 0.1333,
+      "risk_pct": 0.681,
+      "mirror_latency_sec": 40.5,
+      "sl_price": 0.4605,
+      "sl_paper_current": 0.4585,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.002,
+      "sl_compensation_mode": "abc",
+      "wick_filter_enabled": false,
+      "wick_filter_min_breaches": null,
+      "wick_filter_mode": "abc",
+      "sl_breach_count": 0,
+      "ab_group": "B",
+      "tp1_price": 0.44575,
+      "tp2_price": 0.4381,
+      "phase": "A",
+      "entry_order_id": 83338828,
+      "entry_client_id": "cresus_L1779371122_CYSUSDT_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.562,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.009791,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-21T13:46:07.298490+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 76800.0,
+      "btc_change_24h_at_open": -0.446,
+      "btc_pct_vs_ma25_at_open": -0.972,
+      "phase_a_mfe_price": 0.4534,
+      "current_price": 0.4534,
+      "unrealized_pnl_usdt": 0.086,
+      "unrealized_pnl_pct": 0.439,
+      "last_price_check_at": "2026-05-21T13:47:12.515634+00:00"
     }
   ],
   "recent_closed": [
@@ -18434,17 +18488,17 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-21T13:40:50.606548+00:00",
-      "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-05-21T13:45:26.606666+00:00"
+      "reason": "max_concurrent reached (4/4)",
+      "last_checked_at": "2026-05-21T13:47:12.515634+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 77017.4,
-    "btc_ma25_1h": 77562.63,
-    "pct_vs_ma25": -0.703,
-    "change_24h_pct": -0.164,
-    "computed_at": "2026-05-21T13:45:28.466174+00:00"
+    "btc_price": 76874.6,
+    "btc_ma25_1h": 77556.92,
+    "pct_vs_ma25": -0.88,
+    "change_24h_pct": -0.349,
+    "computed_at": "2026-05-21T13:47:14.502948+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
