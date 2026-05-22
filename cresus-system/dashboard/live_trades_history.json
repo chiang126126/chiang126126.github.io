@@ -1,45 +1,43 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-22T09:17:02.644962+00:00",
+  "generated_at": "2026-05-22T09:19:15.571211+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 367,
-    "open": 2,
-    "closed": 365,
-    "wins": 126,
+    "open": 1,
+    "closed": 366,
+    "wins": 127,
     "losses": 236,
-    "win_rate": 0.348,
-    "total_pnl_usdt": -0.9228,
-    "net_pnl_usdt": -7.5996,
-    "avg_pnl_usdt": -0.0025,
+    "win_rate": 0.35,
+    "total_pnl_usdt": -0.2976,
+    "net_pnl_usdt": -6.9947,
+    "avg_pnl_usdt": -0.0008,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 6.6968,
-    "fees_realized_usdt": 6.6768,
-    "fees_open_usdt": 0.0199,
+    "fees_paid_usdt": 6.7071,
+    "fees_realized_usdt": 6.6971,
+    "fees_open_usdt": 0.01,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 39.86,
-    "free_capital_usdt": 52.52,
+    "deployed_usdt": 19.91,
+    "free_capital_usdt": 73.09,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 0.3766,
-    "deployed_usdt": 39.86
+    "daily_pnl": 1.0018,
+    "deployed_usdt": 19.91
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "SAPIENUSDT",
       "COOKIEUSDT"
     ],
     "exchange_symbols": [
-      "SAPIENUSDT",
       "COOKIEUSDT"
     ]
   },
@@ -93,11 +91,13 @@
       "btc_change_24h_at_open": -0.542,
       "btc_pct_vs_ma25_at_open": 0.007,
       "phase_a_mfe_price": 0.01505,
-      "current_price": 0.0151,
-      "unrealized_pnl_usdt": 0.6874,
-      "unrealized_pnl_pct": 3.453,
-      "last_price_check_at": "2026-05-22T09:16:59.681925+00:00"
-    },
+      "current_price": 0.01512,
+      "unrealized_pnl_usdt": 0.662,
+      "unrealized_pnl_pct": 3.325,
+      "last_price_check_at": "2026-05-22T09:19:13.296809+00:00"
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "SAPIENUSDT|LONG|2026-05-22T08:46:58.016557+00:00",
       "trade_id": "L1779439618_SAPIENU_L",
@@ -138,7 +138,7 @@
       "phase_a_mfe_pct": 1.768,
       "phase_b_mfe_pct": 2.516,
       "phase_c_mfe_pct": 4.4,
-      "fees_paid_usdt": 0.009974,
+      "fees_paid_usdt": 0.02026,
       "fees_are_actual": true,
       "opened_at": "2026-05-22T08:47:42.882665+00:00",
       "is_dry_run": false,
@@ -147,15 +147,23 @@
       "btc_change_24h_at_open": -0.752,
       "btc_pct_vs_ma25_at_open": -0.197,
       "phase_a_mfe_price": 0.13184,
-      "current_price": 0.13439,
-      "unrealized_pnl_usdt": 0.7484,
-      "unrealized_pnl_pct": 3.752,
-      "last_price_check_at": "2026-05-22T09:16:59.681925+00:00",
+      "current_price": 0.13369,
+      "unrealized_pnl_usdt": 0.6406,
+      "unrealized_pnl_pct": 3.212,
+      "last_price_check_at": "2026-05-22T09:17:32.860249+00:00",
       "phase_b_mfe_price": 0.13281,
-      "phase_c_mfe_price": 0.13525
-    }
-  ],
-  "recent_closed": [
+      "phase_c_mfe_price": 0.13525,
+      "closed_at": "2026-05-22T09:18:10.084986+00:00",
+      "close_reason": "paper:hit_trail",
+      "avg_exit_price": 0.13359,
+      "realized_pnl_usdt": 0.6252,
+      "close_order_id": 90083404,
+      "close_qty": 154.0,
+      "close_expected_price": 0.13369,
+      "close_slippage_bps": 7.48,
+      "entry_fees_usdt": 0.009974,
+      "close_fees_usdt": 0.010286
+    },
     {
       "paper_id": "ATHUSDT|LONG|2026-05-22T08:02:37.195420+00:00",
       "trade_id": "L1779436957_ATHUSDT_L",
@@ -20883,17 +20891,17 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-22T07:22:34.635907+00:00",
-      "reason": "paper trade too old (6865s > 600s)",
-      "last_checked_at": "2026-05-22T09:16:59.681925+00:00"
+      "reason": "paper trade too old (6999s > 600s)",
+      "last_checked_at": "2026-05-22T09:19:13.296809+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 77207.2,
-    "btc_ma25_1h": 77424.6,
-    "pct_vs_ma25": -0.281,
-    "change_24h_pct": -0.507,
-    "computed_at": "2026-05-22T09:17:02.028683+00:00"
+    "btc_price": 77205.6,
+    "btc_ma25_1h": 77424.53,
+    "pct_vs_ma25": -0.283,
+    "change_24h_pct": -0.509,
+    "computed_at": "2026-05-22T09:19:15.247704+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
