@@ -1,28 +1,28 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-22T15:26:03.767892+00:00",
+  "generated_at": "2026-05-22T15:28:16.341747+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 389,
-    "open": 1,
-    "closed": 388,
+    "open": 0,
+    "closed": 389,
     "wins": 134,
-    "losses": 251,
-    "win_rate": 0.348,
-    "total_pnl_usdt": -0.4756,
-    "net_pnl_usdt": -7.5862,
-    "avg_pnl_usdt": -0.0012,
+    "losses": 252,
+    "win_rate": 0.347,
+    "total_pnl_usdt": -0.6166,
+    "net_pnl_usdt": -7.7473,
+    "avg_pnl_usdt": -0.0016,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 7.1206,
-    "fees_realized_usdt": 7.1106,
-    "fees_open_usdt": 0.01,
+    "fees_paid_usdt": 7.1307,
+    "fees_realized_usdt": 7.1307,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 20.02,
-    "free_capital_usdt": 72.38,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 92.25,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
@@ -41,7 +41,8 @@
       "USELESSUSDT"
     ]
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "USELESSUSDT|SHORT|2026-05-22T14:35:22.681049+00:00",
       "trade_id": "L1779460522_USELESS_S",
@@ -82,7 +83,7 @@
       "phase_a_mfe_pct": 0.113,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.010011,
+      "fees_paid_usdt": 0.020093,
       "fees_are_actual": true,
       "opened_at": "2026-05-22T14:36:35.543994+00:00",
       "is_dry_run": false,
@@ -91,13 +92,21 @@
       "btc_change_24h_at_open": -0.226,
       "btc_pct_vs_ma25_at_open": -0.808,
       "phase_a_mfe_price": 0.07043,
-      "current_price": 0.071,
-      "unrealized_pnl_usdt": -0.0,
-      "unrealized_pnl_pct": -0.0,
-      "last_price_check_at": "2026-05-22T15:26:01.943892+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.0715,
+      "unrealized_pnl_usdt": -0.141,
+      "unrealized_pnl_pct": -0.704,
+      "last_price_check_at": "2026-05-22T15:28:11.624706+00:00",
+      "closed_at": "2026-05-22T15:28:16.297227+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.0715,
+      "realized_pnl_usdt": -0.141,
+      "close_order_id": 111200366,
+      "close_qty": 282.0,
+      "close_expected_price": 0.07149286,
+      "close_slippage_bps": 1.0,
+      "entry_fees_usdt": 0.010011,
+      "close_fees_usdt": 0.010082
+    },
     {
       "paper_id": "KITEUSDT|SHORT|2026-05-22T14:31:13.005189+00:00",
       "trade_id": "L1779460273_KITEUSD_S",
@@ -22308,26 +22317,17 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-22T14:44:41.157778+00:00",
-      "reason": "paper trade too old (2481s > 600s)",
-      "last_checked_at": "2026-05-22T15:26:01.943892+00:00"
-    },
-    {
-      "paper_id": "STABLEUSDT|SHORT|2026-05-22T15:15:23.644977+00:00",
-      "symbol": "STABLEUSDT",
-      "direction": "SHORT",
-      "conviction_score": 5,
-      "signal_at": "2026-05-22T15:15:26.533221+00:00",
-      "reason": "symbol STABLEUSDT in live blacklist (历史 0 胜)",
-      "last_checked_at": "2026-05-22T15:26:01.943892+00:00"
+      "reason": "paper trade too old (2610s > 600s)",
+      "last_checked_at": "2026-05-22T15:28:11.624706+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 76717.0,
-    "btc_ma25_1h": 77409.93,
-    "pct_vs_ma25": -0.895,
-    "change_24h_pct": -0.653,
-    "computed_at": "2026-05-22T15:26:03.446448+00:00"
+    "btc_price": 76750.5,
+    "btc_ma25_1h": 77411.27,
+    "pct_vs_ma25": -0.854,
+    "change_24h_pct": -0.609,
+    "computed_at": "2026-05-22T15:28:13.829869+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
