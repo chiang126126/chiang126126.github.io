@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-22T13:08:15.933145+00:00",
+  "generated_at": "2026-05-22T13:10:27.552984+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 380,
@@ -35,16 +35,16 @@
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "BIOUSDT",
-      "ONDOUSDT",
       "SAPIENUSDT",
-      "JTOUSDT"
+      "ONDOUSDT",
+      "JTOUSDT",
+      "BIOUSDT"
     ],
     "exchange_symbols": [
-      "BIOUSDT",
-      "ONDOUSDT",
       "SAPIENUSDT",
-      "JTOUSDT"
+      "ONDOUSDT",
+      "JTOUSDT",
+      "BIOUSDT"
     ]
   },
   "open_trades": [
@@ -97,10 +97,10 @@
       "btc_change_24h_at_open": 0.111,
       "btc_pct_vs_ma25_at_open": -0.158,
       "phase_a_mfe_price": 0.12302,
-      "current_price": 0.12409,
-      "unrealized_pnl_usdt": -0.0032,
-      "unrealized_pnl_pct": -0.016,
-      "last_price_check_at": "2026-05-22T13:08:12.900794+00:00"
+      "current_price": 0.12402,
+      "unrealized_pnl_usdt": 0.008,
+      "unrealized_pnl_pct": 0.04,
+      "last_price_check_at": "2026-05-22T13:10:24.706295+00:00"
     },
     {
       "paper_id": "BIOUSDT|LONG|2026-05-22T12:26:54.403138+00:00",
@@ -151,10 +151,10 @@
       "btc_change_24h_at_open": 0.167,
       "btc_pct_vs_ma25_at_open": -0.053,
       "phase_a_mfe_price": 0.03686,
-      "current_price": 0.03654,
-      "unrealized_pnl_usdt": -0.0655,
-      "unrealized_pnl_pct": -0.327,
-      "last_price_check_at": "2026-05-22T13:08:12.900794+00:00"
+      "current_price": 0.03653,
+      "unrealized_pnl_usdt": -0.071,
+      "unrealized_pnl_pct": -0.355,
+      "last_price_check_at": "2026-05-22T13:10:24.706295+00:00"
     },
     {
       "paper_id": "ONDOUSDT|LONG|2026-05-22T12:41:45.653288+00:00",
@@ -195,7 +195,7 @@
       "atr_pct": 0.35,
       "phase_a_mfe_pct": 0.952,
       "phase_b_mfe_pct": 1.859,
-      "phase_c_mfe_pct": 5.078,
+      "phase_c_mfe_pct": 6.166,
       "fees_paid_usdt": 0.009961,
       "fees_are_actual": true,
       "opened_at": "2026-05-22T12:42:59.487194+00:00",
@@ -205,12 +205,12 @@
       "btc_change_24h_at_open": 0.187,
       "btc_pct_vs_ma25_at_open": -0.034,
       "phase_a_mfe_price": 0.4453,
-      "current_price": 0.4638,
-      "unrealized_pnl_usdt": 0.9495,
-      "unrealized_pnl_pct": 4.766,
-      "last_price_check_at": "2026-05-22T13:08:12.900794+00:00",
+      "current_price": 0.4682,
+      "unrealized_pnl_usdt": 1.1475,
+      "unrealized_pnl_pct": 5.76,
+      "last_price_check_at": "2026-05-22T13:10:24.706295+00:00",
       "phase_b_mfe_price": 0.4493,
-      "phase_c_mfe_price": 0.4635
+      "phase_c_mfe_price": 0.4683
     },
     {
       "paper_id": "JTOUSDT|LONG|2026-05-22T13:04:05.020312+00:00",
@@ -261,10 +261,10 @@
       "btc_change_24h_at_open": 0.445,
       "btc_pct_vs_ma25_at_open": 0.012,
       "phase_a_mfe_price": 0.5456,
-      "current_price": 0.5419,
-      "unrealized_pnl_usdt": -0.036,
-      "unrealized_pnl_pct": -0.184,
-      "last_price_check_at": "2026-05-22T13:08:12.900794+00:00"
+      "current_price": 0.5424,
+      "unrealized_pnl_usdt": -0.018,
+      "unrealized_pnl_pct": -0.092,
+      "last_price_check_at": "2026-05-22T13:10:24.706295+00:00"
     }
   ],
   "recent_closed": [
@@ -21698,14 +21698,24 @@
       "close_qty": 53792.0
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "BANANAS31USDT|SHORT|2026-05-22T13:08:42.021734+00:00",
+      "symbol": "BANANAS31USDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-05-22T13:09:14.421087+00:00",
+      "reason": "max_concurrent reached (4/4)",
+      "last_checked_at": "2026-05-22T13:10:24.706295+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 77445.1,
-    "btc_ma25_1h": 77440.84,
-    "pct_vs_ma25": 0.006,
-    "change_24h_pct": 0.438,
-    "computed_at": "2026-05-22T13:08:14.757602+00:00"
+    "btc_price": 77434.6,
+    "btc_ma25_1h": 77440.42,
+    "pct_vs_ma25": -0.008,
+    "change_24h_pct": 0.424,
+    "computed_at": "2026-05-22T13:10:26.294184+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
