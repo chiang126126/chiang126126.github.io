@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-22T04:28:19.527496+00:00",
+  "updated_at": "2026-05-22T04:30:37.006740+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 14,
+  "alerts_count": 15,
   "alerts": [
+    {
+      "symbol": "NXPCUSDT",
+      "base": "NXPC",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 0.3366,
+      "price_change_pct": -1.751,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 58342.0,
+      "volume_baseline_usdt": 3926.0,
+      "volume_ratio": 14.86,
+      "detected_at": "2026-05-22T04:30:36.286569+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.47,
+      "change_15m_pct": -0.499,
+      "change_1h_pct": 3.705,
+      "change_4h_pct": 3.864,
+      "taker_buy_ratio_1m": 0.218,
+      "taker_buy_ratio_5m": 0.377,
+      "oi_delta_5m_pct": 1.052,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.944,
+      "range_4h_pct": 8.53,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.34136786,
+      "suggested_tp1": 0.32944821,
+      "suggested_tp2": 0.32229643,
+      "conviction_score": 0,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "DODOXUSDT",
       "base": "DODOX",
