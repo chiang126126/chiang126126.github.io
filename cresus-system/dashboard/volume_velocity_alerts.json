@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-22T04:39:15.373196+00:00",
+  "updated_at": "2026-05-22T04:41:33.143106+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 21,
+  "alerts_count": 22,
   "alerts": [
+    {
+      "symbol": "PLAYUSDT",
+      "base": "PLAY",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.09866,
+      "price_change_pct": -4.823,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 1239090.0,
+      "volume_baseline_usdt": 219455.0,
+      "volume_ratio": 5.65,
+      "detected_at": "2026-05-22T04:40:32.959516+00:00",
+      "intensity": 1,
+      "change_5m_pct": -13.373,
+      "change_15m_pct": -9.705,
+      "change_1h_pct": -5.731,
+      "change_4h_pct": 8.446,
+      "taker_buy_ratio_1m": 0.449,
+      "taker_buy_ratio_5m": 0.472,
+      "oi_delta_5m_pct": 1.009,
+      "funding_rate_pct": 0.0024,
+      "atr_pct": 2.516,
+      "range_4h_pct": 26.71,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.10362429,
+      "suggested_tp1": 0.09121357,
+      "suggested_tp2": 0.08376714,
+      "conviction_score": 0,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "FOGOUSDT",
       "base": "FOGO",
