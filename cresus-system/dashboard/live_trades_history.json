@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-22T09:19:15.571211+00:00",
+  "generated_at": "2026-05-22T09:20:58.500096+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 367,
-    "open": 1,
+    "total_trades": 368,
+    "open": 2,
     "closed": 366,
     "wins": 127,
     "losses": 236,
@@ -14,30 +14,32 @@
     "avg_pnl_usdt": -0.0008,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 6.7071,
+    "fees_paid_usdt": 6.7171,
     "fees_realized_usdt": 6.6971,
-    "fees_open_usdt": 0.01,
+    "fees_open_usdt": 0.02,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 19.91,
-    "free_capital_usdt": 73.09,
+    "deployed_usdt": 39.94,
+    "free_capital_usdt": 53.05,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 1.0018,
-    "deployed_usdt": 19.91
+    "deployed_usdt": 39.94
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
+      "BEAMXUSDT",
       "COOKIEUSDT"
     ],
     "exchange_symbols": [
+      "BEAMXUSDT",
       "COOKIEUSDT"
     ]
   },
@@ -91,10 +93,64 @@
       "btc_change_24h_at_open": -0.542,
       "btc_pct_vs_ma25_at_open": 0.007,
       "phase_a_mfe_price": 0.01505,
-      "current_price": 0.01512,
-      "unrealized_pnl_usdt": 0.662,
-      "unrealized_pnl_pct": 3.325,
-      "last_price_check_at": "2026-05-22T09:19:13.296809+00:00"
+      "current_price": 0.01521,
+      "unrealized_pnl_usdt": 0.5474,
+      "unrealized_pnl_pct": 2.749,
+      "last_price_check_at": "2026-05-22T09:20:54.892084+00:00"
+    },
+    {
+      "paper_id": "BEAMXUSDT|LONG|2026-05-22T09:19:57.548000+00:00",
+      "trade_id": "L1779441597_BEAMXUS_L",
+      "symbol": "BEAMXUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.001995,
+      "avg_fill_price": 0.002,
+      "slippage_bps": 25.06,
+      "qty": 10015.0,
+      "notional_usdt": 20.03,
+      "leverage": 3,
+      "risk_usdt": 0.2153,
+      "risk_pct": 1.075,
+      "mirror_latency_sec": 16.2,
+      "sl_price": 0.0019785,
+      "sl_paper_current": 0.0019785,
+      "sl_compensation_enabled": false,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "abcd",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 2,
+      "wick_filter_mode": "abcd",
+      "sl_breach_count": 0,
+      "regime_gate_enabled": false,
+      "regime_gate_mode": "abcd",
+      "ab_group": "C",
+      "tp1_price": 0.00201975,
+      "tp2_price": 0.0020445,
+      "phase": "A",
+      "entry_order_id": 127765221,
+      "entry_client_id": "cresus_L1779441597_BEAMXUS_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.551,
+      "phase_a_mfe_pct": 0.1,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.010015,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-22T09:20:24.015407+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 77211.0,
+      "btc_change_24h_at_open": -0.502,
+      "btc_pct_vs_ma25_at_open": -0.276,
+      "phase_a_mfe_price": 0.001997,
+      "current_price": 0.002004,
+      "unrealized_pnl_usdt": 0.0401,
+      "unrealized_pnl_pct": 0.2,
+      "last_price_check_at": "2026-05-22T09:20:54.892084+00:00"
     }
   ],
   "recent_closed": [
@@ -20891,17 +20947,26 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-22T07:22:34.635907+00:00",
-      "reason": "paper trade too old (6999s > 600s)",
-      "last_checked_at": "2026-05-22T09:19:13.296809+00:00"
+      "reason": "paper trade too old (7100s > 600s)",
+      "last_checked_at": "2026-05-22T09:20:54.892084+00:00"
+    },
+    {
+      "paper_id": "CFGUSDT|LONG|2026-05-22T09:19:39.890922+00:00",
+      "symbol": "CFGUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-05-22T09:20:07.780326+00:00",
+      "reason": "open_failed (retry next tick)",
+      "last_checked_at": "2026-05-22T09:20:54.892084+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 77205.6,
-    "btc_ma25_1h": 77424.53,
-    "pct_vs_ma25": -0.283,
-    "change_24h_pct": -0.509,
-    "computed_at": "2026-05-22T09:19:15.247704+00:00"
+    "btc_price": 77209.8,
+    "btc_ma25_1h": 77424.7,
+    "pct_vs_ma25": -0.278,
+    "change_24h_pct": -0.504,
+    "computed_at": "2026-05-22T09:20:57.321851+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
