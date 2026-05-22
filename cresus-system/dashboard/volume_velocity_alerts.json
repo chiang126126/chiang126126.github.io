@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-22T18:47:35.279482+00:00",
+  "updated_at": "2026-05-22T18:50:16.758589+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 113,
+  "alerts_count": 114,
   "alerts": [
+    {
+      "symbol": "ZECUSDT",
+      "base": "ZEC",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 605.07,
+      "price_change_pct": -2.121,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 7105465.0,
+      "volume_baseline_usdt": 802253.0,
+      "volume_ratio": 8.86,
+      "detected_at": "2026-05-22T18:49:01.295659+00:00",
+      "intensity": 2,
+      "change_5m_pct": -2.026,
+      "change_15m_pct": -2.088,
+      "change_1h_pct": -3.749,
+      "change_4h_pct": -3.928,
+      "taker_buy_ratio_1m": 0.456,
+      "taker_buy_ratio_5m": 0.371,
+      "oi_delta_5m_pct": -0.485,
+      "funding_rate_pct": 0.0051,
+      "atr_pct": 0.47,
+      "range_4h_pct": 5.33,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 609.33321429,
+      "suggested_tp1": 598.67517857,
+      "suggested_tp2": 592.28035714,
+      "conviction_score": 5,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "SPXUSDT",
       "base": "SPX",
