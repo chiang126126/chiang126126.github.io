@@ -82,6 +82,23 @@ LIVE_SYMBOL_BLACKLIST = [
     "STABLEUSDT",  # 5 笔 0 胜, 累计 -$1.08 (5/21 加)
 ]
 
+# Phase 4.H Conviction filter (2026-05-22)
+# ==========================================
+# 数据驱动: 380 笔实盘数据按 conviction_score 切片:
+#   conv=5: n=354, 人均 -$0.028, ROI -0.141% / 笔
+#   conv=6: n=8,   人均 +$0.005, ROI +0.022% / 笔
+#   conv=7: n=16,  人均 +$0.211, ROI +1.057% / 笔  ← 显著
+#   conv=8: n=2,   人均 -$0.258  (n 太小, 无效)
+#   conv≥6 合计: n=26, 人均 +$0.097, ROI +0.558% / 笔
+# 论断: paper engine 自己的"信心评分"有 alpha. 标准钻石 (5 分) 是稀释信号.
+# 方案: 全员硬过滤, 仅 mirror conv >= LIVE_MIN_CONVICTION_SCORE 的信号.
+# 风险:
+#   - 信号量预计减少 92% (50/天 → ~4/天)
+#   - n=26 样本不显著 (p≈0.1-0.2), 是 "data leading change" 非 "statistically forced"
+# 退路: 改回 None 立即恢复全部 conv 通过.
+LIVE_MIN_CONVICTION_SCORE = 6          # 仅 mirror conviction_score >= N 的信号
+                                        # None = 不启用 filter (向后兼容)
+
 # ⚠️ DRY-RUN 观察期标志 — 仅用于 testnet 观察 mirror lifecycle.
 # True 时:
 #   - 跳过 LIVE_SYMBOL_WHITELIST 检查 (接受 paper 所有 diamond signal)
@@ -338,6 +355,20 @@ def is_eligible_for_mirror(
     # 2b. Symbol 白名单 (observation mode 下跳过, 让我们看 mirror 真实流程)
     if not LIVE_OBSERVATION_MODE and sym not in LIVE_SYMBOL_WHITELIST:
         return False, f"symbol {sym} not in live whitelist {LIVE_SYMBOL_WHITELIST}"
+    # 2c. Phase 4.H: Conviction filter — 仅 mirror 高分位钻石信号.
+    # 在 symbol filter 之后, 资源占用前的最早位置拒绝低分信号.
+    # LIVE_MIN_CONVICTION_SCORE 为 None 或 0 时跳过 (退路).
+    if LIVE_MIN_CONVICTION_SCORE:
+        raw_conv = paper_trade.get("conviction_score")
+        try:
+            conv_val = int(raw_conv) if raw_conv is not None else None
+        except (ValueError, TypeError):
+            conv_val = None
+        if conv_val is None:
+            return False, f"conviction_score 缺失或非数 ({raw_conv!r}), 拒绝 mirror"
+        if conv_val < LIVE_MIN_CONVICTION_SCORE:
+            return False, (f"conviction_score {conv_val} < threshold "
+                          f"{LIVE_MIN_CONVICTION_SCORE} (Phase 4.H filter)")
     # 3. 并发上限
     current_open = len(live_state.get("live_open_trades", []))
     if current_open >= LIVE_MAX_CONCURRENT:
@@ -725,6 +756,7 @@ def publish_live_history(
             "wick_filter_mode": LIVE_SL_WICK_FILTER_MODE,
             "wick_filter_min_breaches": LIVE_WICK_FILTER_MIN_BREACHES,
             "regime_gate_mode": LIVE_REGIME_GATE_MODE,
+            "min_conviction_score": LIVE_MIN_CONVICTION_SCORE,
             "observation_mode": LIVE_OBSERVATION_MODE,
         },
     }
@@ -1352,6 +1384,8 @@ def _try_mirror_open(
         "regime_gate_enabled": regime_gate_enabled,    # D 组标记
         "regime_gate_mode": LIVE_REGIME_GATE_MODE,     # 部署时模式 (溯源用)
         "ab_group": ab_group,                          # 'A' / 'B' / 'C' / 'D' 显式记录
+        # Phase 4.H: Conviction filter 溯源 (部署时阈值, None=未启用)
+        "min_conviction_threshold": LIVE_MIN_CONVICTION_SCORE,
 
         "tp1_price": float(paper_trade.get("tp1") or 0),
         "tp2_price": float(paper_trade.get("tp2") or 0),

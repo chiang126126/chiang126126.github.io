@@ -93,7 +93,9 @@ class TestEligibility(unittest.TestCase):
 
     def setUp(self):
         self.now = datetime.now(timezone.utc)
-        # 标准的 paper trade
+        # 标准的 paper trade. conviction_score=6 让 Phase 4.H filter (默认阈值 6)
+        # 默认通过, 这样 TestEligibility 测试其它 gate (黑名单/白名单/并发/...) 时
+        # 不会被 conv filter 误拦.
         self.recent_trade = {
             "id": "BTCUSDT|LONG|2026-05-14T11:08:07+00:00",
             "symbol": "BTCUSDT",
@@ -101,6 +103,7 @@ class TestEligibility(unittest.TestCase):
             "entered_at": (self.now - timedelta(seconds=30)).isoformat(),
             "entry_price": 81000.0,
             "sl": 80190.0,
+            "conviction_score": 6,
         }
         self.empty_live = _empty_live_state()
 
@@ -374,8 +377,12 @@ class TestMainLoop(unittest.TestCase):
         self._orig_paper_history = live_trader.PAPER_HISTORY
         live_trader.LIVE_STATE = Path(self.tmpdir) / "live.json"
         live_trader.PAPER_HISTORY = Path(self.tmpdir) / "paper.json"
+        # Phase 4.H: 关闭 conv filter
+        self._conv_patcher = patch.object(live_trader, "LIVE_MIN_CONVICTION_SCORE", None)
+        self._conv_patcher.start()
 
     def tearDown(self):
+        self._conv_patcher.stop()
         live_trader.LIVE_STATE = self._orig_live_state
         live_trader.PAPER_HISTORY = self._orig_paper_history
         import shutil
@@ -644,6 +651,9 @@ class TestMainLoopMirroring(unittest.TestCase):
         self._orig_paper_history = live_trader.PAPER_HISTORY
         live_trader.LIVE_STATE = Path(self.tmpdir) / "live.json"
         live_trader.PAPER_HISTORY = Path(self.tmpdir) / "paper.json"
+        # Phase 4.H: 关闭 conv filter (这类测试不测它)
+        self._conv_patcher = patch.object(live_trader, "LIVE_MIN_CONVICTION_SCORE", None)
+        self._conv_patcher.start()
 
         self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
         # Mock fill response
@@ -665,6 +675,7 @@ class TestMainLoopMirroring(unittest.TestCase):
         }
 
     def tearDown(self):
+        self._conv_patcher.stop()
         live_trader.LIVE_STATE = self._orig_live_state
         live_trader.PAPER_HISTORY = self._orig_paper_history
         import shutil
@@ -1683,6 +1694,7 @@ class TestIsEligibleRegimeGate(unittest.TestCase):
             "entered_at": (self.now - timedelta(seconds=10)).isoformat(),
             "entry_price": 80000.0,
             "sl": 79000.0,
+            "conviction_score": 6,   # Phase 4.H: 默认通过 filter
         }
 
     def test_d_group_down_long_blocked(self):
@@ -1733,6 +1745,118 @@ class TestIsEligibleRegimeGate(unittest.TestCase):
             pt, self.live_state, self.now, btc_regime=None
         )
         self.assertTrue(ok, "regime=None 应该跳过 gate, 避免取价失败时误拦")
+
+
+class TestConvictionFilter(unittest.TestCase):
+    """Phase 4.H (2026-05-22): Conviction filter — 仅 mirror 高分位钻石信号.
+
+    数据驱动: 380 笔实盘数据按 conviction_score 切片显示, conv >= 6 子集
+    人均 +$0.097/笔 vs conv=5 子集 -$0.028/笔.
+    实现: is_eligible_for_mirror 在 symbol filter 后增加 conv 检查.
+    """
+
+    def setUp(self):
+        self.now = datetime.now(timezone.utc)
+        self.live_state = {"mirrored_paper_ids": [], "live_open_trades": []}
+
+    def _make_trade(self, conv=None):
+        t = {
+            "id": "BTCUSDT|LONG|2026-05-22T10:00:00+00:00",
+            "symbol": "BTCUSDT",
+            "direction": "LONG",
+            "entered_at": (self.now - timedelta(seconds=10)).isoformat(),
+            "entry_price": 80000.0,
+            "sl": 79000.0,
+        }
+        if conv is not None:
+            t["conviction_score"] = conv
+        return t
+
+    def test_threshold_default_is_6(self):
+        """默认阈值 = 6 (基于 380 笔实盘数据)."""
+        from live_trader import LIVE_MIN_CONVICTION_SCORE
+        self.assertEqual(LIVE_MIN_CONVICTION_SCORE, 6)
+
+    def test_conv_5_rejected(self):
+        """conv=5 (标准钻石) 应被拒. paper 主要信号源现在拒收."""
+        pt = self._make_trade(conv=5)
+        ok, reason = is_eligible_for_mirror(pt, self.live_state, self.now)
+        self.assertFalse(ok)
+        self.assertIn("conviction_score 5", reason)
+        self.assertIn("threshold 6", reason)
+
+    def test_conv_6_passes(self):
+        """conv=6 = 阈值, 应通过 (大于等于阈值)."""
+        pt = self._make_trade(conv=6)
+        ok, _ = is_eligible_for_mirror(pt, self.live_state, self.now)
+        self.assertTrue(ok)
+
+    def test_conv_7_passes(self):
+        """conv=7 (高分位) 应通过."""
+        pt = self._make_trade(conv=7)
+        ok, _ = is_eligible_for_mirror(pt, self.live_state, self.now)
+        self.assertTrue(ok)
+
+    def test_conv_8_passes(self):
+        """conv=8 (最高分) 应通过."""
+        pt = self._make_trade(conv=8)
+        ok, _ = is_eligible_for_mirror(pt, self.live_state, self.now)
+        self.assertTrue(ok)
+
+    def test_conv_missing_rejected(self):
+        """conviction_score 字段缺失 → 拒绝 (防御性, 防 paper schema 变更绕过)."""
+        pt = self._make_trade(conv=None)
+        ok, reason = is_eligible_for_mirror(pt, self.live_state, self.now)
+        self.assertFalse(ok)
+        self.assertIn("conviction_score 缺失", reason)
+
+    def test_conv_invalid_type_rejected(self):
+        """conviction_score 非数字 → 拒绝."""
+        pt = self._make_trade(conv="invalid")
+        ok, reason = is_eligible_for_mirror(pt, self.live_state, self.now)
+        self.assertFalse(ok)
+        self.assertIn("conviction_score", reason)
+
+    def test_conv_zero_rejected(self):
+        """conv=0 (边界) 应被拒."""
+        pt = self._make_trade(conv=0)
+        ok, _ = is_eligible_for_mirror(pt, self.live_state, self.now)
+        self.assertFalse(ok)
+
+    def test_filter_disabled_when_threshold_none(self):
+        """LIVE_MIN_CONVICTION_SCORE=None → filter 关闭, 任何 conv 都通过."""
+        with patch.object(live_trader, "LIVE_MIN_CONVICTION_SCORE", None):
+            for conv in (None, 0, 1, 5, 6, 99):
+                pt = self._make_trade(conv=conv)
+                ok, _ = is_eligible_for_mirror(pt, self.live_state, self.now)
+                self.assertTrue(ok, f"filter off 时 conv={conv} 应该通过")
+
+    def test_filter_disabled_when_threshold_zero(self):
+        """LIVE_MIN_CONVICTION_SCORE=0 → filter 也关闭 (兼容性)."""
+        with patch.object(live_trader, "LIVE_MIN_CONVICTION_SCORE", 0):
+            pt = self._make_trade(conv=None)
+            ok, _ = is_eligible_for_mirror(pt, self.live_state, self.now)
+            self.assertTrue(ok, "threshold=0 应等同 None, filter off")
+
+    def test_custom_threshold_7(self):
+        """自定义阈值 7: 6 拒, 7 通过."""
+        with patch.object(live_trader, "LIVE_MIN_CONVICTION_SCORE", 7):
+            pt6 = self._make_trade(conv=6)
+            ok6, _ = is_eligible_for_mirror(pt6, self.live_state, self.now)
+            self.assertFalse(ok6)
+
+            pt7 = self._make_trade(conv=7)
+            ok7, _ = is_eligible_for_mirror(pt7, self.live_state, self.now)
+            self.assertTrue(ok7)
+
+    def test_filter_runs_after_blacklist(self):
+        """黑名单优先级高于 conv filter: 黑名单 symbol 即使 conv=8 也拒."""
+        pt = self._make_trade(conv=8)
+        pt["symbol"] = "DODOXUSDT"   # 黑名单
+        ok, reason = is_eligible_for_mirror(pt, self.live_state, self.now)
+        self.assertFalse(ok)
+        # 拒绝原因应为黑名单, 不是 conv filter
+        self.assertIn("blacklist", reason)
 
 
 class TestTryMirrorClose(unittest.TestCase):
@@ -2270,9 +2394,13 @@ class TestMainLoopWithRiskGates(unittest.TestCase):
         live_trader.PAPER_HISTORY = Path(self.tmpdir) / "paper.json"
         live_trader.PAUSE_FLAG_PATH = Path(self.tmpdir) / ".cresus-pause"
         live_trader.EMERGENCY_STOP_PATH = Path(self.tmpdir) / ".cresus-emergency-stop"
+        # Phase 4.H: 关闭 conv filter
+        self._conv_patcher = patch.object(live_trader, "LIVE_MIN_CONVICTION_SCORE", None)
+        self._conv_patcher.start()
         self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
 
     def tearDown(self):
+        self._conv_patcher.stop()
         live_trader.LIVE_STATE = self._orig_live_state
         live_trader.PAPER_HISTORY = self._orig_paper_history
         live_trader.PAUSE_FLAG_PATH = self._orig_pause
@@ -2362,6 +2490,7 @@ class TestSingleSymbolLimit(unittest.TestCase):
             "entered_at": (self.now - timedelta(seconds=30)).isoformat(),
             "entry_price": 81000.0,
             "sl": 80190.0,
+            "conviction_score": 6,   # Phase 4.H: 默认通过 filter
         }
 
     def test_symbol_already_open_blocks(self):
@@ -2585,7 +2714,12 @@ class TestRiskGatesWithClient(unittest.TestCase):
 # ============================================================================
 
 class TestMirrorIterationGuards(unittest.TestCase):
-    """Bug fix verification: 循环内 mirror 多个时, 每次都重新评估 state."""
+    """Bug fix verification: 循环内 mirror 多个时, 每次都重新评估 state.
+
+    Phase 4.H: 本测试类设计用于 mirror 流程边界, 不测试 conviction filter.
+    setUp 关闭 LIVE_MIN_CONVICTION_SCORE 隔离, 保留各 test 用原 mock 数据.
+    单独的 TestConvictionFilter 类负责测 4.H 行为.
+    """
 
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp()
@@ -2594,6 +2728,9 @@ class TestMirrorIterationGuards(unittest.TestCase):
         live_trader.LIVE_STATE = Path(self.tmpdir) / "live.json"
         live_trader.PAPER_HISTORY = Path(self.tmpdir) / "paper.json"
         self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+        # Phase 4.H: 关闭 conv filter (这个 test class 不测它)
+        self._conv_patcher = patch.object(live_trader, "LIVE_MIN_CONVICTION_SCORE", None)
+        self._conv_patcher.start()
 
         self.mock_open_result = {
             "trade_id": "L1", "symbol": "X",
@@ -2605,6 +2742,7 @@ class TestMirrorIterationGuards(unittest.TestCase):
         }
 
     def tearDown(self):
+        self._conv_patcher.stop()
         live_trader.LIVE_STATE = self._orig_live_state
         live_trader.PAPER_HISTORY = self._orig_paper_history
         import shutil
