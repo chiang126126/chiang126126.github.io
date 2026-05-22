@@ -1,47 +1,44 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-22T15:38:33.756098+00:00",
+  "generated_at": "2026-05-22T15:40:10.993783+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 391,
-    "open": 1,
-    "closed": 390,
+    "open": 0,
+    "closed": 391,
     "wins": 134,
-    "losses": 253,
-    "win_rate": 0.346,
-    "total_pnl_usdt": -0.874,
-    "net_pnl_usdt": -8.0204,
-    "avg_pnl_usdt": -0.0022,
+    "losses": 254,
+    "win_rate": 0.345,
+    "total_pnl_usdt": -0.941,
+    "net_pnl_usdt": -8.1033,
+    "avg_pnl_usdt": -0.0024,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 7.1544,
-    "fees_realized_usdt": 7.1464,
-    "fees_open_usdt": 0.0079,
+    "fees_paid_usdt": 7.1623,
+    "fees_realized_usdt": 7.1623,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 19.87,
-    "free_capital_usdt": 72.1,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 91.9,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 0.4254,
-    "deployed_usdt": 19.87
+    "daily_pnl": 0.3584,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "APEUSDT"
-    ],
-    "exchange_symbols": [
-      "APEUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "APEUSDT|LONG|2026-05-22T15:36:41.140381+00:00",
       "trade_id": "L1779464201_APEUSDT_L",
@@ -82,7 +79,7 @@
       "phase_a_mfe_pct": 0.067,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.007949,
+      "fees_paid_usdt": 0.015871,
       "fees_are_actual": true,
       "opened_at": "2026-05-22T15:37:25.164482+00:00",
       "is_dry_run": false,
@@ -91,13 +88,21 @@
       "btc_change_24h_at_open": -0.481,
       "btc_pct_vs_ma25_at_open": -0.731,
       "phase_a_mfe_price": 0.1483,
-      "current_price": 0.148,
-      "unrealized_pnl_usdt": -0.0402,
-      "unrealized_pnl_pct": -0.202,
-      "last_price_check_at": "2026-05-22T15:38:30.805830+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.1478,
+      "unrealized_pnl_usdt": -0.067,
+      "unrealized_pnl_pct": -0.337,
+      "last_price_check_at": "2026-05-22T15:39:03.978162+00:00",
+      "closed_at": "2026-05-22T15:39:07.664212+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.1478,
+      "realized_pnl_usdt": -0.067,
+      "close_order_id": 161040323,
+      "close_qty": 134.0,
+      "close_expected_price": 0.14783570999999998,
+      "close_slippage_bps": 2.42,
+      "entry_fees_usdt": 0.007949,
+      "close_fees_usdt": 0.007922
+    },
     {
       "paper_id": "WLDUSDT|LONG|2026-05-22T15:31:45.252673+00:00",
       "trade_id": "L1779463905_WLDUSDT_L",
@@ -22436,17 +22441,26 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-22T14:44:41.157778+00:00",
-      "reason": "paper trade too old (3230s > 600s)",
-      "last_checked_at": "2026-05-22T15:38:30.805830+00:00"
+      "reason": "paper trade too old (3328s > 600s)",
+      "last_checked_at": "2026-05-22T15:40:09.211968+00:00"
+    },
+    {
+      "paper_id": "ALLOUSDT|LONG|2026-05-22T15:38:39.225888+00:00",
+      "symbol": "ALLOUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-05-22T15:39:06.198923+00:00",
+      "reason": "regime gate (D 组): down regime + LONG 被拒 (数据驱动: down+LONG 历史 0/10 胜)",
+      "last_checked_at": "2026-05-22T15:40:09.211968+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 76846.2,
-    "btc_ma25_1h": 77415.1,
-    "pct_vs_ma25": -0.735,
-    "change_24h_pct": -0.485,
-    "computed_at": "2026-05-22T15:38:33.417846+00:00"
+    "btc_price": 76746.3,
+    "btc_ma25_1h": 77411.1,
+    "pct_vs_ma25": -0.859,
+    "change_24h_pct": -0.615,
+    "computed_at": "2026-05-22T15:40:10.952011+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
