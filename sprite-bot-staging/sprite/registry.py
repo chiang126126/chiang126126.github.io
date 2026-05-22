@@ -35,6 +35,9 @@ class TokenInfo:
 # 已知妖币候选的合约地址
 # 来源：Binance 新上合约公告 + CoinGecko
 _REGISTRY: dict[str, TokenInfo] = {
+    # 重点研究池
+    "NEARUSDT": TokenInfo("NEARUSDT", "ETH", "0x85f17cf997934a597031b2e18a9ab6ebd4b9f6a4"),
+
     # 历史样本中的 CEX 币
     "MYXUSDT": TokenInfo("MYXUSDT", "ARB", "0x2129f36f07604c8a8c9a61804e01c6d9e9fe7f7f"),
     "COAIUSDT": TokenInfo("COAIUSDT", "BSC", "0x4cfe225ce54c6609a525768b13b7c8c0a3f0ee5d"),
