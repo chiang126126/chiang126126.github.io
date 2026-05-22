@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-22T14:28:14.222778+00:00",
+  "generated_at": "2026-05-22T14:30:42.718064+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 386,
-    "open": 1,
+    "total_trades": 387,
+    "open": 2,
     "closed": 385,
     "wins": 132,
     "losses": 250,
@@ -14,31 +14,33 @@
     "avg_pnl_usdt": -0.0028,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 7.0609,
+    "fees_paid_usdt": 7.0709,
     "fees_realized_usdt": 7.051,
-    "fees_open_usdt": 0.01,
+    "fees_open_usdt": 0.0199,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 19.93,
-    "free_capital_usdt": 71.95,
+    "deployed_usdt": 39.89,
+    "free_capital_usdt": 51.98,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 0.2389,
-    "deployed_usdt": 19.93
+    "deployed_usdt": 39.89
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "ORCAUSDT"
+      "ORCAUSDT",
+      "KAITOUSDT"
     ],
     "exchange_symbols": [
-      "ORCAUSDT"
+      "ORCAUSDT",
+      "KAITOUSDT"
     ]
   },
   "open_trades": [
@@ -57,8 +59,8 @@
       "risk_usdt": 0.0714,
       "risk_pct": 0.358,
       "mirror_latency_sec": 16.2,
-      "sl_price": 1.455,
-      "sl_paper_current": 1.455,
+      "sl_price": 1.45514369,
+      "sl_paper_current": 1.45514369,
       "sl_compensation_enabled": false,
       "sl_compensation_offset": 0.0,
       "sl_compensation_mode": "abcd",
@@ -94,8 +96,62 @@
       "current_price": 1.461,
       "unrealized_pnl_usdt": 0.0822,
       "unrealized_pnl_pct": 0.412,
-      "last_price_check_at": "2026-05-22T14:28:07.859291+00:00",
+      "last_price_check_at": "2026-05-22T14:30:35.875695+00:00",
       "phase_b_mfe_price": 1.463
+    },
+    {
+      "paper_id": "KAITOUSDT|SHORT|2026-05-22T14:29:05.462052+00:00",
+      "trade_id": "L1779460145_KAITOUS_S",
+      "symbol": "KAITOUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.5134,
+      "avg_fill_price": 0.5143,
+      "slippage_bps": -17.53,
+      "qty": 38.8,
+      "notional_usdt": 19.95484,
+      "leverage": 3,
+      "risk_usdt": 0.0466,
+      "risk_pct": 0.233,
+      "mirror_latency_sec": 33.6,
+      "sl_price": 0.5164,
+      "sl_paper_current": 0.5155,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.0009,
+      "sl_compensation_mode": "abcd",
+      "wick_filter_enabled": false,
+      "wick_filter_min_breaches": null,
+      "wick_filter_mode": "abcd",
+      "sl_breach_count": 0,
+      "regime_gate_enabled": false,
+      "regime_gate_mode": "abcd",
+      "ab_group": "B",
+      "tp1_price": 0.51025,
+      "tp2_price": 0.5071,
+      "phase": "A",
+      "entry_order_id": 118606337,
+      "entry_client_id": "cresus_L1779460145_KAITOUS_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.409,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.009977,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-22T14:30:04.992446+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 76958.3,
+      "btc_change_24h_at_open": -0.013,
+      "btc_pct_vs_ma25_at_open": -0.605,
+      "phase_a_mfe_price": 0.5134,
+      "current_price": 0.5137,
+      "unrealized_pnl_usdt": 0.0233,
+      "unrealized_pnl_pct": 0.117,
+      "last_price_check_at": "2026-05-22T14:30:35.875695+00:00"
     }
   ],
   "recent_closed": [
@@ -22114,8 +22170,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-22T14:07:50.197033+00:00",
-      "reason": "paper trade too old (1218s > 600s)",
-      "last_checked_at": "2026-05-22T14:28:07.859291+00:00"
+      "reason": "paper trade too old (1366s > 600s)",
+      "last_checked_at": "2026-05-22T14:30:35.875695+00:00"
     },
     {
       "paper_id": "COINUSDT|SHORT|2026-05-22T14:22:27.848801+00:00",
@@ -22124,7 +22180,7 @@
       "conviction_score": 5,
       "signal_at": "2026-05-22T14:23:01.130665+00:00",
       "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-05-22T14:28:07.859291+00:00"
+      "last_checked_at": "2026-05-22T14:30:35.875695+00:00"
     },
     {
       "paper_id": "HOODUSDT|SHORT|2026-05-22T14:25:04.597423+00:00",
@@ -22133,16 +22189,16 @@
       "conviction_score": 5,
       "signal_at": "2026-05-22T14:25:15.348251+00:00",
       "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-05-22T14:28:07.859291+00:00"
+      "last_checked_at": "2026-05-22T14:30:35.875695+00:00"
     }
   ],
   "btc_regime_now": {
-    "regime": "chop",
-    "btc_price": 77098.5,
-    "btc_ma25_1h": 77432.05,
-    "pct_vs_ma25": -0.431,
-    "change_24h_pct": 0.17,
-    "computed_at": "2026-05-22T14:28:09.601837+00:00"
+    "regime": "down",
+    "btc_price": 76840.0,
+    "btc_ma25_1h": 77421.71,
+    "pct_vs_ma25": -0.751,
+    "change_24h_pct": -0.166,
+    "computed_at": "2026-05-22T14:30:37.071230+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
