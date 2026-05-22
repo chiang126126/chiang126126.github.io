@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-22T07:03:31.880772+00:00",
+  "generated_at": "2026-05-22T07:05:50.717021+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 359,
-    "open": 1,
+    "total_trades": 360,
+    "open": 2,
     "closed": 358,
     "wins": 123,
     "losses": 233,
@@ -14,31 +14,33 @@
     "avg_pnl_usdt": -0.004,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 6.5504,
+    "fees_paid_usdt": 6.5603,
     "fees_realized_usdt": 6.5404,
-    "fees_open_usdt": 0.01,
+    "fees_open_usdt": 0.02,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 19.97,
-    "free_capital_usdt": 72.04,
+    "deployed_usdt": 39.93,
+    "free_capital_usdt": 52.07,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -0.1452,
-    "deployed_usdt": 19.97
+    "deployed_usdt": 39.93
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "JELLYJELLYUSDT"
+      "JELLYJELLYUSDT",
+      "BIOUSDT"
     ],
     "exchange_symbols": [
-      "JELLYJELLYUSDT"
+      "JELLYJELLYUSDT",
+      "BIOUSDT"
     ]
   },
   "open_trades": [
@@ -57,8 +59,8 @@
       "risk_usdt": 0.1141,
       "risk_pct": 0.571,
       "mirror_latency_sec": 11.2,
-      "sl_price": 0.07084,
-      "sl_paper_current": 0.07084,
+      "sl_price": 0.07128214940000001,
+      "sl_paper_current": 0.07128214940000001,
       "sl_compensation_enabled": false,
       "sl_compensation_offset": 0.0,
       "sl_compensation_mode": "abcd",
@@ -80,7 +82,7 @@
       "alert_type": "sustained",
       "atr_pct": 0.407,
       "phase_a_mfe_pct": 1.172,
-      "phase_b_mfe_pct": 1.172,
+      "phase_b_mfe_pct": 1.242,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.009984,
       "fees_are_actual": true,
@@ -91,11 +93,65 @@
       "btc_change_24h_at_open": -0.259,
       "btc_pct_vs_ma25_at_open": -0.121,
       "phase_a_mfe_price": 0.07167,
-      "current_price": 0.07167,
-      "unrealized_pnl_usdt": 0.2421,
-      "unrealized_pnl_pct": 1.212,
-      "last_price_check_at": "2026-05-22T07:03:28.982581+00:00",
-      "phase_b_mfe_price": 0.07167
+      "current_price": 0.07168,
+      "unrealized_pnl_usdt": 0.2449,
+      "unrealized_pnl_pct": 1.226,
+      "last_price_check_at": "2026-05-22T07:05:45.751641+00:00",
+      "phase_b_mfe_price": 0.07172
+    },
+    {
+      "paper_id": "BIOUSDT|SHORT|2026-05-22T07:04:29.895243+00:00",
+      "trade_id": "L1779433469_BIOUSDT_S",
+      "symbol": "BIOUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.03447,
+      "avg_fill_price": 0.03435,
+      "slippage_bps": 34.81,
+      "qty": 581.0,
+      "notional_usdt": 19.95735,
+      "leverage": 3,
+      "risk_usdt": 0.193,
+      "risk_pct": 0.967,
+      "mirror_latency_sec": 12.9,
+      "sl_price": 0.03456214,
+      "sl_paper_current": 0.03468214,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -0.00012,
+      "sl_compensation_mode": "abcd",
+      "wick_filter_enabled": false,
+      "wick_filter_min_breaches": null,
+      "wick_filter_mode": "abcd",
+      "sl_breach_count": 0,
+      "regime_gate_enabled": false,
+      "regime_gate_mode": "abcd",
+      "ab_group": "B",
+      "tp1_price": 0.03415179,
+      "tp2_price": 0.03383357,
+      "phase": "A",
+      "entry_order_id": 137203850,
+      "entry_client_id": "cresus_L1779433469_BIOUSDT_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.41,
+      "phase_a_mfe_pct": 0.174,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.009979,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-22T07:05:12.571352+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 77385.9,
+      "btc_change_24h_at_open": -0.587,
+      "btc_pct_vs_ma25_at_open": -0.116,
+      "phase_a_mfe_price": 0.03441,
+      "current_price": 0.03447,
+      "unrealized_pnl_usdt": -0.0697,
+      "unrealized_pnl_pct": -0.349,
+      "last_price_check_at": "2026-05-22T07:05:45.751641+00:00"
     }
   ],
   "recent_closed": [
@@ -20365,14 +20421,24 @@
       "close_qty": 53792.0
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "TRUTHUSDT|SHORT|2026-05-22T07:04:45.080233+00:00",
+      "symbol": "TRUTHUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-05-22T07:04:59.635229+00:00",
+      "reason": "open_failed (retry next tick)",
+      "last_checked_at": "2026-05-22T07:05:45.751641+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "chop",
     "btc_price": 77385.9,
     "btc_ma25_1h": 77476.07,
     "pct_vs_ma25": -0.116,
     "change_24h_pct": -0.587,
-    "computed_at": "2026-05-22T07:03:31.561638+00:00"
+    "computed_at": "2026-05-22T07:05:48.533244+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
