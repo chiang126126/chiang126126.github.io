@@ -1,28 +1,28 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-23T02:12:28.876537+00:00",
+  "generated_at": "2026-05-23T02:14:41.421452+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 398,
-    "open": 1,
-    "closed": 397,
+    "open": 0,
+    "closed": 398,
     "wins": 136,
-    "losses": 258,
-    "win_rate": 0.345,
-    "total_pnl_usdt": -3.002,
-    "net_pnl_usdt": -10.2791,
+    "losses": 259,
+    "win_rate": 0.344,
+    "total_pnl_usdt": -3.0325,
+    "net_pnl_usdt": -10.3255,
     "avg_pnl_usdt": -0.0076,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 7.285,
-    "fees_realized_usdt": 7.2771,
-    "fees_open_usdt": 0.0079,
+    "fees_paid_usdt": 7.293,
+    "fees_realized_usdt": 7.293,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 19.83,
-    "free_capital_usdt": 69.88,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 89.67,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
@@ -41,7 +41,8 @@
       "MTLUSDT"
     ]
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "MTLUSDT|LONG|2026-05-23T01:58:36.620084+00:00",
       "trade_id": "L1779501516_MTLUSDT_L",
@@ -65,7 +66,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 2,
       "wick_filter_mode": "abcd",
-      "sl_breach_count": 0,
+      "sl_breach_count": 1,
       "regime_gate_enabled": false,
       "regime_gate_mode": "abcd",
       "ab_group": "C",
@@ -83,7 +84,7 @@
       "phase_a_mfe_pct": 1.869,
       "phase_b_mfe_pct": 3.862,
       "phase_c_mfe_pct": 3.862,
-      "fees_paid_usdt": 0.007932,
+      "fees_paid_usdt": 0.015852,
       "fees_are_actual": true,
       "opened_at": "2026-05-23T01:59:00.218118+00:00",
       "is_dry_run": false,
@@ -92,15 +93,23 @@
       "btc_change_24h_at_open": -2.703,
       "btc_pct_vs_ma25_at_open": -1.767,
       "phase_a_mfe_price": 0.3271,
-      "current_price": 0.3333,
-      "unrealized_pnl_usdt": 0.5002,
-      "unrealized_pnl_pct": 2.522,
-      "last_price_check_at": "2026-05-23T02:12:25.814214+00:00",
+      "current_price": 0.328,
+      "unrealized_pnl_usdt": 0.1769,
+      "unrealized_pnl_pct": 0.892,
+      "last_price_check_at": "2026-05-23T02:14:04.840609+00:00",
       "phase_b_mfe_price": 0.3335,
-      "phase_c_mfe_price": 0.3335
-    }
-  ],
-  "recent_closed": [
+      "phase_c_mfe_price": 0.3335,
+      "closed_at": "2026-05-23T02:14:41.379879+00:00",
+      "close_reason": "paper:hit_trail",
+      "avg_exit_price": 0.3246,
+      "realized_pnl_usdt": -0.0305,
+      "close_order_id": 104742582,
+      "close_qty": 61.0,
+      "close_expected_price": 0.328,
+      "close_slippage_bps": 103.66,
+      "entry_fees_usdt": 0.007932,
+      "close_fees_usdt": 0.00792
+    },
     {
       "paper_id": "STEEMUSDT|LONG|2026-05-23T01:20:55.022246+00:00",
       "trade_id": "L1779499255_STEEMUS_L",
@@ -22893,7 +22902,7 @@
       "conviction_score": 5,
       "signal_at": "2026-05-23T02:10:01.548100+00:00",
       "reason": "conviction_score 5 < threshold 6 (Phase 4.H filter)",
-      "last_checked_at": "2026-05-23T02:12:25.814214+00:00"
+      "last_checked_at": "2026-05-23T02:14:37.759318+00:00"
     }
   ],
   "btc_regime_now": {
@@ -22902,7 +22911,7 @@
     "btc_ma25_1h": 76723.12,
     "pct_vs_ma25": -1.646,
     "change_24h_pct": -2.766,
-    "computed_at": "2026-05-23T02:12:28.527679+00:00"
+    "computed_at": "2026-05-23T02:14:39.994863+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
