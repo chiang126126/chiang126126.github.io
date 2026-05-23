@@ -340,6 +340,8 @@ def _trade_age_sec(paper_trade: dict, now: datetime) -> Optional[float]:
 def is_eligible_for_mirror(
     paper_trade: dict, live_state: dict, now: datetime,
     btc_regime: Optional[str] = None,
+    btc_sub_regime: Optional[str] = None,
+    btc_change_3h_pct: Optional[float] = None,
 ) -> tuple:
     """检查 paper trade 是否应在 live mirror.
 
@@ -348,7 +350,11 @@ def is_eligible_for_mirror(
         live_state: live 当前状态
         now: 当前时刻
         btc_regime: 可选, 当前 BTC regime ('up'/'chop'/'down'). 用于 Phase 4.F
-                    regime gate (仅对 D 组启用). 不传则跳过此 gate (向后兼容).
+                    regime gate. 不传则跳过此 gate (向后兼容).
+        btc_sub_regime: 可选, Phase 4.K sub_regime ('down_acute'/'down_stable'/
+                    'down_rebound'). 仅用于丰富拒绝原因的日志/missed_signal 记录,
+                    **不影响 gate 决策** (gate 仍然 down+LONG 一律拒).
+        btc_change_3h_pct: 可选, BTC 过去 3 小时收盘价变化百分比. 同上, 仅 log.
 
     Returns (eligible: bool, reason: str).
     """
@@ -400,13 +406,21 @@ def is_eligible_for_mirror(
     direction = paper_trade.get("direction", "").upper()
     if direction not in ("LONG", "SHORT"):
         return False, f"invalid direction {direction!r}"
-    # 7. Phase 4.F regime gate (仅对 D 组启用, 当前规则: down + LONG 拒)
+    # 7. Phase 4.F regime gate (Phase 4.J 后默认 always — 全部组适用)
     # 只在 btc_regime 提供时才检查; 测试 / 旧调用不带此参数时跳过 (向后兼容)
     if btc_regime is not None and _ab_use_regime_gate(paper_id, LIVE_REGIME_GATE_MODE):
         if _should_block_for_regime(direction, btc_regime):
             mode = LIVE_REGIME_GATE_MODE
+            # Phase 4.K Shadow Log: 拒绝原因附带 sub_regime + 3h 动量,
+            # 便于事后从 missed_signals 反查"down_rebound 时段被拒的 paper 信号"
+            # 真实表现 (paper 最终 PnL), 决定是否要放开 rebound 子状态.
+            sub_info = ""
+            if btc_sub_regime:
+                sub_info = f" sub={btc_sub_regime}"
+                if btc_change_3h_pct is not None:
+                    sub_info += f" 3h={btc_change_3h_pct:+.2f}%"
             return False, (f"regime gate ({mode}): {btc_regime} regime + {direction} "
-                          f"被拒 (数据驱动: down+LONG 历史 0/10 胜 p=0.042)")
+                          f"被拒{sub_info} (数据驱动: down+LONG 历史 0/10 胜 p=0.042)")
     return True, "ok"
 
 
@@ -1063,12 +1077,33 @@ def _compute_btc_regime(client: BinanceClient) -> Optional[dict]:
         regime = "down"
     else:
         regime = "chop"
+
+    # Phase 4.K Shadow Log (2026-05-23): 在 down regime 内细分 sub_regime,
+    # 用于观察 down_rebound (近期反弹) 是否真的跟 down_acute/stable 表现不同.
+    # 阈值依据用户观察 + 经验值, 后续根据 shadow log 数据调整.
+    # 仅作记录用 — Phase 4.J gate 仍然 down+LONG 一律拒, 不分 sub_regime.
+    sub_regime = None
+    change_3h_pct = None
+    if regime == "down" and len(closes) >= 4:
+        first_3h = closes[-4]   # 3 小时前的 1h close
+        if first_3h > 0:
+            change_3h_pct = (current - first_3h) / first_3h * 100.0
+            if change_3h_pct < -1.0:
+                sub_regime = "down_acute"        # 仍在急跌
+            elif change_3h_pct > 0.5:
+                sub_regime = "down_rebound"      # 已开始反弹
+            else:
+                sub_regime = "down_stable"       # 横盘企稳
+
     return {
         "regime": regime,
         "btc_price": round(current, 2),
         "btc_ma25_1h": round(ma25, 2),
         "pct_vs_ma25": round(pct_vs_ma, 3),
         "change_24h_pct": round(change_24h_pct, 3),
+        # Phase 4.K 新字段 (down regime 时填充, 其它为 None)
+        "sub_regime": sub_regime,
+        "change_3h_pct": round(change_3h_pct, 3) if change_3h_pct is not None else None,
         "computed_at": datetime.now(timezone.utc).isoformat(),
     }
 
@@ -1426,6 +1461,10 @@ def _try_mirror_open(
         live_trade["btc_price_at_open"] = btc_regime.get("btc_price")
         live_trade["btc_change_24h_at_open"] = btc_regime.get("change_24h_pct")
         live_trade["btc_pct_vs_ma25_at_open"] = btc_regime.get("pct_vs_ma25")
+        # Phase 4.K Shadow Log: 在 down regime 时附带 sub_regime + 3h 动量,
+        # 后续可按 sub_regime 切分 PnL, 验证 down_rebound 是否真的跟其它子状态不同.
+        live_trade["btc_sub_regime_at_open"] = btc_regime.get("sub_regime")
+        live_trade["btc_change_3h_at_open"] = btc_regime.get("change_3h_pct")
     return live_trade
 
 
@@ -1505,12 +1544,21 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
     # 注: snapshot 为 None 时保留旧值 (上次成功的 regime), 避免 dashboard 闪烁
 
     # 1. 找 eligible candidates (即使风控触发也走 eligibility 检查, 便于日志一致)
-    # Phase 4.F: 传 btc_regime 给 is_eligible_for_mirror, 让 D 组的 regime gate 生效
+    # Phase 4.F/J: 传 btc_regime 给 is_eligible_for_mirror, 应用 regime gate
+    # Phase 4.K (Shadow Log): 同时传 sub_regime + 3h 动量, 让被拒原因附带这些信息
+    #   方便事后审计 down_rebound 时段的拒绝是否错杀
     current_regime = btc_regime_snapshot.get("regime") if btc_regime_snapshot else None
+    current_sub_regime = btc_regime_snapshot.get("sub_regime") if btc_regime_snapshot else None
+    current_change_3h = btc_regime_snapshot.get("change_3h_pct") if btc_regime_snapshot else None
     mirror_candidates = []
     skip_log = []
     for pt in paper_open:
-        eligible, reason = is_eligible_for_mirror(pt, live, now, btc_regime=current_regime)
+        eligible, reason = is_eligible_for_mirror(
+            pt, live, now,
+            btc_regime=current_regime,
+            btc_sub_regime=current_sub_regime,
+            btc_change_3h_pct=current_change_3h,
+        )
         if eligible:
             mirror_candidates.append(pt)
         else:
@@ -1572,8 +1620,13 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
                 continue
 
             # Re-check eligibility 用最新 live state (含本轮已 mirror 的)
-            # Phase 4.F: 同样传 btc_regime
-            eligible, reason = is_eligible_for_mirror(pt, live, now, btc_regime=current_regime)
+            # Phase 4.F/J/K: 传 btc_regime + sub_regime + 3h 动量
+            eligible, reason = is_eligible_for_mirror(
+                pt, live, now,
+                btc_regime=current_regime,
+                btc_sub_regime=current_sub_regime,
+                btc_change_3h_pct=current_change_3h,
+            )
             if not eligible:
                 log.debug(f"[skip-during-iter] {pt['symbol']}: {reason}")
                 # 不加 mirrored_paper_ids — 下 tick 状态变化后可以重试

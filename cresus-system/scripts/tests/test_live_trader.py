@@ -1215,6 +1215,73 @@ class TestComputeBtcRegime(unittest.TestCase):
         self.assertGreaterEqual(LIVE_BTC_REGIME_THRESHOLD_PCT, 0.1)
         self.assertLessEqual(LIVE_BTC_REGIME_THRESHOLD_PCT, 2.0)
 
+    # --- Phase 4.K Shadow Log: sub_regime + 3h change ---
+
+    def test_phase_4k_sub_regime_only_for_down(self):
+        """sub_regime 仅在 regime='down' 时计算, up/chop 时应为 None."""
+        # up regime: closes 24 个 100 + 最后 101
+        with patch.object(self.client, "get_klines",
+                          return_value=self._kline_set([100.0]*24 + [101.0])):
+            r = _compute_btc_regime(self.client)
+        self.assertEqual(r["regime"], "up")
+        self.assertIsNone(r.get("sub_regime"), f"up regime sub_regime 应 None, 实际 {r.get('sub_regime')}")
+        self.assertIsNone(r.get("change_3h_pct"), "up regime change_3h_pct 应 None")
+
+        # chop regime
+        closes = [100.0] * 25
+        with patch.object(self.client, "get_klines", return_value=self._kline_set(closes)):
+            r = _compute_btc_regime(self.client)
+        self.assertEqual(r["regime"], "chop")
+        self.assertIsNone(r.get("sub_regime"))
+        self.assertIsNone(r.get("change_3h_pct"))
+
+    def test_phase_4k_down_acute_3h_falling(self):
+        """down + 3h 跌 > 1% → sub_regime='down_acute'.
+        造数据: 前 21 个 = 100, 后 4 个递减表示最近 3h 急跌."""
+        closes = [100.0]*21 + [100.0, 99.5, 99.0, 98.5]
+        # current = 98.5, MA25 ≈ 99.76, pct_vs_ma25 = -1.26%, regime = down
+        # 3h 前 close = closes[-4] = 100.0, current = 98.5
+        # 3h change = (98.5 - 100.0) / 100.0 * 100 = -1.5% → < -1% → acute
+        with patch.object(self.client, "get_klines", return_value=self._kline_set(closes)):
+            r = _compute_btc_regime(self.client)
+        self.assertEqual(r["regime"], "down")
+        self.assertEqual(r["sub_regime"], "down_acute")
+        self.assertLess(r["change_3h_pct"], -1.0)
+
+    def test_phase_4k_down_stable_3h_flat(self):
+        """down + 3h 在 -1% 到 +0.5% 之间 → sub_regime='down_stable'."""
+        closes = [100.0]*21 + [99.0, 99.0, 99.0, 99.0]
+        # current = 99.0, MA25 ≈ 99.84, pct_vs_ma25 ≈ -0.84%, regime = down
+        # 3h change = (99.0 - 99.0) / 99.0 * 100 = 0% → stable
+        with patch.object(self.client, "get_klines", return_value=self._kline_set(closes)):
+            r = _compute_btc_regime(self.client)
+        self.assertEqual(r["regime"], "down")
+        self.assertEqual(r["sub_regime"], "down_stable")
+        self.assertAlmostEqual(r["change_3h_pct"], 0.0, places=2)
+
+    def test_phase_4k_down_rebound_3h_rising(self):
+        """down (pct_vs_ma25 ≤ -0.5%) + 3h 涨 > 0.5% → sub_regime='down_rebound'."""
+        # 设计: 前 21 个 = 102, 后 4 个反弹 (97, 99, 100, 101)
+        # current = 101, MA25 = (102*21 + 97+99+100+101)/25 = (2142+397)/25 = 101.56
+        # pct_vs_ma25 = (101-101.56)/101.56 = -0.55% → down (just barely)
+        # 3h change = (101 - 97) / 97 * 100 = 4.12% → > 0.5% → rebound
+        closes = [102.0]*21 + [97.0, 99.0, 100.0, 101.0]
+        with patch.object(self.client, "get_klines", return_value=self._kline_set(closes)):
+            r = _compute_btc_regime(self.client)
+        self.assertEqual(r["regime"], "down", f"应为 down, 实际 {r['regime']}, pct_vs_ma25={r['pct_vs_ma25']}")
+        self.assertEqual(r["sub_regime"], "down_rebound")
+        self.assertGreater(r["change_3h_pct"], 0.5)
+
+    def test_phase_4k_sub_regime_does_not_affect_gate(self):
+        """sub_regime 只是 shadow log, 不应影响 gate 行为.
+        即使 sub_regime='down_rebound' (反弹), down+LONG 仍应被 _should_block_for_regime 拒.
+        这验证 Phase 4.K 是纯观察, gate 逻辑不变."""
+        # 不论 sub_regime 是什么, gate 都看 regime='down' + direction='LONG' → 拒
+        from live_trader import _should_block_for_regime
+        self.assertTrue(_should_block_for_regime("LONG", "down"))
+        # sub_regime 不是 _should_block_for_regime 的参数, 不影响判定
+        # (函数签名只有 direction + regime)
+
 
 class TestSlCompensation(unittest.TestCase):
     """Phase 4.D: SL slippage compensation + A/B 分组.
@@ -1790,6 +1857,33 @@ class TestIsEligibleRegimeGate(unittest.TestCase):
             pt, self.live_state, self.now, btc_regime=None
         )
         self.assertTrue(ok, "regime=None 应该跳过 gate, 避免取价失败时误拦")
+
+    # --- Phase 4.K Shadow Log: reason 文本附带 sub_regime ---
+
+    def test_phase_4k_rejection_reason_includes_sub_regime(self):
+        """Phase 4.K: 被拒 reason 应附带 sub_regime + 3h% 信息 (shadow log)."""
+        pt = self._make_trade(self.a_pid, "LONG")
+        ok, reason = live_trader.is_eligible_for_mirror(
+            pt, self.live_state, self.now,
+            btc_regime="down",
+            btc_sub_regime="down_rebound",
+            btc_change_3h_pct=+0.75,
+        )
+        self.assertFalse(ok)
+        self.assertIn("sub=down_rebound", reason)
+        self.assertIn("3h=+0.75%", reason)
+
+    def test_phase_4k_no_sub_regime_no_extra_info(self):
+        """老调用不传 sub_regime → reason 无附加信息 (向后兼容)."""
+        pt = self._make_trade(self.a_pid, "LONG")
+        ok, reason = live_trader.is_eligible_for_mirror(
+            pt, self.live_state, self.now,
+            btc_regime="down",
+            # 不传 sub_regime
+        )
+        self.assertFalse(ok)
+        self.assertNotIn("sub=", reason)
+        self.assertNotIn("3h=", reason)
 
 
 class TestConvictionFilter(unittest.TestCase):
