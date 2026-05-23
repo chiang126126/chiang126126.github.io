@@ -12,17 +12,22 @@
 
 | 维度 | V3 (现行, 已归档) | V4 (设计中) |
 |---|---|---|
-| K 线周期 | 1m (扫 30s/1m/5m/4h) | **1h + 4h + 1d** |
-| 信号类型 | 1m 量价突变 (burst/sustained) | **regime-adaptive: breakout / mean-rev** |
+| K 线周期 | 1m (扫 30s/1m/5m/4h) | **15min + 1h + 4h + 1d** |
+| 信号决策周期 | 1m 量价突变 | **1h + 4h + 1d** (15min 仅用于 SL/TP 精度) |
 | 持仓时间 | avg 36.9min (median 17.3min) | **目标 1-7 天 (max 14 天)** |
 | SL 距离 | ATR(1m) × 1.0 ≈ 1% | **ATR(4h) × 2.0 ≈ 5%** |
 | TP1/TP2/TP3 | 1.5x / 3.0x ATR | **2.0x / 4.0x / 6.0x ATR(4h)** |
 | Regime 频率 | 30min BTC 检测 | **1h BTC 检测 + 日级 trend filter** |
 | 信号语义 | 短期 momentum 反转 | **日级趋势 + 突破 / 回踩 / 反转** |
-| Conviction | 0-10 (短期 features) | **0-10 (日级 features, 重新校准)** |
+| Conviction | 0-10 (短期 features) | **0-10 (日级 features, 重新校准 — 见 §2.4)** |
+| Funding/OI/Taker 时间窗 | 瞬时 / 5m / 1m-5m 加权 | **当前+7d 平均 / 24h+7d delta / 24h 加权** |
 | 杠杆 | 3x (live) | **1x (live, 省 funding + 无 decay)** |
 | 单笔保证金 | $20 (live) | **$400 起步 (live, $2000 / 5 并发)** |
 | 并发 | 4 (live) | **5 (live, 跟 paper $2000 / $400 一致)** |
+
+### 1.1 为什么加 15min K 线
+回测中检 SL/TP 触发, 1h K 内若 [low, high] 同时穿过 SL 和 TP1, 无法判断顺序 → PnL 估算可能错.
+**用 15min K 线作为 SL/TP 精度层** (信号决策仍用 1h+4h+1d). 4 倍精度, 数据量 +60MB 可接受.
 
 ---
 
@@ -63,16 +68,41 @@
 - **Timeout**: 14 天自动关 (vs V3 4h)
 
 ### 2.4 Conviction Score (0-10, 重新校准)
-- Base: 4 分 (满足 entry 条件)
-- +1: 1d volume > 2 × MA (强量能, vs 1.5x base)
-- +1: 4h MACD 跟方向一致
-- +1: BTC 同向 1d 涨/跌 > 1.5%
-- +1: 该 symbol 30 日历史胜率 > 50% (top decile)
-- +1: 周线趋势 (5d MA > 20d MA for LONG) 同向
-- +1: regime 已确立 > 7 天 (regime stability)
-- Cap at 10.
 
-**Diamond 阈值**: ≥ 6 分 (vs V3 ≥ 5).
+**设计原则**: 硬条件 (信号触发) vs 软加分 (conviction) 严格分离.
+- 硬条件 → 决定**开不开仓** (在 §2.2 信号生成)
+- 软加分 → 决定**信号几分** → 是否过 ≥6 门槛
+
+**Base: 3 分** (满足 §2.2 entry 硬条件)
+
+**软加分** (最多 +7, cap at 10):
+
+技术指标类 (+3):
+- +1: 1d volume > 2x MA (vs 信号触发的 1.5x base)
+- +1: 4h MACD histogram 同向 (LONG signal + hist > 0)
+- +1: 周线趋势同向 (5d MA > 20d MA for LONG)
+
+宏观环境类 (+2):
+- +1: BTC 同向 1d 涨/跌 > 1.5%
+- +1: 当前 regime 已确立 > 7 天 (regime stability)
+
+资金流 / 主力意图 (+3, **V3 验证过有 alpha**):
+- +1: Funding rate 极端同向 (`|funding_8h| ≥ 0.05%`, LONG signal + funding 负, SHORT signal + funding 正)
+- +1: 24h OI delta 方向同向 (LONG + OI 增 > 2%, SHORT + OI 减 > 2%)
+- +1: 24h taker buy ratio 方向同向 (LONG + ratio > 55%, SHORT + ratio < 45%)
+
+历史胜率 (+1):
+- +1: 该 symbol 在最近 30 天 V4 历史信号胜率 > 50%
+  - **第一版回测**: 没 V4 历史数据, 用 V3 paper 30d 胜率作 prior (有偏差但 conservatively 可用)
+  - **第二版回测**: 用 V4 自己的 rolling 30d 胜率
+
+**Diamond 阈值**: ≥ **6** 分 (vs V3 ≥ 5).
+
+### 2.5 V4 不用的 V3 指标 (审计后明确剔除)
+- ❌ 1m volume burst (1m vs 30m 5x) — day-scale 不看分钟噪声
+- ❌ 5m / 15m 涨跌 — 短窗对 day-scale 决策无信息
+- ❌ ATR(1m) — 改用 ATR(4h)
+- ❌ V3 历史 30m 胜率作为 conviction 因子 — 改成 V4 历史胜率 (持仓窗一致)
 
 ---
 
@@ -113,19 +143,26 @@ for symbol in symbols:
 
 ## 4. 历史数据下载 (v4_data_fetcher.py)
 
-### 4.1 来源
-- Binance perp `/fapi/v1/klines` (V3 已用 `binance_client.py`)
-- 6 个月 × 237 symbol × 3 时间框 = 711 个文件
+### 4.1 来源 (Binance perp API)
+- K 线: `/fapi/v1/klines` (V3 已用)
+- Funding: `/fapi/v1/fundingRate` (8h 一次, 6 月 = ~540 行/symbol)
+- OI 历史: `/futures/data/openInterestHist` (5m 粒度, 6 月 = ~52000 行/symbol, 抽样到 4h)
+- Taker buy ratio: `/futures/data/takerlongshortRatio` (4h 粒度, 6 月 = ~1080 行/symbol)
 
 ### 4.2 存储
-- 本地缓存: `~/cresus-bot/v4_klines/{symbol}_{timeframe}.parquet`
-- Parquet 压缩, ~50MB total
+- K 线: `~/cresus-bot/v4_klines/{symbol}_{timeframe}.parquet`
+  - 4 个 timeframe × 237 symbol = 948 文件
+- Funding: `~/cresus-bot/v4_funding/{symbol}.parquet`
+- OI: `~/cresus-bot/v4_oi/{symbol}_4h.parquet`
+- Taker: `~/cresus-bot/v4_taker/{symbol}_4h.parquet`
+- 总量估算: K 线 ~80MB + funding/OI/taker ~20MB = **~100MB**
 
 ### 4.3 容错
-- Rate limit: 1200 weight/min, 1d K-line = 1 weight
+- Rate limit: 1200 weight/min, K-line = 1 weight, OI/funding = 1 weight
 - Throttle: 0.1s 间隔
 - 失败重试 3 次指数退避
 - Symbol 下架 → log 跳过, 不阻塞
+- 数据缺口 (新上币 symbol 历史不足 6 月) → log + continue, 回测时用现有数据
 
 ---
 
@@ -135,17 +172,18 @@ for symbol in symbols:
 cresus-system/scripts/v4/
 ├── V4_SPEC.md                   ← 本文档
 ├── __init__.py
-├── v4_data_fetcher.py           ← Binance 历史 K 线下载 + 缓存
+├── v4_data_fetcher.py           ← K 线 (15m/1h/4h/1d) + funding + OI + taker 下载
 ├── v4_indicators.py             ← ATR / RSI / EMA / Donchian / MACD
-├── v4_regime.py                 ← Day-scale BTC regime 检测
-├── v4_signals.py                ← Hybrid 信号生成 (3 个 sub-strategy)
-├── v4_conviction.py             ← Conviction 评分
-├── v4_paper_engine.py           ← 主引擎 (orchestrator)
-├── v4_backtest.py               ← 回测主循环
+├── v4_regime.py                 ← Day-scale BTC regime 检测 (1h EMA + hysteresis)
+├── v4_signals.py                ← Hybrid 信号生成 (3 个 sub-strategy, 硬条件)
+├── v4_conviction.py             ← Conviction 评分 (软加分: tech + macro + flow + history)
+├── v4_paper_engine.py           ← Position lifecycle (phase A/B/C, 15min 精度)
+├── v4_backtest.py               ← 回测主循环 (跨 symbol portfolio state)
 └── tests/
     ├── test_indicators.py
     ├── test_regime.py
     ├── test_signals.py
+    ├── test_conviction.py
     └── test_backtest.py
 ```
 

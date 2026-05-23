@@ -1,12 +1,19 @@
 """V4 Paper Engine — Position lifecycle management (phase A / B / C trail).
 
 跟 V3 volume_velocity_scanner.py 的 _update_paper_trades 类似, 但:
-  - 时间步进单位: 1h (vs V3 60s)
+  - 时间步进单位: 15min K (vs V3 60s)
+       — 用 15min K 线作为 SL/TP 触发精度层
+       — 信号决策 (开仓) 仍是 1h+4h+1d
   - SL/TP 基于 ATR(4h) (vs V3 ATR(1m))
   - Timeout: 14 天 (vs V3 4h)
   - 多 phase trail 逻辑保留 (A→B→C 棘轮)
 
 无 live trading 调用 — 纯 paper 端 + 回测引擎复用.
+
+15min 精度的具体作用 (回测引擎里):
+  V3 回测如果用 1h K 检 SL/TP, 一根 1h K 的 [low, high] 同时穿过 SL 和 TP1, 无法判断顺序.
+  V4 用 15min K 检触发: 顺序歧义降低 4x, 边界情况显著减少.
+  (理论上仍有 15min 内同时穿过的极端情况, 但概率从 1h-bar 的 ~5% 降到 ~1%.)
 """
 from __future__ import annotations
 from dataclasses import dataclass, field
@@ -52,13 +59,18 @@ def open_position(signal: V4Signal, t: pd.Timestamp) -> V4Position:
     raise NotImplementedError
 
 
-def update_position(pos: V4Position, bar_1h: pd.Series, t: pd.Timestamp) -> V4Position:
-    """单根 1h K 线推进 position 状态.
+def update_position(pos: V4Position, bar_15m: pd.Series, t: pd.Timestamp) -> V4Position:
+    """单根 15min K 线推进 position 状态 (精度 4x vs 1h K).
 
     Phase A: 检 SL / TP1 (3 等分一份, 33% 仓位平). 触 TP1 → 进 phase B.
     Phase B: SL 移到 entry (BE). 检 BE_SL / TP2 / trail_b. 触 TP2 → 进 phase C.
     Phase C: trail SL = max(prev_sl, HWM ∓ 2×ATR). 检 trail_sl / TP3.
     任何 phase: 检 timeout (14d).
+
+    Args:
+        bar_15m: pandas.Series with index [open, high, low, close, volume]
+
+    顺序歧义处理: 若 15min K 内同时穿过 SL 和 TP, 保守取 SL 先触 (避免 PnL 高估).
     """
     # TODO: 实现 phase 转移 + SL trail + close 判断
     raise NotImplementedError

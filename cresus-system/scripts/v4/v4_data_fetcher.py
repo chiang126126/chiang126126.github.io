@@ -24,9 +24,21 @@ from typing import Iterable
 
 # 缓存目录 (跟 ~/cresus-bot/ 数据目录平级)
 V4_KLINES_DIR = Path.home() / "cresus-bot" / "v4_klines"
+V4_FUNDING_DIR = Path.home() / "cresus-bot" / "v4_funding"
+V4_OI_DIR = Path.home() / "cresus-bot" / "v4_oi"
+V4_TAKER_DIR = Path.home() / "cresus-bot" / "v4_taker"
 
-# 支持的时间框 (供 V4 各模块引用)
-TIMEFRAMES = ("1h", "4h", "1d")
+# K 线时间框
+#   15m: SL/TP 精度层 (回测引擎用, 解决 1h K 内同时穿 SL/TP 的歧义)
+#   1h:  Regime 检测 + 信号触发 lookup
+#   4h:  ATR / MACD / 信号确认
+#   1d:  Donchian / volume MA / 周线趋势
+TIMEFRAMES = ("15m", "1h", "4h", "1d")
+
+# Funding / OI / Taker 时间窗 (V4 day-scale, 不用 V3 的瞬时/5m 粒度)
+FUNDING_LOOKBACK_DAYS = 7        # 取 7d funding 序列, 算当前 + 平均
+OI_INTERVAL = "4h"               # OI 历史粒度 (Binance 提供 5m/15m/30m/1h/2h/4h/6h/12h/1d)
+TAKER_INTERVAL = "4h"            # taker buy ratio 粒度
 
 
 def list_v3_symbols(paper_history_path: Path) -> list[str]:
@@ -68,13 +80,56 @@ def load_klines(symbol: str, interval: str):
     raise NotImplementedError
 
 
+def fetch_funding(symbol: str, start_ms: int, end_ms: int) -> list[dict]:
+    """Binance /fapi/v1/fundingRate — 8h 一条记录.
+
+    Returns: list of {fundingTime, fundingRate, markPrice}
+    """
+    # TODO
+    raise NotImplementedError
+
+
+def fetch_oi_hist(symbol: str, start_ms: int, end_ms: int, interval: str = OI_INTERVAL) -> list[dict]:
+    """Binance /futures/data/openInterestHist — 4h 一条 (含 sumOpenInterest, sumOpenInterestValue).
+
+    注意: 该端点仅支持 30 日内的数据查询, 跨大区间需分段请求.
+    """
+    # TODO
+    raise NotImplementedError
+
+
+def fetch_taker_ratio(symbol: str, start_ms: int, end_ms: int, interval: str = TAKER_INTERVAL) -> list[dict]:
+    """Binance /futures/data/takerlongshortRatio — 4h 一条 (含 buySellRatio, buyVol, sellVol)."""
+    # TODO
+    raise NotImplementedError
+
+
+def load_funding(symbol: str):
+    """读 funding 缓存 parquet → DataFrame."""
+    raise NotImplementedError
+
+
+def load_oi(symbol: str):
+    """读 OI 缓存 parquet → DataFrame."""
+    raise NotImplementedError
+
+
+def load_taker(symbol: str):
+    """读 taker ratio 缓存 parquet → DataFrame."""
+    raise NotImplementedError
+
+
 def download_all(symbols: Iterable[str], months_back: int = 6) -> dict:
-    """主入口: 下载所有 symbol × 所有 timeframe 的历史 K 线.
+    """主入口: 下载所有 symbol × 所有 timeframe + funding + OI + taker.
 
     Returns:
-        统计 dict: {"total": N, "ok": M, "skipped": K, "failed": [(sym, tf, err), ...]}
+        统计 dict: {
+            "total_klines": N, "ok_klines": M, "skipped_klines": K,
+            "ok_funding": ..., "ok_oi": ..., "ok_taker": ...,
+            "failed": [(sym, kind, err), ...]
+        }
     """
-    # TODO: orchestrate fetch_klines + save_to_parquet, 含 throttle / retry
+    # TODO: orchestrate 4 个 timeframe K 线 + funding + OI + taker, 含 throttle / retry
     raise NotImplementedError
 
 

@@ -52,4 +52,4 @@ def test_list_v3_symbols_skips_null_symbol():
 
 
 def test_timeframes_constant():
-    assert TIMEFRAMES == ("1h", "4h", "1d")
+    assert TIMEFRAMES == ("15m", "1h", "4h", "1d")

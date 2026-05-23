@@ -1,11 +1,13 @@
 """V4 Backtest Engine — 历史数据上跑 V4 策略, 输出 PF / 胜率 / drawdown.
 
-主循环 (per-symbol, time-stepped 1h):
-  for t in time_range:
-    1. update_position(open_positions, bar_1h[t])  # 收 SL/TP, 推进 phase
-    2. if can_open_new (concurrent < MAX):
+主循环 (跨 symbol portfolio, time-stepped 15min):
+  for t in time_range (15min step):
+    1. update_position(open_positions, bar_15m[t])  # 收 SL/TP, 推进 phase
+                                                     # 15min 精度避免 1h K 内 SL/TP 顺序歧义
+    2. 如果 t 是 1h 整点 + concurrent < MAX:
        sigs = check_all_signals(...)
        if sigs[0].conviction >= 6: open_position()
+       # 信号决策仍是 1h 粒度 (用 1h+4h+1d K 线), 15min 仅做执行精度
 
 跨 symbol 共享: 1 个 portfolio state (max 5 concurrent across all symbols).
 """
