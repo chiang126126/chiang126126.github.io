@@ -1634,7 +1634,11 @@ class TestShouldBlockForRegime(unittest.TestCase):
 
 
 class TestAbUseRegimeGate(unittest.TestCase):
-    """Phase 4.F: _ab_use_regime_gate 启用判定."""
+    """Phase 4.F + 4.J: _ab_use_regime_gate 启用判定.
+
+    Phase 4.J 后默认 mode='always' (gate 普及到全部组), 但保留 'abcd' / 'off'
+    作为退路.
+    """
 
     def test_off_never_enabled(self):
         self.assertFalse(live_trader._ab_use_regime_gate("any", mode="off"))
@@ -1644,7 +1648,7 @@ class TestAbUseRegimeGate(unittest.TestCase):
         self.assertTrue(live_trader._ab_use_regime_gate("", mode="always"))
 
     def test_abcd_only_d_group(self):
-        """abcd mode: 只有 D 组返 True."""
+        """legacy abcd mode: 只有 D 组返 True."""
         for i in range(80):
             pid = f"X{i}|LONG|T+00:00"
             g = live_trader._ab_group(pid, n_groups=4)
@@ -1660,6 +1664,28 @@ class TestAbUseRegimeGate(unittest.TestCase):
 
     def test_unknown_mode_safe_fallback(self):
         self.assertFalse(live_trader._ab_use_regime_gate("any", mode="xyz"))
+
+    def test_phase_4j_default_mode_is_always(self):
+        """Phase 4.J: 默认 LIVE_REGIME_GATE_MODE = 'always'."""
+        self.assertEqual(live_trader.LIVE_REGIME_GATE_MODE, "always",
+                         "Phase 4.J 部署后默认 always (gate 普及全员)")
+
+    def test_phase_4j_always_mode_applies_to_all_groups(self):
+        """Phase 4.J: always mode 下, A/B/C/D 全部组都启用 gate."""
+        # 找到 A/B/C/D 各一个 paper_id
+        found = {}
+        for i in range(200):
+            pid = f"Y{i}|LONG|T+00:00"
+            g = live_trader._ab_group(pid, n_groups=4)
+            if g not in found:
+                found[g] = pid
+            if len(found) == 4:
+                break
+        self.assertEqual(set(found.keys()), {'A', 'B', 'C', 'D'},
+                         f"应找全 4 组, 实际: {set(found.keys())}")
+        for g, pid in found.items():
+            r = live_trader._ab_use_regime_gate(pid, mode="always")
+            self.assertTrue(r, f"always mode 下 {g} 组 (pid={pid[:20]}) 也应启用")
 
 
 class TestIsEligibleRegimeGate(unittest.TestCase):
@@ -1722,13 +1748,32 @@ class TestIsEligibleRegimeGate(unittest.TestCase):
         )
         self.assertTrue(ok)
 
-    def test_a_group_down_long_allowed(self):
-        """A 组 (基线) + down regime + LONG → 允许 (A 不启用 gate)."""
+    def test_a_group_down_long_legacy_abcd_allowed(self):
+        """Phase 4.F legacy 'abcd' mode: A 组 (基线) 不启用 gate → 允许 down+LONG.
+
+        Phase 4.J 后默认 mode='always', 所有组都拦 down+LONG. 但 'abcd' mode
+        仍保留作为退路 (向后兼容老数据 / A/B 测试场景).
+        """
         pt = self._make_trade(self.a_pid, "LONG")
-        ok, _ = live_trader.is_eligible_for_mirror(
+        with patch.object(live_trader, "LIVE_REGIME_GATE_MODE", "abcd"):
+            ok, _ = live_trader.is_eligible_for_mirror(
+                pt, self.live_state, self.now, btc_regime="down"
+            )
+        self.assertTrue(ok, "legacy abcd mode: A 组应允许 down+LONG")
+
+    def test_a_group_down_long_always_mode_blocked(self):
+        """Phase 4.J 默认 'always' mode: A 组 + down + LONG 应被拒 (gate 普及).
+
+        触发: 4.F 部署后 10 笔 down+LONG (A/B/C 组) 9 亏, 数据驱动决策
+        把 gate 推广到全部组.
+        """
+        pt = self._make_trade(self.a_pid, "LONG")
+        # 默认 LIVE_REGIME_GATE_MODE = "always", 不需 patch
+        ok, reason = live_trader.is_eligible_for_mirror(
             pt, self.live_state, self.now, btc_regime="down"
         )
-        self.assertTrue(ok)
+        self.assertFalse(ok, "Phase 4.J 后 A 组 down+LONG 应该被拦")
+        self.assertIn("regime gate", reason)
 
     def test_no_btc_regime_arg_backward_compat(self):
         """不传 btc_regime → 不应触发 regime gate (向后兼容)."""
@@ -3441,6 +3486,49 @@ class TestMirrorIterationGuards(unittest.TestCase):
         lt = result["live_open_trades"][0]
         self.assertTrue(lt["regime_gate_enabled"], "D 组应记 regime_gate_enabled=True")
         self.assertEqual(lt["regime_gate_mode"], "always")
+
+    def test_phase_4j_a_group_down_long_now_blocked(self):
+        """Phase 4.J: A 组 + down regime + LONG 在默认 mode=always 下应被拒.
+
+        这是 4.J 核心行为变化 — 之前 'abcd' mode 下 A 组允许 down+LONG,
+        现在 'always' mode 下全员拦截. 防止 A/B/C 组继续亏钱在已知失利组合上.
+        """
+        now = datetime.now(timezone.utc)
+        # 找 A 组 paper_id
+        a_pid = None
+        for i in range(100):
+            cand = f"BTCUSDT|LONG|a4j_{i}|2026-05-23T10:00:00+00:00"
+            if live_trader._ab_group(cand, n_groups=4) == "A":
+                a_pid = cand
+                break
+        self.assertIsNotNone(a_pid)
+        self._write_paper([{
+            "id": a_pid, "symbol": "BTCUSDT", "direction": "LONG",
+            "entered_at": (now - timedelta(seconds=10)).isoformat(),
+            "entry_price": 80000.0, "sl": 79000.0,
+            "conviction_score": 7,   # 通过 4.H filter
+        }])
+        # 不 patch LIVE_REGIME_GATE_MODE, 用默认 'always'
+        with patch.object(live_trader, "LIVE_SL_COMPENSATION_MODE", "off"), \
+             patch.object(live_trader, "LIVE_SL_WICK_FILTER_MODE", "off"), \
+             patch.object(live_trader, "_compute_btc_regime", return_value={
+                 "regime": "down", "btc_price": 70000.0,
+                 "btc_ma25_1h": 75000.0, "pct_vs_ma25": -6.67,
+                 "change_24h_pct": -5.0, "computed_at": now.isoformat(),
+             }), \
+             patch.object(self.client, "open_position") as mock_op, \
+             patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "80000.0", 0, 0, 0, 0, 0, 0, 0]]):
+            result = main_loop(self.client, dry_run=True)
+        # 不应 mirror
+        self.assertEqual(mock_op.call_count, 0,
+                         "Phase 4.J: A 组 down+LONG 也应被拒, open_position 不该被调")
+        # missed_signal 应包含 regime gate 原因
+        missed = result.get("missed_signals", [])
+        self.assertTrue(
+            any("regime gate" in m.get("reason", "") for m in missed),
+            f"应记 regime gate missed, 实际: {[m.get('reason') for m in missed]}"
+        )
 
 
 # ============================================================================

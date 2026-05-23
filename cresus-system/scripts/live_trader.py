@@ -168,10 +168,22 @@ LIVE_WICK_FILTER_MIN_BREACHES = 2   # 需要连续 N 次轮询都 breach 才触�
 #         显著差于 down SHORT (20% 胜率, -$0.071/笔), t-test p=0.042.
 # 论据: paper 自己的 RISK_OFF 时段 SHORT 人均 +$0.126 也远好于 LONG +$0.037,
 #       证实 BTC 下跌时 SHORT 是更优方向. paper 信号生成器未做此过滤.
-# 方案: D 组对 paper 信号加 regime gate — 当 btc_regime=down 且 direction=LONG,
-#       拒绝 mirror. 防御性, 永不误开仓.
-# A/B/C/D 测试: A=基线, B=补偿, C=wick filter, D=regime gate. 每组 ~1/4 (MD5 mod 4).
-LIVE_REGIME_GATE_MODE = "abcd"      # "off" | "abcd" | "always"
+# 方案 v1 (4.F): D 组对 paper 信号加 regime gate — A/B/C 组继续允许 down+LONG.
+# A/B/C/D 测试: A=基线, B=补偿, C=wick filter, D=regime gate. 每组 ~1/4.
+#
+# Phase 4.J Update (2026-05-23) — Regime Gate 普及到全部组
+# ==========================================
+# 触发原因: 4.F 部署后 1-2 天观察, A/B/C 组的 down+LONG 持续亏损 (10 笔 9 亏),
+#         继续 4-arm 测试等于"花真钱继续验证已知坏假设". 数据已足够支持
+#         全面应用 (p=0.042 + 持续重现).
+# 改动: mode 从 "abcd" 改 "always", 让 _ab_use_regime_gate 对所有组返 True.
+#        regime_gate_enabled 字段在 live_trade 上仍记录, 但现在所有新 trade
+#        都是 True (溯源仍可见).
+# 不动:
+#   - SL 补偿 (B 组) / Wick filter (C 组) 仍保留 4-arm A/B 测试 (这俩还有歧义)
+#   - _should_block_for_regime 规则不变 (仅 down + LONG)
+#   - ab_group 字段仍记录 A/B/C/D (溯源不变, 即使 D 组实质跟 A 组相同)
+LIVE_REGIME_GATE_MODE = "always"    # "off" | "abcd" (legacy 4-arm) | "always" (Phase 4.J 默认)
 
 # 升级 SL 补偿 / wick filter 到 4-arm 一致 (B/C 分别对应)
 LIVE_SL_COMPENSATION_MODE = "abcd"  # "off" | "ab" (legacy 2-arm) | "abc" (3-arm) | "abcd" (Phase 4.F) | "always"
@@ -392,8 +404,9 @@ def is_eligible_for_mirror(
     # 只在 btc_regime 提供时才检查; 测试 / 旧调用不带此参数时跳过 (向后兼容)
     if btc_regime is not None and _ab_use_regime_gate(paper_id, LIVE_REGIME_GATE_MODE):
         if _should_block_for_regime(direction, btc_regime):
-            return False, (f"regime gate (D 组): {btc_regime} regime + {direction} "
-                          f"被拒 (数据驱动: down+LONG 历史 0/10 胜)")
+            mode = LIVE_REGIME_GATE_MODE
+            return False, (f"regime gate ({mode}): {btc_regime} regime + {direction} "
+                          f"被拒 (数据驱动: down+LONG 历史 0/10 胜 p=0.042)")
     return True, "ok"
 
 
