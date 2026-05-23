@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-23T13:12:50.946725+00:00",
+  "updated_at": "2026-05-23T13:14:59.161835+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 21,
+  "alerts_count": 22,
   "alerts": [
+    {
+      "symbol": "EPICUSDT",
+      "base": "EPIC",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.2404,
+      "price_change_pct": -0.866,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 51719.0,
+      "volume_baseline_usdt": 2799.0,
+      "volume_ratio": 18.48,
+      "detected_at": "2026-05-23T13:14:51.524266+00:00",
+      "intensity": 2,
+      "change_5m_pct": -0.905,
+      "change_15m_pct": -1.028,
+      "change_1h_pct": 0.25,
+      "change_4h_pct": 4.062,
+      "taker_buy_ratio_1m": 0.451,
+      "taker_buy_ratio_5m": 0.435,
+      "oi_delta_5m_pct": -0.463,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.324,
+      "range_4h_pct": 6.66,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.24156786,
+      "suggested_tp1": 0.23864821,
+      "suggested_tp2": 0.23689643,
+      "conviction_score": 0,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "MYXUSDT",
       "base": "MYX",
