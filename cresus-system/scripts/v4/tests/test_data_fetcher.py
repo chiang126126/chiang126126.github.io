@@ -14,7 +14,8 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from v4_data_fetcher import (
     TIMEFRAMES, KLINES_MAX_LIMIT,
-    list_v3_symbols,
+    PROTOTYPE_MAINSTREAM, V3_LIVE_WHITELIST, V3_LIVE_BLACKLIST,
+    list_v3_symbols, list_prototype_symbols,
     _ms, _http_get,
     fetch_klines, klines_to_df, save_klines_parquet, load_klines,
     fetch_funding, funding_to_df,
@@ -91,6 +92,36 @@ def test_timeframes_constant():
 def test_ms_helper():
     dt = datetime(2026, 1, 1, tzinfo=timezone.utc)
     assert _ms(dt) == 1767225600000
+
+
+# ── Prototype symbol 集合 ──────────────────────────────────────────
+
+def test_prototype_mainstream_has_10():
+    assert len(PROTOTYPE_MAINSTREAM) == 10
+    # 关键 liquid: BTC ETH SOL 必须在
+    assert "BTCUSDT" in PROTOTYPE_MAINSTREAM
+    assert "ETHUSDT" in PROTOTYPE_MAINSTREAM
+    assert "SOLUSDT" in PROTOTYPE_MAINSTREAM
+
+
+def test_v3_live_whitelist_subset_of_mainstream():
+    """V3 live whitelist (BTC/ETH/SOL) 应该是 mainstream 子集."""
+    assert set(V3_LIVE_WHITELIST).issubset(set(PROTOTYPE_MAINSTREAM))
+
+
+def test_v3_live_blacklist_has_5():
+    """V3 live blacklist (PHASE_NOTES 5 个 0 胜 symbol)."""
+    assert len(V3_LIVE_BLACKLIST) == 5
+    assert "DODOXUSDT" in V3_LIVE_BLACKLIST
+    assert "STABLEUSDT" in V3_LIVE_BLACKLIST
+
+
+def test_list_prototype_symbols_15_unique():
+    """10 mainstream + 5 blacklist = 15 (无重叠)."""
+    syms = list_prototype_symbols()
+    assert len(syms) == 15
+    assert len(set(syms)) == 15  # 无重复
+    assert syms == sorted(syms)  # 已排序
 
 
 # ── klines_to_df ────────────────────────────────────────────────────

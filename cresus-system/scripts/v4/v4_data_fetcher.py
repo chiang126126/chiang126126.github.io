@@ -73,6 +73,41 @@ OI_MAX_LOOKBACK_DAYS = 30
 TAKER_MAX_LOOKBACK_DAYS = 30
 
 
+# ── Prototype symbol 集合 (Day 3 决策点用) ──────────────────────────
+# Day 3 prototype 跑这 15 个 symbol 验证 V4 信号假设是否成立.
+# 全量 237 symbol 等 PF > 1.3 验证后再跑.
+
+PROTOTYPE_MAINSTREAM = (
+    # 10 个 top liquid perp, 流动性 + 数据干净
+    "BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT",
+    "ADAUSDT", "DOGEUSDT", "AVAXUSDT", "LINKUSDT", "DOTUSDT",
+)
+
+V3_LIVE_WHITELIST = (
+    # V3 live_trader.py LIVE_SYMBOL_WHITELIST (Phase 6 实盘允许币种)
+    "BTCUSDT", "ETHUSDT", "SOLUSDT",
+)
+
+V3_LIVE_BLACKLIST = (
+    # V3 live_trader.py LIVE_SYMBOL_BLACKLIST (实盘 0 胜被禁的币)
+    # V4 在这些上跑能验证: day-scale 是否能"救回" 短周期失败的 symbol?
+    "DODOXUSDT",   # 4 笔 0 胜
+    "NMRUSDT",     # 4 笔 0 胜
+    "PLAYUSDT",    # 4 笔 0 胜
+    "GUAUSDT",     # 3 笔 0 胜
+    "STABLEUSDT",  # 5 笔 0 胜
+)
+
+
+def list_prototype_symbols() -> list[str]:
+    """Day 3 prototype 用的 15 个 symbol (10 mainstream + 5 V3 黑名单).
+
+    V3 whitelist (BTC/ETH/SOL) 已包含在 mainstream 里, 不重复.
+    黑名单加入意图: 验证 V4 day-scale 是否能在 V3 已证伪的 symbol 上找到 edge.
+    """
+    return sorted(set(PROTOTYPE_MAINSTREAM) | set(V3_LIVE_BLACKLIST))
+
+
 # ── 通用工具 ──────────────────────────────────────────────────────────
 
 def _ms(dt: datetime) -> int:
@@ -462,6 +497,8 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="V4 historical data downloader")
     parser.add_argument("--symbols", nargs="*", help="symbol list, 默认从 V3 paper 抽")
+    parser.add_argument("--prototype", action="store_true",
+                        help="只拉 prototype 15 symbol (Day 3 验证用)")
     parser.add_argument("--months", type=int, default=6)
     parser.add_argument("--paper-history", type=Path,
                         default=Path.home() / "cresus-bot" / "paper_trades_history.json")
@@ -469,7 +506,10 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
-    if args.symbols:
+    if args.prototype:
+        syms = list_prototype_symbols()
+        print(f"[prototype mode] 15 symbol = 10 mainstream + 5 V3 blacklist")
+    elif args.symbols:
         syms = args.symbols
     else:
         syms = list_v3_symbols(args.paper_history)
