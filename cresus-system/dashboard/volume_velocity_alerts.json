@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-23T09:53:58.599787+00:00",
+  "updated_at": "2026-05-23T09:56:07.003608+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 25,
+  "alerts_count": 26,
   "alerts": [
+    {
+      "symbol": "2ZUSDT",
+      "base": "2Z",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.10786,
+      "price_change_pct": -0.864,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 51827.0,
+      "volume_baseline_usdt": 9556.0,
+      "volume_ratio": 5.42,
+      "detected_at": "2026-05-23T09:55:55.348343+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.854,
+      "change_15m_pct": -0.406,
+      "change_1h_pct": 1.039,
+      "change_4h_pct": 1.228,
+      "taker_buy_ratio_1m": 0.283,
+      "taker_buy_ratio_5m": 0.561,
+      "oi_delta_5m_pct": -0.406,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.358,
+      "range_4h_pct": 5.21,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.10843857,
+      "suggested_tp1": 0.10699214,
+      "suggested_tp2": 0.10612429,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "JELLYJELLYUSDT",
       "base": "JELLYJELLY",
