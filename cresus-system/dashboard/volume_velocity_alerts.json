@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-23T04:45:31.656216+00:00",
+  "updated_at": "2026-05-23T04:47:38.353189+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 17,
+  "alerts_count": 18,
   "alerts": [
+    {
+      "symbol": "MYXUSDT",
+      "base": "MYX",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.1972,
+      "price_change_pct": 2.388,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 56565.0,
+      "volume_baseline_usdt": 8472.0,
+      "volume_ratio": 6.68,
+      "detected_at": "2026-05-23T04:47:15.889447+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.051,
+      "change_15m_pct": 2.508,
+      "change_1h_pct": 6.979,
+      "change_4h_pct": 18.122,
+      "taker_buy_ratio_1m": 0.543,
+      "taker_buy_ratio_5m": 0.509,
+      "oi_delta_5m_pct": 0.591,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.793,
+      "range_4h_pct": 20.64,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.19407143,
+      "suggested_tp1": 0.20189286,
+      "suggested_tp2": 0.20658571,
+      "conviction_score": 5,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "NAORISUSDT",
       "base": "NAORIS",
