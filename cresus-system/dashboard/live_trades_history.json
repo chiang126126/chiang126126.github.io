@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-23T01:19:10.206985+00:00",
+  "generated_at": "2026-05-23T01:21:22.811427+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 396,
-    "open": 0,
+    "total_trades": 397,
+    "open": 1,
     "closed": 396,
     "wins": 136,
     "losses": 257,
@@ -14,15 +14,15 @@
     "avg_pnl_usdt": -0.0064,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 7.2574,
+    "fees_paid_usdt": 7.2673,
     "fees_realized_usdt": 7.2574,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.01,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 90.22,
+    "deployed_usdt": 19.99,
+    "free_capital_usdt": 70.22,
     "max_concurrent_slots": 4,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
@@ -37,7 +37,63 @@
     "live_symbols": [],
     "exchange_symbols": []
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "STEEMUSDT|LONG|2026-05-23T01:20:55.022246+00:00",
+      "trade_id": "L1779499255_STEEMUS_L",
+      "symbol": "STEEMUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.0569,
+      "avg_fill_price": 0.05712,
+      "slippage_bps": 38.66,
+      "qty": 350.0,
+      "notional_usdt": 19.992,
+      "leverage": 3,
+      "risk_usdt": 0.525,
+      "risk_pct": 2.626,
+      "mirror_latency_sec": 23.2,
+      "sl_price": 0.05584,
+      "sl_paper_current": 0.05562,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.00022,
+      "sl_compensation_mode": "abcd",
+      "wick_filter_enabled": false,
+      "wick_filter_min_breaches": null,
+      "wick_filter_mode": "abcd",
+      "sl_breach_count": 0,
+      "regime_gate_enabled": false,
+      "regime_gate_mode": "abcd",
+      "ab_group": "B",
+      "min_conviction_threshold": 6,
+      "tp1_price": 0.05882,
+      "tp2_price": 0.06074,
+      "phase": "A",
+      "entry_order_id": 106777356,
+      "entry_client_id": "cresus_L1779499255_STEEMUS_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 7,
+      "alert_type": "sustained",
+      "atr_pct": 1.125,
+      "phase_a_mfe_pct": 0.281,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.009996,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-23T01:21:22.454974+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 75453.5,
+      "btc_change_24h_at_open": -2.699,
+      "btc_pct_vs_ma25_at_open": -1.762,
+      "phase_a_mfe_price": 0.05706,
+      "current_price": 0.05711,
+      "unrealized_pnl_usdt": -0.0035,
+      "unrealized_pnl_pct": -0.018,
+      "last_price_check_at": "2026-05-23T01:21:18.113833+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "COOKIEUSDT|SHORT|2026-05-22T19:38:56.679632+00:00",
@@ -22766,7 +22822,7 @@
       "conviction_score": 5,
       "signal_at": "2026-05-23T00:49:50.733243+00:00",
       "reason": "conviction_score 5 < threshold 6 (Phase 4.H filter)",
-      "last_checked_at": "2026-05-23T01:19:07.857269+00:00"
+      "last_checked_at": "2026-05-23T01:21:18.113833+00:00"
     },
     {
       "paper_id": "KITEUSDT|SHORT|2026-05-23T01:13:37.690867+00:00",
@@ -22775,7 +22831,7 @@
       "conviction_score": 5,
       "signal_at": "2026-05-23T01:14:15.501370+00:00",
       "reason": "conviction_score 5 < threshold 6 (Phase 4.H filter)",
-      "last_checked_at": "2026-05-23T01:19:07.857269+00:00"
+      "last_checked_at": "2026-05-23T01:21:18.113833+00:00"
     },
     {
       "paper_id": "IRYSUSDT|SHORT|2026-05-23T01:16:06.781204+00:00",
@@ -22784,16 +22840,16 @@
       "conviction_score": 5,
       "signal_at": "2026-05-23T01:16:22.944458+00:00",
       "reason": "conviction_score 5 < threshold 6 (Phase 4.H filter)",
-      "last_checked_at": "2026-05-23T01:19:07.857269+00:00"
+      "last_checked_at": "2026-05-23T01:21:18.113833+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 75370.0,
-    "btc_ma25_1h": 76803.38,
-    "pct_vs_ma25": -1.866,
-    "change_24h_pct": -2.806,
-    "computed_at": "2026-05-23T01:19:10.164284+00:00"
+    "btc_price": 75453.5,
+    "btc_ma25_1h": 76806.72,
+    "pct_vs_ma25": -1.762,
+    "change_24h_pct": -2.699,
+    "computed_at": "2026-05-23T01:21:19.393955+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
