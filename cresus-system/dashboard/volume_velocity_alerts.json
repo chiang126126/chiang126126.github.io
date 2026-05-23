@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-23T21:03:18.289353+00:00",
+  "updated_at": "2026-05-23T21:05:32.780178+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 100,
+  "alerts_count": 101,
   "alerts": [
+    {
+      "symbol": "CLUSDT",
+      "base": "CL",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 90.25,
+      "price_change_pct": -1.56,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 1847755.0,
+      "volume_baseline_usdt": 324569.0,
+      "volume_ratio": 5.69,
+      "detected_at": "2026-05-23T21:04:25.651359+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.298,
+      "change_15m_pct": -0.965,
+      "change_1h_pct": -4.038,
+      "change_4h_pct": -6.493,
+      "taker_buy_ratio_1m": 0.656,
+      "taker_buy_ratio_5m": 0.43,
+      "oi_delta_5m_pct": -2.812,
+      "funding_rate_pct": -0.344,
+      "atr_pct": 0.391,
+      "range_4h_pct": 7.41,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 90.77928571,
+      "suggested_tp1": 89.45607143,
+      "suggested_tp2": 88.66214286,
+      "conviction_score": 7,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "SOXLUSDT",
       "base": "SOXL",
