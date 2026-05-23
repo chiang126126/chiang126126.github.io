@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-23T12:46:30.745396+00:00",
+  "updated_at": "2026-05-23T12:48:36.091892+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 10,
+  "alerts_count": 11,
   "alerts": [
+    {
+      "symbol": "PROMUSDT",
+      "base": "PROM",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 1.096,
+      "price_change_pct": -0.725,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 66065.0,
+      "volume_baseline_usdt": 2106.0,
+      "volume_ratio": 31.37,
+      "detected_at": "2026-05-23T12:48:32.686875+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.634,
+      "change_15m_pct": -1.26,
+      "change_1h_pct": -1.878,
+      "change_4h_pct": -3.263,
+      "taker_buy_ratio_1m": 0.255,
+      "taker_buy_ratio_5m": 0.261,
+      "oi_delta_5m_pct": -0.116,
+      "funding_rate_pct": -0.0052,
+      "atr_pct": 0.306,
+      "range_4h_pct": 4.2,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 1.09935714,
+      "suggested_tp1": 1.09096429,
+      "suggested_tp2": 1.08592857,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "BLUAIUSDT",
       "base": "BLUAI",
