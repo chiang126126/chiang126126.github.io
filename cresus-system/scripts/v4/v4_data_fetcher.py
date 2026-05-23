@@ -1,45 +1,109 @@
-"""V4 Data Fetcher — 6 月历史 K 线 (1h / 4h / 1d) from Binance perp.
+"""V4 Data Fetcher — 6 月历史 K 线 (15m / 1h / 4h / 1d) + Funding + OI + Taker.
 
-输入: V3 paper history 接触过的 237 symbol (来自 paper_trades_history.json).
-输出: ~/cresus-bot/v4_klines/{symbol}_{interval}.parquet
+输入: V3 paper history 接触过的 237 symbol.
+输出: ~/cresus-bot/v4_{klines,funding,oi,taker}/{symbol}_*.parquet
 
-设计:
-- 复用 binance_client.py get_klines (V3 已经实现, 含 rate limit + retry)
-- 每 symbol 拉 6 月数据: 1h × 4320 + 4h × 1080 + 1d × 180 = ~5580 行
-- Parquet 列: open_time, open, high, low, close, volume, close_time, quote_volume,
-              trade_count, taker_buy_base, taker_buy_quote
-- 增量更新: 已有缓存只拉新数据, 文件存在时跳过完整下载
+不依赖 V3 binance_client.py (V3 client 含交易逻辑, V4 数据下载只读公开端点用 requests 直打).
 
 约束:
-- Binance perp /fapi/v1/klines: 1000 行/请求, weight=1, 1200 weight/min
-- 237 symbol × 3 timeframe × 平均 5 请求 = 3555 请求 ≈ 3min 全量下载
+- Binance perp /fapi/v1/klines: 1500 行/请求, weight=1, 2400 weight/min (futures public)
+- Throttle: 0.1s 间隔 → 600 req/min, 在 weight 限制内
+- 失败重试 3 次指数退避 (2s, 4s, 8s)
+- Symbol 下架 → log 跳过
+
+K 线分页 (单次最多 1500 行):
+- 6 月 1d:  180 行 (1 req)
+- 6 月 4h:  1080 行 (1 req)
+- 6 月 1h:  4320 行 (3 req)
+- 6 月 15m: 17280 行 (12 req)
+
+OI / Taker ratio Binance 限制: 仅支持 30 日内查询.
+  → 6 月需分 6 段拉, 每段 30 日.
+  → 实际上 V4 conviction 用 OI/Taker 时只用最近 30 日数据 (live 阶段会持续 fetch).
+  → 回测时 OI/Taker 早于 30 日的 trade, conviction 加分项跳过 (老 trade fallback None).
 """
 from __future__ import annotations
 
 import json
+import logging
 import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Optional
 
-# 缓存目录 (跟 ~/cresus-bot/ 数据目录平级)
+import pandas as pd
+import requests
+
+log = logging.getLogger(__name__)
+
+# Binance perp public endpoints (no auth)
+BINANCE_FAPI = "https://fapi.binance.com"
+KLINES_ENDPOINT = "/fapi/v1/klines"
+FUNDING_ENDPOINT = "/fapi/v1/fundingRate"
+OI_HIST_ENDPOINT = "/futures/data/openInterestHist"
+TAKER_RATIO_ENDPOINT = "/futures/data/takerlongshortRatio"
+
+# 缓存目录
 V4_KLINES_DIR = Path.home() / "cresus-bot" / "v4_klines"
 V4_FUNDING_DIR = Path.home() / "cresus-bot" / "v4_funding"
 V4_OI_DIR = Path.home() / "cresus-bot" / "v4_oi"
 V4_TAKER_DIR = Path.home() / "cresus-bot" / "v4_taker"
 
 # K 线时间框
-#   15m: SL/TP 精度层 (回测引擎用, 解决 1h K 内同时穿 SL/TP 的歧义)
-#   1h:  Regime 检测 + 信号触发 lookup
-#   4h:  ATR / MACD / 信号确认
-#   1d:  Donchian / volume MA / 周线趋势
 TIMEFRAMES = ("15m", "1h", "4h", "1d")
 
-# Funding / OI / Taker 时间窗 (V4 day-scale, 不用 V3 的瞬时/5m 粒度)
-FUNDING_LOOKBACK_DAYS = 7        # 取 7d funding 序列, 算当前 + 平均
-OI_INTERVAL = "4h"               # OI 历史粒度 (Binance 提供 5m/15m/30m/1h/2h/4h/6h/12h/1d)
-TAKER_INTERVAL = "4h"            # taker buy ratio 粒度
+# Funding / OI / Taker 时间窗
+FUNDING_LOOKBACK_DAYS = 7
+OI_INTERVAL = "4h"
+TAKER_INTERVAL = "4h"
 
+# Throttle + retry
+THROTTLE_SEC = 0.1                # 100ms 间隔 → 600 req/min
+MAX_RETRIES = 3
+INITIAL_BACKOFF_SEC = 2.0
+
+# Binance API 单次行数上限
+KLINES_MAX_LIMIT = 1500
+OI_MAX_LIMIT = 500
+TAKER_MAX_LIMIT = 500
+FUNDING_MAX_LIMIT = 1000
+
+# OI / Taker 仅支持 30 日内查询
+OI_MAX_LOOKBACK_DAYS = 30
+TAKER_MAX_LOOKBACK_DAYS = 30
+
+
+# ── 通用工具 ──────────────────────────────────────────────────────────
+
+def _ms(dt: datetime) -> int:
+    """datetime → epoch ms."""
+    return int(dt.timestamp() * 1000)
+
+
+def _http_get(path: str, params: dict, retries: int = MAX_RETRIES) -> list | dict:
+    """带 throttle + retry 的 GET. 公开端点, 无需 auth."""
+    url = f"{BINANCE_FAPI}{path}"
+    backoff = INITIAL_BACKOFF_SEC
+    last_err: Optional[Exception] = None
+    for attempt in range(retries + 1):
+        try:
+            time.sleep(THROTTLE_SEC)
+            r = requests.get(url, params=params, timeout=15)
+            if r.status_code == 429 or r.status_code >= 500:
+                raise requests.HTTPError(f"HTTP {r.status_code}: {r.text[:200]}")
+            r.raise_for_status()
+            return r.json()
+        except Exception as e:
+            last_err = e
+            if attempt < retries:
+                time.sleep(backoff)
+                backoff *= 2
+            else:
+                raise
+    raise RuntimeError(f"unreachable: {last_err}")
+
+
+# ── Symbol 列表 ──────────────────────────────────────────────────────
 
 def list_v3_symbols(paper_history_path: Path) -> list[str]:
     """从 V3 paper_trades_history.json 抽取所有接触过的 symbol."""
@@ -54,93 +118,356 @@ def list_v3_symbols(paper_history_path: Path) -> list[str]:
     return sorted(syms)
 
 
+# ── K 线拉取 ────────────────────────────────────────────────────────
+
+def _klines_chunk(symbol: str, interval: str, start_ms: int, end_ms: int) -> list[list]:
+    """单次拉 K 线 (最多 KLINES_MAX_LIMIT 行)."""
+    params = {
+        "symbol": symbol.upper(),
+        "interval": interval,
+        "startTime": start_ms,
+        "endTime": end_ms,
+        "limit": KLINES_MAX_LIMIT,
+    }
+    data = _http_get(KLINES_ENDPOINT, params)
+    if not isinstance(data, list):
+        raise RuntimeError(f"unexpected response for {symbol} {interval}: {data}")
+    return data
+
+
 def fetch_klines(symbol: str, interval: str, start_ms: int, end_ms: int) -> list[list]:
-    """从 Binance perp /fapi/v1/klines 拉历史 K 线.
-
-    封装 rate limit + 分页 (>1000 行自动多次请求).
-    """
-    # TODO: 调 binance_client.get_klines (V3 已有), 处理分页
-    raise NotImplementedError
-
-
-def save_to_parquet(symbol: str, interval: str, klines: list[list]) -> Path:
-    """存到 V4_KLINES_DIR/{symbol}_{interval}.parquet."""
-    # TODO: 用 pandas + pyarrow 写 parquet
-    raise NotImplementedError
-
-
-def load_klines(symbol: str, interval: str):
-    """读缓存 parquet → DataFrame.
+    """拉指定时间区间的 K 线, 自动分页.
 
     Returns:
-        pandas.DataFrame with columns: open_time, open, high, low, close, volume, ...
-        Indexed by open_time (UTC).
+        list of raw kline rows (12-element lists, 跟 Binance 原始格式).
     """
-    # TODO: pd.read_parquet
-    raise NotImplementedError
+    all_rows: list[list] = []
+    cursor = start_ms
+    while cursor < end_ms:
+        chunk = _klines_chunk(symbol, interval, cursor, end_ms)
+        if not chunk:
+            break
+        all_rows.extend(chunk)
+        last_close = int(chunk[-1][6])
+        next_cursor = last_close + 1
+        if next_cursor <= cursor:
+            break
+        cursor = next_cursor
+        if len(chunk) < KLINES_MAX_LIMIT:
+            break
+    return all_rows
 
+
+def klines_to_df(rows: list[list]) -> pd.DataFrame:
+    """Raw Binance kline rows → DataFrame (typed, indexed by open_time UTC)."""
+    if not rows:
+        return pd.DataFrame()
+    cols = [
+        "open_time", "open", "high", "low", "close", "volume",
+        "close_time", "quote_volume", "trade_count",
+        "taker_buy_base", "taker_buy_quote", "_ignore",
+    ]
+    df = pd.DataFrame(rows, columns=cols)
+    df["open_time"] = pd.to_datetime(df["open_time"], unit="ms", utc=True)
+    df["close_time"] = pd.to_datetime(df["close_time"], unit="ms", utc=True)
+    for c in ("open", "high", "low", "close", "volume", "quote_volume",
+              "taker_buy_base", "taker_buy_quote"):
+        df[c] = df[c].astype(float)
+    df["trade_count"] = df["trade_count"].astype(int)
+    df = df.drop(columns=["_ignore"])
+    df = df.set_index("open_time").sort_index()
+    df = df[~df.index.duplicated(keep="first")]
+    return df
+
+
+def save_klines_parquet(symbol: str, interval: str, df: pd.DataFrame) -> Path:
+    """存 DataFrame 到 V4_KLINES_DIR/{symbol}_{interval}.parquet."""
+    V4_KLINES_DIR.mkdir(parents=True, exist_ok=True)
+    path = V4_KLINES_DIR / f"{symbol}_{interval}.parquet"
+    df.to_parquet(path, compression="snappy")
+    return path
+
+
+def load_klines(symbol: str, interval: str) -> pd.DataFrame:
+    """读 K 线缓存."""
+    path = V4_KLINES_DIR / f"{symbol}_{interval}.parquet"
+    if not path.exists():
+        return pd.DataFrame()
+    return pd.read_parquet(path)
+
+
+# ── Funding rate ─────────────────────────────────────────────────────
 
 def fetch_funding(symbol: str, start_ms: int, end_ms: int) -> list[dict]:
-    """Binance /fapi/v1/fundingRate — 8h 一条记录.
+    """拉 funding rate 历史 (8h 一条). 无 30 日限制."""
+    all_rows: list[dict] = []
+    cursor = start_ms
+    while cursor < end_ms:
+        params = {
+            "symbol": symbol.upper(),
+            "startTime": cursor,
+            "endTime": end_ms,
+            "limit": FUNDING_MAX_LIMIT,
+        }
+        data = _http_get(FUNDING_ENDPOINT, params)
+        if not isinstance(data, list) or not data:
+            break
+        all_rows.extend(data)
+        last_t = int(data[-1]["fundingTime"])
+        if last_t + 1 <= cursor:
+            break
+        cursor = last_t + 1
+        if len(data) < FUNDING_MAX_LIMIT:
+            break
+    return all_rows
 
-    Returns: list of {fundingTime, fundingRate, markPrice}
-    """
-    # TODO
-    raise NotImplementedError
 
+def funding_to_df(rows: list[dict]) -> pd.DataFrame:
+    if not rows:
+        return pd.DataFrame()
+    df = pd.DataFrame(rows)
+    df["funding_time"] = pd.to_datetime(df["fundingTime"], unit="ms", utc=True)
+    df["funding_rate"] = df["fundingRate"].astype(float)
+    if "markPrice" in df.columns:
+        df["mark_price"] = df["markPrice"].astype(float)
+    else:
+        df["mark_price"] = 0.0
+    df = df[["funding_time", "funding_rate", "mark_price"]].set_index("funding_time").sort_index()
+    df = df[~df.index.duplicated(keep="first")]
+    return df
+
+
+def save_funding_parquet(symbol: str, df: pd.DataFrame) -> Path:
+    V4_FUNDING_DIR.mkdir(parents=True, exist_ok=True)
+    path = V4_FUNDING_DIR / f"{symbol}.parquet"
+    df.to_parquet(path, compression="snappy")
+    return path
+
+
+def load_funding(symbol: str) -> pd.DataFrame:
+    path = V4_FUNDING_DIR / f"{symbol}.parquet"
+    if not path.exists():
+        return pd.DataFrame()
+    return pd.read_parquet(path)
+
+
+# ── Open Interest history (30 日内查询限制) ──────────────────────────
 
 def fetch_oi_hist(symbol: str, start_ms: int, end_ms: int, interval: str = OI_INTERVAL) -> list[dict]:
-    """Binance /futures/data/openInterestHist — 4h 一条 (含 sumOpenInterest, sumOpenInterestValue).
+    """拉 OI 历史. Binance 限制 30 日 → 分段拉."""
+    all_rows: list[dict] = []
+    cursor = start_ms
+    while cursor < end_ms:
+        chunk_end = min(cursor + OI_MAX_LOOKBACK_DAYS * 86400 * 1000, end_ms)
+        params = {
+            "symbol": symbol.upper(),
+            "period": interval,
+            "startTime": cursor,
+            "endTime": chunk_end,
+            "limit": OI_MAX_LIMIT,
+        }
+        try:
+            data = _http_get(OI_HIST_ENDPOINT, params)
+        except Exception as e:
+            log.warning(f"OI fetch failed for {symbol} [{cursor}-{chunk_end}]: {e}")
+            cursor = chunk_end + 1
+            continue
+        if not isinstance(data, list):
+            break
+        all_rows.extend(data)
+        cursor = chunk_end + 1
+    return all_rows
 
-    注意: 该端点仅支持 30 日内的数据查询, 跨大区间需分段请求.
-    """
-    # TODO
-    raise NotImplementedError
 
+def oi_to_df(rows: list[dict]) -> pd.DataFrame:
+    if not rows:
+        return pd.DataFrame()
+    df = pd.DataFrame(rows)
+    df["ts"] = pd.to_datetime(df["timestamp"], unit="ms", utc=True)
+    df["sum_oi"] = df["sumOpenInterest"].astype(float)
+    df["sum_oi_value"] = df["sumOpenInterestValue"].astype(float)
+    df = df[["ts", "sum_oi", "sum_oi_value"]].set_index("ts").sort_index()
+    df = df[~df.index.duplicated(keep="first")]
+    return df
+
+
+def save_oi_parquet(symbol: str, df: pd.DataFrame) -> Path:
+    V4_OI_DIR.mkdir(parents=True, exist_ok=True)
+    path = V4_OI_DIR / f"{symbol}_{OI_INTERVAL}.parquet"
+    df.to_parquet(path, compression="snappy")
+    return path
+
+
+def load_oi(symbol: str) -> pd.DataFrame:
+    path = V4_OI_DIR / f"{symbol}_{OI_INTERVAL}.parquet"
+    if not path.exists():
+        return pd.DataFrame()
+    return pd.read_parquet(path)
+
+
+# ── Taker buy ratio (30 日内查询限制) ─────────────────────────────────
 
 def fetch_taker_ratio(symbol: str, start_ms: int, end_ms: int, interval: str = TAKER_INTERVAL) -> list[dict]:
-    """Binance /futures/data/takerlongshortRatio — 4h 一条 (含 buySellRatio, buyVol, sellVol)."""
-    # TODO
-    raise NotImplementedError
+    """拉 taker buy/sell ratio. 30 日限制 → 分段."""
+    all_rows: list[dict] = []
+    cursor = start_ms
+    while cursor < end_ms:
+        chunk_end = min(cursor + TAKER_MAX_LOOKBACK_DAYS * 86400 * 1000, end_ms)
+        params = {
+            "symbol": symbol.upper(),
+            "period": interval,
+            "startTime": cursor,
+            "endTime": chunk_end,
+            "limit": TAKER_MAX_LIMIT,
+        }
+        try:
+            data = _http_get(TAKER_RATIO_ENDPOINT, params)
+        except Exception as e:
+            log.warning(f"taker fetch failed for {symbol} [{cursor}-{chunk_end}]: {e}")
+            cursor = chunk_end + 1
+            continue
+        if not isinstance(data, list):
+            break
+        all_rows.extend(data)
+        cursor = chunk_end + 1
+    return all_rows
 
 
-def load_funding(symbol: str):
-    """读 funding 缓存 parquet → DataFrame."""
-    raise NotImplementedError
+def taker_to_df(rows: list[dict]) -> pd.DataFrame:
+    if not rows:
+        return pd.DataFrame()
+    df = pd.DataFrame(rows)
+    df["ts"] = pd.to_datetime(df["timestamp"], unit="ms", utc=True)
+    df["buy_sell_ratio"] = df["buySellRatio"].astype(float)
+    df["buy_vol"] = df["buyVol"].astype(float)
+    df["sell_vol"] = df["sellVol"].astype(float)
+    # 派生 taker buy ratio = buy / (buy+sell), 用 0-1 区间 (跟 V4_SPEC §2.4 阈值 0.55/0.45 对齐)
+    total = (df["buy_vol"] + df["sell_vol"]).replace(0, float("nan"))
+    df["taker_buy_ratio"] = df["buy_vol"] / total
+    df = df[["ts", "buy_sell_ratio", "buy_vol", "sell_vol", "taker_buy_ratio"]].set_index("ts").sort_index()
+    df = df[~df.index.duplicated(keep="first")]
+    return df
 
 
-def load_oi(symbol: str):
-    """读 OI 缓存 parquet → DataFrame."""
-    raise NotImplementedError
+def save_taker_parquet(symbol: str, df: pd.DataFrame) -> Path:
+    V4_TAKER_DIR.mkdir(parents=True, exist_ok=True)
+    path = V4_TAKER_DIR / f"{symbol}_{TAKER_INTERVAL}.parquet"
+    df.to_parquet(path, compression="snappy")
+    return path
 
 
-def load_taker(symbol: str):
-    """读 taker ratio 缓存 parquet → DataFrame."""
-    raise NotImplementedError
+def load_taker(symbol: str) -> pd.DataFrame:
+    path = V4_TAKER_DIR / f"{symbol}_{TAKER_INTERVAL}.parquet"
+    if not path.exists():
+        return pd.DataFrame()
+    return pd.read_parquet(path)
+
+
+# ── 主入口 ──────────────────────────────────────────────────────────
+
+def download_one_symbol(symbol: str, start_ms: int, end_ms: int,
+                        timeframes: tuple = TIMEFRAMES,
+                        include_funding: bool = True,
+                        include_oi: bool = True,
+                        include_taker: bool = True) -> dict:
+    """下载单 symbol 全部数据.
+
+    Returns:
+        {"ok": [...], "skipped": [...], "failed": [(kind, err), ...], "rows": {...}}
+    """
+    result: dict = {"ok": [], "skipped": [], "failed": [], "rows": {}}
+
+    for tf in timeframes:
+        try:
+            rows = fetch_klines(symbol, tf, start_ms, end_ms)
+            df = klines_to_df(rows)
+            if df.empty:
+                result["skipped"].append(f"klines_{tf}")
+                continue
+            save_klines_parquet(symbol, tf, df)
+            result["ok"].append(f"klines_{tf}")
+            result["rows"][f"klines_{tf}"] = len(df)
+        except Exception as e:
+            result["failed"].append((f"klines_{tf}", str(e)))
+
+    if include_funding:
+        try:
+            rows = fetch_funding(symbol, start_ms, end_ms)
+            df = funding_to_df(rows)
+            if not df.empty:
+                save_funding_parquet(symbol, df)
+                result["ok"].append("funding")
+                result["rows"]["funding"] = len(df)
+            else:
+                result["skipped"].append("funding")
+        except Exception as e:
+            result["failed"].append(("funding", str(e)))
+
+    if include_oi:
+        try:
+            rows = fetch_oi_hist(symbol, start_ms, end_ms)
+            df = oi_to_df(rows)
+            if not df.empty:
+                save_oi_parquet(symbol, df)
+                result["ok"].append("oi")
+                result["rows"]["oi"] = len(df)
+            else:
+                result["skipped"].append("oi")
+        except Exception as e:
+            result["failed"].append(("oi", str(e)))
+
+    if include_taker:
+        try:
+            rows = fetch_taker_ratio(symbol, start_ms, end_ms)
+            df = taker_to_df(rows)
+            if not df.empty:
+                save_taker_parquet(symbol, df)
+                result["ok"].append("taker")
+                result["rows"]["taker"] = len(df)
+            else:
+                result["skipped"].append("taker")
+        except Exception as e:
+            result["failed"].append(("taker", str(e)))
+
+    return result
 
 
 def download_all(symbols: Iterable[str], months_back: int = 6) -> dict:
-    """主入口: 下载所有 symbol × 所有 timeframe + funding + OI + taker.
+    """主入口: 下载所有 symbol × 所有数据."""
+    end = datetime.now(tz=timezone.utc)
+    start = end - timedelta(days=months_back * 30)
+    end_ms, start_ms = _ms(end), _ms(start)
 
-    Returns:
-        统计 dict: {
-            "total_klines": N, "ok_klines": M, "skipped_klines": K,
-            "ok_funding": ..., "ok_oi": ..., "ok_taker": ...,
-            "failed": [(sym, kind, err), ...]
-        }
-    """
-    # TODO: orchestrate 4 个 timeframe K 线 + funding + OI + taker, 含 throttle / retry
-    raise NotImplementedError
+    stats: dict = {"start": start.isoformat(), "end": end.isoformat(),
+                   "symbols": 0, "ok": 0, "partial": 0, "failed_all": [], "by_symbol": {}}
+    symbols = list(symbols)
+    stats["symbols"] = len(symbols)
+
+    for i, sym in enumerate(symbols, 1):
+        r = download_one_symbol(sym, start_ms, end_ms)
+        stats["by_symbol"][sym] = r
+        if not r["failed"]:
+            stats["ok"] += 1
+        elif r["ok"]:
+            stats["partial"] += 1
+        else:
+            stats["failed_all"].append(sym)
+        if i % 10 == 0:
+            log.info(f"progress: {i}/{len(symbols)} ({i/len(symbols)*100:.0f}%)")
+
+    return stats
 
 
 if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser(description="V4 historical kline downloader")
+    parser = argparse.ArgumentParser(description="V4 historical data downloader")
     parser.add_argument("--symbols", nargs="*", help="symbol list, 默认从 V3 paper 抽")
-    parser.add_argument("--months", type=int, default=6, help="回看月数 (默认 6)")
+    parser.add_argument("--months", type=int, default=6)
     parser.add_argument("--paper-history", type=Path,
                         default=Path.home() / "cresus-bot" / "paper_trades_history.json")
     args = parser.parse_args()
+
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
     if args.symbols:
         syms = args.symbols
@@ -148,4 +475,4 @@ if __name__ == "__main__":
         syms = list_v3_symbols(args.paper_history)
     print(f"下载 {len(syms)} symbol × {len(TIMEFRAMES)} timeframe × {args.months} 月...")
     stats = download_all(syms, months_back=args.months)
-    print(json.dumps(stats, indent=2))
+    print(json.dumps({k: v for k, v in stats.items() if k != "by_symbol"}, indent=2, default=str))
