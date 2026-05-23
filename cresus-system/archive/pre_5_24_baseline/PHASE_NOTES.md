@@ -282,78 +282,6 @@ Audit 跑实际数据后翻转为 "-$10". 教训:
 
 ---
 
-## 5/24 第三次审计: 字段名 bug 让所有 paper vs live 对比失效
-
-讨论"整套切换 $2000 + 1x + 长 hold + 宽 SL" 前的强制 audit, 揭出**更严重的基线 bug**.
-
-### 致命字段名 bug
-- Live 字段: `realized_pnl_usdt`
-- Paper 字段: `realized_usdt_pnl` (顺序颠倒!)
-- 此前所有用 `realized_pnl_usdt` 读 paper 的脚本都拿到 None → 折算 $0
-- 影响范围:
-  - Phase 4.I 限价单 v1/v2 模拟 (paper 端基线错)
-  - Phase 4.K down 阈值审计 (down+LONG paper PnL 错)
-  - 5/23 "拓宽 SL 净 -$9.6 / -$33.78" 估算 (premature 漏赚错)
-  - 历次"paper vs live"复盘
-
-### 真实数据 (修正后)
-- Paper 981 closed: 净 **+$1012.57**, 胜率 38.9%, 人均 **+$1.03/笔** ← **paper 有真 edge**
-- Live 406 closed: 累计 ~-$9, 链路损耗 ~$1000+
-- "假止损 88 笔"漏赚: $450 (人均 $5.12, 不是之前算的 $0.16)
-- Paper hit_sl 565 笔: 167 笔 (29.6%) 曾 MFE>0.5% (可救), 398 笔真趋势 (救不了)
-- Paper 持仓: avg 36.9min, median 17.3min, max 11.8hr — **30min 反转语义**
-
-### 长 hold + 宽 SL + 宽 TP 整套切换审计
-理论上限模拟 (paper 数据, 假设给 5% SL):
-  - 救 167 笔 MFE>0.5% × $5 ≈ +$835
-  - 其它 398 笔真趋势深 4% × $20 = -$318
-  - paper 端净 +$517, 真实 live 打折 ≈ +$250
-
-但**信号语义不支持**: paper engine 用 30s/5min K 线找短周期反转, 不是 day-scale 趋势.
-把 30min 反转信号当 7 天趋势持 = **信号语义错位**, 这个上限拿不到.
-
-### $2000 + 1x 杠杆审计
-**"1x 留长持空间" 不成立**:
-- 真正空间 = SL 距离 × notional, 跟杠杆无关
-- 有 SL 前提下, 1x 跟 3x 的"空间"一样 (爆仓远在 SL 外)
-- 1x 真好处: 没 funding fee 累积 + 没 leverage decay + 心理负担小
-
-**风险数学**:
-- 当前: $60 notional × 1% SL = **$0.60 风险/笔**
-- 切后: $400 notional × 5% SL = **$20 风险/笔**, 放大 **33x**
-- 4 笔并发 = $80 同时 in-risk
-- Edge 未在 live 验证前扩 33x = 高度危险
-
-### 决策: 不立即整套切换
-理由:
-1. **多变量同时改无法归因** (capital × 20, leverage 3→1, SL 1%→5%, hold 30min→days)
-2. **真正瓶颈是链路损耗** (滑点 / sl_breach_client 误触), 不是 SL 宽度
-3. **新发现的字段 bug 让此前 audit 信心降低**, 应先打牢基线再扩容
-4. **Paper engine 信号语义不支持 day-scale**, 需先改 paper 端再说
-
-### 渐进替代路径
-- Step 1 (本周): 修字段 bug, 全局重审 4.A/B/C 真实效果
-- Step 2 (下周): paper 端模拟 5% SL + 4h hold, 看 paper PnL
-- Step 3 (2 周后): live 小幅试 2% SL (非 5%), $100 不变
-- Step 4 (1 月后, 有正向数据): 才考虑扩容到 $500 或 $2000
-
-### 跨 phase 教训 #7
-**字段名细节差 1 个字符 (`_pnl_usdt` vs `_usdt_pnl`) 让基线对比静默归零**.
-教训:
-  - 跨数据源对比前, **必须先打印 sample record** 看字段名一致
-  - "字段为 None" 不报错, 但对比结果完全错 — 比 crash 更危险
-  - 任何 `safe(x) = float(x) if x is not None else 0.0` helper 都隐藏字段缺失
-  - 应改成 `safe(x, name) = ... else raise(f"missing {name}")` 让错误暴露
-
-### 归档
-5/24 audit 完成后, 把 baseline 数据快照到 `cresus-system/archive/pre_5_24_baseline/`:
-  - live_trades_history.json, paper_trades_history.json (字段 bug 修正前最后一次)
-  - paper_shadow_history.json, pnl.json, regime_history.jsonl, analyses.jsonl
-  - PHASE_NOTES.md (此版)
-  - README.md (归档元数据 + 推荐路径)
-
----
-
 ## 关键反思 (跨 phase)
 
 1. **数据驱动 ≠ 等 100% 统计显著才动** — 当多次小样本 + 强先验都指向同一结论时, 防御性介入比"等 p<0.05"更合理
@@ -362,4 +290,3 @@ Audit 跑实际数据后翻转为 "-$10". 教训:
 4. **简单数据 check > 复杂模拟** — 模拟容易引入假设错误, 直接看实战数据更可信
 5. **模式补全的诱惑** — 不让"看上去合理"代替"已验证" (5/24 竞品分析事件)
 6. **Back-of-envelope 估算容易错错错** — 任何 "净效应 = saved - cost" 估算, 必须先 audit 输入参数 (5/24 SL 拓宽事件)
-7. **字段名细节 bug 是最隐蔽的灾难** — `_pnl_usdt` vs `_usdt_pnl` 让对比静默归零 (5/24 重审事件)
