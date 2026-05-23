@@ -1,5 +1,12 @@
 """Live Trader — Mirror paper trader's decisions on real Binance Futures.
 
+System Version: V3 (固化于 2026-05-24, 归档 cresus-system/archive/v3_baseline/)
+  - $100 cap, 3x leverage, $20 margin/笔, 4 concurrent max
+  - SL ~1%, TP 0.5/1.5/3%, hold ~30min
+  - Phase 4.A → 4.K 全部累积
+V4 (即将切换): paper + live 同步重写, day-scale hold + 5% SL + 1x leverage.
+  详见 cresus-system/archive/v3_baseline/README.md.
+
 Phase 3.1: DRY-RUN 骨架. 读 paper trader state, 输出 "would-mirror" 日志.
 不真下单. 为 Phase 3.2+ 接入真交易铺路.
 
@@ -56,6 +63,9 @@ from binance_client import BinanceClient, BinanceError, load_credentials
 PAPER_HISTORY = Path.home() / "cresus-bot" / "paper_trades_history.json"
 LIVE_STATE = Path.home() / "cresus-bot" / ".live_trades.json"
 LIVE_HISTORY = Path.home() / "cresus-bot" / "live_trades_history.json"
+
+# 系统版本代号 (V3 固化于 2026-05-24; V4 切换后 bump 至 "V4")
+SYSTEM_VERSION = "V3"
 
 # Live 交易配置 (小心调整)
 LIVE_NOTIONAL_USDT = 20.0              # 每笔 $20 (paper 是 $400, 等比缩放 1/20)
@@ -746,6 +756,7 @@ def publish_live_history(
     )
     payload = {
         "version": STATE_VERSION,
+        "system_version": SYSTEM_VERSION,   # V3 / V4 系统代号 (清晰分辨)
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "session_started_at": live_state.get("session_started_at"),
         "stats": stats,

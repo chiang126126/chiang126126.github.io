@@ -5,6 +5,20 @@
 
 ---
 
+## 系统版本代号 (清晰分辨)
+
+| 代号 | 时段 | 核心特征 | 状态 |
+|---|---|---|---|
+| **V3** | 启动 → 2026-05-24 | $100, 3x lev, $20/笔, SL ~1%, hold ~30min, Phase 4.A→4.K 累积 | **已固化归档** (`cresus-system/archive/v3_baseline/`) |
+| **V4** | 2026-05-24 之后 | paper + live 同步重写: day-scale hold, 5% SL, 1x lev, 阶梯扩容至 $2000 | 设计中, 未上线 |
+
+V3 实战数据 (5/24 归档): Paper 981 笔 +$1012 (PF>1, edge 真实), Live 406 笔 ~-$9 (链路损耗 ~$1000+).
+
+代码标识: `live_trader.py` 顶部 `SYSTEM_VERSION = "V3"` 常量, 写入 `live_trades_history.json.system_version` 字段.
+V4 上线时 bump 到 `"V4"`, dashboard 可按字段分流显示.
+
+---
+
 ## Phase 4.I 限价单方案 (放弃) — 含 v1/v2 模拟修正
 
 ### 提议时间
