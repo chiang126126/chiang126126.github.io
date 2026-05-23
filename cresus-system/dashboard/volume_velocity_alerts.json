@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-23T01:49:47.914436+00:00",
+  "updated_at": "2026-05-23T01:51:59.700711+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 30,
+  "alerts_count": 31,
   "alerts": [
+    {
+      "symbol": "CUSDT",
+      "base": "C",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.09072,
+      "price_change_pct": -0.809,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 53371.0,
+      "volume_baseline_usdt": 2958.0,
+      "volume_ratio": 18.05,
+      "detected_at": "2026-05-23T01:51:45.816836+00:00",
+      "intensity": 2,
+      "change_5m_pct": -0.678,
+      "change_15m_pct": -0.318,
+      "change_1h_pct": -1.131,
+      "change_4h_pct": -5.569,
+      "taker_buy_ratio_1m": 0.308,
+      "taker_buy_ratio_5m": 0.357,
+      "oi_delta_5m_pct": -0.048,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.303,
+      "range_4h_pct": 6.98,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.0911325,
+      "suggested_tp1": 0.09010125,
+      "suggested_tp2": 0.0894825,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "IRYSUSDT",
       "base": "IRYS",
