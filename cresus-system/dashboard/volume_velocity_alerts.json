@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-23T10:29:19.166114+00:00",
+  "updated_at": "2026-05-23T10:31:31.067601+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 24,
+  "alerts_count": 25,
   "alerts": [
+    {
+      "symbol": "PROMUSDT",
+      "base": "PROM",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 1.104,
+      "price_change_pct": -0.541,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 35943.0,
+      "volume_baseline_usdt": 5243.0,
+      "volume_ratio": 6.86,
+      "detected_at": "2026-05-23T10:31:28.124992+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.271,
+      "change_15m_pct": -0.45,
+      "change_1h_pct": -1.162,
+      "change_4h_pct": -6.588,
+      "taker_buy_ratio_1m": 0.293,
+      "taker_buy_ratio_5m": 0.287,
+      "oi_delta_5m_pct": -0.127,
+      "funding_rate_pct": -0.0055,
+      "atr_pct": 0.272,
+      "range_4h_pct": 7.79,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 1.1085,
+      "suggested_tp1": 1.09725,
+      "suggested_tp2": 1.0905,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "HUMAUSDT",
       "base": "HUMA",
