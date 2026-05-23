@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-23T02:20:36.713231+00:00",
+  "generated_at": "2026-05-23T02:22:49.206881+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 398,
-    "open": 0,
+    "total_trades": 399,
+    "open": 1,
     "closed": 398,
     "wins": 136,
     "losses": 259,
@@ -14,30 +14,90 @@
     "avg_pnl_usdt": -0.0076,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 7.293,
+    "fees_paid_usdt": 7.301,
     "fees_realized_usdt": 7.293,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.008,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 89.67,
+    "deployed_usdt": 20.01,
+    "free_capital_usdt": 69.66,
     "max_concurrent_slots": 4,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -0.5135,
-    "deployed_usdt": 0
+    "deployed_usdt": 20.01
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "GTCUSDT"
+    ],
+    "exchange_symbols": [
+      "GTCUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "GTCUSDT|LONG|2026-05-23T02:21:08.511674+00:00",
+      "trade_id": "L1779502868_GTCUSDT_L",
+      "symbol": "GTCUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.11606,
+      "avg_fill_price": 0.116,
+      "slippage_bps": -5.17,
+      "qty": 172.5,
+      "notional_usdt": 20.01,
+      "leverage": 3,
+      "risk_usdt": 0.1785,
+      "risk_pct": 0.892,
+      "mirror_latency_sec": 32.5,
+      "sl_price": 0.11490500000000001,
+      "sl_paper_current": 0.114965,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -6e-05,
+      "sl_compensation_mode": "abcd",
+      "wick_filter_enabled": false,
+      "wick_filter_min_breaches": null,
+      "wick_filter_mode": "abcd",
+      "sl_breach_count": 0,
+      "regime_gate_enabled": false,
+      "regime_gate_mode": "abcd",
+      "ab_group": "B",
+      "min_conviction_threshold": 6,
+      "tp1_price": 0.1177025,
+      "tp2_price": 0.119345,
+      "phase": "A",
+      "entry_order_id": 108476183,
+      "entry_client_id": "cresus_L1779502868_GTCUSDT_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 8,
+      "alert_type": "sustained",
+      "atr_pct": 0.629,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.008004,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-23T02:21:43.974152+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 75469.8,
+      "btc_change_24h_at_open": -2.753,
+      "btc_pct_vs_ma25_at_open": -1.634,
+      "phase_a_mfe_price": 0.11606,
+      "current_price": 0.115,
+      "unrealized_pnl_usdt": -0.1725,
+      "unrealized_pnl_pct": -0.862,
+      "last_price_check_at": "2026-05-23T02:22:46.951351+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "MTLUSDT|LONG|2026-05-23T01:58:36.620084+00:00",
@@ -22898,16 +22958,16 @@
       "conviction_score": 5,
       "signal_at": "2026-05-23T02:10:01.548100+00:00",
       "reason": "conviction_score 5 < threshold 6 (Phase 4.H filter)",
-      "last_checked_at": "2026-05-23T02:20:34.605262+00:00"
+      "last_checked_at": "2026-05-23T02:22:46.951351+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 75469.8,
-    "btc_ma25_1h": 76723.52,
-    "pct_vs_ma25": -1.634,
-    "change_24h_pct": -2.753,
-    "computed_at": "2026-05-23T02:20:36.671161+00:00"
+    "btc_price": 75439.0,
+    "btc_ma25_1h": 76722.29,
+    "pct_vs_ma25": -1.673,
+    "change_24h_pct": -2.793,
+    "computed_at": "2026-05-23T02:22:48.882140+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
