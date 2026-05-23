@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-23T18:26:47.101219+00:00",
+  "updated_at": "2026-05-23T18:29:03.828825+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 21,
+  "alerts_count": 22,
   "alerts": [
+    {
+      "symbol": "HUSDT",
+      "base": "H",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.20964,
+      "price_change_pct": 0.556,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 35078.0,
+      "volume_baseline_usdt": 4745.0,
+      "volume_ratio": 7.39,
+      "detected_at": "2026-05-23T18:28:30.063516+00:00",
+      "intensity": 1,
+      "change_5m_pct": 1.234,
+      "change_15m_pct": 1.857,
+      "change_1h_pct": 1.912,
+      "change_4h_pct": 0.048,
+      "taker_buy_ratio_1m": 0.715,
+      "taker_buy_ratio_5m": 0.75,
+      "oi_delta_5m_pct": -0.012,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.258,
+      "range_4h_pct": 4.07,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.20909929,
+      "suggested_tp1": 0.21045107,
+      "suggested_tp2": 0.21126214,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "TAGUSDT",
       "base": "TAG",
