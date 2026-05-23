@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-23T19:08:52.460934+00:00",
+  "updated_at": "2026-05-23T19:11:11.005976+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 29,
+  "alerts_count": 30,
   "alerts": [
+    {
+      "symbol": "FHEUSDT",
+      "base": "FHE",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.03049,
+      "price_change_pct": -0.846,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 19334.0,
+      "volume_baseline_usdt": 2625.0,
+      "volume_ratio": 7.37,
+      "detected_at": "2026-05-23T19:10:56.455632+00:00",
+      "intensity": 2,
+      "change_5m_pct": -0.098,
+      "change_15m_pct": -0.196,
+      "change_1h_pct": 0.925,
+      "change_4h_pct": 2.448,
+      "taker_buy_ratio_1m": 0.127,
+      "taker_buy_ratio_5m": 0.268,
+      "oi_delta_5m_pct": -0.057,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.337,
+      "range_4h_pct": 5.41,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.03064429,
+      "suggested_tp1": 0.03025857,
+      "suggested_tp2": 0.03002714,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "BLUAIUSDT",
       "base": "BLUAI",
