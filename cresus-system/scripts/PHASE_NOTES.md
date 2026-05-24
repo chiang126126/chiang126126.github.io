@@ -712,3 +712,38 @@ ThrottleInterval=10 防止 crash 循环刷屏.
 - 历史 stats 新旧 mix, dashboard 报表需按 `notional_usdt` 切片.
 
 ---
+
+### Phase 4.R6.1: Live leverage 3x → 1x — 跟 paper 完全一致 (2026-05-24)
+
+**触发**: 用户问"paper 跟 live 是不是都是 3 倍合约". 查 paper 数据
+(FOGOUSDT closed[0]: notional 400 × pct 0.612% = realized $2.45) 证实
+paper engine **无 leverage 概念, PnL 直接按 notional × pct 算 = 等价 1x**.
+Live 之前 3x 是历史保守设定 ($100 起始时不占用过多 margin), 但是:
+
+1. **PnL 公式跟 leverage 无关**: pnl = notional × pct, 不管几倍杠杆都是同一个数.
+2. **fees 跟 leverage 无关**: Binance 按 notional 收 fees.
+3. **强平距离**: 1x 100% (基本不可能) > 3x 33% > 20x 5% — 1x 反而最安全.
+4. **Capital 占用**: 1x 占 100% = $400/笔, 3x 占 33% = $133/笔.
+
+**改动 (单行)**:
+```python
+LIVE_LEVERAGE = 3   →   LIVE_LEVERAGE = 1
+```
+
+**效果**:
+- Live 跟 paper **完全一致** (notional 400, max_concurrent 4, leverage 1x).
+- 4 槽部署 = 4×$400 = $1600 capital 占用 (跟旧 3x 的 $533 margin 相比, capital
+  占用从 27% 涨到 80%, 但 PnL / fees 没变化).
+- testnet 上 $2000 capital 足够 $1600 部署 + $400 buffer.
+- 单笔/累计风险跟 3x 完全一样 (因为 SL 触发亏损跟 leverage 无关).
+
+**没改的**: notional / max_concurrent / risk gates 全部保持 R6 设定.
+
+**部署**: launchd 30s 自动重启 live_trader 读新 LIVE_LEVERAGE=1.
+首次 mirror 时 `client.set_leverage(sym, 1)` 把 Binance 上该 symbol 杠杆设 1x.
+
+**回滚**: `LIVE_LEVERAGE = 3` (但不推荐 — 1x 反而更安全).
+
+**测试**: 296 passed (leverage 不影响测试逻辑).
+
+---

@@ -74,9 +74,11 @@ SYSTEM_VERSION = "V3"
 # 风控阈值同步 20x 放大保持等效百分比 (daily DD 5%, max deploy 80%).
 LIVE_NOTIONAL_USDT = 400.0             # 每笔 $400 (跟 paper 一致, 不再缩放)
 LIVE_MAX_CONCURRENT = 4                # 实盘并发上限 ($2000 起始: 4×$400=$1600 部署 + $400 保留, 20% buffer)
-LIVE_LEVERAGE = 3                      # 杠杆 (paper 是 1x; live 3x 是历史保守设定);
-                                       # 每次 mirror_open 前强制 set_leverage,
-                                       # 防止 Binance 默认 20x 漂移
+LIVE_LEVERAGE = 1                      # 杠杆 1x (Phase 4.R6+ 跟 paper 一致).
+                                       # PnL = notional × pct, 跟 leverage 无关 →
+                                       # 1x vs 3x 不改 PnL/fees, 只改 margin 占用.
+                                       # 1x 强平距离 100% (基本不可能), 比 3x 33% 更安全.
+                                       # 每次 mirror_open 前强制 set_leverage(1) 防漂移.
 LIVE_SYMBOL_WHITELIST = [              # Phase 6 第 1 周限主流币
     "BTCUSDT", "ETHUSDT", "SOLUSDT",
 ]
