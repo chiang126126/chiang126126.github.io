@@ -377,3 +377,128 @@ Audit 跑实际数据后翻转为 "-$10". 教训:
 5. **模式补全的诱惑** — 不让"看上去合理"代替"已验证" (5/24 竞品分析事件)
 6. **Back-of-envelope 估算容易错错错** — 任何 "净效应 = saved - cost" 估算, 必须先 audit 输入参数 (5/24 SL 拓宽事件)
 7. **字段名细节 bug 是最隐蔽的灾难** — `_pnl_usdt` vs `_usdt_pnl` 让对比静默归零 (5/24 重审事件)
+8. **不能从竞品结果倒推策略 — 入场逻辑是 black box** — V4 Step A 5 天工程 / PF 0.24 灾难 (5/24 V4 回测事件)
+
+---
+
+## V4 Step A 失败 retrospective (2026-05-24)
+
+### Timeline (5 天工程)
+
+| Day | 产出 | 测试数 |
+|---|---|---|
+| 1 | V4_SPEC.md + 8 文件骨架 + data_fetcher 入口 | 4 |
+| 2 | data_fetcher 完整 + indicators 库 | 47 |
+| 3 | regime + 3 sub-strategy signals | 35 |
+| 4 | conviction (9 features) + paper_engine (phase A/B/C) | 55 |
+| 5 | backtest 引擎 + 跑 251 symbol × 6 月真数据 | 10 + 1 skip |
+| **合计** | ~2500 行 src + 152 测试 | 152 通过 |
+
+### V4 设计核心 (回顾)
+
+- K 线: 1h + 4h + 1d + 15min (vs V3 30s/1m/5m)
+- 持仓: 1-7 天 (vs V3 30min avg)
+- SL: 2 × ATR(4h) ≈ 5% (vs V3 1%)
+- 信号: regime-adaptive (up→long breakout / down→short breakout / chop→mean rev)
+- TP: entry ± 2/4/6 × ATR, 分批 1/3 各 TP
+- Conviction: 9 features × 1 分 + base 3, cap 10
+- Notional: $400/笔 × 5 并发 = $2000
+
+### 真实 backtest 结果 (251 symbol × 6 月)
+
+```
+n_trades:     866
+win_rate:     15.9%    (vs 门槛 35%, ❌ 远低)
+total_pnl:    -$18,408 USDT
+avg_pnl:      -$21.26/笔
+pf:           0.24     (vs 门槛 1.3, ❌ 灾难)
+max_dd:       $18,536  (vs 门槛 30% 资金, ❌ 全部本金)
+wins:         138
+losses:       728
+```
+
+按 V4_SPEC §6 通过门槛 **3 项全不达标**.
+
+### 按 sub-strategy 拆解
+
+| Strategy | n | Win% | Total PnL | 解读 |
+|---|---|---|---|---|
+| breakout_long (up regime) | 592 | 13% | **-$13,206** | 主力 loser, Donchian 假突破多 |
+| breakout_short (down regime) | 255 | 20% | -$5,040 | 也不工作 |
+| mean_rev_long (chop) | 2 | 0% | -$93 | 样本太少 |
+| **mean_rev_short (chop)** | 17 | **53%** | -$68 | **小样本表象**, 仅因 fees 亏 |
+
+mean_rev_short 17 笔 53% 看似"亮点", 但 17 样本下 53% 是 0.5 σ 噪声 — **不是统计意义上的 edge**.
+
+### 4 个失败因素 (优先级)
+
+1. **核心信号 = 我们自己猜的 Donchian breakout** (不是学竞品的)
+   - 跨 phase 教训 #8: 竞品截图只看到结果, 没看到入场逻辑
+   - 我硬选 Donchian 20d 突破 — 5 天工程后 backtest 证伪
+2. **没实施学习点 #1 (funding TTL)** — V4 conviction 用了 funding 加分, 但**没用 funding 动态延长持仓**
+3. **没实施学习点 #4 (conviction sizing)** — V4 全部固定 $400, conviction 只是 hard filter
+4. **Chop regime 数据太少** — 6 月样本中 chop 只 19/866, mean_rev 没机会展示 edge
+
+### V4 跟原 4 学习点对照
+
+| 学习点 (5/24 早) | V4 实施? |
+|---|---|
+| #1 资金费纳入收益模型 | ❌ 部分 (conviction 加分, 但没 TTL 调整) |
+| #2 长持 + 分批止盈 | ✓ |
+| #3 方向跟随 regime | ✓ |
+| #4 conviction-sized 仓位 | ❌ |
+
+实施 2/4. 但**核心信号 (Donchian breakout) 不在 4 学习点之内, 是我加的猜测** — 这才是失败主因.
+
+### 决策: V4 落档 (不进 Step B, 不投 v2)
+
+按 V4_SPEC §7 ("Step A 失败 → 不进 Step B, 不为'启动'强行进 live"), 全部停下.
+
+**不投 V4 v2** 理由 (跟用户 3 目标对照):
+
+| 用户目标 | V3 现状 | V3 修复 | V4 v2 (假设) |
+|---|---|---|---|
+| 稳当开平 | 中 (24% 假止损) | ✓ 强 (直接修) | 未知 |
+| 持续盈利 | 边缘 (paper edge 被链路吃) | ✓ +$50-150/月 (释放 paper edge) | 未知 (历史数据 -$18,408) |
+| 控亏 | ✓ ($0.60/笔) | ✓ ($0.60/笔) | ✗ ($20/笔, 33x 放大) |
+
+V3 修复路径 **3 目标全 dominant**. V4 v2 全部"未知 or 反目标".
+
+### V4 保留资产 (不浪费)
+
+| 资产 | 处理 |
+|---|---|
+| V4 代码 (~2500 行 + 152 测试) | 留 `cresus-system/scripts/v4/`, git history 完整 |
+| V4 baseline 数据 (360MB, 251 symbol × 6 月) | 留 `cresus-system/v4_data/baseline_2026_05_24/`, 可重用 |
+| V4 失败教训 | 本 retrospective + 跨 phase 教训 #8 |
+| V4 backtest 结果 CSV | 866 笔细节留 `~/cresus-bot/v4_backtest_result.csv` (新 Mac), 不入 git |
+
+### V4 长期 reserve 条件
+
+未来重启 V4 的前提:
+1. 有新 alpha hypothesis (不是 reverse engineer 竞品)
+2. V3 优化到达天花板 (链路损耗修干净, paper engine 也已迭代)
+3. 找到 day-scale 自己验证过有 edge 的信号源 (paper engine 产生 + 历史回测验证)
+4. 有 out-of-sample 测试集 (不能再用 5/24 之前的 baseline)
+
+### 跨 phase 教训 #8 全文
+
+**不能从竞品结果倒推策略 — 入场逻辑是 black box**
+
+V4 失败的根本: 我看到竞品 V7 Live 截图的"5% SL / 3-7 天持仓 / 高胜率", 推测他们用 Donchian 突破 + ATR-based SL. 这是 **pattern completion** (跨 phase 教训 #5 的姐妹错误).
+
+教训:
+- 竞品看不到的: 入场触发逻辑 / conviction 评分细节 / 仓位调整规则
+- 竞品看得到的: 持仓时间 / SL/TP 距离比例 / 方向 / regime 偏向
+- **可学习的是"框架"** (持仓哲学), **不可学的是"信号"** (技术指标 + 阈值)
+- 信号必须**自己用 paper engine 测出 edge**, 不能从竞品结果反推
+
+V4 把"自己猜的信号" 当"学习到的信号", 投入 5 天工程, backtest 证伪. 不是工程 bug, 是**假设 bug**.
+
+---
+
+## 转向: V3 链路损耗修复 (2026-05-24 起)
+
+V4 落档后, 全力做 V3 修复. 目标 +$50-150/月 (释放 paper engine 已验证的 +$1012 edge).
+
+具体 R1-R4 路线待 V3 现状重新 audit 后定 (新 Mac 跑了 ~6h, 数据 fresh).
