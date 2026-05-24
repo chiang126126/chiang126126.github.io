@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-24T23:35:33.484422+00:00",
+  "updated_at": "2026-05-24T23:37:38.652317+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 9,
+  "alerts_count": 10,
   "alerts": [
+    {
+      "symbol": "BICOUSDT",
+      "base": "BICO",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.02784,
+      "price_change_pct": 2.053,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 250819.0,
+      "volume_baseline_usdt": 730.0,
+      "volume_ratio": 343.72,
+      "detected_at": "2026-05-24T23:37:13.869588+00:00",
+      "intensity": 3,
+      "change_5m_pct": 2.2,
+      "change_15m_pct": 2.614,
+      "change_1h_pct": 2.614,
+      "change_4h_pct": 0.432,
+      "taker_buy_ratio_1m": 0.642,
+      "taker_buy_ratio_5m": 0.644,
+      "oi_delta_5m_pct": -0.002,
+      "funding_rate_pct": 0.0059,
+      "atr_pct": 0.298,
+      "range_4h_pct": 4.63,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.02775714,
+      "suggested_tp1": 0.02796429,
+      "suggested_tp2": 0.02808857,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "AIGENSYNUSDT",
       "base": "AIGENSYN",
