@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-24T04:18:46.333584+00:00",
+  "updated_at": "2026-05-24T04:21:00.786359+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 17,
+  "alerts_count": 18,
   "alerts": [
+    {
+      "symbol": "DRAMUSDT",
+      "base": "DRAM",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 54.68,
+      "price_change_pct": -0.546,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 40098.0,
+      "volume_baseline_usdt": 4397.0,
+      "volume_ratio": 9.12,
+      "detected_at": "2026-05-24T04:20:44.761855+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.273,
+      "change_15m_pct": -0.055,
+      "change_1h_pct": 0.037,
+      "change_4h_pct": 0.146,
+      "taker_buy_ratio_1m": 0.148,
+      "taker_buy_ratio_5m": 0.164,
+      "oi_delta_5m_pct": 0.43,
+      "funding_rate_pct": 0.0043,
+      "atr_pct": 0.176,
+      "range_4h_pct": 1.61,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 54.77642857,
+      "suggested_tp1": 54.53535714,
+      "suggested_tp2": 54.39071429,
+      "conviction_score": 0,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "LYNUSDT",
       "base": "LYN",
