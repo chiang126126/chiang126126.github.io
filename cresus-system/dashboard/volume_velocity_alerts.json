@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-24T21:25:37.387379+00:00",
+  "updated_at": "2026-05-24T21:27:46.206217+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 23,
+  "alerts_count": 24,
   "alerts": [
+    {
+      "symbol": "MEUSDT",
+      "base": "ME",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.0981,
+      "price_change_pct": -0.608,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 55442.0,
+      "volume_baseline_usdt": 5812.0,
+      "volume_ratio": 9.54,
+      "detected_at": "2026-05-24T21:26:58.411087+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.607,
+      "change_15m_pct": -0.808,
+      "change_1h_pct": -1.207,
+      "change_4h_pct": -0.406,
+      "taker_buy_ratio_1m": 0.18,
+      "taker_buy_ratio_5m": 0.222,
+      "oi_delta_5m_pct": 0.045,
+      "funding_rate_pct": -0.0716,
+      "atr_pct": 0.233,
+      "range_4h_pct": 3.26,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.09832857,
+      "suggested_tp1": 0.09775714,
+      "suggested_tp2": 0.09741429,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "UAIUSDT",
       "base": "UAI",
