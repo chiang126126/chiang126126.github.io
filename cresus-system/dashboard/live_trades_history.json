@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-24T21:36:03.588680+00:00",
+  "generated_at": "2026-05-24T21:38:16.076717+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 414,
@@ -36,16 +36,16 @@
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "ZENUSDT",
-      "FIDAUSDT",
       "ZEREBROUSDT",
-      "FOGOUSDT"
+      "FIDAUSDT",
+      "FOGOUSDT",
+      "ZENUSDT"
     ],
     "exchange_symbols": [
-      "ZENUSDT",
-      "FIDAUSDT",
       "ZEREBROUSDT",
-      "FOGOUSDT"
+      "FIDAUSDT",
+      "FOGOUSDT",
+      "ZENUSDT"
     ]
   },
   "open_trades": [
@@ -103,10 +103,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.0153,
-      "current_price": 0.01527,
-      "unrealized_pnl_usdt": 5.4123,
-      "unrealized_pnl_pct": 1.357,
-      "last_price_check_at": "2026-05-24T21:36:00.734152+00:00"
+      "current_price": 0.01526,
+      "unrealized_pnl_usdt": 5.6701,
+      "unrealized_pnl_pct": 1.421,
+      "last_price_check_at": "2026-05-24T21:38:13.404357+00:00"
     },
     {
       "paper_id": "ZEREBROUSDT|LONG|2026-05-24T21:21:14.597730+00:00",
@@ -162,10 +162,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.022416,
-      "current_price": 0.02215,
-      "unrealized_pnl_usdt": -1.6231,
-      "unrealized_pnl_pct": -0.405,
-      "last_price_check_at": "2026-05-24T21:36:00.734152+00:00"
+      "current_price": 0.02223,
+      "unrealized_pnl_usdt": -0.1803,
+      "unrealized_pnl_pct": -0.045,
+      "last_price_check_at": "2026-05-24T21:38:13.404357+00:00"
     },
     {
       "paper_id": "FIDAUSDT|SHORT|2026-05-24T21:31:01.719849+00:00",
@@ -221,10 +221,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.03546,
-      "current_price": 0.0355,
-      "unrealized_pnl_usdt": 5.2222,
-      "unrealized_pnl_pct": 1.307,
-      "last_price_check_at": "2026-05-24T21:36:00.734152+00:00"
+      "current_price": 0.03533,
+      "unrealized_pnl_usdt": 7.111,
+      "unrealized_pnl_pct": 1.779,
+      "last_price_check_at": "2026-05-24T21:38:13.404357+00:00"
     },
     {
       "paper_id": "ZENUSDT|SHORT|2026-05-24T21:31:24.624755+00:00",
@@ -241,8 +241,8 @@
       "risk_usdt": 1.0356,
       "risk_pct": 0.26,
       "mirror_latency_sec": 12.1,
-      "sl_price": 6.068714290000001,
-      "sl_paper_current": 6.06971429,
+      "sl_price": 6.053999999999999,
+      "sl_paper_current": 6.055,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": -0.001,
       "sl_compensation_mode": "abcd",
@@ -258,7 +258,7 @@
       "min_conviction_threshold": null,
       "tp1_price": 6.03292857,
       "tp2_price": 6.01085714,
-      "phase": "A",
+      "phase": "B",
       "entry_order_id": 168649398,
       "entry_client_id": "cresus_L1779658284_ZENUSDT_S_E",
       "sl_order_id": null,
@@ -266,8 +266,8 @@
       "conviction_score": 5,
       "alert_type": "sustained",
       "atr_pct": 0.243,
-      "phase_a_mfe_pct": 0.281,
-      "phase_b_mfe_pct": null,
+      "phase_a_mfe_pct": 0.661,
+      "phase_b_mfe_pct": 0.661,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.159583,
       "fees_are_actual": true,
@@ -279,11 +279,12 @@
       "btc_pct_vs_ma25_at_open": -0.248,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 6.038,
-      "current_price": 6.01,
-      "unrealized_pnl_usdt": 2.8996,
-      "unrealized_pnl_pct": 0.727,
-      "last_price_check_at": "2026-05-24T21:36:00.734152+00:00"
+      "phase_a_mfe_price": 6.015,
+      "current_price": 6.0,
+      "unrealized_pnl_usdt": 3.5586,
+      "unrealized_pnl_pct": 0.892,
+      "last_price_check_at": "2026-05-24T21:38:13.404357+00:00",
+      "phase_b_mfe_price": 6.015
     }
   ],
   "recent_closed": [
@@ -23940,18 +23941,45 @@
       "conviction_score": 5,
       "signal_at": "2026-05-24T21:32:02.112749+00:00",
       "reason": "max_concurrent reached (4/4)",
-      "last_checked_at": "2026-05-24T21:36:00.734152+00:00"
+      "last_checked_at": "2026-05-24T21:38:13.404357+00:00"
+    },
+    {
+      "paper_id": "VIRTUALUSDT|SHORT|2026-05-24T21:35:26.773391+00:00",
+      "symbol": "VIRTUALUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-05-24T21:36:26.454483+00:00",
+      "reason": "max_concurrent reached (4/4)",
+      "last_checked_at": "2026-05-24T21:38:13.404357+00:00"
+    },
+    {
+      "paper_id": "NEIROUSDT|SHORT|2026-05-24T21:36:05.095961+00:00",
+      "symbol": "NEIROUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-05-24T21:36:26.454483+00:00",
+      "reason": "max_concurrent reached (4/4)",
+      "last_checked_at": "2026-05-24T21:38:13.404357+00:00"
+    },
+    {
+      "paper_id": "POLYXUSDT|SHORT|2026-05-24T21:36:07.536894+00:00",
+      "symbol": "POLYXUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-05-24T21:36:26.454483+00:00",
+      "reason": "max_concurrent reached (4/4)",
+      "last_checked_at": "2026-05-24T21:38:13.404357+00:00"
     }
   ],
   "btc_regime_now": {
-    "regime": "chop",
-    "btc_price": 76625.2,
-    "btc_ma25_1h": 76765.84,
-    "pct_vs_ma25": -0.183,
-    "change_24h_pct": -0.182,
-    "sub_regime": null,
-    "change_3h_pct": null,
-    "computed_at": "2026-05-24T21:36:02.433223+00:00"
+    "regime": "down",
+    "btc_price": 76352.2,
+    "btc_ma25_1h": 76754.92,
+    "pct_vs_ma25": -0.525,
+    "change_24h_pct": -0.538,
+    "sub_regime": "down_stable",
+    "change_3h_pct": -0.371,
+    "computed_at": "2026-05-24T21:38:14.948710+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
