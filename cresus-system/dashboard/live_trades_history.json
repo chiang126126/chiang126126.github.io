@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-24T00:16:40.232354+00:00",
+  "generated_at": "2026-05-24T00:18:51.244588+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 406,
-    "open": 0,
+    "total_trades": 407,
+    "open": 1,
     "closed": 406,
     "wins": 137,
     "losses": 265,
@@ -15,30 +15,92 @@
     "avg_pnl_usdt": -0.0093,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 7.4366,
+    "fees_paid_usdt": 7.4467,
     "fees_realized_usdt": 7.4366,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.01,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 88.78,
+    "deployed_usdt": 20.03,
+    "free_capital_usdt": 68.74,
     "max_concurrent_slots": 4,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 0.0,
-    "deployed_usdt": 0
+    "deployed_usdt": 20.03
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "STEEMUSDT"
+    ],
+    "exchange_symbols": [
+      "STEEMUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "STEEMUSDT|LONG|2026-05-24T00:16:14.621114+00:00",
+      "trade_id": "L1779581774_STEEMUS_L",
+      "symbol": "STEEMUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.05538,
+      "avg_fill_price": 0.05549,
+      "slippage_bps": 19.86,
+      "qty": 361.0,
+      "notional_usdt": 20.03189,
+      "leverage": 3,
+      "risk_usdt": 0.1942,
+      "risk_pct": 0.969,
+      "mirror_latency_sec": 27.6,
+      "sl_price": 0.055062139999999996,
+      "sl_paper_current": 0.05495214,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.00011,
+      "sl_compensation_mode": "abcd",
+      "wick_filter_enabled": false,
+      "wick_filter_min_breaches": null,
+      "wick_filter_mode": "abcd",
+      "sl_breach_count": 0,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "B",
+      "min_conviction_threshold": 6,
+      "tp1_price": 0.05602179,
+      "tp2_price": 0.05666357,
+      "phase": "A",
+      "entry_order_id": 107533804,
+      "entry_client_id": "cresus_L1779581774_STEEMUS_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 7,
+      "alert_type": "sustained",
+      "atr_pct": 0.773,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.010016,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-24T00:17:15.354698+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "up",
+      "btc_price_at_open": 76680.1,
+      "btc_change_24h_at_open": 1.784,
+      "btc_pct_vs_ma25_at_open": 1.512,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.05538,
+      "current_price": 0.0553,
+      "unrealized_pnl_usdt": -0.0686,
+      "unrealized_pnl_pct": -0.342,
+      "last_price_check_at": "2026-05-24T00:18:49.829330+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "AEROUSDT|LONG|2026-05-23T18:21:53.715411+00:00",
@@ -23423,7 +23485,7 @@
       "conviction_score": 5,
       "signal_at": "2026-05-24T00:07:51.172478+00:00",
       "reason": "conviction_score 5 < threshold 6 (Phase 4.H filter)",
-      "last_checked_at": "2026-05-24T00:16:38.805783+00:00"
+      "last_checked_at": "2026-05-24T00:18:49.829330+00:00"
     }
   ],
   "btc_regime_now": {
@@ -23434,7 +23496,7 @@
     "change_24h_pct": 1.784,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-24T00:16:40.189302+00:00"
+    "computed_at": "2026-05-24T00:18:50.915260+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
