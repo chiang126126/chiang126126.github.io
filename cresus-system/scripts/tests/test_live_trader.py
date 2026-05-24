@@ -2456,34 +2456,27 @@ class TestCashReserve(unittest.TestCase):
 
     def test_under_cap(self):
         state = _empty_live_state()
+        per = live_trader.LIVE_MAX_DEPLOY_USDT / 4 * 0.5   # 半 cap
         state["live_open_trades"] = [
-            {"notional_usdt": 20.0},
-            {"notional_usdt": 20.0},
+            {"notional_usdt": per},
+            {"notional_usdt": per},
         ]
-        self.assertIsNone(_check_cash_reserve(state))  # $40 < $60 cap
+        self.assertIsNone(_check_cash_reserve(state))
 
     def test_at_cap_blocks(self):
         state = _empty_live_state()
-        # 4 笔 × $20 = $80 = LIVE_MAX_DEPLOY_USDT cap
-        state["live_open_trades"] = [
-            {"notional_usdt": 20.0},
-            {"notional_usdt": 20.0},
-            {"notional_usdt": 20.0},
-            {"notional_usdt": 20.0},
-        ]
+        # 4 笔 × (cap/4) = cap
+        per = live_trader.LIVE_MAX_DEPLOY_USDT / 4
+        state["live_open_trades"] = [{"notional_usdt": per} for _ in range(4)]
         result = _check_cash_reserve(state)
         self.assertIsNotNone(result)
         self.assertIn("cap", result)
 
     def test_over_cap_blocks(self):
         state = _empty_live_state()
-        # 4 笔 × $25 = $100 > $80 cap
-        state["live_open_trades"] = [
-            {"notional_usdt": 25.0},
-            {"notional_usdt": 25.0},
-            {"notional_usdt": 25.0},
-            {"notional_usdt": 25.0},
-        ]
+        # 4 笔 × (cap/4 + 5) > cap
+        per = live_trader.LIVE_MAX_DEPLOY_USDT / 4 + 5.0
+        state["live_open_trades"] = [{"notional_usdt": per} for _ in range(4)]
         result = _check_cash_reserve(state)
         self.assertIsNotNone(result)
 
@@ -2574,11 +2567,11 @@ class TestDailyDD(unittest.TestCase):
         state = _empty_live_state()
         state["live_closed_trades"] = [{
             "closed_at": self.now.isoformat(),
-            "realized_pnl_usdt": -5.5,
+            "realized_pnl_usdt": -(LIVE_DAILY_DD_LIMIT_USDT + 0.5),
         }]
         result = _check_daily_dd(state, self.now)
         self.assertIsNotNone(result)
-        self.assertIn("-$5", result)
+        self.assertIn(f"-${LIVE_DAILY_DD_LIMIT_USDT:.0f}", result)
 
     def test_at_limit_blocks(self):
         """Edge: 正好 -$5 也触发 (使用 <= 而非 <)."""
@@ -2624,8 +2617,10 @@ class TestRiskGatesAggregator(unittest.TestCase):
         live_trader.PAUSE_FLAG_PATH.write_text("manual")
         live_trader.EMERGENCY_STOP_PATH.write_text("auto: DD limit")
         state = _empty_live_state()
-        # 触发 cash reserve cap ($80)
-        state["live_open_trades"] = [{"notional_usdt": 80.0}]
+        # 触发 cash reserve cap (deploy = MAX_DEPLOY_USDT)
+        state["live_open_trades"] = [
+            {"notional_usdt": live_trader.LIVE_MAX_DEPLOY_USDT}
+        ]
         result = check_risk_gates(state, self.now)
         self.assertTrue(result["block_new_opens"])
         self.assertGreaterEqual(len(result["reasons"]), 3)
@@ -2805,17 +2800,21 @@ class TestCumulativeDD(unittest.TestCase):
         self.assertIsNone(b)
 
     def test_dd_under_limit_no_trigger(self):
-        """balance ≥ threshold ($95) → 不触发."""
+        """balance ≥ threshold (= start × (1-DD%)) → 不触发."""
+        threshold = (live_trader.LIVE_STARTING_CAPITAL_USDT *
+                     (1 - live_trader.LIVE_TOTAL_DD_LIMIT_PCT / 100))
         with patch.object(self.client, "get_account",
-                          return_value={"totalMarginBalance": "96.0"}):
+                          return_value={"totalMarginBalance": str(threshold + 1.0)}):
             result = _check_cumulative_dd_and_trigger(self.client)
         self.assertIsNone(result)
         self.assertFalse(live_trader.EMERGENCY_STOP_PATH.exists())
 
     def test_dd_at_threshold_triggers(self):
-        """balance = 94.99 < threshold $95 → 触发 + 自动写文件."""
+        """balance = threshold - 0.01 < threshold → 触发 + 自动写文件."""
+        threshold = (live_trader.LIVE_STARTING_CAPITAL_USDT *
+                     (1 - live_trader.LIVE_TOTAL_DD_LIMIT_PCT / 100))
         with patch.object(self.client, "get_account",
-                          return_value={"totalMarginBalance": "94.99"}):
+                          return_value={"totalMarginBalance": str(threshold - 0.01)}):
             result = _check_cumulative_dd_and_trigger(self.client)
         self.assertIsNotNone(result)
         self.assertIn("cumulative DD", result)
@@ -2826,9 +2825,10 @@ class TestCumulativeDD(unittest.TestCase):
         self.assertIn("cumulative DD", content)
 
     def test_dd_deep_triggers(self):
-        """balance = 80 (-20% DD) → 触发."""
+        """balance = start × 80% (即 -20% DD) → 触发."""
+        balance = live_trader.LIVE_STARTING_CAPITAL_USDT * 0.80
         with patch.object(self.client, "get_account",
-                          return_value={"totalMarginBalance": "80.0"}):
+                          return_value={"totalMarginBalance": str(balance)}):
             result = _check_cumulative_dd_and_trigger(self.client)
         self.assertIsNotNone(result)
         self.assertIn("20", result)  # 20% DD 应出现在 reason
@@ -2943,14 +2943,17 @@ class TestRiskGatesWithClient(unittest.TestCase):
     def test_with_client_normal_no_block(self):
         state = _empty_live_state()
         with patch.object(self.client, "get_account",
-                          return_value={"totalMarginBalance": "100.0"}):
+                          return_value={"totalMarginBalance":
+                                        str(live_trader.LIVE_STARTING_CAPITAL_USDT)}):
             result = check_risk_gates(state, self.now, client=self.client)
         self.assertFalse(result["block_new_opens"])
 
     def test_with_client_dd_triggers_and_creates_flag(self):
         state = _empty_live_state()
+        # balance = start × 85% (即 -15% DD, > 5% 阈值)
+        balance = live_trader.LIVE_STARTING_CAPITAL_USDT * 0.85
         with patch.object(self.client, "get_account",
-                          return_value={"totalMarginBalance": "85.0"}):
+                          return_value={"totalMarginBalance": str(balance)}):
             result = check_risk_gates(state, self.now, client=self.client)
         self.assertTrue(result["block_new_opens"])
         # 应该有 cumulative DD reason
@@ -3822,7 +3825,8 @@ class TestComputeLiveStats(unittest.TestCase):
         self.assertEqual(s["wins"], 0)
         self.assertEqual(s["losses"], 0)
         self.assertEqual(s["total_pnl_usdt"], 0)
-        self.assertEqual(s["starting_capital_usdt"], 100.0)
+        self.assertEqual(s["starting_capital_usdt"],
+                         live_trader.LIVE_STARTING_CAPITAL_USDT)
 
     def test_with_closed_trades(self):
         state = _empty_live_state()
@@ -3851,8 +3855,9 @@ class TestComputeLiveStats(unittest.TestCase):
         self.assertEqual(s["open"], 2)
         self.assertEqual(s["slots_used"], 2)
         self.assertAlmostEqual(s["deployed_usdt"], 45.0, places=2)
-        # free = 100 - 45 + 0 (无已实现 PnL) - 0.02 (开仓费扣钱包) = 54.98
-        self.assertAlmostEqual(s["free_capital_usdt"], 54.98, places=2)
+        # free = starting - deployed - fees_open
+        expected = live_trader.LIVE_STARTING_CAPITAL_USDT - 45.0 - 0.02
+        self.assertAlmostEqual(s["free_capital_usdt"], expected, places=2)
 
     def test_net_pnl_and_fees_breakdown(self):
         """net_pnl = total_pnl − fees_realized; free_capital 用 NET."""
@@ -3879,9 +3884,10 @@ class TestComputeLiveStats(unittest.TestCase):
         # net = 0.20 − 0.027 = 0.173
         self.assertAlmostEqual(s["net_pnl_usdt"], 0.173, places=4)
         # free_capital = starting − deployed + total_pnl − fees_total
-        #             = 100 − 20 + 0.20 − 0.035 = 80.165 → round(2) = 80.17 (float imprecision)
-        # (注意: 修复前用 net_pnl 只扣 realized fee, 现在扣所有 fee 含 fees_open)
-        self.assertAlmostEqual(s["free_capital_usdt"], 80.17, places=2)
+        #             = starting − 20 + 0.20 − 0.035
+        expected_free = (live_trader.LIVE_STARTING_CAPITAL_USDT
+                         - 20.0 + 0.20 - 0.035)
+        self.assertAlmostEqual(s["free_capital_usdt"], expected_free, places=2)
         self.assertTrue(s["fees_are_actual"])
 
     def test_fees_are_actual_false_if_any_estimate(self):
@@ -4062,12 +4068,14 @@ class TestPublishLiveHistory(unittest.TestCase):
         publish_live_history(state)
         payload = json.loads(live_trader.LIVE_HISTORY.read_text())
         config = payload["config"]
-        self.assertEqual(config["starting_capital_usdt"], 100.0)
-        self.assertEqual(config["max_concurrent"], 4)
-        self.assertEqual(config["max_deploy_usdt"], 80.0)
-        self.assertEqual(config["leverage"], 3)
+        self.assertEqual(config["starting_capital_usdt"],
+                         live_trader.LIVE_STARTING_CAPITAL_USDT)
+        self.assertEqual(config["max_concurrent"], live_trader.LIVE_MAX_CONCURRENT)
+        self.assertEqual(config["max_deploy_usdt"], live_trader.LIVE_MAX_DEPLOY_USDT)
+        self.assertEqual(config["leverage"], live_trader.LIVE_LEVERAGE)
         self.assertIn("BTCUSDT", config["symbol_whitelist"])
-        self.assertEqual(config["daily_dd_limit_usdt"], 5.0)
+        self.assertEqual(config["daily_dd_limit_usdt"],
+                         live_trader.LIVE_DAILY_DD_LIMIT_USDT)
 
     def test_publish_recent_closed_sorted_desc(self):
         """recent_closed 应按 closed_at 倒序 (最新在前)."""

@@ -68,9 +68,13 @@ LIVE_HISTORY = Path.home() / "cresus-bot" / "live_trades_history.json"
 SYSTEM_VERSION = "V3"
 
 # Live 交易配置 (小心调整)
-LIVE_NOTIONAL_USDT = 20.0              # 每笔 $20 (paper 是 $400, 等比缩放 1/20)
-LIVE_MAX_CONCURRENT = 4                # 实盘并发上限 ($100 起始: 4×$20=$80 部署 + $20 保留)
-LIVE_LEVERAGE = 3                      # 杠杆 (符合 $100 起始资金的保守设定);
+# Phase 4.R6 (2026-05-24): notional 从 $20 → $400, 起始资金 $100 → $2000
+# 跟 paper engine 1:1 同步 ($400/笔, 5 槽里取 4 槽, $2000 starting), 便于
+# 直接对比 paper vs live 单笔 PnL / fees / slippage 绝对值, 减少缩放噪声.
+# 风控阈值同步 20x 放大保持等效百分比 (daily DD 5%, max deploy 80%).
+LIVE_NOTIONAL_USDT = 400.0             # 每笔 $400 (跟 paper 一致, 不再缩放)
+LIVE_MAX_CONCURRENT = 4                # 实盘并发上限 ($2000 起始: 4×$400=$1600 部署 + $400 保留, 20% buffer)
+LIVE_LEVERAGE = 3                      # 杠杆 (paper 是 1x; live 3x 是历史保守设定);
                                        # 每次 mirror_open 前强制 set_leverage,
                                        # 防止 Binance 默认 20x 漂移
 LIVE_SYMBOL_WHITELIST = [              # Phase 6 第 1 周限主流币
@@ -117,10 +121,10 @@ LIVE_MIN_CONVICTION_SCORE = 6          # 仅 mirror conviction_score >= N 的信
 # 实盘前必须改回 False!
 LIVE_OBSERVATION_MODE = True
 
-# Phase 3.3.a 风控参数 (实盘 $100 USDT 起始)
-LIVE_STARTING_CAPITAL_USDT = 100.0     # 实盘起始资金 (校准用)
-LIVE_DAILY_DD_LIMIT_USDT = 5.0         # 日亏 -$5 → block new opens
-LIVE_MAX_DEPLOY_USDT = 80.0            # 总部署上限 $80 (20% 现金保留, 配合 4 并发)
+# Phase 3.3.a 风控参数 (Phase 4.R6 调整: $100 → $2000 起始)
+LIVE_STARTING_CAPITAL_USDT = 2000.0    # 实盘起始资金 (跟 paper 一致, testnet 资金)
+LIVE_DAILY_DD_LIMIT_USDT = 100.0       # 日亏 -$100 (= 5% × $2000, 跟旧 5%/$100 等效)
+LIVE_MAX_DEPLOY_USDT = 1600.0          # 总部署上限 $1600 (80% × $2000, 配合 4 槽 × $400)
 
 # Phase 3.3.b 累计 DD kill switch
 LIVE_TOTAL_DD_LIMIT_PCT = 5.0          # 总回撤 5% → 自动写 emergency flag

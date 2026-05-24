@@ -674,3 +674,41 @@ ThrottleInterval=10 防止 crash 循环刷屏.
 **验证窗口**: 1 周观察 — 期望 missing 比例从 62% → < 30%, 死亡窗口 (>30min 无开仓) ≤ 1 次/周.
 
 ---
+
+### Phase 4.R6: Live notional $20 → $400 — 跟 paper 1:1 同步 (2026-05-24)
+
+**触发**: 用户提议. 当前 $20 notional 是 paper $400 的 1/20 缩放,
+百分比可比但绝对值噪声大: 单笔 PnL 经常在 ±$0.10 量级跟 fees ($0.016) 混在一起,
+切片统计 (按 funding / regime / conv 等) 容易被噪声盖掉真信号.
+
+**改动 (live_trader.py)**:
+| 常量 | 旧 | 新 | 论据 |
+|---|---|---|---|
+| `LIVE_NOTIONAL_USDT` | 20.0 | 400.0 | 跟 paper 一致 |
+| `LIVE_STARTING_CAPITAL_USDT` | 100.0 | 2000.0 | 跟 paper 一致 (testnet 有余额) |
+| `LIVE_DAILY_DD_LIMIT_USDT` | 5.0 | 100.0 | 等效 5% (5/100 = 100/2000) |
+| `LIVE_MAX_DEPLOY_USDT` | 80.0 | 1600.0 | 等效 80% (80/100 = 1600/2000) |
+| `LIVE_MAX_CONCURRENT` | 4 | 4 (保持) | 4×$400 = $1600 部署 + $400 buffer |
+| `LIVE_LEVERAGE` | 3 | 3 (保持) | margin 占用 4×$133 = $533 << $2000 |
+
+**效果**:
+1. 单笔 PnL 放大 20x (噪声/fees 比例不变, 但绝对值更易统计).
+2. paper vs live 1:1 直接对比 — 不用按 20x 缩放, 减少口径错误.
+3. slippage 行为更接近 paper 真实情况 ($400 单更可能吃多档 vs $20 单)
+4. 单笔最大亏损 ~$22 (vs 旧 ~$1.14), 但占资金比例不变 (1.1%).
+5. testnet 钱, 不烧真钱 — 风险 = 0.
+
+**回滚** (1 行): 把 4 个常量改回旧值即可. 历史 trades 用 `notional_usdt` 字段
+标识 ($20 vs $400), dashboard 可按金额切片新旧统计.
+
+**部署方式**: V3 launchd 每 30s 重起 live_trader, 自动读新 config. 无需手动操作.
+
+**测试覆盖**: 11 个 hardcoded 旧值 ($100/$5/$80) 的测试改用 live_trader.LIVE_*
+常量动态计算, 以后再调 notional 也不用改测试.
+
+**风险**:
+- testnet 不烧真钱 → 风险 = 0.
+- 主网切换前需确认: 真账户余额 ≥ $2000, max DD 限制重新评估 (5% × $2000 = $100/天).
+- 历史 stats 新旧 mix, dashboard 报表需按 `notional_usdt` 切片.
+
+---
