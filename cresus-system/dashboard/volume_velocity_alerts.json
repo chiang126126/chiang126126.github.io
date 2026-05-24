@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-24T14:57:09.692493+00:00",
+  "updated_at": "2026-05-24T14:59:17.844512+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 3,
+  "alerts_count": 4,
   "alerts": [
+    {
+      "symbol": "AIAUSDT",
+      "base": "AIA",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.06085,
+      "price_change_pct": -0.863,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 107085.0,
+      "volume_baseline_usdt": 6827.0,
+      "volume_ratio": 15.68,
+      "detected_at": "2026-05-24T14:58:45.843954+00:00",
+      "intensity": 2,
+      "change_5m_pct": -1.309,
+      "change_15m_pct": -1.5,
+      "change_1h_pct": -2.272,
+      "change_4h_pct": 0.246,
+      "taker_buy_ratio_1m": 0.224,
+      "taker_buy_ratio_5m": 0.234,
+      "oi_delta_5m_pct": -0.059,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.398,
+      "range_4h_pct": 7.81,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.06121321,
+      "suggested_tp1": 0.06030518,
+      "suggested_tp2": 0.05976036,
+      "conviction_score": 3,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "DYMUSDT",
       "base": "DYM",
