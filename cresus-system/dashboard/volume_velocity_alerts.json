@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-24T05:11:06.397025+00:00",
+  "updated_at": "2026-05-24T05:13:15.033244+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 7,
+  "alerts_count": 8,
   "alerts": [
+    {
+      "symbol": "PARTIUSDT",
+      "base": "PARTI",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.05028,
+      "price_change_pct": 0.883,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 20662.0,
+      "volume_baseline_usdt": 2335.0,
+      "volume_ratio": 8.85,
+      "detected_at": "2026-05-24T05:13:11.223944+00:00",
+      "intensity": 2,
+      "change_5m_pct": 0.762,
+      "change_15m_pct": 0.822,
+      "change_1h_pct": -0.099,
+      "change_4h_pct": 1.412,
+      "taker_buy_ratio_1m": 0.739,
+      "taker_buy_ratio_5m": 0.617,
+      "oi_delta_5m_pct": 0.048,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.189,
+      "range_4h_pct": 2.98,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.050185,
+      "suggested_tp1": 0.0504225,
+      "suggested_tp2": 0.050565,
+      "conviction_score": 3,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "NAORISUSDT",
       "base": "NAORIS",
