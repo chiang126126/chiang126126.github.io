@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-24T02:51:54.125302+00:00",
+  "updated_at": "2026-05-24T02:54:07.215323+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 22,
+  "alerts_count": 23,
   "alerts": [
+    {
+      "symbol": "DYMUSDT",
+      "base": "DYM",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.0297,
+      "price_change_pct": 0.883,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 139511.0,
+      "volume_baseline_usdt": 9952.0,
+      "volume_ratio": 14.02,
+      "detected_at": "2026-05-24T02:53:32.469578+00:00",
+      "intensity": 2,
+      "change_5m_pct": 1.026,
+      "change_15m_pct": 1.898,
+      "change_1h_pct": 1.617,
+      "change_4h_pct": 5.918,
+      "taker_buy_ratio_1m": 0.734,
+      "taker_buy_ratio_5m": 0.711,
+      "oi_delta_5m_pct": 0.063,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.467,
+      "range_4h_pct": 7.95,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.02949214,
+      "suggested_tp1": 0.03001179,
+      "suggested_tp2": 0.03032357,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "NEARUSDT",
       "base": "NEAR",
