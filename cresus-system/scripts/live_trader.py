@@ -98,22 +98,28 @@ LIVE_SYMBOL_BLACKLIST = [
     "STABLEUSDT",  # 5 笔 0 胜, 累计 -$1.08 (5/21 加)
 ]
 
-# Phase 4.H Conviction filter (2026-05-22)
-# ==========================================
-# 数据驱动: 380 笔实盘数据按 conviction_score 切片:
-#   conv=5: n=354, 人均 -$0.028, ROI -0.141% / 笔
-#   conv=6: n=8,   人均 +$0.005, ROI +0.022% / 笔
-#   conv=7: n=16,  人均 +$0.211, ROI +1.057% / 笔  ← 显著
-#   conv=8: n=2,   人均 -$0.258  (n 太小, 无效)
-#   conv≥6 合计: n=26, 人均 +$0.097, ROI +0.558% / 笔
-# 论断: paper engine 自己的"信心评分"有 alpha. 标准钻石 (5 分) 是稀释信号.
-# 方案: 全员硬过滤, 仅 mirror conv >= LIVE_MIN_CONVICTION_SCORE 的信号.
-# 风险:
-#   - 信号量预计减少 92% (50/天 → ~4/天)
-#   - n=26 样本不显著 (p≈0.1-0.2), 是 "data leading change" 非 "statistically forced"
-# 退路: 改回 None 立即恢复全部 conv 通过.
-LIVE_MIN_CONVICTION_SCORE = 6          # 仅 mirror conviction_score >= N 的信号
-                                        # None = 不启用 filter (向后兼容)
+# Phase 4.H Conviction filter (2026-05-22 部署) / Phase 4.R7 (2026-05-24 关闭)
+# ==============================================================================
+# 4.H 部署时论据 (回看不充分):
+#   380 笔实盘按 conv 切片, conv≥6 26 笔 +$0.097/笔 vs conv=5 354 笔 -$0.028.
+#   用户当时注: "n=26 样本不显著 (p≈0.1-0.2), 是 data leading change".
+#   而且 5/24 后发现 paper / live 字段名 bug (realized_pnl_usdt vs
+#   realized_usdt_pnl swap), 原数据切片可能也是错的.
+#
+# Phase 4.R7 (2026-05-24) — 关闭决策 (基于 9 天累计数据修正后):
+#   Paper 全样本 5/15-5/24 (929 笔):
+#     conv=5: n=847, avg +$0.868/笔  ← 被拒掉的, 其实大幅盈利
+#     conv≥6: n=82,  avg +$2.969/笔
+#   Paper 4.H 部署后 5/22-5/24 (283 笔):
+#     conv<6 (被拒):  n=259, avg +$1.044/笔   ← 拒掉的盈利
+#     conv≥6 (让过):  n=24,  avg -$1.426/笔   ← 反向, 让过的反而亏!
+#   Live 4.H 部署后 (54 笔):
+#     conv<6 (漏掉): n=39, avg -$0.0205/笔, win 35.9%
+#     conv≥6 (让过): n=15, avg -$0.1725/笔, win 6.7%   ← 双源一致反向
+#   累计影响: 4.H 部署 3 天 paper EV ~-$300 (拒盈利+让亏损).
+# 决策: 关 filter. 后续累积 100+ 笔再重审.
+LIVE_MIN_CONVICTION_SCORE = None       # Phase 4.R7: 关 filter (None = 全部 conv 通过)
+                                        # 历史: 6 → None (基于双源数据反向证据)
 
 # ⚠️ DRY-RUN 观察期标志 — 仅用于 testnet 观察 mirror lifecycle.
 # True 时:

@@ -2008,16 +2008,23 @@ class TestIsEligibleFundingGate(unittest.TestCase):
 
 
 class TestConvictionFilter(unittest.TestCase):
-    """Phase 4.H (2026-05-22): Conviction filter — 仅 mirror 高分位钻石信号.
+    """Phase 4.H (2026-05-22 部署) / Phase 4.R7 (2026-05-24 关闭) — Conviction filter.
 
-    数据驱动: 380 笔实盘数据按 conviction_score 切片显示, conv >= 6 子集
-    人均 +$0.097/笔 vs conv=5 子集 -$0.028/笔.
-    实现: is_eligible_for_mirror 在 symbol filter 后增加 conv 检查.
+    4.H 部署论据: 26 笔 conv>=6 +$0.097/笔 (n 小, p≈0.1-0.2).
+    4.R7 关闭论据: 部署后 paper 283 笔 + live 54 笔双源数据显示 conv>=6 反而
+                    比 conv<6 更差 (paper -$1.43 vs +$1.04, live -$0.17 vs -$0.02).
+                    模块默认改为 None. 本测试类测 filter 行为本身, setUp 强制开启 filter=6.
     """
 
     def setUp(self):
         self.now = datetime.now(timezone.utc)
         self.live_state = {"mirrored_paper_ids": [], "live_open_trades": []}
+        # Phase 4.R7: 模块默认 None, 本类测 filter 行为, 强制开启 = 6
+        self._conv_patcher = patch.object(live_trader, "LIVE_MIN_CONVICTION_SCORE", 6)
+        self._conv_patcher.start()
+
+    def tearDown(self):
+        self._conv_patcher.stop()
 
     def _make_trade(self, conv=None):
         t = {
@@ -2032,10 +2039,16 @@ class TestConvictionFilter(unittest.TestCase):
             t["conviction_score"] = conv
         return t
 
-    def test_threshold_default_is_6(self):
-        """默认阈值 = 6 (基于 380 笔实盘数据)."""
-        from live_trader import LIVE_MIN_CONVICTION_SCORE
-        self.assertEqual(LIVE_MIN_CONVICTION_SCORE, 6)
+    def test_module_default_is_none_after_r7(self):
+        """Phase 4.R7: 模块默认改为 None (filter 默认关闭)."""
+        # stop patch 临时, 读模块原始默认
+        self._conv_patcher.stop()
+        try:
+            from live_trader import LIVE_MIN_CONVICTION_SCORE
+            self.assertIsNone(LIVE_MIN_CONVICTION_SCORE,
+                              "Phase 4.R7 后模块默认应为 None (filter 关闭)")
+        finally:
+            self._conv_patcher.start()   # 恢复测试默认
 
     def test_conv_5_rejected(self):
         """conv=5 (标准钻石) 应被拒. paper 主要信号源现在拒收."""
