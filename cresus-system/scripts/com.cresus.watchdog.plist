@@ -16,7 +16,7 @@
            launchctl enable gui/$(id -u)/com.cresus.watchdog -->
     <key>ProgramArguments</key>
     <array>
-        <string>/Users/mangzi/chiang126126.github.io/cresus-system/scripts/cresus-watchdog.sh</string>
+        <string>/Users/hong/chiang126126.github.io/cresus-system/scripts/cresus-watchdog.sh</string>
     </array>
 
     <!-- 每 60 秒检查一次 -->
@@ -28,12 +28,12 @@
 
     <!-- 工作目录无所谓 (脚本只依赖 $HOME), 仍然设一下 -->
     <key>WorkingDirectory</key>
-    <string>/Users/mangzi</string>
+    <string>/Users/hong</string>
 
     <!-- launchd 本身的输出 (脚本内部已写自己的 watchdog.log) -->
     <key>StandardOutPath</key>
-    <string>/Users/mangzi/cresus-bot/logs/watchdog-launchd.log</string>
+    <string>/Users/hong/cresus-bot/logs/watchdog-launchd.log</string>
     <key>StandardErrorPath</key>
-    <string>/Users/mangzi/cresus-bot/logs/watchdog-launchd.log</string>
+    <string>/Users/hong/cresus-bot/logs/watchdog-launchd.log</string>
 </dict>
 </plist>

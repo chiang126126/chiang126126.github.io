@@ -12,8 +12,8 @@
                           3) touch ~/.allow-live -->
     <key>ProgramArguments</key>
     <array>
-        <string>/usr/bin/python3</string>
-        <string>/Users/mangzi/chiang126126.github.io/cresus-system/scripts/live_trader.py</string>
+        <string>/Users/hong/cresus-bot/.venv/bin/python3</string>
+        <string>/Users/hong/chiang126126.github.io/cresus-system/scripts/live_trader.py</string>
         <string>--once</string>
         <string>--live</string>
     </array>
@@ -25,15 +25,29 @@
     <key>RunAtLoad</key>
     <true/>
 
+    <!-- Phase 4.R5 (2026-05-24) — KeepAlive only on crash.
+         --once 模式正常 exit 0 后由 StartInterval=30 拉起下一轮.
+         但若 main_loop 抛未捕获异常 (exit != 0) 或 SIGKILL, 立即重启不等 30s.
+         配合 ThrottleInterval=10 防止 crash 循环刷屏. -->
+    <key>KeepAlive</key>
+    <dict>
+        <key>Crashed</key>
+        <true/>
+        <key>SuccessfulExit</key>
+        <false/>
+    </dict>
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+
     <!-- 凭证从 ~/.cresus-bot/binance_keys.json 自动读取 (load_credentials helper).
          不在 plist 里硬编码 key (即使 plist 是私有的, 也避免事故). -->
 
     <key>WorkingDirectory</key>
-    <string>/Users/mangzi/chiang126126.github.io</string>
+    <string>/Users/hong/chiang126126.github.io</string>
 
     <key>StandardOutPath</key>
-    <string>/Users/mangzi/cresus-bot/logs/live_trader.log</string>
+    <string>/Users/hong/cresus-bot/logs/live_trader.log</string>
     <key>StandardErrorPath</key>
-    <string>/Users/mangzi/cresus-bot/logs/live_trader.log</string>
+    <string>/Users/hong/cresus-bot/logs/live_trader.log</string>
 </dict>
 </plist>

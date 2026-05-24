@@ -619,3 +619,58 @@ LIVE_REJECT_ADVERSE_FUNDING = False   # 关 funding adverse gate
 跟 4.L 一起部署可在同一时间窗口收 paper vs live 对比数据.
 
 ---
+
+### Phase 4.R5: Live Trader 可靠性强化 (2026-05-24)
+
+**触发**: 5/15-5/24 paper vs live audit 显示 **665 笔 paper / 62% 没 mirror**.
+拆分后 53% missing 落在 **live trader 死亡窗口** (paper engine 在跑, live 不响应),
+最严重 5/19→5/20 一次 10.2 小时, 5/23 7.2 小时, 5/22 5.7 小时.
+同时段 velocity_fast_sync 每 2 分钟提交都正常 — 不是整机下线, 只是 launchd 挂起.
+
+**根因**: 旧 Mac (mangzi) `pmset sleep` 默认 1 分钟 idle 即系统级睡眠,
+launchd 自身也被挂起 → 30s schedule 停掉 → live_trader 不跑.
+死亡窗口全部发生在用户离开 Mac 的深夜/凌晨/上午.
+
+**3 道防线**:
+
+#### P0 — `pmset` 关 AC 睡眠 (人工执行)
+```bash
+sudo pmset -c sleep 0 disksleep 0    # AC 永不睡 (24/7 运行场景)
+sudo pmset -b sleep 60               # 电池 60 分钟睡 (省电, 离桌才会用)
+```
+
+#### P1 — `com.cresus.live-trader.plist` 加 KeepAlive
+```xml
+<key>KeepAlive</key>
+<dict>
+    <key>Crashed</key><true/>
+    <key>SuccessfulExit</key><false/>
+</dict>
+<key>ThrottleInterval</key><integer>10</integer>
+```
+语义: `--once` 正常 exit 0 不动 (由 StartInterval=30 拉起),
+但若 main_loop 抛未捕获异常 (exit != 0) 立即重启, 不等 30s.
+ThrottleInterval=10 防止 crash 循环刷屏.
+
+#### P2 — Watchdog 已存在 (Phase 4.F 部署)
+`cresus-watchdog.sh` 每 60s 检查 `live_trades_history.json` mtime,
+> 5min 没更新 = stale, 连续 2 次失败自动 `launchctl kickstart`.
+本次 R5 顺手修了 plist 路径 `mangzi → hong` (Mac 迁移遗留).
+
+**预期效果**:
+- P0 解决 95% 死亡 (Mac 不睡, launchd 不挂).
+- P1 解决 4% (live_trader crash 时立即恢复, 而非等 30s).
+- P2 兜底 1% (watchdog 检测异常 → kickstart).
+- 实盘笔数预计 409 → ~600 笔 (+47%), 释放被死亡窗口截掉的 conv≥6 信号.
+
+**风险**: 极低. pmset 改电源策略, plist 加 KeepAlive 是 launchd 标准用法.
+回滚: `sudo pmset -c sleep 5` + 删 plist 里的 KeepAlive block.
+
+**部署**:
+1. 用户在 Mac 跑 P0 pmset 命令 (需 sudo).
+2. cp git 里两个改过的 plist 到 `~/Library/LaunchAgents/`.
+3. `launchctl unload + load com.cresus.live-trader.plist` 让 KeepAlive 生效.
+
+**验证窗口**: 1 周观察 — 期望 missing 比例从 62% → < 30%, 死亡窗口 (>30min 无开仓) ≤ 1 次/周.
+
+---
