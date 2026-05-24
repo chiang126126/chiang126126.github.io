@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-24T16:19:15.911306+00:00",
+  "updated_at": "2026-05-24T16:21:26.345454+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 28,
+  "alerts_count": 29,
   "alerts": [
+    {
+      "symbol": "LUMIAUSDT",
+      "base": "LUMIA",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.11609,
+      "price_change_pct": 0.685,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 67375.0,
+      "volume_baseline_usdt": 8511.0,
+      "volume_ratio": 7.92,
+      "detected_at": "2026-05-24T16:21:09.778512+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.808,
+      "change_15m_pct": 1.318,
+      "change_1h_pct": 2.274,
+      "change_4h_pct": 4.155,
+      "taker_buy_ratio_1m": 0.474,
+      "taker_buy_ratio_5m": 0.518,
+      "oi_delta_5m_pct": 0.887,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.353,
+      "range_4h_pct": 5.66,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.11547607,
+      "suggested_tp1": 0.11701089,
+      "suggested_tp2": 0.11793179,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "PLAYUSDT",
       "base": "PLAY",
