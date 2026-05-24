@@ -1495,6 +1495,26 @@ class TestAbUseWickFilter(unittest.TestCase):
             else:
                 self.assertFalse(r, f"{pid} (g={g}) 应该 wick=False")
 
+    def test_phase_4l_always_mode_all_groups_enabled(self):
+        """Phase 4.L (2026-05-24): wick filter 推广到 'always', 所有 group 都启用.
+
+        基于 9 天 (5/15-5/24, 239 笔 sl_breach_client) 数据驱动:
+          C 组 32.7% 假止损率 vs A/B/D 38.0% (5.3 pp 改善).
+        切到 'always' 全员启用, 预期月度 +$170.
+        """
+        # 各种 paper_id 覆盖 A/B/C/D 4 组, always mode 都应 True
+        for i in range(100):
+            pid = f"S{i}|LONG|T+00:00"
+            self.assertTrue(
+                live_trader._ab_use_wick_filter(pid, mode="always"),
+                f"always mode 应对 {pid} (group={live_trader._ab_group(pid, n_groups=4)}) 返 True",
+            )
+
+    def test_phase_4l_module_default_is_always(self):
+        """Phase 4.L: 模块级默认值已从 'abcd' 切到 'always'."""
+        self.assertEqual(live_trader.LIVE_SL_WICK_FILTER_MODE, "always",
+                         "Phase 4.L 已部署, 默认应为 'always'")
+
     def test_empty_paper_id_safe_path(self):
         """空 paper_id 在 abc 模式下也安全 (返 False = 不过滤, 等同 A 组)."""
         # _ab_group("") == "A", 所以 abc 模式 wick=False

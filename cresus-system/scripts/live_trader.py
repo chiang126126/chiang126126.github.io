@@ -169,8 +169,18 @@ LIVE_BTC_REGIME_THRESHOLD_PCT = 0.5
 #       SL 外停留 ≥ ~30s). 单次 wick 不再触发.
 # A/B/C 测试: A=无补偿无过滤(基线), B=补偿无过滤(Phase 4.D), C=无补偿有过滤(Phase 4.E).
 #   每组 ~1/3, 用同一 paper_id MD5 → 0/1/2 分配.
-LIVE_SL_WICK_FILTER_MODE = "abcd"   # "off" | "abc" (3-arm) | "abcd" (Phase 4.F) | "always"
-LIVE_WICK_FILTER_MIN_BREACHES = 2   # 需要连续 N 次轮询都 breach 才触发 SL
+#
+# Phase 4.L (2026-05-24): wick filter 推广 "abcd" → "always"
+# ==========================================
+# 9 天 (5/15-5/24, 239 笔 sl_breach_client) 数据驱动决策:
+#   C 组 (filter ON):   17 假止损 / 52 = 32.7%  (人均漏赚 $4.70)
+#   A+B+D (filter OFF): 71 假止损 / 187 = 38.0% (人均漏赚 ~$5)
+#   差异: 5.3 pp 改善 (C 组显著优)
+# 论断: wick filter 有真实 alpha. 推广全员 ('always' mode) 预期月度 +$170 (释放 paper edge).
+# 风险: 极低. orthogonal to regime gate (D 组). 改回 'abcd' 1 行即回滚.
+# 验证窗口: 2-3 天观察新数据. 若假止损率不降到 33% 左右, 重审.
+LIVE_SL_WICK_FILTER_MODE = "always"  # Phase 4.L 推广 (was "abcd")
+LIVE_WICK_FILTER_MIN_BREACHES = 2    # 需要连续 N 次轮询都 breach 才触发 SL
 
 # Phase 4.F Regime Gate (2026-05-21)
 # ==========================================
