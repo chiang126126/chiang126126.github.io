@@ -1,48 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-24T00:24:47.563614+00:00",
+  "generated_at": "2026-05-24T00:26:59.791199+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 407,
-    "open": 1,
-    "closed": 406,
+    "open": 0,
+    "closed": 407,
     "wins": 137,
-    "losses": 265,
-    "win_rate": 0.341,
-    "total_pnl_usdt": -3.7859,
-    "net_pnl_usdt": -11.2225,
-    "avg_pnl_usdt": -0.0093,
+    "losses": 266,
+    "win_rate": 0.34,
+    "total_pnl_usdt": -4.0855,
+    "net_pnl_usdt": -11.542,
+    "avg_pnl_usdt": -0.01,
     "best_trade_usdt": 3.5914,
     "worst_trade_usdt": -1.14,
-    "fees_paid_usdt": 7.4467,
-    "fees_realized_usdt": 7.4366,
-    "fees_open_usdt": 0.01,
+    "fees_paid_usdt": 7.4565,
+    "fees_realized_usdt": 7.4565,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 100.0,
-    "deployed_usdt": 20.03,
-    "free_capital_usdt": 68.74,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 88.46,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 0.0,
-    "deployed_usdt": 20.03
+    "daily_pnl": -0.2996,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "STEEMUSDT"
-    ],
-    "exchange_symbols": [
-      "STEEMUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "STEEMUSDT|LONG|2026-05-24T00:16:14.621114+00:00",
       "trade_id": "L1779581774_STEEMUS_L",
@@ -84,7 +81,7 @@
       "phase_a_mfe_pct": 0.506,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.010016,
+      "fees_paid_usdt": 0.019882,
       "fees_are_actual": true,
       "opened_at": "2026-05-24T00:17:15.354698+00:00",
       "is_dry_run": false,
@@ -95,13 +92,21 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.05566,
-      "current_price": 0.05518,
-      "unrealized_pnl_usdt": -0.1119,
-      "unrealized_pnl_pct": -0.559,
-      "last_price_check_at": "2026-05-24T00:24:45.703282+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.05474,
+      "unrealized_pnl_usdt": -0.2708,
+      "unrealized_pnl_pct": -1.352,
+      "last_price_check_at": "2026-05-24T00:25:17.785821+00:00",
+      "closed_at": "2026-05-24T00:25:23.023823+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.05466,
+      "realized_pnl_usdt": -0.2996,
+      "close_order_id": 107539311,
+      "close_qty": 361.0,
+      "close_expected_price": 0.055062139999999996,
+      "close_slippage_bps": 73.03,
+      "entry_fees_usdt": 0.010016,
+      "close_fees_usdt": 0.009866
+    },
     {
       "paper_id": "AEROUSDT|LONG|2026-05-23T18:21:53.715411+00:00",
       "trade_id": "L1779560513_AEROUSD_L",
@@ -23485,18 +23490,27 @@
       "conviction_score": 5,
       "signal_at": "2026-05-24T00:07:51.172478+00:00",
       "reason": "conviction_score 5 < threshold 6 (Phase 4.H filter)",
-      "last_checked_at": "2026-05-24T00:24:45.703282+00:00"
+      "last_checked_at": "2026-05-24T00:26:57.680275+00:00"
+    },
+    {
+      "paper_id": "HIVEUSDT|LONG|2026-05-24T00:25:07.524697+00:00",
+      "symbol": "HIVEUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-05-24T00:25:40.217606+00:00",
+      "reason": "conviction_score 5 < threshold 6 (Phase 4.H filter)",
+      "last_checked_at": "2026-05-24T00:26:57.680275+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 76622.0,
-    "btc_ma25_1h": 75535.74,
-    "pct_vs_ma25": 1.438,
-    "change_24h_pct": 1.707,
+    "btc_price": 76628.7,
+    "btc_ma25_1h": 75536.01,
+    "pct_vs_ma25": 1.447,
+    "change_24h_pct": 1.716,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-24T00:24:47.234292+00:00"
+    "computed_at": "2026-05-24T00:26:59.748236+00:00"
   },
   "config": {
     "starting_capital_usdt": 100.0,
