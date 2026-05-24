@@ -15,13 +15,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from v4_data_fetcher import (
     TIMEFRAMES, KLINES_MAX_LIMIT,
     PROTOTYPE_MAINSTREAM, V3_LIVE_WHITELIST, V3_LIVE_BLACKLIST,
-    list_v3_symbols, list_prototype_symbols,
+    list_v3_symbols, list_prototype_symbols, list_default_universe,
     _ms, _http_get,
     fetch_klines, klines_to_df, save_klines_parquet, load_klines,
     fetch_funding, funding_to_df,
     fetch_oi_hist, oi_to_df,
     fetch_taker_ratio, taker_to_df,
-    download_one_symbol,
+    download_one_symbol, download_all,
 )
 import v4_data_fetcher as df_mod
 
@@ -122,6 +122,28 @@ def test_list_prototype_symbols_15_unique():
     assert len(syms) == 15
     assert len(set(syms)) == 15  # 无重复
     assert syms == sorted(syms)  # 已排序
+
+
+def test_list_default_universe_includes_mainstream(tmp_path):
+    """V4 默认 universe 必须含主流币 (V3 paper 不含主流币的 bug 修复)."""
+    history_path = tmp_path / "paper.json"
+    history_path.write_text(json.dumps({
+        "recent_closed": [
+            {"symbol": "RANDOMUSDT"}, {"symbol": "MEMEUSDT"},
+        ],
+        "open_trades": [],
+    }))
+    syms = list_default_universe(history_path)
+    # V3 paper 抽到 2 个 + 10 mainstream + 5 blacklist
+    assert "BTCUSDT" in syms
+    assert "ETHUSDT" in syms
+    assert "SOLUSDT" in syms
+    assert "RANDOMUSDT" in syms
+    assert "MEMEUSDT" in syms
+    assert "DODOXUSDT" in syms  # V3 blacklist
+    assert syms == sorted(syms)
+    # 排重: 2 + 10 + 5 = 17 unique (无 overlap 时)
+    assert len(syms) == 17
 
 
 # ── klines_to_df ────────────────────────────────────────────────────

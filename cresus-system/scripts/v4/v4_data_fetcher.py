@@ -141,7 +141,11 @@ def _http_get(path: str, params: dict, retries: int = MAX_RETRIES) -> list | dic
 # ── Symbol 列表 ──────────────────────────────────────────────────────
 
 def list_v3_symbols(paper_history_path: Path) -> list[str]:
-    """从 V3 paper_trades_history.json 抽取所有接触过的 symbol."""
+    """从 V3 paper_trades_history.json 抽取所有接触过的 symbol.
+
+    注意: V3 paper engine 用 1m 量价突变信号, 主流币 (BTC/ETH/SOL) 流动性大不被触发,
+    所以 V3 paper history 不含主流币. V4 默认 universe 用 list_default_universe() 补.
+    """
     with open(paper_history_path) as f:
         data = json.load(f)
     syms: set[str] = set()
@@ -151,6 +155,19 @@ def list_v3_symbols(paper_history_path: Path) -> list[str]:
             if sym:
                 syms.add(sym)
     return sorted(syms)
+
+
+def list_default_universe(paper_history_path: Path) -> list[str]:
+    """V4 默认下载/回测 universe.
+
+    = V3 paper ∪ Mainstream (10) ∪ V3 黑名单 (5)
+    确保主流币 (BTC/ETH/SOL/BNB/...) 一定在 — V4 day-scale 用 BTC 算 regime,
+    用主流币作长持目标. V3 paper 不含主流币 (1m 量价突变信号过滤掉了).
+    """
+    paper_syms = set(list_v3_symbols(paper_history_path))
+    mainstream = set(PROTOTYPE_MAINSTREAM)
+    blacklist = set(V3_LIVE_BLACKLIST)
+    return sorted(paper_syms | mainstream | blacklist)
 
 
 # ── K 线拉取 ────────────────────────────────────────────────────────
@@ -286,32 +303,30 @@ def load_funding(symbol: str) -> pd.DataFrame:
     return pd.read_parquet(path)
 
 
-# ── Open Interest history (30 日内查询限制) ──────────────────────────
+# ── Open Interest history ────────────────────────────────────────────
+# Binance 限制 (2026 verified):
+#   - 仅最近 30 日数据可查
+#   - startTime/endTime range 必须 *严格* < 30 days (= 30d 也会 400)
+# 简化处理: 不传 time params, 单次拿最新 limit=500 (max), Binance 自动 cap 在 30d.
+# 返回 ~180 行 (30d × 24h / 4h) for 4h interval.
 
-def fetch_oi_hist(symbol: str, start_ms: int, end_ms: int, interval: str = OI_INTERVAL) -> list[dict]:
-    """拉 OI 历史. Binance 限制 30 日 → 分段拉."""
-    all_rows: list[dict] = []
-    cursor = start_ms
-    while cursor < end_ms:
-        chunk_end = min(cursor + OI_MAX_LOOKBACK_DAYS * 86400 * 1000, end_ms)
-        params = {
-            "symbol": symbol.upper(),
-            "period": interval,
-            "startTime": cursor,
-            "endTime": chunk_end,
-            "limit": OI_MAX_LIMIT,
-        }
-        try:
-            data = _http_get(OI_HIST_ENDPOINT, params)
-        except Exception as e:
-            log.warning(f"OI fetch failed for {symbol} [{cursor}-{chunk_end}]: {e}")
-            cursor = chunk_end + 1
-            continue
-        if not isinstance(data, list):
-            break
-        all_rows.extend(data)
-        cursor = chunk_end + 1
-    return all_rows
+def fetch_oi_hist(symbol: str, start_ms: int = 0, end_ms: int = 0, interval: str = OI_INTERVAL) -> list[dict]:
+    """拉 OI 历史 (最近 30 日, ~180 行 at 4h).
+
+    start_ms / end_ms 参数保留为 backward-compat, 实际忽略.
+    Binance 仅存 30 日数据, 无法补更早.
+    """
+    params = {
+        "symbol": symbol.upper(),
+        "period": interval,
+        "limit": OI_MAX_LIMIT,
+    }
+    try:
+        data = _http_get(OI_HIST_ENDPOINT, params)
+    except Exception as e:
+        log.warning(f"OI fetch failed for {symbol}: {e}")
+        return []
+    return data if isinstance(data, list) else []
 
 
 def oi_to_df(rows: list[dict]) -> pd.DataFrame:
@@ -340,32 +355,23 @@ def load_oi(symbol: str) -> pd.DataFrame:
     return pd.read_parquet(path)
 
 
-# ── Taker buy ratio (30 日内查询限制) ─────────────────────────────────
+# ── Taker buy ratio ──────────────────────────────────────────────────
+# 同 OI: Binance 限制 30 日 + range 严格 < 30d.
+# 不传 time params, 单次拿最新 500 行.
 
-def fetch_taker_ratio(symbol: str, start_ms: int, end_ms: int, interval: str = TAKER_INTERVAL) -> list[dict]:
-    """拉 taker buy/sell ratio. 30 日限制 → 分段."""
-    all_rows: list[dict] = []
-    cursor = start_ms
-    while cursor < end_ms:
-        chunk_end = min(cursor + TAKER_MAX_LOOKBACK_DAYS * 86400 * 1000, end_ms)
-        params = {
-            "symbol": symbol.upper(),
-            "period": interval,
-            "startTime": cursor,
-            "endTime": chunk_end,
-            "limit": TAKER_MAX_LIMIT,
-        }
-        try:
-            data = _http_get(TAKER_RATIO_ENDPOINT, params)
-        except Exception as e:
-            log.warning(f"taker fetch failed for {symbol} [{cursor}-{chunk_end}]: {e}")
-            cursor = chunk_end + 1
-            continue
-        if not isinstance(data, list):
-            break
-        all_rows.extend(data)
-        cursor = chunk_end + 1
-    return all_rows
+def fetch_taker_ratio(symbol: str, start_ms: int = 0, end_ms: int = 0, interval: str = TAKER_INTERVAL) -> list[dict]:
+    """拉 taker buy/sell ratio (最近 30 日)."""
+    params = {
+        "symbol": symbol.upper(),
+        "period": interval,
+        "limit": TAKER_MAX_LIMIT,
+    }
+    try:
+        data = _http_get(TAKER_RATIO_ENDPOINT, params)
+    except Exception as e:
+        log.warning(f"taker fetch failed for {symbol}: {e}")
+        return []
+    return data if isinstance(data, list) else []
 
 
 def taker_to_df(rows: list[dict]) -> pd.DataFrame:
@@ -467,19 +473,34 @@ def download_one_symbol(symbol: str, start_ms: int, end_ms: int,
     return result
 
 
-def download_all(symbols: Iterable[str], months_back: int = 6) -> dict:
-    """主入口: 下载所有 symbol × 所有数据."""
+def download_all(symbols: Iterable[str], months_back: int = 6,
+                 timeframes: tuple = TIMEFRAMES,
+                 include_funding: bool = True,
+                 include_oi: bool = True,
+                 include_taker: bool = True) -> dict:
+    """主入口: 下载所有 symbol × 所有数据.
+
+    返回 stats dict 含 per-category 计数 (klines/funding/oi/taker), 方便 debug.
+    """
     end = datetime.now(tz=timezone.utc)
     start = end - timedelta(days=months_back * 30)
     end_ms, start_ms = _ms(end), _ms(start)
 
-    stats: dict = {"start": start.isoformat(), "end": end.isoformat(),
-                   "symbols": 0, "ok": 0, "partial": 0, "failed_all": [], "by_symbol": {}}
+    stats: dict = {
+        "start": start.isoformat(), "end": end.isoformat(),
+        "symbols": 0, "ok": 0, "partial": 0, "failed_all": [],
+        "kline_ok": 0, "funding_ok": 0, "oi_ok": 0, "taker_ok": 0,
+        "by_symbol": {},
+    }
     symbols = list(symbols)
     stats["symbols"] = len(symbols)
 
     for i, sym in enumerate(symbols, 1):
-        r = download_one_symbol(sym, start_ms, end_ms)
+        r = download_one_symbol(sym, start_ms, end_ms,
+                                timeframes=timeframes,
+                                include_funding=include_funding,
+                                include_oi=include_oi,
+                                include_taker=include_taker)
         stats["by_symbol"][sym] = r
         if not r["failed"]:
             stats["ok"] += 1
@@ -487,6 +508,15 @@ def download_all(symbols: Iterable[str], months_back: int = 6) -> dict:
             stats["partial"] += 1
         else:
             stats["failed_all"].append(sym)
+        # 分类计数
+        if any(k.startswith("klines_") for k in r["ok"]):
+            stats["kline_ok"] += 1
+        if "funding" in r["ok"]:
+            stats["funding_ok"] += 1
+        if "oi" in r["ok"]:
+            stats["oi_ok"] += 1
+        if "taker" in r["ok"]:
+            stats["taker_ok"] += 1
         if i % 10 == 0:
             log.info(f"progress: {i}/{len(symbols)} ({i/len(symbols)*100:.0f}%)")
 
@@ -496,23 +526,39 @@ def download_all(symbols: Iterable[str], months_back: int = 6) -> dict:
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="V4 historical data downloader")
-    parser.add_argument("--symbols", nargs="*", help="symbol list, 默认从 V3 paper 抽")
+    parser.add_argument("--symbols", nargs="*", help="symbol list")
     parser.add_argument("--prototype", action="store_true",
                         help="只拉 prototype 15 symbol (Day 3 验证用)")
     parser.add_argument("--months", type=int, default=6)
     parser.add_argument("--paper-history", type=Path,
                         default=Path.home() / "cresus-bot" / "paper_trades_history.json")
+    parser.add_argument("--skip-klines", action="store_true",
+                        help="跳过 K 线 (K 线已下过, 仅补 funding/OI/taker, 快很多)")
+    parser.add_argument("--skip-funding", action="store_true", help="跳过 funding")
+    parser.add_argument("--skip-oi", action="store_true", help="跳过 OI")
+    parser.add_argument("--skip-taker", action="store_true", help="跳过 taker")
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
+    # Symbol universe 默认: V3 paper ∪ Mainstream ∪ V3 黑名单 (含 BTC/ETH/SOL 等主流币)
     if args.prototype:
         syms = list_prototype_symbols()
         print(f"[prototype mode] 15 symbol = 10 mainstream + 5 V3 blacklist")
     elif args.symbols:
         syms = args.symbols
+        print(f"[explicit symbols] {len(syms)} from CLI")
     else:
-        syms = list_v3_symbols(args.paper_history)
-    print(f"下载 {len(syms)} symbol × {len(TIMEFRAMES)} timeframe × {args.months} 月...")
-    stats = download_all(syms, months_back=args.months)
+        syms = list_default_universe(args.paper_history)
+        print(f"[default universe] {len(syms)} = V3 paper ∪ Mainstream ∪ V3 blacklist")
+
+    tfs = () if args.skip_klines else TIMEFRAMES
+    print(f"下载 {len(syms)} symbol × {len(tfs)} timeframe × {args.months} 月 "
+          f"(funding={'skip' if args.skip_funding else 'on'}, "
+          f"oi={'skip' if args.skip_oi else 'on'}, "
+          f"taker={'skip' if args.skip_taker else 'on'})")
+    stats = download_all(syms, months_back=args.months, timeframes=tfs,
+                         include_funding=not args.skip_funding,
+                         include_oi=not args.skip_oi,
+                         include_taker=not args.skip_taker)
     print(json.dumps({k: v for k, v in stats.items() if k != "by_symbol"}, indent=2, default=str))
