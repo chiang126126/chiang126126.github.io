@@ -182,6 +182,25 @@ LIVE_BTC_REGIME_THRESHOLD_PCT = 0.5
 LIVE_SL_WICK_FILTER_MODE = "always"  # Phase 4.L 推广 (was "abcd")
 LIVE_WICK_FILTER_MIN_BREACHES = 2    # 需要连续 N 次轮询都 breach 才触发 SL
 
+# Phase 4.M Funding-aware mirror filter (2026-05-24)
+# ==========================================
+# 9 天 (5/15-5/24, paper 1072 笔) 数据驱动 audit:
+#   funding ≤ -0.05% (任意方向): paper 人均 +$3.97/笔 (LONG +$3.89, SHORT +$4.15)
+#   funding ≥ +0.05% (任意方向): paper 人均 -$0.85/笔 (LONG -$0.75, SHORT -$1.13)
+#   neutral |funding| < 0.05%:   paper 人均 +$0.57/笔 (基线)
+# 现象: funding 不是简单的"收钱/付钱"作用, 而是市场情绪 leading indicator.
+#       funding 负 = 恐慌/波动期, V3 volume-burst 信号在此环境更准.
+# 实施:
+#   1) funding ≥ +0.05% → 拒 mirror (live 不利组 16 笔 -$2, EV 负, 拒得起)
+#   2) funding ≤ -0.05% → 友好标记, _check_sl_breach 用 +1 breaches (3 vs 默认 2)
+#      给 favorable signal 多 30s wick 宽容, 减少假止损
+# 预期 EV: 月度 +$85 (合计拒 negative + 救假止损)
+# 风险: 低. fallback 'neutral' 不变. 改 LIVE_REJECT_ADVERSE_FUNDING=False 即回滚.
+LIVE_FUNDING_FAVORABLE_THRESHOLD_PCT = -0.05    # paper funding_rate_pct ≤ 此 → 友好
+LIVE_FUNDING_ADVERSE_THRESHOLD_PCT = 0.05       # ≥ 此 → 不利
+LIVE_REJECT_ADVERSE_FUNDING = True              # True: funding 不利时拒 mirror
+LIVE_FUNDING_FAVORABLE_WICK_BREACHES = 3        # 友好时 wick min_breaches (vs 默认 2)
+
 # Phase 4.F Regime Gate (2026-05-21)
 # ==========================================
 # 数据驱动: 333 笔实盘里 down regime LONG 10 笔 0 胜 0% (-$3.14, 人均 -$0.314),
@@ -357,6 +376,31 @@ def _trade_age_sec(paper_trade: dict, now: datetime) -> Optional[float]:
         return None
 
 
+def _funding_signal(paper_trade: dict) -> str:
+    """Phase 4.M: 根据 paper 信号 funding_rate_pct 判定 funding 类型.
+
+    Returns:
+        "favorable"  — funding_rate_pct ≤ LIVE_FUNDING_FAVORABLE_THRESHOLD_PCT (-0.05%).
+                       paper 数据: 人均 +$3.97/笔 (LONG +$3.89, SHORT +$4.15)
+        "adverse"    — funding_rate_pct ≥ LIVE_FUNDING_ADVERSE_THRESHOLD_PCT (+0.05%).
+                       paper 数据: 人均 -$0.85/笔 (LONG -$0.75, SHORT -$1.13)
+        "neutral"    — |funding| < 0.05%, 或字段缺失.
+                       paper 数据: 人均 +$0.57/笔 (基线)
+    """
+    f = paper_trade.get("funding_rate_pct")
+    if f is None:
+        return "neutral"
+    try:
+        f = float(f)
+    except (ValueError, TypeError):
+        return "neutral"
+    if f <= LIVE_FUNDING_FAVORABLE_THRESHOLD_PCT:
+        return "favorable"
+    if f >= LIVE_FUNDING_ADVERSE_THRESHOLD_PCT:
+        return "adverse"
+    return "neutral"
+
+
 def is_eligible_for_mirror(
     paper_trade: dict, live_state: dict, now: datetime,
     btc_regime: Optional[str] = None,
@@ -441,6 +485,13 @@ def is_eligible_for_mirror(
                     sub_info += f" 3h={btc_change_3h_pct:+.2f}%"
             return False, (f"regime gate ({mode}): {btc_regime} regime + {direction} "
                           f"被拒{sub_info} (数据驱动: down+LONG 历史 0/10 胜 p=0.042)")
+    # 8. Phase 4.M Funding gate: 拒 funding 不利信号 (≥ +0.05%, 任意方向)
+    if LIVE_REJECT_ADVERSE_FUNDING:
+        fs = _funding_signal(paper_trade)
+        if fs == "adverse":
+            f_pct = paper_trade.get("funding_rate_pct")
+            return False, (f"funding adverse ({f_pct}% ≥ {LIVE_FUNDING_ADVERSE_THRESHOLD_PCT}%) "
+                          f"(Phase 4.M: paper 历史人均 -$0.85, 不利 mirror)")
     return True, "ok"
 
 
@@ -1400,6 +1451,11 @@ def _try_mirror_open(
     wick_filter_enabled = _ab_use_wick_filter(paper_id, LIVE_SL_WICK_FILTER_MODE)
     regime_gate_enabled = _ab_use_regime_gate(paper_id, LIVE_REGIME_GATE_MODE)
     ab_group = _ab_group(paper_id)   # 'A' / 'B' / 'C' / 'D' — 记录用
+    # Phase 4.M: funding signal 类型 (友好/不利/中性). 友好时 wick filter 用 +1 breaches.
+    funding_signal = _funding_signal(paper_trade)
+    wick_min_breaches = (LIVE_FUNDING_FAVORABLE_WICK_BREACHES
+                         if funding_signal == "favorable" and wick_filter_enabled
+                         else LIVE_WICK_FILTER_MIN_BREACHES)
     sl_comp_offset = 0.0
     final_sl = float(result.get("sl_price", sl_price))   # 默认 = paper_sl
     sl_paper_at_open = float(sl_price)                    # 记录原始 paper_sl
@@ -1415,8 +1471,8 @@ def _try_mirror_open(
             )
     if wick_filter_enabled:
         log.info(
-            f"[wick-filter] {sym} {side} group=C, 启用 wick 过滤 "
-            f"(需 ≥{LIVE_WICK_FILTER_MIN_BREACHES} 次连续 breach 才触发 SL)"
+            f"[wick-filter] {sym} {side} 启用 wick 过滤 "
+            f"(需 ≥{wick_min_breaches} 次连续 breach 才触发 SL; funding={funding_signal})"
         )
     if regime_gate_enabled:
         log.info(
@@ -1444,11 +1500,14 @@ def _try_mirror_open(
         "sl_compensation_enabled": sl_comp_enabled,    # B 组标记 (Phase 4.D)
         "sl_compensation_offset": sl_comp_offset,      # offset (B 组非 0; A/C 组 0)
         "sl_compensation_mode": LIVE_SL_COMPENSATION_MODE,  # 部署时模式 (溯源用)
-        # Phase 4.E: Wick filter 字段
-        "wick_filter_enabled": wick_filter_enabled,    # C 组标记
-        "wick_filter_min_breaches": LIVE_WICK_FILTER_MIN_BREACHES if wick_filter_enabled else None,
+        # Phase 4.E / 4.L / 4.M: Wick filter 字段
+        "wick_filter_enabled": wick_filter_enabled,    # C 组标记 (4.L 起 always)
+        "wick_filter_min_breaches": wick_min_breaches if wick_filter_enabled else None,
         "wick_filter_mode": LIVE_SL_WICK_FILTER_MODE,  # 部署时模式 (溯源用)
-        "sl_breach_count": 0,                          # 连续 breach 计数器 (C 组用)
+        "sl_breach_count": 0,                          # 连续 breach 计数器
+        # Phase 4.M: Funding-aware filter 字段
+        "funding_signal": funding_signal,              # 'favorable' / 'adverse' / 'neutral'
+        "funding_rate_pct_at_open": paper_trade.get("funding_rate_pct"),
         # Phase 4.F: Regime gate 字段
         "regime_gate_enabled": regime_gate_enabled,    # D 组标记
         "regime_gate_mode": LIVE_REGIME_GATE_MODE,     # 部署时模式 (溯源用)

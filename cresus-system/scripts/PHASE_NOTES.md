@@ -552,3 +552,70 @@ LIVE_SL_WICK_FILTER_MODE = "abcd"   →   "always"
 - R2-R4: 其它链路修复 (限价单 4.I 重审 / 限制 SL 跟 paper sync 频率 / 等)
 
 合计 R1-R4 预期月度 +$700-1200, 跟 V4 v2 路径形成强对比 (V4 v2 EV 未知, 单笔风险 $20 vs V3 $0.60).
+
+---
+
+### Phase 4.M: A1 — Funding-aware mirror filter (2026-05-24)
+
+并行于 R1.1 观察期 (Phase 4.L 部署后 24-72h 观察), 启动 A1 funding 利用.
+
+**数据 audit (9 天, 5/15-5/24, paper 1072 笔)** —
+按 `funding_rate_pct` 切片人均 PnL:
+
+| 桶 | 阈值 | n | 人均 PnL | 备注 |
+|---|---|---|---|---|
+| LONG · funding ≤ -0.05% | favorable | ~250 | **+$3.89** | 多头给空头钱 |
+| SHORT · funding ≤ -0.05% | favorable | ~190 | **+$4.15** | (信号方向都是) |
+| neutral · | -0.05% ~ +0.05% | ~330 | +$0.57 | 基线 |
+| LONG · funding ≥ +0.05% | adverse | ~170 | **-$0.75** | 多头要付钱 |
+| SHORT · funding ≥ +0.05% | adverse | ~130 | **-$1.13** | (信号方向都是) |
+
+**洞察**:
+1. funding 是**方向性 alpha**, 不仅是 income/cost — `|funding| ≥ 0.05%` 子集人均 PnL 跟 funding 同方向 (favorable +$3.97 vs adverse -$0.85, 差 **+$4.82/笔**).
+2. funding "income" 几乎可忽略 ($0.01-0.03/笔), 所以 +$4.82 几乎全是**入场质量**.
+3. 解释: funding 极端 = 拥挤交易 = mean reversion 概率高, 我们的入场逻辑刚好"反 funding 方向" → 顺势.
+
+**实施 (2 道 gate)**:
+
+```python
+# config (live_trader.py)
+LIVE_FUNDING_FAVORABLE_THRESHOLD_PCT = -0.05   # ≤ → favorable
+LIVE_FUNDING_ADVERSE_THRESHOLD_PCT = 0.05      # ≥ → adverse
+LIVE_REJECT_ADVERSE_FUNDING = True             # gate 开关
+LIVE_FUNDING_FAVORABLE_WICK_BREACHES = 3       # favorable 时 wick 需 3 次 (vs 默认 2)
+```
+
+1. **Gate 1 (拒)**: `is_eligible_for_mirror` 在 conviction filter 后增 funding adverse check —
+   `_funding_signal(paper_trade) == "adverse"` 直接 return False.
+   → 预期 mirror 笔数 -30%, 但是被拒的是人均 -$0.85 的子集.
+2. **Gate 2 (Boost wick)**: favorable 笔, `wick_min_breaches = 3` (vs 默认 2) —
+   留更长时间给假插针自愈, 因为 funding 友好的盘往往 SL 假触发更多.
+
+**预期 EV (保守)**:
+- 拒掉 adverse: 月度 ~170 + ~130 = 300 笔, 平均 -$0.94 → +$282/月 避损.
+- favorable 加 wick: 240+190=430 笔 × 增加 ~2% 留存率 × $4 改善 ≈ +$30/月.
+- 合计 **~+$300/月** (但需 sample 累积验证).
+
+**风险**:
+- 低. fallback 'neutral' 不变. `LIVE_REJECT_ADVERSE_FUNDING = False` 即回滚.
+- 没影响 paper engine, 只影响 mirror eligibility.
+- 老 paper 数据没 `funding_rate_pct` 字段 → `_funding_signal` fallback "neutral" → 允许.
+
+**回滚开关 (单行)**:
+```python
+LIVE_REJECT_ADVERSE_FUNDING = False   # 关 funding adverse gate
+```
+
+**Live trade 字段新增**:
+- `funding_signal`: "favorable" / "adverse" / "neutral"
+- `funding_rate_pct_at_open`: 入场时 paper 的 funding_rate_pct (溯源用)
+- `wick_filter_min_breaches`: 友好时 = 3, 否则 = LIVE_WICK_FILTER_MIN_BREACHES (=2)
+
+**验证窗口**: 7-10 天累积新数据, 按 `funding_signal` 切 live PnL, 看是否复制 paper 分层.
+- 期望: live favorable 比 live neutral 高 ≥ $2/笔 (paper 是 $3.4 差).
+- 若反向 (live favorable 更差) — Phase 4.M 失败, 关 gate 重审 hypothesis.
+
+**为什么并行做 (没等 R1.1)**: A1 跟 R1.1 改的是不同维度 (R1.1 = wick 推广, A1 = funding 入场过滤), 可独立观察互不污染.
+跟 4.L 一起部署可在同一时间窗口收 paper vs live 对比数据.
+
+---

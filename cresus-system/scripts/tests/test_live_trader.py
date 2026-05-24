@@ -1906,6 +1906,107 @@ class TestIsEligibleRegimeGate(unittest.TestCase):
         self.assertNotIn("3h=", reason)
 
 
+class TestFundingSignal(unittest.TestCase):
+    """Phase 4.M (2026-05-24): _funding_signal 三分类 + funding adverse gate.
+
+    9 天 paper 数据 (5/15-5/24, 1072 笔) 驱动:
+      funding ≤ -0.05%: 人均 +$3.97/笔 (LONG +$3.89, SHORT +$4.15)  ← favorable
+      |funding| < 0.05%: 人均 +$0.57/笔                              ← neutral
+      funding ≥ +0.05%: 人均 -$0.85/笔 (LONG -$0.75, SHORT -$1.13)  ← adverse
+    """
+
+    def test_funding_signal_favorable_at_negative_threshold(self):
+        self.assertEqual(live_trader._funding_signal({"funding_rate_pct": -0.05}),
+                         "favorable")
+        self.assertEqual(live_trader._funding_signal({"funding_rate_pct": -0.10}),
+                         "favorable")
+
+    def test_funding_signal_adverse_at_positive_threshold(self):
+        self.assertEqual(live_trader._funding_signal({"funding_rate_pct": 0.05}),
+                         "adverse")
+        self.assertEqual(live_trader._funding_signal({"funding_rate_pct": 0.20}),
+                         "adverse")
+
+    def test_funding_signal_neutral_middle_range(self):
+        self.assertEqual(live_trader._funding_signal({"funding_rate_pct": 0.0}),
+                         "neutral")
+        self.assertEqual(live_trader._funding_signal({"funding_rate_pct": 0.04}),
+                         "neutral")
+        self.assertEqual(live_trader._funding_signal({"funding_rate_pct": -0.04}),
+                         "neutral")
+
+    def test_funding_signal_missing_or_invalid_field_neutral(self):
+        """字段缺失或类型错误 → 'neutral' (fallback, 不影响老数据)."""
+        self.assertEqual(live_trader._funding_signal({}), "neutral")
+        self.assertEqual(live_trader._funding_signal({"funding_rate_pct": None}),
+                         "neutral")
+        self.assertEqual(live_trader._funding_signal({"funding_rate_pct": "n/a"}),
+                         "neutral")
+
+
+class TestIsEligibleFundingGate(unittest.TestCase):
+    """Phase 4.M: is_eligible_for_mirror 增 funding adverse gate (步骤 8)."""
+
+    def setUp(self):
+        self.now = datetime.now(timezone.utc)
+        self.live_state = {"mirrored_paper_ids": [], "live_open_trades": []}
+
+    def _make_trade(self, funding_pct=None, direction="LONG"):
+        t = {
+            "id": f"BTCUSDT|{direction}|2026-05-24T10:00:00+00:00",
+            "symbol": "BTCUSDT",
+            "direction": direction,
+            "entered_at": (self.now - timedelta(seconds=10)).isoformat(),
+            "entry_price": 80000.0,
+            "sl": 79000.0,
+            "conviction_score": 6,
+        }
+        if funding_pct is not None:
+            t["funding_rate_pct"] = funding_pct
+        return t
+
+    def test_adverse_funding_blocked(self):
+        """funding_rate_pct ≥ +0.05% → 拒 mirror, reason 含 'funding adverse'."""
+        pt = self._make_trade(funding_pct=0.12)
+        ok, reason = live_trader.is_eligible_for_mirror(
+            pt, self.live_state, self.now, btc_regime="up"
+        )
+        self.assertFalse(ok)
+        self.assertIn("funding adverse", reason)
+
+    def test_favorable_funding_allowed(self):
+        """funding_rate_pct ≤ -0.05% → 允许 (favorable)."""
+        pt = self._make_trade(funding_pct=-0.10)
+        ok, reason = live_trader.is_eligible_for_mirror(
+            pt, self.live_state, self.now, btc_regime="up"
+        )
+        self.assertTrue(ok, f"favorable funding 应允许, reason={reason}")
+
+    def test_neutral_funding_allowed(self):
+        pt = self._make_trade(funding_pct=0.02)
+        ok, _ = live_trader.is_eligible_for_mirror(
+            pt, self.live_state, self.now, btc_regime="up"
+        )
+        self.assertTrue(ok)
+
+    def test_missing_funding_field_allowed_backward_compat(self):
+        """老 paper 没 funding_rate_pct → fallback 'neutral' → 允许."""
+        pt = self._make_trade(funding_pct=None)
+        ok, _ = live_trader.is_eligible_for_mirror(
+            pt, self.live_state, self.now, btc_regime="up"
+        )
+        self.assertTrue(ok)
+
+    def test_reject_disabled_when_flag_off(self):
+        """LIVE_REJECT_ADVERSE_FUNDING=False → adverse 也允许 (回滚开关)."""
+        pt = self._make_trade(funding_pct=0.20)
+        with patch.object(live_trader, "LIVE_REJECT_ADVERSE_FUNDING", False):
+            ok, _ = live_trader.is_eligible_for_mirror(
+                pt, self.live_state, self.now, btc_regime="up"
+            )
+        self.assertTrue(ok, "关掉开关后 adverse 应放行 (回滚验证)")
+
+
 class TestConvictionFilter(unittest.TestCase):
     """Phase 4.H (2026-05-22): Conviction filter — 仅 mirror 高分位钻石信号.
 
@@ -3476,6 +3577,69 @@ class TestMirrorIterationGuards(unittest.TestCase):
         lt = result["live_open_trades"][0]
         self.assertFalse(lt["wick_filter_enabled"])
         self.assertIsNone(lt["wick_filter_min_breaches"])
+
+    def test_phase_4m_favorable_funding_boosts_wick_breaches(self):
+        """Phase 4.M 集成: favorable funding (≤ -0.05%) + wick always
+        → wick_filter_min_breaches = 3 (而非默认 2). live_trade 含 funding_signal."""
+        now = datetime.now(timezone.utc)
+        self._write_paper([{
+            "id": "BTCUSDT|LONG|t_fav_funding",
+            "symbol": "BTCUSDT", "direction": "LONG",
+            "entered_at": (now - timedelta(seconds=10)).isoformat(),
+            "entry_price": 100.0, "sl": 95.0,
+            "funding_rate_pct": -0.10,   # favorable
+        }])
+        mock_open = {
+            "trade_id": "L1", "symbol": "BTCUSDT", "side": "BUY", "qty": 0.2,
+            "avg_fill_price": 100.0, "actual_notional": 20.0,
+            "entry_order_id": 1, "entry_client_id": "x",
+            "sl_price": 95.0,
+            "sl_side": "SELL", "sl_mode": "client_side",
+            "opened_at": now.isoformat(),
+            "fees_paid_usdt": 0, "_dryRun": True,
+        }
+        with patch.object(live_trader, "LIVE_SL_WICK_FILTER_MODE", "always"), \
+             patch.object(live_trader, "LIVE_SL_COMPENSATION_MODE", "off"), \
+             patch.object(self.client, "open_position", return_value=mock_open), \
+             patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "100.0", 0, 0, 0, 0, 0, 0, 0]]):
+            result = main_loop(self.client, dry_run=True)
+        lt = result["live_open_trades"][0]
+        self.assertEqual(lt["funding_signal"], "favorable")
+        self.assertEqual(lt["funding_rate_pct_at_open"], -0.10)
+        self.assertTrue(lt["wick_filter_enabled"])
+        self.assertEqual(lt["wick_filter_min_breaches"],
+                         live_trader.LIVE_FUNDING_FAVORABLE_WICK_BREACHES)
+
+    def test_phase_4m_neutral_funding_uses_default_breaches(self):
+        """Phase 4.M 集成: neutral funding → wick_filter_min_breaches = 默认 2."""
+        now = datetime.now(timezone.utc)
+        self._write_paper([{
+            "id": "BTCUSDT|LONG|t_neutral_funding",
+            "symbol": "BTCUSDT", "direction": "LONG",
+            "entered_at": (now - timedelta(seconds=10)).isoformat(),
+            "entry_price": 100.0, "sl": 95.0,
+            "funding_rate_pct": 0.02,   # neutral
+        }])
+        mock_open = {
+            "trade_id": "L1", "symbol": "BTCUSDT", "side": "BUY", "qty": 0.2,
+            "avg_fill_price": 100.0, "actual_notional": 20.0,
+            "entry_order_id": 1, "entry_client_id": "x",
+            "sl_price": 95.0,
+            "sl_side": "SELL", "sl_mode": "client_side",
+            "opened_at": now.isoformat(),
+            "fees_paid_usdt": 0, "_dryRun": True,
+        }
+        with patch.object(live_trader, "LIVE_SL_WICK_FILTER_MODE", "always"), \
+             patch.object(live_trader, "LIVE_SL_COMPENSATION_MODE", "off"), \
+             patch.object(self.client, "open_position", return_value=mock_open), \
+             patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "100.0", 0, 0, 0, 0, 0, 0, 0]]):
+            result = main_loop(self.client, dry_run=True)
+        lt = result["live_open_trades"][0]
+        self.assertEqual(lt["funding_signal"], "neutral")
+        self.assertEqual(lt["wick_filter_min_breaches"],
+                         live_trader.LIVE_WICK_FILTER_MIN_BREACHES)
 
     def test_phase_4f_regime_gate_blocks_down_long_in_main_loop(self):
         """Phase 4.F 集成: D 组 + down regime + LONG → main_loop 不 mirror,
