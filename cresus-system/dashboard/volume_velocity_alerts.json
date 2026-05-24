@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-24T21:08:58.231658+00:00",
+  "updated_at": "2026-05-24T21:11:03.155144+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 20,
+  "alerts_count": 21,
   "alerts": [
+    {
+      "symbol": "HEIUSDT",
+      "base": "HEI",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.0614,
+      "price_change_pct": 0.672,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 55510.0,
+      "volume_baseline_usdt": 4795.0,
+      "volume_ratio": 11.58,
+      "detected_at": "2026-05-24T21:11:02.402579+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.311,
+      "change_15m_pct": 1.29,
+      "change_1h_pct": 3.41,
+      "change_4h_pct": 0.525,
+      "taker_buy_ratio_1m": 0.541,
+      "taker_buy_ratio_5m": 0.456,
+      "oi_delta_5m_pct": 1.978,
+      "funding_rate_pct": -0.0001,
+      "atr_pct": 0.579,
+      "range_4h_pct": 5.5,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.06086643,
+      "suggested_tp1": 0.06220036,
+      "suggested_tp2": 0.06300071,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "HANAUSDT",
       "base": "HANA",
