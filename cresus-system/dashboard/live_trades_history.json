@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-25T10:09:56.350926+00:00",
+  "generated_at": "2026-05-25T10:12:10.146650+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 445,
-    "open": 2,
+    "total_trades": 446,
+    "open": 3,
     "closed": 443,
     "wins": 147,
     "losses": 292,
@@ -15,35 +15,35 @@
     "avg_pnl_usdt": -0.192,
     "best_trade_usdt": 29.0009,
     "worst_trade_usdt": -14.8626,
-    "fees_paid_usdt": 19.9236,
+    "fees_paid_usdt": 20.1238,
     "fees_realized_usdt": 19.5233,
-    "fees_open_usdt": 0.4003,
+    "fees_open_usdt": 0.6005,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 800.53,
-    "free_capital_usdt": 1094.49,
+    "deployed_usdt": 1201.0,
+    "free_capital_usdt": 693.82,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 3
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -70.6122,
-    "deployed_usdt": 1201.72
+    "daily_pnl": -74.0003,
+    "deployed_usdt": 1201.0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "MORPHOUSDT",
-      "APRUSDT",
-      "HANAUSDT"
+      "ZEREBROUSDT",
+      "HANAUSDT",
+      "MORPHOUSDT"
     ],
     "exchange_symbols": [
-      "MORPHOUSDT",
-      "APRUSDT",
-      "HANAUSDT"
+      "ZEREBROUSDT",
+      "HANAUSDT",
+      "MORPHOUSDT"
     ]
   },
   "open_trades": [
@@ -101,10 +101,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.03469,
-      "current_price": 0.03553,
-      "unrealized_pnl_usdt": 7.3988,
-      "unrealized_pnl_pct": 1.851,
-      "last_price_check_at": "2026-05-25T10:09:51.631199+00:00"
+      "current_price": 0.03563,
+      "unrealized_pnl_usdt": 6.2945,
+      "unrealized_pnl_pct": 1.575,
+      "last_price_check_at": "2026-05-25T10:12:07.247496+00:00"
     },
     {
       "paper_id": "MORPHOUSDT|LONG|2026-05-25T09:33:59.778075+00:00",
@@ -148,7 +148,7 @@
       "atr_pct": 0.318,
       "phase_a_mfe_pct": 0.642,
       "phase_b_mfe_pct": 1.31,
-      "phase_c_mfe_pct": 2.203,
+      "phase_c_mfe_pct": 2.276,
       "fees_paid_usdt": 0.200385,
       "fees_are_actual": true,
       "opened_at": "2026-05-25T09:34:59.151376+00:00",
@@ -160,12 +160,71 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 2.366,
-      "current_price": 2.3975,
-      "unrealized_pnl_usdt": 7.2846,
-      "unrealized_pnl_pct": 1.818,
-      "last_price_check_at": "2026-05-25T10:09:51.631199+00:00",
+      "current_price": 2.4033,
+      "unrealized_pnl_usdt": 8.2717,
+      "unrealized_pnl_pct": 2.064,
+      "last_price_check_at": "2026-05-25T10:12:07.247496+00:00",
       "phase_b_mfe_price": 2.3817,
-      "phase_c_mfe_price": 2.4027
+      "phase_c_mfe_price": 2.4044
+    },
+    {
+      "paper_id": "ZEREBROUSDT|LONG|2026-05-25T10:02:52.181667+00:00",
+      "trade_id": "L1779703372_ZEREBRO_L",
+      "symbol": "ZEREBROUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.024662,
+      "avg_fill_price": 0.0245796,
+      "slippage_bps": -33.41,
+      "qty": 16293.0,
+      "notional_usdt": 400.47565,
+      "leverage": 1,
+      "risk_usdt": 3.7757,
+      "risk_pct": 0.943,
+      "mirror_latency_sec": 441.4,
+      "sl_price": 0.02426546,
+      "sl_paper_current": 0.02434786,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -8.24e-05,
+      "sl_compensation_mode": "abcd",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 2,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "B",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.02513321,
+      "tp2_price": 0.02560443,
+      "phase": "A",
+      "entry_order_id": 165181972,
+      "entry_client_id": "cresus_L1779703372_ZEREBRO_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.637,
+      "phase_a_mfe_pct": 0.596,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.200238,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-25T10:10:30.516047+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "up",
+      "btc_price_at_open": 77542.1,
+      "btc_change_24h_at_open": 0.489,
+      "btc_pct_vs_ma25_at_open": 0.74,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.024809,
+      "current_price": 0.02472,
+      "unrealized_pnl_usdt": 2.2875,
+      "unrealized_pnl_pct": 0.571,
+      "last_price_check_at": "2026-05-25T10:12:07.247496+00:00"
     }
   ],
   "recent_closed": [
@@ -26114,7 +26173,7 @@
     "change_24h_pct": 0.489,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-25T10:09:54.176860+00:00"
+    "computed_at": "2026-05-25T10:12:09.299708+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
