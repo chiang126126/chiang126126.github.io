@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-25T15:42:40.127688+00:00",
+  "generated_at": "2026-05-25T15:44:45.289535+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 461,
-    "open": 1,
+    "total_trades": 462,
+    "open": 2,
     "closed": 460,
     "wins": 153,
     "losses": 303,
@@ -15,30 +15,32 @@
     "avg_pnl_usdt": -0.1266,
     "best_trade_usdt": 29.0009,
     "worst_trade_usdt": -14.8626,
-    "fees_paid_usdt": 25.746,
+    "fees_paid_usdt": 25.9458,
     "fees_realized_usdt": 25.546,
-    "fees_open_usdt": 0.2,
+    "fees_open_usdt": 0.3998,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 400.0,
-    "free_capital_usdt": 1516.01,
+    "deployed_usdt": 799.68,
+    "free_capital_usdt": 1116.13,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -47.1888,
-    "deployed_usdt": 400.0
+    "deployed_usdt": 799.68
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
+      "ORDIUSDT",
       "SAGAUSDT"
     ],
     "exchange_symbols": [
+      "ORDIUSDT",
       "SAGAUSDT"
     ]
   },
@@ -83,7 +85,7 @@
       "conviction_score": 5,
       "alert_type": "sustained",
       "atr_pct": 0.702,
-      "phase_a_mfe_pct": 0.081,
+      "phase_a_mfe_pct": 0.121,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.2,
@@ -96,11 +98,70 @@
       "btc_pct_vs_ma25_at_open": 0.725,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 0.02476,
-      "current_price": 0.0247,
-      "unrealized_pnl_usdt": -1.6129,
-      "unrealized_pnl_pct": -0.403,
-      "last_price_check_at": "2026-05-25T15:42:37.663983+00:00"
+      "phase_a_mfe_price": 0.02477,
+      "current_price": 0.0249,
+      "unrealized_pnl_usdt": 1.6129,
+      "unrealized_pnl_pct": 0.403,
+      "last_price_check_at": "2026-05-25T15:44:43.597263+00:00"
+    },
+    {
+      "paper_id": "ORDIUSDT|LONG|2026-05-25T15:42:37.756943+00:00",
+      "trade_id": "L1779723757_ORDIUSD_L",
+      "symbol": "ORDIUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 4.219,
+      "avg_fill_price": 4.216,
+      "slippage_bps": -7.11,
+      "qty": 94.8,
+      "notional_usdt": 399.6768,
+      "leverage": 1,
+      "risk_usdt": 1.4322,
+      "risk_pct": 0.358,
+      "mirror_latency_sec": 9.6,
+      "sl_price": 4.20089286,
+      "sl_paper_current": 4.20089286,
+      "sl_compensation_enabled": false,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "abcd",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 2,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.0002,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "A",
+      "min_conviction_threshold": null,
+      "tp1_price": 4.24616071,
+      "tp2_price": 4.27332143,
+      "phase": "A",
+      "entry_order_id": 111044533,
+      "entry_client_id": "cresus_L1779723757_ORDIUSD_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.286,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.199838,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-25T15:43:22.113717+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "up",
+      "btc_price_at_open": 77594.3,
+      "btc_change_24h_at_open": 1.616,
+      "btc_pct_vs_ma25_at_open": 0.674,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 4.219,
+      "current_price": 4.214,
+      "unrealized_pnl_usdt": -0.1896,
+      "unrealized_pnl_pct": -0.047,
+      "last_price_check_at": "2026-05-25T15:44:43.597263+00:00"
     }
   ],
   "recent_closed": [
@@ -27231,8 +27292,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-25T14:13:36.928943+00:00",
-      "reason": "paper trade too old (5341s > 600s)",
-      "last_checked_at": "2026-05-25T15:42:37.663983+00:00"
+      "reason": "paper trade too old (5467s > 600s)",
+      "last_checked_at": "2026-05-25T15:44:43.597263+00:00"
     },
     {
       "paper_id": "RENDERUSDT|LONG|2026-05-25T14:49:55.459198+00:00",
@@ -27240,8 +27301,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-25T14:50:49.435053+00:00",
-      "reason": "paper trade too old (3108s > 600s)",
-      "last_checked_at": "2026-05-25T15:42:37.663983+00:00"
+      "reason": "paper trade too old (3234s > 600s)",
+      "last_checked_at": "2026-05-25T15:44:43.597263+00:00"
     },
     {
       "paper_id": "AZTECUSDT|LONG|2026-05-25T15:05:37.502980+00:00",
@@ -27249,8 +27310,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-25T15:05:40.409887+00:00",
-      "reason": "paper trade too old (2217s > 600s)",
-      "last_checked_at": "2026-05-25T15:42:37.663983+00:00"
+      "reason": "paper trade too old (2343s > 600s)",
+      "last_checked_at": "2026-05-25T15:44:43.597263+00:00"
     },
     {
       "paper_id": "GUAUSDT|LONG|2026-05-25T15:25:08.065800+00:00",
@@ -27259,7 +27320,7 @@
       "conviction_score": 6,
       "signal_at": "2026-05-25T15:25:56.996745+00:00",
       "reason": "symbol GUAUSDT in live blacklist (历史 0 胜)",
-      "last_checked_at": "2026-05-25T15:42:37.663983+00:00"
+      "last_checked_at": "2026-05-25T15:44:43.597263+00:00"
     },
     {
       "paper_id": "CHIPUSDT|SHORT|2026-05-25T15:25:09.869388+00:00",
@@ -27267,19 +27328,19 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-25T15:25:56.996745+00:00",
-      "reason": "paper trade too old (1001s > 600s)",
-      "last_checked_at": "2026-05-25T15:42:37.663983+00:00"
+      "reason": "paper trade too old (1127s > 600s)",
+      "last_checked_at": "2026-05-25T15:44:43.597263+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 77619.1,
-    "btc_ma25_1h": 77076.12,
-    "pct_vs_ma25": 0.704,
-    "change_24h_pct": 1.648,
+    "btc_price": 77594.4,
+    "btc_ma25_1h": 77075.13,
+    "pct_vs_ma25": 0.674,
+    "change_24h_pct": 1.616,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-25T15:42:39.815054+00:00"
+    "computed_at": "2026-05-25T15:44:44.641123+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
