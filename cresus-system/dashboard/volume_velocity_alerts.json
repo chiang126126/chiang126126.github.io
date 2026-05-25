@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-25T15:58:13.184954+00:00",
+  "updated_at": "2026-05-25T16:00:22.591761+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 39,
+  "alerts_count": 40,
   "alerts": [
+    {
+      "symbol": "DOGSUSDT",
+      "base": "DOGS",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 5.477e-05,
+      "price_change_pct": 1.576,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 74496.0,
+      "volume_baseline_usdt": 11821.0,
+      "volume_ratio": 6.3,
+      "detected_at": "2026-05-25T15:59:47.563858+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.549,
+      "change_15m_pct": 2.632,
+      "change_1h_pct": 1.928,
+      "change_4h_pct": 7.341,
+      "taker_buy_ratio_1m": 0.454,
+      "taker_buy_ratio_5m": 0.536,
+      "oi_delta_5m_pct": 1.187,
+      "funding_rate_pct": -0.0027,
+      "atr_pct": 0.511,
+      "range_4h_pct": 7.41,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 5.435e-05,
+      "suggested_tp1": 5.54e-05,
+      "suggested_tp2": 5.603e-05,
+      "conviction_score": 5,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "GUAUSDT",
       "base": "GUA",
