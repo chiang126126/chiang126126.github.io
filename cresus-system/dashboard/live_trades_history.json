@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-25T03:59:55.397792+00:00",
+  "generated_at": "2026-05-25T04:02:03.861317+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 423,
-    "open": 0,
+    "total_trades": 424,
+    "open": 1,
     "closed": 423,
     "wins": 141,
     "losses": 278,
@@ -15,30 +15,94 @@
     "avg_pnl_usdt": -0.1179,
     "best_trade_usdt": 3.6082,
     "worst_trade_usdt": -10.931,
-    "fees_paid_usdt": 12.996,
+    "fees_paid_usdt": 13.1959,
     "fees_realized_usdt": 12.996,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.2,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 1937.15,
+    "deployed_usdt": 399.94,
+    "free_capital_usdt": 1537.01,
     "max_concurrent_slots": 4,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -38.7977,
-    "deployed_usdt": 0
+    "deployed_usdt": 399.94
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "VVVUSDT"
+    ],
+    "exchange_symbols": [
+      "VVVUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "VVVUSDT|SHORT|2026-05-25T04:00:24.170351+00:00",
+      "trade_id": "L1779681624_VVVUSDT_S",
+      "symbol": "VVVUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 18.598,
+      "avg_fill_price": 18.602,
+      "slippage_bps": -2.15,
+      "qty": 21.5,
+      "notional_usdt": 399.943,
+      "leverage": 1,
+      "risk_usdt": 4.0005,
+      "risk_pct": 1.0,
+      "mirror_latency_sec": 12.0,
+      "sl_price": 18.78807143,
+      "sl_paper_current": 18.78807143,
+      "sl_compensation_enabled": false,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "abcd",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 2,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "A",
+      "min_conviction_threshold": null,
+      "tp1_price": 18.31289286,
+      "tp2_price": 18.02778571,
+      "phase": "A",
+      "entry_order_id": 123692035,
+      "entry_client_id": "cresus_L1779681624_VVVUSDT_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.681,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.199971,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-25T04:01:31.537801+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 76999.2,
+      "btc_change_24h_at_open": 0.327,
+      "btc_pct_vs_ma25_at_open": 0.239,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 18.598,
+      "current_price": 18.6,
+      "unrealized_pnl_usdt": 0.043,
+      "unrealized_pnl_pct": 0.011,
+      "last_price_check_at": "2026-05-25T04:02:01.957453+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "SAHARAUSDT|LONG|2026-05-25T02:14:43.967896+00:00",
@@ -24594,19 +24658,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-25T03:48:55.658659+00:00",
-      "reason": "paper trade too old (658s > 600s)",
-      "last_checked_at": "2026-05-25T03:59:53.292183+00:00"
+      "reason": "paper trade too old (786s > 600s)",
+      "last_checked_at": "2026-05-25T04:02:01.957453+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 77000.0,
-    "btc_ma25_1h": 76806.46,
-    "pct_vs_ma25": 0.252,
-    "change_24h_pct": 0.317,
+    "btc_price": 77015.1,
+    "btc_ma25_1h": 76816.61,
+    "pct_vs_ma25": 0.258,
+    "change_24h_pct": 0.348,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-25T03:59:55.371978+00:00"
+    "computed_at": "2026-05-25T04:02:03.558768+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
