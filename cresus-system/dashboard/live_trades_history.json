@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-25T08:50:33.367779+00:00",
+  "generated_at": "2026-05-25T08:52:47.242646+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 439,
-    "open": 2,
+    "total_trades": 440,
+    "open": 3,
     "closed": 437,
     "wins": 146,
     "losses": 287,
@@ -20,16 +20,16 @@
     "fees_open_usdt": 0.3999,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 799.76,
-    "free_capital_usdt": 1134.23,
+    "deployed_usdt": 1200.89,
+    "free_capital_usdt": 733.1,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 3
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -36.4673,
-    "deployed_usdt": 799.76
+    "deployed_usdt": 1200.89
   },
   "reconciliation": {
     "ok": true,
@@ -37,9 +37,11 @@
     "api_failed": false,
     "live_symbols": [
       "SAGAUSDT",
+      "RESOLVUSDT",
       "HANAUSDT"
     ],
     "exchange_symbols": [
+      "RESOLVUSDT",
       "SAGAUSDT",
       "HANAUSDT"
     ]
@@ -85,7 +87,7 @@
       "conviction_score": 5,
       "alert_type": "sustained",
       "atr_pct": 2.762,
-      "phase_a_mfe_pct": 0.882,
+      "phase_a_mfe_pct": 1.13,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.199878,
@@ -98,11 +100,11 @@
       "btc_pct_vs_ma25_at_open": 0.538,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 0.03596,
-      "current_price": 0.03587,
-      "unrealized_pnl_usdt": 3.6442,
-      "unrealized_pnl_pct": 0.912,
-      "last_price_check_at": "2026-05-25T08:50:31.429257+00:00"
+      "phase_a_mfe_price": 0.03587,
+      "current_price": 0.03604,
+      "unrealized_pnl_usdt": 1.7669,
+      "unrealized_pnl_pct": 0.442,
+      "last_price_check_at": "2026-05-25T08:52:44.433325+00:00"
     },
     {
       "paper_id": "SAGAUSDT|LONG|2026-05-25T08:28:26.793620+00:00",
@@ -158,10 +160,69 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.0228,
-      "current_price": 0.0225,
-      "unrealized_pnl_usdt": 1.7857,
-      "unrealized_pnl_pct": 0.446,
-      "last_price_check_at": "2026-05-25T08:50:31.429257+00:00"
+      "current_price": 0.0223,
+      "unrealized_pnl_usdt": -1.7857,
+      "unrealized_pnl_pct": -0.446,
+      "last_price_check_at": "2026-05-25T08:52:44.433325+00:00"
+    },
+    {
+      "paper_id": "RESOLVUSDT|LONG|2026-05-25T08:50:10.220295+00:00",
+      "trade_id": "L1779699010_RESOLVU_L",
+      "symbol": "RESOLVUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.02794,
+      "avg_fill_price": 0.02794,
+      "slippage_bps": 0.0,
+      "qty": 14357.0,
+      "notional_usdt": 401.13458,
+      "leverage": 1,
+      "risk_usdt": 4.4455,
+      "risk_pct": 1.108,
+      "mirror_latency_sec": 36.7,
+      "sl_price": 0.02763036,
+      "sl_paper_current": 0.02763036,
+      "sl_compensation_enabled": false,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "abcd",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 2,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": -0.001,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "A",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.02840446,
+      "tp2_price": 0.02886893,
+      "phase": "A",
+      "entry_order_id": 98466238,
+      "entry_client_id": "cresus_L1779699010_RESOLVU_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.739,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.0,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-25T08:51:07.917323+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "up",
+      "btc_price_at_open": 77325.0,
+      "btc_change_24h_at_open": 0.711,
+      "btc_pct_vs_ma25_at_open": 0.531,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.02794,
+      "current_price": 0.02778,
+      "unrealized_pnl_usdt": -2.2971,
+      "unrealized_pnl_pct": -0.573,
+      "last_price_check_at": "2026-05-25T08:52:44.433325+00:00"
     }
   ],
   "recent_closed": [
@@ -25689,13 +25750,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 77325.0,
-    "btc_ma25_1h": 76916.26,
-    "pct_vs_ma25": 0.531,
-    "change_24h_pct": 0.711,
+    "btc_price": 77305.6,
+    "btc_ma25_1h": 76915.48,
+    "pct_vs_ma25": 0.507,
+    "change_24h_pct": 0.686,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-25T08:50:32.785981+00:00"
+    "computed_at": "2026-05-25T08:52:46.300240+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
