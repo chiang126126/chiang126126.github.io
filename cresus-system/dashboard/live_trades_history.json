@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-25T16:44:05.312690+00:00",
+  "generated_at": "2026-05-25T16:46:12.631459+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 465,
-    "open": 0,
+    "total_trades": 466,
+    "open": 1,
     "closed": 465,
     "wins": 155,
     "losses": 306,
@@ -15,30 +15,94 @@
     "avg_pnl_usdt": -0.0912,
     "best_trade_usdt": 29.0009,
     "worst_trade_usdt": -14.8626,
-    "fees_paid_usdt": 27.5534,
+    "fees_paid_usdt": 27.7533,
     "fees_realized_usdt": 27.5534,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.2,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 1930.06,
+    "deployed_usdt": 399.98,
+    "free_capital_usdt": 1529.88,
     "max_concurrent_slots": 4,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -31.3339,
-    "deployed_usdt": 0
+    "deployed_usdt": 399.98
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "ZEREBROUSDT"
+    ],
+    "exchange_symbols": [
+      "ZEREBROUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "ZEREBROUSDT|LONG|2026-05-25T16:44:23.422449+00:00",
+      "trade_id": "L1779727463_ZEREBRO_L",
+      "symbol": "ZEREBROUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.027468,
+      "avg_fill_price": 0.02749,
+      "slippage_bps": 8.01,
+      "qty": 14550.0,
+      "notional_usdt": 399.9795,
+      "leverage": 1,
+      "risk_usdt": 4.7661,
+      "risk_pct": 1.192,
+      "mirror_latency_sec": 7.8,
+      "sl_price": 0.02716243,
+      "sl_paper_current": 0.02716243,
+      "sl_compensation_enabled": false,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "abcd",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 2,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": -0.0075,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "D",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.02792636,
+      "tp2_price": 0.02838471,
+      "phase": "A",
+      "entry_order_id": 165469198,
+      "entry_client_id": "cresus_L1779727463_ZEREBRO_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.742,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.19999,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-25T16:45:11.154385+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "up",
+      "btc_price_at_open": 77636.0,
+      "btc_change_24h_at_open": 1.29,
+      "btc_pct_vs_ma25_at_open": 0.662,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.027468,
+      "current_price": 0.0274,
+      "unrealized_pnl_usdt": -1.3095,
+      "unrealized_pnl_pct": -0.327,
+      "last_price_check_at": "2026-05-25T16:46:10.536295+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "TONUSDT|LONG|2026-05-25T15:54:58.248157+00:00",
@@ -27516,28 +27580,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-25T14:50:49.435053+00:00",
-      "reason": "paper trade too old (6795s > 600s)",
-      "last_checked_at": "2026-05-25T16:44:04.179871+00:00"
-    },
-    {
-      "paper_id": "PLAYUSDT|SHORT|2026-05-25T16:39:39.926358+00:00",
-      "symbol": "PLAYUSDT",
-      "direction": "SHORT",
-      "conviction_score": 5,
-      "signal_at": "2026-05-25T16:40:41.786300+00:00",
-      "reason": "funding adverse (0.0522% ≥ 0.05%) (Phase 4.M: paper 历史人均 -$0.85, 不利 mirror)",
-      "last_checked_at": "2026-05-25T16:44:04.179871+00:00"
+      "reason": "paper trade too old (6921s > 600s)",
+      "last_checked_at": "2026-05-25T16:46:10.536295+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 77611.0,
-    "btc_ma25_1h": 77124.52,
-    "pct_vs_ma25": 0.631,
-    "change_24h_pct": 1.258,
+    "btc_price": 77636.0,
+    "btc_ma25_1h": 77125.52,
+    "pct_vs_ma25": 0.662,
+    "change_24h_pct": 1.29,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-25T16:44:05.283518+00:00"
+    "computed_at": "2026-05-25T16:46:12.332776+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
