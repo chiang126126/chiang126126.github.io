@@ -518,6 +518,59 @@ class BinanceClient:
             return self._dry_run_response("place_market_order", params)
         return self._signed_request("POST", "/fapi/v1/order", params)
 
+    def place_limit_order(
+        self,
+        symbol: str,
+        side: str,
+        quantity: float,
+        price: float,
+        *,
+        time_in_force: str = "IOC",
+        client_order_id: Optional[str] = None,
+        reduce_only: bool = False,
+        dry_run: Optional[bool] = None,
+    ) -> dict:
+        """限价单 (默认 IOC: 立即成交否则自动取消).
+
+        IOC 模式下发单挂 limit @ price: 若当前 ask ≤ price 立即成交;
+        若价格已超出则取消 (status=EXPIRED) — 上层捕获后记 missed_signal 重试.
+        相比市价单: 入场价有硬上限, 不会在快速行情里吃到超预期的价格.
+
+        time_in_force: "IOC" (默认) | "GTC" | "FOK" | "GTX"
+        """
+        side = side.upper()
+        if side not in ("BUY", "SELL"):
+            raise ValueError(f"side 必须 BUY 或 SELL, got {side!r}")
+        if quantity <= 0:
+            raise ValueError(f"quantity 必须 > 0, got {quantity}")
+        if price <= 0:
+            raise ValueError(f"price 必须 > 0, got {price}")
+        if time_in_force not in ("GTC", "IOC", "FOK", "GTX"):
+            raise ValueError(f"time_in_force 无效: {time_in_force!r}")
+        is_dry = self._is_dry_run(dry_run)
+        self._check_live_authorization(is_dry)
+        params = {
+            "symbol":       symbol.upper(),
+            "side":         side,
+            "type":         "LIMIT",
+            "timeInForce":  time_in_force,
+            "quantity":     _format_quantity(quantity),
+            "price":        _format_price(price),
+            "newOrderRespType": "RESULT",
+        }
+        if reduce_only:
+            params["reduceOnly"] = "true"
+        if client_order_id:
+            _validate_client_order_id(client_order_id)
+            params["newClientOrderId"] = client_order_id
+        if is_dry:
+            log.info(
+                f"[DRY_RUN] place_limit_order {symbol} {side} "
+                f"qty={quantity} price={price} tif={time_in_force}"
+            )
+            return self._dry_run_response("place_limit_order", params)
+        return self._signed_request("POST", "/fapi/v1/order", params)
+
     def place_stop_market_order(
         self,
         symbol: str,
@@ -816,6 +869,7 @@ class BinanceClient:
         sl_price: float,
         *,
         trade_id: str,
+        limit_price: Optional[float] = None,
         use_exchange_sl: bool = True,
         dry_run: Optional[bool] = None,
     ) -> dict:
@@ -823,15 +877,19 @@ class BinanceClient:
 
         side='BUY' → LONG, side='SELL' → SHORT (one-way mode)
 
+        limit_price (Phase 4.V): 若提供, 用 IOC 限价单代替市价单.
+            填写调用方已拿到的盘口 ask/bid 价, 实现"成交则在此价, 超出则取消重试".
+            IOC 未成交 (EXPIRED) → 返 None → 上层记 missed_signal 下 tick 重试.
+            None (默认): 回退到市价单 (旧行为, 完全向后兼容).
+
         use_exchange_sl=True (默认): 挂 STOP_MARKET 到 exchange. 失败 → rollback.
         use_exchange_sl=False: 只开仓, sl_price 仅供上层客户端轮询使用.
-            (用于 Binance testnet 不支持 STOP_MARKET 的情景, 或主动选择 client-side SL)
 
         失败保护 (use_exchange_sl=True 时):
         - SL 挂单失败 → 立刻反向 market close (rollback)
         - rollback 失败 → raise CRITICAL, 要求人工介入
 
-        Returns dict (见函数末尾).
+        Returns dict (见函数末尾), 或 None (IOC 未成交).
         """
         # 1. 入参验证
         side = side.upper()
@@ -849,11 +907,14 @@ class BinanceClient:
         # 2. 拉 symbol filters
         filters = self.get_symbol_filters(symbol)
 
-        # 3. 拉当前价
-        klines = self.get_klines(symbol, interval="1m", limit=1)
-        if not klines:
-            raise BinanceError(f"无法获取 {symbol} 当前价")
-        last_close = float(klines[0][4])
+        # 3. 拉当前价 (limit_price 已提供时跳过 kline 调用, 直接用盘口价)
+        if limit_price is not None and limit_price > 0:
+            last_close = limit_price
+        else:
+            klines = self.get_klines(symbol, interval="1m", limit=1)
+            if not klines:
+                raise BinanceError(f"无法获取 {symbol} 当前价")
+            last_close = float(klines[0][4])
 
         # 4. 验证 SL 价位于持仓方向相反侧
         if side == "BUY":  # LONG: SL 必须 < 当前价
@@ -880,8 +941,10 @@ class BinanceClient:
             qty = round(qty, filters["quantity_precision"])
             actual_notional = qty * last_close
 
-        # 6. Round SL 到 tick_size
+        # 6. Round SL 到 tick_size; 若用限价单也对入场价做 tick 对齐
         sl_price = round_price_to_tick(sl_price, filters["tick_size"])
+        if limit_price is not None and limit_price > 0:
+            limit_price = round_price_to_tick(limit_price, filters["tick_size"])
 
         # 7. 构造 client_order_ids
         entry_coid = f"cresus_{trade_id}_E"
@@ -919,13 +982,30 @@ class BinanceClient:
 
         # ====== 实盘路径 ======
 
-        # 9. 下市价开仓单
-        log.info(f"open_position step 1/2: ENTRY {entry_coid} {side} {qty} {symbol}")
-        entry_resp = self.place_market_order(
-            symbol=symbol, side=side, quantity=qty,
-            client_order_id=entry_coid,
-            dry_run=False,
-        )
+        # 9. 开仓单: IOC 限价 (limit_price 已提供) 或市价单 (默认)
+        if limit_price is not None:
+            log.info(
+                f"open_position step 1/2: IOC LIMIT {entry_coid} "
+                f"{side} {qty}@{limit_price} {symbol}"
+            )
+            entry_resp = self.place_limit_order(
+                symbol=symbol, side=side, quantity=qty,
+                price=limit_price, time_in_force="IOC",
+                client_order_id=entry_coid, dry_run=False,
+            )
+            entry_status = entry_resp.get("status")
+            if entry_status == "EXPIRED":
+                log.info(
+                    f"[open_position] IOC limit EXPIRED — 价格已越过 {limit_price}, "
+                    f"将由上层下 tick 重试"
+                )
+                return None
+        else:
+            log.info(f"open_position step 1/2: MARKET {entry_coid} {side} {qty} {symbol}")
+            entry_resp = self.place_market_order(
+                symbol=symbol, side=side, quantity=qty,
+                client_order_id=entry_coid, dry_run=False,
+            )
         entry_status = entry_resp.get("status")
         if entry_status not in ("FILLED", "PARTIALLY_FILLED"):
             raise BinanceError(

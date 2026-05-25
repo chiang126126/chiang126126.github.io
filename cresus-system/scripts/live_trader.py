@@ -104,7 +104,15 @@ LIVE_TOTAL_DD_LIMIT_PCT = 5.0          # 总回撤 5% → 自动写 emergency fl
 #     17 笔被拦(38%), paper 上累计赚 $27 等比$1.35 漏赚,
 #     真正灾难性事件是 >100 bps (尤其 656 bps STORJ 单).
 #     50 bps 仍然过滤所有 >100 bps 极端事件, 同时少拒 30-50 区间的小滑点.
-LIVE_MAX_ENTRY_SLIPPAGE_BPS = 50.0     # 预滑点上限. 超过放弃开仓.
+LIVE_MAX_ENTRY_SLIPPAGE_BPS = 50.0     # 预滑点上限 (intensity=1 默认值).
+# Phase 4.V (5/25) 动态阈值: 高动量信号接受更大预滑点.
+# 依据: XANUSDT intensity=3 场景下 134 bps 被拦截, 而 paper 后续 +$49.44;
+# 高滑点在强趋势中可被后续走势消化; 低 intensity 信号保持保守阈值.
+LIVE_SLIPPAGE_THRESHOLD_BY_INTENSITY = {
+    3: 200.0,   # 高速急拉 (XANUSDT/SAGAUSDT 型)
+    2: 150.0,   # 中等动量
+    1:  50.0,   # 低动量 / 默认
+}
 
 # Phase 4.C BTC regime-aware 标签 (每笔 trade 开仓时记录当时 BTC 状态)
 # 用 1h K 线的 MA(25) 作 baseline (~24h 滚动均值, 匹配短线持仓视角).
@@ -131,7 +139,7 @@ MIRRORED_IDS_KEEP_LAST_N = 500          # mirrored_paper_ids 滚动窗口
 MISSED_SIGNALS_KEEP_LAST_N = 50         # missed_signals 滚动窗口 (诊断用)
 
 # 主循环
-POLL_INTERVAL_SEC = 30                  # --loop 模式 poll 间隔
+POLL_INTERVAL_SEC = 5                   # --loop 模式 poll 间隔 (Phase 4.V 5/25: 30→5s)
 
 # 状态文件 schema 版本
 STATE_VERSION = "1.0"
@@ -816,6 +824,21 @@ def _compute_pre_entry_slippage_bps(
     return (current - paper_entry) / paper_entry * 10000.0 * side_sign
 
 
+def _get_effective_slippage_threshold(paper_trade: dict) -> float:
+    """动态预滑点阈值: 按 paper_trade.intensity 查 LIVE_SLIPPAGE_THRESHOLD_BY_INTENSITY.
+
+    intensity=3 → 200 bps  (高速急拉, XANUSDT/SAGAUSDT 型)
+    intensity=2 → 150 bps  (中等动量)
+    intensity=1 →  50 bps  (低动量 / 默认)
+    字段缺 / 非整数 → 50 bps  (fail-safe 保守, 不误放行未知信号)
+    """
+    try:
+        inten = int(paper_trade.get("intensity") or 1)
+    except (TypeError, ValueError):
+        inten = 1
+    return LIVE_SLIPPAGE_THRESHOLD_BY_INTENSITY.get(inten, LIVE_MAX_ENTRY_SLIPPAGE_BPS)
+
+
 def _ab_use_sl_compensation(paper_id: str, mode: str = None) -> bool:
     """Phase 4.D SL 补偿 A/B 分组判定.
 
@@ -1096,6 +1119,19 @@ def _try_mirror_open(
         )
         return None
 
+    # Phase 4.V: 取实时盘口价用于 IOC 限价入场 (价格有硬上限, 不追价).
+    # LONG: ask (我们要吃的卖一价); SHORT: bid (我们要打的买一价).
+    # 失败时 fallback None → open_position 回退到市价单 (向后兼容).
+    entry_limit_price: Optional[float] = None
+    try:
+        bt = client.get_book_ticker(sym)
+        side_key = "askPrice" if side == "BUY" else "bidPrice"
+        raw_px = float(bt.get(side_key) or 0)
+        if raw_px > 0:
+            entry_limit_price = raw_px
+    except (BinanceError, ValueError, KeyError, TypeError) as e:
+        log.warning(f"[mirror-open] {sym}: bookTicker 失败 ({e}), 回退市价单")
+
     try:
         result = client.open_position(
             symbol=sym,
@@ -1103,6 +1139,7 @@ def _try_mirror_open(
             notional_usdt=LIVE_NOTIONAL_USDT,
             sl_price=sl_price,
             trade_id=trade_id,
+            limit_price=entry_limit_price,
             use_exchange_sl=False,   # Plan B: client-side SL (Phase 3.2.b 实现 polling)
         )
     except (BinanceError, ValueError) as e:
@@ -1373,19 +1410,22 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
                 )
                 continue
 
-            # 滑点护栏 (Phase 4.A): paper 信号价 → 当前价 预滑点检测.
+            # 滑点护栏 (Phase 4.A/4.V): paper 信号价 → 盘口实时价 预滑点检测.
+            # 4.V 动态阈值: intensity=3 → 200 bps / =2 → 150 / =1 → 50 (默认).
             # fail-safe: 取价失败 / 字段缺 → 返 None → 不拒绝, 按原流程开仓.
-            # 仅当能计算出 pre_slip 且超过阈值时才拒绝, 避免误杀.
             pre_slip_bps = _compute_pre_entry_slippage_bps(client, pt)
-            if pre_slip_bps is not None and pre_slip_bps > LIVE_MAX_ENTRY_SLIPPAGE_BPS:
+            slip_threshold = _get_effective_slippage_threshold(pt)
+            if pre_slip_bps is not None and pre_slip_bps > slip_threshold:
                 reason = (
                     f"pre_slippage_too_high "
-                    f"(+{pre_slip_bps:.1f}bps > {LIVE_MAX_ENTRY_SLIPPAGE_BPS:.0f}bps)"
+                    f"(+{pre_slip_bps:.1f}bps > {slip_threshold:.0f}bps "
+                    f"intensity={pt.get('intensity',1)})"
                 )
                 _record_missed_signal(live, pt, reason, now)
                 log.warning(
                     f"[skip-mirror-slip] {pt['symbol']}: 预滑点 "
-                    f"+{pre_slip_bps:.1f}bps 超阈值 {LIVE_MAX_ENTRY_SLIPPAGE_BPS:.0f}bps, "
+                    f"+{pre_slip_bps:.1f}bps 超阈值 {slip_threshold:.0f}bps "
+                    f"(intensity={pt.get('intensity',1)}), "
                     f"放弃 mirror (paper_id={pt.get('id','')[:40]})"
                 )
                 continue

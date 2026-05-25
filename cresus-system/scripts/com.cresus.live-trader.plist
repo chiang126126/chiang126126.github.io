@@ -18,9 +18,10 @@
         <string>--live</string>
     </array>
 
-    <!-- 每 30 秒跑一次 (跟 paper trader 频率相近, 含 SL polling 间隔) -->
+    <!-- Phase 4.V (5/25): 5s 轮询 — 缩短 paper 信号到 live 首次检查的延迟.
+         Rate limit 测算: ~25 weight/poll × 12 polls/min = 300 weight/min (预算 2400/min, 占用 12.5%). -->
     <key>StartInterval</key>
-    <integer>30</integer>
+    <integer>5</integer>
 
     <key>RunAtLoad</key>
     <true/>
