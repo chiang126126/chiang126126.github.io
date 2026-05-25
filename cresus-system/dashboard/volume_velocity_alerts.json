@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-25T22:10:15.051363+00:00",
+  "updated_at": "2026-05-25T22:12:22.461890+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 16,
+  "alerts_count": 17,
   "alerts": [
+    {
+      "symbol": "CATIUSDT",
+      "base": "CATI",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.05593,
+      "price_change_pct": -0.569,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 28335.0,
+      "volume_baseline_usdt": 1702.0,
+      "volume_ratio": 16.65,
+      "detected_at": "2026-05-25T22:12:20.190138+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.071,
+      "change_15m_pct": -0.303,
+      "change_1h_pct": -1.148,
+      "change_4h_pct": -4.652,
+      "taker_buy_ratio_1m": 0.137,
+      "taker_buy_ratio_5m": 0.399,
+      "oi_delta_5m_pct": -0.116,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.217,
+      "range_4h_pct": 5.81,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.05611214,
+      "suggested_tp1": 0.05565679,
+      "suggested_tp2": 0.05538357,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "BABYUSDT",
       "base": "BABY",
