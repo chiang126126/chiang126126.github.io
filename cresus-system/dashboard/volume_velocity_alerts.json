@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-25T00:00:21.147096+00:00",
+  "updated_at": "2026-05-25T00:02:26.761806+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 7,
+  "alerts_count": 8,
   "alerts": [
+    {
+      "symbol": "POLYXUSDT",
+      "base": "POLYX",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.05805,
+      "price_change_pct": 0.921,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 438608.0,
+      "volume_baseline_usdt": 47495.0,
+      "volume_ratio": 9.23,
+      "detected_at": "2026-05-25T00:02:12.068442+00:00",
+      "intensity": 2,
+      "change_5m_pct": 4.187,
+      "change_15m_pct": 4.506,
+      "change_1h_pct": 6.249,
+      "change_4h_pct": 5.629,
+      "taker_buy_ratio_1m": 0.521,
+      "taker_buy_ratio_5m": 0.55,
+      "oi_delta_5m_pct": -0.075,
+      "funding_rate_pct": 0.0003,
+      "atr_pct": 0.635,
+      "range_4h_pct": 8.27,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.05749714,
+      "suggested_tp1": 0.05887929,
+      "suggested_tp2": 0.05970857,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "LITEUSDT",
       "base": "LITE",
