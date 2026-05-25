@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-25T22:48:52.364117+00:00",
+  "updated_at": "2026-05-25T22:50:59.477490+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 24,
+  "alerts_count": 25,
   "alerts": [
+    {
+      "symbol": "RESOLVUSDT",
+      "base": "RESOLV",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.02626,
+      "price_change_pct": 1.981,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 113241.0,
+      "volume_baseline_usdt": 9695.0,
+      "volume_ratio": 11.68,
+      "detected_at": "2026-05-25T22:50:39.787063+00:00",
+      "intensity": 3,
+      "change_5m_pct": 2.724,
+      "change_15m_pct": 1.891,
+      "change_1h_pct": 5.431,
+      "change_4h_pct": -0.377,
+      "taker_buy_ratio_1m": 0.691,
+      "taker_buy_ratio_5m": 0.642,
+      "oi_delta_5m_pct": -0.696,
+      "funding_rate_pct": -0.0003,
+      "atr_pct": 0.56,
+      "range_4h_pct": 11.23,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.02596571,
+      "suggested_tp1": 0.02670143,
+      "suggested_tp2": 0.02714286,
+      "conviction_score": 1,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "DOGSUSDT",
       "base": "DOGS",
