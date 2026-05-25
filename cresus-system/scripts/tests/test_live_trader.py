@@ -233,58 +233,6 @@ class TestEligibility(unittest.TestCase):
         ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
         self.assertFalse(ok)
 
-    # --- Phase 4.T (5/25) 反向过滤: 1h 涨幅 >8% 禁 SHORT ---
-
-    def test_phase_4t_blocks_short_in_strong_uptrend(self):
-        """SHORT 信号 + 1h 已涨 >8% → 反向交易, 必须拒."""
-        trade = dict(self.recent_trade)
-        trade["direction"] = "SHORT"
-        trade["change_1h_pct"] = 12.5   # XANUSDT 00:06 同类场景
-        ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
-        self.assertFalse(ok)
-        self.assertIn("anti-reversal", reason)
-        self.assertIn("4.T", reason)
-
-    def test_phase_4t_allows_short_in_chop(self):
-        """SHORT + 1h 小涨 (<8%) → 不是趋势反向, 放行."""
-        trade = dict(self.recent_trade)
-        trade["direction"] = "SHORT"
-        trade["change_1h_pct"] = 3.0
-        ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
-        self.assertTrue(ok, f"3% 涨幅不应触发 4.T, got: {reason}")
-
-    def test_phase_4t_allows_short_in_downtrend(self):
-        """SHORT + 1h 跌 → 顺势, 必须放行."""
-        trade = dict(self.recent_trade)
-        trade["direction"] = "SHORT"
-        trade["change_1h_pct"] = -5.4   # INXUSDT 实数据
-        ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
-        self.assertTrue(ok, f"下跌中 SHORT 必须通过, got: {reason}")
-
-    def test_phase_4t_does_not_block_long(self):
-        """4.T 只针对 SHORT — LONG 信号在 1h 大涨时正是顺势, 不能拦."""
-        trade = dict(self.recent_trade)
-        trade["direction"] = "LONG"
-        trade["change_1h_pct"] = 15.0   # XANUSDT 04:13 同类场景
-        ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
-        self.assertTrue(ok, f"LONG 顺势必须通过 4.T, got: {reason}")
-
-    def test_phase_4t_missing_field_fails_open(self):
-        """字段缺失时 fail-safe (放行), 不能因为 paper 字段断供把 SHORT 全拒."""
-        trade = dict(self.recent_trade)
-        trade["direction"] = "SHORT"
-        # 不设 change_1h_pct
-        ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
-        self.assertTrue(ok, f"字段缺应放行, got: {reason}")
-
-    def test_phase_4t_invalid_field_fails_open(self):
-        """字段非数值时 fail-safe."""
-        trade = dict(self.recent_trade)
-        trade["direction"] = "SHORT"
-        trade["change_1h_pct"] = "not a number"
-        ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
-        self.assertTrue(ok)
-
 
 # ============================================================================
 # Side mapping

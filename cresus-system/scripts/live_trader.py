@@ -311,20 +311,13 @@ def is_eligible_for_mirror(
     direction = paper_trade.get("direction", "").upper()
     if direction not in ("LONG", "SHORT"):
         return False, f"invalid direction {direction!r}"
-    # 7. Phase 4.T (5/25) 反向过滤: 1h 涨幅 >8% 时禁止 SHORT.
-    # 来源: XANUSDT 00:06 SHORT 在 1h +8%+ 时被 mirror, 最终亏损;
-    # BTC 从 $74.2k 流动性猎杀恢复期叠加山寨轮动结构, 逆势做空概率极低.
-    # 字段缺失时不拦截 (fail-safe), 但记 warning 便于排查 paper 字段供给.
-    if direction == "SHORT":
-        ch1h = paper_trade.get("change_1h_pct")
-        if ch1h is not None:
-            try:
-                ch1h_f = float(ch1h)
-                if ch1h_f > 8.0:
-                    return False, (f"anti-reversal (4.T): 1h +{ch1h_f:.2f}% "
-                                   f"趋势中禁止 SHORT (>8% 阈值)")
-            except (TypeError, ValueError):
-                pass
+    # Phase 4.T 审计后撤销 (5/25):
+    # 设计意图是"1h 涨幅 >8% 时禁止 SHORT", 但数据审计显示:
+    #   - 历史 171 笔 SHORT, change_1h_pct 最高仅 +0.58%, 从未超过 1%
+    #   - velocity scanner 方向对齐检查已在上游过滤反向信号
+    #   - 8% 阈值是永不触发的死条件, 提供虚假安全感
+    # 真正的反向过滤保护在 scanner 上游. 若未来 paper_trade 加入 change_4h_pct
+    # 字段, 可以用 4h 趋势 (更稳健) 重新实现此 gate.
     return True, "ok"
 
 
