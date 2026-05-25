@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-25T13:50:07.682797+00:00",
+  "updated_at": "2026-05-25T13:52:14.862124+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 27,
+  "alerts_count": 28,
   "alerts": [
+    {
+      "symbol": "HYPERUSDT",
+      "base": "HYPER",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.10358,
+      "price_change_pct": 0.524,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 44230.0,
+      "volume_baseline_usdt": 4187.0,
+      "volume_ratio": 10.56,
+      "detected_at": "2026-05-25T13:52:10.792342+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.876,
+      "change_15m_pct": 0.984,
+      "change_1h_pct": 0.592,
+      "change_4h_pct": 1.339,
+      "taker_buy_ratio_1m": 0.677,
+      "taker_buy_ratio_5m": 0.693,
+      "oi_delta_5m_pct": -0.04,
+      "funding_rate_pct": 0.0044,
+      "atr_pct": 0.123,
+      "range_4h_pct": 2.35,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.10345214,
+      "suggested_tp1": 0.10377179,
+      "suggested_tp2": 0.10396357,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "RENDERUSDT",
       "base": "RENDER",
