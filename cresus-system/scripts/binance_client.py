@@ -360,6 +360,15 @@ class BinanceClient:
         }
         return self._public_request("GET", "/fapi/v1/klines", params)
 
+    def get_book_ticker(self, symbol: str) -> dict:
+        """获取盘口最优买卖价 (实时, <1s 延迟). 用于开仓前精确预滑点检测.
+        相比 get_klines(1m).close (可滞后 0-60s), 盘口价能在快速行情里给出真实成交价基准.
+        Returns: {"symbol": "...", "bidPrice": "...", "bidQty": "...",
+                  "askPrice": "...", "askQty": "...", "time": ..., "lastUpdateId": ...}
+        """
+        params = {"symbol": symbol.upper()}
+        return self._public_request("GET", "/fapi/v1/ticker/bookTicker", params)
+
     def get_exchange_info(self) -> dict:
         """获取所有 symbol 的交易规则 (minNotional / minQty / stepSize / 等)."""
         return self._public_request("GET", "/fapi/v1/exchangeInfo", {})

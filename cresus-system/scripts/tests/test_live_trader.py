@@ -233,6 +233,58 @@ class TestEligibility(unittest.TestCase):
         ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
         self.assertFalse(ok)
 
+    # --- Phase 4.T (5/25) 反向过滤: 1h 涨幅 >8% 禁 SHORT ---
+
+    def test_phase_4t_blocks_short_in_strong_uptrend(self):
+        """SHORT 信号 + 1h 已涨 >8% → 反向交易, 必须拒."""
+        trade = dict(self.recent_trade)
+        trade["direction"] = "SHORT"
+        trade["change_1h_pct"] = 12.5   # XANUSDT 00:06 同类场景
+        ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
+        self.assertFalse(ok)
+        self.assertIn("anti-reversal", reason)
+        self.assertIn("4.T", reason)
+
+    def test_phase_4t_allows_short_in_chop(self):
+        """SHORT + 1h 小涨 (<8%) → 不是趋势反向, 放行."""
+        trade = dict(self.recent_trade)
+        trade["direction"] = "SHORT"
+        trade["change_1h_pct"] = 3.0
+        ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
+        self.assertTrue(ok, f"3% 涨幅不应触发 4.T, got: {reason}")
+
+    def test_phase_4t_allows_short_in_downtrend(self):
+        """SHORT + 1h 跌 → 顺势, 必须放行."""
+        trade = dict(self.recent_trade)
+        trade["direction"] = "SHORT"
+        trade["change_1h_pct"] = -5.4   # INXUSDT 实数据
+        ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
+        self.assertTrue(ok, f"下跌中 SHORT 必须通过, got: {reason}")
+
+    def test_phase_4t_does_not_block_long(self):
+        """4.T 只针对 SHORT — LONG 信号在 1h 大涨时正是顺势, 不能拦."""
+        trade = dict(self.recent_trade)
+        trade["direction"] = "LONG"
+        trade["change_1h_pct"] = 15.0   # XANUSDT 04:13 同类场景
+        ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
+        self.assertTrue(ok, f"LONG 顺势必须通过 4.T, got: {reason}")
+
+    def test_phase_4t_missing_field_fails_open(self):
+        """字段缺失时 fail-safe (放行), 不能因为 paper 字段断供把 SHORT 全拒."""
+        trade = dict(self.recent_trade)
+        trade["direction"] = "SHORT"
+        # 不设 change_1h_pct
+        ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
+        self.assertTrue(ok, f"字段缺应放行, got: {reason}")
+
+    def test_phase_4t_invalid_field_fails_open(self):
+        """字段非数值时 fail-safe."""
+        trade = dict(self.recent_trade)
+        trade["direction"] = "SHORT"
+        trade["change_1h_pct"] = "not a number"
+        ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
+        self.assertTrue(ok)
+
 
 # ============================================================================
 # Side mapping
@@ -1046,6 +1098,53 @@ class TestComputePreEntrySlippage(unittest.TestCase):
         self.assertAlmostEqual(slip, target, places=1)
         self.assertTrue(slip > LIVE_MAX_ENTRY_SLIPPAGE_BPS,
                         f"slip {slip} 应 > 阈值 {LIVE_MAX_ENTRY_SLIPPAGE_BPS}, 应拒")
+
+    # --- Phase 4.U (5/25): bookTicker 优先, kline fallback ---
+
+    def test_uses_book_ticker_ask_for_long(self):
+        """LONG: 应取 askPrice (我们要吃卖一), 不是 bidPrice 也不是 kline."""
+        paper = {"symbol": "BTCUSDT", "direction": "LONG", "entry_price": 100.0}
+        bt = {"symbol": "BTCUSDT", "bidPrice": "100.3", "askPrice": "100.5"}
+        with patch.object(self.client, "get_book_ticker", return_value=bt), \
+             patch.object(self.client, "get_klines",
+                          return_value=self._kline(99.0)) as mock_klines:
+            slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        self.assertAlmostEqual(slip, 50.0, places=1)   # (100.5-100)/100*10000
+        mock_klines.assert_not_called()                # 不应触发 fallback
+
+    def test_uses_book_ticker_bid_for_short(self):
+        """SHORT: 应取 bidPrice (我们要打买一)."""
+        paper = {"symbol": "BTCUSDT", "direction": "SHORT", "entry_price": 100.0}
+        bt = {"symbol": "BTCUSDT", "bidPrice": "99.7", "askPrice": "99.9"}
+        with patch.object(self.client, "get_book_ticker", return_value=bt), \
+             patch.object(self.client, "get_klines",
+                          return_value=self._kline(101.0)) as mock_klines:
+            slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        # SHORT: (current-paper)/paper * -1; current=99.7, paper=100
+        # → (99.7-100)/100*10000*-1 = +30 bps (卖便宜 = 不利)
+        self.assertAlmostEqual(slip, 30.0, places=1)
+        mock_klines.assert_not_called()
+
+    def test_falls_back_to_kline_on_book_ticker_error(self):
+        """bookTicker 失败 → 自动 fallback 到 1m kline close (保留旧行为)."""
+        paper = {"symbol": "BTCUSDT", "direction": "LONG", "entry_price": 100.0}
+        with patch.object(self.client, "get_book_ticker",
+                          side_effect=BinanceError("network")), \
+             patch.object(self.client, "get_klines",
+                          return_value=self._kline(100.5)) as mock_klines:
+            slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        self.assertAlmostEqual(slip, 50.0, places=1)
+        mock_klines.assert_called_once()
+
+    def test_falls_back_when_book_ticker_returns_zero(self):
+        """bookTicker 返 0/None → fallback (防御性, 不该相信 0 价)."""
+        paper = {"symbol": "BTCUSDT", "direction": "LONG", "entry_price": 100.0}
+        bt = {"symbol": "BTCUSDT", "bidPrice": "0", "askPrice": "0"}
+        with patch.object(self.client, "get_book_ticker", return_value=bt), \
+             patch.object(self.client, "get_klines",
+                          return_value=self._kline(100.5)):
+            slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        self.assertAlmostEqual(slip, 50.0, places=1)
 
 
 class TestComputeBtcRegime(unittest.TestCase):

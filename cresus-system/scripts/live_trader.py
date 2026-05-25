@@ -75,6 +75,7 @@ LIVE_MIRROR_MAX_AGE_SEC = 600          # 仅 mirror 10min 内开的 paper trade
 LIVE_SYMBOL_BLACKLIST = [
     "DODOXUSDT",   # 4 笔 0 胜, 累计 -$0.69
     "NMRUSDT",     # 4 笔 0 胜, 累计 -$0.37
+    "XAGUSDT",     # TradFi-Perps 需单独签协议, -4411 错误循环 (5/25 加)
 ]
 
 # ⚠️ DRY-RUN 观察期标志 — 仅用于 testnet 观察 mirror lifecycle.
@@ -310,6 +311,20 @@ def is_eligible_for_mirror(
     direction = paper_trade.get("direction", "").upper()
     if direction not in ("LONG", "SHORT"):
         return False, f"invalid direction {direction!r}"
+    # 7. Phase 4.T (5/25) 反向过滤: 1h 涨幅 >8% 时禁止 SHORT.
+    # 来源: XANUSDT 00:06 SHORT 在 1h +8%+ 时被 mirror, 最终亏损;
+    # BTC 从 $74.2k 流动性猎杀恢复期叠加山寨轮动结构, 逆势做空概率极低.
+    # 字段缺失时不拦截 (fail-safe), 但记 warning 便于排查 paper 字段供给.
+    if direction == "SHORT":
+        ch1h = paper_trade.get("change_1h_pct")
+        if ch1h is not None:
+            try:
+                ch1h_f = float(ch1h)
+                if ch1h_f > 8.0:
+                    return False, (f"anti-reversal (4.T): 1h +{ch1h_f:.2f}% "
+                                   f"趋势中禁止 SHORT (>8% 阈值)")
+            except (TypeError, ValueError):
+                pass
     return True, "ok"
 
 
@@ -748,10 +763,39 @@ def _get_current_price(client: BinanceClient, symbol: str) -> Optional[float]:
         return None
 
 
+def _get_entry_reference_price(
+    client: BinanceClient, symbol: str, direction: str,
+) -> Optional[float]:
+    """获取开仓侧实时基准价 (盘口最优价, <1s).
+
+    LONG (市价 BUY)  → 用 askPrice (我们要吃卖一)
+    SHORT (市价 SELL) → 用 bidPrice (我们要打买一)
+
+    失败时 fallback 到 1m kline close (旧行为). fallback 路径会带 0-60s
+    滞后, 但保证 fail-safe (返 None 让上层放行而非误拒).
+    """
+    try:
+        bt = client.get_book_ticker(symbol)
+        if direction == "LONG":
+            px = float(bt.get("askPrice") or 0)
+        else:
+            px = float(bt.get("bidPrice") or 0)
+        if px > 0:
+            return px
+    except (BinanceError, ValueError, TypeError, KeyError) as e:
+        log.warning(f"[book_ticker] {symbol}: {type(e).__name__}: {e}, "
+                    f"fallback 1m kline")
+    return _get_current_price(client, symbol)
+
+
 def _compute_pre_entry_slippage_bps(
     client: BinanceClient, paper_trade: dict,
 ) -> Optional[float]:
-    """计算 paper 信号价 → 当前实时价 的预滑点 (bps).
+    """计算 paper 信号价 → 当前开仓侧实时价 的预滑点 (bps).
+
+    Phase 4.U (5/25): 改用盘口最优价 (askPrice for LONG, bidPrice for SHORT)
+    替代 1m kline close, 消除 0-60s 价格滞后. 修复 SAGAUSDT 07:32 等
+    "gate 假通过但实际成交滑点远超阈值" 的场景.
 
     返回值约定:
         正 bps = 不利 (开仓即吃亏)
@@ -772,7 +816,7 @@ def _compute_pre_entry_slippage_bps(
         return None
     if paper_entry <= 0:
         return None
-    current = _get_current_price(client, sym)
+    current = _get_entry_reference_price(client, sym, direction)
     if current is None or current <= 0:
         return None
     side_sign = 1 if direction == "LONG" else -1

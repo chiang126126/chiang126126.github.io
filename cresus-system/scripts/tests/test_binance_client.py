@@ -433,6 +433,43 @@ class TestURLConstruction(unittest.TestCase):
         self.assertIn("symbol=BTCUSDT", url)
         self.assertIn("interval=1m", url)
 
+    def test_book_ticker_url_construction(self):
+        """Phase 4.U: bookTicker endpoint 路径和参数验证."""
+        captured_url = []
+
+        def fake_urlopen(req, timeout=None):
+            captured_url.append(req.full_url)
+            raise TimeoutError("intercepted")
+
+        with patch("urllib.request.urlopen", side_effect=fake_urlopen):
+            with patch("time.sleep"):
+                try:
+                    self.client.get_book_ticker("XANUSDT")
+                except BinanceNetworkError:
+                    pass
+        self.assertTrue(captured_url, "urlopen 没被调用")
+        url = captured_url[0]
+        self.assertIn("/fapi/v1/ticker/bookTicker", url)
+        self.assertIn("symbol=XANUSDT", url)
+        # bookTicker 不带 timestamp/signature (public endpoint)
+        self.assertNotIn("signature=", url)
+
+    def test_book_ticker_uppercases_symbol(self):
+        """防御: 小写 symbol 自动转大写 (与 get_klines 一致)."""
+        captured_url = []
+
+        def fake_urlopen(req, timeout=None):
+            captured_url.append(req.full_url)
+            raise TimeoutError("intercepted")
+
+        with patch("urllib.request.urlopen", side_effect=fake_urlopen):
+            with patch("time.sleep"):
+                try:
+                    self.client.get_book_ticker("xanusdt")
+                except BinanceNetworkError:
+                    pass
+        self.assertIn("symbol=XANUSDT", captured_url[0])
+
     def test_signed_url_has_signature(self):
         captured_url = []
         captured_headers = []
