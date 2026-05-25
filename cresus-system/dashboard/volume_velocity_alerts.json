@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-25T06:54:02.757805+00:00",
+  "updated_at": "2026-05-25T06:56:07.343085+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 30,
+  "alerts_count": 31,
   "alerts": [
+    {
+      "symbol": "TAGUSDT",
+      "base": "TAG",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.0017389,
+      "price_change_pct": 1.779,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 89807.0,
+      "volume_baseline_usdt": 8523.0,
+      "volume_ratio": 10.54,
+      "detected_at": "2026-05-25T06:55:39.425873+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.312,
+      "change_15m_pct": 1.118,
+      "change_1h_pct": 2.654,
+      "change_4h_pct": 14.167,
+      "taker_buy_ratio_1m": 0.701,
+      "taker_buy_ratio_5m": 0.552,
+      "oi_delta_5m_pct": 0.095,
+      "funding_rate_pct": 0.0373,
+      "atr_pct": 0.634,
+      "range_4h_pct": 14.04,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.00171684,
+      "suggested_tp1": 0.00177199,
+      "suggested_tp2": 0.00180507,
+      "conviction_score": 5,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "EDENUSDT",
       "base": "EDEN",
