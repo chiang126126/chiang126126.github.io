@@ -433,6 +433,43 @@ class TestURLConstruction(unittest.TestCase):
         self.assertIn("symbol=BTCUSDT", url)
         self.assertIn("interval=1m", url)
 
+    def test_book_ticker_url_construction(self):
+        """Phase 4.U: bookTicker endpoint 路径和参数验证."""
+        captured_url = []
+
+        def fake_urlopen(req, timeout=None):
+            captured_url.append(req.full_url)
+            raise TimeoutError("intercepted")
+
+        with patch("urllib.request.urlopen", side_effect=fake_urlopen):
+            with patch("time.sleep"):
+                try:
+                    self.client.get_book_ticker("XANUSDT")
+                except BinanceNetworkError:
+                    pass
+        self.assertTrue(captured_url, "urlopen 没被调用")
+        url = captured_url[0]
+        self.assertIn("/fapi/v1/ticker/bookTicker", url)
+        self.assertIn("symbol=XANUSDT", url)
+        # bookTicker 不带 timestamp/signature (public endpoint)
+        self.assertNotIn("signature=", url)
+
+    def test_book_ticker_uppercases_symbol(self):
+        """防御: 小写 symbol 自动转大写 (与 get_klines 一致)."""
+        captured_url = []
+
+        def fake_urlopen(req, timeout=None):
+            captured_url.append(req.full_url)
+            raise TimeoutError("intercepted")
+
+        with patch("urllib.request.urlopen", side_effect=fake_urlopen):
+            with patch("time.sleep"):
+                try:
+                    self.client.get_book_ticker("xanusdt")
+                except BinanceNetworkError:
+                    pass
+        self.assertIn("symbol=XANUSDT", captured_url[0])
+
     def test_signed_url_has_signature(self):
         captured_url = []
         captured_headers = []
@@ -458,6 +495,63 @@ class TestURLConstruction(unittest.TestCase):
         h = captured_headers[0]
         api_keys = [v for k, v in h.items() if k.lower() == "x-mbx-apikey"]
         self.assertTrue(api_keys, f"X-MBX-APIKEY header 缺失: {h}")
+
+
+# ============================================================================
+# Phase 4.V: place_limit_order
+# ============================================================================
+
+class TestPlaceLimitOrder(unittest.TestCase):
+    """Phase 4.V: IOC 限价入场单.
+
+    核心不变式:
+      - type=LIMIT, timeInForce=IOC (默认)
+      - price 参数存在
+      - dry_run 响应与市价单同结构 (上层可统一处理)
+    """
+
+    def setUp(self):
+        self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+
+    def test_limit_order_type_and_tif_in_dry_run(self):
+        """type=LIMIT, timeInForce=IOC 必须写入 params (dry_run 响应反映真实参数)."""
+        r = self.client.place_limit_order("XANUSDT", "BUY", 100.0, 0.02141)
+        self.assertEqual(r["type"], "LIMIT")
+        self.assertEqual(r["_method"], "place_limit_order")
+        self.assertEqual(r["symbol"], "XANUSDT")
+        self.assertEqual(r["side"], "BUY")
+
+    def test_limit_order_dry_run_flag(self):
+        r = self.client.place_limit_order("XANUSDT", "BUY", 100.0, 0.02141)
+        self.assertEqual(r["status"], "DRY_RUN")
+
+    def test_sell_side_dry_run(self):
+        r = self.client.place_limit_order("SAGAUSDT", "SELL", 50.0, 0.02100)
+        self.assertEqual(r["side"], "SELL")
+        self.assertEqual(r["symbol"], "SAGAUSDT")
+
+    def test_gtc_tif_accepted(self):
+        """GTC 也是有效的 timeInForce."""
+        r = self.client.place_limit_order("XANUSDT", "BUY", 100.0, 0.02141,
+                                          time_in_force="GTC")
+        self.assertEqual(r["status"], "DRY_RUN")
+
+    def test_invalid_side_raises(self):
+        with self.assertRaises(ValueError):
+            self.client.place_limit_order("XANUSDT", "INVALID", 100.0, 0.02141)
+
+    def test_invalid_tif_raises(self):
+        with self.assertRaises(ValueError):
+            self.client.place_limit_order("XANUSDT", "BUY", 100.0, 0.02141,
+                                          time_in_force="ZZZZ")
+
+    def test_zero_price_raises(self):
+        with self.assertRaises(ValueError):
+            self.client.place_limit_order("XANUSDT", "BUY", 100.0, 0.0)
+
+    def test_zero_qty_raises(self):
+        with self.assertRaises(ValueError):
+            self.client.place_limit_order("XANUSDT", "BUY", 0.0, 0.02141)
 
 
 # ============================================================================

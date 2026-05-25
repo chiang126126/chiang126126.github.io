@@ -34,11 +34,13 @@ from live_trader import (  # noqa: E402
     main_loop, _empty_live_state,
     _record_missed_signal, _prune_obsolete_missed,
     _compute_pre_entry_slippage_bps,
+    _get_effective_slippage_threshold,
+    LIVE_SLIPPAGE_THRESHOLD_BY_INTENSITY,
     _compute_btc_regime,
     _ab_use_sl_compensation,
     _compute_compensated_sl,
     MISSED_SIGNALS_KEEP_LAST_N,
-    LIVE_MAX_ENTRY_SLIPPAGE_BPS,
+    LIVE_MAX_ENTRY_SLIPPAGE_BPS, POLL_INTERVAL_SEC,
     LIVE_BTC_REGIME_THRESHOLD_PCT,
     LIVE_SL_COMPENSATION_MODE,
     LIVE_SYMBOL_WHITELIST, LIVE_MAX_CONCURRENT, LIVE_MIRROR_MAX_AGE_SEC,
@@ -1086,6 +1088,119 @@ class TestComputePreEntrySlippage(unittest.TestCase):
         self.assertAlmostEqual(slip, target, places=1)
         self.assertTrue(slip > LIVE_MAX_ENTRY_SLIPPAGE_BPS,
                         f"slip {slip} 应 > 阈值 {LIVE_MAX_ENTRY_SLIPPAGE_BPS}, 应拒")
+
+    # --- Phase 4.U (5/25): bookTicker 优先, kline fallback ---
+
+    def test_uses_book_ticker_ask_for_long(self):
+        """LONG: 应取 askPrice (我们要吃卖一), 不是 bidPrice 也不是 kline."""
+        paper = {"symbol": "BTCUSDT", "direction": "LONG", "entry_price": 100.0}
+        bt = {"symbol": "BTCUSDT", "bidPrice": "100.3", "askPrice": "100.5"}
+        with patch.object(self.client, "get_book_ticker", return_value=bt), \
+             patch.object(self.client, "get_klines",
+                          return_value=self._kline(99.0)) as mock_klines:
+            slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        self.assertAlmostEqual(slip, 50.0, places=1)   # (100.5-100)/100*10000
+        mock_klines.assert_not_called()                # 不应触发 fallback
+
+    def test_uses_book_ticker_bid_for_short(self):
+        """SHORT: 应取 bidPrice (我们要打买一)."""
+        paper = {"symbol": "BTCUSDT", "direction": "SHORT", "entry_price": 100.0}
+        bt = {"symbol": "BTCUSDT", "bidPrice": "99.7", "askPrice": "99.9"}
+        with patch.object(self.client, "get_book_ticker", return_value=bt), \
+             patch.object(self.client, "get_klines",
+                          return_value=self._kline(101.0)) as mock_klines:
+            slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        # SHORT: (current-paper)/paper * -1; current=99.7, paper=100
+        # → (99.7-100)/100*10000*-1 = +30 bps (卖便宜 = 不利)
+        self.assertAlmostEqual(slip, 30.0, places=1)
+        mock_klines.assert_not_called()
+
+    def test_falls_back_to_kline_on_book_ticker_error(self):
+        """bookTicker 失败 → 自动 fallback 到 1m kline close (保留旧行为)."""
+        paper = {"symbol": "BTCUSDT", "direction": "LONG", "entry_price": 100.0}
+        with patch.object(self.client, "get_book_ticker",
+                          side_effect=BinanceError("network")), \
+             patch.object(self.client, "get_klines",
+                          return_value=self._kline(100.5)) as mock_klines:
+            slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        self.assertAlmostEqual(slip, 50.0, places=1)
+        mock_klines.assert_called_once()
+
+    def test_falls_back_when_book_ticker_returns_zero(self):
+        """bookTicker 返 0/None → fallback (防御性, 不该相信 0 价)."""
+        paper = {"symbol": "BTCUSDT", "direction": "LONG", "entry_price": 100.0}
+        bt = {"symbol": "BTCUSDT", "bidPrice": "0", "askPrice": "0"}
+        with patch.object(self.client, "get_book_ticker", return_value=bt), \
+             patch.object(self.client, "get_klines",
+                          return_value=self._kline(100.5)):
+            slip = _compute_pre_entry_slippage_bps(self.client, paper)
+        self.assertAlmostEqual(slip, 50.0, places=1)
+
+
+class TestDynamicSlippageThreshold(unittest.TestCase):
+    """Phase 4.V: 动态预滑点阈值 (intensity → bps).
+
+    核心不变式:
+      - intensity=3 拿到最高阈值 (捕获 XANUSDT 型急拉)
+      - intensity=1 保持保守阈值 (不放行低动量信号)
+      - 字段缺失 / 非法值 fail-safe 到保守值
+    """
+
+    def test_intensity_3_gives_highest_threshold(self):
+        """intensity=3: 高速急拉 → 200 bps (XANUSDT 134 bps 应可通过)."""
+        t = {"symbol": "XANUSDT", "direction": "LONG",
+             "entry_price": 1.0, "intensity": 3}
+        self.assertEqual(_get_effective_slippage_threshold(t), 200.0)
+
+    def test_intensity_2_gives_medium_threshold(self):
+        t = {"intensity": 2}
+        self.assertEqual(_get_effective_slippage_threshold(t), 150.0)
+
+    def test_intensity_1_gives_base_threshold(self):
+        t = {"intensity": 1}
+        self.assertEqual(_get_effective_slippage_threshold(t), LIVE_MAX_ENTRY_SLIPPAGE_BPS)
+
+    def test_intensity_missing_gives_base_threshold(self):
+        """字段缺失 → fail-safe 保守值, 不误放行未知信号."""
+        t = {"symbol": "X"}
+        self.assertEqual(_get_effective_slippage_threshold(t), LIVE_MAX_ENTRY_SLIPPAGE_BPS)
+
+    def test_intensity_none_gives_base_threshold(self):
+        t = {"intensity": None}
+        self.assertEqual(_get_effective_slippage_threshold(t), LIVE_MAX_ENTRY_SLIPPAGE_BPS)
+
+    def test_intensity_string_invalid_gives_base_threshold(self):
+        """非整数字段 → fail-safe."""
+        t = {"intensity": "high"}
+        self.assertEqual(_get_effective_slippage_threshold(t), LIVE_MAX_ENTRY_SLIPPAGE_BPS)
+
+    def test_intensity_string_numeric_coerced(self):
+        """字符串数字 '3' 应被 int() 解析."""
+        t = {"intensity": "3"}
+        self.assertEqual(_get_effective_slippage_threshold(t), 200.0)
+
+    def test_threshold_table_is_monotone(self):
+        """intensity 越高 → 阈值越高 (单调性)."""
+        vals = [LIVE_SLIPPAGE_THRESHOLD_BY_INTENSITY[i] for i in (1, 2, 3)]
+        self.assertEqual(vals, sorted(vals))
+
+    def test_xanusdt_134bps_would_pass_intensity3(self):
+        """XANUSDT 04:13 复盘: 134 bps 在 intensity=3 (200 bps 阈值) 应通过."""
+        t = {"intensity": 3}
+        threshold = _get_effective_slippage_threshold(t)
+        self.assertGreater(threshold, 134.0,
+                           "134 bps 应在 intensity=3 阈值内, 否则 XANUSDT 仍被拦截")
+
+    def test_low_intensity_still_blocks_high_slip(self):
+        """intensity=1 时, 51 bps 仍超阈值 50 bps → 应被拒."""
+        t = {"intensity": 1}
+        threshold = _get_effective_slippage_threshold(t)
+        self.assertLess(threshold, 52.0)
+
+    def test_poll_interval_reduced(self):
+        """Phase 4.V: 轮询周期缩短到 5s (确保 plist 改了代码常量也同步)."""
+        self.assertEqual(POLL_INTERVAL_SEC, 5,
+                         "POLL_INTERVAL_SEC 必须是 5 (Phase 4.V), 否则 --loop 模式仍 30s")
 
 
 class TestComputeBtcRegime(unittest.TestCase):

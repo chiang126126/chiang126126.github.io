@@ -96,6 +96,7 @@ LIVE_SYMBOL_BLACKLIST = [
     "PLAYUSDT",    # 4 笔 0 胜, 累计 -$2.75 (5/21 加)
     "GUAUSDT",     # 3 笔 0 胜, 累计 -$1.74 (5/21 加)
     "STABLEUSDT",  # 5 笔 0 胜, 累计 -$1.08 (5/21 加)
+    "XAGUSDT",     # TradFi-Perps 需单独签协议, -4411 错误循环 (5/25 加)
 ]
 
 # Phase 4.H Conviction filter (2026-05-22 部署) / Phase 4.R7 (2026-05-24 关闭)
@@ -147,12 +148,18 @@ LIVE_TOTAL_DD_LIMIT_PCT = 5.0          # 总回撤 5% → 自动写 emergency fl
 #   v3 (5/21 放宽): 100 bps  ← 333 笔数据揭示反直觉现象:
 #     高滑点 (>50bps) 48 笔 净 +$1.91, 人均 +$0.040
 #     低滑点 (≤50bps) 267 笔 净 -$10.18, 人均 -$0.038
-#     即"被 gate 拦下"那批反而是赚钱方向. 推测原因: 高滑点常出现在
-#     强势/弱势行情, 跟得到的 trade 往往是真趋势; 50bps gate 把这些都
-#     切掉, 只留下"小幅震荡"环境的弱信号.
-#     v3 放宽到 100 bps 仅拦截真正灾难性事件 (≥100bps, 5% 的占比),
-#     保留 50-100 bps 的潜在盈利信号. 656 bps STORJ 这种仍会被拦.
-LIVE_MAX_ENTRY_SLIPPAGE_BPS = 100.0    # 预滑点上限. 超过放弃开仓.
+#     高滑点常出现在强势/弱势行情, 往往是真趋势. 656 bps STORJ 这种仍会被拦.
+#   v4 (5/25 动态化): 按 intensity 分级 — intensity=1 保 100bps (v3 数据结论),
+#     高动量信号接受更大阈值: intensity=3 最高 200 bps (XANUSDT/SAGAUSDT 型).
+LIVE_MAX_ENTRY_SLIPPAGE_BPS = 100.0    # 预滑点上限 (intensity=1 默认值, fallback).
+# Phase 4.V (5/25) 动态阈值: 高动量信号接受更大预滑点.
+# 依据: XANUSDT intensity=3 场景下 134 bps 被拦截, 而 paper 后续 +$49.44;
+# 高滑点在强趋势中可被后续走势消化; intensity=1 与 v3 100bps 数据分析一致.
+LIVE_SLIPPAGE_THRESHOLD_BY_INTENSITY = {
+    3: 200.0,   # 高速急拉 (XANUSDT/SAGAUSDT 型)
+    2: 150.0,   # 中等动量
+    1: 100.0,   # 低动量 / 默认 (与 v3 100bps 数据分析一致)
+}
 
 # Phase 4.C BTC regime-aware 标签 (每笔 trade 开仓时记录当时 BTC 状态)
 # 用 1h K 线的 MA(25) 作 baseline (~24h 滚动均值, 匹配短线持仓视角).
@@ -248,7 +255,7 @@ MIRRORED_IDS_KEEP_LAST_N = 500          # mirrored_paper_ids 滚动窗口
 MISSED_SIGNALS_KEEP_LAST_N = 50         # missed_signals 滚动窗口 (诊断用)
 
 # 主循环
-POLL_INTERVAL_SEC = 30                  # --loop 模式 poll 间隔
+POLL_INTERVAL_SEC = 5                   # --loop 模式 poll 间隔 (Phase 4.V 5/25: 30→5s)
 
 # 状态文件 schema 版本
 STATE_VERSION = "1.0"
@@ -504,6 +511,13 @@ def is_eligible_for_mirror(
             f_pct = paper_trade.get("funding_rate_pct")
             return False, (f"funding adverse ({f_pct}% ≥ {LIVE_FUNDING_ADVERSE_THRESHOLD_PCT}%) "
                           f"(Phase 4.M: paper 历史人均 -$0.85, 不利 mirror)")
+    # Phase 4.T 审计后撤销 (5/25):
+    # 设计意图是"1h 涨幅 >8% 时禁止 SHORT", 但数据审计显示:
+    #   - 历史 171 笔 SHORT, change_1h_pct 最高仅 +0.58%, 从未超过 1%
+    #   - velocity scanner 方向对齐检查已在上游过滤反向信号
+    #   - 8% 阈值是永不触发的死条件, 提供虚假安全感
+    # 真正的反向过滤保护在 scanner 上游. 若未来 paper_trade 加入 change_4h_pct
+    # 字段, 可以用 4h 趋势 (更稳健) 重新实现此 gate.
     return True, "ok"
 
 
@@ -947,10 +961,39 @@ def _get_current_price(client: BinanceClient, symbol: str) -> Optional[float]:
         return None
 
 
+def _get_entry_reference_price(
+    client: BinanceClient, symbol: str, direction: str,
+) -> Optional[float]:
+    """获取开仓侧实时基准价 (盘口最优价, <1s).
+
+    LONG (市价 BUY)  → 用 askPrice (我们要吃卖一)
+    SHORT (市价 SELL) → 用 bidPrice (我们要打买一)
+
+    失败时 fallback 到 1m kline close (旧行为). fallback 路径会带 0-60s
+    滞后, 但保证 fail-safe (返 None 让上层放行而非误拒).
+    """
+    try:
+        bt = client.get_book_ticker(symbol)
+        if direction == "LONG":
+            px = float(bt.get("askPrice") or 0)
+        else:
+            px = float(bt.get("bidPrice") or 0)
+        if px > 0:
+            return px
+    except (BinanceError, ValueError, TypeError, KeyError) as e:
+        log.warning(f"[book_ticker] {symbol}: {type(e).__name__}: {e}, "
+                    f"fallback 1m kline")
+    return _get_current_price(client, symbol)
+
+
 def _compute_pre_entry_slippage_bps(
     client: BinanceClient, paper_trade: dict,
 ) -> Optional[float]:
-    """计算 paper 信号价 → 当前实时价 的预滑点 (bps).
+    """计算 paper 信号价 → 当前开仓侧实时价 的预滑点 (bps).
+
+    Phase 4.U (5/25): 改用盘口最优价 (askPrice for LONG, bidPrice for SHORT)
+    替代 1m kline close, 消除 0-60s 价格滞后. 修复 SAGAUSDT 07:32 等
+    "gate 假通过但实际成交滑点远超阈值" 的场景.
 
     返回值约定:
         正 bps = 不利 (开仓即吃亏)
@@ -971,7 +1014,7 @@ def _compute_pre_entry_slippage_bps(
         return None
     if paper_entry <= 0:
         return None
-    current = _get_current_price(client, sym)
+    current = _get_entry_reference_price(client, sym, direction)
     if current is None or current <= 0:
         return None
     side_sign = 1 if direction == "LONG" else -1
@@ -1023,6 +1066,21 @@ def _should_block_for_regime(direction: str, regime: Optional[str]) -> bool:
     if r == "down" and d == "LONG":
         return True
     return False
+
+
+def _get_effective_slippage_threshold(paper_trade: dict) -> float:
+    """动态预滑点阈值: 按 paper_trade.intensity 查 LIVE_SLIPPAGE_THRESHOLD_BY_INTENSITY.
+
+    intensity=3 → 200 bps  (高速急拉, XANUSDT/SAGAUSDT 型)
+    intensity=2 → 150 bps  (中等动量)
+    intensity=1 → 100 bps  (低动量 / 默认, 与 v3 100bps 数据分析一致)
+    字段缺 / 非整数 → 100 bps  (fail-safe, 与 LIVE_MAX_ENTRY_SLIPPAGE_BPS 对齐)
+    """
+    try:
+        inten = int(paper_trade.get("intensity") or 1)
+    except (TypeError, ValueError):
+        inten = 1
+    return LIVE_SLIPPAGE_THRESHOLD_BY_INTENSITY.get(inten, LIVE_MAX_ENTRY_SLIPPAGE_BPS)
 
 
 def _ab_use_sl_compensation(paper_id: str, mode: str = None) -> bool:
@@ -1404,6 +1462,19 @@ def _try_mirror_open(
         )
         return None
 
+    # Phase 4.V: 取实时盘口价用于 IOC 限价入场 (价格有硬上限, 不追价).
+    # LONG: ask (我们要吃的卖一价); SHORT: bid (我们要打的买一价).
+    # 失败时 fallback None → open_position 回退到市价单 (向后兼容).
+    entry_limit_price: Optional[float] = None
+    try:
+        bt = client.get_book_ticker(sym)
+        side_key = "askPrice" if side == "BUY" else "bidPrice"
+        raw_px = float(bt.get(side_key) or 0)
+        if raw_px > 0:
+            entry_limit_price = raw_px
+    except (BinanceError, ValueError, KeyError, TypeError) as e:
+        log.warning(f"[mirror-open] {sym}: bookTicker 失败 ({e}), 回退市价单")
+
     try:
         result = client.open_position(
             symbol=sym,
@@ -1411,6 +1482,7 @@ def _try_mirror_open(
             notional_usdt=LIVE_NOTIONAL_USDT,
             sl_price=sl_price,
             trade_id=trade_id,
+            limit_price=entry_limit_price,
             use_exchange_sl=False,   # Plan B: client-side SL (Phase 3.2.b 实现 polling)
         )
     except (BinanceError, ValueError) as e:
@@ -1737,19 +1809,22 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
                 )
                 continue
 
-            # 滑点护栏 (Phase 4.A): paper 信号价 → 当前价 预滑点检测.
+            # 滑点护栏 (Phase 4.A/4.V): paper 信号价 → 盘口实时价 预滑点检测.
+            # 4.V 动态阈值: intensity=3 → 200 bps / =2 → 150 / =1 → 50 (默认).
             # fail-safe: 取价失败 / 字段缺 → 返 None → 不拒绝, 按原流程开仓.
-            # 仅当能计算出 pre_slip 且超过阈值时才拒绝, 避免误杀.
             pre_slip_bps = _compute_pre_entry_slippage_bps(client, pt)
-            if pre_slip_bps is not None and pre_slip_bps > LIVE_MAX_ENTRY_SLIPPAGE_BPS:
+            slip_threshold = _get_effective_slippage_threshold(pt)
+            if pre_slip_bps is not None and pre_slip_bps > slip_threshold:
                 reason = (
                     f"pre_slippage_too_high "
-                    f"(+{pre_slip_bps:.1f}bps > {LIVE_MAX_ENTRY_SLIPPAGE_BPS:.0f}bps)"
+                    f"(+{pre_slip_bps:.1f}bps > {slip_threshold:.0f}bps "
+                    f"intensity={pt.get('intensity',1)})"
                 )
                 _record_missed_signal(live, pt, reason, now)
                 log.warning(
                     f"[skip-mirror-slip] {pt['symbol']}: 预滑点 "
-                    f"+{pre_slip_bps:.1f}bps 超阈值 {LIVE_MAX_ENTRY_SLIPPAGE_BPS:.0f}bps, "
+                    f"+{pre_slip_bps:.1f}bps 超阈值 {slip_threshold:.0f}bps "
+                    f"(intensity={pt.get('intensity',1)}), "
                     f"放弃 mirror (paper_id={pt.get('id','')[:40]})"
                 )
                 continue
