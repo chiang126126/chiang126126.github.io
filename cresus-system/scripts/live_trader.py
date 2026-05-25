@@ -90,13 +90,14 @@ LIVE_MIRROR_MAX_AGE_SEC = 600          # 仅 mirror 10min 内开的 paper trade
 # 复审时间:
 #   2026-05-17 (89 笔实盘数据, 仅加 n≥4 且 0 胜的 symbol)
 #   2026-05-21 (333 笔实盘数据, 加 PLAY/GUA/STABLE — 均 n≥3 0 胜)
+#   2026-05-25 (审计: DODO/NMR/PLAY/GUA 拉黑后 paper 0 新信号, scanner 自然淘汰,
+#               Phase 4.U/4.V 新策略下释放观察; STABLE 5/0 p<0.05 保留)
 LIVE_SYMBOL_BLACKLIST = [
-    "DODOXUSDT",   # 4 笔 0 胜, 累计 -$0.69 (5/17 加)
-    "NMRUSDT",     # 4 笔 0 胜, 累计 -$0.37 (5/17 加)
-    "PLAYUSDT",    # 4 笔 0 胜, 累计 -$2.75 (5/21 加)
-    "GUAUSDT",     # 3 笔 0 胜, 累计 -$1.74 (5/21 加)
-    "STABLEUSDT",  # 5 笔 0 胜, 累计 -$1.08 (5/21 加)
-    "XAGUSDT",     # TradFi-Perps 需单独签协议, -4411 错误循环 (5/25 加)
+    "STABLEUSDT",  # 5 笔 0 胜, 累计 -$1.08 (5/21 加); 5/25 复审: p<0.05 唯一统计显著, 保留
+    "XAGUSDT",     # TradFi-Perps 需单独签协议, -4411 结构性错误 (5/25 加)
+    # 已释放 (5/25): DODOXUSDT / NMRUSDT / PLAYUSDT / GUAUSDT
+    #   原因: 拉黑后 paper 0 新信号 (scanner 自然淘汰), 样本 n≤4 统计不显著.
+    #   Phase 4.U/4.V 新策略下重新开放, 若 paper 再出信号可积累新样本复审.
 ]
 
 # Phase 4.H Conviction filter (2026-05-22 部署) / Phase 4.R7 (2026-05-24 关闭)
