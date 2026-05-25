@@ -1,46 +1,44 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-25T17:27:00.911114+00:00",
+  "generated_at": "2026-05-25T17:29:06.917236+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 468,
-    "open": 2,
-    "closed": 466,
+    "open": 1,
+    "closed": 467,
     "wins": 156,
-    "losses": 306,
-    "win_rate": 0.338,
-    "total_pnl_usdt": -38.606,
-    "net_pnl_usdt": -66.5612,
-    "avg_pnl_usdt": -0.0828,
+    "losses": 307,
+    "win_rate": 0.337,
+    "total_pnl_usdt": -48.8091,
+    "net_pnl_usdt": -77.1694,
+    "avg_pnl_usdt": -0.1045,
     "best_trade_usdt": 29.0009,
     "worst_trade_usdt": -14.8626,
-    "fees_paid_usdt": 28.3552,
-    "fees_realized_usdt": 27.9552,
-    "fees_open_usdt": 0.4,
+    "fees_paid_usdt": 28.5603,
+    "fees_realized_usdt": 28.3603,
+    "fees_open_usdt": 0.2,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 799.96,
-    "free_capital_usdt": 1133.07,
+    "deployed_usdt": 399.99,
+    "free_capital_usdt": 1522.64,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -27.5509,
-    "deployed_usdt": 799.96
+    "daily_pnl": -37.754,
+    "deployed_usdt": 399.99
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "PHAUSDT",
       "TONUSDT"
     ],
     "exchange_symbols": [
-      "PHAUSDT",
       "TONUSDT"
     ]
   },
@@ -60,8 +58,8 @@
       "risk_usdt": 6.057,
       "risk_pct": 1.514,
       "mirror_latency_sec": 5.6,
-      "sl_price": 2.143828141,
-      "sl_paper_current": 2.143828141,
+      "sl_price": 2.1441248920000002,
+      "sl_paper_current": 2.1441248920000002,
       "sl_compensation_enabled": false,
       "sl_compensation_offset": 0.0,
       "sl_compensation_mode": "abcd",
@@ -86,7 +84,7 @@
       "alert_type": "sustained",
       "atr_pct": 0.722,
       "phase_a_mfe_pct": 2.496,
-      "phase_b_mfe_pct": 4.217,
+      "phase_b_mfe_pct": 4.232,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.199994,
       "fees_are_actual": true,
@@ -99,12 +97,14 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 2.1315,
-      "current_price": 2.163,
-      "unrealized_pnl_usdt": 15.7412,
-      "unrealized_pnl_pct": 3.935,
-      "last_price_check_at": "2026-05-25T17:26:58.199008+00:00",
-      "phase_b_mfe_price": 2.1673
-    },
+      "current_price": 2.1633,
+      "unrealized_pnl_usdt": 15.7988,
+      "unrealized_pnl_pct": 3.95,
+      "last_price_check_at": "2026-05-25T17:29:04.984788+00:00",
+      "phase_b_mfe_price": 2.1676
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "PHAUSDT|SHORT|2026-05-25T17:07:31.310732+00:00",
       "trade_id": "L1779728851_PHAUSDT_S",
@@ -128,7 +128,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 3,
       "wick_filter_mode": "always",
-      "sl_breach_count": 1,
+      "sl_breach_count": 2,
       "funding_signal": "favorable",
       "funding_rate_pct_at_open": -0.0536,
       "regime_gate_enabled": true,
@@ -148,7 +148,7 @@
       "phase_a_mfe_pct": 1.276,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.199989,
+      "fees_paid_usdt": 0.405079,
       "fees_are_actual": true,
       "opened_at": "2026-05-25T17:11:09.920273+00:00",
       "is_dry_run": false,
@@ -159,13 +159,21 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.04644,
-      "current_price": 0.0478,
-      "unrealized_pnl_usdt": -9.8601,
-      "unrealized_pnl_pct": -2.465,
-      "last_price_check_at": "2026-05-25T17:26:58.199008+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.04783,
+      "unrealized_pnl_usdt": -10.1173,
+      "unrealized_pnl_pct": -2.529,
+      "last_price_check_at": "2026-05-25T17:27:09.026789+00:00",
+      "closed_at": "2026-05-25T17:27:22.778774+00:00",
+      "close_reason": "paper:hit_sl",
+      "avg_exit_price": 0.04784,
+      "realized_pnl_usdt": -10.2031,
+      "close_order_id": 108025189,
+      "close_qty": 8574.0,
+      "close_expected_price": 0.04783,
+      "close_slippage_bps": 2.09,
+      "entry_fees_usdt": 0.199989,
+      "close_fees_usdt": 0.20509
+    },
     {
       "paper_id": "ZEREBROUSDT|LONG|2026-05-25T16:44:23.422449+00:00",
       "trade_id": "L1779727463_ZEREBRO_L",
@@ -27712,19 +27720,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-25T17:06:17.200154+00:00",
-      "reason": "paper trade too old (1241s > 600s)",
-      "last_checked_at": "2026-05-25T17:26:58.199008+00:00"
+      "reason": "paper trade too old (1368s > 600s)",
+      "last_checked_at": "2026-05-25T17:29:04.984788+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 77600.0,
-    "btc_ma25_1h": 77166.26,
-    "pct_vs_ma25": 0.562,
-    "change_24h_pct": 1.225,
+    "btc_price": 77590.0,
+    "btc_ma25_1h": 77165.86,
+    "pct_vs_ma25": 0.55,
+    "change_24h_pct": 1.212,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-25T17:27:00.333973+00:00"
+    "computed_at": "2026-05-25T17:29:06.592944+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
