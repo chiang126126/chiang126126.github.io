@@ -1,29 +1,29 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-25T15:46:52.318874+00:00",
+  "generated_at": "2026-05-25T15:48:48.570178+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 462,
-    "open": 2,
-    "closed": 460,
+    "open": 1,
+    "closed": 461,
     "wins": 153,
-    "losses": 303,
-    "win_rate": 0.336,
-    "total_pnl_usdt": -58.2439,
-    "net_pnl_usdt": -83.7899,
-    "avg_pnl_usdt": -0.1266,
+    "losses": 304,
+    "win_rate": 0.335,
+    "total_pnl_usdt": -61.9411,
+    "net_pnl_usdt": -87.8849,
+    "avg_pnl_usdt": -0.1344,
     "best_trade_usdt": 29.0009,
     "worst_trade_usdt": -14.8626,
-    "fees_paid_usdt": 25.9458,
-    "fees_realized_usdt": 25.546,
-    "fees_open_usdt": 0.3998,
+    "fees_paid_usdt": 26.1438,
+    "fees_realized_usdt": 25.9438,
+    "fees_open_usdt": 0.2,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 799.68,
-    "free_capital_usdt": 1116.13,
+    "deployed_usdt": 400.0,
+    "free_capital_usdt": 1511.92,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
@@ -36,12 +36,12 @@
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "SAGAUSDT",
-      "ORDIUSDT"
+      "ORDIUSDT",
+      "SAGAUSDT"
     ],
     "exchange_symbols": [
-      "SAGAUSDT",
-      "ORDIUSDT"
+      "ORDIUSDT",
+      "SAGAUSDT"
     ]
   },
   "open_trades": [
@@ -99,11 +99,13 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.02489,
-      "current_price": 0.0246,
-      "unrealized_pnl_usdt": -3.2258,
-      "unrealized_pnl_pct": -0.806,
-      "last_price_check_at": "2026-05-25T15:46:49.901554+00:00"
-    },
+      "current_price": 0.0245,
+      "unrealized_pnl_usdt": -4.8387,
+      "unrealized_pnl_pct": -1.21,
+      "last_price_check_at": "2026-05-25T15:48:44.734020+00:00"
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "ORDIUSDT|LONG|2026-05-25T15:42:37.756943+00:00",
       "trade_id": "L1779723757_ORDIUSD_L",
@@ -127,7 +129,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 2,
       "wick_filter_mode": "always",
-      "sl_breach_count": 0,
+      "sl_breach_count": 2,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.0002,
       "regime_gate_enabled": true,
@@ -147,7 +149,7 @@
       "phase_a_mfe_pct": 0.0,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.199838,
+      "fees_paid_usdt": 0.397828,
       "fees_are_actual": true,
       "opened_at": "2026-05-25T15:43:22.113717+00:00",
       "is_dry_run": false,
@@ -158,13 +160,21 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 4.219,
-      "current_price": 4.218,
-      "unrealized_pnl_usdt": 0.1896,
-      "unrealized_pnl_pct": 0.047,
-      "last_price_check_at": "2026-05-25T15:46:49.901554+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 4.187,
+      "unrealized_pnl_usdt": -2.7492,
+      "unrealized_pnl_pct": -0.688,
+      "last_price_check_at": "2026-05-25T15:48:44.734020+00:00",
+      "closed_at": "2026-05-25T15:48:48.542124+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 4.177,
+      "realized_pnl_usdt": -3.6972,
+      "close_order_id": 111047585,
+      "close_qty": 94.8,
+      "close_expected_price": 4.20089286,
+      "close_slippage_bps": 56.88,
+      "entry_fees_usdt": 0.199838,
+      "close_fees_usdt": 0.19799
+    },
     {
       "paper_id": "ARKMUSDT|LONG|2026-05-25T14:11:18.978610+00:00",
       "trade_id": "L1779718278_ARKMUSD_L",
@@ -27292,8 +27302,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-25T14:13:36.928943+00:00",
-      "reason": "paper trade too old (5593s > 600s)",
-      "last_checked_at": "2026-05-25T15:46:49.901554+00:00"
+      "reason": "paper trade too old (5708s > 600s)",
+      "last_checked_at": "2026-05-25T15:48:44.734020+00:00"
     },
     {
       "paper_id": "RENDERUSDT|LONG|2026-05-25T14:49:55.459198+00:00",
@@ -27301,8 +27311,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-25T14:50:49.435053+00:00",
-      "reason": "paper trade too old (3360s > 600s)",
-      "last_checked_at": "2026-05-25T15:46:49.901554+00:00"
+      "reason": "paper trade too old (3475s > 600s)",
+      "last_checked_at": "2026-05-25T15:48:44.734020+00:00"
     },
     {
       "paper_id": "AZTECUSDT|LONG|2026-05-25T15:05:37.502980+00:00",
@@ -27310,8 +27320,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-25T15:05:40.409887+00:00",
-      "reason": "paper trade too old (2469s > 600s)",
-      "last_checked_at": "2026-05-25T15:46:49.901554+00:00"
+      "reason": "paper trade too old (2584s > 600s)",
+      "last_checked_at": "2026-05-25T15:48:44.734020+00:00"
     },
     {
       "paper_id": "GUAUSDT|LONG|2026-05-25T15:25:08.065800+00:00",
@@ -27320,7 +27330,7 @@
       "conviction_score": 6,
       "signal_at": "2026-05-25T15:25:56.996745+00:00",
       "reason": "symbol GUAUSDT in live blacklist (历史 0 胜)",
-      "last_checked_at": "2026-05-25T15:46:49.901554+00:00"
+      "last_checked_at": "2026-05-25T15:48:44.734020+00:00"
     },
     {
       "paper_id": "CHIPUSDT|SHORT|2026-05-25T15:25:09.869388+00:00",
@@ -27328,19 +27338,19 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-25T15:25:56.996745+00:00",
-      "reason": "paper trade too old (1253s > 600s)",
-      "last_checked_at": "2026-05-25T15:46:49.901554+00:00"
+      "reason": "paper trade too old (1368s > 600s)",
+      "last_checked_at": "2026-05-25T15:48:44.734020+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 77592.0,
-    "btc_ma25_1h": 77075.04,
-    "pct_vs_ma25": 0.671,
-    "change_24h_pct": 1.613,
+    "btc_price": 77569.8,
+    "btc_ma25_1h": 77074.15,
+    "pct_vs_ma25": 0.643,
+    "change_24h_pct": 1.584,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-25T15:46:51.730735+00:00"
+    "computed_at": "2026-05-25T15:48:46.633992+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
