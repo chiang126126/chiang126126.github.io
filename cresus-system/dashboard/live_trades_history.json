@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-26T18:15:14.396032+00:00",
+  "generated_at": "2026-05-26T18:17:19.619026+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 505,
@@ -35,6 +35,11 @@
     "ok": false,
     "mismatches": [
       {
+        "symbol": "JTOUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has JTOUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
         "symbol": "AZTECUSDT",
         "kind": "exchange_only",
         "message": "exchange has AZTECUSDT position but live doesn't track (user manual? or state lost)"
@@ -43,11 +48,6 @@
         "symbol": "DEXEUSDT",
         "kind": "exchange_only",
         "message": "exchange has DEXEUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "JTOUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has JTOUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "IOUSDT",
@@ -60,11 +60,11 @@
       "BASUSDT"
     ],
     "exchange_symbols": [
-      "BASUSDT",
-      "DEXEUSDT",
       "JTOUSDT",
+      "AZTECUSDT",
       "IOUSDT",
-      "AZTECUSDT"
+      "BASUSDT",
+      "DEXEUSDT"
     ]
   },
   "open_trades": [
@@ -30315,8 +30315,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-26T17:38:36.098056+00:00",
-      "reason": "paper trade too old (2193s > 600s)",
-      "last_checked_at": "2026-05-26T18:15:09.299507+00:00"
+      "reason": "paper trade too old (2319s > 600s)",
+      "last_checked_at": "2026-05-26T18:17:14.868107+00:00"
     },
     {
       "paper_id": "WLFIUSDT|SHORT|2026-05-26T18:01:32.449876+00:00",
@@ -30324,8 +30324,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-26T18:02:19.246901+00:00",
-      "reason": "paper trade too old (770s > 600s)",
-      "last_checked_at": "2026-05-26T18:15:09.299507+00:00"
+      "reason": "paper trade too old (896s > 600s)",
+      "last_checked_at": "2026-05-26T18:17:14.868107+00:00"
     }
   ],
   "btc_regime_now": {
@@ -30336,7 +30336,7 @@
     "change_24h_pct": -1.343,
     "sub_regime": "down_stable",
     "change_3h_pct": -0.0,
-    "computed_at": "2026-05-26T18:15:10.506724+00:00"
+    "computed_at": "2026-05-26T18:17:16.561762+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
