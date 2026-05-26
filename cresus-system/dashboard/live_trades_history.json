@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-26T20:09:55.330415+00:00",
+  "generated_at": "2026-05-26T20:12:01.885593+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 505,
@@ -35,6 +35,16 @@
     "ok": false,
     "mismatches": [
       {
+        "symbol": "DEXEUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has DEXEUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "JTOUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has JTOUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
         "symbol": "IOUSDT",
         "kind": "exchange_only",
         "message": "exchange has IOUSDT position but live doesn't track (user manual? or state lost)"
@@ -43,25 +53,15 @@
         "symbol": "AZTECUSDT",
         "kind": "exchange_only",
         "message": "exchange has AZTECUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "JTOUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has JTOUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "DEXEUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has DEXEUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
     "live_symbols": [],
     "exchange_symbols": [
-      "IOUSDT",
-      "AZTECUSDT",
+      "DEXEUSDT",
       "JTOUSDT",
-      "DEXEUSDT"
+      "IOUSDT",
+      "AZTECUSDT"
     ]
   },
   "open_trades": [],
@@ -30321,19 +30321,19 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-26T17:38:36.098056+00:00",
-      "reason": "paper trade too old (9077s > 600s)",
-      "last_checked_at": "2026-05-26T20:09:53.522694+00:00"
+      "reason": "paper trade too old (9205s > 600s)",
+      "last_checked_at": "2026-05-26T20:12:00.831101+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 76062.5,
-    "btc_ma25_1h": 76843.38,
-    "pct_vs_ma25": -1.016,
-    "change_24h_pct": -1.529,
+    "btc_price": 76076.6,
+    "btc_ma25_1h": 76843.95,
+    "pct_vs_ma25": -0.999,
+    "change_24h_pct": -1.511,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.571,
-    "computed_at": "2026-05-26T20:09:55.300690+00:00"
+    "change_3h_pct": -0.552,
+    "computed_at": "2026-05-26T20:12:01.854660+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
