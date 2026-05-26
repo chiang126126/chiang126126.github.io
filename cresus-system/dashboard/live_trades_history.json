@@ -1,49 +1,39 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-26T14:17:48.804468+00:00",
+  "generated_at": "2026-05-26T14:19:45.997438+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 494,
+    "total_trades": 495,
     "open": 0,
-    "closed": 494,
+    "closed": 495,
     "wins": 163,
-    "losses": 326,
+    "losses": 327,
     "win_rate": 0.333,
-    "total_pnl_usdt": -76.2104,
-    "net_pnl_usdt": -114.0568,
-    "avg_pnl_usdt": -0.1543,
+    "total_pnl_usdt": -77.5439,
+    "net_pnl_usdt": -115.7895,
+    "avg_pnl_usdt": -0.1567,
     "best_trade_usdt": 29.4143,
     "worst_trade_usdt": -16.6993,
-    "fees_paid_usdt": 37.8464,
-    "fees_realized_usdt": 37.8464,
+    "fees_paid_usdt": 38.2456,
+    "fees_realized_usdt": 38.2456,
     "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
     "deployed_usdt": 0,
-    "free_capital_usdt": 1885.94,
+    "free_capital_usdt": 1884.21,
     "max_concurrent_slots": 4,
     "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -19.5451,
+    "daily_pnl": -20.8786,
     "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": false,
     "mismatches": [
-      {
-        "symbol": "DEXEUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has DEXEUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "AZTECUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has AZTECUSDT position but live doesn't track (user manual? or state lost)"
-      },
       {
         "symbol": "JTOUSDT",
         "kind": "exchange_only",
@@ -53,19 +43,98 @@
         "symbol": "IOUSDT",
         "kind": "exchange_only",
         "message": "exchange has IOUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "DEXEUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has DEXEUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "AZTECUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has AZTECUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
     "live_symbols": [],
     "exchange_symbols": [
-      "DEXEUSDT",
-      "AZTECUSDT",
       "JTOUSDT",
-      "IOUSDT"
+      "IOUSDT",
+      "DEXEUSDT",
+      "AZTECUSDT"
     ]
   },
   "open_trades": [],
   "recent_closed": [
+    {
+      "paper_id": "RAVEUSDT|LONG|2026-05-26T14:17:37.334933+00:00",
+      "trade_id": "L1779805057_RAVEUSD_L",
+      "symbol": "RAVEUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.5392,
+      "avg_fill_price": 0.5367,
+      "slippage_bps": -46.36,
+      "qty": 745.0,
+      "notional_usdt": 399.8415,
+      "leverage": 1,
+      "risk_usdt": 0.7796,
+      "risk_pct": 0.195,
+      "mirror_latency_sec": 15.0,
+      "sl_price": 0.53565357,
+      "sl_paper_current": 0.53565357,
+      "sl_compensation_enabled": false,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "abcd",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 2,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 2,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "A",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.54451964,
+      "tp2_price": 0.54983929,
+      "phase": "A",
+      "entry_order_id": 97861217,
+      "entry_client_id": "cresus_L1779805057_RAVEUSD_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.438,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.399175,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-26T14:18:34.389268+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 77332.0,
+      "btc_change_24h_at_open": -0.466,
+      "btc_pct_vs_ma25_at_open": 0.233,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.5392,
+      "current_price": 0.535,
+      "unrealized_pnl_usdt": -1.2665,
+      "unrealized_pnl_pct": -0.317,
+      "last_price_check_at": "2026-05-26T14:19:33.615848+00:00",
+      "closed_at": "2026-05-26T14:19:38.875508+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.53491,
+      "realized_pnl_usdt": -1.3335,
+      "close_order_id": 97868993,
+      "close_qty": 745.0,
+      "close_expected_price": 0.53565357,
+      "close_slippage_bps": 13.88,
+      "entry_fees_usdt": 0.199921,
+      "close_fees_usdt": 0.199254
+    },
     {
       "paper_id": "GRASSUSDT|LONG|2026-05-26T12:47:59.264327+00:00",
       "trade_id": "L1779799679_GRASSUS_L",
@@ -29554,8 +29623,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-26T13:08:08.380856+00:00",
-      "reason": "paper trade too old (4179s > 600s)",
-      "last_checked_at": "2026-05-26T14:17:46.978087+00:00"
+      "reason": "paper trade too old (4296s > 600s)",
+      "last_checked_at": "2026-05-26T14:19:43.986525+00:00"
     },
     {
       "paper_id": "SOXLUSDT|LONG|2026-05-26T13:40:12.450012+00:00",
@@ -29563,8 +29632,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-26T13:40:52.015858+00:00",
-      "reason": "paper trade too old (2215s > 600s)",
-      "last_checked_at": "2026-05-26T14:17:46.978087+00:00"
+      "reason": "paper trade too old (2332s > 600s)",
+      "last_checked_at": "2026-05-26T14:19:43.986525+00:00"
     },
     {
       "paper_id": "MRVLUSDT|SHORT|2026-05-26T14:13:12.932268+00:00",
@@ -29573,18 +29642,27 @@
       "conviction_score": 5,
       "signal_at": "2026-05-26T14:13:52.736257+00:00",
       "reason": "funding adverse (0.0736% ≥ 0.05%) (Phase 4.M: paper 历史人均 -$0.85, 不利 mirror)",
-      "last_checked_at": "2026-05-26T14:17:46.978087+00:00"
+      "last_checked_at": "2026-05-26T14:19:43.986525+00:00"
+    },
+    {
+      "paper_id": "QCOMUSDT|LONG|2026-05-26T14:17:56.106588+00:00",
+      "symbol": "QCOMUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-05-26T14:18:19.361129+00:00",
+      "reason": "open_failed (retry next tick)",
+      "last_checked_at": "2026-05-26T14:19:43.986525+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 77267.2,
-    "btc_ma25_1h": 77150.01,
-    "pct_vs_ma25": 0.152,
-    "change_24h_pct": -0.549,
+    "btc_price": 77259.2,
+    "btc_ma25_1h": 77149.69,
+    "pct_vs_ma25": 0.142,
+    "change_24h_pct": -0.559,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-26T14:17:48.776389+00:00"
+    "computed_at": "2026-05-26T14:19:45.133830+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
