@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-26T09:51:19.480725+00:00",
+  "generated_at": "2026-05-26T09:53:25.218271+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 485,
@@ -36,12 +36,12 @@
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "VVVUSDT",
-      "GUAUSDT"
+      "GUAUSDT",
+      "VVVUSDT"
     ],
     "exchange_symbols": [
-      "VVVUSDT",
-      "GUAUSDT"
+      "GUAUSDT",
+      "VVVUSDT"
     ]
   },
   "open_trades": [
@@ -99,10 +99,10 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.265,
       "phase_a_mfe_price": 1.4447,
-      "current_price": 1.44934,
-      "unrealized_pnl_usdt": 26.7537,
-      "unrealized_pnl_pct": 6.701,
-      "last_price_check_at": "2026-05-26T09:51:17.290981+00:00",
+      "current_price": 1.4497,
+      "unrealized_pnl_usdt": 26.6612,
+      "unrealized_pnl_pct": 6.678,
+      "last_price_check_at": "2026-05-26T09:53:22.842778+00:00",
       "phase_b_mfe_price": 1.4381
     },
     {
@@ -159,10 +159,10 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.264,
       "phase_a_mfe_price": 17.027,
-      "current_price": 17.043,
-      "unrealized_pnl_usdt": -0.4933,
-      "unrealized_pnl_pct": -0.123,
-      "last_price_check_at": "2026-05-26T09:51:17.290981+00:00"
+      "current_price": 17.021,
+      "unrealized_pnl_usdt": 0.0235,
+      "unrealized_pnl_pct": 0.006,
+      "last_price_check_at": "2026-05-26T09:53:22.842778+00:00"
     }
   ],
   "recent_closed": [
@@ -28893,19 +28893,28 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-26T08:58:57.085790+00:00",
-      "reason": "paper trade too old (3140s > 600s)",
-      "last_checked_at": "2026-05-26T09:51:17.290981+00:00"
+      "reason": "paper trade too old (3266s > 600s)",
+      "last_checked_at": "2026-05-26T09:53:22.842778+00:00"
+    },
+    {
+      "paper_id": "BASUSDT|LONG|2026-05-26T09:51:38.564527+00:00",
+      "symbol": "BASUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-05-26T09:52:05.285514+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.27% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-05-26T09:53:22.842778+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 76661.4,
-    "btc_ma25_1h": 77183.33,
-    "pct_vs_ma25": -0.676,
+    "btc_price": 76662.0,
+    "btc_ma25_1h": 77183.36,
+    "pct_vs_ma25": -0.675,
     "change_24h_pct": -1.171,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.267,
-    "computed_at": "2026-05-26T09:51:18.841980+00:00"
+    "change_3h_pct": -0.266,
+    "computed_at": "2026-05-26T09:53:24.638190+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
