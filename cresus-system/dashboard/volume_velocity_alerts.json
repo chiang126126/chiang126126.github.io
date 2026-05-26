@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-26T03:31:04.187441+00:00",
+  "updated_at": "2026-05-26T03:33:10.609557+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 19,
+  "alerts_count": 20,
   "alerts": [
+    {
+      "symbol": "APRUSDT",
+      "base": "APR",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.18118,
+      "price_change_pct": 0.6,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 17473.0,
+      "volume_baseline_usdt": 2253.0,
+      "volume_ratio": 7.76,
+      "detected_at": "2026-05-26T03:33:00.239663+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.527,
+      "change_15m_pct": 0.6,
+      "change_1h_pct": -0.132,
+      "change_4h_pct": -0.127,
+      "taker_buy_ratio_1m": 0.896,
+      "taker_buy_ratio_5m": 0.837,
+      "oi_delta_5m_pct": -0.001,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.181,
+      "range_4h_pct": 1.96,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.18085143,
+      "suggested_tp1": 0.18167286,
+      "suggested_tp2": 0.18216571,
+      "conviction_score": 0,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "EDENUSDT",
       "base": "EDEN",
