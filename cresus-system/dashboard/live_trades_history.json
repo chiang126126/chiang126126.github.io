@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-26T13:50:59.117225+00:00",
+  "generated_at": "2026-05-26T13:53:04.184561+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 494,
@@ -35,9 +35,9 @@
     "ok": false,
     "mismatches": [
       {
-        "symbol": "IOUSDT",
+        "symbol": "JTOUSDT",
         "kind": "exchange_only",
-        "message": "exchange has IOUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has JTOUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "DEXEUSDT",
@@ -45,23 +45,23 @@
         "message": "exchange has DEXEUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "JTOUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has JTOUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
         "symbol": "AZTECUSDT",
         "kind": "exchange_only",
         "message": "exchange has AZTECUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "IOUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has IOUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
     "live_symbols": [],
     "exchange_symbols": [
-      "IOUSDT",
-      "DEXEUSDT",
       "JTOUSDT",
-      "AZTECUSDT"
+      "DEXEUSDT",
+      "AZTECUSDT",
+      "IOUSDT"
     ]
   },
   "open_trades": [],
@@ -29554,8 +29554,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-26T09:52:05.285514+00:00",
-      "reason": "paper trade too old (14332s > 600s)",
-      "last_checked_at": "2026-05-26T13:50:57.208458+00:00"
+      "reason": "paper trade too old (14457s > 600s)",
+      "last_checked_at": "2026-05-26T13:53:01.936596+00:00"
     },
     {
       "paper_id": "FFUSDT|LONG|2026-05-26T13:07:34.410271+00:00",
@@ -29563,17 +29563,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-26T13:08:08.380856+00:00",
-      "reason": "paper trade too old (2569s > 600s)",
-      "last_checked_at": "2026-05-26T13:50:57.208458+00:00"
-    },
-    {
-      "paper_id": "MUUSDT|LONG|2026-05-26T13:33:06.962684+00:00",
-      "symbol": "MUUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-05-26T13:34:21.674520+00:00",
-      "reason": "paper trade too old (996s > 600s)",
-      "last_checked_at": "2026-05-26T13:50:57.208458+00:00"
+      "reason": "paper trade too old (2694s > 600s)",
+      "last_checked_at": "2026-05-26T13:53:01.936596+00:00"
     },
     {
       "paper_id": "DRAMUSDT|LONG|2026-05-26T13:38:08.380826+00:00",
@@ -29581,17 +29572,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-26T13:38:41.146676+00:00",
-      "reason": "paper trade too old (736s > 600s)",
-      "last_checked_at": "2026-05-26T13:50:57.208458+00:00"
-    },
-    {
-      "paper_id": "SNDKUSDT|LONG|2026-05-26T13:39:53.778486+00:00",
-      "symbol": "SNDKUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-05-26T13:40:52.015858+00:00",
-      "reason": "paper trade too old (605s > 600s)",
-      "last_checked_at": "2026-05-26T13:50:57.208458+00:00"
+      "reason": "paper trade too old (861s > 600s)",
+      "last_checked_at": "2026-05-26T13:53:01.936596+00:00"
     },
     {
       "paper_id": "SOXLUSDT|LONG|2026-05-26T13:40:12.450012+00:00",
@@ -29599,8 +29581,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-26T13:40:52.015858+00:00",
-      "reason": "paper trade too old (605s > 600s)",
-      "last_checked_at": "2026-05-26T13:50:57.208458+00:00"
+      "reason": "paper trade too old (730s > 600s)",
+      "last_checked_at": "2026-05-26T13:53:01.936596+00:00"
     },
     {
       "paper_id": "EWYUSDT|LONG|2026-05-26T13:46:29.893420+00:00",
@@ -29609,18 +29591,18 @@
       "conviction_score": 5,
       "signal_at": "2026-05-26T13:47:21.937170+00:00",
       "reason": "funding adverse (0.0542% ≥ 0.05%) (Phase 4.M: paper 历史人均 -$0.85, 不利 mirror)",
-      "last_checked_at": "2026-05-26T13:50:57.208458+00:00"
+      "last_checked_at": "2026-05-26T13:53:01.936596+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 77296.0,
-    "btc_ma25_1h": 77156.25,
-    "pct_vs_ma25": 0.181,
-    "change_24h_pct": -0.008,
+    "btc_price": 77290.6,
+    "btc_ma25_1h": 77156.03,
+    "pct_vs_ma25": 0.174,
+    "change_24h_pct": -0.015,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-26T13:50:59.084887+00:00"
+    "computed_at": "2026-05-26T13:53:04.154955+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
