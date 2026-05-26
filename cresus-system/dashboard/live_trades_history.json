@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-26T17:48:37.702501+00:00",
+  "generated_at": "2026-05-26T17:50:31.588382+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 505,
@@ -35,9 +35,9 @@
     "ok": false,
     "mismatches": [
       {
-        "symbol": "AZTECUSDT",
+        "symbol": "JTOUSDT",
         "kind": "exchange_only",
-        "message": "exchange has AZTECUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has JTOUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "IOUSDT",
@@ -45,14 +45,14 @@
         "message": "exchange has IOUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
+        "symbol": "AZTECUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has AZTECUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
         "symbol": "DEXEUSDT",
         "kind": "exchange_only",
         "message": "exchange has DEXEUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "JTOUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has JTOUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
@@ -60,11 +60,11 @@
       "BASUSDT"
     ],
     "exchange_symbols": [
-      "DEXEUSDT",
-      "BASUSDT",
       "JTOUSDT",
       "AZTECUSDT",
-      "IOUSDT"
+      "DEXEUSDT",
+      "IOUSDT",
+      "BASUSDT"
     ]
   },
   "open_trades": [
@@ -30310,31 +30310,13 @@
   ],
   "missed_signals": [
     {
-      "paper_id": "QCOMUSDT|SHORT|2026-05-26T16:38:35.152013+00:00",
-      "symbol": "QCOMUSDT",
-      "direction": "SHORT",
-      "conviction_score": 5,
-      "signal_at": "2026-05-26T16:39:08.868222+00:00",
-      "reason": "paper trade too old (4164s > 600s)",
-      "last_checked_at": "2026-05-26T17:48:32.842521+00:00"
-    },
-    {
       "paper_id": "PHAUSDT|LONG|2026-05-26T16:51:04.945950+00:00",
       "symbol": "PHAUSDT",
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-26T16:52:04.077155+00:00",
-      "reason": "paper trade too old (3389s > 600s)",
-      "last_checked_at": "2026-05-26T17:48:32.842521+00:00"
-    },
-    {
-      "paper_id": "RAVEUSDT|SHORT|2026-05-26T17:33:27.605959+00:00",
-      "symbol": "RAVEUSDT",
-      "direction": "SHORT",
-      "conviction_score": 5,
-      "signal_at": "2026-05-26T17:34:09.297883+00:00",
-      "reason": "paper trade too old (864s > 600s)",
-      "last_checked_at": "2026-05-26T17:48:32.842521+00:00"
+      "reason": "paper trade too old (3503s > 600s)",
+      "last_checked_at": "2026-05-26T17:50:27.563013+00:00"
     },
     {
       "paper_id": "SPORTFUNUSDT|SHORT|2026-05-26T17:38:16.611622+00:00",
@@ -30342,8 +30324,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-26T17:38:36.098056+00:00",
-      "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-05-26T17:48:32.842521+00:00"
+      "reason": "paper trade too old (711s > 600s)",
+      "last_checked_at": "2026-05-26T17:50:27.563013+00:00"
     }
   ],
   "btc_regime_now": {
@@ -30354,7 +30336,7 @@
     "change_24h_pct": -1.355,
     "sub_regime": "down_stable",
     "change_3h_pct": -0.634,
-    "computed_at": "2026-05-26T17:48:33.897801+00:00"
+    "computed_at": "2026-05-26T17:50:28.665854+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
