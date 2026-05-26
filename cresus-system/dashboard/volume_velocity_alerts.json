@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-26T21:55:38.422817+00:00",
+  "updated_at": "2026-05-26T21:57:44.541097+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 21,
+  "alerts_count": 22,
   "alerts": [
+    {
+      "symbol": "PLAYUSDT",
+      "base": "PLAY",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.10744,
+      "price_change_pct": 2.197,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 1065962.0,
+      "volume_baseline_usdt": 15734.0,
+      "volume_ratio": 67.75,
+      "detected_at": "2026-05-26T21:56:48.143460+00:00",
+      "intensity": 3,
+      "change_5m_pct": 2.991,
+      "change_15m_pct": 3.379,
+      "change_1h_pct": 2.312,
+      "change_4h_pct": 4.305,
+      "taker_buy_ratio_1m": 0.682,
+      "taker_buy_ratio_5m": 0.679,
+      "oi_delta_5m_pct": 0.07,
+      "funding_rate_pct": 0.019,
+      "atr_pct": 0.721,
+      "range_4h_pct": 9.18,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.10627857,
+      "suggested_tp1": 0.10918214,
+      "suggested_tp2": 0.11092429,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "MUBARAKUSDT",
       "base": "MUBARAK",
