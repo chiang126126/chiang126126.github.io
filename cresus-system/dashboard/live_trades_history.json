@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-26T15:15:17.982970+00:00",
+  "generated_at": "2026-05-26T15:17:13.477708+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 502,
-    "open": 3,
+    "total_trades": 503,
+    "open": 4,
     "closed": 499,
     "wins": 164,
     "losses": 330,
@@ -15,21 +15,21 @@
     "avg_pnl_usdt": -0.1616,
     "best_trade_usdt": 29.4143,
     "worst_trade_usdt": -16.6993,
-    "fees_paid_usdt": 40.3229,
+    "fees_paid_usdt": 40.5229,
     "fees_realized_usdt": 39.763,
-    "fees_open_usdt": 0.5599,
+    "fees_open_usdt": 0.7599,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 1199.74,
-    "free_capital_usdt": 679.29,
+    "deployed_usdt": 1599.73,
+    "free_capital_usdt": 279.1,
     "max_concurrent_slots": 4,
-    "slots_used": 3
+    "slots_used": 4
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -25.6479,
-    "deployed_usdt": 1599.72
+    "daily_pnl": -23.9821,
+    "deployed_usdt": 1599.73
   },
   "reconciliation": {
     "ok": false,
@@ -40,9 +40,9 @@
         "message": "exchange has DEXEUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "JTOUSDT",
+        "symbol": "IOUSDT",
         "kind": "exchange_only",
-        "message": "exchange has JTOUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has IOUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "AZTECUSDT",
@@ -50,27 +50,27 @@
         "message": "exchange has AZTECUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "IOUSDT",
+        "symbol": "JTOUSDT",
         "kind": "exchange_only",
-        "message": "exchange has IOUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has JTOUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
     "live_symbols": [
+      "BASUSDT",
+      "SPXUSDT",
       "AIAUSDT",
-      "HIGHUSDT",
-      "PIPPINUSDT",
-      "SPXUSDT"
+      "HIGHUSDT"
     ],
     "exchange_symbols": [
-      "HIGHUSDT",
       "DEXEUSDT",
+      "JTOUSDT",
       "SPXUSDT",
-      "PIPPINUSDT",
-      "IOUSDT",
-      "AZTECUSDT",
       "AIAUSDT",
-      "JTOUSDT"
+      "IOUSDT",
+      "HIGHUSDT",
+      "BASUSDT",
+      "AZTECUSDT"
     ]
   },
   "open_trades": [
@@ -128,10 +128,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.05783,
-      "current_price": 0.05822,
-      "unrealized_pnl_usdt": -1.9328,
-      "unrealized_pnl_pct": -0.483,
-      "last_price_check_at": "2026-05-26T15:15:14.054713+00:00"
+      "current_price": 0.05813,
+      "unrealized_pnl_usdt": -1.3116,
+      "unrealized_pnl_pct": -0.328,
+      "last_price_check_at": "2026-05-26T15:17:10.019636+00:00"
     },
     {
       "paper_id": "SPXUSDT|SHORT|2026-05-26T15:04:09.602473+00:00",
@@ -187,10 +187,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.3631,
-      "current_price": 0.3643,
-      "unrealized_pnl_usdt": -0.2196,
-      "unrealized_pnl_pct": -0.055,
-      "last_price_check_at": "2026-05-26T15:15:14.054713+00:00"
+      "current_price": 0.3645,
+      "unrealized_pnl_usdt": -0.4392,
+      "unrealized_pnl_pct": -0.11,
+      "last_price_check_at": "2026-05-26T15:17:10.019636+00:00"
     },
     {
       "paper_id": "HIGHUSDT|SHORT|2026-05-26T15:08:07.340797+00:00",
@@ -249,7 +249,66 @@
       "current_price": 0.1369,
       "unrealized_pnl_usdt": -0.0,
       "unrealized_pnl_pct": -0.0,
-      "last_price_check_at": "2026-05-26T15:15:14.054713+00:00"
+      "last_price_check_at": "2026-05-26T15:17:10.019636+00:00"
+    },
+    {
+      "paper_id": "BASUSDT|LONG|2026-05-26T15:12:35.478254+00:00",
+      "trade_id": "L1779808355_BASUSDT_L",
+      "symbol": "BASUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.026556,
+      "avg_fill_price": 0.026642,
+      "slippage_bps": 32.38,
+      "qty": 15013.8,
+      "notional_usdt": 399.9976596,
+      "leverage": 1,
+      "risk_usdt": 4.5406,
+      "risk_pct": 1.135,
+      "mirror_latency_sec": 150.8,
+      "sl_price": 0.02633957,
+      "sl_paper_current": 0.02633957,
+      "sl_compensation_enabled": false,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "abcd",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 2,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.0475,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "D",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.02688064,
+      "tp2_price": 0.02720529,
+      "phase": "A",
+      "entry_order_id": 224015596,
+      "entry_client_id": "cresus_L1779808355_BASUSDT_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.543,
+      "phase_a_mfe_pct": 0.388,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.199999,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-26T15:15:27.733530+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 76911.9,
+      "btc_change_24h_at_open": -0.86,
+      "btc_pct_vs_ma25_at_open": -0.254,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.026659,
+      "current_price": 0.026806,
+      "unrealized_pnl_usdt": 2.4623,
+      "unrealized_pnl_pct": 0.616,
+      "last_price_check_at": "2026-05-26T15:17:10.019636+00:00"
     }
   ],
   "recent_closed": [
@@ -30089,7 +30148,7 @@
       "conviction_score": 5,
       "signal_at": "2026-05-26T13:08:08.380856+00:00",
       "reason": "max_concurrent reached (4/4)",
-      "last_checked_at": "2026-05-26T15:15:14.054713+00:00"
+      "last_checked_at": "2026-05-26T15:17:10.019636+00:00"
     },
     {
       "paper_id": "QCOMUSDT|LONG|2026-05-26T14:48:31.664758+00:00",
@@ -30098,27 +30157,18 @@
       "conviction_score": 7,
       "signal_at": "2026-05-26T14:49:02.378792+00:00",
       "reason": "max_concurrent reached (4/4)",
-      "last_checked_at": "2026-05-26T15:15:14.054713+00:00"
-    },
-    {
-      "paper_id": "BASUSDT|LONG|2026-05-26T15:12:35.478254+00:00",
-      "symbol": "BASUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-05-26T15:12:56.921816+00:00",
-      "reason": "max_concurrent reached (4/4)",
-      "last_checked_at": "2026-05-26T15:15:14.054713+00:00"
+      "last_checked_at": "2026-05-26T15:17:10.019636+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 76911.9,
-    "btc_ma25_1h": 77107.53,
-    "pct_vs_ma25": -0.254,
-    "change_24h_pct": -0.86,
+    "btc_price": 76903.1,
+    "btc_ma25_1h": 77107.18,
+    "pct_vs_ma25": -0.265,
+    "change_24h_pct": -0.871,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-26T15:15:15.079331+00:00"
+    "computed_at": "2026-05-26T15:17:11.968282+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
