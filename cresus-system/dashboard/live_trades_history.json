@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-26T18:17:19.619026+00:00",
+  "generated_at": "2026-05-26T18:19:14.999197+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 505,
@@ -35,11 +35,6 @@
     "ok": false,
     "mismatches": [
       {
-        "symbol": "JTOUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has JTOUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
         "symbol": "AZTECUSDT",
         "kind": "exchange_only",
         "message": "exchange has AZTECUSDT position but live doesn't track (user manual? or state lost)"
@@ -53,6 +48,11 @@
         "symbol": "IOUSDT",
         "kind": "exchange_only",
         "message": "exchange has IOUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "JTOUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has JTOUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
@@ -60,10 +60,10 @@
       "BASUSDT"
     ],
     "exchange_symbols": [
+      "BASUSDT",
       "JTOUSDT",
       "AZTECUSDT",
       "IOUSDT",
-      "BASUSDT",
       "DEXEUSDT"
     ]
   },
@@ -30315,8 +30315,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-26T17:38:36.098056+00:00",
-      "reason": "paper trade too old (2319s > 600s)",
-      "last_checked_at": "2026-05-26T18:17:14.868107+00:00"
+      "reason": "paper trade too old (2435s > 600s)",
+      "last_checked_at": "2026-05-26T18:19:11.005468+00:00"
     },
     {
       "paper_id": "WLFIUSDT|SHORT|2026-05-26T18:01:32.449876+00:00",
@@ -30324,8 +30324,17 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-26T18:02:19.246901+00:00",
-      "reason": "paper trade too old (896s > 600s)",
-      "last_checked_at": "2026-05-26T18:17:14.868107+00:00"
+      "reason": "paper trade too old (1012s > 600s)",
+      "last_checked_at": "2026-05-26T18:19:11.005468+00:00"
+    },
+    {
+      "paper_id": "GENIUSUSDT|LONG|2026-05-26T18:16:50.956333+00:00",
+      "symbol": "GENIUSUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-05-26T18:17:42.224506+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.00% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-05-26T18:19:11.005468+00:00"
     }
   ],
   "btc_regime_now": {
@@ -30336,7 +30345,7 @@
     "change_24h_pct": -1.343,
     "sub_regime": "down_stable",
     "change_3h_pct": -0.0,
-    "computed_at": "2026-05-26T18:17:16.561762+00:00"
+    "computed_at": "2026-05-26T18:19:11.999430+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
