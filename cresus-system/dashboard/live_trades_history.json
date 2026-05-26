@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-26T10:40:27.438069+00:00",
+  "generated_at": "2026-05-26T10:42:34.621964+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 487,
@@ -32,14 +32,21 @@
     "deployed_usdt": 399.94
   },
   "reconciliation": {
-    "ok": true,
-    "mismatches": [],
+    "ok": false,
+    "mismatches": [
+      {
+        "symbol": "DEXEUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has DEXEUSDT position but live doesn't track (user manual? or state lost)"
+      }
+    ],
     "api_failed": false,
     "live_symbols": [
       "VIRTUALUSDT"
     ],
     "exchange_symbols": [
-      "VIRTUALUSDT"
+      "VIRTUALUSDT",
+      "DEXEUSDT"
     ]
   },
   "open_trades": [
@@ -97,10 +104,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.8293,
-      "current_price": 0.8254,
-      "unrealized_pnl_usdt": -1.6887,
-      "unrealized_pnl_pct": -0.422,
-      "last_price_check_at": "2026-05-26T10:40:26.060711+00:00"
+      "current_price": 0.828,
+      "unrealized_pnl_usdt": -0.4343,
+      "unrealized_pnl_pct": -0.109,
+      "last_price_check_at": "2026-05-26T10:42:32.233223+00:00"
     }
   ],
   "recent_closed": [
@@ -29039,8 +29046,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-26T08:58:57.085790+00:00",
-      "reason": "paper trade too old (6089s > 600s)",
-      "last_checked_at": "2026-05-26T10:40:26.060711+00:00"
+      "reason": "paper trade too old (6215s > 600s)",
+      "last_checked_at": "2026-05-26T10:42:32.233223+00:00"
     },
     {
       "paper_id": "BASUSDT|LONG|2026-05-26T09:51:38.564527+00:00",
@@ -29048,19 +29055,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-26T09:52:05.285514+00:00",
-      "reason": "paper trade too old (2901s > 600s)",
-      "last_checked_at": "2026-05-26T10:40:26.060711+00:00"
+      "reason": "paper trade too old (3027s > 600s)",
+      "last_checked_at": "2026-05-26T10:42:32.233223+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 77313.3,
-    "btc_ma25_1h": 77173.05,
-    "pct_vs_ma25": 0.182,
-    "change_24h_pct": -0.261,
+    "btc_price": 77329.2,
+    "btc_ma25_1h": 77173.69,
+    "pct_vs_ma25": 0.202,
+    "change_24h_pct": -0.24,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-26T10:40:27.112796+00:00"
+    "computed_at": "2026-05-26T10:42:34.313161+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
