@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-26T08:44:09.500363+00:00",
+  "updated_at": "2026-05-26T08:46:16.325380+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 21,
+  "alerts_count": 22,
   "alerts": [
+    {
+      "symbol": "ARKMUSDT",
+      "base": "ARKM",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.1541,
+      "price_change_pct": 1.582,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 72591.0,
+      "volume_baseline_usdt": 9570.0,
+      "volume_ratio": 7.59,
+      "detected_at": "2026-05-26T08:45:46.630879+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.588,
+      "change_15m_pct": 1.249,
+      "change_1h_pct": 3.634,
+      "change_4h_pct": 6.501,
+      "taker_buy_ratio_1m": 0.809,
+      "taker_buy_ratio_5m": 0.724,
+      "oi_delta_5m_pct": 1.04,
+      "funding_rate_pct": -0.0084,
+      "atr_pct": 0.561,
+      "range_4h_pct": 7.4,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.15280357,
+      "suggested_tp1": 0.15604464,
+      "suggested_tp2": 0.15798929,
+      "conviction_score": 5,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "MYXUSDT",
       "base": "MYX",
