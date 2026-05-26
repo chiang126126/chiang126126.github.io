@@ -1546,142 +1546,178 @@ def _try_mirror_open(
                   exc_info=True)
         return None
 
-    # Slippage 计算 (paper_entry 是信号时价格, actual_fill 是真实成交)
-    actual_fill = float(result.get("avg_fill_price") or 0)
-    slippage_bps = 0.0
-    if paper_entry > 0 and actual_fill > 0:
-        # LONG: 实际成交 > 预期 = 不利 (正 bps)
-        # SHORT: 实际成交 < 预期 = 不利 (取负)
-        raw_bps = (actual_fill - paper_entry) / paper_entry * 10000.0
-        slippage_bps = raw_bps if side == "BUY" else -raw_bps
+    # ━━━ 此处 result 已存在 — 仓位已实际在 Binance 开了 ━━━
+    # Phase 4.X (5/26): 包裹所有 post-open 计算到 try/except.
+    # 若任何字段构造失败 (paper_trade 异常值 / result 字段缺等), 不能直接 raise —
+    # 否则仓位泄漏成孤儿. 构造最小合法 live_trade 兜底, 后续 sync 会补全字段.
+    try:
+        # Slippage 计算 (paper_entry 是信号时价格, actual_fill 是真实成交)
+        actual_fill = float(result.get("avg_fill_price") or 0)
+        slippage_bps = 0.0
+        if paper_entry > 0 and actual_fill > 0:
+            # LONG: 实际成交 > 预期 = 不利 (正 bps)
+            # SHORT: 实际成交 < 预期 = 不利 (取负)
+            raw_bps = (actual_fill - paper_entry) / paper_entry * 10000.0
+            slippage_bps = raw_bps if side == "BUY" else -raw_bps
 
-    # 风险金额: (entry - SL) / entry × notional = "最多丢多少"
-    actual_notional = float(result.get("actual_notional", 0) or 0)
-    risk_usdt = 0.0
-    risk_pct = 0.0
-    if actual_fill > 0 and sl_price > 0 and actual_notional > 0:
-        risk_pct = abs(actual_fill - sl_price) / actual_fill * 100.0
-        risk_usdt = risk_pct / 100.0 * actual_notional
+        # 风险金额: (entry - SL) / entry × notional = "最多丢多少"
+        actual_notional = float(result.get("actual_notional", 0) or 0)
+        risk_usdt = 0.0
+        risk_pct = 0.0
+        if actual_fill > 0 and sl_price > 0 and actual_notional > 0:
+            risk_pct = abs(actual_fill - sl_price) / actual_fill * 100.0
+            risk_usdt = risk_pct / 100.0 * actual_notional
 
-    # 信号→镜像延迟: paper 开仓时间到 live 开仓时间
-    mirror_latency_sec = None
-    paper_entered_at = paper_trade.get("entered_at") or paper_trade.get("opened_at")
-    opened_at_iso = result.get("opened_at")
-    if paper_entered_at and opened_at_iso:
-        try:
-            paper_dt = datetime.fromisoformat(
-                str(paper_entered_at).replace("Z", "+00:00")
-            )
-            live_dt = datetime.fromisoformat(
-                str(opened_at_iso).replace("Z", "+00:00")
-            )
-            mirror_latency_sec = round((live_dt - paper_dt).total_seconds(), 1)
-        except (ValueError, TypeError):
-            pass
+        # 信号→镜像延迟: paper 开仓时间到 live 开仓时间
+        mirror_latency_sec = None
+        paper_entered_at = paper_trade.get("entered_at") or paper_trade.get("opened_at")
+        opened_at_iso = result.get("opened_at")
+        if paper_entered_at and opened_at_iso:
+            try:
+                paper_dt = datetime.fromisoformat(
+                    str(paper_entered_at).replace("Z", "+00:00")
+                )
+                live_dt = datetime.fromisoformat(
+                    str(opened_at_iso).replace("Z", "+00:00")
+                )
+                mirror_latency_sec = round((live_dt - paper_dt).total_seconds(), 1)
+            except (ValueError, TypeError):
+                pass
 
-    # Phase 4.D + 4.E + 4.F: A/B/C/D 4-arm 测试
-    # 在 live_trade 构造时一次性确定, 整个 trade 生命周期保持同一分组.
-    # 注: trade 走到这里说明已通过 is_eligible_for_mirror, 所以 D 组 regime gate
-    #     如果该拒已经拒了; 这里只是记录"曾经分到了 D 组"作为统计标签.
-    sl_comp_enabled = _ab_use_sl_compensation(paper_id, LIVE_SL_COMPENSATION_MODE)
-    wick_filter_enabled = _ab_use_wick_filter(paper_id, LIVE_SL_WICK_FILTER_MODE)
-    regime_gate_enabled = _ab_use_regime_gate(paper_id, LIVE_REGIME_GATE_MODE)
-    ab_group = _ab_group(paper_id)   # 'A' / 'B' / 'C' / 'D' — 记录用
-    # Phase 4.M: funding signal 类型 (友好/不利/中性). 友好时 wick filter 用 +1 breaches.
-    funding_signal = _funding_signal(paper_trade)
-    wick_min_breaches = (LIVE_FUNDING_FAVORABLE_WICK_BREACHES
-                         if funding_signal == "favorable" and wick_filter_enabled
-                         else LIVE_WICK_FILTER_MIN_BREACHES)
-    sl_comp_offset = 0.0
-    final_sl = float(result.get("sl_price", sl_price))   # 默认 = paper_sl
-    sl_paper_at_open = float(sl_price)                    # 记录原始 paper_sl
-    if sl_comp_enabled and actual_fill > 0 and paper_entry > 0:
-        compensated = _compute_compensated_sl(sl_price, actual_fill, paper_entry)
-        if compensated is not None and compensated > 0:
-            sl_comp_offset = round(actual_fill - paper_entry, 8)
-            final_sl = compensated
+        # Phase 4.D + 4.E + 4.F: A/B/C/D 4-arm 测试
+        # 在 live_trade 构造时一次性确定, 整个 trade 生命周期保持同一分组.
+        # 注: trade 走到这里说明已通过 is_eligible_for_mirror, 所以 D 组 regime gate
+        #     如果该拒已经拒了; 这里只是记录"曾经分到了 D 组"作为统计标签.
+        sl_comp_enabled = _ab_use_sl_compensation(paper_id, LIVE_SL_COMPENSATION_MODE)
+        wick_filter_enabled = _ab_use_wick_filter(paper_id, LIVE_SL_WICK_FILTER_MODE)
+        regime_gate_enabled = _ab_use_regime_gate(paper_id, LIVE_REGIME_GATE_MODE)
+        ab_group = _ab_group(paper_id)   # 'A' / 'B' / 'C' / 'D' — 记录用
+        # Phase 4.M: funding signal 类型 (友好/不利/中性). 友好时 wick filter 用 +1 breaches.
+        funding_signal = _funding_signal(paper_trade)
+        wick_min_breaches = (LIVE_FUNDING_FAVORABLE_WICK_BREACHES
+                             if funding_signal == "favorable" and wick_filter_enabled
+                             else LIVE_WICK_FILTER_MIN_BREACHES)
+        sl_comp_offset = 0.0
+        final_sl = float(result.get("sl_price", sl_price))   # 默认 = paper_sl
+        sl_paper_at_open = float(sl_price)                    # 记录原始 paper_sl
+        if sl_comp_enabled and actual_fill > 0 and paper_entry > 0:
+            compensated = _compute_compensated_sl(sl_price, actual_fill, paper_entry)
+            if compensated is not None and compensated > 0:
+                sl_comp_offset = round(actual_fill - paper_entry, 8)
+                final_sl = compensated
+                log.info(
+                    f"[sl-comp] {sym} {side} paper_sl={sl_price:.6f} "
+                    f"→ live_sl={final_sl:.6f} (offset {sl_comp_offset:+.6f}, "
+                    f"slip {slippage_bps:+.1f}bps)"
+                )
+        if wick_filter_enabled:
             log.info(
-                f"[sl-comp] {sym} {side} paper_sl={sl_price:.6f} "
-                f"→ live_sl={final_sl:.6f} (offset {sl_comp_offset:+.6f}, "
-                f"slip {slippage_bps:+.1f}bps)"
+                f"[wick-filter] {sym} {side} 启用 wick 过滤 "
+                f"(需 ≥{wick_min_breaches} 次连续 breach 才触发 SL; funding={funding_signal})"
             )
-    if wick_filter_enabled:
-        log.info(
-            f"[wick-filter] {sym} {side} 启用 wick 过滤 "
-            f"(需 ≥{wick_min_breaches} 次连续 breach 才触发 SL; funding={funding_signal})"
-        )
-    if regime_gate_enabled:
-        log.info(
-            f"[regime-gate] {sym} {side} group=D, 启用 regime gate "
-            f"(规则: down + LONG 被拒, 但本笔已通过 = 非 down 或非 LONG)"
-        )
+        if regime_gate_enabled:
+            log.info(
+                f"[regime-gate] {sym} {side} group=D, 启用 regime gate "
+                f"(规则: down + LONG 被拒, 但本笔已通过 = 非 down 或非 LONG)"
+            )
 
-    live_trade = {
-        "paper_id": paper_id,
-        "trade_id": trade_id,
-        "symbol": sym,
-        "side": side,
-        "direction": direction,
-        "entry_price_paper": paper_entry,
-        "avg_fill_price": actual_fill,
-        "slippage_bps": round(slippage_bps, 2),
-        "qty": result.get("qty", 0),
-        "notional_usdt": actual_notional,
-        "leverage": LIVE_LEVERAGE,
-        "risk_usdt": round(risk_usdt, 4),
-        "risk_pct": round(risk_pct, 3),
-        "mirror_latency_sec": mirror_latency_sec,
-        "sl_price": final_sl,                          # SL polling 实际用此值
-        "sl_paper_current": sl_paper_at_open,          # 当前 paper SL (sync 时更新)
-        "sl_compensation_enabled": sl_comp_enabled,    # B 组标记 (Phase 4.D)
-        "sl_compensation_offset": sl_comp_offset,      # offset (B 组非 0; A/C 组 0)
-        "sl_compensation_mode": LIVE_SL_COMPENSATION_MODE,  # 部署时模式 (溯源用)
-        # Phase 4.E / 4.L / 4.M: Wick filter 字段
-        "wick_filter_enabled": wick_filter_enabled,    # C 组标记 (4.L 起 always)
-        "wick_filter_min_breaches": wick_min_breaches if wick_filter_enabled else None,
-        "wick_filter_mode": LIVE_SL_WICK_FILTER_MODE,  # 部署时模式 (溯源用)
-        "sl_breach_count": 0,                          # 连续 breach 计数器
-        # Phase 4.M: Funding-aware filter 字段
-        "funding_signal": funding_signal,              # 'favorable' / 'adverse' / 'neutral'
-        "funding_rate_pct_at_open": paper_trade.get("funding_rate_pct"),
-        # Phase 4.F: Regime gate 字段
-        "regime_gate_enabled": regime_gate_enabled,    # D 组标记
-        "regime_gate_mode": LIVE_REGIME_GATE_MODE,     # 部署时模式 (溯源用)
-        "ab_group": ab_group,                          # 'A' / 'B' / 'C' / 'D' 显式记录
-        # Phase 4.H: Conviction filter 溯源 (部署时阈值, None=未启用)
-        "min_conviction_threshold": LIVE_MIN_CONVICTION_SCORE,
+        live_trade = {
+            "paper_id": paper_id,
+            "trade_id": trade_id,
+            "symbol": sym,
+            "side": side,
+            "direction": direction,
+            "entry_price_paper": paper_entry,
+            "avg_fill_price": actual_fill,
+            "slippage_bps": round(slippage_bps, 2),
+            "qty": result.get("qty", 0),
+            "notional_usdt": actual_notional,
+            "leverage": LIVE_LEVERAGE,
+            "risk_usdt": round(risk_usdt, 4),
+            "risk_pct": round(risk_pct, 3),
+            "mirror_latency_sec": mirror_latency_sec,
+            "sl_price": final_sl,                          # SL polling 实际用此值
+            "sl_paper_current": sl_paper_at_open,          # 当前 paper SL (sync 时更新)
+            "sl_compensation_enabled": sl_comp_enabled,    # B 组标记 (Phase 4.D)
+            "sl_compensation_offset": sl_comp_offset,      # offset (B 组非 0; A/C 组 0)
+            "sl_compensation_mode": LIVE_SL_COMPENSATION_MODE,  # 部署时模式 (溯源用)
+            # Phase 4.E / 4.L / 4.M: Wick filter 字段
+            "wick_filter_enabled": wick_filter_enabled,    # C 组标记 (4.L 起 always)
+            "wick_filter_min_breaches": wick_min_breaches if wick_filter_enabled else None,
+            "wick_filter_mode": LIVE_SL_WICK_FILTER_MODE,  # 部署时模式 (溯源用)
+            "sl_breach_count": 0,                          # 连续 breach 计数器
+            # Phase 4.M: Funding-aware filter 字段
+            "funding_signal": funding_signal,              # 'favorable' / 'adverse' / 'neutral'
+            "funding_rate_pct_at_open": paper_trade.get("funding_rate_pct"),
+            # Phase 4.F: Regime gate 字段
+            "regime_gate_enabled": regime_gate_enabled,    # D 组标记
+            "regime_gate_mode": LIVE_REGIME_GATE_MODE,     # 部署时模式 (溯源用)
+            "ab_group": ab_group,                          # 'A' / 'B' / 'C' / 'D' 显式记录
+            # Phase 4.H: Conviction filter 溯源 (部署时阈值, None=未启用)
+            "min_conviction_threshold": LIVE_MIN_CONVICTION_SCORE,
 
-        "tp1_price": float(paper_trade.get("tp1") or 0),
-        "tp2_price": float(paper_trade.get("tp2") or 0),
-        "phase": "A",
-        "entry_order_id": result.get("entry_order_id"),
-        "entry_client_id": result.get("entry_client_id"),
-        "sl_order_id": result.get("sl_order_id"),
-        "sl_mode": result.get("sl_mode", "client_side"),
-        "conviction_score": paper_trade.get("conviction_score"),
-        "alert_type": paper_trade.get("alert_type"),
-        "atr_pct": paper_trade.get("atr_pct"),
-        # MFE 字段初始化为 None — 会在 _sync_live_with_paper 中从 paper 拷过来
-        "phase_a_mfe_pct": None,
-        "phase_b_mfe_pct": None,
-        "phase_c_mfe_pct": None,
-        "fees_paid_usdt": result.get("fees_paid_usdt", 0),
-        "fees_are_actual": bool(result.get("fees_are_actual", False)),
-        "opened_at": opened_at_iso,
-        "is_dry_run": bool(dry_run or result.get("_dryRun")),
-    }
-    # Phase 4.C BTC regime 标签 (开仓时刻 snapshot, 供复盘按 regime 切分).
-    # 仅在 main_loop 传入时打, None 不打 (向后兼容旧数据).
-    if isinstance(btc_regime, dict) and btc_regime.get("regime"):
-        live_trade["btc_regime_at_open"] = btc_regime["regime"]
-        live_trade["btc_price_at_open"] = btc_regime.get("btc_price")
-        live_trade["btc_change_24h_at_open"] = btc_regime.get("change_24h_pct")
-        live_trade["btc_pct_vs_ma25_at_open"] = btc_regime.get("pct_vs_ma25")
-        # Phase 4.K Shadow Log: 在 down regime 时附带 sub_regime + 3h 动量,
-        # 后续可按 sub_regime 切分 PnL, 验证 down_rebound 是否真的跟其它子状态不同.
-        live_trade["btc_sub_regime_at_open"] = btc_regime.get("sub_regime")
-        live_trade["btc_change_3h_at_open"] = btc_regime.get("change_3h_pct")
-    return live_trade
+            "tp1_price": float(paper_trade.get("tp1") or 0),
+            "tp2_price": float(paper_trade.get("tp2") or 0),
+            "phase": "A",
+            "entry_order_id": result.get("entry_order_id"),
+            "entry_client_id": result.get("entry_client_id"),
+            "sl_order_id": result.get("sl_order_id"),
+            "sl_mode": result.get("sl_mode", "client_side"),
+            "conviction_score": paper_trade.get("conviction_score"),
+            "alert_type": paper_trade.get("alert_type"),
+            "atr_pct": paper_trade.get("atr_pct"),
+            # MFE 字段初始化为 None — 会在 _sync_live_with_paper 中从 paper 拷过来
+            "phase_a_mfe_pct": None,
+            "phase_b_mfe_pct": None,
+            "phase_c_mfe_pct": None,
+            "fees_paid_usdt": result.get("fees_paid_usdt", 0),
+            "fees_are_actual": bool(result.get("fees_are_actual", False)),
+            "opened_at": opened_at_iso,
+            "is_dry_run": bool(dry_run or result.get("_dryRun")),
+        }
+        # Phase 4.C BTC regime 标签 (开仓时刻 snapshot, 供复盘按 regime 切分).
+        # 仅在 main_loop 传入时打, None 不打 (向后兼容旧数据).
+        if isinstance(btc_regime, dict) and btc_regime.get("regime"):
+            live_trade["btc_regime_at_open"] = btc_regime["regime"]
+            live_trade["btc_price_at_open"] = btc_regime.get("btc_price")
+            live_trade["btc_change_24h_at_open"] = btc_regime.get("change_24h_pct")
+            live_trade["btc_pct_vs_ma25_at_open"] = btc_regime.get("pct_vs_ma25")
+            # Phase 4.K Shadow Log: 在 down regime 时附带 sub_regime + 3h 动量,
+            # 后续可按 sub_regime 切分 PnL, 验证 down_rebound 是否真的跟其它子状态不同.
+            live_trade["btc_sub_regime_at_open"] = btc_regime.get("sub_regime")
+            live_trade["btc_change_3h_at_open"] = btc_regime.get("change_3h_pct")
+        return live_trade
+    except Exception as e:
+        # Phase 4.X: post-open 构造异常 — 仓位已在 exchange, 必须返回最小 live_trade
+        # 让外层正确记录到 state. 缺的字段会在后续 sync tick 由 _sync_live_with_paper 补全.
+        log.error(
+            f"[mirror-open PARTIAL] {sym} {side}: post-open 构造异常 "
+            f"({type(e).__name__}: {e}). 仓位已在 exchange, 用最小字段记录防孤儿.",
+            exc_info=True,
+        )
+        panic_trade = {
+            "paper_id": paper_id,
+            "trade_id": trade_id,
+            "symbol": sym,
+            "side": side,
+            "direction": direction,
+            "entry_price_paper": paper_entry,
+            "avg_fill_price": float(result.get("avg_fill_price") or 0),
+            "qty": result.get("qty", 0),
+            "notional_usdt": float(result.get("actual_notional", 0) or 0),
+            "leverage": LIVE_LEVERAGE,
+            "sl_price": float(result.get("sl_price", sl_price) or sl_price),
+            "sl_paper_current": float(sl_price),
+            "tp1_price": 0.0,
+            "tp2_price": 0.0,
+            "phase": "A",
+            "entry_order_id": result.get("entry_order_id"),
+            "entry_client_id": result.get("entry_client_id"),
+            "opened_at": result.get("opened_at"),
+            "is_dry_run": bool(dry_run or result.get("_dryRun")),
+            "_partial_record": True,  # 标记: 缺 A/B 组 / wick / regime 等字段
+        }
+        return panic_trade
 
 
 # ============================================================================
@@ -1904,6 +1940,17 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
                 f"slippage={new_trade['slippage_bps']:+.1f}bps "
                 f"({len(live['live_open_trades'])} live open now)"
             )
+            # Phase 4.X (5/26): 立即 flush state — 防 tick 后续异常导致刚开的仓
+            # 没记录到 state, 形成孤儿. binance 下单 + state 保存必须原子可见.
+            # save_live_state 是原子 .tmp→rename, 多次调用安全.
+            try:
+                save_live_state(live)
+            except Exception as e:
+                log.error(
+                    f"[state-save IMMEDIATE FAILED] {new_trade['symbol']}: {e}. "
+                    f"位置已在 exchange, 后续 tick 会被 recon 识别为孤儿!",
+                    exc_info=True,
+                )
 
     # 3. Sync + monitor live opens, 触发 close 条件 (Phase 3.2.b)
     # 三个 close 触发器 (按优先级):
@@ -2074,7 +2121,14 @@ def _cli_main() -> int:
     )
 
     if not args.loop:
-        main_loop(client, dry_run=dry_run)
+        # Phase 4.X (5/26): --once 模式加 try/except, 跟 --loop 一致.
+        # 之前裸调用导致 main_loop 中任何异常都让进程崩溃退出, 而 plist
+        # 5s 后又重启, 中间的 state 写入完全丢失 — 是孤儿仓的核心成因.
+        try:
+            main_loop(client, dry_run=dry_run)
+        except Exception as e:
+            log.error(f"main_loop error in --once mode: {e}", exc_info=True)
+            return 1
         return 0
 
     while True:

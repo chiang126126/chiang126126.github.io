@@ -144,7 +144,7 @@ class TestEligibility(unittest.TestCase):
     def test_blacklist_blocks_in_observation_mode(self):
         """黑名单优先级最高 — 即使 OBS mode 跳过白名单, 黑名单仍然拒."""
         trade = dict(self.recent_trade)
-        trade["symbol"] = "DODOXUSDT"   # 黑名单成员
+        trade["symbol"] = "STABLEUSDT"   # 黑名单成员 (5/25 复审后保留)
         with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
             ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
         self.assertFalse(ok, "OBS mode 不应允许黑名单 symbol")
@@ -153,7 +153,7 @@ class TestEligibility(unittest.TestCase):
     def test_blacklist_blocks_in_strict_whitelist_mode(self):
         """关 OBS mode 后黑名单仍生效."""
         trade = dict(self.recent_trade)
-        trade["symbol"] = "NMRUSDT"
+        trade["symbol"] = "XAGUSDT"
         with patch.object(live_trader, "LIVE_OBSERVATION_MODE", False):
             ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
         self.assertFalse(ok)
@@ -163,7 +163,7 @@ class TestEligibility(unittest.TestCase):
     def test_blacklist_priority_before_whitelist(self):
         """如果一个 symbol 既不在白名单又在黑名单, 应优先报黑名单."""
         trade = dict(self.recent_trade)
-        trade["symbol"] = "DODOXUSDT"   # 黑名单且不在白名单
+        trade["symbol"] = "STABLEUSDT"   # 黑名单且不在白名单
         with patch.object(live_trader, "LIVE_OBSERVATION_MODE", False):
             ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
         self.assertFalse(ok)
@@ -193,22 +193,25 @@ class TestEligibility(unittest.TestCase):
             self.assertTrue(s.endswith("USDT"),
                             f"{s} 不是 USDT 结尾, 可能是配置错误")
 
-    def test_phase_4f_new_blacklist_members(self):
-        """Phase 4.F (5/21 复盘): PLAY/GUA/STABLE 都已加入黑名单.
+    def test_current_blacklist_members(self):
+        """5/25 复审后黑名单仅剩 STABLEUSDT (p<0.05) + XAGUSDT (结构性 -4411).
 
-        数据依据 (333 笔实盘):
-          PLAYUSDT:   4 笔 0 胜, 净 -$2.75
-          GUAUSDT:    3 笔 0 胜, 净 -$1.74
-          STABLEUSDT: 5 笔 0 胜, 净 -$1.08
-        全部 n≥3 0 胜, 超过黑名单标准.
+        历史: 5/17 加 DODO/NMR, 5/21 加 PLAY/GUA/STABLE, 5/25 复审后
+        释放 DODO/NMR/PLAY/GUA (scanner 自然淘汰, n≤4 不显著), 保留:
+          STABLEUSDT: 5 笔 0 胜 p<0.05, 唯一统计显著
+          XAGUSDT:    TradFi-Perps 协议未签 -4411 结构性错误
         """
         from live_trader import LIVE_SYMBOL_BLACKLIST
-        for sym in ("PLAYUSDT", "GUAUSDT", "STABLEUSDT"):
-            self.assertIn(sym, LIVE_SYMBOL_BLACKLIST, f"{sym} 应已加入黑名单")
+        for sym in ("STABLEUSDT", "XAGUSDT"):
+            self.assertIn(sym, LIVE_SYMBOL_BLACKLIST, f"{sym} 应在黑名单")
+        # 释放的 4 个不应再在黑名单
+        for sym in ("DODOXUSDT", "NMRUSDT", "PLAYUSDT", "GUAUSDT"):
+            self.assertNotIn(sym, LIVE_SYMBOL_BLACKLIST,
+                             f"{sym} 5/25 已释放, 不应仍在黑名单")
 
-    def test_blacklist_new_members_block_mirror(self):
-        """Phase 4.F 新加成员实测拦截."""
-        for sym in ("PLAYUSDT", "GUAUSDT", "STABLEUSDT"):
+    def test_blacklist_current_members_block_mirror(self):
+        """当前黑名单成员实测拦截."""
+        for sym in ("STABLEUSDT", "XAGUSDT"):
             trade = dict(self.recent_trade)
             trade["symbol"] = sym
             with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
@@ -225,7 +228,7 @@ class TestEligibility(unittest.TestCase):
         """
         trade = dict(self.recent_trade)
         # 三种 case 变体都应该被拦截
-        for case in ("dodoxusdt", "DodoXUSDT", "DODOXUSDT"):
+        for case in ("stableusdt", "StableUSDT", "STABLEUSDT"):
             trade["symbol"] = case
             with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
                 ok, reason = is_eligible_for_mirror(trade, self.empty_live, self.now)
@@ -1192,10 +1195,14 @@ class TestDynamicSlippageThreshold(unittest.TestCase):
                            "134 bps 应在 intensity=3 阈值内, 否则 XANUSDT 仍被拦截")
 
     def test_low_intensity_still_blocks_high_slip(self):
-        """intensity=1 时, 51 bps 仍超阈值 50 bps → 应被拒."""
+        """intensity=1 时, 101 bps 应超阈值 100 bps → 应被拒.
+
+        阈值演进: 5/25 merge main 时 intensity=1 从 50 改 100 (与 main v3 数据驱动一致).
+        """
         t = {"intensity": 1}
         threshold = _get_effective_slippage_threshold(t)
-        self.assertLess(threshold, 52.0)
+        self.assertLessEqual(threshold, 100.0,
+                              "intensity=1 阈值应为 100 bps (与 main v3 数据分析对齐)")
 
     def test_poll_interval_reduced(self):
         """Phase 4.V: 轮询周期缩短到 5s (确保 plist 改了代码常量也同步)."""
@@ -2240,7 +2247,7 @@ class TestConvictionFilter(unittest.TestCase):
     def test_filter_runs_after_blacklist(self):
         """黑名单优先级高于 conv filter: 黑名单 symbol 即使 conv=8 也拒."""
         pt = self._make_trade(conv=8)
-        pt["symbol"] = "DODOXUSDT"   # 黑名单
+        pt["symbol"] = "STABLEUSDT"   # 黑名单
         ok, reason = is_eligible_for_mirror(pt, self.live_state, self.now)
         self.assertFalse(ok)
         # 拒绝原因应为黑名单, 不是 conv filter
@@ -3481,8 +3488,8 @@ class TestMirrorIterationGuards(unittest.TestCase):
         now = datetime.now(timezone.utc)
         # 写一笔黑名单 symbol 的 paper trade
         self._write_paper([{
-            "id": "DODOXUSDT|LONG|2026-05-17T10:00:00+00:00",
-            "symbol": "DODOXUSDT",   # 黑名单成员
+            "id": "STABLEUSDT|LONG|2026-05-17T10:00:00+00:00",
+            "symbol": "STABLEUSDT",   # 黑名单成员
             "direction": "LONG",
             "entered_at": (now - timedelta(seconds=10)).isoformat(),
             "entry_price": 1.0, "sl": 0.95,
@@ -4219,6 +4226,95 @@ class TestPublishLiveHistory(unittest.TestCase):
         ts = [t["closed_at"] for t in payload["recent_closed"]]
         self.assertEqual(ts[0], "2026-05-15T12:00:00+00:00")
         self.assertEqual(ts[-1], "2026-05-15T10:00:00+00:00")
+
+
+class TestPhase4XOrphanPrevention(unittest.TestCase):
+    """Phase 4.X (5/26): 防孤儿仓 — _try_mirror_open post-open 异常时返回
+    panic_trade 而不是 None, 让外层能记录到 state.
+
+    背景: 之前如果 open_position 成功 (仓位已在 Binance), 但后续字段构造抛
+    异常, _try_mirror_open 把异常上抛, 进程崩溃, save_live_state 永不执行,
+    仓位变成 dashboard 报警的孤儿. 5/26 复审发现 4 个孤儿仓全是此 bug 产物.
+    """
+
+    def setUp(self):
+        from binance_client import BinanceClient
+        self.client = MagicMock(spec=BinanceClient)
+        self.client.dry_run = False
+        self.client.get_book_ticker = MagicMock(return_value={
+            "askPrice": "100.0", "bidPrice": "99.5",
+        })
+        self.client.set_leverage = MagicMock(return_value=None)
+        # open_position 返回有效 result (仓位真已开)
+        self.client.open_position = MagicMock(return_value={
+            "avg_fill_price": 100.0,
+            "qty": 4.0,
+            "actual_notional": 400.0,
+            "entry_order_id": "12345",
+            "entry_client_id": "test_client_id",
+            "sl_order_id": None,
+            "sl_mode": "client_side",
+            "opened_at": "2026-05-26T22:00:00+00:00",
+            "fees_paid_usdt": 0.4,
+            "fees_are_actual": True,
+        })
+
+    def _make_paper(self, **overrides):
+        pt = {
+            "id": "BTCUSDT|LONG|2026-05-26T22:00:00+00:00",
+            "symbol": "BTCUSDT",
+            "direction": "LONG",
+            "entry_price": 100.0,
+            "sl": 95.0,
+            "tp1": 105.0,
+            "tp2": 110.0,
+            "entered_at": "2026-05-26T22:00:00+00:00",
+            "intensity": 2,
+        }
+        pt.update(overrides)
+        return pt
+
+    def test_post_open_panic_returns_minimal_trade_not_none(self):
+        """post-open 字段构造抛异常时, 返回 panic_trade (含 paper_id/symbol)
+        而不是 None — 防止外层无法记录到 state 形成孤儿.
+        """
+        # 构造一个会让 _funding_signal 抛异常的 paper (强制损坏 funding_rate_pct)
+        # 但更可靠的方式: 用 patch 让某个内部函数 raise
+        pt = self._make_paper()
+        with patch.object(
+            live_trader, "_ab_use_sl_compensation",
+            side_effect=RuntimeError("simulated post-open failure"),
+        ):
+            result = live_trader._try_mirror_open(
+                self.client, pt, dry_run=False, btc_regime=None,
+            )
+        self.assertIsNotNone(
+            result,
+            "post-open 异常必须返回 panic_trade 而不是 None — 否则仓位在 exchange 但 state 不知, 形成孤儿",
+        )
+        self.assertEqual(result["symbol"], "BTCUSDT")
+        self.assertEqual(result["paper_id"], pt["id"])
+        self.assertTrue(result.get("_partial_record"),
+                        "panic_trade 应有 _partial_record=True 标记")
+        # 关键字段必须存在
+        self.assertIn("trade_id", result)
+        self.assertIn("avg_fill_price", result)
+        self.assertIn("qty", result)
+        self.assertIn("sl_price", result)
+
+    def test_normal_path_still_works(self):
+        """sanity: 正常情况下 _try_mirror_open 仍返回完整 live_trade (无 _partial_record)."""
+        pt = self._make_paper()
+        result = live_trader._try_mirror_open(
+            self.client, pt, dry_run=False, btc_regime=None,
+        )
+        self.assertIsNotNone(result)
+        self.assertFalse(result.get("_partial_record", False),
+                         "正常路径不应有 _partial_record 标记")
+        # 完整字段应都存在
+        self.assertIn("ab_group", result)
+        self.assertIn("funding_signal", result)
+        self.assertIn("slippage_bps", result)
 
 
 if __name__ == "__main__":
