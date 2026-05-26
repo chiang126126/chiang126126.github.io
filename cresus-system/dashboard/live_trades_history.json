@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-26T14:15:43.358257+00:00",
+  "generated_at": "2026-05-26T14:17:48.804468+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 494,
@@ -40,6 +40,11 @@
         "message": "exchange has DEXEUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
+        "symbol": "AZTECUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has AZTECUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
         "symbol": "JTOUSDT",
         "kind": "exchange_only",
         "message": "exchange has JTOUSDT position but live doesn't track (user manual? or state lost)"
@@ -48,20 +53,15 @@
         "symbol": "IOUSDT",
         "kind": "exchange_only",
         "message": "exchange has IOUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "AZTECUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has AZTECUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
     "live_symbols": [],
     "exchange_symbols": [
       "DEXEUSDT",
+      "AZTECUSDT",
       "JTOUSDT",
-      "IOUSDT",
-      "AZTECUSDT"
+      "IOUSDT"
     ]
   },
   "open_trades": [],
@@ -29554,8 +29554,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-26T13:08:08.380856+00:00",
-      "reason": "paper trade too old (4053s > 600s)",
-      "last_checked_at": "2026-05-26T14:15:41.197014+00:00"
+      "reason": "paper trade too old (4179s > 600s)",
+      "last_checked_at": "2026-05-26T14:17:46.978087+00:00"
     },
     {
       "paper_id": "SOXLUSDT|LONG|2026-05-26T13:40:12.450012+00:00",
@@ -29563,8 +29563,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-26T13:40:52.015858+00:00",
-      "reason": "paper trade too old (2089s > 600s)",
-      "last_checked_at": "2026-05-26T14:15:41.197014+00:00"
+      "reason": "paper trade too old (2215s > 600s)",
+      "last_checked_at": "2026-05-26T14:17:46.978087+00:00"
     },
     {
       "paper_id": "MRVLUSDT|SHORT|2026-05-26T14:13:12.932268+00:00",
@@ -29573,18 +29573,18 @@
       "conviction_score": 5,
       "signal_at": "2026-05-26T14:13:52.736257+00:00",
       "reason": "funding adverse (0.0736% ≥ 0.05%) (Phase 4.M: paper 历史人均 -$0.85, 不利 mirror)",
-      "last_checked_at": "2026-05-26T14:15:41.197014+00:00"
+      "last_checked_at": "2026-05-26T14:17:46.978087+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 77293.4,
-    "btc_ma25_1h": 77151.06,
-    "pct_vs_ma25": 0.185,
-    "change_24h_pct": -0.515,
+    "btc_price": 77267.2,
+    "btc_ma25_1h": 77150.01,
+    "pct_vs_ma25": 0.152,
+    "change_24h_pct": -0.549,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-26T14:15:43.326058+00:00"
+    "computed_at": "2026-05-26T14:17:48.776389+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
