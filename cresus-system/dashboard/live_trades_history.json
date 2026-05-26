@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-26T14:09:35.600784+00:00",
+  "generated_at": "2026-05-26T14:11:32.095438+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 494,
@@ -35,16 +35,6 @@
     "ok": false,
     "mismatches": [
       {
-        "symbol": "AZTECUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has AZTECUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "IOUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has IOUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
         "symbol": "DEXEUSDT",
         "kind": "exchange_only",
         "message": "exchange has DEXEUSDT position but live doesn't track (user manual? or state lost)"
@@ -53,15 +43,25 @@
         "symbol": "JTOUSDT",
         "kind": "exchange_only",
         "message": "exchange has JTOUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "IOUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has IOUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "AZTECUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has AZTECUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
     "live_symbols": [],
     "exchange_symbols": [
-      "AZTECUSDT",
-      "IOUSDT",
       "DEXEUSDT",
-      "JTOUSDT"
+      "JTOUSDT",
+      "IOUSDT",
+      "AZTECUSDT"
     ]
   },
   "open_trades": [],
@@ -29554,8 +29554,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-26T13:08:08.380856+00:00",
-      "reason": "paper trade too old (3686s > 600s)",
-      "last_checked_at": "2026-05-26T14:09:33.994661+00:00"
+      "reason": "paper trade too old (3802s > 600s)",
+      "last_checked_at": "2026-05-26T14:11:30.180591+00:00"
     },
     {
       "paper_id": "SOXLUSDT|LONG|2026-05-26T13:40:12.450012+00:00",
@@ -29563,19 +29563,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-26T13:40:52.015858+00:00",
-      "reason": "paper trade too old (1722s > 600s)",
-      "last_checked_at": "2026-05-26T14:09:33.994661+00:00"
+      "reason": "paper trade too old (1838s > 600s)",
+      "last_checked_at": "2026-05-26T14:11:30.180591+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 77160.0,
-    "btc_ma25_1h": 77145.72,
-    "pct_vs_ma25": 0.019,
-    "change_24h_pct": -0.687,
+    "btc_price": 77248.2,
+    "btc_ma25_1h": 77149.25,
+    "pct_vs_ma25": 0.128,
+    "change_24h_pct": -0.574,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-26T14:09:35.571995+00:00"
+    "computed_at": "2026-05-26T14:11:32.066874+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
