@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-26T19:05:25.502179+00:00",
+  "updated_at": "2026-05-26T19:07:30.152930+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 22,
+  "alerts_count": 23,
   "alerts": [
+    {
+      "symbol": "GRASSUSDT",
+      "base": "GRASS",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.5388,
+      "price_change_pct": -1.571,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 671104.0,
+      "volume_baseline_usdt": 58785.0,
+      "volume_ratio": 11.42,
+      "detected_at": "2026-05-26T19:06:36.936292+00:00",
+      "intensity": 3,
+      "change_5m_pct": -2.179,
+      "change_15m_pct": -1.751,
+      "change_1h_pct": -2.374,
+      "change_4h_pct": -6.96,
+      "taker_buy_ratio_1m": 0.338,
+      "taker_buy_ratio_5m": 0.351,
+      "oi_delta_5m_pct": -0.279,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.536,
+      "range_4h_pct": 14.05,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.54457143,
+      "suggested_tp1": 0.53014286,
+      "suggested_tp2": 0.52148571,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "HYPEUSDT",
       "base": "HYPE",
