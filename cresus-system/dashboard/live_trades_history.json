@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-26T21:48:21.552223+00:00",
+  "generated_at": "2026-05-26T21:50:27.549742+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 508,
@@ -45,8 +45,8 @@
       "SAHARAUSDT"
     ],
     "exchange_symbols": [
-      "AZTECUSDT",
-      "SAHARAUSDT"
+      "SAHARAUSDT",
+      "AZTECUSDT"
     ]
   },
   "open_trades": [
@@ -65,8 +65,8 @@
       "risk_usdt": 6.2924,
       "risk_pct": 1.573,
       "mirror_latency_sec": 9.5,
-      "sl_price": 0.032563699,
-      "sl_paper_current": 0.032563699,
+      "sl_price": 0.03231087525,
+      "sl_paper_current": 0.03231087525,
       "sl_compensation_enabled": false,
       "sl_compensation_offset": 0.0,
       "sl_compensation_mode": "abcd",
@@ -91,7 +91,7 @@
       "alert_type": "sustained",
       "atr_pct": 0.753,
       "phase_a_mfe_pct": 1.761,
-      "phase_b_mfe_pct": 2.217,
+      "phase_b_mfe_pct": 2.976,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.199999,
       "fees_are_actual": true,
@@ -104,11 +104,11 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.656,
       "phase_a_mfe_price": 0.03235,
-      "phase_b_mfe_price": 0.0322,
-      "current_price": 0.0323,
-      "unrealized_pnl_usdt": 1.4806,
-      "unrealized_pnl_pct": 0.37,
-      "last_price_check_at": "2026-05-26T21:48:20.216807+00:00"
+      "phase_b_mfe_price": 0.03195,
+      "current_price": 0.03214,
+      "unrealized_pnl_usdt": 3.4546,
+      "unrealized_pnl_pct": 0.864,
+      "last_price_check_at": "2026-05-26T21:50:26.039688+00:00"
     }
   ],
   "recent_closed": [
@@ -30498,16 +30498,26 @@
       "close_qty": 53792.0
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "1000LUNCUSDT|LONG|2026-05-26T21:48:43.504567+00:00",
+      "symbol": "1000LUNCUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-05-26T21:49:13.342783+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.67% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-05-26T21:50:26.039688+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 76000.0,
-    "btc_ma25_1h": 76794.41,
-    "pct_vs_ma25": -1.034,
-    "change_24h_pct": -1.682,
+    "btc_price": 75983.8,
+    "btc_ma25_1h": 76793.76,
+    "pct_vs_ma25": -1.055,
+    "change_24h_pct": -1.703,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.652,
-    "computed_at": "2026-05-26T21:48:21.253478+00:00"
+    "change_3h_pct": -0.673,
+    "computed_at": "2026-05-26T21:50:27.165673+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
