@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-26T21:25:50.185861+00:00",
+  "generated_at": "2026-05-26T21:27:56.115066+00:00",
   "stats": {
-    "total_trades": 3517,
+    "total_trades": 3518,
     "open": 1,
-    "closed": 3516,
-    "wins": 1253,
+    "closed": 3517,
+    "wins": 1254,
     "losses": 2067,
     "scratches": 196,
-    "win_rate": 0.377,
-    "avg_pnl_pct": 0.23,
+    "win_rate": 0.378,
+    "avg_pnl_pct": 0.232,
     "best_trade": 33.33,
     "worst_trade": -7.36,
-    "total_usdt_pnl": 1619.62,
+    "total_usdt_pnl": 1633.54,
     "verdict": "⚖️ 中性 (μ +0.23% / 胜率 37%) — 继续观察",
     "verdict_class": "neutral",
     "hypothetical_notional_usdt": 200.0,
     "by_outcome": {
       "hit_sl": 2049,
       "hit_be_sl": 23,
-      "hit_trail": 762,
+      "hit_trail": 763,
       "timeout": 63,
       "hit_b_trail": 619
     },
@@ -30,10 +30,10 @@
         "avg_pct": 0.219
       },
       "oi_mismatch": {
-        "n": 805,
-        "wins": 300,
+        "n": 806,
+        "wins": 301,
         "win_rate": 0.373,
-        "avg_pct": 0.269
+        "avg_pct": 0.277
       },
       "no_oi_data": {
         "n": 0,
@@ -44,6 +44,46 @@
     }
   },
   "open_trades": [
+    {
+      "id": "shadow|BANUSDT|SHORT|2026-05-26T21:27:46.250336+00:00",
+      "shadow": true,
+      "symbol": "BANUSDT",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "intensity": 1,
+      "conviction_score": 4,
+      "conviction_tier": "premium",
+      "atr_pct": 0.295,
+      "range_4h_pct": 5.21,
+      "vol_mult_used": 1.5,
+      "entry_price": 0.09639,
+      "sl": 0.09681643,
+      "tp1": 0.09575036,
+      "tp2": 0.09511071,
+      "entered_at": "2026-05-26T21:27:55.709855+00:00",
+      "current_price": 0.09636,
+      "unrealized_pnl_pct": 0.031,
+      "notional_usdt": 200.0,
+      "unrealized_usdt_pnl": 0.06,
+      "funding_rate_pct": 0.005,
+      "oi_delta_5m_pct": -0.021,
+      "oi_matches_direction": true,
+      "taker_buy_ratio_1m": 0.241,
+      "change_1h_pct": -1.239,
+      "change_4h_pct": -3.153,
+      "regime_at_open": "RISK_OFF",
+      "regime_zh_at_open": "风险释放",
+      "regime_confidence_at_open": 68,
+      "phase": "A",
+      "tp1_hit_at": null,
+      "tp2_hit_at": null,
+      "high_water_mark": 0.09636,
+      "trailing_sl": null,
+      "phase_a_mfe_price": 0.09636,
+      "phase_a_mfe_pct": 0.031
+    }
+  ],
+  "recent_closed": [
     {
       "id": "shadow|ESPORTSUSDT|SHORT|2026-05-26T20:01:50.385280+00:00",
       "shadow": true,
@@ -61,10 +101,10 @@
       "tp1": 0.03736429,
       "tp2": 0.03592857,
       "entered_at": "2026-05-26T20:02:59.718178+00:00",
-      "current_price": 0.0357,
-      "unrealized_pnl_pct": 7.99,
+      "current_price": 0.0361,
+      "unrealized_pnl_pct": 6.959,
       "notional_usdt": 200.0,
-      "unrealized_usdt_pnl": 15.98,
+      "unrealized_usdt_pnl": 13.92,
       "funding_rate_pct": 0.3339,
       "oi_delta_5m_pct": 0.21,
       "oi_matches_direction": false,
@@ -84,10 +124,17 @@
       "phase_b_mfe_price": 0.0359,
       "phase_b_mfe_pct": 7.474,
       "phase_c_mfe_price": 0.0352,
-      "phase_c_mfe_pct": 9.278
-    }
-  ],
-  "recent_closed": [
+      "phase_c_mfe_pct": 9.278,
+      "closed_at": "2026-05-26T21:27:55.709855+00:00",
+      "close_price": 0.036068032,
+      "close_reason": "hit_trail",
+      "gross_pnl_pct": 7.041,
+      "fee_pct": 0.08,
+      "fee_usdt": 0.16,
+      "realized_pnl_pct": 6.961,
+      "realized_usdt_pnl": 13.92,
+      "hold_time_min": 84.9
+    },
     {
       "id": "shadow|TAGUSDT|SHORT|2026-05-26T21:21:28.482400+00:00",
       "shadow": true,
