@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-26T16:10:51.839478+00:00",
+  "generated_at": "2026-05-26T16:12:47.227616+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 505,
@@ -35,16 +35,6 @@
     "ok": false,
     "mismatches": [
       {
-        "symbol": "IOUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has IOUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "JTOUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has JTOUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
         "symbol": "DEXEUSDT",
         "kind": "exchange_only",
         "message": "exchange has DEXEUSDT position but live doesn't track (user manual? or state lost)"
@@ -53,6 +43,16 @@
         "symbol": "AZTECUSDT",
         "kind": "exchange_only",
         "message": "exchange has AZTECUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "IOUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has IOUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "JTOUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has JTOUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
@@ -61,12 +61,12 @@
       "HIGHUSDT"
     ],
     "exchange_symbols": [
-      "DEXEUSDT",
-      "AZTECUSDT",
-      "IOUSDT",
-      "JTOUSDT",
       "BASUSDT",
-      "HIGHUSDT"
+      "DEXEUSDT",
+      "IOUSDT",
+      "HIGHUSDT",
+      "JTOUSDT",
+      "AZTECUSDT"
     ]
   },
   "open_trades": [
@@ -112,7 +112,7 @@
       "atr_pct": 0.717,
       "phase_a_mfe_pct": 2.053,
       "phase_b_mfe_pct": 3.739,
-      "phase_c_mfe_pct": 3.739,
+      "phase_c_mfe_pct": 3.959,
       "fees_paid_usdt": 0.159998,
       "fees_are_actual": true,
       "opened_at": "2026-05-26T15:08:49.282366+00:00",
@@ -124,12 +124,12 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.1336,
-      "current_price": 0.1312,
-      "unrealized_pnl_usdt": 16.6543,
-      "unrealized_pnl_pct": 4.164,
-      "last_price_check_at": "2026-05-26T16:10:49.291783+00:00",
+      "current_price": 0.1311,
+      "unrealized_pnl_usdt": 16.9464,
+      "unrealized_pnl_pct": 4.237,
+      "last_price_check_at": "2026-05-26T16:12:45.178428+00:00",
       "phase_b_mfe_price": 0.1313,
-      "phase_c_mfe_price": 0.1313
+      "phase_c_mfe_price": 0.131
     },
     {
       "paper_id": "BASUSDT|LONG|2026-05-26T15:12:35.478254+00:00",
@@ -188,7 +188,7 @@
       "current_price": 0.027098,
       "unrealized_pnl_usdt": 6.8463,
       "unrealized_pnl_pct": 1.712,
-      "last_price_check_at": "2026-05-26T16:10:49.291783+00:00",
+      "last_price_check_at": "2026-05-26T16:12:45.178428+00:00",
       "phase_b_mfe_price": 0.027155
     }
   ],
@@ -30301,33 +30301,24 @@
   ],
   "missed_signals": [
     {
-      "paper_id": "PUMPUSDT|LONG|2026-05-26T15:48:24.605513+00:00",
-      "symbol": "PUMPUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-05-26T15:49:24.679991+00:00",
-      "reason": "paper trade too old (1285s > 600s)",
-      "last_checked_at": "2026-05-26T16:10:49.291783+00:00"
-    },
-    {
       "paper_id": "PARTIUSDT|LONG|2026-05-26T16:04:19.444038+00:00",
       "symbol": "PARTIUSDT",
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-26T16:04:40.403671+00:00",
       "reason": "regime gate (always): down regime + LONG 被拒 sub=down_acute 3h=-1.01% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-05-26T16:10:49.291783+00:00"
+      "last_checked_at": "2026-05-26T16:12:45.178428+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 76397.3,
-    "btc_ma25_1h": 77043.77,
-    "pct_vs_ma25": -0.839,
-    "change_24h_pct": -1.678,
+    "btc_price": 76393.5,
+    "btc_ma25_1h": 77043.62,
+    "pct_vs_ma25": -0.844,
+    "change_24h_pct": -1.683,
     "sub_regime": "down_acute",
-    "change_3h_pct": -1.008,
-    "computed_at": "2026-05-26T16:10:51.134909+00:00"
+    "change_3h_pct": -1.013,
+    "computed_at": "2026-05-26T16:12:46.645095+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
