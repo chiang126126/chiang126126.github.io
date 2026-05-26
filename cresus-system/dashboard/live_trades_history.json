@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-26T17:20:00.378899+00:00",
+  "generated_at": "2026-05-26T17:33:45.352943+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 505,
@@ -35,24 +35,24 @@
     "ok": false,
     "mismatches": [
       {
-        "symbol": "AZTECUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has AZTECUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
         "symbol": "IOUSDT",
         "kind": "exchange_only",
         "message": "exchange has IOUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "DEXEUSDT",
+        "symbol": "AZTECUSDT",
         "kind": "exchange_only",
-        "message": "exchange has DEXEUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has AZTECUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "JTOUSDT",
         "kind": "exchange_only",
         "message": "exchange has JTOUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "DEXEUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has DEXEUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
@@ -60,11 +60,11 @@
       "BASUSDT"
     ],
     "exchange_symbols": [
-      "IOUSDT",
-      "BASUSDT",
       "AZTECUSDT",
-      "DEXEUSDT",
-      "JTOUSDT"
+      "IOUSDT",
+      "JTOUSDT",
+      "BASUSDT",
+      "DEXEUSDT"
     ]
   },
   "open_trades": [
@@ -30315,17 +30315,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-26T16:04:40.403671+00:00",
-      "reason": "paper trade too old (4518s > 600s)",
-      "last_checked_at": "2026-05-26T17:19:58.374435+00:00"
-    },
-    {
-      "paper_id": "BILLUSDT|LONG|2026-05-26T16:23:05.883520+00:00",
-      "symbol": "BILLUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-05-26T16:24:13.972937+00:00",
-      "reason": "paper trade too old (3344s > 600s)",
-      "last_checked_at": "2026-05-26T17:19:58.374435+00:00"
+      "reason": "paper trade too old (5340s > 600s)",
+      "last_checked_at": "2026-05-26T17:33:40.465522+00:00"
     },
     {
       "paper_id": "ESPORTSUSDT|LONG|2026-05-26T16:33:54.243727+00:00",
@@ -30333,8 +30324,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-26T16:34:53.316381+00:00",
-      "reason": "paper trade too old (2705s > 600s)",
-      "last_checked_at": "2026-05-26T17:19:58.374435+00:00"
+      "reason": "paper trade too old (3527s > 600s)",
+      "last_checked_at": "2026-05-26T17:33:40.465522+00:00"
     },
     {
       "paper_id": "QCOMUSDT|SHORT|2026-05-26T16:38:35.152013+00:00",
@@ -30342,17 +30333,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-26T16:39:08.868222+00:00",
-      "reason": "paper trade too old (2450s > 600s)",
-      "last_checked_at": "2026-05-26T17:19:58.374435+00:00"
-    },
-    {
-      "paper_id": "FFUSDT|LONG|2026-05-26T16:44:57.837228+00:00",
-      "symbol": "FFUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-05-26T16:45:32.460504+00:00",
-      "reason": "paper trade too old (2066s > 600s)",
-      "last_checked_at": "2026-05-26T17:19:58.374435+00:00"
+      "reason": "paper trade too old (3272s > 600s)",
+      "last_checked_at": "2026-05-26T17:33:40.465522+00:00"
     },
     {
       "paper_id": "PHAUSDT|LONG|2026-05-26T16:51:04.945950+00:00",
@@ -30360,8 +30342,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-26T16:52:04.077155+00:00",
-      "reason": "paper trade too old (1674s > 600s)",
-      "last_checked_at": "2026-05-26T17:19:58.374435+00:00"
+      "reason": "paper trade too old (2496s > 600s)",
+      "last_checked_at": "2026-05-26T17:33:40.465522+00:00"
     }
   ],
   "btc_regime_now": {
@@ -30372,7 +30354,7 @@
     "change_24h_pct": -1.355,
     "sub_regime": "down_stable",
     "change_3h_pct": -0.634,
-    "computed_at": "2026-05-26T17:20:00.004928+00:00"
+    "computed_at": "2026-05-26T17:33:42.046467+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
