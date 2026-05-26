@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-26T15:50:08.872611+00:00",
+  "generated_at": "2026-05-26T15:52:14.144213+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 503,
@@ -35,6 +35,11 @@
     "ok": false,
     "mismatches": [
       {
+        "symbol": "AZTECUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has AZTECUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
         "symbol": "IOUSDT",
         "kind": "exchange_only",
         "message": "exchange has IOUSDT position but live doesn't track (user manual? or state lost)"
@@ -45,11 +50,6 @@
         "message": "exchange has DEXEUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "AZTECUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has AZTECUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
         "symbol": "JTOUSDT",
         "kind": "exchange_only",
         "message": "exchange has JTOUSDT position but live doesn't track (user manual? or state lost)"
@@ -57,18 +57,18 @@
     ],
     "api_failed": false,
     "live_symbols": [
-      "BASUSDT",
+      "HIGHUSDT",
       "AIAUSDT",
-      "HIGHUSDT"
+      "BASUSDT"
     ],
     "exchange_symbols": [
-      "IOUSDT",
-      "BASUSDT",
-      "HIGHUSDT",
       "AZTECUSDT",
       "JTOUSDT",
+      "HIGHUSDT",
+      "AIAUSDT",
       "DEXEUSDT",
-      "AIAUSDT"
+      "IOUSDT",
+      "BASUSDT"
     ]
   },
   "open_trades": [
@@ -126,10 +126,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.05715,
-      "current_price": 0.0572,
-      "unrealized_pnl_usdt": 5.1082,
-      "unrealized_pnl_pct": 1.277,
-      "last_price_check_at": "2026-05-26T15:50:06.478129+00:00",
+      "current_price": 0.05712,
+      "unrealized_pnl_usdt": 5.6605,
+      "unrealized_pnl_pct": 1.415,
+      "last_price_check_at": "2026-05-26T15:52:11.294188+00:00",
       "phase_b_mfe_price": 0.05707
     },
     {
@@ -147,8 +147,8 @@
       "risk_usdt": 2.8279,
       "risk_pct": 0.707,
       "mirror_latency_sec": 6.4,
-      "sl_price": 0.1339250375,
-      "sl_paper_current": 0.1339250375,
+      "sl_price": 0.13341966000000002,
+      "sl_paper_current": 0.13341966000000002,
       "sl_compensation_enabled": false,
       "sl_compensation_offset": 0.0,
       "sl_compensation_mode": "abcd",
@@ -173,7 +173,7 @@
       "alert_type": "sustained",
       "atr_pct": 0.717,
       "phase_a_mfe_pct": 2.053,
-      "phase_b_mfe_pct": 2.859,
+      "phase_b_mfe_pct": 3.226,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.159998,
       "fees_are_actual": true,
@@ -186,11 +186,11 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.1336,
-      "current_price": 0.1333,
-      "unrealized_pnl_usdt": 10.5185,
-      "unrealized_pnl_pct": 2.63,
-      "last_price_check_at": "2026-05-26T15:50:06.478129+00:00",
-      "phase_b_mfe_price": 0.1325
+      "current_price": 0.1316,
+      "unrealized_pnl_usdt": 15.4855,
+      "unrealized_pnl_pct": 3.871,
+      "last_price_check_at": "2026-05-26T15:52:11.294188+00:00",
+      "phase_b_mfe_price": 0.132
     },
     {
       "paper_id": "BASUSDT|LONG|2026-05-26T15:12:35.478254+00:00",
@@ -249,7 +249,7 @@
       "current_price": 0.026932,
       "unrealized_pnl_usdt": 4.354,
       "unrealized_pnl_pct": 1.089,
-      "last_price_check_at": "2026-05-26T15:50:06.478129+00:00",
+      "last_price_check_at": "2026-05-26T15:52:11.294188+00:00",
       "phase_b_mfe_price": 0.026986
     }
   ],
@@ -30160,7 +30160,7 @@
       "conviction_score": 5,
       "signal_at": "2026-05-26T15:49:24.679991+00:00",
       "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.80% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-05-26T15:50:06.478129+00:00"
+      "last_checked_at": "2026-05-26T15:52:11.294188+00:00"
     }
   ],
   "btc_regime_now": {
@@ -30171,7 +30171,7 @@
     "change_24h_pct": -1.414,
     "sub_regime": "down_stable",
     "change_3h_pct": -0.8,
-    "computed_at": "2026-05-26T15:50:08.022412+00:00"
+    "computed_at": "2026-05-26T15:52:13.276691+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
