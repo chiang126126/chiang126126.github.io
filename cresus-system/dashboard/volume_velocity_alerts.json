@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-26T07:08:07.299224+00:00",
+  "updated_at": "2026-05-26T07:10:16.282897+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 30,
+  "alerts_count": 31,
   "alerts": [
+    {
+      "symbol": "GENIUSUSDT",
+      "base": "GENIUS",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 0.6967,
+      "price_change_pct": -3.007,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 236900.0,
+      "volume_baseline_usdt": 44694.0,
+      "volume_ratio": 5.3,
+      "detected_at": "2026-05-26T07:09:24.293608+00:00",
+      "intensity": 1,
+      "change_5m_pct": -1.236,
+      "change_15m_pct": -4.702,
+      "change_1h_pct": -1.558,
+      "change_4h_pct": 6.807,
+      "taker_buy_ratio_1m": 0.403,
+      "taker_buy_ratio_5m": 0.482,
+      "oi_delta_5m_pct": -0.513,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.948,
+      "range_4h_pct": 13.36,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.70991429,
+      "suggested_tp1": 0.67687857,
+      "suggested_tp2": 0.65705714,
+      "conviction_score": 0,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "HIGHUSDT",
       "base": "HIGH",
