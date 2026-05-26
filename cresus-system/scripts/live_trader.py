@@ -162,6 +162,11 @@ LIVE_SLIPPAGE_THRESHOLD_BY_INTENSITY = {
     1: 100.0,   # 低动量 / 默认 (与 v3 100bps 数据分析一致)
 }
 
+# Phase 4.W (5/26): 本 session 中 Binance 返 -1121 (Invalid symbol) 的合约.
+# Testnet 未上线但主网存在的新币在 set_leverage 时触发 -1121.
+# 内存集合, 不跨进程 — 切主网时这些 symbol 可能恢复可用, 故不写入永久 blacklist.
+_EXCHANGE_UNAVAILABLE_SYMBOLS: set = set()
+
 # Phase 4.C BTC regime-aware 标签 (每笔 trade 开仓时记录当时 BTC 状态)
 # 用 1h K 线的 MA(25) 作 baseline (~24h 滚动均值, 匹配短线持仓视角).
 # 距 MA25 >= +阈值% = up, <= -阈值% = down, 中间 = chop.
@@ -454,6 +459,10 @@ def is_eligible_for_mirror(
     # 2a. Symbol 黑名单 (Phase 4.B) — 优先于一切 symbol filter, 即使 OBS mode 也拒.
     if sym in LIVE_SYMBOL_BLACKLIST:
         return False, f"symbol {sym} in live blacklist (历史 0 胜)"
+    # 2a'. Phase 4.W: 本 session 中 -1121 (Invalid symbol) 的合约 — session 内跳过,
+    #      不写永久 blacklist (主网可能有效).
+    if sym in _EXCHANGE_UNAVAILABLE_SYMBOLS:
+        return False, f"symbol {sym} not available on exchange (-1121, session skip)"
     # 2b. Symbol 白名单 (observation mode 下跳过, 让我们看 mirror 真实流程)
     if not LIVE_OBSERVATION_MODE and sym not in LIVE_SYMBOL_WHITELIST:
         return False, f"symbol {sym} not in live whitelist {LIVE_SYMBOL_WHITELIST}"
@@ -1451,10 +1460,19 @@ def _try_mirror_open(
     try:
         client.set_leverage(sym, LIVE_LEVERAGE)
     except (BinanceError, ValueError) as e:
-        log.error(
-            f"[mirror-open FAILED] {sym}: set_leverage({LIVE_LEVERAGE}x) "
-            f"失败 → 放弃本次 mirror: {type(e).__name__}: {e}"
-        )
+        if "-1121" in str(e):
+            # Phase 4.W: symbol 在本环境不可交易 (testnet 未上线), 加入 session 跳过集合.
+            # 不写永久 blacklist — 主网切换后此 symbol 可能恢复.
+            _EXCHANGE_UNAVAILABLE_SYMBOLS.add(sym)
+            log.warning(
+                f"[mirror-open] {sym}: -1121 Invalid symbol "
+                f"(本环境不可交易, session 内后续 tick 将自动跳过)"
+            )
+        else:
+            log.error(
+                f"[mirror-open FAILED] {sym}: set_leverage({LIVE_LEVERAGE}x) "
+                f"失败 → 放弃本次 mirror: {type(e).__name__}: {e}"
+            )
         return None
     except Exception as e:
         log.error(
@@ -1475,6 +1493,23 @@ def _try_mirror_open(
             entry_limit_price = raw_px
     except (BinanceError, ValueError, KeyError, TypeError) as e:
         log.warning(f"[mirror-open] {sym}: bookTicker 失败 ({e}), 回退市价单")
+
+    # Phase 4.W (5/26): SL 有效性预检 — 在下单前完成, 不额外消耗 API quota.
+    # paper_sl 在 paper 开仓时基于当时价设定. 若 mirror 延迟期间价格逆向移动,
+    # SL 可能已被穿越 → SHORT sl < 当前价 (止损在下方, 永不触发); LONG sl > 当前价.
+    # 此类信号入场即为错方向充分运动的残局, 直接跳过, 不重试.
+    if entry_limit_price is not None and sl_price > 0:
+        sl_breached = (
+            (side == "SELL" and sl_price < entry_limit_price) or
+            (side == "BUY"  and sl_price > entry_limit_price)
+        )
+        if sl_breached:
+            gap_pct = abs(entry_limit_price - sl_price) / entry_limit_price * 100
+            log.warning(
+                f"[mirror-open SKIP] {sym} {side}: paper SL={sl_price:.6f} 已被当前价 "
+                f"{entry_limit_price:.6f} 穿越 ({gap_pct:.2f}%) — 放弃, 不重试"
+            )
+            return None
 
     try:
         result = client.open_position(
