@@ -100,6 +100,14 @@ LIVE_SYMBOL_BLACKLIST = [
     #   Phase 4.U/4.V 新策略下重新开放, 若 paper 再出信号可积累新样本复审.
 ]
 
+# Phase 4.W (5/26): Reconciliation 忽略列表 — testnet 上"无法平仓"的僵尸合约.
+# 这些 symbol 在 exchange 上有 positionAmt > 0 但已下架/无对手方 (返 -2020),
+# 永远无法平掉, 也不应当被 live_trader 重新认领. 跳过 reconciliation 警报,
+# 避免 dashboard 持续报错. 不影响真正的 trading 逻辑.
+LIVE_RECON_IGNORE_SYMBOLS = {
+    "AZTECUSDT",  # 2026-05-26: testnet 价格归零, -2020 Unable to fill, -$86.52 锁住
+}
+
 # Phase 4.H Conviction filter (2026-05-22 部署) / Phase 4.R7 (2026-05-24 关闭)
 # ==============================================================================
 # 4.H 部署时论据 (回看不充分):
@@ -740,13 +748,21 @@ def check_position_reconciliation(
         }
 
     exchange_symbols = set()
+    ignored_zombies = []
     for p in positions:
         try:
             amt = float(p.get("positionAmt") or 0)
         except (ValueError, TypeError):
             continue
         if abs(amt) > 0:
-            exchange_symbols.add(p.get("symbol", ""))
+            sym = p.get("symbol", "")
+            # Phase 4.W: 跳过 testnet 无法平仓的僵尸合约 (避免持续误报)
+            if sym in LIVE_RECON_IGNORE_SYMBOLS:
+                ignored_zombies.append(sym)
+                continue
+            exchange_symbols.add(sym)
+    if ignored_zombies:
+        log.debug(f"[recon] 忽略僵尸持仓: {ignored_zombies}")
 
     mismatches = []
     for sym in live_symbols - exchange_symbols:
