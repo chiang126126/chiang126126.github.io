@@ -4442,5 +4442,39 @@ class TestPhase4YSlCompensationAlways(unittest.TestCase):
                           "Phase 4.Y 依赖 wick filter always (防 SL 移近后的误触发)")
 
 
+class TestPhase5ALiveNotionalByScore(unittest.TestCase):
+    """Phase 5.A: live notional 按 paper conviction_score 分档.
+
+    与 paper 同步:
+      score 5: $400 基准, 6-7: $800 (2×), 8+: $200 (0.5×).
+    """
+
+    def test_score_5_baseline(self):
+        from live_trader import _live_notional_for_paper
+        self.assertEqual(_live_notional_for_paper({"conviction_score": 5}), 400.0)
+
+    def test_score_6_7_doubled(self):
+        from live_trader import _live_notional_for_paper
+        self.assertEqual(_live_notional_for_paper({"conviction_score": 6}), 800.0)
+        self.assertEqual(_live_notional_for_paper({"conviction_score": 7}), 800.0)
+
+    def test_score_8_plus_halved(self):
+        from live_trader import _live_notional_for_paper
+        self.assertEqual(_live_notional_for_paper({"conviction_score": 8}), 200.0)
+        self.assertEqual(_live_notional_for_paper({"conviction_score": 9}), 200.0)
+        self.assertEqual(_live_notional_for_paper({"conviction_score": 10}), 200.0)
+
+    def test_score_missing_fallback(self):
+        from live_trader import _live_notional_for_paper, LIVE_NOTIONAL_USDT
+        self.assertEqual(_live_notional_for_paper({}), LIVE_NOTIONAL_USDT)
+        self.assertEqual(_live_notional_for_paper({"conviction_score": "bad"}),
+                          LIVE_NOTIONAL_USDT)
+
+    def test_max_deploy_increased_to_2400(self):
+        """Phase 5.A: max_deploy $1600 → $2400 (适配 score 分档)."""
+        from live_trader import LIVE_MAX_DEPLOY_USDT
+        self.assertEqual(LIVE_MAX_DEPLOY_USDT, 2400.0)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

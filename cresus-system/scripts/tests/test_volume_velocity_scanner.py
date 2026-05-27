@@ -170,5 +170,97 @@ class TestUrlConstruction(unittest.TestCase):
         self.assertIn("symbol=SOLUSDT", captured["url"])
 
 
+class TestPhase5AScoreBasedNotional(unittest.TestCase):
+    """Phase 5.A (5/27): conviction score 分档仓位.
+
+    数据驱动 (1410 笔 paper):
+      score 5  (92%): avg +$0.92 → $400 基准
+      score 6-7 (7%): avg +$4.50 → $800 (2× 加大)
+      score 8+ (0.5%): avg -$17.78 (n=7 反向证据) → $200 减半
+    """
+
+    def test_score_5_baseline(self):
+        from volume_velocity_scanner import _notional_for_score
+        self.assertEqual(_notional_for_score(5), 400.0)
+
+    def test_score_6_7_doubled(self):
+        from volume_velocity_scanner import _notional_for_score
+        self.assertEqual(_notional_for_score(6), 800.0)
+        self.assertEqual(_notional_for_score(7), 800.0)
+
+    def test_score_8_plus_halved(self):
+        """高分反向证据 — score 8+ 减半到 $200."""
+        from volume_velocity_scanner import _notional_for_score
+        self.assertEqual(_notional_for_score(8), 200.0)
+        self.assertEqual(_notional_for_score(9), 200.0)
+        self.assertEqual(_notional_for_score(10), 200.0)
+
+    def test_score_missing_fallback(self):
+        from volume_velocity_scanner import _notional_for_score, PAPER_NOTIONAL_PER_TRADE_USDT
+        self.assertEqual(_notional_for_score(None), PAPER_NOTIONAL_PER_TRADE_USDT)
+        self.assertEqual(_notional_for_score("invalid"), PAPER_NOTIONAL_PER_TRADE_USDT)
+
+    def test_atr_threshold_relaxed(self):
+        """Phase 5.A: ATR 拒从 2.0 → 3.0 (数据: ATR≥2% avg +$7.14 最高 EV)."""
+        from volume_velocity_scanner import PAPER_MAX_ATR_PCT
+        self.assertEqual(PAPER_MAX_ATR_PCT, 3.0)
+
+
+class TestPhase5AAltSeasonPenalty(unittest.TestCase):
+    """Phase 5.A: ALT_SEASON_RUNNING + LONG conviction -1.
+
+    数据驱动: 156 笔 avg +$0.06 win 33% (准负 EV).
+    软减分而非硬拒, 其他维度强信号仍可救.
+    """
+
+    def _make_alert(self, direction="LONG", change_1h=2.0, change_4h=2.0,
+                     funding=0.5, oi_delta=1.0):
+        from volume_velocity_scanner import VelocityAlert
+        return VelocityAlert(
+            symbol="BTCUSDT", base="BTC", direction=direction,
+            alert_type="burst", price=100.0, price_change_pct=2.5,
+            metric_window_min=1, volume_1m_usdt=100000,
+            volume_baseline_usdt=10000, volume_ratio=10.0,
+            detected_at="2026-05-27T00:00:00+00:00", intensity=2,
+            change_1h_pct=change_1h, change_4h_pct=change_4h,
+            funding_rate_pct=funding, oi_delta_5m_pct=oi_delta,
+        )
+
+    def test_alt_season_long_gets_penalty(self):
+        """ALT_SEASON_RUNNING + LONG → score 减 1."""
+        from volume_velocity_scanner import _compute_conviction
+        a = self._make_alert(direction="LONG")
+        score_no_regime, _ = _compute_conviction(a, None, regime=None)
+        score_alt, _ = _compute_conviction(a, None, regime="ALT_SEASON_RUNNING")
+        self.assertEqual(score_alt, max(0, score_no_regime - 1),
+                          "ALT_SEASON_RUNNING+LONG 应减 1 (但不低于 0)")
+
+    def test_alt_season_short_no_penalty(self):
+        """ALT_SEASON_RUNNING + SHORT → 不减分 (数据未显示需要)."""
+        from volume_velocity_scanner import _compute_conviction
+        a = self._make_alert(direction="SHORT", change_1h=-2.0, change_4h=-2.0)
+        score_no_regime, _ = _compute_conviction(a, None, regime=None)
+        score_alt, _ = _compute_conviction(a, None, regime="ALT_SEASON_RUNNING")
+        self.assertEqual(score_alt, score_no_regime, "ALT_SEASON_RUNNING+SHORT 不应减分")
+
+    def test_other_regimes_no_penalty(self):
+        """RISK_OFF / RANGE_BORING 等其他 regime 不减分."""
+        from volume_velocity_scanner import _compute_conviction
+        a = self._make_alert(direction="LONG")
+        base, _ = _compute_conviction(a, None, regime=None)
+        for r in ["RISK_OFF", "RANGE_BORING", None]:
+            score, _ = _compute_conviction(a, None, regime=r)
+            self.assertEqual(score, base, f"regime={r} 不应触发减分")
+
+    def test_score_never_negative(self):
+        """边界: 即使所有指标都不利, score 永不为负 (tier 计算要非负)."""
+        from volume_velocity_scanner import _compute_conviction
+        # 低 base score + ALT_SEASON 减分 → 不能负
+        a = self._make_alert(direction="LONG", change_1h=0.5, change_4h=0.5,
+                              funding=0.0, oi_delta=-1.0)
+        score, _ = _compute_conviction(a, None, regime="ALT_SEASON_RUNNING")
+        self.assertGreaterEqual(score, 0)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -72,8 +72,31 @@ SYSTEM_VERSION = "V3"
 # 跟 paper engine 1:1 同步 ($400/笔, 5 槽里取 4 槽, $2000 starting), 便于
 # 直接对比 paper vs live 单笔 PnL / fees / slippage 绝对值, 减少缩放噪声.
 # 风控阈值同步 20x 放大保持等效百分比 (daily DD 5%, max deploy 80%).
-LIVE_NOTIONAL_USDT = 400.0             # 每笔 $400 (跟 paper 一致, 不再缩放)
-LIVE_MAX_CONCURRENT = 4                # 实盘并发上限 ($2000 起始: 4×$400=$1600 部署 + $400 保留, 20% buffer)
+LIVE_NOTIONAL_USDT = 400.0             # 每笔基准 $400 (Phase 5.A 起按 score 分档)
+# Phase 5.A (5/27) score 分档仓位 (与 paper 同步):
+#   score 5  (92%): $400 基准, 历史 EV +$0.92
+#   score 6-7 (7%): $800 (2×, 历史 EV +$4.5/笔, 5×)
+#   score 8+ (0.5%): $200 (0.5×, n=7 累计 -$118, 反向证据)
+LIVE_NOTIONAL_BY_SCORE = {
+    5:   400.0,
+    6:   800.0,
+    7:   800.0,
+    8:   200.0,
+    9:   200.0,
+    10:  200.0,
+}
+
+
+def _live_notional_for_paper(paper_trade: dict) -> float:
+    """按 paper_trade.conviction_score 返回 live notional. 字段缺/异常返基准."""
+    try:
+        s = int(paper_trade.get("conviction_score"))
+    except (TypeError, ValueError):
+        return LIVE_NOTIONAL_USDT
+    return LIVE_NOTIONAL_BY_SCORE.get(s, LIVE_NOTIONAL_USDT)
+
+
+LIVE_MAX_CONCURRENT = 4                # 实盘并发上限
 LIVE_LEVERAGE = 1                      # 杠杆 1x (Phase 4.R6+ 跟 paper 一致).
                                        # PnL = notional × pct, 跟 leverage 无关 →
                                        # 1x vs 3x 不改 PnL/fees, 只改 margin 占用.
@@ -142,7 +165,9 @@ LIVE_OBSERVATION_MODE = True
 # Phase 3.3.a 风控参数 (Phase 4.R6 调整: $100 → $2000 起始)
 LIVE_STARTING_CAPITAL_USDT = 2000.0    # 实盘起始资金 (跟 paper 一致, testnet 资金)
 LIVE_DAILY_DD_LIMIT_USDT = 100.0       # 日亏 -$100 (= 5% × $2000, 跟旧 5%/$100 等效)
-LIVE_MAX_DEPLOY_USDT = 1600.0          # 总部署上限 $1600 (80% × $2000, 配合 4 槽 × $400)
+LIVE_MAX_DEPLOY_USDT = 2400.0          # Phase 5.A (5/27): $1600 → $2400 — 适配 score 分档.
+                                       # 极端场景 2×$800(score6-7) + 2×$400(score5) = $2400.
+                                       # Paper 总额 $2000 + 20% buffer 实际为 $2400 等效上限.
 
 # Phase 3.3.b 累计 DD kill switch
 LIVE_TOTAL_DD_LIMIT_PCT = 5.0          # 总回撤 5% → 自动写 emergency flag
@@ -1472,8 +1497,12 @@ def _try_mirror_open(
         log.error(f"[mirror-open FAILED] {sym}: paper trade 缺关键字段: {e}")
         return None
 
+    # Phase 5.A: 按 conviction score 决定 notional ($400 / $800 / $200)
+    trade_notional = _live_notional_for_paper(paper_trade)
+    score = paper_trade.get("conviction_score")
+
     log.info(
-        f"[mirror-open] {sym} {side} notional=${LIVE_NOTIONAL_USDT} "
+        f"[mirror-open] {sym} {side} notional=${trade_notional} (score={score}) "
         f"lev={LIVE_LEVERAGE}x sl={sl_price} "
         f"paper_id={paper_id[:40]} → trade_id={trade_id}"
     )
@@ -1538,7 +1567,7 @@ def _try_mirror_open(
         result = client.open_position(
             symbol=sym,
             side=side,
-            notional_usdt=LIVE_NOTIONAL_USDT,
+            notional_usdt=trade_notional,
             sl_price=sl_price,
             trade_id=trade_id,
             limit_price=entry_limit_price,
@@ -1901,14 +1930,16 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
                 continue
 
             # Re-check cash reserve (mirror_candidates 计算时未含本轮已部署)
+            # Phase 5.A: 用 score-based notional 而非固定 LIVE_NOTIONAL_USDT.
+            pt_notional = _live_notional_for_paper(pt)
             deployed_now = sum(
                 float(lt.get("notional_usdt", 0) or 0)
                 for lt in (live.get("live_open_trades") or [])
             )
-            if deployed_now + LIVE_NOTIONAL_USDT > LIVE_MAX_DEPLOY_USDT:
+            if deployed_now + pt_notional > LIVE_MAX_DEPLOY_USDT:
                 log.debug(
                     f"[skip-during-iter-cash] {pt['symbol']}: "
-                    f"deployed ${deployed_now:.0f} + ${LIVE_NOTIONAL_USDT} "
+                    f"deployed ${deployed_now:.0f} + ${pt_notional} "
                     f"> cap ${LIVE_MAX_DEPLOY_USDT}"
                 )
                 continue

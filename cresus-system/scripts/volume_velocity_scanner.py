@@ -79,7 +79,9 @@ PAPER_STATE       = Path.home() / "cresus-bot" / ".paper_trades.json"       # �
 PAPER_HISTORY     = Path.home() / "cresus-bot" / "paper_trades_history.json" # 推给看板
 PAPER_AUTO_CLOSE_HOURS = 4            # 4 小时未触发 SL/TP 自动平仓 (跟 OUTCOME_STAGES 4h 对齐)
 PAPER_SYMBOL_COOLDOWN_MIN = 30        # Phase 1.1: 同 symbol 任意 exit 后冷却 (任意 close_reason, 防信号抖动 + 长尾反复亏损)
-PAPER_MAX_ATR_PCT = 2.0               # Phase 1.3: ATR>=2% 信号 reject (审计 N=142: ATR 2.0-2.5% cell n=6 全亏 avg -2.89%)
+PAPER_MAX_ATR_PCT = 3.0               # Phase 5.A (5/27): 2.0→3.0 — 数据 (1410笔):
+                                       # ATR ≥2% n=26 avg +$7.14 (最高 EV 区!), 旧规则错杀.
+                                       # 保留 ATR ≥3% 极端波动保护 (n=极少, 不可控).
 PAPER_CONSEC_SL_TRIGGER = 2           # Phase 1.2: 同 symbol 连续 SL 次数阈值 (审计: QUSDT 5/5 SL, ATA 4/4 SL)
 PAPER_CONSEC_SL_WINDOW_HOURS = 4      # Phase 1.2: 连续 SL 检测窗口 (4h 内)
 PAPER_CONSEC_SL_COOLDOWN_HOURS = 4    # Phase 1.2: 触发后冷却时长
@@ -90,6 +92,29 @@ PAPER_MIN_TIER     = "diamond"        # 只对钻石信号自动开仓 (高质�
 # 可用资金 = 余额 - 已分配; 若 < notional 则新钻石信号跳过 (资金不足)
 PAPER_STARTING_CAPITAL_USDT   = 2000.0  # 起始账户余额 (整个仓总额)
 PAPER_NOTIONAL_PER_TRADE_USDT = 400.0   # 每笔交易分配 ($2000 × 20%, 最多并发 5)
+
+# Phase 5.A (5/27): Conviction score 分档仓位 — 数据驱动 (1410 笔):
+#   score 5  (92%): avg +$0.92  → 基准 $400
+#   score 6-7 (7%): avg +$4.50  → 加大到 $800 (EV 5×, n=109 充分)
+#   score 8+ (0.5%): avg -$17.78 → 减半到 $200 (反向证据, n=7, 高分=过拟合警示)
+# 若 score 字段缺/异常 → 退路到 PAPER_NOTIONAL_PER_TRADE_USDT (基准).
+PAPER_NOTIONAL_BY_SCORE = {
+    5:   400.0,
+    6:   800.0,
+    7:   800.0,
+    8:   200.0,
+    9:   200.0,
+    10:  200.0,
+}
+
+
+def _notional_for_score(score) -> float:
+    """按 conviction score 返回分配 notional. 字段异常退路到基准."""
+    try:
+        s = int(score)
+    except (TypeError, ValueError):
+        return PAPER_NOTIONAL_PER_TRADE_USDT
+    return PAPER_NOTIONAL_BY_SCORE.get(s, PAPER_NOTIONAL_PER_TRADE_USDT)
 # 手续费 — Binance USDT-M 永续 taker 0.04%, system 触发的 open/close 都是 market = taker
 # round-trip = 0.04% × 2 = 0.08% (保守估计, 实战 maker 可能更便宜)
 # 老 trade (无 fee_pct 字段) 会在 _enrich_trade_for_publish + 统计时追溯扣手续费
@@ -896,13 +921,18 @@ def _trim_old_alerts(alerts: List[dict]) -> List[dict]:
 CONVICTION_DIAMOND_THRESHOLD = 5   # ≥5 = 💎 钻石
 CONVICTION_PREMIUM_THRESHOLD = 3   # ≥3 = ⭐ 中置信
 
-def _compute_conviction(a: VelocityAlert, winrate_summary: Optional[dict]) -> tuple:
+def _compute_conviction(a: VelocityAlert, winrate_summary: Optional[dict],
+                          regime: Optional[str] = None) -> tuple:
     """计算 (score 0-10, tier str).
     修订 v2 (基于 USELESS/GTC 失败案例反向工程):
     - 加宏观逆势硬否决 (1h/4h 严重反向直接拒绝, 不靠加分扛)
     - 历史胜率: N≥10 严格 / N≥5 高胜率折扣 (避免小样本误导)
     - Funding 权重 +3 → +2 (单一指标不应主导评分)
     - 多窗口对齐: 1h+4h 都同向 +2 (强对齐), 单边同向 +1
+
+    Phase 5.A (5/27) 增: regime 联动减分.
+    - ALT_SEASON_RUNNING + LONG: -1 分 (数据: 156 笔 avg +$0.06, win 33%, 准负 EV)
+    - 不硬拒, 其他维度强信号仍可救到 diamond.
     """
     is_long = (a.direction == "LONG")
 
@@ -966,6 +996,15 @@ def _compute_conviction(a: VelocityAlert, winrate_summary: Optional[dict]) -> tu
             score += 2   # 强对齐: 短线 + 中线趋势都站我方
         elif h1_aligned or h4_aligned:
             score += 1
+
+    # 6. Phase 5.A regime 联动: ALT_SEASON_RUNNING + LONG -1 分
+    # 数据驱动 (1410 笔): ALT_SEASON_RUNNING+LONG n=156 avg +$0.06 win 33%, 准负 EV.
+    # 软减分而非硬拒, 让其他维度强信号仍可救到 diamond.
+    if regime == "ALT_SEASON_RUNNING" and is_long:
+        score -= 1
+
+    # 防御: score 永不为负 (tier 计算要求非负数)
+    score = max(score, 0)
 
     # tier 分级 (阈值不变)
     if score >= CONVICTION_DIAMOND_THRESHOLD:
@@ -1464,8 +1503,13 @@ def _open_paper_trade(a: VelocityAlert, state: dict, now: datetime,
         return None
     if a.suggested_sl is None or a.suggested_tp1 is None or a.suggested_tp2 is None:
         return None
+    # Phase 5.A (5/27): 按 conviction score 决定 notional, 取代固定 $400.
+    # score 5: $400 (基准), 6-7: $800 (高 EV 加仓), 8+: $200 (反向证据减仓).
+    trade_notional = _notional_for_score(a.conviction_score)
     # 资金检查: 不够开本金就跳过 (最多 5 笔并发或老仓未平时常见)
-    if free_capital < PAPER_NOTIONAL_PER_TRADE_USDT:
+    if free_capital < trade_notional:
+        _log(f"[paper] SKIP open {a.symbol} {a.direction}: "
+             f"free_capital ${free_capital:.0f} < score-based notional ${trade_notional:.0f}")
         return None
     # 防御: SL/TP 顺序异常 → 拒开 (避免逻辑 bug 把"止损"开在盈利方向)
     if a.direction == "LONG":
@@ -1527,8 +1571,8 @@ def _open_paper_trade(a: VelocityAlert, state: dict, now: datetime,
         "entered_at": now.isoformat(),
         "current_price": a.price,
         "unrealized_pnl_pct": 0.0,
-        # Phase 4 资金跟踪
-        "notional_usdt": PAPER_NOTIONAL_PER_TRADE_USDT,
+        # Phase 4 资金跟踪 (Phase 5.A 改为 score-based)
+        "notional_usdt": trade_notional,
         "unrealized_usdt_pnl": 0.0,
         # 上下文 (复盘用)
         "funding_rate_pct": a.funding_rate_pct,
@@ -2386,9 +2430,15 @@ def run_scan() -> List[VelocityAlert]:
         _log(f"outcome tracking failed: {e}")
 
     # ===== Phase 3a: 置信评分 (基于 GTC 反向工程, 必须在写盘前完成) =====
+    # Phase 5.A: 加载 regime snapshot 用于 ALT_SEASON_RUNNING+LONG 减分.
+    try:
+        regime_snap_for_scoring = _load_current_regime()
+        current_regime = regime_snap_for_scoring.get("regime") if regime_snap_for_scoring else None
+    except Exception:
+        current_regime = None
     try:
         for a in new_alerts:
-            score, tier = _compute_conviction(a, winrate_summary)
+            score, tier = _compute_conviction(a, winrate_summary, regime=current_regime)
             a.conviction_score = score
             a.conviction_tier = tier
         diamonds = [a for a in new_alerts if a.conviction_tier == "diamond"]
