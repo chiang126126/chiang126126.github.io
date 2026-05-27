@@ -4317,5 +4317,43 @@ class TestPhase4XOrphanPrevention(unittest.TestCase):
         self.assertIn("slippage_bps", result)
 
 
+class TestPhase4YSlCompensationAlways(unittest.TestCase):
+    """Phase 4.Y (5/27): SL 补偿从 abcd 推广到 always.
+
+    数据驱动决策 (5/26 复盘):
+      - 11 笔 paper hit_sl → live sl_breach_client, avg gap +$1.61/笔
+      - 平均 slippage 28.5 bps, 入场偏移使 live 实际 SL 距离 > paper
+      - 启用 always 后所有 trade 的 live_sl = paper_sl + slippage_offset
+      - Wick filter 已 always (min_breaches=2) 防误触发
+    """
+
+    def test_compensation_mode_is_always(self):
+        """常量从 'abcd' 升级到 'always' (Phase 4.Y)."""
+        from live_trader import LIVE_SL_COMPENSATION_MODE
+        self.assertEqual(LIVE_SL_COMPENSATION_MODE, "always",
+                          "Phase 4.Y: 所有 trade 都应启用 SL 补偿")
+
+    def test_all_paper_ids_get_compensation(self):
+        """always 模式下所有 paper_id 都返回 True (不分 A/B/C/D 组)."""
+        # 跨多个典型 paper_id 验证
+        ids = [
+            "BTCUSDT|LONG|2026-05-27T00:00:00+00:00",
+            "ETHUSDT|SHORT|2026-05-27T12:00:00+00:00",
+            "RANDOM|LONG|2026-05-27T05:30:00+00:00",
+            "MYXUSDT|SHORT|2026-05-26T14:00:00+00:00",
+        ]
+        for pid in ids:
+            self.assertTrue(
+                _ab_use_sl_compensation(pid),
+                f"Phase 4.Y always 模式下 {pid} 应启用 SL 补偿",
+            )
+
+    def test_wick_filter_still_always(self):
+        """前置条件: wick filter 必须 always, 否则 SL 移近 + 无 wick 过滤 = 误触发."""
+        from live_trader import LIVE_SL_WICK_FILTER_MODE
+        self.assertEqual(LIVE_SL_WICK_FILTER_MODE, "always",
+                          "Phase 4.Y 依赖 wick filter always (防 SL 移近后的误触发)")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

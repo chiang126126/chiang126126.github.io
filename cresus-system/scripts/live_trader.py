@@ -258,7 +258,14 @@ LIVE_FUNDING_FAVORABLE_WICK_BREACHES = 3        # 友好时 wick min_breaches (v
 LIVE_REGIME_GATE_MODE = "always"    # "off" | "abcd" (legacy 4-arm) | "always" (Phase 4.J 默认)
 
 # 升级 SL 补偿 / wick filter 到 4-arm 一致 (B/C 分别对应)
-LIVE_SL_COMPENSATION_MODE = "abcd"  # "off" | "ab" (legacy 2-arm) | "abc" (3-arm) | "abcd" (Phase 4.F) | "always"
+# Phase 4.Y (5/27): SL 补偿从 "abcd" (4-arm A/B 测试) 推广到 "always".
+# 数据依据 (5/26 复盘 32 笔 mirror):
+#   - 11 笔 paper hit_sl → live sl_breach_client, avg gap +$1.61/笔 = $17.71/天
+#   - 平均 slippage 28.5 bps, 入场偏移使 live 实际 SL 距离 > paper, 触发时多损失
+#   - SL 补偿将 live_sl 移动 = paper_sl + slippage, 让 live 实际 SL 距离 ≈ paper
+#   - Wick filter 已 always, 防御 SL 移近后的误触发
+# 预期: $7-17/天止损改善. 风险: SL 移近时 wick 触发率上升 (由 wick filter 防御).
+LIVE_SL_COMPENSATION_MODE = "always"  # "off" | "ab" (legacy) | "abc" | "abcd" | "always"
 
 # Phase 3.3.a/b 控制文件 (在 ~/.cresus-*)
 PAUSE_FLAG_PATH = Path.home() / ".cresus-pause"
@@ -2022,10 +2029,33 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
             log.debug(f"[live-monitor] failed to record unrealized for {lt.get('symbol')}: {e}")
 
         if _check_sl_breach(lt, current_price):
-            log.warning(
-                f"[SL-BREACH] {lt.get('symbol')} {lt.get('side')}: "
-                f"current={current_price} crossed sl={lt.get('sl_price')}"
-            )
+            # Phase 4.Y (5/27): 加强 SL-BREACH 日志, 记录完整上下文供后续审计.
+            # 5/26 复盘发现 5 笔 paper hit_b_trail → live sl_breach (盈利变亏损),
+            # 但没有足够日志判断是 wick 误触发还是真实 SL. 此日志填补诊断缺口.
+            try:
+                entry = float(lt.get("avg_fill_price") or 0)
+                sl = float(lt.get("sl_price") or 0)
+                paper_sl = float(lt.get("sl_paper_current") or 0)
+                pct_below_entry = ((current_price - entry) / entry * 100
+                                   if entry > 0 else 0)
+                slip = lt.get("slippage_bps") or 0
+                breach_cnt = lt.get("sl_breach_count") or "?"
+                comp = "comp" if lt.get("sl_compensation_enabled") else "no-comp"
+                wick = "wick" if lt.get("wick_filter_enabled") else "no-wick"
+                log.warning(
+                    f"[SL-BREACH] {lt.get('symbol')} {lt.get('side')} "
+                    f"phase={lt.get('phase')} "
+                    f"current={current_price} live_sl={sl} paper_sl={paper_sl} "
+                    f"pct_from_entry={pct_below_entry:+.2f}% slip_at_open={slip:+.1f}bps "
+                    f"breach_cnt={breach_cnt} mode={comp}/{wick} "
+                    f"ab_group={lt.get('ab_group')}"
+                )
+            except (ValueError, TypeError) as e:
+                log.warning(
+                    f"[SL-BREACH] {lt.get('symbol')} {lt.get('side')}: "
+                    f"current={current_price} crossed sl={lt.get('sl_price')} "
+                    f"(log enhance failed: {e})"
+                )
             closed_lt = _try_mirror_close(
                 client, lt, reason="sl_breach_client", dry_run=dry_run,
             )
