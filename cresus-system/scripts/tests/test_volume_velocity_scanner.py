@@ -262,5 +262,157 @@ class TestPhase5AAltSeasonPenalty(unittest.TestCase):
         self.assertGreaterEqual(score, 0)
 
 
+class TestPhase5BBtcRegimeBonus(unittest.TestCase):
+    """Phase 5.B: BTC regime trend-aligned conviction +1.
+    BTC up + LONG → +1, BTC down + SHORT → +1, 其他不动.
+    """
+
+    def _make_alert(self, direction="LONG"):
+        from volume_velocity_scanner import VelocityAlert
+        return VelocityAlert(
+            symbol="BTCUSDT", base="BTC", direction=direction,
+            alert_type="burst", price=100.0, price_change_pct=2.5,
+            metric_window_min=1, volume_1m_usdt=100000,
+            volume_baseline_usdt=10000, volume_ratio=10.0,
+            detected_at="2026-05-27T00:00:00+00:00", intensity=2,
+            change_1h_pct=2.0, change_4h_pct=2.0,
+            funding_rate_pct=0.5, oi_delta_5m_pct=1.0,
+        )
+
+    def test_btc_up_long_gets_bonus(self):
+        from volume_velocity_scanner import _compute_conviction
+        a = self._make_alert(direction="LONG")
+        base, _ = _compute_conviction(a, None, btc_regime=None)
+        bonus, _ = _compute_conviction(a, None, btc_regime="up")
+        self.assertEqual(bonus, base + 1, "BTC up + LONG 应 +1")
+
+    def test_btc_down_short_gets_bonus(self):
+        from volume_velocity_scanner import _compute_conviction
+        a = self._make_alert(direction="SHORT")
+        # SHORT 信号: 反向 1h/4h 即正向(下跌)
+        a.change_1h_pct = -2.0
+        a.change_4h_pct = -2.0
+        base, _ = _compute_conviction(a, None, btc_regime=None)
+        bonus, _ = _compute_conviction(a, None, btc_regime="down")
+        self.assertEqual(bonus, base + 1, "BTC down + SHORT 应 +1")
+
+    def test_btc_up_short_no_bonus(self):
+        """逆势不加分."""
+        from volume_velocity_scanner import _compute_conviction
+        a = self._make_alert(direction="SHORT")
+        a.change_1h_pct = -2.0
+        a.change_4h_pct = -2.0
+        base, _ = _compute_conviction(a, None, btc_regime=None)
+        no_bonus, _ = _compute_conviction(a, None, btc_regime="up")
+        self.assertEqual(no_bonus, base, "BTC up + SHORT 不应加分")
+
+    def test_btc_chop_no_bonus(self):
+        """chop regime 不加不减."""
+        from volume_velocity_scanner import _compute_conviction
+        a = self._make_alert(direction="LONG")
+        base, _ = _compute_conviction(a, None, btc_regime=None)
+        chop, _ = _compute_conviction(a, None, btc_regime="chop")
+        self.assertEqual(chop, base, "BTC chop 不应加分")
+
+
+class TestPhase5CTp1PartialClose(unittest.TestCase):
+    """Phase 5.C: TP1 触发时部分平仓 A/B 测试.
+    A 组 (50%): 维持满仓走 trailing.
+    B 组 (50%): 锁 50% 利润, 剩 50% 继续 trailing.
+    """
+
+    def test_mode_off_never_partial(self):
+        from volume_velocity_scanner import _use_tp1_partial_close
+        for pid in ["BTC|LONG|t1", "X|SHORT|t", ""]:
+            self.assertFalse(_use_tp1_partial_close(pid, "off"))
+
+    def test_mode_always_always_partial(self):
+        from volume_velocity_scanner import _use_tp1_partial_close
+        for pid in ["BTC|LONG|t1", "X|SHORT|t"]:
+            self.assertTrue(_use_tp1_partial_close(pid, "always"))
+
+    def test_mode_ab_deterministic(self):
+        """同 paper_id 必须返回同样分组."""
+        from volume_velocity_scanner import _use_tp1_partial_close
+        pid = "STORJUSDT|LONG|2026-05-27T10:00:00+00:00"
+        results = [_use_tp1_partial_close(pid, "ab") for _ in range(10)]
+        self.assertTrue(all(r == results[0] for r in results))
+
+    def test_mode_ab_roughly_50_50(self):
+        """大样本接近 50/50."""
+        from volume_velocity_scanner import _use_tp1_partial_close
+        ids = [f"SYM{i}|LONG|2026-05-{(i%28)+1:02d}T00:00:00" for i in range(1, 1001)]
+        true_n = sum(1 for pid in ids if _use_tp1_partial_close(pid, "ab"))
+        ratio = true_n / 1000
+        self.assertGreater(ratio, 0.40)
+        self.assertLess(ratio, 0.60)
+
+    def test_mode_ab_empty_pid_returns_false(self):
+        from volume_velocity_scanner import _use_tp1_partial_close
+        self.assertFalse(_use_tp1_partial_close("", "ab"))
+        self.assertFalse(_use_tp1_partial_close(None, "ab"))
+
+    def test_apply_partial_close_b_group(self):
+        """B 组: 触 TP1 锁 50%, notional 减半."""
+        from volume_velocity_scanner import _apply_tp1_partial_close, PAPER_FEE_PCT_ROUND_TRIP
+        # 构造一个 MD5 落在 B 组的 paper_id (h%2==1)
+        # paper_id "B" hash → 9d5ed678fe57bcca... 转 int 不一定 ==1, 多试几个
+        b_group_pid = None
+        for i in range(100):
+            import hashlib
+            test_pid = f"TEST|LONG|t{i}"
+            h = int(hashlib.md5(test_pid.encode("utf-8")).hexdigest(), 16)
+            if (h % 2) == 1:
+                b_group_pid = test_pid
+                break
+        self.assertIsNotNone(b_group_pid)
+        # entry=100, current=110 (10% gain on LONG = 10% gross)
+        t = {"id": b_group_pid, "notional_usdt": 400.0}
+        _apply_tp1_partial_close(t, cur=110.0, entry=100.0, is_long=True)
+        self.assertTrue(t["tp1_partial_closed"])
+        self.assertEqual(t["notional_usdt"], 200.0)  # 减半
+        # 锁定金额 = 200 × (10% - 0.08%) / 100 = 200 × 9.92 / 100 = $19.84
+        expected = round(200.0 * (10.0 - PAPER_FEE_PCT_ROUND_TRIP) / 100.0, 2)
+        self.assertEqual(t["tp1_locked_pnl_usdt"], expected)
+
+    def test_apply_partial_close_a_group(self):
+        """A 组: 不改 trade, 仅标记."""
+        from volume_velocity_scanner import _apply_tp1_partial_close
+        # 找一个 A 组 (h%2==0) 的 pid
+        a_group_pid = None
+        for i in range(100):
+            import hashlib
+            test_pid = f"TEST|LONG|t{i}"
+            h = int(hashlib.md5(test_pid.encode("utf-8")).hexdigest(), 16)
+            if (h % 2) == 0:
+                a_group_pid = test_pid
+                break
+        self.assertIsNotNone(a_group_pid)
+        t = {"id": a_group_pid, "notional_usdt": 400.0}
+        _apply_tp1_partial_close(t, cur=110.0, entry=100.0, is_long=True)
+        self.assertFalse(t["tp1_partial_closed"])
+        self.assertEqual(t["notional_usdt"], 400.0)  # 不变
+        self.assertNotIn("tp1_locked_pnl_usdt", t)
+
+    def test_apply_partial_close_short(self):
+        """SHORT 同 LONG 公式 (取反 raw_pct)."""
+        from volume_velocity_scanner import _apply_tp1_partial_close, PAPER_FEE_PCT_ROUND_TRIP
+        b_group_pid = None
+        for i in range(100):
+            import hashlib
+            test_pid = f"TEST|SHORT|t{i}"
+            h = int(hashlib.md5(test_pid.encode("utf-8")).hexdigest(), 16)
+            if (h % 2) == 1:
+                b_group_pid = test_pid
+                break
+        # entry=100, current=90 (SHORT 赚 10%)
+        t = {"id": b_group_pid, "notional_usdt": 400.0}
+        _apply_tp1_partial_close(t, cur=90.0, entry=100.0, is_long=False)
+        self.assertTrue(t["tp1_partial_closed"])
+        # SHORT 利润 = -(90-100)/100 × 100 = +10% gross
+        expected = round(200.0 * (10.0 - PAPER_FEE_PCT_ROUND_TRIP) / 100.0, 2)
+        self.assertEqual(t["tp1_locked_pnl_usdt"], expected)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

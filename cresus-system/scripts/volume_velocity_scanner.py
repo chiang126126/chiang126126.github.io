@@ -26,6 +26,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import sys
@@ -115,10 +116,70 @@ def _notional_for_score(score) -> float:
     except (TypeError, ValueError):
         return PAPER_NOTIONAL_PER_TRADE_USDT
     return PAPER_NOTIONAL_BY_SCORE.get(s, PAPER_NOTIONAL_PER_TRADE_USDT)
+
+
+def _use_tp1_partial_close(paper_id: str, mode: Optional[str] = None) -> bool:
+    """Phase 5.C TP1 部分平仓 A/B 分组判定.
+
+    mode='off':    永不分组 (维持满仓走 trailing)
+    mode='always': 永远部分平仓
+    mode='ab':     MD5 hash 50/50 (B 组启用部分平仓)
+    Returns True 表示该 trade 触 TP1 时应锁 50% 利润.
+    用 MD5 而非 hash() — 后者跨进程值不稳 (PYTHONHASHSEED).
+    """
+    if mode is None:
+        mode = PAPER_TP1_PARTIAL_CLOSE_MODE
+    if mode == "off":
+        return False
+    if mode == "always":
+        return True
+    if mode == "ab":
+        if not paper_id:
+            return False
+        h = int(hashlib.md5(paper_id.encode("utf-8")).hexdigest(), 16)
+        return (h % 2) == 1   # 一半 B 组启用
+    return False  # 未知 mode 安全退路
+
+
+def _apply_tp1_partial_close(t: dict, cur: float, entry: float, is_long: bool) -> None:
+    """Phase 5.C: 触 TP1 时若该 trade 属 B 组, 锁 50% 利润 + 剩 50% 继续走 trailing.
+
+    操作 (mutate t in place):
+      - 计算锁定 USDT 利润 (50% 仓位 × (gross_pct - 全 RT fee)).
+      - notional_usdt 减半 → 后续 Phase B/C 的 unrealized 和 close PnL 用剩 50%.
+      - tp1_locked_pnl_usdt 字段保存锁定金额, 终账时加回.
+      - tp1_partial_closed 标记便于审计.
+
+    A 组 (不分组) 此函数直接 return, 不改 trade.
+    """
+    paper_id = t.get("id", "")
+    if not _use_tp1_partial_close(paper_id):
+        t["tp1_partial_closed"] = False
+        return
+    notional_full = float(t.get("notional_usdt", PAPER_NOTIONAL_PER_TRADE_USDT))
+    half_notional = notional_full / 2.0
+    # gross %: LONG = (cur - entry) / entry; SHORT 取反向
+    raw_pct = (cur - entry) / entry * 100
+    gross_pct = raw_pct if is_long else -raw_pct
+    # 锁定半仓的 net PnL = half × (gross - RT fee 0.08%)
+    net_pct = gross_pct - PAPER_FEE_PCT_ROUND_TRIP
+    locked = round(half_notional * net_pct / 100.0, 2)
+    t["tp1_partial_closed"] = True
+    t["tp1_locked_pnl_usdt"] = locked
+    t["notional_usdt"] = round(half_notional, 2)   # 剩 50% 仓位继续
 # 手续费 — Binance USDT-M 永续 taker 0.04%, system 触发的 open/close 都是 market = taker
 # round-trip = 0.04% × 2 = 0.08% (保守估计, 实战 maker 可能更便宜)
 # 老 trade (无 fee_pct 字段) 会在 _enrich_trade_for_publish + 统计时追溯扣手续费
 PAPER_FEE_PCT_ROUND_TRIP      = 0.08
+
+# Phase 5.C (5/27) TP1 部分平仓 A/B 测试.
+# 假设: 触 TP1 锁 50% 利润 + 50% 走 trailing 是否好过全单走 trailing.
+# 数据驱动 (1410 笔) 预估全单走 trailing EV +$8.85/笔, 部分平仓 EV +$7.26/笔 (-$1.59)
+# 但用户要求实测对比 — 由 MD5 hash 50/50 分组, 一周后审计两组真实表现.
+#   "off":   永远不分组 (维持当前满仓走 trailing 行为)
+#   "always": 永远部分平仓 (用于完全切换)
+#   "ab":    MD5 hash 50/50 分组 (推荐, A=全单走 trailing, B=TP1 部分平仓)
+PAPER_TP1_PARTIAL_CLOSE_MODE = "ab"
 
 # ---- Phase 4 Shadow: premium tier 影子追踪 (不开真仓, 但模拟跟踪) ----
 # 目的: 在不冒资金风险的前提下, 用 1-2 周时间收集 premium 信号的真实 outcome,
@@ -302,6 +363,40 @@ def fetch_all_funding_rates() -> dict:
         except (ValueError, TypeError):
             pass
     return out
+
+
+# Phase 5.B (5/27) — BTC regime (1h MA25 baseline), 复用 live_trader 算法.
+# 用于 _compute_conviction trend-aligned bonus (+1 BTC up+LONG / BTC down+SHORT).
+# Threshold ±0.5% 来自 live_trader LIVE_BTC_REGIME_THRESHOLD_PCT.
+BTC_REGIME_THRESHOLD_PCT = 0.5
+
+
+def fetch_btc_regime() -> Optional[str]:
+    """获取 BTC 1h MA25 regime ('up' / 'down' / 'chop').
+
+    一次 API 调用 per scan (整个 scan 共享同一 snapshot), 不是 per symbol.
+    Returns: 'up' / 'down' / 'chop' / None (失败时).
+    """
+    url = f"{BINANCE_FAPI}/fapi/v1/klines?symbol=BTCUSDT&interval=1h&limit=25"
+    data = _http_get_json(url)
+    if not isinstance(data, list) or len(data) < 25:
+        return None
+    try:
+        closes = [float(k[4]) for k in data]
+    except (ValueError, IndexError, TypeError):
+        return None
+    current = closes[-1]
+    if current <= 0:
+        return None
+    ma25 = sum(closes) / len(closes)
+    if ma25 <= 0:
+        return None
+    pct_vs_ma = (current - ma25) / ma25 * 100.0
+    if pct_vs_ma >= BTC_REGIME_THRESHOLD_PCT:
+        return "up"
+    if pct_vs_ma <= -BTC_REGIME_THRESHOLD_PCT:
+        return "down"
+    return "chop"
 
 
 def fetch_oi_delta_5m(symbol: str) -> Optional[float]:
@@ -922,7 +1017,8 @@ CONVICTION_DIAMOND_THRESHOLD = 5   # ≥5 = 💎 钻石
 CONVICTION_PREMIUM_THRESHOLD = 3   # ≥3 = ⭐ 中置信
 
 def _compute_conviction(a: VelocityAlert, winrate_summary: Optional[dict],
-                          regime: Optional[str] = None) -> tuple:
+                          regime: Optional[str] = None,
+                          btc_regime: Optional[str] = None) -> tuple:
     """计算 (score 0-10, tier str).
     修订 v2 (基于 USELESS/GTC 失败案例反向工程):
     - 加宏观逆势硬否决 (1h/4h 严重反向直接拒绝, 不靠加分扛)
@@ -930,9 +1026,13 @@ def _compute_conviction(a: VelocityAlert, winrate_summary: Optional[dict],
     - Funding 权重 +3 → +2 (单一指标不应主导评分)
     - 多窗口对齐: 1h+4h 都同向 +2 (强对齐), 单边同向 +1
 
-    Phase 5.A (5/27) 增: regime 联动减分.
+    Phase 5.A (5/27) 增: macro regime 联动减分.
     - ALT_SEASON_RUNNING + LONG: -1 分 (数据: 156 笔 avg +$0.06, win 33%, 准负 EV)
-    - 不硬拒, 其他维度强信号仍可救到 diamond.
+
+    Phase 5.B (5/27) 增: BTC regime trend-aligned bonus.
+    - BTC up + LONG: +1 (顺势)
+    - BTC down + SHORT: +1 (顺势)
+    - BTC down + LONG: 已在 live_trader 硬拒, scanner 不再加分
     """
     is_long = (a.direction == "LONG")
 
@@ -1002,6 +1102,16 @@ def _compute_conviction(a: VelocityAlert, winrate_summary: Optional[dict],
     # 软减分而非硬拒, 让其他维度强信号仍可救到 diamond.
     if regime == "ALT_SEASON_RUNNING" and is_long:
         score -= 1
+
+    # 7. Phase 5.B BTC regime trend-aligned bonus
+    # 假设: 顺 BTC 短线趋势 (1h MA25) 的方向应该比逆势更可靠.
+    # 数据: 历史 paper 没有 BTC up/down 字段, 无直接验证, 采用理论合理的小幅加分.
+    # BTC up + LONG / BTC down + SHORT → +1 ; 其他不动.
+    # down + LONG 已在 live_trader is_eligible 硬拒 (0/10 胜率 p=0.042), 不再加分.
+    if btc_regime == "up" and is_long:
+        score += 1
+    elif btc_regime == "down" and not is_long:
+        score += 1
 
     # 防御: score 永不为负 (tier 计算要求非负数)
     score = max(score, 0)
@@ -1690,6 +1800,8 @@ def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
                     # 初始化 Phase B MFE 起点 = 当前价 (TP1 trigger price)
                     t["phase_b_mfe_price"] = cur
                     t["phase_b_mfe_pct"]   = round((cur - entry) / entry * 100, 3)
+                    # Phase 5.C: B 组在 TP1 触发时锁 50% 利润, 剩 50% 继续 trailing
+                    _apply_tp1_partial_close(t, cur, entry, is_long=True)
                     phase_transitions.append({
                         "type": "tp1", "trade": t.copy(), "old_sl_pct": -atr_pct,
                     })
@@ -1703,6 +1815,8 @@ def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
                     # 初始化 Phase B MFE (SHORT 取反向 %)
                     t["phase_b_mfe_price"] = cur
                     t["phase_b_mfe_pct"]   = round((entry - cur) / entry * 100, 3)
+                    # Phase 5.C: SHORT 同 LONG, B 组在 TP1 锁 50% 利润
+                    _apply_tp1_partial_close(t, cur, entry, is_long=False)
                     phase_transitions.append({
                         "type": "tp1", "trade": t.copy(), "old_sl_pct": -atr_pct,
                     })
@@ -1797,7 +1911,10 @@ def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
             t["fee_pct"]         = fee_pct
             t["fee_usdt"]        = round(notional * fee_pct / 100.0, 2)
             t["realized_pnl_pct"] = round(net_pct, 3)   # 改义: 现在存的是 NET
-            t["realized_usdt_pnl"]= round(notional * net_pct / 100.0, 2)
+            # Phase 5.C: 若 B 组在 TP1 已锁 50% 利润, 加回到最终 realized.
+            # notional 已减半, 这里 net_pct × 半仓 = 剩 50% 部分的 PnL.
+            tp1_locked = float(t.get("tp1_locked_pnl_usdt") or 0)
+            t["realized_usdt_pnl"]= round(notional * net_pct / 100.0 + tp1_locked, 2)
             t["hold_time_min"] = round(hold_min, 1)
             state["closed_trades"].append(t)
             closed_now.append(t)
@@ -2430,15 +2547,24 @@ def run_scan() -> List[VelocityAlert]:
         _log(f"outcome tracking failed: {e}")
 
     # ===== Phase 3a: 置信评分 (基于 GTC 反向工程, 必须在写盘前完成) =====
-    # Phase 5.A: 加载 regime snapshot 用于 ALT_SEASON_RUNNING+LONG 减分.
+    # Phase 5.A: 加载 macro regime snapshot (用于 ALT_SEASON_RUNNING+LONG 减分).
+    # Phase 5.B: 加载 BTC regime snapshot (用于 trend-aligned bonus).
     try:
         regime_snap_for_scoring = _load_current_regime()
         current_regime = regime_snap_for_scoring.get("regime") if regime_snap_for_scoring else None
     except Exception:
         current_regime = None
     try:
+        current_btc_regime = fetch_btc_regime()  # 一次 API per scan, 不是 per symbol
+    except Exception:
+        current_btc_regime = None
+    try:
         for a in new_alerts:
-            score, tier = _compute_conviction(a, winrate_summary, regime=current_regime)
+            score, tier = _compute_conviction(
+                a, winrate_summary,
+                regime=current_regime,
+                btc_regime=current_btc_regime,
+            )
             a.conviction_score = score
             a.conviction_tier = tier
         diamonds = [a for a in new_alerts if a.conviction_tier == "diamond"]
