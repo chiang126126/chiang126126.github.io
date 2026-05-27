@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-27T11:43:31.937584+00:00",
+  "generated_at": "2026-05-27T11:46:50.875721+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 518,
-    "open": 0,
+    "total_trades": 519,
+    "open": 1,
     "closed": 518,
     "wins": 170,
     "losses": 343,
@@ -15,30 +15,94 @@
     "avg_pnl_usdt": -0.1755,
     "best_trade_usdt": 29.4143,
     "worst_trade_usdt": -16.6993,
-    "fees_paid_usdt": 46.8801,
+    "fees_paid_usdt": 47.08,
     "fees_realized_usdt": 46.8801,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.2,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 1862.2,
+    "deployed_usdt": 399.96,
+    "free_capital_usdt": 1462.04,
     "max_concurrent_slots": 4,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -28.6476,
-    "deployed_usdt": 0
+    "deployed_usdt": 399.96
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "JELLYJELLYUSDT"
+    ],
+    "exchange_symbols": [
+      "JELLYJELLYUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "JELLYJELLYUSDT|LONG|2026-05-27T11:43:47.817684+00:00",
+      "trade_id": "L1779882227_JELLYJE_L",
+      "symbol": "JELLYJELLYUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.05875,
+      "avg_fill_price": 0.05887,
+      "slippage_bps": 20.43,
+      "qty": 6794.0,
+      "notional_usdt": 399.96278,
+      "leverage": 1,
+      "risk_usdt": 5.3673,
+      "risk_pct": 1.342,
+      "mirror_latency_sec": 9.5,
+      "sl_price": 0.0582,
+      "sl_paper_current": 0.05808,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.00012,
+      "sl_compensation_mode": "abcd",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 2,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "B",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.059755,
+      "tp2_price": 0.06076,
+      "phase": "A",
+      "entry_order_id": 135927952,
+      "entry_client_id": "cresus_L1779882227_JELLYJE_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.57,
+      "phase_a_mfe_pct": 0.034,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.199981,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-27T11:44:05.758624+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 75787.1,
+      "btc_change_24h_at_open": -1.864,
+      "btc_pct_vs_ma25_at_open": -0.48,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.05877,
+      "current_price": 0.05863,
+      "unrealized_pnl_usdt": -1.6306,
+      "unrealized_pnl_pct": -0.408,
+      "last_price_check_at": "2026-05-27T11:46:48.792842+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "RIFUSDT|LONG|2026-05-27T11:02:12.427858+00:00",
@@ -31191,13 +31255,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 75787.7,
-    "btc_ma25_1h": 76152.65,
-    "pct_vs_ma25": -0.479,
-    "change_24h_pct": -1.863,
+    "btc_price": 75780.1,
+    "btc_ma25_1h": 76152.35,
+    "pct_vs_ma25": -0.489,
+    "change_24h_pct": -1.873,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-27T11:43:31.906506+00:00"
+    "computed_at": "2026-05-27T11:46:50.555493+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
