@@ -171,6 +171,14 @@ class VelocityAlert:
     # OI Δ (新仓 vs 平仓识别): >0+价↑ = 真新仓; <0+价↑ = 空头回补
     oi_delta_5m_pct: Optional[float] = None
 
+    # Phase 4.Z (5/27): 大户 / 散户多空比 — 当前阶段仅采集, 不进 scoring.
+    # top_position > 1: Top 20% 大户按仓位金额净多 ; < 1: 净空.
+    # top_account 与 global_account 同向偏离 = 大户散户共识 (高概率延续).
+    # top vs global 反向 = 大户散户分歧 (常预示反转).
+    top_trader_position_ratio: Optional[float] = None
+    top_trader_account_ratio: Optional[float] = None
+    global_account_ratio: Optional[float] = None
+
     # Funding rate (情绪拥挤指标): >0.05% = 多拥挤; <-0.05% = 空拥挤
     funding_rate_pct: Optional[float] = None
 
@@ -283,6 +291,70 @@ def fetch_oi_delta_5m(symbol: str) -> Optional[float]:
         if prev <= 0:
             return None
         return round((curr - prev) / prev * 100, 3)
+    except (ValueError, TypeError, KeyError):
+        return None
+
+
+# Phase 4.Z (5/27): 大户 / 散户多空比数据采集.
+# 三个接口的本质区别:
+#   topLongShortPositionRatio:  Top 20% 大户按"仓位 USDT 加权"的多空比 — 真金白银的方向
+#   topLongShortAccountRatio:   Top 20% 大户按"账户数"的多空比 — 大户共识度
+#   globalLongShortAccountRatio: 全市场散户按"账户数"的多空比 — retail 情绪
+# 三者组合可识别"大户与散户分歧" (top_position 看空 但 retail 看多 = 大概率回调).
+# 当前阶段: 仅采集到 paper_trade 元字段, 不进 conviction scoring.
+# 1 周后 (~100 笔样本) 数据驱动判断是否纳入 scoring.
+
+def fetch_top_position_ratio(symbol: str, period: str = "5m") -> Optional[float]:
+    """Top 20% trader 多空比 (仓位 USDT 加权).
+
+    Binance: /futures/data/topLongShortPositionRatio
+    返回 longShortRatio (浮点): > 1.0 大户净多, < 1.0 大户净空.
+    取最近 1 个 period (5m) snapshot.
+    """
+    url = (f"{BINANCE_FAPI}/futures/data/topLongShortPositionRatio"
+           f"?symbol={symbol}&period={period}&limit=1")
+    data = _http_get_json(url)
+    if not isinstance(data, list) or not data:
+        return None
+    try:
+        ratio = float(data[-1].get("longShortRatio", 0))
+        return round(ratio, 4) if ratio > 0 else None
+    except (ValueError, TypeError, KeyError):
+        return None
+
+
+def fetch_top_account_ratio(symbol: str, period: str = "5m") -> Optional[float]:
+    """Top 20% trader 多空账户比 (按账户数).
+
+    Binance: /futures/data/topLongShortAccountRatio
+    返回 longShortRatio: 反映大户中"做多账户 / 做空账户"数量比.
+    """
+    url = (f"{BINANCE_FAPI}/futures/data/topLongShortAccountRatio"
+           f"?symbol={symbol}&period={period}&limit=1")
+    data = _http_get_json(url)
+    if not isinstance(data, list) or not data:
+        return None
+    try:
+        ratio = float(data[-1].get("longShortRatio", 0))
+        return round(ratio, 4) if ratio > 0 else None
+    except (ValueError, TypeError, KeyError):
+        return None
+
+
+def fetch_global_account_ratio(symbol: str, period: str = "5m") -> Optional[float]:
+    """全市场散户多空账户比 (与 top 对比识别大户/散户分歧).
+
+    Binance: /futures/data/globalLongShortAccountRatio
+    返回 longShortRatio: 全市场 (含所有账户) 的多空账户数比.
+    """
+    url = (f"{BINANCE_FAPI}/futures/data/globalLongShortAccountRatio"
+           f"?symbol={symbol}&period={period}&limit=1")
+    data = _http_get_json(url)
+    if not isinstance(data, list) or not data:
+        return None
+    try:
+        ratio = float(data[-1].get("longShortRatio", 0))
+        return round(ratio, 4) if ratio > 0 else None
     except (ValueError, TypeError, KeyError):
         return None
 
@@ -497,8 +569,15 @@ def analyze_symbol(symbol: str,
 
         # OI 5m Δ (额外 1 次 API,可禁用)
         oi_delta = None
+        # Phase 4.Z 大户/散户多空比 (3 次 API, 与 OI 同 candidate-level 节流)
+        top_pos_ratio = None
+        top_acc_ratio = None
+        global_acc_ratio = None
         if not skip_oi:
             oi_delta = fetch_oi_delta_5m(symbol)
+            top_pos_ratio = fetch_top_position_ratio(symbol)
+            top_acc_ratio = fetch_top_account_ratio(symbol)
+            global_acc_ratio = fetch_global_account_ratio(symbol)
 
         return VelocityAlert(
             symbol=symbol,
@@ -520,6 +599,9 @@ def analyze_symbol(symbol: str,
             taker_buy_ratio_1m=taker_1m,
             taker_buy_ratio_5m=taker_5m,
             oi_delta_5m_pct=oi_delta,
+            top_trader_position_ratio=top_pos_ratio,
+            top_trader_account_ratio=top_acc_ratio,
+            global_account_ratio=global_acc_ratio,
             funding_rate_pct=round(funding_rate_pct, 4) if funding_rate_pct is not None else None,
             atr_pct=atr_pct,
             range_4h_pct=range_4h,
@@ -1453,6 +1535,10 @@ def _open_paper_trade(a: VelocityAlert, state: dict, now: datetime,
         "oi_delta_5m_pct": a.oi_delta_5m_pct,
         "taker_buy_ratio_1m": a.taker_buy_ratio_1m,
         "change_1h_pct": a.change_1h_pct,
+        # Phase 4.Z 大户/散户多空比 (数据采集期, 不进 scoring)
+        "top_trader_position_ratio": a.top_trader_position_ratio,
+        "top_trader_account_ratio":  a.top_trader_account_ratio,
+        "global_account_ratio":      a.global_account_ratio,
         # Regime 快照 (开仓时, 不影响决策, 仅 regime×胜率 切片复盘用)
         "regime_at_open":            regime_snap["regime"],
         "regime_zh_at_open":         regime_snap["regime_zh"],
@@ -1938,6 +2024,10 @@ def _open_shadow_trade(a: VelocityAlert, state: dict, now: datetime) -> Optional
         "taker_buy_ratio_1m": a.taker_buy_ratio_1m,
         "change_1h_pct": a.change_1h_pct,
         "change_4h_pct": a.change_4h_pct,
+        # Phase 4.Z 大户/散户多空比 (shadow 也采集, 数据维度一致便于比对)
+        "top_trader_position_ratio": a.top_trader_position_ratio,
+        "top_trader_account_ratio":  a.top_trader_account_ratio,
+        "global_account_ratio":      a.global_account_ratio,
         # Regime 快照 (开仓时, 不影响决策, 仅 regime×胜率 切片复盘用)
         "regime_at_open":            regime_snap["regime"],
         "regime_zh_at_open":         regime_snap["regime_zh"],
