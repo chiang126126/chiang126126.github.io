@@ -1,35 +1,35 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-27T14:31:50.182882+00:00",
+  "generated_at": "2026-05-27T14:33:54.353230+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 527,
-    "open": 2,
-    "closed": 525,
+    "open": 1,
+    "closed": 526,
     "wins": 174,
-    "losses": 346,
-    "win_rate": 0.335,
-    "total_pnl_usdt": -83.8973,
-    "net_pnl_usdt": -133.4096,
-    "avg_pnl_usdt": -0.1598,
+    "losses": 347,
+    "win_rate": 0.334,
+    "total_pnl_usdt": -86.3626,
+    "net_pnl_usdt": -136.2761,
+    "avg_pnl_usdt": -0.1642,
     "best_trade_usdt": 29.4143,
     "worst_trade_usdt": -16.6993,
-    "fees_paid_usdt": 49.9123,
-    "fees_realized_usdt": 49.5123,
-    "fees_open_usdt": 0.4,
+    "fees_paid_usdt": 50.1135,
+    "fees_realized_usdt": 49.9135,
+    "fees_open_usdt": 0.2,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 799.96,
-    "free_capital_usdt": 1066.23,
+    "deployed_usdt": 399.96,
+    "free_capital_usdt": 1463.56,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -21.6278,
-    "deployed_usdt": 799.96
+    "daily_pnl": -24.0931,
+    "deployed_usdt": 399.96
   },
   "reconciliation": {
     "ok": false,
@@ -42,13 +42,11 @@
     ],
     "api_failed": false,
     "live_symbols": [
-      "ATHUSDT",
       "PLAYUSDT"
     ],
     "exchange_symbols": [
-      "PLAYUSDT",
       "HIGHUSDT",
-      "ATHUSDT"
+      "PLAYUSDT"
     ]
   },
   "open_trades": [
@@ -92,7 +90,7 @@
       "conviction_score": 5,
       "alert_type": "sustained",
       "atr_pct": 3.077,
-      "phase_a_mfe_pct": 2.846,
+      "phase_a_mfe_pct": 3.162,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.19998,
@@ -105,12 +103,14 @@
       "btc_pct_vs_ma25_at_open": -1.382,
       "btc_sub_regime_at_open": "down_acute",
       "btc_change_3h_at_open": -1.24,
-      "phase_a_mfe_price": 0.09831,
-      "current_price": 0.09829,
-      "unrealized_pnl_usdt": 11.6159,
-      "unrealized_pnl_pct": 2.904,
-      "last_price_check_at": "2026-05-27T14:31:46.223379+00:00"
-    },
+      "phase_a_mfe_price": 0.09799,
+      "current_price": 0.09817,
+      "unrealized_pnl_usdt": 12.0901,
+      "unrealized_pnl_pct": 3.023,
+      "last_price_check_at": "2026-05-27T14:33:50.898597+00:00"
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "ATHUSDT|SHORT|2026-05-27T14:29:36.220211+00:00",
       "trade_id": "L1779892176_ATHUSDT_S",
@@ -134,7 +134,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 2,
       "wick_filter_mode": "always",
-      "sl_breach_count": 0,
+      "sl_breach_count": 2,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.005,
       "regime_gate_enabled": true,
@@ -154,7 +154,7 @@
       "phase_a_mfe_pct": 0.0,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.199999,
+      "fees_paid_usdt": 0.401231,
       "fees_are_actual": true,
       "opened_at": "2026-05-27T14:30:15.604899+00:00",
       "is_dry_run": false,
@@ -165,13 +165,21 @@
       "btc_sub_regime_at_open": "down_acute",
       "btc_change_3h_at_open": -1.163,
       "phase_a_mfe_price": 0.00648,
-      "current_price": 0.00652,
-      "unrealized_pnl_usdt": -1.849,
-      "unrealized_pnl_pct": -0.462,
-      "last_price_check_at": "2026-05-27T14:31:46.223379+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.00653,
+      "unrealized_pnl_usdt": -2.4653,
+      "unrealized_pnl_pct": -0.616,
+      "last_price_check_at": "2026-05-27T14:32:06.992927+00:00",
+      "closed_at": "2026-05-27T14:32:12.157644+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.00653,
+      "realized_pnl_usdt": -2.4653,
+      "close_order_id": 125219121,
+      "close_qty": 61633.0,
+      "close_expected_price": 0.006524500000000001,
+      "close_slippage_bps": 8.43,
+      "entry_fees_usdt": 0.199999,
+      "close_fees_usdt": 0.201232
+    },
     {
       "paper_id": "JELLYJELLYUSDT|LONG|2026-05-27T12:16:22.857488+00:00",
       "trade_id": "L1779884182_JELLYJE_L",
@@ -31817,8 +31825,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-27T13:37:50.175551+00:00",
-      "reason": "paper trade too old (3236s > 600s)",
-      "last_checked_at": "2026-05-27T14:31:46.223379+00:00"
+      "reason": "paper trade too old (3361s > 600s)",
+      "last_checked_at": "2026-05-27T14:33:50.898597+00:00"
     },
     {
       "paper_id": "SOXLUSDT|SHORT|2026-05-27T14:09:28.818001+00:00",
@@ -31826,8 +31834,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-27T14:10:31.214876+00:00",
-      "reason": "paper trade too old (1275s > 600s)",
-      "last_checked_at": "2026-05-27T14:31:46.223379+00:00"
+      "reason": "paper trade too old (1400s > 600s)",
+      "last_checked_at": "2026-05-27T14:33:50.898597+00:00"
     },
     {
       "paper_id": "ESPORTSUSDT|LONG|2026-05-27T14:20:24.690794+00:00",
@@ -31835,8 +31843,8 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-05-27T14:21:25.094125+00:00",
-      "reason": "paper trade too old (621s > 600s)",
-      "last_checked_at": "2026-05-27T14:31:46.223379+00:00"
+      "reason": "paper trade too old (746s > 600s)",
+      "last_checked_at": "2026-05-27T14:33:50.898597+00:00"
     },
     {
       "paper_id": "MRVLUSDT|SHORT|2026-05-27T14:29:23.115117+00:00",
@@ -31845,7 +31853,7 @@
       "conviction_score": 5,
       "signal_at": "2026-05-27T14:30:07.708681+00:00",
       "reason": "funding adverse (0.1109% ≥ 0.05%) (Phase 4.M: paper 历史人均 -$0.85, 不利 mirror)",
-      "last_checked_at": "2026-05-27T14:31:46.223379+00:00"
+      "last_checked_at": "2026-05-27T14:33:50.898597+00:00"
     },
     {
       "paper_id": "SNDKUSDT|SHORT|2026-05-27T14:26:50.205805+00:00",
@@ -31854,7 +31862,7 @@
       "conviction_score": 5,
       "signal_at": "2026-05-27T14:27:55.592391+00:00",
       "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-05-27T14:31:46.223379+00:00"
+      "last_checked_at": "2026-05-27T14:33:50.898597+00:00"
     },
     {
       "paper_id": "ARMUSDT|SHORT|2026-05-27T14:27:51.051804+00:00",
@@ -31863,18 +31871,18 @@
       "conviction_score": 5,
       "signal_at": "2026-05-27T14:27:55.592391+00:00",
       "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-05-27T14:31:46.223379+00:00"
+      "last_checked_at": "2026-05-27T14:33:50.898597+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 74983.2,
-    "btc_ma25_1h": 75917.28,
-    "pct_vs_ma25": -1.23,
-    "change_24h_pct": -2.603,
-    "sub_regime": "down_stable",
-    "change_3h_pct": -0.988,
-    "computed_at": "2026-05-27T14:31:47.787011+00:00"
+    "btc_price": 74957.5,
+    "btc_ma25_1h": 75916.25,
+    "pct_vs_ma25": -1.263,
+    "change_24h_pct": -2.636,
+    "sub_regime": "down_acute",
+    "change_3h_pct": -1.022,
+    "computed_at": "2026-05-27T14:33:52.287722+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
