@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-27T18:30:36.776413+00:00",
+  "updated_at": "2026-05-27T18:32:46.058261+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 23,
+  "alerts_count": 24,
   "alerts": [
+    {
+      "symbol": "4USDT",
+      "base": "4",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.00885,
+      "price_change_pct": 7.704,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 19614.0,
+      "volume_baseline_usdt": 3459.0,
+      "volume_ratio": 5.67,
+      "detected_at": "2026-05-27T18:32:44.751254+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.431,
+      "change_15m_pct": 10.732,
+      "change_1h_pct": 7.829,
+      "change_4h_pct": 6.192,
+      "taker_buy_ratio_1m": 0.37,
+      "taker_buy_ratio_5m": 0.463,
+      "oi_delta_5m_pct": -4.629,
+      "funding_rate_pct": 0.0107,
+      "atr_pct": 2.224,
+      "range_4h_pct": 14.29,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.00845643,
+      "suggested_tp1": 0.00944036,
+      "suggested_tp2": 0.01003071,
+      "conviction_score": 3,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "METAUSDT",
       "base": "META",
