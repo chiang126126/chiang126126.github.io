@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-27T09:37:23.432126+00:00",
+  "updated_at": "2026-05-27T09:39:27.400853+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 18,
+  "alerts_count": 19,
   "alerts": [
+    {
+      "symbol": "ATHUSDT",
+      "base": "ATH",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.006808,
+      "price_change_pct": 2.623,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 62539.0,
+      "volume_baseline_usdt": 11382.0,
+      "volume_ratio": 5.49,
+      "detected_at": "2026-05-27T09:39:00.210475+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.753,
+      "change_15m_pct": 2.569,
+      "change_1h_pct": 3.959,
+      "change_4h_pct": 4.917,
+      "taker_buy_ratio_1m": 0.319,
+      "taker_buy_ratio_5m": 0.447,
+      "oi_delta_5m_pct": 1.186,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.626,
+      "range_4h_pct": 6.11,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.00674404,
+      "suggested_tp1": 0.00690395,
+      "suggested_tp2": 0.00699989,
+      "conviction_score": 5,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "NEARUSDT",
       "base": "NEAR",
