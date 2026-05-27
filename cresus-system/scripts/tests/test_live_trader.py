@@ -4317,6 +4317,93 @@ class TestPhase4XOrphanPrevention(unittest.TestCase):
         self.assertIn("slippage_bps", result)
 
 
+class TestPhase4ZLiveTradeMetadata(unittest.TestCase):
+    """Phase 4.Z (5/27): live_trade 字典也复制 paper 的大户/散户多空比.
+
+    数据流: scanner 写 paper_trade.top_trader_* → live_trader mirror
+    时复制到 live_trade.top_trader_* → 写入 live_trades_history.json.
+    复盘时直接按 live 切片 (无需 JOIN paper).
+    """
+
+    def setUp(self):
+        from binance_client import BinanceClient
+        self.client = MagicMock(spec=BinanceClient)
+        self.client.dry_run = False
+        self.client.get_book_ticker = MagicMock(return_value={
+            "askPrice": "100.0", "bidPrice": "99.5",
+        })
+        self.client.set_leverage = MagicMock(return_value=None)
+        self.client.open_position = MagicMock(return_value={
+            "avg_fill_price": 100.0,
+            "qty": 4.0,
+            "actual_notional": 400.0,
+            "entry_order_id": "12345",
+            "entry_client_id": "test_client_id",
+            "sl_order_id": None,
+            "sl_mode": "client_side",
+            "opened_at": "2026-05-27T22:00:00+00:00",
+            "fees_paid_usdt": 0.4,
+            "fees_are_actual": True,
+        })
+
+    def _make_paper(self):
+        return {
+            "id": "BTCUSDT|LONG|2026-05-27T22:00:00+00:00",
+            "symbol": "BTCUSDT",
+            "direction": "LONG",
+            "entry_price": 100.0,
+            "sl": 95.0,
+            "tp1": 105.0,
+            "tp2": 110.0,
+            "entered_at": "2026-05-27T22:00:00+00:00",
+            "intensity": 2,
+            # Phase 4.Z 字段
+            "top_trader_position_ratio": 1.85,
+            "top_trader_account_ratio":  1.45,
+            "global_account_ratio":      0.62,
+        }
+
+    def test_normal_path_copies_phase4z_fields(self):
+        pt = self._make_paper()
+        result = live_trader._try_mirror_open(
+            self.client, pt, dry_run=False, btc_regime=None,
+        )
+        self.assertIsNotNone(result)
+        self.assertEqual(result["top_trader_position_ratio"], 1.85)
+        self.assertEqual(result["top_trader_account_ratio"], 1.45)
+        self.assertEqual(result["global_account_ratio"], 0.62)
+
+    def test_panic_path_copies_phase4z_fields(self):
+        """异常路径也必须保留 Phase 4.Z 字段 (数据完整性)."""
+        pt = self._make_paper()
+        with patch.object(
+            live_trader, "_ab_use_sl_compensation",
+            side_effect=RuntimeError("trigger panic"),
+        ):
+            result = live_trader._try_mirror_open(
+                self.client, pt, dry_run=False, btc_regime=None,
+            )
+        self.assertIsNotNone(result)
+        self.assertTrue(result.get("_partial_record"))
+        self.assertEqual(result["top_trader_position_ratio"], 1.85)
+        self.assertEqual(result["top_trader_account_ratio"], 1.45)
+        self.assertEqual(result["global_account_ratio"], 0.62)
+
+    def test_missing_phase4z_fields_defaults_to_none(self):
+        """paper 没有 Phase 4.Z 字段 (旧数据) → live_trade 该字段为 None."""
+        pt = self._make_paper()
+        del pt["top_trader_position_ratio"]
+        del pt["top_trader_account_ratio"]
+        del pt["global_account_ratio"]
+        result = live_trader._try_mirror_open(
+            self.client, pt, dry_run=False, btc_regime=None,
+        )
+        self.assertIsNotNone(result)
+        self.assertIsNone(result["top_trader_position_ratio"])
+        self.assertIsNone(result["top_trader_account_ratio"])
+        self.assertIsNone(result["global_account_ratio"])
+
+
 class TestPhase4YSlCompensationAlways(unittest.TestCase):
     """Phase 4.Y (5/27): SL 补偿从 abcd 推广到 always.
 

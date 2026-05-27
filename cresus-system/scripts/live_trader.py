@@ -1673,6 +1673,11 @@ def _try_mirror_open(
             "conviction_score": paper_trade.get("conviction_score"),
             "alert_type": paper_trade.get("alert_type"),
             "atr_pct": paper_trade.get("atr_pct"),
+            # Phase 4.Z (5/27): 从 paper 复制大户/散户多空比快照, 让 live_trades_history
+            # 直接含这些维度, 复盘时可直接按 live 切片 (无需 JOIN paper).
+            "top_trader_position_ratio": paper_trade.get("top_trader_position_ratio"),
+            "top_trader_account_ratio":  paper_trade.get("top_trader_account_ratio"),
+            "global_account_ratio":      paper_trade.get("global_account_ratio"),
             # MFE 字段初始化为 None — 会在 _sync_live_with_paper 中从 paper 拷过来
             "phase_a_mfe_pct": None,
             "phase_b_mfe_pct": None,
@@ -1722,6 +1727,10 @@ def _try_mirror_open(
             "entry_client_id": result.get("entry_client_id"),
             "opened_at": result.get("opened_at"),
             "is_dry_run": bool(dry_run or result.get("_dryRun")),
+            # Phase 4.Z: 即使 panic 路径也保留大户/散户多空比 (数据完整性)
+            "top_trader_position_ratio": paper_trade.get("top_trader_position_ratio"),
+            "top_trader_account_ratio":  paper_trade.get("top_trader_account_ratio"),
+            "global_account_ratio":      paper_trade.get("global_account_ratio"),
             "_partial_record": True,  # 标记: 缺 A/B 组 / wick / regime 等字段
         }
         return panic_trade
