@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-27T20:07:09.172184+00:00",
+  "generated_at": "2026-05-27T20:09:15.808708+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 530,
-    "open": 0,
+    "total_trades": 531,
+    "open": 1,
     "closed": 530,
     "wins": 177,
     "losses": 348,
@@ -15,21 +15,21 @@
     "avg_pnl_usdt": -0.1133,
     "best_trade_usdt": 29.4143,
     "worst_trade_usdt": -16.6993,
-    "fees_paid_usdt": 51.4993,
+    "fees_paid_usdt": 51.6992,
     "fees_realized_usdt": 51.4993,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.1999,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 1888.43,
+    "deployed_usdt": 399.8,
+    "free_capital_usdt": 1488.44,
     "max_concurrent_slots": 4,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 2.2,
-    "deployed_usdt": 0
+    "deployed_usdt": 399.8
   },
   "reconciliation": {
     "ok": false,
@@ -41,12 +41,78 @@
       }
     ],
     "api_failed": false,
-    "live_symbols": [],
+    "live_symbols": [
+      "JTOUSDT"
+    ],
     "exchange_symbols": [
+      "JTOUSDT",
       "HIGHUSDT"
     ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "JTOUSDT|LONG|2026-05-27T20:02:41.609328+00:00",
+      "trade_id": "L1779912161_JTOUSDT_L",
+      "symbol": "JTOUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.5857,
+      "avg_fill_price": 0.5888,
+      "slippage_bps": 52.93,
+      "qty": 679.0,
+      "notional_usdt": 399.7952,
+      "leverage": 1,
+      "risk_usdt": 5.9267,
+      "risk_pct": 1.482,
+      "mirror_latency_sec": 311.3,
+      "sl_price": 0.58317143,
+      "sl_paper_current": 0.58007143,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.0031,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 2,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": -0.012,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "C",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.59414286,
+      "tp2_price": 0.60258571,
+      "phase": "A",
+      "entry_order_id": 120561496,
+      "entry_client_id": "cresus_L1779912161_JTOUSDT_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.48,
+      "top_trader_position_ratio": null,
+      "top_trader_account_ratio": null,
+      "global_account_ratio": null,
+      "phase_a_mfe_pct": 0.359,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.199898,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-27T20:08:33.926776+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 75209.3,
+      "btc_change_24h_at_open": -1.147,
+      "btc_pct_vs_ma25_at_open": -0.499,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.5878,
+      "current_price": 0.5866,
+      "unrealized_pnl_usdt": -1.4938,
+      "unrealized_pnl_pct": -0.374,
+      "last_price_check_at": "2026-05-27T20:09:12.289961+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "PLAYUSDT|SHORT|2026-05-27T13:41:14.652369+00:00",
@@ -32043,17 +32109,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-27T19:26:40.759506+00:00",
-      "reason": "paper trade too old (2425s > 600s)",
-      "last_checked_at": "2026-05-27T20:07:05.798231+00:00"
-    },
-    {
-      "paper_id": "JTOUSDT|LONG|2026-05-27T20:02:41.609328+00:00",
-      "symbol": "JTOUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-05-27T20:03:22.630843+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=+0.37% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-05-27T20:07:05.798231+00:00"
+      "reason": "paper trade too old (2552s > 600s)",
+      "last_checked_at": "2026-05-27T20:09:12.289961+00:00"
     },
     {
       "paper_id": "MAVIAUSDT|SHORT|2026-05-27T20:05:25.160397+00:00",
@@ -32062,18 +32119,18 @@
       "conviction_score": 5,
       "signal_at": "2026-05-27T20:05:42.514990+00:00",
       "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-05-27T20:07:05.798231+00:00"
+      "last_checked_at": "2026-05-27T20:09:12.289961+00:00"
     }
   ],
   "btc_regime_now": {
-    "regime": "down",
-    "btc_price": 75143.1,
-    "btc_ma25_1h": 75584.21,
-    "pct_vs_ma25": -0.584,
-    "change_24h_pct": -1.234,
-    "sub_regime": "down_stable",
-    "change_3h_pct": 0.368,
-    "computed_at": "2026-05-27T20:07:08.212703+00:00"
+    "regime": "chop",
+    "btc_price": 75224.6,
+    "btc_ma25_1h": 75587.47,
+    "pct_vs_ma25": -0.48,
+    "change_24h_pct": -1.127,
+    "sub_regime": null,
+    "change_3h_pct": null,
+    "computed_at": "2026-05-27T20:09:14.562532+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
