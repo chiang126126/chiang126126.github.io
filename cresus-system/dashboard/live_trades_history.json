@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-27T08:50:23.177810+00:00",
+  "generated_at": "2026-05-27T08:52:28.880330+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 514,
-    "open": 0,
+    "total_trades": 515,
+    "open": 1,
     "closed": 514,
     "wins": 170,
     "losses": 339,
@@ -15,30 +15,94 @@
     "avg_pnl_usdt": -0.1404,
     "best_trade_usdt": 29.4143,
     "worst_trade_usdt": -16.6993,
-    "fees_paid_usdt": 45.4461,
+    "fees_paid_usdt": 45.6461,
     "fees_realized_usdt": 45.4461,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.2,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 1882.38,
+    "deployed_usdt": 400.0,
+    "free_capital_usdt": 1482.18,
     "max_concurrent_slots": 4,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -9.9039,
-    "deployed_usdt": 0
+    "deployed_usdt": 400.0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "ZAMAUSDT"
+    ],
+    "exchange_symbols": [
+      "ZAMAUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "ZAMAUSDT|SHORT|2026-05-27T08:51:22.930520+00:00",
+      "trade_id": "L1779871882_ZAMAUSD_S",
+      "symbol": "ZAMAUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.03344,
+      "avg_fill_price": 0.0334,
+      "slippage_bps": 11.96,
+      "qty": 11976.0,
+      "notional_usdt": 399.9984,
+      "leverage": 1,
+      "risk_usdt": 2.3867,
+      "risk_pct": 0.597,
+      "mirror_latency_sec": 10.1,
+      "sl_price": 0.03359929,
+      "sl_paper_current": 0.03359929,
+      "sl_compensation_enabled": false,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "abcd",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 2,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": -0.0012,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "C",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.03320107,
+      "tp2_price": 0.03296214,
+      "phase": "A",
+      "entry_order_id": 69332249,
+      "entry_client_id": "cresus_L1779871882_ZAMAUSD_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.476,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.199999,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-27T08:51:49.068752+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 75931.6,
+      "btc_change_24h_at_open": -1.06,
+      "btc_pct_vs_ma25_at_open": -0.467,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.03344,
+      "current_price": 0.0335,
+      "unrealized_pnl_usdt": -1.1976,
+      "unrealized_pnl_pct": -0.299,
+      "last_price_check_at": "2026-05-27T08:52:27.129366+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "DYDXUSDT|LONG|2026-05-27T08:06:46.781777+00:00",
@@ -30915,13 +30979,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 75945.0,
-    "btc_ma25_1h": 76288.44,
-    "pct_vs_ma25": -0.45,
-    "change_24h_pct": -1.042,
+    "btc_price": 75929.5,
+    "btc_ma25_1h": 76287.82,
+    "pct_vs_ma25": -0.47,
+    "change_24h_pct": -1.063,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-27T08:50:23.145477+00:00"
+    "computed_at": "2026-05-27T08:52:28.576222+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
