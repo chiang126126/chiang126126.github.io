@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-28T06:00:07.433552+00:00",
+  "generated_at": "2026-05-28T06:02:02.290435+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 553,
@@ -42,13 +42,13 @@
     ],
     "api_failed": false,
     "live_symbols": [
-      "BCHUSDT",
-      "DYMUSDT"
+      "DYMUSDT",
+      "BCHUSDT"
     ],
     "exchange_symbols": [
-      "BCHUSDT",
       "DYMUSDT",
-      "HIGHUSDT"
+      "HIGHUSDT",
+      "BCHUSDT"
     ]
   },
   "open_trades": [
@@ -173,10 +173,10 @@
       "btc_sub_regime_at_open": "down_acute",
       "btc_change_3h_at_open": -1.681,
       "phase_a_mfe_price": 324.85,
-      "current_price": 325.31,
-      "unrealized_pnl_usdt": 1.0421,
-      "unrealized_pnl_pct": 0.261,
-      "last_price_check_at": "2026-05-28T06:00:04.608430+00:00"
+      "current_price": 325.54,
+      "unrealized_pnl_usdt": 0.7601,
+      "unrealized_pnl_pct": 0.19,
+      "last_price_check_at": "2026-05-28T06:01:59.701204+00:00"
     }
   ],
   "recent_closed": [
@@ -33702,19 +33702,28 @@
       "direction": "LONG",
       "conviction_score": 7,
       "signal_at": "2026-05-28T05:46:16.570669+00:00",
-      "reason": "paper trade too old (828s > 600s)",
-      "last_checked_at": "2026-05-28T06:00:04.608430+00:00"
+      "reason": "paper trade too old (943s > 600s)",
+      "last_checked_at": "2026-05-28T06:01:59.701204+00:00"
+    },
+    {
+      "paper_id": "SKYAIUSDT|LONG|2026-05-28T06:00:35.518452+00:00",
+      "symbol": "SKYAIUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-05-28T06:01:23.450008+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.38% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-05-28T06:01:59.701204+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 72951.4,
-    "btc_ma25_1h": 74916.21,
-    "pct_vs_ma25": -2.623,
-    "change_24h_pct": -3.608,
-    "sub_regime": "down_acute",
-    "change_3h_pct": -1.748,
-    "computed_at": "2026-05-28T06:00:05.953440+00:00"
+    "btc_price": 72975.1,
+    "btc_ma25_1h": 74807.93,
+    "pct_vs_ma25": -2.45,
+    "change_24h_pct": -3.727,
+    "sub_regime": "down_stable",
+    "change_3h_pct": -0.38,
+    "computed_at": "2026-05-28T06:02:00.780108+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
