@@ -1893,6 +1893,20 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
             # 记录 missed signal 供 dashboard 诊断 (排除"已 mirror"噪音)
             _record_missed_signal(live, pt, reason, now)
 
+    # Phase 5.D (5/28): slot 稀缺时按 conviction_score 优先 + 趋势对齐隐式优先.
+    # 之前 mirror_candidates 按 paper_open 出现顺序 (FIFO), 当 max_concurrent 满
+    # 或 deploy cap 接近时, 后到的高 EV 信号被前面低 EV 信号挤掉.
+    # 数据 (1410 笔): score 6-7 avg +$4.50 vs score 5 avg +$0.92 (5×).
+    # Phase 5.B 已给 BTC trend-aligned (up+LONG / down+SHORT) +1 score,
+    # 故 score 降序排自动让趋势对齐信号优先入场 — 无需额外的 regime alignment 逻辑.
+    # 同 score 时按 entered_at FIFO (公平 + 确定性).
+    mirror_candidates.sort(
+        key=lambda pt: (
+            -int(pt.get("conviction_score") or 0),
+            pt.get("entered_at", ""),
+        )
+    )
+
     if skip_log:
         for sym, pid, reason in skip_log[:5]:
             log.debug(f"[skip-mirror] {sym} ({pid[:30]}...): {reason}")

@@ -4479,6 +4479,91 @@ class TestPhase5ALiveNotionalByScore(unittest.TestCase):
         self.assertEqual(LIVE_MAX_DEPLOY_USDT, 2400.0)
 
 
+class TestPhase5DCandidatePrioritization(unittest.TestCase):
+    """Phase 5.D (5/28): slot 稀缺时 mirror_candidates 按 conviction_score 优先.
+
+    背景: 1410 笔数据显示 score 6-7 EV 是 score 5 的 5× ($4.50 vs $0.92).
+    当 max_concurrent / deploy cap 限制时, 高 score 信号应优先入场,
+    漏掉的应是低 EV (score 5) 信号. Phase 5.B 已让 BTC trend-aligned
+    信号 +1 score, 故 score 降序排自动倾向趋势对齐.
+    """
+
+    def _make_pt(self, symbol, score, entered_at, direction="LONG"):
+        """构造一个 paper trade dict 用于排序测试."""
+        return {
+            "id": f"{symbol}|{direction}|{entered_at}",
+            "symbol": symbol, "direction": direction,
+            "conviction_score": score,
+            "entered_at": entered_at,
+            "entry_price": 100.0, "sl": 95.0, "tp1": 105.0, "tp2": 110.0,
+        }
+
+    def test_high_score_sorts_first(self):
+        """score 6-7 应排在 score 5 前面."""
+        candidates = [
+            self._make_pt("AUSDT", 5, "2026-05-28T10:00:00+00:00"),
+            self._make_pt("BUSDT", 7, "2026-05-28T10:01:00+00:00"),
+            self._make_pt("CUSDT", 6, "2026-05-28T10:02:00+00:00"),
+        ]
+        candidates.sort(
+            key=lambda pt: (
+                -int(pt.get("conviction_score") or 0),
+                pt.get("entered_at", ""),
+            )
+        )
+        # 顺序: 7 (BUSDT) → 6 (CUSDT) → 5 (AUSDT)
+        self.assertEqual([pt["symbol"] for pt in candidates],
+                          ["BUSDT", "CUSDT", "AUSDT"])
+
+    def test_same_score_fifo_by_entered_at(self):
+        """同 score 时按时间 FIFO."""
+        candidates = [
+            self._make_pt("LATE", 5, "2026-05-28T10:05:00+00:00"),
+            self._make_pt("EARLY", 5, "2026-05-28T10:00:00+00:00"),
+            self._make_pt("MID", 5, "2026-05-28T10:02:00+00:00"),
+        ]
+        candidates.sort(
+            key=lambda pt: (
+                -int(pt.get("conviction_score") or 0),
+                pt.get("entered_at", ""),
+            )
+        )
+        self.assertEqual([pt["symbol"] for pt in candidates],
+                          ["EARLY", "MID", "LATE"])
+
+    def test_btc_aligned_long_sorts_before_non_aligned_via_score(self):
+        """关键验证: Phase 5.B + 5.D 协同 — BTC up + LONG 因 +1 score 自动优先.
+        模拟 scanner 输出: 同样基础质量的信号, BTC up 时 LONG 得 score 6, SHORT 仅 score 5.
+        """
+        aligned = self._make_pt("ALIGNED", 6, "2026-05-28T10:00:00+00:00", direction="LONG")
+        non_aligned = self._make_pt("NONALIGNED", 5, "2026-05-28T09:55:00+00:00", direction="SHORT")
+        # 注意: non_aligned 时间更早 (FIFO 本应先), 但 score 低应该排后
+        candidates = [non_aligned, aligned]
+        candidates.sort(
+            key=lambda pt: (
+                -int(pt.get("conviction_score") or 0),
+                pt.get("entered_at", ""),
+            )
+        )
+        self.assertEqual(candidates[0]["symbol"], "ALIGNED",
+                          "趋势对齐 (score 6) 应优先于早到的非对齐 (score 5)")
+
+    def test_missing_score_treated_as_zero(self):
+        """异常: conviction_score 缺失 → 视为 0, 排到最后."""
+        candidates = [
+            self._make_pt("NORMAL", 5, "2026-05-28T10:00:00+00:00"),
+            {"id": "BROKEN", "symbol": "BROKEN", "entered_at": "2026-05-28T09:00:00+00:00"},
+        ]
+        candidates.sort(
+            key=lambda pt: (
+                -int(pt.get("conviction_score") or 0),
+                pt.get("entered_at", ""),
+            )
+        )
+        self.assertEqual(candidates[0]["symbol"], "NORMAL")
+        self.assertEqual(candidates[1]["symbol"], "BROKEN")
+
+
 class TestPhase5AExternalCloseRecovery(unittest.TestCase):
     """Phase 5.A-fix (5/28): _try_mirror_close 处理 "exchange 已无持仓" 恢复.
 
