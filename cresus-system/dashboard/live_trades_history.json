@@ -1,35 +1,35 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-28T06:08:10.518143+00:00",
+  "generated_at": "2026-05-28T06:10:15.313289+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 553,
-    "open": 2,
-    "closed": 551,
+    "open": 1,
+    "closed": 552,
     "wins": 186,
-    "losses": 359,
+    "losses": 360,
     "win_rate": 0.341,
-    "total_pnl_usdt": 8.232,
-    "net_pnl_usdt": -50.743,
-    "avg_pnl_usdt": 0.0149,
+    "total_pnl_usdt": 8.1094,
+    "net_pnl_usdt": -51.1856,
+    "avg_pnl_usdt": 0.0147,
     "best_trade_usdt": 30.9787,
     "worst_trade_usdt": -16.6993,
-    "fees_paid_usdt": 59.335,
-    "fees_realized_usdt": 58.975,
-    "fees_open_usdt": 0.3599,
+    "fees_paid_usdt": 59.495,
+    "fees_realized_usdt": 59.295,
+    "fees_open_usdt": 0.2,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 799.87,
-    "free_capital_usdt": 1149.03,
+    "deployed_usdt": 400.0,
+    "free_capital_usdt": 1548.61,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 65.564,
-    "deployed_usdt": 799.87
+    "daily_pnl": 65.4414,
+    "deployed_usdt": 400.0
   },
   "reconciliation": {
     "ok": false,
@@ -42,13 +42,11 @@
     ],
     "api_failed": false,
     "live_symbols": [
-      "BCHUSDT",
       "DYMUSDT"
     ],
     "exchange_symbols": [
-      "BCHUSDT",
-      "DYMUSDT",
-      "HIGHUSDT"
+      "HIGHUSDT",
+      "DYMUSDT"
     ]
   },
   "open_trades": [
@@ -115,7 +113,9 @@
       "last_price_check_at": "2026-05-28T02:08:21.578993+00:00",
       "phase_b_mfe_price": 0.02097,
       "phase_c_mfe_price": 0.02065
-    },
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "BCHUSDT|SHORT|2026-05-28T05:51:47.017854+00:00",
       "trade_id": "L1779947507_BCHUSDT_S",
@@ -162,7 +162,7 @@
       "phase_a_mfe_pct": 0.236,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.159949,
+      "fees_paid_usdt": 0.319947,
       "fees_are_actual": true,
       "opened_at": "2026-05-28T05:52:46.687714+00:00",
       "is_dry_run": false,
@@ -173,13 +173,21 @@
       "btc_sub_regime_at_open": "down_acute",
       "btc_change_3h_at_open": -1.681,
       "phase_a_mfe_price": 324.85,
-      "current_price": 326.17,
-      "unrealized_pnl_usdt": -0.0123,
-      "unrealized_pnl_pct": -0.003,
-      "last_price_check_at": "2026-05-28T06:08:07.694391+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 326.26,
+      "unrealized_pnl_usdt": -0.1226,
+      "unrealized_pnl_pct": -0.031,
+      "last_price_check_at": "2026-05-28T06:09:52.819457+00:00",
+      "closed_at": "2026-05-28T06:10:06.958861+00:00",
+      "close_reason": "paper:hit_sl",
+      "avg_exit_price": 326.26,
+      "realized_pnl_usdt": -0.1226,
+      "close_order_id": 1379935502,
+      "close_qty": 1.226,
+      "close_expected_price": 326.26,
+      "close_slippage_bps": 0.0,
+      "entry_fees_usdt": 0.159949,
+      "close_fees_usdt": 0.159998
+    },
     {
       "paper_id": "GRASSUSDT|SHORT|2026-05-28T05:32:44.753034+00:00",
       "trade_id": "L1779946364_GRASSUS_S",
@@ -33702,19 +33710,19 @@
       "direction": "LONG",
       "conviction_score": 7,
       "signal_at": "2026-05-28T05:46:16.570669+00:00",
-      "reason": "paper trade too old (1311s > 600s)",
-      "last_checked_at": "2026-05-28T06:08:07.694391+00:00"
+      "reason": "paper trade too old (1437s > 600s)",
+      "last_checked_at": "2026-05-28T06:10:13.111372+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 72977.2,
-    "btc_ma25_1h": 74808.02,
-    "pct_vs_ma25": -2.447,
-    "change_24h_pct": -3.724,
+    "btc_price": 72968.1,
+    "btc_ma25_1h": 74807.65,
+    "pct_vs_ma25": -2.459,
+    "change_24h_pct": -3.736,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.377,
-    "computed_at": "2026-05-28T06:08:09.221422+00:00"
+    "change_3h_pct": -0.389,
+    "computed_at": "2026-05-28T06:10:14.217557+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
