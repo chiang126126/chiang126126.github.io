@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-28T10:22:47.442580+00:00",
+  "updated_at": "2026-05-28T10:24:55.784874+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 18,
+  "alerts_count": 19,
   "alerts": [
+    {
+      "symbol": "WLDUSDT",
+      "base": "WLD",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.2985,
+      "price_change_pct": -1.906,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 8065347.0,
+      "volume_baseline_usdt": 247006.0,
+      "volume_ratio": 32.65,
+      "detected_at": "2026-05-28T10:23:54.143901+00:00",
+      "intensity": 3,
+      "change_5m_pct": -2.167,
+      "change_15m_pct": -3.561,
+      "change_1h_pct": -3.216,
+      "change_4h_pct": -3.216,
+      "taker_buy_ratio_1m": 0.332,
+      "taker_buy_ratio_5m": 0.338,
+      "oi_delta_5m_pct": 0.003,
+      "funding_rate_pct": -0.0144,
+      "atr_pct": 0.598,
+      "range_4h_pct": 6.26,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.30117857,
+      "suggested_tp1": 0.29448214,
+      "suggested_tp2": 0.29046429,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "ONDOUSDT",
       "base": "ONDO",
