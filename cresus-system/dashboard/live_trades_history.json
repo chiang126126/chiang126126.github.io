@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-28T05:51:53.000972+00:00",
+  "generated_at": "2026-05-28T05:53:48.902142+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 552,
-    "open": 2,
+    "total_trades": 553,
+    "open": 3,
     "closed": 550,
     "wins": 186,
     "losses": 358,
@@ -15,21 +15,21 @@
     "avg_pnl_usdt": 0.0223,
     "best_trade_usdt": 30.9787,
     "worst_trade_usdt": -16.6993,
-    "fees_paid_usdt": 58.973,
+    "fees_paid_usdt": 59.133,
     "fees_realized_usdt": 58.573,
-    "fees_open_usdt": 0.4,
+    "fees_open_usdt": 0.5599,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 799.95,
-    "free_capital_usdt": 1153.32,
+    "deployed_usdt": 1199.83,
+    "free_capital_usdt": 753.28,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 3
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 69.5744,
-    "deployed_usdt": 799.95
+    "deployed_usdt": 1199.83
   },
   "reconciliation": {
     "ok": false,
@@ -43,12 +43,14 @@
     "api_failed": false,
     "live_symbols": [
       "DYMUSDT",
+      "BCHUSDT",
       "GRASSUSDT"
     ],
     "exchange_symbols": [
-      "DYMUSDT",
       "GRASSUSDT",
-      "HIGHUSDT"
+      "DYMUSDT",
+      "HIGHUSDT",
+      "BCHUSDT"
     ]
   },
   "open_trades": [
@@ -173,10 +175,72 @@
       "btc_sub_regime_at_open": "down_acute",
       "btc_change_3h_at_open": -1.72,
       "phase_a_mfe_price": 0.4769,
-      "current_price": 0.4814,
-      "unrealized_pnl_usdt": -2.2558,
-      "unrealized_pnl_pct": -0.564,
-      "last_price_check_at": "2026-05-28T05:51:50.078101+00:00"
+      "current_price": 0.4813,
+      "unrealized_pnl_usdt": -2.1723,
+      "unrealized_pnl_pct": -0.543,
+      "last_price_check_at": "2026-05-28T05:53:45.455694+00:00"
+    },
+    {
+      "paper_id": "BCHUSDT|SHORT|2026-05-28T05:51:47.017854+00:00",
+      "trade_id": "L1779947507_BCHUSDT_S",
+      "symbol": "BCHUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 325.62,
+      "avg_fill_price": 326.16,
+      "slippage_bps": -16.58,
+      "qty": 1.226,
+      "notional_usdt": 399.87216,
+      "leverage": 1,
+      "risk_usdt": 0.444,
+      "risk_pct": 0.111,
+      "mirror_latency_sec": 8.1,
+      "sl_price": 327.06214286,
+      "sl_paper_current": 326.52214286,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.54,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 2,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": -0.0326,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "B",
+      "min_conviction_threshold": null,
+      "tp1_price": 324.26678571,
+      "tp2_price": 322.91357143,
+      "phase": "A",
+      "entry_order_id": 1379866182,
+      "entry_client_id": "cresus_L1779947507_BCHUSDT_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.277,
+      "top_trader_position_ratio": null,
+      "top_trader_account_ratio": null,
+      "global_account_ratio": null,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.159949,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-28T05:52:46.687714+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 73001.5,
+      "btc_change_24h_at_open": -3.542,
+      "btc_pct_vs_ma25_at_open": -2.558,
+      "btc_sub_regime_at_open": "down_acute",
+      "btc_change_3h_at_open": -1.681,
+      "phase_a_mfe_price": 325.62,
+      "current_price": 324.93,
+      "unrealized_pnl_usdt": 1.508,
+      "unrealized_pnl_pct": 0.377,
+      "last_price_check_at": "2026-05-28T05:53:45.455694+00:00"
     }
   ],
   "recent_closed": [
@@ -33630,19 +33694,19 @@
       "direction": "LONG",
       "conviction_score": 7,
       "signal_at": "2026-05-28T05:46:16.570669+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_acute 3h=-1.76% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-05-28T05:51:50.078101+00:00"
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_acute 3h=-1.66% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-05-28T05:53:45.455694+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 72941.5,
-    "btc_ma25_1h": 74915.82,
-    "pct_vs_ma25": -2.635,
-    "change_24h_pct": -3.621,
+    "btc_price": 73018.0,
+    "btc_ma25_1h": 74918.88,
+    "pct_vs_ma25": -2.537,
+    "change_24h_pct": -3.52,
     "sub_regime": "down_acute",
-    "change_3h_pct": -1.761,
-    "computed_at": "2026-05-28T05:51:51.638811+00:00"
+    "change_3h_pct": -1.658,
+    "computed_at": "2026-05-28T05:53:46.769344+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
