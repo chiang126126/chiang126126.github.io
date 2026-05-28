@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-28T17:43:03.022286+00:00",
+  "updated_at": "2026-05-28T17:45:14.623076+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 23,
+  "alerts_count": 24,
   "alerts": [
+    {
+      "symbol": "PENDLEUSDT",
+      "base": "PENDLE",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 1.5115,
+      "price_change_pct": 0.713,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 396510.0,
+      "volume_baseline_usdt": 10394.0,
+      "volume_ratio": 38.15,
+      "detected_at": "2026-05-28T17:44:35.537343+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.518,
+      "change_15m_pct": 1.083,
+      "change_1h_pct": 1.225,
+      "change_4h_pct": 2.058,
+      "taker_buy_ratio_1m": 0.459,
+      "taker_buy_ratio_5m": 0.454,
+      "oi_delta_5m_pct": -0.009,
+      "funding_rate_pct": 0.0074,
+      "atr_pct": 0.242,
+      "range_4h_pct": 3.49,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 1.50783571,
+      "suggested_tp1": 1.51699643,
+      "suggested_tp2": 1.52249286,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "DYDXUSDT",
       "base": "DYDX",
