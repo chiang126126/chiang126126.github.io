@@ -45,7 +45,7 @@ import json
 import logging
 import time
 import hashlib    # Phase 4.D: A/B 分组用 MD5 (确定性, 跨进程一致)
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Optional
 
@@ -330,6 +330,79 @@ def _empty_live_state() -> dict:
         "last_update": None,
         "session_started_at": datetime.now(timezone.utc).isoformat(),
     }
+
+
+# Phase 5.E (5/28): 连损熔断 — 数据驱动 (1410 笔 + circuit breaker 模拟).
+# 历史最长 streak: 13 笔连亏 (5/15 02:37-05:40, 22 笔 -$52).
+# 模拟 4/30m/30m 净避亏 +$127 over 1410 笔.
+#
+# 触发: 滑动 LIVE_CB_WINDOW_MIN 分钟内 ≥ LIVE_CB_SL_THRESHOLD 笔 hit_sl
+#       (含 sl_breach_client + paper:hit_sl, paper trail/breakeven 不算)
+# 动作: 暂停 mirror_open LIVE_CB_PAUSE_MIN 分钟
+#       paper 继续跑 (数据采集), live 不开新仓
+#       现有持仓不影响 (close/sync 照常)
+#
+# 阈值组合优化结果 (净避亏 over 1410 笔):
+#   3/30m/30m → -$32 (误杀太多)
+#   4/30m/30m → +$127 ⭐ (最优)
+#   5/30m/30m → -$25 (触发太少)
+#   5/60m/60m → +$105 (次优, 窗口大)
+LIVE_CB_SL_THRESHOLD = 4
+LIVE_CB_WINDOW_MIN = 30
+LIVE_CB_PAUSE_MIN = 30
+
+
+def _check_circuit_breaker(live_state: dict, now: datetime) -> tuple:
+    """Phase 5.E: 检查是否触发连损熔断, 或仍在暂停期内.
+
+    Returns (paused: bool, until_iso: Optional[str]).
+    若 paused=True, 上层应跳过 mirror_open (但 sync/close 照常).
+    """
+    # 1. 仍在暂停期内?
+    paused_until_iso = live_state.get("circuit_breaker_paused_until")
+    if paused_until_iso:
+        try:
+            until = datetime.fromisoformat(
+                str(paused_until_iso).replace("Z", "+00:00")
+            )
+            if now < until:
+                return True, paused_until_iso
+            # 暂停结束, 清掉标记
+            live_state["circuit_breaker_paused_until"] = None
+        except (ValueError, TypeError):
+            live_state["circuit_breaker_paused_until"] = None
+
+    # 2. 统计 window 内 hit_sl 数量
+    cutoff = now - timedelta(minutes=LIVE_CB_WINDOW_MIN)
+    recent_sl = 0
+    for t in (live_state.get("live_closed_trades") or []):
+        cr = t.get("close_reason", "")
+        # 计入: sl_breach_client (live 自己 SL polling 触发)
+        #      paper:hit_sl (mirror 了 paper 的 SL close)
+        # 不计: paper:hit_b_trail / paper:hit_trail / timeout / already_closed_externally
+        if cr in ("sl_breach_client", "paper:hit_sl"):
+            ca = t.get("closed_at")
+            if not ca: continue
+            try:
+                closed_dt = datetime.fromisoformat(str(ca).replace("Z", "+00:00"))
+                if closed_dt >= cutoff:
+                    recent_sl += 1
+            except (ValueError, TypeError):
+                continue
+
+    # 3. 是否触发?
+    if recent_sl >= LIVE_CB_SL_THRESHOLD:
+        until = now + timedelta(minutes=LIVE_CB_PAUSE_MIN)
+        until_iso = until.isoformat()
+        live_state["circuit_breaker_paused_until"] = until_iso
+        log.warning(
+            f"🛑 [circuit-breaker] {recent_sl} SL in last {LIVE_CB_WINDOW_MIN}min "
+            f">= threshold {LIVE_CB_SL_THRESHOLD} → 暂停 mirror_open {LIVE_CB_PAUSE_MIN}min "
+            f"(until {until_iso})"
+        )
+        return True, until_iso
+
+    return False, None
 
 
 def _record_missed_signal(live: dict, paper_trade: dict,
@@ -1920,6 +1993,24 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
     # 清理已平仓/已 mirror 的过期 missed 记录
     paper_open_ids = {pt.get("id") for pt in paper_open if pt.get("id")}
     _prune_obsolete_missed(live, paper_open_ids)
+
+    # Phase 5.E: 连损熔断检查 (在 risk gate 之后, 候选迭代之前).
+    # 数据驱动 (1410 笔 + 模拟): 30min 内 ≥4 笔 hit_sl 触发, 暂停 30min mirror_open.
+    # 净避亏 +$127 over 1410 笔, 不影响 sync/close 现有持仓.
+    cb_paused, cb_until = _check_circuit_breaker(live, now)
+    if cb_paused and mirror_candidates:
+        log.warning(
+            f"⏸ [circuit-breaker active] 暂停至 {cb_until}, "
+            f"{len(mirror_candidates)} candidate(s) 全部记 missed"
+        )
+        for pt in mirror_candidates:
+            _record_missed_signal(
+                live, pt,
+                f"circuit_breaker ({LIVE_CB_SL_THRESHOLD}+ SL in {LIVE_CB_WINDOW_MIN}min, "
+                f"pause until {cb_until[:19]})",
+                now,
+            )
+        mirror_candidates = []   # 清空, 跳过下面的迭代
 
     # 2. 对每个 candidate 真实下单 (Plan B: 无 exchange SL)
     #    仅当风控未 block 时执行

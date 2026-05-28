@@ -4479,6 +4479,94 @@ class TestPhase5ALiveNotionalByScore(unittest.TestCase):
         self.assertEqual(LIVE_MAX_DEPLOY_USDT, 2400.0)
 
 
+class TestPhase5ECircuitBreaker(unittest.TestCase):
+    """Phase 5.E (5/28): 连损熔断 — 30min 内 ≥4 笔 hit_sl 触发暂停 30min.
+
+    数据驱动 (1410 笔模拟): 净避亏 +$127. 触发: hit_sl 计数, paper:hit_sl 也算,
+    但 hit_b_trail / hit_trail / timeout / already_closed_externally 不计.
+    """
+
+    def _make_state(self, sl_times, base_time=None, paused_until=None):
+        """构造一个 live_state 含指定时间的 hit_sl trades."""
+        base = base_time or datetime(2026, 5, 28, 10, 0, 0, tzinfo=timezone.utc)
+        closed_trades = []
+        for offset_min, reason in sl_times:
+            closed_trades.append({
+                "symbol": "TEST", "close_reason": reason,
+                "closed_at": (base - timedelta(minutes=offset_min)).isoformat(),
+            })
+        state = {"live_closed_trades": closed_trades}
+        if paused_until:
+            state["circuit_breaker_paused_until"] = paused_until
+        return state, base
+
+    def test_no_trigger_below_threshold(self):
+        """3 笔 hit_sl in 30min < threshold 4 → 不触发."""
+        state, now = self._make_state([(5, "sl_breach_client"), (10, "paper:hit_sl"),
+                                         (15, "sl_breach_client")])
+        paused, _ = live_trader._check_circuit_breaker(state, now)
+        self.assertFalse(paused)
+
+    def test_trigger_at_threshold(self):
+        """正好 4 笔 → 触发."""
+        state, now = self._make_state([
+            (5, "sl_breach_client"), (10, "paper:hit_sl"),
+            (15, "sl_breach_client"), (25, "paper:hit_sl"),
+        ])
+        paused, until_iso = live_trader._check_circuit_breaker(state, now)
+        self.assertTrue(paused)
+        self.assertIsNotNone(until_iso)
+        # state 应该被更新
+        self.assertEqual(state["circuit_breaker_paused_until"], until_iso)
+
+    def test_old_sl_outside_window_not_counted(self):
+        """超出 30min 窗口的 SL 不计入."""
+        state, now = self._make_state([
+            (5, "sl_breach_client"), (10, "sl_breach_client"),
+            (15, "sl_breach_client"),
+            (35, "sl_breach_client"),  # 在窗口外
+            (40, "sl_breach_client"),  # 在窗口外
+        ])
+        paused, _ = live_trader._check_circuit_breaker(state, now)
+        self.assertFalse(paused, "超出 30min 的 SL 不应计数")
+
+    def test_non_sl_reasons_not_counted(self):
+        """hit_b_trail / hit_trail / timeout 不算 SL."""
+        state, now = self._make_state([
+            (5, "paper:hit_b_trail"), (10, "paper:hit_trail"),
+            (15, "timeout"), (20, "paper:hit_b_trail"),
+            (25, "already_closed_externally"),
+        ])
+        paused, _ = live_trader._check_circuit_breaker(state, now)
+        self.assertFalse(paused, "非 SL close reason 不应触发熔断")
+
+    def test_still_paused_during_pause_period(self):
+        """暂停期内 (paused_until > now) 直接返 True, 不重新检查."""
+        future = (datetime(2026, 5, 28, 11, 0, 0, tzinfo=timezone.utc) +
+                  timedelta(minutes=20)).isoformat()
+        state, now = self._make_state([], paused_until=future)
+        paused, until_iso = live_trader._check_circuit_breaker(state, now)
+        self.assertTrue(paused)
+        self.assertEqual(until_iso, future)
+
+    def test_pause_expires_after_until(self):
+        """暂停时间过去后, 标记清除, 重新检查触发条件."""
+        past = (datetime(2026, 5, 28, 10, 0, 0, tzinfo=timezone.utc) -
+                timedelta(minutes=10)).isoformat()
+        state, now = self._make_state([], paused_until=past)
+        paused, _ = live_trader._check_circuit_breaker(state, now)
+        self.assertFalse(paused, "暂停过期应清除并重新评估")
+        self.assertIsNone(state["circuit_breaker_paused_until"])
+
+    def test_invalid_paused_until_recovers(self):
+        """损坏的 paused_until 字符串 → 安全清除, 不崩."""
+        state, now = self._make_state([], paused_until="not a valid datetime")
+        # 不应抛异常
+        paused, _ = live_trader._check_circuit_breaker(state, now)
+        # state 应该被清掉
+        self.assertIsNone(state.get("circuit_breaker_paused_until"))
+
+
 class TestPhase5DCandidatePrioritization(unittest.TestCase):
     """Phase 5.D (5/28): slot 稀缺时 mirror_candidates 按 conviction_score 优先.
 
