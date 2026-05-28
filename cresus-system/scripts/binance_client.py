@@ -378,13 +378,17 @@ class BinanceClient:
             {
               'step_size': 0.001,      # LOT_SIZE 数量步长
               'min_qty': 0.001,        # LOT_SIZE 最小数量
-              'max_qty': 1000.0,       # LOT_SIZE 最大
+              'max_qty': 1000.0,       # LOT_SIZE 最大 (limit order)
+              'market_max_qty': 100.0, # MARKET_LOT_SIZE 最大 (market order, 通常 < max_qty)
               'min_notional': 100.0,   # MIN_NOTIONAL 最小订单总额
               'tick_size': 0.10,       # PRICE_FILTER 价格步长
               'quantity_precision': 3, # 数量小数位
               'price_precision': 2,    # 价格小数位
             }
         测试网 vs 主网过滤器可能不同, 启动时必查.
+
+        Phase 5.A-fix (5/28): 新增 market_max_qty. DYMUSDT 案例显示 MARKET_LOT_SIZE
+        maxQty 10000 远小于 LOT_SIZE maxQty 1000000. 用 MARKET_LOT_SIZE 来防 -4005.
         """
         ei = self.get_exchange_info()
         sym = symbol.upper()
@@ -395,12 +399,16 @@ class BinanceClient:
             log.warning(f"⚠️ {sym} status={sym_info.get('status')} 非 TRADING")
         filters = {f["filterType"]: f for f in sym_info.get("filters", [])}
         lot = filters.get("LOT_SIZE", {})
+        market_lot = filters.get("MARKET_LOT_SIZE", {})
         notional = filters.get("MIN_NOTIONAL", {}) or filters.get("NOTIONAL", {})
         price_f = filters.get("PRICE_FILTER", {})
+        # market_max_qty: 若 MARKET_LOT_SIZE 不存在 fallback 到 LOT_SIZE.
+        market_max = float(market_lot.get("maxQty", 0)) or float(lot.get("maxQty", 0))
         return {
             "step_size":           float(lot.get("stepSize", 0.001)),
             "min_qty":             float(lot.get("minQty", 0.001)),
             "max_qty":             float(lot.get("maxQty", 0)),
+            "market_max_qty":      market_max,
             "min_notional":        float(notional.get("notional", 0) or notional.get("minNotional", 0)),
             "tick_size":           float(price_f.get("tickSize", 0.01)),
             "quantity_precision":  int(sym_info.get("quantityPrecision", 3)),
@@ -940,6 +948,19 @@ class BinanceClient:
             qty = math.ceil(need / filters["step_size"]) * filters["step_size"]
             qty = round(qty, filters["quantity_precision"])
             actual_notional = qty * last_close
+        # Phase 5.A-fix (5/28): cap qty 不超过 MARKET_LOT_SIZE maxQty.
+        # DYMUSDT 案例: $800 / $0.044 = 18075, 超 maxQty 10000 → 平仓时 -4005 死循环.
+        # 截断到 maxQty (= 实际 notional 缩水), 比开成无法平的仓更安全.
+        market_max = float(filters.get("market_max_qty") or 0)
+        if market_max > 0 and qty > market_max:
+            old_qty = qty
+            qty = round_qty_down_to_step(market_max, filters["step_size"])
+            actual_notional = qty * last_close
+            log.warning(
+                f"open_position: {symbol} qty {old_qty} > market_max {market_max}, "
+                f"截断到 {qty} (实际 notional ${actual_notional:.2f}, 原 ${notional_usdt:.2f}). "
+                f"防止后续平仓 -4005 死循环."
+            )
 
         # 6. Round SL 到 tick_size; 若用限价单也对入场价做 tick 对齐
         sl_price = round_price_to_tick(sl_price, filters["tick_size"])
@@ -1333,24 +1354,64 @@ class BinanceClient:
             log.warning(f"get_open_orders 失败 (继续平仓): {e}")
 
         # 3. reduceOnly market 平仓
+        # Phase 5.A-fix (5/28): 自动 chunking if qty > MARKET_LOT_SIZE maxQty.
+        # 案例: DYMUSDT 18075 > maxQty 10000 触发 -4005, 死循环重试. 拆 2 笔可平.
         coid = f"cresus_{trade_id}_C" if trade_id else None
         if coid:
             _validate_client_order_id(coid)
+        try:
+            filters = self.get_symbol_filters(symbol)
+            market_max = float(filters.get("market_max_qty") or 0)
+        except (BinanceError, ValueError):
+            market_max = 0  # 取不到 fallback 单笔尝试 (老行为)
+        # 准备分块列表 (qty <= market_max 直接单笔, 否则按 market_max 拆)
+        chunks: list = []
+        if market_max > 0 and qty > market_max:
+            remaining = qty
+            while remaining > market_max:
+                chunks.append(market_max)
+                remaining = round(remaining - market_max, 8)
+            if remaining > 0:
+                chunks.append(remaining)
+            log.warning(
+                f"close_position: {symbol} qty={qty} > market_max={market_max}, "
+                f"拆 {len(chunks)} 笔 chunked close: {chunks}"
+            )
+        else:
+            chunks = [qty]
+
+        # 逐笔执行 close (失败立即抛, 上层 _try_mirror_close 处理)
         log.info(
             f"close_position: market {close_side} {qty} {symbol} "
-            f"(reduceOnly, canceled {canceled} pending orders)"
+            f"(reduceOnly, canceled {canceled} pending orders, chunks={len(chunks)})"
         )
-        close_resp = self.place_market_order(
-            symbol=symbol,
-            side=close_side,
-            quantity=qty,
-            reduce_only=True,
-            client_order_id=coid,
-            dry_run=False,
-        )
-        exit_price = float(close_resp.get("avgPrice") or 0)
-        close_cum_quote = float(close_resp.get("cumQuote") or 0)
-        close_order_id_int = int(close_resp.get("orderId") or 0)
+        # 聚合统计 (跨多笔)
+        total_qty_closed = 0.0
+        total_cum_quote = 0.0
+        last_order_id = 0
+        last_resp: dict = {}
+        for i, chunk_qty in enumerate(chunks):
+            # 多笔时只第一笔用原 coid (Binance 不允许重复 coid)
+            chunk_coid = coid if i == 0 else None
+            chunk_resp = self.place_market_order(
+                symbol=symbol,
+                side=close_side,
+                quantity=chunk_qty,
+                reduce_only=True,
+                client_order_id=chunk_coid,
+                dry_run=False,
+            )
+            total_qty_closed += float(chunk_resp.get("executedQty") or chunk_qty)
+            total_cum_quote += float(chunk_resp.get("cumQuote") or 0)
+            last_order_id = int(chunk_resp.get("orderId") or last_order_id)
+            last_resp = chunk_resp
+        close_resp = last_resp  # 保持原 close_resp 变量名兼容下面计算
+        exit_price = (total_cum_quote / total_qty_closed
+                       if total_qty_closed > 0 else float(close_resp.get("avgPrice") or 0))
+        close_cum_quote = total_cum_quote
+        close_order_id_int = last_order_id
+        # 重写 qty 为实际成交总量 (chunking 后)
+        qty = total_qty_closed
         # PnL: LONG = (exit - entry) * qty; SHORT = (entry - exit) * qty
         if side == "BUY":
             pnl = (exit_price - entry_price) * qty

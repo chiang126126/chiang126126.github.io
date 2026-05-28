@@ -1423,6 +1423,21 @@ def _try_mirror_close(
             symbol=sym, side=side, trade_id=trade_id,
         )
     except (BinanceError, ValueError) as e:
+        err_str = str(e)
+        # Phase 5.A-fix (5/28): exchange 已无持仓 (外部 close / 之前的手动平仓 /
+        # 异常重复 close) → 标记关闭, 不无限重试.
+        if "无持仓" in err_str or "positionAmt=0" in err_str:
+            log.warning(
+                f"[mirror-close] {sym}: exchange 已无持仓 — 视为 already_closed_externally, "
+                f"清理 live state 不再重试. 原因: {reason}"
+            )
+            closed = dict(live_trade)
+            closed["closed_at"] = datetime.now(timezone.utc).isoformat()
+            closed["close_reason"] = "already_closed_externally"
+            closed["realized_pnl_usdt"] = 0.0   # 无法精确知道, 外部 close 时 PnL 在 binance 手动结算
+            closed["close_qty"] = 0.0
+            closed["avg_exit_price"] = 0.0
+            return closed
         log.error(f"[mirror-close FAILED] {sym}: {type(e).__name__}: {e}")
         return None
     except Exception as e:
