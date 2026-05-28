@@ -183,10 +183,14 @@ class TestPhase5AScoreBasedNotional(unittest.TestCase):
         from volume_velocity_scanner import _notional_for_score
         self.assertEqual(_notional_for_score(5), 400.0)
 
-    def test_score_6_7_doubled(self):
+    def test_score_6_7_baseline_hotfix(self):
+        """Phase 5.A-hotfix (5/28): score 6-7 临时回 $400 (本应 $800).
+        原因: DYMUSDT $800 = 18075 units 超 Binance MARKET_LOT_SIZE maxQty
+        触发 -4005. 等 max_qty cap + close chunking 实现后再恢复 $800.
+        """
         from volume_velocity_scanner import _notional_for_score
-        self.assertEqual(_notional_for_score(6), 800.0)
-        self.assertEqual(_notional_for_score(7), 800.0)
+        self.assertEqual(_notional_for_score(6), 400.0)
+        self.assertEqual(_notional_for_score(7), 400.0)
 
     def test_score_8_plus_halved(self):
         """高分反向证据 — score 8+ 减半到 $200."""

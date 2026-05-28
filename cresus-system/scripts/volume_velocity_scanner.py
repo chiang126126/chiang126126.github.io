@@ -99,10 +99,15 @@ PAPER_NOTIONAL_PER_TRADE_USDT = 400.0   # 每笔交易分配 ($2000 × 20%, 最�
 #   score 6-7 (7%): avg +$4.50  → 加大到 $800 (EV 5×, n=109 充分)
 #   score 8+ (0.5%): avg -$17.78 → 减半到 $200 (反向证据, n=7, 高分=过拟合警示)
 # 若 score 字段缺/异常 → 退路到 PAPER_NOTIONAL_PER_TRADE_USDT (基准).
+#
+# Phase 5.A-hotfix (5/28): score 6-7 临时回 $400 (跟 live 同步).
+#   live 上 DYMUSDT $800 notional = 18075 units 超 MARKET_LOT_SIZE maxQty
+#   → -4005 无法平仓 → 死循环重试. paper 同步降回避免 paper/live PnL 差异
+#   被 notional 不同放大. 等 max_qty cap 实现后恢复 $800.
 PAPER_NOTIONAL_BY_SCORE = {
     5:   400.0,
-    6:   800.0,
-    7:   800.0,
+    6:   400.0,  # 临时 hotfix
+    7:   400.0,  # 临时 hotfix
     8:   200.0,
     9:   200.0,
     10:  200.0,

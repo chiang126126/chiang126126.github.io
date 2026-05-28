@@ -77,10 +77,17 @@ LIVE_NOTIONAL_USDT = 400.0             # 每笔基准 $400 (Phase 5.A 起按 sco
 #   score 5  (92%): $400 基准, 历史 EV +$0.92
 #   score 6-7 (7%): $800 (2×, 历史 EV +$4.5/笔, 5×)
 #   score 8+ (0.5%): $200 (0.5×, n=7 累计 -$118, 反向证据)
+#
+# Phase 5.A-hotfix (5/28): score 6-7 临时回 $400 (跟 score 5 同).
+#   原因: DYMUSDT $800 notional = 18075 units 超过 Binance MARKET_LOT_SIZE maxQty,
+#         触发 -4005 错误无法平仓, 形成事实孤儿仓 + 死循环重试.
+#   修复方向: 1) 实施 max_qty 感知的 notional cap (per-symbol)
+#             2) close_position 实现自动 chunking (qty > maxQty 时分多笔)
+#   两个修复完成前, score 6-7 维持 $400 防止再发生.
 LIVE_NOTIONAL_BY_SCORE = {
     5:   400.0,
-    6:   800.0,
-    7:   800.0,
+    6:   400.0,  # 临时 hotfix (本来 800), 等 max_qty cap 实现后恢复
+    7:   400.0,  # 临时 hotfix (本来 800), 等 max_qty cap 实现后恢复
     8:   200.0,
     9:   200.0,
     10:  200.0,

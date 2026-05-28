@@ -4453,10 +4453,13 @@ class TestPhase5ALiveNotionalByScore(unittest.TestCase):
         from live_trader import _live_notional_for_paper
         self.assertEqual(_live_notional_for_paper({"conviction_score": 5}), 400.0)
 
-    def test_score_6_7_doubled(self):
+    def test_score_6_7_baseline_hotfix(self):
+        """Phase 5.A-hotfix (5/28): score 6-7 临时回 $400 (本应 $800).
+        DYMUSDT $800 = 18075 units 超 MARKET_LOT_SIZE maxQty 触发 -4005.
+        """
         from live_trader import _live_notional_for_paper
-        self.assertEqual(_live_notional_for_paper({"conviction_score": 6}), 800.0)
-        self.assertEqual(_live_notional_for_paper({"conviction_score": 7}), 800.0)
+        self.assertEqual(_live_notional_for_paper({"conviction_score": 6}), 400.0)
+        self.assertEqual(_live_notional_for_paper({"conviction_score": 7}), 400.0)
 
     def test_score_8_plus_halved(self):
         from live_trader import _live_notional_for_paper
