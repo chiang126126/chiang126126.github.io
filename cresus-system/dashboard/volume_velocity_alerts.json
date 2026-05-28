@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-28T03:21:17.195228+00:00",
+  "updated_at": "2026-05-28T03:23:29.314774+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 40,
+  "alerts_count": 41,
   "alerts": [
+    {
+      "symbol": "RAVEUSDT",
+      "base": "RAVE",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 0.4693,
+      "price_change_pct": -2.736,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 100239.0,
+      "volume_baseline_usdt": 13247.0,
+      "volume_ratio": 7.57,
+      "detected_at": "2026-05-28T03:22:58.938942+00:00",
+      "intensity": 2,
+      "change_5m_pct": -3.081,
+      "change_15m_pct": -4.444,
+      "change_1h_pct": -7.041,
+      "change_4h_pct": -7.954,
+      "taker_buy_ratio_1m": 0.559,
+      "taker_buy_ratio_5m": 0.363,
+      "oi_delta_5m_pct": -0.462,
+      "funding_rate_pct": 0.0065,
+      "atr_pct": 1.068,
+      "range_4h_pct": 12.93,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.47932857,
+      "suggested_tp1": 0.45425714,
+      "suggested_tp2": 0.43921429,
+      "conviction_score": 5,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "SPXUSDT",
       "base": "SPX",
