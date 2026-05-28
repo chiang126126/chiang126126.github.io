@@ -1167,6 +1167,223 @@ class TestActualCommission(unittest.TestCase):
 
 # ============================================================================
 # Main
+class TestPhase5AMaxQtyAndChunking(unittest.TestCase):
+    """Phase 5.A-fix (5/28): MARKET_LOT_SIZE 限制 + 自动 chunking.
+
+    场景: DYMUSDT $800 notional = 18075 units 超 MARKET_LOT_SIZE.maxQty 10000.
+    之前死循环 -4005. 修复:
+      - get_symbol_filters 返回 market_max_qty (vs LOT_SIZE.maxQty)
+      - open_position 截断 qty (防新仓超限)
+      - close_position 自动 chunking (qty > maxQty 拆多笔)
+    """
+
+    def setUp(self):
+        self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, testnet=True, dry_run=False)
+        self.client._bucket.acquire = MagicMock(return_value=True)
+
+    # === get_symbol_filters market_max_qty ===
+
+    def test_filters_returns_market_max_qty(self):
+        """get_symbol_filters 应返回 market_max_qty (来自 MARKET_LOT_SIZE.maxQty)."""
+        fake_ei = {
+            "symbols": [{
+                "symbol": "DYMUSDT", "status": "TRADING",
+                "quantityPrecision": 1, "pricePrecision": 5,
+                "filters": [
+                    {"filterType": "LOT_SIZE", "stepSize": "0.1",
+                     "minQty": "0.1", "maxQty": "1000000"},
+                    {"filterType": "MARKET_LOT_SIZE", "stepSize": "0.1",
+                     "minQty": "0.1", "maxQty": "10000"},
+                    {"filterType": "PRICE_FILTER", "tickSize": "0.00001"},
+                    {"filterType": "MIN_NOTIONAL", "notional": "5"},
+                ],
+            }]
+        }
+        with patch.object(self.client, "get_exchange_info", return_value=fake_ei):
+            f = self.client.get_symbol_filters("DYMUSDT")
+        self.assertEqual(f["max_qty"], 1000000.0)        # LOT_SIZE
+        self.assertEqual(f["market_max_qty"], 10000.0)   # MARKET_LOT_SIZE
+
+    def test_filters_fallback_to_lot_size_if_no_market_lot(self):
+        """若 MARKET_LOT_SIZE 不存在 fallback 到 LOT_SIZE.maxQty (向后兼容)."""
+        fake_ei = {
+            "symbols": [{
+                "symbol": "BTCUSDT", "status": "TRADING",
+                "quantityPrecision": 3, "pricePrecision": 2,
+                "filters": [
+                    {"filterType": "LOT_SIZE", "stepSize": "0.001",
+                     "minQty": "0.001", "maxQty": "1000"},
+                    {"filterType": "PRICE_FILTER", "tickSize": "0.01"},
+                ],
+            }]
+        }
+        with patch.object(self.client, "get_exchange_info", return_value=fake_ei):
+            f = self.client.get_symbol_filters("BTCUSDT")
+        self.assertEqual(f["market_max_qty"], 1000.0)  # 等于 LOT_SIZE.maxQty
+
+    # === open_position qty 截断 ===
+
+    def test_open_position_caps_qty_to_market_max(self):
+        """raw_qty > market_max_qty 时, qty 被截断, notional 缩水."""
+        fake_filters = {
+            "step_size": 0.1, "min_qty": 0.1, "max_qty": 1000000.0,
+            "market_max_qty": 10000.0, "min_notional": 5.0,
+            "tick_size": 0.00001, "quantity_precision": 1, "price_precision": 5,
+            "status": "TRADING",
+        }
+        with patch.object(self.client, "get_symbol_filters", return_value=fake_filters), \
+             patch.object(self.client, "get_klines",
+                          return_value=[[0,0,0,0,"0.044",0,0,0,0,0,0,0]]), \
+             patch.object(self.client, "place_market_order",
+                          return_value={
+                              "orderId": 1, "executedQty": "10000.0",
+                              "cumQuote": "440.0", "avgPrice": "0.044",
+                              "status": "FILLED",
+                          }), \
+             patch.object(self.client, "place_stop_market_order",
+                          return_value={"orderId": 2}), \
+             patch.object(self.client, "_actual_commission_usdt", return_value=None):
+            # $800 / $0.044 = 18181 raw → 截断到 10000 (= market_max)
+            result = self.client.open_position(
+                symbol="DYMUSDT", side="SELL",
+                notional_usdt=800.0, sl_price=0.05,
+                trade_id="test_cap_001", use_exchange_sl=False,
+            )
+        # qty 应被截断到 ≤ market_max
+        self.assertLessEqual(float(result.get("qty", 999999)), 10000.0)
+
+    def test_open_position_no_cap_when_qty_under_max(self):
+        """raw_qty < market_max 时不截断, 行为不变."""
+        fake_filters = {
+            "step_size": 0.001, "min_qty": 0.001, "max_qty": 1000.0,
+            "market_max_qty": 1000.0, "min_notional": 5.0,
+            "tick_size": 0.01, "quantity_precision": 3, "price_precision": 2,
+            "status": "TRADING",
+        }
+        with patch.object(self.client, "get_symbol_filters", return_value=fake_filters), \
+             patch.object(self.client, "get_klines",
+                          return_value=[[0,0,0,0,"50000.0",0,0,0,0,0,0,0]]), \
+             patch.object(self.client, "place_market_order",
+                          return_value={
+                              "orderId": 1, "executedQty": "0.016",
+                              "cumQuote": "800.0", "avgPrice": "50000.0",
+                              "status": "FILLED",
+                          }), \
+             patch.object(self.client, "place_stop_market_order",
+                          return_value={"orderId": 2}), \
+             patch.object(self.client, "_actual_commission_usdt", return_value=None):
+            # $800 / $50000 = 0.016 BTC, 远 < market_max 1000
+            result = self.client.open_position(
+                symbol="BTCUSDT", side="BUY",
+                notional_usdt=800.0, sl_price=49000.0,
+                trade_id="test_nocap_001", use_exchange_sl=False,
+            )
+        self.assertAlmostEqual(float(result["qty"]), 0.016, places=3)
+
+    # === close_position chunking ===
+
+    def _mock_position(self, symbol, amt):
+        """构造 get_positions 返回的单仓数据."""
+        return [{
+            "symbol": symbol,
+            "positionAmt": str(amt),
+            "entryPrice": "0.044",
+        }]
+
+    def test_close_position_single_when_qty_under_max(self):
+        """qty < market_max: 单笔关仓 (不 chunking)."""
+        fake_filters = {
+            "step_size": 0.1, "min_qty": 0.1, "max_qty": 1000000.0,
+            "market_max_qty": 10000.0, "min_notional": 5.0,
+            "tick_size": 0.00001, "quantity_precision": 1, "price_precision": 5,
+            "status": "TRADING",
+        }
+        mock_place = MagicMock(return_value={
+            "orderId": 999, "executedQty": "5000.0",
+            "cumQuote": "220.0", "avgPrice": "0.044",
+        })
+        with patch.object(self.client, "get_positions",
+                          return_value=self._mock_position("DYMUSDT", -5000.0)), \
+             patch.object(self.client, "get_symbol_filters", return_value=fake_filters), \
+             patch.object(self.client, "get_open_orders", return_value=[]), \
+             patch.object(self.client, "place_market_order", mock_place), \
+             patch.object(self.client, "_actual_commission_usdt", return_value=None):
+            self.client.close_position("DYMUSDT", "SELL", trade_id="t1")
+        self.assertEqual(mock_place.call_count, 1, "qty 5000 < max 10000 应单笔")
+
+    def test_close_position_chunks_when_qty_exceeds_max(self):
+        """qty > market_max: 自动拆多笔."""
+        fake_filters = {
+            "step_size": 0.1, "min_qty": 0.1, "max_qty": 1000000.0,
+            "market_max_qty": 10000.0, "min_notional": 5.0,
+            "tick_size": 0.00001, "quantity_precision": 1, "price_precision": 5,
+            "status": "TRADING",
+        }
+        # 18075 units: 拆 2 笔 (10000 + 8075)
+        mock_place = MagicMock(return_value={
+            "orderId": 1, "executedQty": "10000.0",
+            "cumQuote": "205.3", "avgPrice": "0.02053",
+        })
+        with patch.object(self.client, "get_positions",
+                          return_value=self._mock_position("DYMUSDT", -18075.0)), \
+             patch.object(self.client, "get_symbol_filters", return_value=fake_filters), \
+             patch.object(self.client, "get_open_orders", return_value=[]), \
+             patch.object(self.client, "place_market_order", mock_place), \
+             patch.object(self.client, "_actual_commission_usdt", return_value=None):
+            self.client.close_position("DYMUSDT", "SELL", trade_id="t1")
+        self.assertEqual(mock_place.call_count, 2, "qty 18075 > max 10000 应拆 2 笔")
+        # 验证 chunk size: 第一笔 10000, 第二笔 8075
+        call_qtys = [c.kwargs["quantity"] for c in mock_place.call_args_list]
+        self.assertEqual(call_qtys[0], 10000.0)
+        self.assertAlmostEqual(call_qtys[1], 8075.0, places=4)
+
+    def test_close_position_chunks_three_or_more(self):
+        """qty ≫ market_max: 拆 3+ 笔."""
+        fake_filters = {
+            "step_size": 0.1, "min_qty": 0.1, "max_qty": 1000000.0,
+            "market_max_qty": 10000.0, "min_notional": 5.0,
+            "tick_size": 0.00001, "quantity_precision": 1, "price_precision": 5,
+            "status": "TRADING",
+        }
+        # 25000 units: 拆 3 笔 (10000 + 10000 + 5000)
+        mock_place = MagicMock(return_value={
+            "orderId": 1, "executedQty": "10000.0",
+            "cumQuote": "205.3", "avgPrice": "0.02053",
+        })
+        with patch.object(self.client, "get_positions",
+                          return_value=self._mock_position("DYMUSDT", -25000.0)), \
+             patch.object(self.client, "get_symbol_filters", return_value=fake_filters), \
+             patch.object(self.client, "get_open_orders", return_value=[]), \
+             patch.object(self.client, "place_market_order", mock_place), \
+             patch.object(self.client, "_actual_commission_usdt", return_value=None):
+            self.client.close_position("DYMUSDT", "SELL", trade_id="t1")
+        self.assertEqual(mock_place.call_count, 3, "qty 25000 应拆 3 笔")
+
+    def test_close_position_chunks_only_first_has_coid(self):
+        """多笔时只第 1 笔用原 client_order_id (Binance 不允许重复 coid)."""
+        fake_filters = {
+            "step_size": 0.1, "min_qty": 0.1, "max_qty": 1000000.0,
+            "market_max_qty": 10000.0, "min_notional": 5.0,
+            "tick_size": 0.00001, "quantity_precision": 1, "price_precision": 5,
+            "status": "TRADING",
+        }
+        mock_place = MagicMock(return_value={
+            "orderId": 1, "executedQty": "10000.0",
+            "cumQuote": "205.3", "avgPrice": "0.02053",
+        })
+        with patch.object(self.client, "get_positions",
+                          return_value=self._mock_position("DYMUSDT", -15000.0)), \
+             patch.object(self.client, "get_symbol_filters", return_value=fake_filters), \
+             patch.object(self.client, "get_open_orders", return_value=[]), \
+             patch.object(self.client, "place_market_order", mock_place), \
+             patch.object(self.client, "_actual_commission_usdt", return_value=None):
+            self.client.close_position("DYMUSDT", "SELL", trade_id="test_chunk")
+        # 第 1 笔有 coid, 第 2 笔无
+        self.assertEqual(mock_place.call_args_list[0].kwargs["client_order_id"],
+                          "cresus_test_chunk_C")
+        self.assertIsNone(mock_place.call_args_list[1].kwargs["client_order_id"])
+
+
 # ============================================================================
 
 if __name__ == "__main__":

@@ -1426,7 +1426,15 @@ def _try_mirror_close(
         err_str = str(e)
         # Phase 5.A-fix (5/28): exchange 已无持仓 (外部 close / 之前的手动平仓 /
         # 异常重复 close) → 标记关闭, 不无限重试.
-        if "无持仓" in err_str or "positionAmt=0" in err_str:
+        # binance_client.close_position 抛 2 种"无持仓"信号:
+        #   "X 当前无持仓 (positionAmt=0)"  ← 仓位记录在但 amt=0
+        #   "无 X 持仓记录"                 ← 仓位完全不在 positions 列表
+        no_position = (
+            "无持仓" in err_str
+            or "positionAmt=0" in err_str
+            or "持仓记录" in err_str
+        )
+        if no_position:
             log.warning(
                 f"[mirror-close] {sym}: exchange 已无持仓 — 视为 already_closed_externally, "
                 f"清理 live state 不再重试. 原因: {reason}"

@@ -4479,5 +4479,76 @@ class TestPhase5ALiveNotionalByScore(unittest.TestCase):
         self.assertEqual(LIVE_MAX_DEPLOY_USDT, 2400.0)
 
 
+class TestPhase5AExternalCloseRecovery(unittest.TestCase):
+    """Phase 5.A-fix (5/28): _try_mirror_close 处理 "exchange 已无持仓" 恢复.
+
+    场景: live_state 还追踪某 trade, 但 exchange 上已平仓 (手动 / 之前 /
+    异常成交). 之前 close_position 抛 BinanceError("无持仓"), live_trader
+    返 None, 上层无限重试每 5s → DYMUSDT 死循环 6+ min.
+
+    修复: 检测 "无持仓" / "positionAmt=0" 错误时, 不重试, 返回 synthetic
+    closed dict 标记 already_closed_externally, 让 state 自动清理.
+    """
+
+    def setUp(self):
+        from binance_client import BinanceClient
+        self.client = MagicMock(spec=BinanceClient)
+        self.live_trade = {
+            "symbol": "DYMUSDT", "side": "SELL", "trade_id": "test_trade_001",
+            "paper_id": "DYMUSDT|SHORT|2026-05-28T00:00:00+00:00",
+            "avg_fill_price": 0.022, "qty": 18075, "sl_price": 0.025,
+        }
+
+    def test_no_position_returns_synthetic_closed_not_none(self):
+        """exchange 已无持仓 → 返回 synthetic closed (非 None) 让上层归类."""
+        from binance_client import BinanceError
+        self.client.close_position = MagicMock(
+            side_effect=BinanceError("DYMUSDT 当前无持仓 (positionAmt=0)")
+        )
+        result = live_trader._try_mirror_close(
+            self.client, self.live_trade, reason="paper:hit_trail", dry_run=False,
+        )
+        self.assertIsNotNone(result, "无持仓应返回 synthetic dict, 而不是 None")
+        self.assertEqual(result["close_reason"], "already_closed_externally")
+        self.assertEqual(result["realized_pnl_usdt"], 0.0)
+        self.assertIn("closed_at", result)
+
+    def test_no_position_alternative_message(self):
+        """支持多种 '无持仓' 错误措辞 ('无持仓' / 'positionAmt=0')."""
+        from binance_client import BinanceError
+        # 测试只含 "无持仓" 关键字
+        self.client.close_position = MagicMock(
+            side_effect=BinanceError("无 DYMUSDT 持仓记录")
+        )
+        result = live_trader._try_mirror_close(
+            self.client, self.live_trade, reason="test", dry_run=False,
+        )
+        self.assertIsNotNone(result)
+        self.assertEqual(result["close_reason"], "already_closed_externally")
+
+    def test_other_errors_still_return_none(self):
+        """非 '无持仓' 错误 (如 timeout, 网络) 仍返 None → 上层重试."""
+        from binance_client import BinanceError
+        self.client.close_position = MagicMock(
+            side_effect=BinanceError("http 408 code=-1007 msg=Timeout")
+        )
+        result = live_trader._try_mirror_close(
+            self.client, self.live_trade, reason="test", dry_run=False,
+        )
+        self.assertIsNone(result, "其他错误应返 None 让上层重试, 不能误归 already_closed")
+
+    def test_synthetic_preserves_paper_id(self):
+        """synthetic dict 必须保留 paper_id (供 audit 匹配)."""
+        from binance_client import BinanceError
+        self.client.close_position = MagicMock(
+            side_effect=BinanceError("当前无持仓 (positionAmt=0)")
+        )
+        result = live_trader._try_mirror_close(
+            self.client, self.live_trade, reason="test", dry_run=False,
+        )
+        self.assertEqual(result["paper_id"], self.live_trade["paper_id"])
+        self.assertEqual(result["symbol"], "DYMUSDT")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
