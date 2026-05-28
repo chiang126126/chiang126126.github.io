@@ -352,6 +352,45 @@ LIVE_CB_WINDOW_MIN = 30
 LIVE_CB_PAUSE_MIN = 30
 
 
+# Phase 5.G (5/28): Post-fill 应急平仓 — 参考社区设计 "shadow_entry_deviation" +
+# "shadow_levels_invalid". 思路:
+#   open_position 返回 actual_fill 后再做 2 次校验, 任一不过立即应急平仓.
+#   pre-check (bookTicker + 动态滑点) 是开仓前防御, post-fill 是兜底 — 即使
+#   pre-check 放行, 真实成交价仍可能偏离过大 (限价 partial fill, 市价异常滑点).
+#
+# 校验 1: 入场偏离应急
+#   |actual_fill - paper_entry| / paper_entry × 10000 > LIVE_POST_FILL_MAX_DEVIATION_BPS
+#   触发: 立即应急平 + close_reason="entry_deviation_too_high"
+#   200 bps (2%) 阈值: 高于任何 pre-check 阈值 (intensity=3 max 200bps) 的兜底,
+#   只在真正灾难性偏离时才触发, 不与 Phase 4.V 冲突.
+#
+# 校验 2: TP/SL 结构有效性
+#   LONG  必须满足: paper_sl < actual_fill < paper_tp1 < paper_tp2
+#   SHORT 必须满足: paper_sl > actual_fill > paper_tp1 > paper_tp2
+#   触发: 立即应急平 + close_reason="post_fill_structure_invalid"
+#   场景: fill 价剧烈滑点导致已在 TP 区, 继续持仓就是"立即 TP1 ≈0 收益".
+LIVE_POST_FILL_MAX_DEVIATION_BPS = 200.0
+
+
+def _validate_post_fill_structure(side: str, fill: float, sl: float,
+                                    tp1: float, tp2: float) -> bool:
+    """Phase 5.G: 校验 fill 价是否落在 paper SL/TP1/TP2 结构内的正确区间.
+
+    LONG  (BUY):  sl < fill < tp1 < tp2  (低 SL, 高 TP)
+    SHORT (SELL): sl > fill > tp1 > tp2  (高 SL, 低 TP)
+
+    任一字段缺/异常 (= 0) 返 True (向后兼容, 跳过校验).
+    """
+    if not (fill > 0 and sl > 0 and tp1 > 0 and tp2 > 0):
+        return True   # 字段不全, 跳过校验避免误平
+    side = (side or "").upper()
+    if side == "BUY":
+        return sl < fill < tp1 < tp2
+    elif side == "SELL":
+        return sl > fill > tp1 > tp2
+    return True   # 未知 side, 跳过
+
+
 def _check_circuit_breaker(live_state: dict, now: datetime) -> tuple:
     """Phase 5.E: 检查是否触发连损熔断, 或仍在暂停期内.
 
@@ -1698,6 +1737,45 @@ def _try_mirror_open(
             # SHORT: 实际成交 < 预期 = 不利 (取负)
             raw_bps = (actual_fill - paper_entry) / paper_entry * 10000.0
             slippage_bps = raw_bps if side == "BUY" else -raw_bps
+
+        # Phase 5.G (5/28): Post-fill 应急平仓兜底.
+        # 此时仓位已在 Binance 开成 (open_position 成功), 但需要 2 次后置校验:
+        #   1) 入场偏离 > 200 bps → entry_deviation_too_high
+        #   2) TP/SL 结构无效 (fill 在错误区间) → post_fill_structure_invalid
+        # 任一触发: 立即调 close_position 应急平仓, 返回 None (mirror 视作失败).
+        paper_tp1 = 0.0
+        paper_tp2 = 0.0
+        try:
+            paper_tp1 = float(paper_trade.get("tp1") or 0)
+            paper_tp2 = float(paper_trade.get("tp2") or 0)
+        except (TypeError, ValueError):
+            pass
+        deviation_bps = (abs(actual_fill - paper_entry) / paper_entry * 10000.0
+                          if (paper_entry > 0 and actual_fill > 0) else 0.0)
+        structure_ok = _validate_post_fill_structure(
+            side, actual_fill, sl_price, paper_tp1, paper_tp2,
+        )
+        emergency_reason = None
+        if deviation_bps > LIVE_POST_FILL_MAX_DEVIATION_BPS:
+            emergency_reason = "entry_deviation_too_high"
+        elif not structure_ok:
+            emergency_reason = "post_fill_structure_invalid"
+        if emergency_reason:
+            log.warning(
+                f"🛑 [post-fill-emergency] {sym} {side}: {emergency_reason} "
+                f"(fill={actual_fill} paper_entry={paper_entry} "
+                f"deviation={deviation_bps:.1f}bps sl={sl_price} tp1={paper_tp1} tp2={paper_tp2}). "
+                f"立即应急平仓."
+            )
+            try:
+                client.close_position(symbol=sym, side=side, trade_id=trade_id)
+                log.info(f"[post-fill-emergency] {sym} 应急平仓完成")
+            except (BinanceError, ValueError) as e:
+                log.error(
+                    f"[post-fill-emergency] {sym} 应急平仓失败 ({type(e).__name__}: {e}). "
+                    f"position 留在 exchange, 下 tick recon 会识别并提示."
+                )
+            return None
 
         # 风险金额: (entry - SL) / entry × notional = "最多丢多少"
         actual_notional = float(result.get("actual_notional", 0) or 0)

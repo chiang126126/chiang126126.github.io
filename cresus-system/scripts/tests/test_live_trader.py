@@ -514,7 +514,11 @@ class TestTryMirrorOpen(unittest.TestCase):
         """SHORT: 实际 fill 高于预期 → 有利, 应为负 bps."""
         short_paper = dict(self.paper_trade)
         short_paper["direction"] = "SHORT"
-        short_paper["sl"] = 81810.0   # SHORT SL 要高于 entry
+        # SHORT 完整结构 (sl > entry > tp1 > tp2) — 否则 Phase 5.G post-fill
+        # 结构校验会拒 (LONG 模板的 tp1/tp2 在 SHORT 里位于错误侧).
+        short_paper["sl"] = 81810.0    # SL 高于 entry
+        short_paper["tp1"] = 79785.0   # TP1 低于 entry (1.5R)
+        short_paper["tp2"] = 78570.0   # TP2 低于 entry (3R)
         short_result = dict(self.mock_open_result)
         short_result["side"] = "SELL"
         short_result["avg_fill_price"] = 81050.0  # 高于 81000 = SHORT 有利
@@ -3130,6 +3134,9 @@ class TestMirrorIterationGuards(unittest.TestCase):
         self._conv_patcher = patch.object(live_trader, "LIVE_MIN_CONVICTION_SCORE", None)
         self._conv_patcher.start()
 
+        # Mock fill 默认对齐多数测试的 paper entry_price=100.0.
+        # entry_price=1.0 的特殊测试 (test_same_symbol_blocks_within_iteration) 用
+        # side_effect 重载 fill 值.
         self.mock_open_result = {
             "trade_id": "L1", "symbol": "X",
             "side": "BUY", "qty": 0.001,
@@ -3217,6 +3224,9 @@ class TestMirrorIterationGuards(unittest.TestCase):
             r = dict(self.mock_open_result)
             r["symbol"] = symbol
             r["side"] = side
+            # Phase 5.G: paper entry=1.0, mock fill 跟随避免 post-fill 应急平
+            r["avg_fill_price"] = 1.0
+            r["sl_price"] = 0.95
             return r
 
         with patch.object(self.client, "open_position",
@@ -4477,6 +4487,89 @@ class TestPhase5ALiveNotionalByScore(unittest.TestCase):
         """Phase 5.A: max_deploy $1600 → $2400 (适配 score 分档)."""
         from live_trader import LIVE_MAX_DEPLOY_USDT
         self.assertEqual(LIVE_MAX_DEPLOY_USDT, 2400.0)
+
+
+class TestPhase5GPostFillEmergency(unittest.TestCase):
+    """Phase 5.G (5/28): Post-fill 应急平仓 (参考社区 shadow_entry_deviation).
+
+    open_position 成功后 2 次后置校验:
+      1) |fill - paper_entry| > 200bps → entry_deviation_too_high
+      2) TP/SL 结构无效 (LONG sl<fill<tp1<tp2; SHORT sl>fill>tp1>tp2) → post_fill_structure_invalid
+    任一触发: client.close_position 应急平仓 + 返回 None.
+    """
+
+    # === _validate_post_fill_structure ===
+
+    def test_structure_long_valid(self):
+        """LONG: sl < fill < tp1 < tp2 → True."""
+        self.assertTrue(
+            live_trader._validate_post_fill_structure(
+                "BUY", fill=100.0, sl=95.0, tp1=105.0, tp2=110.0,
+            )
+        )
+
+    def test_structure_long_fill_above_tp1_invalid(self):
+        """LONG: fill 已在 TP 区, 结构破坏 → False."""
+        self.assertFalse(
+            live_trader._validate_post_fill_structure(
+                "BUY", fill=106.0, sl=95.0, tp1=105.0, tp2=110.0,
+            )
+        )
+
+    def test_structure_long_sl_above_fill_invalid(self):
+        """LONG: SL 在 fill 上 (即开仓即亏损区) → False."""
+        self.assertFalse(
+            live_trader._validate_post_fill_structure(
+                "BUY", fill=100.0, sl=101.0, tp1=105.0, tp2=110.0,
+            )
+        )
+
+    def test_structure_short_valid(self):
+        """SHORT: sl > fill > tp1 > tp2 → True."""
+        self.assertTrue(
+            live_trader._validate_post_fill_structure(
+                "SELL", fill=100.0, sl=105.0, tp1=95.0, tp2=90.0,
+            )
+        )
+
+    def test_structure_short_fill_below_tp1_invalid(self):
+        """SHORT: fill 已在 TP 区下方 → False."""
+        self.assertFalse(
+            live_trader._validate_post_fill_structure(
+                "SELL", fill=94.0, sl=105.0, tp1=95.0, tp2=90.0,
+            )
+        )
+
+    def test_structure_missing_fields_skipped(self):
+        """字段缺/异常 (= 0) 返 True (向后兼容, 不误平)."""
+        self.assertTrue(
+            live_trader._validate_post_fill_structure(
+                "BUY", fill=100.0, sl=0, tp1=105.0, tp2=110.0,
+            )
+        )
+        self.assertTrue(
+            live_trader._validate_post_fill_structure(
+                "BUY", fill=0, sl=95.0, tp1=105.0, tp2=110.0,
+            )
+        )
+
+    def test_structure_unknown_side_skipped(self):
+        """未知 side → True (跳过, 不阻塞)."""
+        self.assertTrue(
+            live_trader._validate_post_fill_structure(
+                "INVALID", fill=100.0, sl=95.0, tp1=105.0, tp2=110.0,
+            )
+        )
+
+    # === 应急平仓集成 (验证常量) ===
+
+    def test_post_fill_threshold_constant(self):
+        """常量定义在合理范围 (≥ 100 bps, ≤ 500 bps, 不与 pre-check 阈值冲突)."""
+        from live_trader import LIVE_POST_FILL_MAX_DEVIATION_BPS
+        # ≥ 100: 至少 1% 才触发, 避免微小滑点误平
+        self.assertGreaterEqual(LIVE_POST_FILL_MAX_DEVIATION_BPS, 100)
+        # ≤ 500: 5% 是绝对上限, 再大就是 paper 数据异常
+        self.assertLessEqual(LIVE_POST_FILL_MAX_DEVIATION_BPS, 500)
 
 
 class TestPhase5ECircuitBreaker(unittest.TestCase):
