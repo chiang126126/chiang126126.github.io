@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-28T22:28:03.303643+00:00",
+  "generated_at": "2026-05-28T22:29:58.456098+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 574,
@@ -35,14 +35,14 @@
     "ok": false,
     "mismatches": [
       {
-        "symbol": "PENDLEUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
         "symbol": "ZECUSDT",
         "kind": "exchange_only",
         "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "PENDLEUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
@@ -50,9 +50,9 @@
       "EIGENUSDT"
     ],
     "exchange_symbols": [
-      "PENDLEUSDT",
+      "EIGENUSDT",
       "ZECUSDT",
-      "EIGENUSDT"
+      "PENDLEUSDT"
     ]
   },
   "open_trades": [
@@ -71,8 +71,8 @@
       "risk_usdt": 2.2978,
       "risk_pct": 0.574,
       "mirror_latency_sec": 13.8,
-      "sl_price": 0.21824999999999997,
-      "sl_paper_current": 0.21885,
+      "sl_price": 0.21760000000000002,
+      "sl_paper_current": 0.2182,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": -0.0006,
       "sl_compensation_mode": "always",
@@ -88,7 +88,7 @@
       "min_conviction_threshold": null,
       "tp1_price": 0.217225,
       "tp2_price": 0.21625,
-      "phase": "A",
+      "phase": "B",
       "entry_order_id": 153103058,
       "entry_client_id": "cresus_L1780006902_EIGENUS_S_E",
       "sl_order_id": null,
@@ -99,8 +99,8 @@
       "top_trader_position_ratio": null,
       "top_trader_account_ratio": null,
       "global_account_ratio": null,
-      "phase_a_mfe_pct": 0.321,
-      "phase_b_mfe_pct": null,
+      "phase_a_mfe_pct": 0.55,
+      "phase_b_mfe_pct": 0.55,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.199996,
       "fees_are_actual": true,
@@ -112,11 +112,12 @@
       "btc_pct_vs_ma25_at_open": 0.166,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 0.2175,
-      "current_price": 0.2167,
-      "unrealized_pnl_usdt": 1.6544,
-      "unrealized_pnl_pct": 0.414,
-      "last_price_check_at": "2026-05-28T22:28:02.022981+00:00"
+      "phase_a_mfe_price": 0.217,
+      "current_price": 0.2169,
+      "unrealized_pnl_usdt": 1.2867,
+      "unrealized_pnl_pct": 0.322,
+      "last_price_check_at": "2026-05-28T22:29:56.425599+00:00",
+      "phase_b_mfe_price": 0.217
     }
   ],
   "recent_closed": [
@@ -35224,13 +35225,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73593.7,
-    "btc_ma25_1h": 73556.8,
-    "pct_vs_ma25": 0.05,
-    "change_24h_pct": -1.133,
+    "btc_price": 73591.6,
+    "btc_ma25_1h": 73556.72,
+    "pct_vs_ma25": 0.047,
+    "change_24h_pct": -1.135,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-28T22:28:02.988131+00:00"
+    "computed_at": "2026-05-28T22:29:58.138045+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
