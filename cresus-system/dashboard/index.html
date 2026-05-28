@@ -3083,6 +3083,18 @@
     </div>
   </div>
 
+  <!-- Phase 5.F (5/28): 执行质量 - paper vs live 同笔配对差额拆解 -->
+  <div class="panel" id="exec-quality-panel" style="display:none">
+    <h2>🎯 执行质量 <span class="meta-inline" id="exec-quality-meta">数据加载中…</span></h2>
+    <div class="panel-body" style="padding: 14px 18px;">
+      <div style="color:var(--text-dim); font-size:12px; line-height:1.5; margin-bottom:14px;">
+        最近 24 小时 · <b>正数代表 Live 比 Paper 少赚</b>(已按相同 notional 归一化), 按开仓滑点、平仓滑点、手续费拆开看
+      </div>
+      <div id="exec-quality-summary" style="display:flex; flex-direction:column; gap:8px;"></div>
+      <div id="exec-quality-table-wrap" style="margin-top:14px;"></div>
+    </div>
+  </div>
+
   <div class="panel" id="positions-panel" style="display:none">
     <h2>📈 当前持仓 <span class="meta-inline" id="positions-count"></span></h2>
     <div id="positions-table"></div>
@@ -7386,6 +7398,142 @@ function initCollapsibles() {
 }
 initCollapsibles();
 
+// === Phase 5.F: 执行质量 (paper vs live 配对差额拆解) =====================
+async function loadExecutionQuality() {
+  try {
+    const [pr, lr] = await Promise.all([
+      fetch("./paper_trades_history.json?_=" + Date.now()),
+      fetch("./live_trades_history.json?_=" + Date.now()),
+    ]);
+    if (!pr.ok || !lr.ok) {
+      const m = document.getElementById("exec-quality-meta");
+      if (m) m.textContent = "数据未就绪";
+      return;
+    }
+    renderExecutionQuality(await pr.json(), await lr.json());
+  } catch (e) {
+    const m = document.getElementById("exec-quality-meta");
+    if (m) m.textContent = "加载失败: " + e.message;
+  }
+}
+function renderExecutionQuality(paper, live) {
+  const cutoff = Date.now() - 24 * 3600 * 1000;
+  const paperById = new Map();
+  for (const t of (paper.recent_closed || [])) {
+    if (t.id && t.close_reason) paperById.set(t.id, t);
+  }
+  const pairs = [];
+  for (const lt of (live.recent_closed || [])) {
+    if (!lt.closed_at || !lt.paper_id) continue;
+    const closedTs = Date.parse(lt.closed_at);
+    if (!closedTs || closedTs < cutoff) continue;
+    const pt = paperById.get(lt.paper_id);
+    if (!pt) continue;
+    pairs.push({ live: lt, paper: pt });
+  }
+  const panel = document.getElementById("exec-quality-panel");
+  if (!panel) return;
+  if (pairs.length === 0) {
+    panel.style.display = "block";
+    document.getElementById("exec-quality-meta").textContent = "最近 24h 无可配对笔";
+    document.getElementById("exec-quality-summary").innerHTML = '<div style="color:var(--text-dim); font-size:13px;">等待 mirror 后 paper 与 live 同时平仓的样本…</div>';
+    document.getElementById("exec-quality-table-wrap").innerHTML = "";
+    return;
+  }
+  const PAPER_FEE_PCT = 0.08;
+  let totalGap = 0, openSlipCost = 0, closeSlipCost = 0, feeDiff = 0;
+  for (const { live: lt, paper: pt } of pairs) {
+    const ln = Number(lt.notional_usdt) || 0;
+    const paperPct = Number(pt.realized_pnl_pct) || 0;
+    const livePnl = Number(lt.realized_pnl_usdt) || 0;
+    const paperEq = paperPct * ln / 100;
+    totalGap += paperEq - livePnl;
+    openSlipCost += Math.abs(Number(lt.slippage_bps) || 0) * ln / 10000;
+    closeSlipCost += Math.abs(Number(lt.close_slippage_bps) || 0) * ln / 10000;
+    feeDiff += (Number(lt.fees_paid_usdt) || 0) - (ln * PAPER_FEE_PCT / 100);
+  }
+  const other = totalGap - openSlipCost - closeSlipCost - feeDiff;
+  const avg = totalGap / pairs.length;
+  document.getElementById("exec-quality-meta").textContent =
+    `${pairs.length} 笔可对比 · 主要拖累 ${eqLabelLargestDrag(openSlipCost, closeSlipCost, feeDiff, other)}`;
+  document.getElementById("exec-quality-summary").innerHTML = [
+    eqMetricCard("总少赚", totalGap, "USDT", "差额 = paper 等效 - live 实际", "big"),
+    eqMetricCard("开仓滑点", openSlipCost, "USDT", "进场价 vs paper 信号价"),
+    eqMetricCard("平仓滑点", closeSlipCost, "USDT", "出场价 vs 期望价"),
+    eqMetricCard("手续费", feeDiff, "USDT", "live 实际 - paper 假设 0.08% RT"),
+    eqMetricCard("其他差额", other, "USDT", "时序差等"),
+    eqMetricCard("单笔平均", avg, "USDT", `${pairs.length} 笔均摊`),
+  ].join("");
+  pairs.sort((a, b) => Date.parse(b.live.closed_at) - Date.parse(a.live.closed_at));
+  const rows = pairs.slice(0, 20).map(({ live: lt, paper: pt }) => {
+    const ln = Number(lt.notional_usdt) || 0;
+    const pe = Number(pt.entry_price) || 0;
+    const le = Number(lt.avg_fill_price) || 0;
+    const pc = Number(pt.close_price) || 0;
+    const lc = Number(lt.avg_exit_price) || 0;
+    const paperPct = Number(pt.realized_pnl_pct) || 0;
+    const gap = (paperPct * ln / 100) - (Number(lt.realized_pnl_usdt) || 0);
+    const dirCh = lt.direction === "LONG" ? '<span style="color:#52c41a">做多</span>' : '<span style="color:#ff7875">做空</span>';
+    return `<tr>
+      <td><b>${lt.symbol}</b></td>
+      <td style="text-align:center">${dirCh}</td>
+      <td style="text-align:right; font-variant-numeric:tabular-nums;">
+        <div>${eqFmtPrice(pe)}</div>
+        <div style="color:var(--text-dim); font-size:11px;">${eqFmtPrice(le)}</div>
+      </td>
+      <td style="text-align:right; font-variant-numeric:tabular-nums;">
+        <div>${eqFmtPrice(pc)}</div>
+        <div style="color:var(--text-dim); font-size:11px;">${eqFmtPrice(lc)}</div>
+      </td>
+      <td style="text-align:right; font-variant-numeric:tabular-nums; color:${gap >= 0.5 ? '#ff7875' : (gap <= -0.5 ? '#52c41a' : 'var(--text-dim)')}">
+        ${gap >= 0 ? '+' : ''}${gap.toFixed(2)}
+      </td>
+    </tr>`;
+  }).join("");
+  document.getElementById("exec-quality-table-wrap").innerHTML = `
+    <table style="width:100%; border-collapse:collapse; font-size:12px;">
+      <thead style="color:var(--text-dim); border-bottom:1px solid #2a2a2a;">
+        <tr>
+          <th style="text-align:left; padding:8px 6px;">SYMBOL</th>
+          <th style="text-align:center; padding:8px 6px;">方向</th>
+          <th style="text-align:right; padding:8px 6px;">Paper / Live<br>入场</th>
+          <th style="text-align:right; padding:8px 6px;">Paper / Live<br>平仓</th>
+          <th style="text-align:right; padding:8px 6px;">少赚 (USDT)</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+    ${pairs.length > 20 ? `<div style="margin-top:10px; color:var(--text-dim); font-size:11px; text-align:center;">显示最近 20 笔, 共 ${pairs.length} 笔可对比</div>` : ""}`;
+  panel.style.display = "block";
+}
+function eqMetricCard(label, value, unit, hint, size) {
+  const isBig = size === "big";
+  const color = value >= 0.5 ? '#ff7875' : (value <= -0.5 ? '#52c41a' : 'var(--text-dim)');
+  const sign = value >= 0 ? '+' : '';
+  return `<div style="padding:10px 12px; background:rgba(255,255,255,0.03); border:1px solid #2a2a2a; border-radius:8px; display:flex; justify-content:space-between; align-items:center; gap:14px;">
+    <div>
+      <div style="font-size:${isBig ? '13px' : '12px'}; color:var(--text-dim);">${label}</div>
+      ${hint ? `<div style="font-size:10px; color:var(--text-dim); margin-top:2px; opacity:0.7;">${hint}</div>` : ''}
+    </div>
+    <div style="font-size:${isBig ? '22px' : '17px'}; font-weight:600; color:${color}; font-variant-numeric:tabular-nums;">
+      ${sign}${value.toFixed(2)} <span style="font-size:11px; font-weight:400; color:var(--text-dim);">${unit}</span>
+    </div>
+  </div>`;
+}
+function eqLabelLargestDrag(o, c, f, ot) {
+  const items = [{n:"开仓滑点",v:o},{n:"平仓滑点",v:c},{n:"手续费",v:f},{n:"其他差额",v:ot}].filter(x=>Math.abs(x.v)>=0.5);
+  if (items.length === 0) return "差额均很小";
+  items.sort((a,b) => b.v - a.v);
+  return items[0].n;
+}
+function eqFmtPrice(p) {
+  if (!p) return "—";
+  if (p >= 100) return p.toFixed(2);
+  if (p >= 1) return p.toFixed(4);
+  return p.toFixed(6);
+}
+// === End Phase 5.F =========================================================
+
 loadSignals();
 loadPnL();
 loadPrices();
@@ -7406,9 +7554,11 @@ setInterval(loadPrecogRadar, 5 * 60_000);      // P23: 预兆雷达 5min 刷新
 loadVelocityRadar();
 loadPaperTrades();
 loadLiveTrades();
+loadExecutionQuality();
 setInterval(loadVelocityRadar, 60_000);        // P27-X: 量能加速度 1m 刷新 (跟 scanner cron 同频)
 setInterval(loadPaperTrades, 60_000);          // Phase 4: 模拟仓 1m 刷新
 setInterval(loadLiveTrades, 60_000);           // Phase 8: 实盘交易 1m 刷新
+setInterval(loadExecutionQuality, 120_000);    // Phase 5.F: 执行质量 2m 刷新 (跟 fast-sync 同节奏)
 
 // 切回 tab 时立刻刷新关键面板,避免看陈旧数据
 document.addEventListener("visibilitychange", () => {
