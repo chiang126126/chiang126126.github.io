@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-28T22:11:52.919450+00:00",
+  "updated_at": "2026-05-28T22:13:56.910132+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 15,
+  "alerts_count": 16,
   "alerts": [
+    {
+      "symbol": "OPNUSDT",
+      "base": "OPN",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.1468,
+      "price_change_pct": 0.548,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 39626.0,
+      "volume_baseline_usdt": 692.0,
+      "volume_ratio": 57.28,
+      "detected_at": "2026-05-28T22:13:51.782488+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.411,
+      "change_15m_pct": 0.274,
+      "change_1h_pct": 0.137,
+      "change_4h_pct": -1.147,
+      "taker_buy_ratio_1m": 0.913,
+      "taker_buy_ratio_5m": 0.9,
+      "oi_delta_5m_pct": -0.003,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.204,
+      "range_4h_pct": 2.93,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.1465,
+      "suggested_tp1": 0.14725,
+      "suggested_tp2": 0.1477,
+      "conviction_score": 1,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "USUSDT",
       "base": "US",
