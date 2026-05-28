@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-28T12:01:23.296948+00:00",
+  "updated_at": "2026-05-28T12:03:31.484923+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 25,
+  "alerts_count": 26,
   "alerts": [
+    {
+      "symbol": "XLMUSDT",
+      "base": "XLM",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.1797,
+      "price_change_pct": 0.667,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 3088491.0,
+      "volume_baseline_usdt": 587021.0,
+      "volume_ratio": 5.26,
+      "detected_at": "2026-05-28T12:02:29.484382+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.968,
+      "change_15m_pct": 0.375,
+      "change_1h_pct": 3.007,
+      "change_4h_pct": 8.329,
+      "taker_buy_ratio_1m": 0.632,
+      "taker_buy_ratio_5m": 0.618,
+      "oi_delta_5m_pct": 0.268,
+      "funding_rate_pct": -0.031,
+      "atr_pct": 0.312,
+      "range_4h_pct": 8.22,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.17885893,
+      "suggested_tp1": 0.18096161,
+      "suggested_tp2": 0.18222321,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "VICUSDT",
       "base": "VIC",
