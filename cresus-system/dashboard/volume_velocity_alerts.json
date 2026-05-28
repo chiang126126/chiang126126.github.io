@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-28T19:56:35.936082+00:00",
+  "updated_at": "2026-05-28T19:58:40.076025+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 11,
+  "alerts_count": 12,
   "alerts": [
+    {
+      "symbol": "MANTAUSDT",
+      "base": "MANTA",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.08094,
+      "price_change_pct": -0.565,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 75430.0,
+      "volume_baseline_usdt": 7124.0,
+      "volume_ratio": 10.59,
+      "detected_at": "2026-05-28T19:58:25.163520+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.943,
+      "change_15m_pct": -0.761,
+      "change_1h_pct": -0.37,
+      "change_4h_pct": -0.357,
+      "taker_buy_ratio_1m": 0.438,
+      "taker_buy_ratio_5m": 0.417,
+      "oi_delta_5m_pct": -0.096,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.326,
+      "range_4h_pct": 5.93,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.08133536,
+      "suggested_tp1": 0.08034696,
+      "suggested_tp2": 0.07975393,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "KITEUSDT",
       "base": "KITE",
