@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-28T23:43:00.988942+00:00",
+  "updated_at": "2026-05-28T23:45:06.146070+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,7 +8,7 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 7,
+  "alerts_count": 5,
   "alerts": [
     {
       "symbol": "JTOUSDT",
@@ -159,66 +159,6 @@
       "suggested_tp2": 2.47985714,
       "conviction_score": 3,
       "conviction_tier": "premium"
-    },
-    {
-      "symbol": "BCHUSDT",
-      "base": "BCH",
-      "direction": "SHORT",
-      "alert_type": "burst",
-      "price": 296.33,
-      "price_change_pct": -0.876,
-      "metric_window_min": 1,
-      "volume_1m_usdt": 2770909.0,
-      "volume_baseline_usdt": 62401.0,
-      "volume_ratio": 44.4,
-      "detected_at": "2026-05-28T22:44:07.264094+00:00",
-      "intensity": 2,
-      "change_5m_pct": -1.161,
-      "change_15m_pct": -1.161,
-      "change_1h_pct": -1.978,
-      "change_4h_pct": -2.279,
-      "taker_buy_ratio_1m": 0.337,
-      "taker_buy_ratio_5m": 0.34,
-      "oi_delta_5m_pct": 0.018,
-      "funding_rate_pct": -0.0498,
-      "atr_pct": 0.193,
-      "range_4h_pct": 2.63,
-      "vol_mult_used": 1.0,
-      "suggested_sl": 296.90071429,
-      "suggested_tp1": 295.47392857,
-      "suggested_tp2": 294.61785714,
-      "conviction_score": 2,
-      "conviction_tier": "regular"
-    },
-    {
-      "symbol": "ALLOUSDT",
-      "base": "ALLO",
-      "direction": "LONG",
-      "alert_type": "sustained",
-      "price": 0.16106,
-      "price_change_pct": 2.449,
-      "metric_window_min": 10,
-      "volume_1m_usdt": 853810.0,
-      "volume_baseline_usdt": 157634.0,
-      "volume_ratio": 5.42,
-      "detected_at": "2026-05-28T22:44:06.081842+00:00",
-      "intensity": 1,
-      "change_5m_pct": 2.986,
-      "change_15m_pct": 4.044,
-      "change_1h_pct": 4.171,
-      "change_4h_pct": 14.22,
-      "taker_buy_ratio_1m": 0.493,
-      "taker_buy_ratio_5m": 0.577,
-      "oi_delta_5m_pct": 0.818,
-      "funding_rate_pct": -0.0084,
-      "atr_pct": 1.015,
-      "range_4h_pct": 16.11,
-      "vol_mult_used": 2.0,
-      "suggested_sl": 0.15779143,
-      "suggested_tp1": 0.16596286,
-      "suggested_tp2": 0.17086571,
-      "conviction_score": 5,
-      "conviction_tier": "diamond"
     }
   ]
 }
