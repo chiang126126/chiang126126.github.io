@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-28T05:45:43.632329+00:00",
+  "generated_at": "2026-05-28T05:49:45.925002+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 552,
@@ -42,13 +42,13 @@
     ],
     "api_failed": false,
     "live_symbols": [
-      "DYMUSDT",
-      "GRASSUSDT"
+      "GRASSUSDT",
+      "DYMUSDT"
     ],
     "exchange_symbols": [
+      "HIGHUSDT",
       "GRASSUSDT",
-      "DYMUSDT",
-      "HIGHUSDT"
+      "DYMUSDT"
     ]
   },
   "open_trades": [
@@ -173,10 +173,10 @@
       "btc_sub_regime_at_open": "down_acute",
       "btc_change_3h_at_open": -1.72,
       "phase_a_mfe_price": 0.4769,
-      "current_price": 0.4814,
-      "unrealized_pnl_usdt": -2.2558,
-      "unrealized_pnl_pct": -0.564,
-      "last_price_check_at": "2026-05-28T05:45:40.697966+00:00"
+      "current_price": 0.4815,
+      "unrealized_pnl_usdt": -2.3394,
+      "unrealized_pnl_pct": -0.585,
+      "last_price_check_at": "2026-05-28T05:49:43.415196+00:00"
     }
   ],
   "recent_closed": [
@@ -33623,16 +33623,26 @@
       "close_qty": 53792.0
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "PRLUSDT|LONG|2026-05-28T05:45:52.023780+00:00",
+      "symbol": "PRLUSDT",
+      "direction": "LONG",
+      "conviction_score": 7,
+      "signal_at": "2026-05-28T05:46:16.570669+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_acute 3h=-1.78% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-05-28T05:49:43.415196+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 73003.5,
-    "btc_ma25_1h": 74918.3,
-    "pct_vs_ma25": -2.556,
-    "change_24h_pct": -3.539,
+    "btc_price": 72926.8,
+    "btc_ma25_1h": 74915.23,
+    "pct_vs_ma25": -2.654,
+    "change_24h_pct": -3.641,
     "sub_regime": "down_acute",
-    "change_3h_pct": -1.678,
-    "computed_at": "2026-05-28T05:45:42.226039+00:00"
+    "change_3h_pct": -1.781,
+    "computed_at": "2026-05-28T05:49:44.538096+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
