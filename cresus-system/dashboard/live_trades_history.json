@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-29T00:36:59.017678+00:00",
+  "generated_at": "2026-05-29T00:39:05.480209+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 575,
-    "open": 0,
+    "total_trades": 576,
+    "open": 1,
     "closed": 575,
     "wins": 191,
     "losses": 377,
@@ -15,44 +15,110 @@
     "avg_pnl_usdt": -0.0512,
     "best_trade_usdt": 30.9787,
     "worst_trade_usdt": -16.6993,
-    "fees_paid_usdt": 67.6268,
+    "fees_paid_usdt": 67.7868,
     "fees_realized_usdt": 67.6268,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.16,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 1902.91,
+    "deployed_usdt": 399.99,
+    "free_capital_usdt": 1502.76,
     "max_concurrent_slots": 4,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 2.3829,
-    "deployed_usdt": 0
+    "deployed_usdt": 399.99
   },
   "reconciliation": {
     "ok": false,
     "mismatches": [
       {
-        "symbol": "ZECUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
         "symbol": "PENDLEUSDT",
         "kind": "exchange_only",
         "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "ZECUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
-    "live_symbols": [],
+    "live_symbols": [
+      "IOTAUSDT"
+    ],
     "exchange_symbols": [
-      "ZECUSDT",
-      "PENDLEUSDT"
+      "PENDLEUSDT",
+      "IOTAUSDT",
+      "ZECUSDT"
     ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "IOTAUSDT|LONG|2026-05-29T00:36:53.544383+00:00",
+      "trade_id": "L1780015013_IOTAUSD_L",
+      "symbol": "IOTAUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.0605,
+      "avg_fill_price": 0.0607,
+      "slippage_bps": 33.06,
+      "qty": 6589.7,
+      "notional_usdt": 399.99479,
+      "leverage": 1,
+      "risk_usdt": 3.7891,
+      "risk_pct": 0.947,
+      "mirror_latency_sec": 8.5,
+      "sl_price": 0.060325,
+      "sl_paper_current": 0.060125,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.0002,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 2,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": -0.0107,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "D",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.0610625,
+      "tp2_price": 0.061625,
+      "phase": "A",
+      "entry_order_id": 262737327,
+      "entry_client_id": "cresus_L1780015013_IOTAUSD_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.413,
+      "top_trader_position_ratio": null,
+      "top_trader_account_ratio": null,
+      "global_account_ratio": null,
+      "phase_a_mfe_pct": 0.331,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.159998,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-29T00:37:12.498491+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 73760.0,
+      "btc_change_24h_at_open": -1.034,
+      "btc_pct_vs_ma25_at_open": 0.365,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.0607,
+      "current_price": 0.0612,
+      "unrealized_pnl_usdt": 3.2949,
+      "unrealized_pnl_pct": 0.824,
+      "last_price_check_at": "2026-05-29T00:39:04.042085+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "ALGOUSDT|LONG|2026-05-29T00:03:07.648278+00:00",
@@ -35308,19 +35374,19 @@
       "direction": "LONG",
       "conviction_score": 7,
       "signal_at": "2026-05-29T00:14:15.915108+00:00",
-      "reason": "paper trade too old (1362s > 600s)",
-      "last_checked_at": "2026-05-29T00:36:58.014355+00:00"
+      "reason": "paper trade too old (1488s > 600s)",
+      "last_checked_at": "2026-05-29T00:39:04.042085+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73760.0,
-    "btc_ma25_1h": 73491.96,
-    "pct_vs_ma25": 0.365,
-    "change_24h_pct": -1.034,
+    "btc_price": 73777.3,
+    "btc_ma25_1h": 73492.66,
+    "pct_vs_ma25": 0.387,
+    "change_24h_pct": -1.011,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-29T00:36:58.983935+00:00"
+    "computed_at": "2026-05-29T00:39:05.162833+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
