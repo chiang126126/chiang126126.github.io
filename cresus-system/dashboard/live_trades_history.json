@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-29T21:28:40.855104+00:00",
+  "generated_at": "2026-05-29T21:30:38.580243+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 624,
-    "open": 1,
+    "total_trades": 625,
+    "open": 2,
     "closed": 623,
     "wins": 203,
     "losses": 412,
@@ -15,44 +15,29 @@
     "avg_pnl_usdt": -0.2004,
     "best_trade_usdt": 30.9787,
     "worst_trade_usdt": -24.1805,
-    "fees_paid_usdt": 84.6384,
+    "fees_paid_usdt": 84.7984,
     "fees_realized_usdt": 84.4785,
-    "fees_open_usdt": 0.16,
+    "fees_open_usdt": 0.32,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 399.94,
-    "free_capital_usdt": 1390.54,
+    "deployed_usdt": 799.83,
+    "free_capital_usdt": 990.49,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -93.0367,
-    "deployed_usdt": 399.94
+    "deployed_usdt": 799.83
   },
   "reconciliation": {
     "ok": false,
     "mismatches": [
       {
-        "symbol": "AIAUSDT",
+        "symbol": "PENDLEUSDT",
         "kind": "exchange_only",
-        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "IDUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has IDUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "ZECUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "KITEUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has KITEUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "PYTHUSDT",
@@ -70,31 +55,48 @@
         "message": "exchange has BASUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "PENDLEUSDT",
+        "symbol": "IDUSDT",
         "kind": "exchange_only",
-        "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has IDUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "GPSUSDT",
         "kind": "exchange_only",
         "message": "exchange has GPSUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "ZECUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "AIAUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "KITEUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has KITEUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
     "live_symbols": [
-      "APEUSDT"
+      "APEUSDT",
+      "HYPEUSDT"
     ],
     "exchange_symbols": [
-      "AIAUSDT",
-      "IDUSDT",
-      "ZECUSDT",
+      "PENDLEUSDT",
       "KITEUSDT",
       "PYTHUSDT",
-      "APEUSDT",
       "CFXUSDT",
       "BASUSDT",
-      "PENDLEUSDT",
-      "GPSUSDT"
+      "IDUSDT",
+      "HYPEUSDT",
+      "GPSUSDT",
+      "ZECUSDT",
+      "AIAUSDT",
+      "APEUSDT"
     ]
   },
   "open_trades": [
@@ -155,10 +157,72 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.1392,
-      "current_price": 0.1388,
-      "unrealized_pnl_usdt": 2.0272,
-      "unrealized_pnl_pct": 0.507,
-      "last_price_check_at": "2026-05-29T21:28:39.425203+00:00"
+      "current_price": 0.1376,
+      "unrealized_pnl_usdt": -1.448,
+      "unrealized_pnl_pct": -0.362,
+      "last_price_check_at": "2026-05-29T21:30:36.907695+00:00"
+    },
+    {
+      "paper_id": "HYPEUSDT|SHORT|2026-05-29T21:28:22.533976+00:00",
+      "trade_id": "L1780090102_HYPEUSD_S",
+      "symbol": "HYPEUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 64.531,
+      "avg_fill_price": 64.499,
+      "slippage_bps": 4.96,
+      "qty": 6.2,
+      "notional_usdt": 399.8938,
+      "leverage": 1,
+      "risk_usdt": 1.3281,
+      "risk_pct": 0.332,
+      "mirror_latency_sec": 10.0,
+      "sl_price": 64.68121428999999,
+      "sl_paper_current": 64.71321429,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -0.032,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 2,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "D",
+      "min_conviction_threshold": null,
+      "tp1_price": 64.25767857,
+      "tp2_price": 63.98435714,
+      "phase": "A",
+      "entry_order_id": 193978091,
+      "entry_client_id": "cresus_L1780090102_HYPEUSD_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 7,
+      "alert_type": "sustained",
+      "atr_pct": 0.282,
+      "top_trader_position_ratio": null,
+      "top_trader_account_ratio": null,
+      "global_account_ratio": null,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.16,
+      "fees_are_actual": false,
+      "opened_at": "2026-05-29T21:29:35.537259+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 73519.2,
+      "btc_change_24h_at_open": -0.387,
+      "btc_pct_vs_ma25_at_open": -0.036,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 64.531,
+      "current_price": 64.578,
+      "unrealized_pnl_usdt": -0.4898,
+      "unrealized_pnl_pct": -0.122,
+      "last_price_check_at": "2026-05-29T21:30:36.907695+00:00"
     }
   ],
   "recent_closed": [
@@ -38891,19 +38955,19 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-29T19:54:40.792171+00:00",
-      "reason": "paper trade too old (5639s > 600s)",
-      "last_checked_at": "2026-05-29T21:28:39.425203+00:00"
+      "reason": "paper trade too old (5756s > 600s)",
+      "last_checked_at": "2026-05-29T21:30:36.907695+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73544.4,
-    "btc_ma25_1h": 73547.02,
-    "pct_vs_ma25": -0.004,
-    "change_24h_pct": -0.353,
+    "btc_price": 73514.3,
+    "btc_ma25_1h": 73545.81,
+    "pct_vs_ma25": -0.043,
+    "change_24h_pct": -0.394,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-29T21:28:40.546655+00:00"
+    "computed_at": "2026-05-29T21:30:37.932019+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
