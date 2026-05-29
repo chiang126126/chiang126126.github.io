@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-29T04:28:27.935469+00:00",
+  "generated_at": "2026-05-29T04:30:33.185633+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 584,
@@ -35,11 +35,6 @@
     "ok": false,
     "mismatches": [
       {
-        "symbol": "PENDLEUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
         "symbol": "CFXUSDT",
         "kind": "exchange_only",
         "message": "exchange has CFXUSDT position but live doesn't track (user manual? or state lost)"
@@ -50,9 +45,14 @@
         "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "GPSUSDT",
+        "symbol": "PENDLEUSDT",
         "kind": "exchange_only",
-        "message": "exchange has GPSUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "AIAUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "IDUSDT",
@@ -60,29 +60,29 @@
         "message": "exchange has IDUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "AIAUSDT",
+        "symbol": "GPSUSDT",
         "kind": "exchange_only",
-        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has GPSUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
     "live_symbols": [
-      "PYTHUSDT",
       "HMSTRUSDT",
       "USUSDT",
+      "PYTHUSDT",
       "ARCUSDT"
     ],
     "exchange_symbols": [
-      "PENDLEUSDT",
-      "ARCUSDT",
+      "USUSDT",
+      "HMSTRUSDT",
       "PYTHUSDT",
       "CFXUSDT",
-      "USUSDT",
-      "IDUSDT",
-      "HMSTRUSDT",
       "ZECUSDT",
-      "GPSUSDT",
-      "AIAUSDT"
+      "PENDLEUSDT",
+      "AIAUSDT",
+      "IDUSDT",
+      "ARCUSDT",
+      "GPSUSDT"
     ]
   },
   "open_trades": [
@@ -143,10 +143,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.06578,
-      "current_price": 0.06719,
-      "unrealized_pnl_usdt": 13.126,
-      "unrealized_pnl_pct": 3.282,
-      "last_price_check_at": "2026-05-29T04:28:25.735606+00:00"
+      "current_price": 0.0669,
+      "unrealized_pnl_usdt": 14.7955,
+      "unrealized_pnl_pct": 3.699,
+      "last_price_check_at": "2026-05-29T04:30:31.111630+00:00"
     },
     {
       "paper_id": "USUSDT|LONG|2026-05-29T03:52:41.220243+00:00",
@@ -205,10 +205,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.007058,
-      "current_price": 0.00701,
-      "unrealized_pnl_usdt": 0.5714,
-      "unrealized_pnl_pct": 0.143,
-      "last_price_check_at": "2026-05-29T04:28:25.735606+00:00"
+      "current_price": 0.00699,
+      "unrealized_pnl_usdt": -0.5714,
+      "unrealized_pnl_pct": -0.143,
+      "last_price_check_at": "2026-05-29T04:30:31.111630+00:00"
     },
     {
       "paper_id": "PYTHUSDT|LONG|2026-05-29T04:27:12.558959+00:00",
@@ -253,7 +253,7 @@
       "top_trader_position_ratio": null,
       "top_trader_account_ratio": null,
       "global_account_ratio": null,
-      "phase_a_mfe_pct": 0.0,
+      "phase_a_mfe_pct": 0.404,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.199985,
@@ -266,11 +266,11 @@
       "btc_pct_vs_ma25_at_open": -0.093,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 0.03956,
-      "current_price": 0.03958,
-      "unrealized_pnl_usdt": 0.3034,
-      "unrealized_pnl_pct": 0.076,
-      "last_price_check_at": "2026-05-29T04:28:25.735606+00:00"
+      "phase_a_mfe_price": 0.03972,
+      "current_price": 0.03972,
+      "unrealized_pnl_usdt": 1.7192,
+      "unrealized_pnl_pct": 0.43,
+      "last_price_check_at": "2026-05-29T04:30:31.111630+00:00"
     },
     {
       "paper_id": "HMSTRUSDT|LONG|2026-05-29T04:27:13.140795+00:00",
@@ -315,7 +315,7 @@
       "top_trader_position_ratio": null,
       "top_trader_account_ratio": null,
       "global_account_ratio": null,
-      "phase_a_mfe_pct": 0.0,
+      "phase_a_mfe_pct": 0.59,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.2,
@@ -328,11 +328,11 @@
       "btc_pct_vs_ma25_at_open": -0.093,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 0.0001864,
-      "current_price": 0.0001867,
-      "unrealized_pnl_usdt": 0.429,
-      "unrealized_pnl_pct": 0.107,
-      "last_price_check_at": "2026-05-29T04:28:25.735606+00:00"
+      "phase_a_mfe_price": 0.0001875,
+      "current_price": 0.0001866,
+      "unrealized_pnl_usdt": 0.2145,
+      "unrealized_pnl_pct": 0.054,
+      "last_price_check_at": "2026-05-29T04:30:31.111630+00:00"
     }
   ],
   "recent_closed": [
@@ -35954,7 +35954,7 @@
       "conviction_score": 5,
       "signal_at": "2026-05-29T04:07:11.079753+00:00",
       "reason": "max_concurrent reached (4/4)",
-      "last_checked_at": "2026-05-29T04:28:25.735606+00:00"
+      "last_checked_at": "2026-05-29T04:30:31.111630+00:00"
     },
     {
       "paper_id": "ZEREBROUSDT|LONG|2026-05-29T04:27:19.579067+00:00",
@@ -35963,18 +35963,18 @@
       "conviction_score": 5,
       "signal_at": "2026-05-29T04:27:24.597861+00:00",
       "reason": "max_concurrent reached (4/4)",
-      "last_checked_at": "2026-05-29T04:28:25.735606+00:00"
+      "last_checked_at": "2026-05-29T04:30:31.111630+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73314.7,
-    "btc_ma25_1h": 73372.92,
-    "pct_vs_ma25": -0.079,
-    "change_24h_pct": 0.246,
+    "btc_price": 73326.5,
+    "btc_ma25_1h": 73373.39,
+    "pct_vs_ma25": -0.064,
+    "change_24h_pct": 0.262,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-29T04:28:26.770497+00:00"
+    "computed_at": "2026-05-29T04:30:32.054659+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
