@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-29T04:50:09.699105+00:00",
+  "updated_at": "2026-05-29T04:52:13.406352+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 29,
+  "alerts_count": 30,
   "alerts": [
+    {
+      "symbol": "AIGENSYNUSDT",
+      "base": "AIGENSYN",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.03032,
+      "price_change_pct": 1.643,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 94571.0,
+      "volume_baseline_usdt": 13895.0,
+      "volume_ratio": 6.81,
+      "detected_at": "2026-05-29T04:51:42.540987+00:00",
+      "intensity": 1,
+      "change_5m_pct": 1.035,
+      "change_15m_pct": 1.68,
+      "change_1h_pct": 3.416,
+      "change_4h_pct": 4.307,
+      "taker_buy_ratio_1m": 0.593,
+      "taker_buy_ratio_5m": 0.562,
+      "oi_delta_5m_pct": 0.424,
+      "funding_rate_pct": -0.0164,
+      "atr_pct": 0.422,
+      "range_4h_pct": 6.07,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.03012821,
+      "suggested_tp1": 0.03060768,
+      "suggested_tp2": 0.03089536,
+      "conviction_score": 5,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "DEXEUSDT",
       "base": "DEXE",
