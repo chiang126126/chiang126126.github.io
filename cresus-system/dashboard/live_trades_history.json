@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-29T13:34:08.719674+00:00",
+  "generated_at": "2026-05-29T13:36:13.438250+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 607,
@@ -35,9 +35,29 @@
     "ok": false,
     "mismatches": [
       {
-        "symbol": "CFXUSDT",
+        "symbol": "ZECUSDT",
         "kind": "exchange_only",
-        "message": "exchange has CFXUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "GPSUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has GPSUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "PENDLEUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "BASUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has BASUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "PYTHUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has PYTHUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "KITEUSDT",
@@ -50,34 +70,14 @@
         "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "PYTHUSDT",
+        "symbol": "CFXUSDT",
         "kind": "exchange_only",
-        "message": "exchange has PYTHUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "PENDLEUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has CFXUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "IDUSDT",
         "kind": "exchange_only",
         "message": "exchange has IDUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "ZECUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "BASUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has BASUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "GPSUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has GPSUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
@@ -86,17 +86,17 @@
       "SEIUSDT"
     ],
     "exchange_symbols": [
-      "CFXUSDT",
-      "KITEUSDT",
-      "SEIUSDT",
-      "AIAUSDT",
-      "PYTHUSDT",
-      "PENDLEUSDT",
-      "KOMAUSDT",
-      "IDUSDT",
       "ZECUSDT",
+      "GPSUSDT",
+      "KOMAUSDT",
+      "PENDLEUSDT",
       "BASUSDT",
-      "GPSUSDT"
+      "PYTHUSDT",
+      "KITEUSDT",
+      "AIAUSDT",
+      "CFXUSDT",
+      "IDUSDT",
+      "SEIUSDT"
     ]
   },
   "open_trades": [
@@ -143,7 +143,7 @@
       "top_trader_position_ratio": null,
       "top_trader_account_ratio": null,
       "global_account_ratio": null,
-      "phase_a_mfe_pct": 0.532,
+      "phase_a_mfe_pct": 0.594,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.16,
@@ -156,11 +156,11 @@
       "btc_pct_vs_ma25_at_open": -0.332,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 0.0636,
-      "current_price": 0.0636,
-      "unrealized_pnl_usdt": 2.5,
-      "unrealized_pnl_pct": 0.625,
-      "last_price_check_at": "2026-05-29T13:34:06.588277+00:00"
+      "phase_a_mfe_price": 0.06356,
+      "current_price": 0.0637,
+      "unrealized_pnl_usdt": 1.875,
+      "unrealized_pnl_pct": 0.469,
+      "last_price_check_at": "2026-05-29T13:36:11.102104+00:00"
     },
     {
       "paper_id": "KOMAUSDT|SHORT|2026-05-29T13:06:28.257583+00:00",
@@ -219,10 +219,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.007061,
-      "current_price": 0.00709,
-      "unrealized_pnl_usdt": 5.5632,
-      "unrealized_pnl_pct": 1.391,
-      "last_price_check_at": "2026-05-29T13:34:06.588277+00:00"
+      "current_price": 0.00706,
+      "unrealized_pnl_usdt": 7.2322,
+      "unrealized_pnl_pct": 1.808,
+      "last_price_check_at": "2026-05-29T13:36:11.102104+00:00"
     }
   ],
   "recent_closed": [
@@ -37652,19 +37652,28 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-29T09:35:04.350447+00:00",
-      "reason": "paper trade too old (14342s > 600s)",
-      "last_checked_at": "2026-05-29T13:34:06.588277+00:00"
+      "reason": "paper trade too old (14467s > 600s)",
+      "last_checked_at": "2026-05-29T13:36:11.102104+00:00"
+    },
+    {
+      "paper_id": "HOODUSDT|LONG|2026-05-29T13:34:16.191421+00:00",
+      "symbol": "HOODUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-05-29T13:34:48.060106+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.93% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-05-29T13:36:11.102104+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 72928.2,
-    "btc_ma25_1h": 73441.18,
-    "pct_vs_ma25": -0.698,
-    "change_24h_pct": -0.083,
+    "btc_price": 72962.4,
+    "btc_ma25_1h": 73442.55,
+    "pct_vs_ma25": -0.654,
+    "change_24h_pct": -0.036,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.976,
-    "computed_at": "2026-05-29T13:34:08.104959+00:00"
+    "change_3h_pct": -0.929,
+    "computed_at": "2026-05-29T13:36:12.831413+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
