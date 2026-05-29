@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-29T14:39:55.701799+00:00",
+  "generated_at": "2026-05-29T14:42:00.503568+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 610,
@@ -35,9 +35,9 @@
     "ok": false,
     "mismatches": [
       {
-        "symbol": "CFXUSDT",
+        "symbol": "AIAUSDT",
         "kind": "exchange_only",
-        "message": "exchange has CFXUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "GPSUSDT",
@@ -45,24 +45,14 @@
         "message": "exchange has GPSUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "AIAUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
         "symbol": "PENDLEUSDT",
         "kind": "exchange_only",
         "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "ZECUSDT",
+        "symbol": "BASUSDT",
         "kind": "exchange_only",
-        "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "PYTHUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has PYTHUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has BASUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "KITEUSDT",
@@ -70,14 +60,24 @@
         "message": "exchange has KITEUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
+        "symbol": "CFXUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has CFXUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "ZECUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
         "symbol": "IDUSDT",
         "kind": "exchange_only",
         "message": "exchange has IDUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "BASUSDT",
+        "symbol": "PYTHUSDT",
         "kind": "exchange_only",
-        "message": "exchange has BASUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has PYTHUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
@@ -85,16 +85,16 @@
       "KOMAUSDT"
     ],
     "exchange_symbols": [
-      "CFXUSDT",
-      "GPSUSDT",
       "KOMAUSDT",
       "AIAUSDT",
+      "GPSUSDT",
       "PENDLEUSDT",
-      "ZECUSDT",
-      "PYTHUSDT",
+      "BASUSDT",
       "KITEUSDT",
+      "CFXUSDT",
+      "ZECUSDT",
       "IDUSDT",
-      "BASUSDT"
+      "PYTHUSDT"
     ]
   },
   "open_trades": [
@@ -113,8 +113,8 @@
       "risk_usdt": 9.2983,
       "risk_pct": 2.325,
       "mirror_latency_sec": 6.1,
-      "sl_price": 0.00696898485,
-      "sl_paper_current": 0.00698098485,
+      "sl_price": 0.006967968695,
+      "sl_paper_current": 0.006979968695,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": -1.2e-05,
       "sl_compensation_mode": "always",
@@ -142,7 +142,7 @@
       "top_trader_account_ratio": null,
       "global_account_ratio": null,
       "phase_a_mfe_pct": 4.207,
-      "phase_b_mfe_pct": 4.61,
+      "phase_b_mfe_pct": 4.624,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.199997,
       "fees_are_actual": true,
@@ -155,11 +155,11 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.006899,
-      "current_price": 0.0069,
-      "unrealized_pnl_usdt": 16.1333,
-      "unrealized_pnl_pct": 4.033,
-      "last_price_check_at": "2026-05-29T14:39:52.273021+00:00",
-      "phase_b_mfe_price": 0.00687
+      "current_price": 0.00687,
+      "unrealized_pnl_usdt": 17.8022,
+      "unrealized_pnl_pct": 4.451,
+      "last_price_check_at": "2026-05-29T14:41:57.864826+00:00",
+      "phase_b_mfe_price": 0.006869
     }
   ],
   "recent_closed": [
@@ -37878,8 +37878,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-29T13:41:09.320582+00:00",
-      "reason": "paper trade too old (3523s > 600s)",
-      "last_checked_at": "2026-05-29T14:39:52.273021+00:00"
+      "reason": "paper trade too old (3649s > 600s)",
+      "last_checked_at": "2026-05-29T14:41:57.864826+00:00"
     },
     {
       "paper_id": "SOXLUSDT|SHORT|2026-05-29T14:25:36.398248+00:00",
@@ -37887,17 +37887,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-29T14:26:41.387818+00:00",
-      "reason": "paper trade too old (791s > 600s)",
-      "last_checked_at": "2026-05-29T14:39:52.273021+00:00"
-    },
-    {
-      "paper_id": "IDUSDT|LONG|2026-05-29T14:32:19.562293+00:00",
-      "symbol": "IDUSDT",
-      "direction": "LONG",
-      "conviction_score": 7,
-      "signal_at": "2026-05-29T14:33:16.072454+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_acute 3h=-1.01% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-05-29T14:39:52.273021+00:00"
+      "reason": "paper trade too old (916s > 600s)",
+      "last_checked_at": "2026-05-29T14:41:57.864826+00:00"
     },
     {
       "paper_id": "ORCLUSDT|LONG|2026-05-29T14:37:04.216852+00:00",
@@ -37905,8 +37896,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-29T14:37:31.911224+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_acute 3h=-1.01% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-05-29T14:39:52.273021+00:00"
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.99% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-05-29T14:41:57.864826+00:00"
     },
     {
       "paper_id": "USUSDT|LONG|2026-05-29T14:39:28.127665+00:00",
@@ -37914,8 +37905,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-29T14:39:38.289726+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_acute 3h=-1.01% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-05-29T14:39:52.273021+00:00"
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.99% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-05-29T14:41:57.864826+00:00"
     },
     {
       "paper_id": "AZTECUSDT|SHORT|2026-05-29T14:33:00.893640+00:00",
@@ -37924,18 +37915,18 @@
       "conviction_score": 5,
       "signal_at": "2026-05-29T14:33:16.072454+00:00",
       "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-05-29T14:39:52.273021+00:00"
+      "last_checked_at": "2026-05-29T14:41:57.864826+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 72698.0,
-    "btc_ma25_1h": 73437.36,
-    "pct_vs_ma25": -1.007,
-    "change_24h_pct": -0.425,
-    "sub_regime": "down_acute",
-    "change_3h_pct": -1.01,
-    "computed_at": "2026-05-29T14:39:54.575138+00:00"
+    "btc_price": 72709.1,
+    "btc_ma25_1h": 73437.81,
+    "pct_vs_ma25": -0.992,
+    "change_24h_pct": -0.409,
+    "sub_regime": "down_stable",
+    "change_3h_pct": -0.995,
+    "computed_at": "2026-05-29T14:41:59.374725+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
