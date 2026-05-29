@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-29T01:54:00.856258+00:00",
+  "updated_at": "2026-05-29T01:56:04.857672+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 20,
+  "alerts_count": 21,
   "alerts": [
+    {
+      "symbol": "NILUSDT",
+      "base": "NIL",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.06536,
+      "price_change_pct": 1.13,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 53678.0,
+      "volume_baseline_usdt": 9849.0,
+      "volume_ratio": 5.45,
+      "detected_at": "2026-05-29T01:55:35.001975+00:00",
+      "intensity": 1,
+      "change_5m_pct": 2.005,
+      "change_15m_pct": 2.595,
+      "change_1h_pct": 2.419,
+      "change_4h_pct": 2.691,
+      "taker_buy_ratio_1m": 0.879,
+      "taker_buy_ratio_5m": 0.767,
+      "oi_delta_5m_pct": 0.241,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.294,
+      "range_4h_pct": 4.67,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.06516786,
+      "suggested_tp1": 0.06564821,
+      "suggested_tp2": 0.06593643,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "HIGHUSDT",
       "base": "HIGH",
