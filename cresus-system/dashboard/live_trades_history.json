@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-29T01:46:29.627506+00:00",
+  "generated_at": "2026-05-29T01:48:45.568058+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 577,
@@ -35,6 +35,11 @@
     "ok": false,
     "mismatches": [
       {
+        "symbol": "AIAUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
         "symbol": "PENDLEUSDT",
         "kind": "exchange_only",
         "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
@@ -43,11 +48,6 @@
         "symbol": "ZECUSDT",
         "kind": "exchange_only",
         "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "AIAUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
@@ -55,10 +55,10 @@
       "IDUSDT"
     ],
     "exchange_symbols": [
-      "IDUSDT",
+      "AIAUSDT",
       "PENDLEUSDT",
-      "ZECUSDT",
-      "AIAUSDT"
+      "IDUSDT",
+      "ZECUSDT"
     ]
   },
   "open_trades": [
@@ -119,10 +119,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.02905,
-      "current_price": 0.02912,
-      "unrealized_pnl_usdt": 7.8428,
-      "unrealized_pnl_pct": 1.961,
-      "last_price_check_at": "2026-05-29T01:46:28.371110+00:00",
+      "current_price": 0.02917,
+      "unrealized_pnl_usdt": 8.5431,
+      "unrealized_pnl_pct": 2.136,
+      "last_price_check_at": "2026-05-29T01:48:44.189847+00:00",
       "phase_b_mfe_price": 0.02918
     }
   ],
@@ -35455,19 +35455,19 @@
       "direction": "LONG",
       "conviction_score": 7,
       "signal_at": "2026-05-29T00:14:15.915108+00:00",
-      "reason": "paper trade too old (5532s > 600s)",
-      "last_checked_at": "2026-05-29T01:46:28.371110+00:00"
+      "reason": "paper trade too old (5668s > 600s)",
+      "last_checked_at": "2026-05-29T01:48:44.189847+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73530.0,
-    "btc_ma25_1h": 73449.2,
-    "pct_vs_ma25": 0.11,
-    "change_24h_pct": -1.054,
+    "btc_price": 73528.0,
+    "btc_ma25_1h": 73449.12,
+    "pct_vs_ma25": 0.107,
+    "change_24h_pct": -1.056,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-29T01:46:29.312925+00:00"
+    "computed_at": "2026-05-29T01:48:45.252629+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
