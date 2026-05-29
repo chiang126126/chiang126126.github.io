@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-29T06:59:47.686382+00:00",
+  "updated_at": "2026-05-29T07:01:53.232154+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 32,
+  "alerts_count": 33,
   "alerts": [
+    {
+      "symbol": "PYTHUSDT",
+      "base": "PYTH",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.04131,
+      "price_change_pct": 2.405,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 215020.0,
+      "volume_baseline_usdt": 10122.0,
+      "volume_ratio": 21.24,
+      "detected_at": "2026-05-29T07:01:40.960821+00:00",
+      "intensity": 3,
+      "change_5m_pct": 2.283,
+      "change_15m_pct": 2.487,
+      "change_1h_pct": 3.987,
+      "change_4h_pct": 5.667,
+      "taker_buy_ratio_1m": 0.656,
+      "taker_buy_ratio_5m": 0.642,
+      "oi_delta_5m_pct": 0.101,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.417,
+      "range_4h_pct": 6.78,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.04105179,
+      "suggested_tp1": 0.04169732,
+      "suggested_tp2": 0.04208464,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "ARUSDT",
       "base": "AR",
