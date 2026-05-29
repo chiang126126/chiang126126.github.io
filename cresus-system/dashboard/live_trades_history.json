@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-29T02:11:15.638945+00:00",
+  "generated_at": "2026-05-29T02:13:12.077753+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 578,
-    "open": 1,
+    "total_trades": 579,
+    "open": 2,
     "closed": 577,
     "wins": 193,
     "losses": 377,
@@ -15,21 +15,21 @@
     "avg_pnl_usdt": -0.0338,
     "best_trade_usdt": 30.9787,
     "worst_trade_usdt": -16.6993,
-    "fees_paid_usdt": 68.4708,
+    "fees_paid_usdt": 68.6707,
     "fees_realized_usdt": 68.2708,
-    "fees_open_usdt": 0.2,
+    "fees_open_usdt": 0.4,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 400.0,
-    "free_capital_usdt": 1512.02,
+    "deployed_usdt": 799.93,
+    "free_capital_usdt": 1111.89,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 12.3338,
-    "deployed_usdt": 400.0
+    "deployed_usdt": 799.93
   },
   "reconciliation": {
     "ok": false,
@@ -45,26 +45,28 @@
         "message": "exchange has GPSUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "AIAUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
         "symbol": "ZECUSDT",
         "kind": "exchange_only",
         "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "AIAUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
     "live_symbols": [
-      "NILUSDT"
+      "NILUSDT",
+      "ARCUSDT"
     ],
     "exchange_symbols": [
-      "AIAUSDT",
       "GPSUSDT",
       "ZECUSDT",
+      "AIAUSDT",
+      "NILUSDT",
       "PENDLEUSDT",
-      "NILUSDT"
+      "ARCUSDT"
     ]
   },
   "open_trades": [
@@ -128,7 +130,69 @@
       "current_price": 0.0666,
       "unrealized_pnl_usdt": -1.7937,
       "unrealized_pnl_pct": -0.448,
-      "last_price_check_at": "2026-05-29T02:11:11.549873+00:00"
+      "last_price_check_at": "2026-05-29T02:13:07.105733+00:00"
+    },
+    {
+      "paper_id": "ARCUSDT|SHORT|2026-05-29T02:11:58.982921+00:00",
+      "trade_id": "L1780020718_ARCUSDT_S",
+      "symbol": "ARCUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.06881,
+      "avg_fill_price": 0.06947,
+      "slippage_bps": -95.92,
+      "qty": 5757.0,
+      "notional_usdt": 399.93879,
+      "leverage": 1,
+      "risk_usdt": 8.5944,
+      "risk_pct": 2.149,
+      "mirror_latency_sec": 6.7,
+      "sl_price": 0.07162286000000001,
+      "sl_paper_current": 0.07096286,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.00066,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 2,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.0195,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "C",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.06558071,
+      "tp2_price": 0.06235143,
+      "phase": "A",
+      "entry_order_id": 143064261,
+      "entry_client_id": "cresus_L1780020718_ARCUSDT_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 1.564,
+      "top_trader_position_ratio": null,
+      "top_trader_account_ratio": null,
+      "global_account_ratio": null,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.199969,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-29T02:12:30.372991+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 73568.9,
+      "btc_change_24h_at_open": -0.917,
+      "btc_pct_vs_ma25_at_open": 0.201,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.06881,
+      "current_price": 0.06953,
+      "unrealized_pnl_usdt": -0.3454,
+      "unrealized_pnl_pct": -0.086,
+      "last_price_check_at": "2026-05-29T02:13:07.105733+00:00"
     }
   ],
   "recent_closed": [
@@ -35533,8 +35597,8 @@
       "direction": "LONG",
       "conviction_score": 7,
       "signal_at": "2026-05-29T00:14:15.915108+00:00",
-      "reason": "paper trade too old (7016s > 600s)",
-      "last_checked_at": "2026-05-29T02:11:11.549873+00:00"
+      "reason": "paper trade too old (7131s > 600s)",
+      "last_checked_at": "2026-05-29T02:13:07.105733+00:00"
     },
     {
       "paper_id": "ALLOUSDT|LONG|2026-05-29T02:03:23.311971+00:00",
@@ -35543,7 +35607,7 @@
       "conviction_score": 5,
       "signal_at": "2026-05-29T02:04:50.691688+00:00",
       "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-05-29T02:11:11.549873+00:00"
+      "last_checked_at": "2026-05-29T02:13:07.105733+00:00"
     },
     {
       "paper_id": "CTRUSDT|LONG|2026-05-29T02:03:50.284351+00:00",
@@ -35552,18 +35616,18 @@
       "conviction_score": 5,
       "signal_at": "2026-05-29T02:04:50.691688+00:00",
       "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-05-29T02:11:11.549873+00:00"
+      "last_checked_at": "2026-05-29T02:13:07.105733+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73575.2,
-    "btc_ma25_1h": 73421.5,
-    "pct_vs_ma25": 0.209,
-    "change_24h_pct": -0.908,
+    "btc_price": 73593.1,
+    "btc_ma25_1h": 73422.21,
+    "pct_vs_ma25": 0.233,
+    "change_24h_pct": -0.884,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-29T02:11:12.506854+00:00"
+    "computed_at": "2026-05-29T02:13:08.377950+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
