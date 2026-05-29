@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-29T10:45:48.262063+00:00",
+  "generated_at": "2026-05-29T10:47:54.904976+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 599,
@@ -35,34 +35,9 @@
     "ok": false,
     "mismatches": [
       {
-        "symbol": "PENDLEUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "AIAUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "KITEUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has KITEUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
         "symbol": "PYTHUSDT",
         "kind": "exchange_only",
         "message": "exchange has PYTHUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "IDUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has IDUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "CFXUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has CFXUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "GPSUSDT",
@@ -75,9 +50,34 @@
         "message": "exchange has BASUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
+        "symbol": "KITEUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has KITEUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "AIAUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
         "symbol": "ZECUSDT",
         "kind": "exchange_only",
         "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "CFXUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has CFXUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "IDUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has IDUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "PENDLEUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
@@ -85,16 +85,16 @@
       "NILUSDT"
     ],
     "exchange_symbols": [
-      "PENDLEUSDT",
-      "AIAUSDT",
-      "KITEUSDT",
       "PYTHUSDT",
-      "IDUSDT",
-      "CFXUSDT",
       "GPSUSDT",
-      "NILUSDT",
       "BASUSDT",
-      "ZECUSDT"
+      "KITEUSDT",
+      "AIAUSDT",
+      "ZECUSDT",
+      "CFXUSDT",
+      "IDUSDT",
+      "PENDLEUSDT",
+      "NILUSDT"
     ]
   },
   "open_trades": [
@@ -113,8 +113,8 @@
       "risk_usdt": 4.9186,
       "risk_pct": 1.23,
       "mirror_latency_sec": 8.0,
-      "sl_price": 0.0722584677,
-      "sl_paper_current": 0.0722184677,
+      "sl_price": 0.07256573815,
+      "sl_paper_current": 0.07252573815,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": 4e-05,
       "sl_compensation_mode": "always",
@@ -142,7 +142,7 @@
       "top_trader_account_ratio": null,
       "global_account_ratio": null,
       "phase_a_mfe_pct": 1.815,
-      "phase_b_mfe_pct": 2.533,
+      "phase_b_mfe_pct": 2.969,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.199997,
       "fees_are_actual": true,
@@ -155,11 +155,11 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.07235,
-      "current_price": 0.0731,
-      "unrealized_pnl_usdt": 11.2516,
-      "unrealized_pnl_pct": 2.813,
-      "last_price_check_at": "2026-05-29T10:45:45.865675+00:00",
-      "phase_b_mfe_price": 0.07286
+      "current_price": 0.0734,
+      "unrealized_pnl_usdt": 12.9393,
+      "unrealized_pnl_pct": 3.235,
+      "last_price_check_at": "2026-05-29T10:47:53.566985+00:00",
+      "phase_b_mfe_price": 0.07317
     }
   ],
   "recent_closed": [
@@ -37083,8 +37083,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-29T09:35:04.350447+00:00",
-      "reason": "paper trade too old (4242s > 600s)",
-      "last_checked_at": "2026-05-29T10:45:45.865675+00:00"
+      "reason": "paper trade too old (4369s > 600s)",
+      "last_checked_at": "2026-05-29T10:47:53.566985+00:00"
     },
     {
       "paper_id": "CTRUSDT|SHORT|2026-05-29T10:16:05.498339+00:00",
@@ -37092,19 +37092,28 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-29T10:16:46.696197+00:00",
-      "reason": "paper trade too old (1739s > 600s)",
-      "last_checked_at": "2026-05-29T10:45:45.865675+00:00"
+      "reason": "paper trade too old (1867s > 600s)",
+      "last_checked_at": "2026-05-29T10:47:53.566985+00:00"
+    },
+    {
+      "paper_id": "FIDAUSDT|SHORT|2026-05-29T10:45:31.459306+00:00",
+      "symbol": "FIDAUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-05-29T10:46:01.968077+00:00",
+      "reason": "circuit_breaker (4+ SL in 30min, pause until 2026-05-29T10:52:08)",
+      "last_checked_at": "2026-05-29T10:47:53.566985+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73574.7,
-    "btc_ma25_1h": 73468.58,
-    "pct_vs_ma25": 0.144,
-    "change_24h_pct": 0.246,
+    "btc_price": 73576.8,
+    "btc_ma25_1h": 73468.67,
+    "pct_vs_ma25": 0.147,
+    "change_24h_pct": 0.249,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-29T10:45:47.949358+00:00"
+    "computed_at": "2026-05-29T10:47:54.597887+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
