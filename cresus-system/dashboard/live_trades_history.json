@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-29T08:05:44.902347+00:00",
+  "generated_at": "2026-05-29T08:07:49.762495+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 592,
@@ -35,14 +35,9 @@
     "ok": false,
     "mismatches": [
       {
-        "symbol": "PYTHUSDT",
+        "symbol": "PENDLEUSDT",
         "kind": "exchange_only",
-        "message": "exchange has PYTHUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "GPSUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has GPSUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "KITEUSDT",
@@ -50,9 +45,9 @@
         "message": "exchange has KITEUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "IDUSDT",
+        "symbol": "PYTHUSDT",
         "kind": "exchange_only",
-        "message": "exchange has IDUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has PYTHUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "AIAUSDT",
@@ -65,19 +60,24 @@
         "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
+        "symbol": "GPSUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has GPSUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
         "symbol": "CFXUSDT",
         "kind": "exchange_only",
         "message": "exchange has CFXUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
+        "symbol": "IDUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has IDUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
         "symbol": "BASUSDT",
         "kind": "exchange_only",
         "message": "exchange has BASUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "PENDLEUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
@@ -85,16 +85,16 @@
       "HMSTRUSDT"
     ],
     "exchange_symbols": [
-      "PYTHUSDT",
-      "GPSUSDT",
+      "PENDLEUSDT",
       "KITEUSDT",
-      "IDUSDT",
+      "HMSTRUSDT",
+      "PYTHUSDT",
       "AIAUSDT",
       "ZECUSDT",
-      "HMSTRUSDT",
+      "GPSUSDT",
       "CFXUSDT",
-      "BASUSDT",
-      "PENDLEUSDT"
+      "IDUSDT",
+      "BASUSDT"
     ]
   },
   "open_trades": [
@@ -155,10 +155,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.000172,
-      "current_price": 0.0001654,
-      "unrealized_pnl_usdt": 20.6422,
-      "unrealized_pnl_pct": 5.161,
-      "last_price_check_at": "2026-05-29T08:05:42.645163+00:00",
+      "current_price": 0.0001655,
+      "unrealized_pnl_usdt": 20.4128,
+      "unrealized_pnl_pct": 5.103,
+      "last_price_check_at": "2026-05-29T08:07:48.341491+00:00",
       "phase_b_mfe_price": 0.0001697,
       "phase_c_mfe_price": 0.0001644
     }
@@ -36576,8 +36576,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-29T07:41:34.187421+00:00",
-      "reason": "paper trade too old (1448s > 600s)",
-      "last_checked_at": "2026-05-29T08:05:42.645163+00:00"
+      "reason": "paper trade too old (1574s > 600s)",
+      "last_checked_at": "2026-05-29T08:07:48.341491+00:00"
     },
     {
       "paper_id": "INJUSDT|LONG|2026-05-29T07:57:40.132736+00:00",
@@ -36586,7 +36586,7 @@
       "conviction_score": 5,
       "signal_at": "2026-05-29T07:58:32.156206+00:00",
       "reason": "circuit_breaker (4+ SL in 30min, pause until 2026-05-29T08:10:48)",
-      "last_checked_at": "2026-05-29T08:05:42.645163+00:00"
+      "last_checked_at": "2026-05-29T08:07:48.341491+00:00"
     },
     {
       "paper_id": "GRASSUSDT|LONG|2026-05-29T08:02:11.035188+00:00",
@@ -36595,7 +36595,7 @@
       "conviction_score": 5,
       "signal_at": "2026-05-29T08:02:45.305115+00:00",
       "reason": "circuit_breaker (4+ SL in 30min, pause until 2026-05-29T08:10:48)",
-      "last_checked_at": "2026-05-29T08:05:42.645163+00:00"
+      "last_checked_at": "2026-05-29T08:07:48.341491+00:00"
     },
     {
       "paper_id": "GENIUSUSDT|SHORT|2026-05-29T08:04:01.202451+00:00",
@@ -36604,18 +36604,18 @@
       "conviction_score": 5,
       "signal_at": "2026-05-29T08:04:51.276599+00:00",
       "reason": "circuit_breaker (4+ SL in 30min, pause until 2026-05-29T08:10:48)",
-      "last_checked_at": "2026-05-29T08:05:42.645163+00:00"
+      "last_checked_at": "2026-05-29T08:07:48.341491+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73628.0,
-    "btc_ma25_1h": 73447.92,
-    "pct_vs_ma25": 0.245,
-    "change_24h_pct": 0.456,
+    "btc_price": 73623.0,
+    "btc_ma25_1h": 73447.72,
+    "pct_vs_ma25": 0.239,
+    "change_24h_pct": 0.449,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-29T08:05:44.588377+00:00"
+    "computed_at": "2026-05-29T08:07:49.440670+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
