@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-29T02:56:08.478939+00:00",
+  "generated_at": "2026-05-29T02:58:16.455009+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 580,
@@ -35,14 +35,9 @@
     "ok": false,
     "mismatches": [
       {
-        "symbol": "PENDLEUSDT",
+        "symbol": "IDUSDT",
         "kind": "exchange_only",
-        "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "AIAUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has IDUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "GPSUSDT",
@@ -55,24 +50,29 @@
         "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "IDUSDT",
+        "symbol": "PENDLEUSDT",
         "kind": "exchange_only",
-        "message": "exchange has IDUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "AIAUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
     "live_symbols": [
-      "RIFUSDT",
-      "ARCUSDT"
+      "ARCUSDT",
+      "RIFUSDT"
     ],
     "exchange_symbols": [
-      "PENDLEUSDT",
-      "AIAUSDT",
-      "RIFUSDT",
       "IDUSDT",
-      "ARCUSDT",
       "GPSUSDT",
-      "ZECUSDT"
+      "ZECUSDT",
+      "RIFUSDT",
+      "ARCUSDT",
+      "AIAUSDT",
+      "PENDLEUSDT"
     ]
   },
   "open_trades": [
@@ -119,7 +119,7 @@
       "top_trader_position_ratio": null,
       "top_trader_account_ratio": null,
       "global_account_ratio": null,
-      "phase_a_mfe_pct": 2.645,
+      "phase_a_mfe_pct": 2.674,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.199969,
@@ -132,11 +132,11 @@
       "btc_pct_vs_ma25_at_open": 0.201,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 0.06699,
-      "current_price": 0.06705,
-      "unrealized_pnl_usdt": 13.9319,
-      "unrealized_pnl_pct": 3.484,
-      "last_price_check_at": "2026-05-29T02:56:04.627661+00:00"
+      "phase_a_mfe_price": 0.06697,
+      "current_price": 0.06664,
+      "unrealized_pnl_usdt": 16.2923,
+      "unrealized_pnl_pct": 4.074,
+      "last_price_check_at": "2026-05-29T02:58:12.328063+00:00"
     },
     {
       "paper_id": "RIFUSDT|LONG|2026-05-29T02:46:38.087548+00:00",
@@ -198,7 +198,7 @@
       "current_price": 0.08115,
       "unrealized_pnl_usdt": -0.2955,
       "unrealized_pnl_pct": -0.074,
-      "last_price_check_at": "2026-05-29T02:56:04.627661+00:00"
+      "last_price_check_at": "2026-05-29T02:58:12.328063+00:00"
     }
   ],
   "recent_closed": [
@@ -35675,8 +35675,8 @@
       "direction": "LONG",
       "conviction_score": 7,
       "signal_at": "2026-05-29T00:14:15.915108+00:00",
-      "reason": "paper trade too old (9709s > 600s)",
-      "last_checked_at": "2026-05-29T02:56:04.627661+00:00"
+      "reason": "paper trade too old (9836s > 600s)",
+      "last_checked_at": "2026-05-29T02:58:12.328063+00:00"
     },
     {
       "paper_id": "IRYSUSDT|LONG|2026-05-29T02:36:22.556373+00:00",
@@ -35684,8 +35684,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-29T02:36:43.686445+00:00",
-      "reason": "paper trade too old (1161s > 600s)",
-      "last_checked_at": "2026-05-29T02:56:04.627661+00:00"
+      "reason": "paper trade too old (1289s > 600s)",
+      "last_checked_at": "2026-05-29T02:58:12.328063+00:00"
     },
     {
       "paper_id": "CLOUSDT|LONG|2026-05-29T02:53:04.663522+00:00",
@@ -35694,7 +35694,7 @@
       "conviction_score": 5,
       "signal_at": "2026-05-29T02:53:54.121597+00:00",
       "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-05-29T02:56:04.627661+00:00"
+      "last_checked_at": "2026-05-29T02:58:12.328063+00:00"
     }
   ],
   "btc_regime_now": {
@@ -35705,7 +35705,7 @@
     "change_24h_pct": -1.302,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-29T02:56:05.585785+00:00"
+    "computed_at": "2026-05-29T02:58:13.274204+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
