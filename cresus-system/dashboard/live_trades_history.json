@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-29T07:49:23.788318+00:00",
+  "generated_at": "2026-05-29T07:51:20.110731+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 592,
@@ -35,14 +35,9 @@
     "ok": false,
     "mismatches": [
       {
-        "symbol": "PENDLEUSDT",
+        "symbol": "PYTHUSDT",
         "kind": "exchange_only",
-        "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "BASUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has BASUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has PYTHUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "IDUSDT",
@@ -50,24 +45,19 @@
         "message": "exchange has IDUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "CFXUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has CFXUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
         "symbol": "ZECUSDT",
         "kind": "exchange_only",
         "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
+        "symbol": "BASUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has BASUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
         "symbol": "AIAUSDT",
         "kind": "exchange_only",
         "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "PYTHUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has PYTHUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "KITEUSDT",
@@ -78,6 +68,16 @@
         "symbol": "GPSUSDT",
         "kind": "exchange_only",
         "message": "exchange has GPSUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "PENDLEUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "CFXUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has CFXUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
@@ -85,16 +85,16 @@
       "HMSTRUSDT"
     ],
     "exchange_symbols": [
-      "PENDLEUSDT",
-      "BASUSDT",
-      "IDUSDT",
-      "CFXUSDT",
-      "HMSTRUSDT",
-      "ZECUSDT",
-      "AIAUSDT",
       "PYTHUSDT",
+      "IDUSDT",
+      "ZECUSDT",
+      "BASUSDT",
+      "AIAUSDT",
       "KITEUSDT",
-      "GPSUSDT"
+      "GPSUSDT",
+      "PENDLEUSDT",
+      "CFXUSDT",
+      "HMSTRUSDT"
     ]
   },
   "open_trades": [
@@ -155,10 +155,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.000172,
-      "current_price": 0.0001676,
-      "unrealized_pnl_usdt": 15.5963,
-      "unrealized_pnl_pct": 3.899,
-      "last_price_check_at": "2026-05-29T07:49:22.302749+00:00",
+      "current_price": 0.0001681,
+      "unrealized_pnl_usdt": 14.4495,
+      "unrealized_pnl_pct": 3.612,
+      "last_price_check_at": "2026-05-29T07:51:18.449656+00:00",
       "phase_b_mfe_price": 0.0001697,
       "phase_c_mfe_price": 0.0001673
     }
@@ -36571,33 +36571,24 @@
   ],
   "missed_signals": [
     {
-      "paper_id": "IDUSDT|LONG|2026-05-29T07:41:07.207118+00:00",
-      "symbol": "IDUSDT",
-      "direction": "LONG",
-      "conviction_score": 7,
-      "signal_at": "2026-05-29T07:41:34.187421+00:00",
-      "reason": "circuit_breaker (4+ SL in 30min, pause until 2026-05-29T08:10:48)",
-      "last_checked_at": "2026-05-29T07:49:22.302749+00:00"
-    },
-    {
       "paper_id": "IOTAUSDT|SHORT|2026-05-29T07:41:06.626367+00:00",
       "symbol": "IOTAUSDT",
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-29T07:41:34.187421+00:00",
       "reason": "circuit_breaker (4+ SL in 30min, pause until 2026-05-29T08:10:48)",
-      "last_checked_at": "2026-05-29T07:49:22.302749+00:00"
+      "last_checked_at": "2026-05-29T07:51:18.449656+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73370.7,
-    "btc_ma25_1h": 73438.25,
-    "pct_vs_ma25": -0.092,
-    "change_24h_pct": -0.137,
+    "btc_price": 73397.0,
+    "btc_ma25_1h": 73439.3,
+    "pct_vs_ma25": -0.058,
+    "change_24h_pct": -0.101,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-29T07:49:23.471245+00:00"
+    "computed_at": "2026-05-29T07:51:19.789053+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
