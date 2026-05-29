@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-29T02:13:12.077753+00:00",
+  "generated_at": "2026-05-29T02:15:15.527474+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 579,
@@ -35,14 +35,19 @@
     "ok": false,
     "mismatches": [
       {
-        "symbol": "PENDLEUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
         "symbol": "GPSUSDT",
         "kind": "exchange_only",
         "message": "exchange has GPSUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "AIAUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "IDUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has IDUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "ZECUSDT",
@@ -50,23 +55,24 @@
         "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "AIAUSDT",
+        "symbol": "PENDLEUSDT",
         "kind": "exchange_only",
-        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
     "live_symbols": [
-      "NILUSDT",
-      "ARCUSDT"
+      "ARCUSDT",
+      "NILUSDT"
     ],
     "exchange_symbols": [
       "GPSUSDT",
-      "ZECUSDT",
       "AIAUSDT",
+      "ARCUSDT",
       "NILUSDT",
-      "PENDLEUSDT",
-      "ARCUSDT"
+      "IDUSDT",
+      "ZECUSDT",
+      "PENDLEUSDT"
     ]
   },
   "open_trades": [
@@ -127,10 +133,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.06689,
-      "current_price": 0.0666,
-      "unrealized_pnl_usdt": -1.7937,
-      "unrealized_pnl_pct": -0.448,
-      "last_price_check_at": "2026-05-29T02:13:07.105733+00:00"
+      "current_price": 0.0665,
+      "unrealized_pnl_usdt": -2.3916,
+      "unrealized_pnl_pct": -0.598,
+      "last_price_check_at": "2026-05-29T02:15:13.176456+00:00"
     },
     {
       "paper_id": "ARCUSDT|SHORT|2026-05-29T02:11:58.982921+00:00",
@@ -189,10 +195,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.06881,
-      "current_price": 0.06953,
-      "unrealized_pnl_usdt": -0.3454,
-      "unrealized_pnl_pct": -0.086,
-      "last_price_check_at": "2026-05-29T02:13:07.105733+00:00"
+      "current_price": 0.06959,
+      "unrealized_pnl_usdt": -0.6908,
+      "unrealized_pnl_pct": -0.173,
+      "last_price_check_at": "2026-05-29T02:15:13.176456+00:00"
     }
   ],
   "recent_closed": [
@@ -35597,8 +35603,8 @@
       "direction": "LONG",
       "conviction_score": 7,
       "signal_at": "2026-05-29T00:14:15.915108+00:00",
-      "reason": "paper trade too old (7131s > 600s)",
-      "last_checked_at": "2026-05-29T02:13:07.105733+00:00"
+      "reason": "paper trade too old (7257s > 600s)",
+      "last_checked_at": "2026-05-29T02:15:13.176456+00:00"
     },
     {
       "paper_id": "ALLOUSDT|LONG|2026-05-29T02:03:23.311971+00:00",
@@ -35606,28 +35612,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-29T02:04:50.691688+00:00",
-      "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-05-29T02:13:07.105733+00:00"
-    },
-    {
-      "paper_id": "CTRUSDT|LONG|2026-05-29T02:03:50.284351+00:00",
-      "symbol": "CTRUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-05-29T02:04:50.691688+00:00",
-      "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-05-29T02:13:07.105733+00:00"
+      "reason": "paper trade too old (622s > 600s)",
+      "last_checked_at": "2026-05-29T02:15:13.176456+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73593.1,
-    "btc_ma25_1h": 73422.21,
-    "pct_vs_ma25": 0.233,
-    "change_24h_pct": -0.884,
+    "btc_price": 73595.0,
+    "btc_ma25_1h": 73422.29,
+    "pct_vs_ma25": 0.235,
+    "change_24h_pct": -0.881,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-29T02:13:08.377950+00:00"
+    "computed_at": "2026-05-29T02:15:14.933517+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
