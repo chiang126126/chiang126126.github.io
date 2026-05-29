@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-29T05:40:26.098919+00:00",
+  "updated_at": "2026-05-29T05:42:30.145880+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 31,
+  "alerts_count": 32,
   "alerts": [
+    {
+      "symbol": "BILLUSDT",
+      "base": "BILL",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.06968,
+      "price_change_pct": -0.599,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 257384.0,
+      "volume_baseline_usdt": 37923.0,
+      "volume_ratio": 6.79,
+      "detected_at": "2026-05-29T05:41:37.644181+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.583,
+      "change_15m_pct": -0.171,
+      "change_1h_pct": -3.932,
+      "change_4h_pct": -14.488,
+      "taker_buy_ratio_1m": 0.55,
+      "taker_buy_ratio_5m": 0.472,
+      "oi_delta_5m_pct": -0.0,
+      "funding_rate_pct": -0.0432,
+      "atr_pct": 0.454,
+      "range_4h_pct": 20.36,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.07031286,
+      "suggested_tp1": 0.06873071,
+      "suggested_tp2": 0.06778143,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "BASUSDT",
       "base": "BAS",
