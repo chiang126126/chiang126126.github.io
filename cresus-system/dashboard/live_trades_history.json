@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-29T05:07:19.875532+00:00",
+  "generated_at": "2026-05-29T05:09:25.173039+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 586,
@@ -35,6 +35,21 @@
     "ok": false,
     "mismatches": [
       {
+        "symbol": "ZECUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "AIAUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "GPSUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has GPSUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
         "symbol": "CFXUSDT",
         "kind": "exchange_only",
         "message": "exchange has CFXUSDT position but live doesn't track (user manual? or state lost)"
@@ -48,41 +63,26 @@
         "symbol": "PENDLEUSDT",
         "kind": "exchange_only",
         "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "GPSUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has GPSUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "AIAUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "ZECUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
     "live_symbols": [
-      "USUSDT",
+      "ETHFIUSDT",
       "ZEREBROUSDT",
-      "ARCUSDT",
-      "ETHFIUSDT"
+      "USUSDT",
+      "ARCUSDT"
     ],
     "exchange_symbols": [
+      "ZECUSDT",
       "ZEREBROUSDT",
-      "ARCUSDT",
+      "ETHFIUSDT",
+      "AIAUSDT",
+      "GPSUSDT",
+      "USUSDT",
       "CFXUSDT",
       "IDUSDT",
       "PENDLEUSDT",
-      "ETHFIUSDT",
-      "USUSDT",
-      "GPSUSDT",
-      "AIAUSDT",
-      "ZECUSDT"
+      "ARCUSDT"
     ]
   },
   "open_trades": [
@@ -143,10 +143,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.06578,
-      "current_price": 0.06747,
-      "unrealized_pnl_usdt": 11.514,
-      "unrealized_pnl_pct": 2.879,
-      "last_price_check_at": "2026-05-29T05:07:17.180655+00:00"
+      "current_price": 0.0676,
+      "unrealized_pnl_usdt": 10.7656,
+      "unrealized_pnl_pct": 2.692,
+      "last_price_check_at": "2026-05-29T05:09:22.672145+00:00"
     },
     {
       "paper_id": "USUSDT|LONG|2026-05-29T03:52:41.220243+00:00",
@@ -205,10 +205,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.007067,
-      "current_price": 0.00706,
-      "unrealized_pnl_usdt": 3.4285,
-      "unrealized_pnl_pct": 0.857,
-      "last_price_check_at": "2026-05-29T05:07:17.180655+00:00"
+      "current_price": 0.00707,
+      "unrealized_pnl_usdt": 3.9999,
+      "unrealized_pnl_pct": 1.0,
+      "last_price_check_at": "2026-05-29T05:09:22.672145+00:00"
     },
     {
       "paper_id": "ZEREBROUSDT|LONG|2026-05-29T04:27:19.579067+00:00",
@@ -267,10 +267,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.025124,
-      "current_price": 0.02471,
-      "unrealized_pnl_usdt": -3.0522,
-      "unrealized_pnl_pct": -0.763,
-      "last_price_check_at": "2026-05-29T05:07:17.180655+00:00"
+      "current_price": 0.02475,
+      "unrealized_pnl_usdt": -2.4096,
+      "unrealized_pnl_pct": -0.602,
+      "last_price_check_at": "2026-05-29T05:09:22.672145+00:00"
     },
     {
       "paper_id": "ETHFIUSDT|LONG|2026-05-29T05:02:08.452255+00:00",
@@ -329,10 +329,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.403,
-      "current_price": 0.402,
-      "unrealized_pnl_usdt": 0.1991,
-      "unrealized_pnl_pct": 0.05,
-      "last_price_check_at": "2026-05-29T05:07:17.180655+00:00"
+      "current_price": 0.4027,
+      "unrealized_pnl_usdt": 0.896,
+      "unrealized_pnl_pct": 0.224,
+      "last_price_check_at": "2026-05-29T05:09:22.672145+00:00"
     }
   ],
   "recent_closed": [
@@ -36100,7 +36100,7 @@
       "conviction_score": 5,
       "signal_at": "2026-05-29T04:07:11.079753+00:00",
       "reason": "max_concurrent reached (4/4)",
-      "last_checked_at": "2026-05-29T05:07:17.180655+00:00"
+      "last_checked_at": "2026-05-29T05:09:22.672145+00:00"
     },
     {
       "paper_id": "AIGENSYNUSDT|LONG|2026-05-29T04:51:42.540987+00:00",
@@ -36109,7 +36109,7 @@
       "conviction_score": 5,
       "signal_at": "2026-05-29T04:52:13.857810+00:00",
       "reason": "max_concurrent reached (4/4)",
-      "last_checked_at": "2026-05-29T05:07:17.180655+00:00"
+      "last_checked_at": "2026-05-29T05:09:22.672145+00:00"
     },
     {
       "paper_id": "ESPORTSUSDT|SHORT|2026-05-29T04:53:20.995437+00:00",
@@ -36118,18 +36118,18 @@
       "conviction_score": 5,
       "signal_at": "2026-05-29T04:54:17.774935+00:00",
       "reason": "max_concurrent reached (4/4)",
-      "last_checked_at": "2026-05-29T05:07:17.180655+00:00"
+      "last_checked_at": "2026-05-29T05:09:22.672145+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73458.6,
-    "btc_ma25_1h": 73391.62,
-    "pct_vs_ma25": 0.091,
-    "change_24h_pct": 0.695,
+    "btc_price": 73547.0,
+    "btc_ma25_1h": 73395.16,
+    "pct_vs_ma25": 0.207,
+    "change_24h_pct": 0.816,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-29T05:07:18.733449+00:00"
+    "computed_at": "2026-05-29T05:09:24.019208+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
