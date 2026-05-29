@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-29T04:32:28.321879+00:00",
+  "generated_at": "2026-05-29T04:34:33.552831+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 584,
-    "open": 3,
+    "total_trades": 585,
+    "open": 4,
     "closed": 581,
     "wins": 193,
     "losses": 381,
@@ -15,29 +15,29 @@
     "avg_pnl_usdt": -0.0641,
     "best_trade_usdt": 30.9787,
     "worst_trade_usdt": -16.6993,
-    "fees_paid_usdt": 70.3848,
+    "fees_paid_usdt": 70.5848,
     "fees_realized_usdt": 69.7848,
-    "fees_open_usdt": 0.6,
+    "fees_open_usdt": 0.7999,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 1199.9,
-    "free_capital_usdt": 692.48,
+    "deployed_usdt": 1599.9,
+    "free_capital_usdt": 292.28,
     "max_concurrent_slots": 4,
-    "slots_used": 3
+    "slots_used": 4
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -0.4606,
+    "daily_pnl": -5.3936,
     "deployed_usdt": 1599.9
   },
   "reconciliation": {
     "ok": false,
     "mismatches": [
       {
-        "symbol": "PENDLEUSDT",
+        "symbol": "GPSUSDT",
         "kind": "exchange_only",
-        "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has GPSUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "ZECUSDT",
@@ -45,9 +45,9 @@
         "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "GPSUSDT",
+        "symbol": "CFXUSDT",
         "kind": "exchange_only",
-        "message": "exchange has GPSUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has CFXUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "IDUSDT",
@@ -55,34 +55,34 @@
         "message": "exchange has IDUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
+        "symbol": "PENDLEUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
         "symbol": "AIAUSDT",
         "kind": "exchange_only",
         "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "CFXUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has CFXUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
     "live_symbols": [
-      "HMSTRUSDT",
-      "USUSDT",
       "PYTHUSDT",
+      "USUSDT",
+      "ZEREBROUSDT",
       "ARCUSDT"
     ],
     "exchange_symbols": [
-      "USUSDT",
-      "HMSTRUSDT",
-      "PENDLEUSDT",
-      "ZECUSDT",
       "GPSUSDT",
-      "ARCUSDT",
+      "PENDLEUSDT",
       "IDUSDT",
-      "AIAUSDT",
       "PYTHUSDT",
-      "CFXUSDT"
+      "CFXUSDT",
+      "USUSDT",
+      "ARCUSDT",
+      "ZECUSDT",
+      "ZEREBROUSDT",
+      "AIAUSDT"
     ]
   },
   "open_trades": [
@@ -143,10 +143,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.06578,
-      "current_price": 0.06693,
-      "unrealized_pnl_usdt": 14.6228,
-      "unrealized_pnl_pct": 3.656,
-      "last_price_check_at": "2026-05-29T04:32:23.859300+00:00"
+      "current_price": 0.06668,
+      "unrealized_pnl_usdt": 16.062,
+      "unrealized_pnl_pct": 4.016,
+      "last_price_check_at": "2026-05-29T04:34:31.506032+00:00"
     },
     {
       "paper_id": "USUSDT|LONG|2026-05-29T03:52:41.220243+00:00",
@@ -205,10 +205,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.007058,
-      "current_price": 0.00697,
-      "unrealized_pnl_usdt": -1.7143,
-      "unrealized_pnl_pct": -0.429,
-      "last_price_check_at": "2026-05-29T04:32:23.859300+00:00"
+      "current_price": 0.00699,
+      "unrealized_pnl_usdt": -0.5714,
+      "unrealized_pnl_pct": -0.143,
+      "last_price_check_at": "2026-05-29T04:34:31.506032+00:00"
     },
     {
       "paper_id": "PYTHUSDT|LONG|2026-05-29T04:27:12.558959+00:00",
@@ -225,8 +225,8 @@
       "risk_usdt": 1.0402,
       "risk_pct": 0.26,
       "mirror_latency_sec": 10.0,
-      "sl_price": 0.039549999999999995,
-      "sl_paper_current": 0.03956,
+      "sl_price": 0.03969951299999999,
+      "sl_paper_current": 0.039709512999999995,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": -1e-05,
       "sl_compensation_mode": "always",
@@ -267,11 +267,73 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.03988,
-      "current_price": 0.03978,
-      "unrealized_pnl_usdt": 2.326,
-      "unrealized_pnl_pct": 0.582,
-      "last_price_check_at": "2026-05-29T04:32:23.859300+00:00",
+      "current_price": 0.03986,
+      "unrealized_pnl_usdt": 3.135,
+      "unrealized_pnl_pct": 0.784,
+      "last_price_check_at": "2026-05-29T04:34:31.506032+00:00",
       "phase_b_mfe_price": 0.03988
+    },
+    {
+      "paper_id": "ZEREBROUSDT|LONG|2026-05-29T04:27:19.579067+00:00",
+      "trade_id": "L1780028839_ZEREBRO_L",
+      "symbol": "ZEREBROUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.024958,
+      "avg_fill_price": 0.0249,
+      "slippage_bps": -23.24,
+      "qty": 16064.0,
+      "notional_usdt": 399.9936,
+      "leverage": 1,
+      "risk_usdt": 6.8662,
+      "risk_pct": 1.717,
+      "mirror_latency_sec": 313.5,
+      "sl_price": 0.024414569999999997,
+      "sl_paper_current": 0.02447257,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -5.8e-05,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 2,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "D",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.02568614,
+      "tp2_price": 0.02641429,
+      "phase": "A",
+      "entry_order_id": 171010234,
+      "entry_client_id": "cresus_L1780028839_ZEREBRO_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.972,
+      "top_trader_position_ratio": null,
+      "top_trader_account_ratio": null,
+      "global_account_ratio": null,
+      "phase_a_mfe_pct": 0.216,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.199997,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-29T04:32:38.107366+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 73322.7,
+      "btc_change_24h_at_open": 0.257,
+      "btc_pct_vs_ma25_at_open": -0.069,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.025012,
+      "current_price": 0.0247,
+      "unrealized_pnl_usdt": -3.2128,
+      "unrealized_pnl_pct": -0.803,
+      "last_price_check_at": "2026-05-29T04:34:31.506032+00:00"
     }
   ],
   "recent_closed": [
@@ -35965,27 +36027,18 @@
       "conviction_score": 5,
       "signal_at": "2026-05-29T04:07:11.079753+00:00",
       "reason": "max_concurrent reached (4/4)",
-      "last_checked_at": "2026-05-29T04:32:23.859300+00:00"
-    },
-    {
-      "paper_id": "ZEREBROUSDT|LONG|2026-05-29T04:27:19.579067+00:00",
-      "symbol": "ZEREBROUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-05-29T04:27:24.597861+00:00",
-      "reason": "max_concurrent reached (4/4)",
-      "last_checked_at": "2026-05-29T04:32:23.859300+00:00"
+      "last_checked_at": "2026-05-29T04:34:31.506032+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73328.4,
-    "btc_ma25_1h": 73373.46,
-    "pct_vs_ma25": -0.061,
-    "change_24h_pct": 0.265,
+    "btc_price": 73355.3,
+    "btc_ma25_1h": 73374.54,
+    "pct_vs_ma25": -0.026,
+    "change_24h_pct": 0.302,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-29T04:32:24.979893+00:00"
+    "computed_at": "2026-05-29T04:34:32.428147+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
