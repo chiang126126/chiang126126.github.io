@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-29T06:08:45.818053+00:00",
+  "generated_at": "2026-05-29T06:10:51.057386+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 586,
@@ -35,9 +35,29 @@
     "ok": false,
     "mismatches": [
       {
+        "symbol": "IDUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has IDUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "ZECUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
         "symbol": "BASUSDT",
         "kind": "exchange_only",
         "message": "exchange has BASUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "AIAUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "GPSUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has GPSUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "CFXUSDT",
@@ -48,45 +68,25 @@
         "symbol": "PENDLEUSDT",
         "kind": "exchange_only",
         "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "ZECUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "AIAUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "IDUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has IDUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "GPSUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has GPSUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
     "live_symbols": [
-      "ARCUSDT",
       "USUSDT",
-      "ZEREBROUSDT"
+      "ZEREBROUSDT",
+      "ARCUSDT"
     ],
     "exchange_symbols": [
-      "BASUSDT",
+      "IDUSDT",
       "CFXUSDT",
-      "PENDLEUSDT",
-      "ZECUSDT",
-      "ARCUSDT",
+      "BASUSDT",
+      "ZEREBROUSDT",
       "USUSDT",
       "AIAUSDT",
-      "IDUSDT",
       "GPSUSDT",
-      "ZEREBROUSDT"
+      "ARCUSDT",
+      "ZECUSDT",
+      "PENDLEUSDT"
     ]
   },
   "open_trades": [
@@ -150,7 +150,7 @@
       "current_price": 0.06789,
       "unrealized_pnl_usdt": 9.0961,
       "unrealized_pnl_pct": 2.274,
-      "last_price_check_at": "2026-05-29T06:08:44.011215+00:00"
+      "last_price_check_at": "2026-05-29T06:10:48.835083+00:00"
     },
     {
       "paper_id": "USUSDT|LONG|2026-05-29T03:52:41.220243+00:00",
@@ -167,8 +167,8 @@
       "risk_usdt": 3.3348,
       "risk_pct": 0.834,
       "mirror_latency_sec": 10.6,
-      "sl_price": 0.00693164,
-      "sl_paper_current": 0.00694164,
+      "sl_price": 0.007,
+      "sl_paper_current": 0.00701,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": -1e-05,
       "sl_compensation_mode": "always",
@@ -184,7 +184,7 @@
       "min_conviction_threshold": null,
       "tp1_price": 0.00711254,
       "tp2_price": 0.00721507,
-      "phase": "A",
+      "phase": "B",
       "entry_order_id": 78586581,
       "entry_client_id": "cresus_L1780026761_USUSDT_L_E",
       "sl_order_id": null,
@@ -195,8 +195,8 @@
       "top_trader_position_ratio": null,
       "top_trader_account_ratio": null,
       "global_account_ratio": null,
-      "phase_a_mfe_pct": 1.041,
-      "phase_b_mfe_pct": null,
+      "phase_a_mfe_pct": 1.626,
+      "phase_b_mfe_pct": 1.626,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.199997,
       "fees_are_actual": true,
@@ -208,11 +208,12 @@
       "btc_pct_vs_ma25_at_open": -0.143,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 0.007083,
-      "current_price": 0.00711,
-      "unrealized_pnl_usdt": 6.2856,
-      "unrealized_pnl_pct": 1.571,
-      "last_price_check_at": "2026-05-29T06:08:44.011215+00:00"
+      "phase_a_mfe_price": 0.007124,
+      "current_price": 0.00713,
+      "unrealized_pnl_usdt": 7.4285,
+      "unrealized_pnl_pct": 1.857,
+      "last_price_check_at": "2026-05-29T06:10:48.835083+00:00",
+      "phase_b_mfe_price": 0.007124
     },
     {
       "paper_id": "ZEREBROUSDT|LONG|2026-05-29T04:27:19.579067+00:00",
@@ -271,10 +272,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.025124,
-      "current_price": 0.02473,
-      "unrealized_pnl_usdt": -2.7309,
-      "unrealized_pnl_pct": -0.683,
-      "last_price_check_at": "2026-05-29T06:08:44.011215+00:00"
+      "current_price": 0.02465,
+      "unrealized_pnl_usdt": -4.016,
+      "unrealized_pnl_pct": -1.004,
+      "last_price_check_at": "2026-05-29T06:10:48.835083+00:00"
     }
   ],
   "recent_closed": [
@@ -36113,19 +36114,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-29T05:44:34.415805+00:00",
-      "reason": "paper trade too old (1450s > 600s)",
-      "last_checked_at": "2026-05-29T06:08:44.011215+00:00"
+      "reason": "paper trade too old (1574s > 600s)",
+      "last_checked_at": "2026-05-29T06:10:48.835083+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73640.1,
-    "btc_ma25_1h": 73425.6,
-    "pct_vs_ma25": 0.292,
-    "change_24h_pct": 0.647,
+    "btc_price": 73633.4,
+    "btc_ma25_1h": 73425.33,
+    "pct_vs_ma25": 0.283,
+    "change_24h_pct": 0.638,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-29T06:08:44.949408+00:00"
+    "computed_at": "2026-05-29T06:10:50.150356+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
