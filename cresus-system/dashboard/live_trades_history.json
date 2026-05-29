@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-29T04:14:01.846383+00:00",
+  "generated_at": "2026-05-29T04:16:08.923697+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 582,
@@ -45,14 +45,14 @@
         "message": "exchange has IDUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "AIAUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
         "symbol": "CFXUSDT",
         "kind": "exchange_only",
         "message": "exchange has CFXUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "AIAUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "ZECUSDT",
@@ -73,14 +73,14 @@
     ],
     "exchange_symbols": [
       "PENDLEUSDT",
-      "IOUSDT",
       "IDUSDT",
-      "ARCUSDT",
-      "AIAUSDT",
-      "CFXUSDT",
-      "ZECUSDT",
       "USUSDT",
-      "GPSUSDT"
+      "CFXUSDT",
+      "AIAUSDT",
+      "ZECUSDT",
+      "GPSUSDT",
+      "ARCUSDT",
+      "IOUSDT"
     ]
   },
   "open_trades": [
@@ -141,10 +141,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.06578,
-      "current_price": 0.06719,
-      "unrealized_pnl_usdt": 13.126,
-      "unrealized_pnl_pct": 3.282,
-      "last_price_check_at": "2026-05-29T04:13:59.045861+00:00"
+      "current_price": 0.06696,
+      "unrealized_pnl_usdt": 14.4501,
+      "unrealized_pnl_pct": 3.613,
+      "last_price_check_at": "2026-05-29T04:16:06.761951+00:00"
     },
     {
       "paper_id": "USUSDT|LONG|2026-05-29T03:52:41.220243+00:00",
@@ -203,10 +203,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.007058,
-      "current_price": 0.00703,
-      "unrealized_pnl_usdt": 1.7143,
-      "unrealized_pnl_pct": 0.429,
-      "last_price_check_at": "2026-05-29T04:13:59.045861+00:00"
+      "current_price": 0.00699,
+      "unrealized_pnl_usdt": -0.5714,
+      "unrealized_pnl_pct": -0.143,
+      "last_price_check_at": "2026-05-29T04:16:06.761951+00:00"
     },
     {
       "paper_id": "IOUSDT|SHORT|2026-05-29T04:11:01.308796+00:00",
@@ -265,10 +265,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.1593,
-      "current_price": 0.1597,
-      "unrealized_pnl_usdt": -1.5085,
-      "unrealized_pnl_pct": -0.377,
-      "last_price_check_at": "2026-05-29T04:13:59.045861+00:00"
+      "current_price": 0.1599,
+      "unrealized_pnl_usdt": -2.0113,
+      "unrealized_pnl_pct": -0.503,
+      "last_price_check_at": "2026-05-29T04:16:06.761951+00:00"
     }
   ],
   "recent_closed": [
@@ -35812,51 +35812,24 @@
   ],
   "missed_signals": [
     {
-      "paper_id": "ESPORTSUSDT|LONG|2026-05-29T00:13:17.034189+00:00",
-      "symbol": "ESPORTSUSDT",
-      "direction": "LONG",
-      "conviction_score": 7,
-      "signal_at": "2026-05-29T00:14:15.915108+00:00",
-      "reason": "paper trade too old (14383s > 600s)",
-      "last_checked_at": "2026-05-29T04:13:59.045861+00:00"
-    },
-    {
-      "paper_id": "ALLOUSDT|LONG|2026-05-29T03:47:24.148354+00:00",
-      "symbol": "ALLOUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-05-29T03:48:47.319100+00:00",
-      "reason": "paper trade too old (1512s > 600s)",
-      "last_checked_at": "2026-05-29T04:13:59.045861+00:00"
-    },
-    {
       "paper_id": "KOMAUSDT|LONG|2026-05-29T04:06:55.156738+00:00",
       "symbol": "KOMAUSDT",
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-29T04:07:11.079753+00:00",
       "reason": "funding adverse (0.0646% ≥ 0.05%) (Phase 4.M: paper 历史人均 -$0.85, 不利 mirror)",
-      "last_checked_at": "2026-05-29T04:13:59.045861+00:00"
-    },
-    {
-      "paper_id": "ICPUSDT|SHORT|2026-05-29T04:12:45.363537+00:00",
-      "symbol": "ICPUSDT",
-      "direction": "SHORT",
-      "conviction_score": 5,
-      "signal_at": "2026-05-29T04:13:46.198793+00:00",
-      "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-05-29T04:13:59.045861+00:00"
+      "last_checked_at": "2026-05-29T04:16:06.761951+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73200.0,
-    "btc_ma25_1h": 73368.33,
-    "pct_vs_ma25": -0.229,
-    "change_24h_pct": 0.089,
+    "btc_price": 73224.8,
+    "btc_ma25_1h": 73369.32,
+    "pct_vs_ma25": -0.197,
+    "change_24h_pct": 0.123,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-29T04:14:00.002567+00:00"
+    "computed_at": "2026-05-29T04:16:08.072416+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
