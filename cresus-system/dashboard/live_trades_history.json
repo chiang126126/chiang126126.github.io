@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-29T21:55:16.366528+00:00",
+  "generated_at": "2026-05-29T21:57:21.996841+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 626,
@@ -37,14 +37,9 @@
     "ok": false,
     "mismatches": [
       {
-        "symbol": "AIAUSDT",
+        "symbol": "KITEUSDT",
         "kind": "exchange_only",
-        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "GPSUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has GPSUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has KITEUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "CFXUSDT",
@@ -52,19 +47,14 @@
         "message": "exchange has CFXUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "BASUSDT",
+        "symbol": "IDUSDT",
         "kind": "exchange_only",
-        "message": "exchange has BASUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has IDUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "ZECUSDT",
+        "symbol": "AIAUSDT",
         "kind": "exchange_only",
-        "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "KITEUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has KITEUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "PENDLEUSDT",
@@ -77,23 +67,33 @@
         "message": "exchange has PYTHUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "IDUSDT",
+        "symbol": "GPSUSDT",
         "kind": "exchange_only",
-        "message": "exchange has IDUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has GPSUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "BASUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has BASUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "ZECUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
     "live_symbols": [],
     "exchange_symbols": [
-      "AIAUSDT",
-      "GPSUSDT",
-      "CFXUSDT",
-      "BASUSDT",
-      "ZECUSDT",
       "KITEUSDT",
+      "CFXUSDT",
+      "IDUSDT",
+      "AIAUSDT",
       "PENDLEUSDT",
       "PYTHUSDT",
-      "IDUSDT"
+      "GPSUSDT",
+      "BASUSDT",
+      "ZECUSDT"
     ]
   },
   "open_trades": [],
@@ -39036,16 +39036,26 @@
       "close_qty": 53792.0
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "SWARMSUSDT|SHORT|2026-05-29T21:56:01.201331+00:00",
+      "symbol": "SWARMSUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-05-29T21:56:32.280367+00:00",
+      "reason": "circuit_breaker (4+ SL in 30min, pause until 2026-05-29T22:18:55)",
+      "last_checked_at": "2026-05-29T21:57:20.386133+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73410.0,
-    "btc_ma25_1h": 73541.64,
-    "pct_vs_ma25": -0.179,
-    "change_24h_pct": -0.535,
+    "btc_price": 73402.2,
+    "btc_ma25_1h": 73541.33,
+    "pct_vs_ma25": -0.189,
+    "change_24h_pct": -0.546,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-29T21:55:16.328166+00:00"
+    "computed_at": "2026-05-29T21:57:21.964245+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
