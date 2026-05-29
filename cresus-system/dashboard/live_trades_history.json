@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-29T01:40:21.707451+00:00",
+  "generated_at": "2026-05-29T01:42:26.275330+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 577,
@@ -40,14 +40,14 @@
         "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "AIAUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
         "symbol": "ZECUSDT",
         "kind": "exchange_only",
         "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "AIAUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
@@ -56,9 +56,9 @@
     ],
     "exchange_symbols": [
       "IDUSDT",
+      "ZECUSDT",
       "PENDLEUSDT",
-      "AIAUSDT",
-      "ZECUSDT"
+      "AIAUSDT"
     ]
   },
   "open_trades": [
@@ -77,8 +77,8 @@
       "risk_usdt": 6.2972,
       "risk_pct": 1.574,
       "mirror_latency_sec": 11.2,
-      "sl_price": 0.02825036,
-      "sl_paper_current": 0.02811036,
+      "sl_price": 0.028560000000000002,
+      "sl_paper_current": 0.02842,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": 0.00014,
       "sl_compensation_mode": "always",
@@ -94,7 +94,7 @@
       "min_conviction_threshold": null,
       "tp1_price": 0.02888446,
       "tp2_price": 0.02934893,
-      "phase": "A",
+      "phase": "B",
       "entry_order_id": 96261177,
       "entry_client_id": "cresus_L1780017390_IDUSDT_L_E",
       "sl_order_id": null,
@@ -105,8 +105,8 @@
       "top_trader_position_ratio": null,
       "top_trader_account_ratio": null,
       "global_account_ratio": null,
-      "phase_a_mfe_pct": 1.443,
-      "phase_b_mfe_pct": null,
+      "phase_a_mfe_pct": 2.217,
+      "phase_b_mfe_pct": 2.217,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.159993,
       "fees_are_actual": true,
@@ -118,11 +118,12 @@
       "btc_pct_vs_ma25_at_open": 0.391,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 0.02883,
-      "current_price": 0.0288,
-      "unrealized_pnl_usdt": 3.3612,
-      "unrealized_pnl_pct": 0.84,
-      "last_price_check_at": "2026-05-29T01:40:18.543417+00:00"
+      "phase_a_mfe_price": 0.02905,
+      "current_price": 0.02908,
+      "unrealized_pnl_usdt": 7.2826,
+      "unrealized_pnl_pct": 1.821,
+      "last_price_check_at": "2026-05-29T01:42:24.636285+00:00",
+      "phase_b_mfe_price": 0.02905
     }
   ],
   "recent_closed": [
@@ -35454,17 +35455,8 @@
       "direction": "LONG",
       "conviction_score": 7,
       "signal_at": "2026-05-29T00:14:15.915108+00:00",
-      "reason": "paper trade too old (5163s > 600s)",
-      "last_checked_at": "2026-05-29T01:40:18.543417+00:00"
-    },
-    {
-      "paper_id": "EDENUSDT|LONG|2026-05-29T01:36:40.694158+00:00",
-      "symbol": "EDENUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-05-29T01:37:18.021659+00:00",
-      "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-05-29T01:40:18.543417+00:00"
+      "reason": "paper trade too old (5289s > 600s)",
+      "last_checked_at": "2026-05-29T01:42:24.636285+00:00"
     }
   ],
   "btc_regime_now": {
@@ -35475,7 +35467,7 @@
     "change_24h_pct": -1.056,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-29T01:40:19.501329+00:00"
+    "computed_at": "2026-05-29T01:42:25.948244+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
