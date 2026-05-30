@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-30T08:03:11.930513+00:00",
+  "updated_at": "2026-05-30T08:05:25.379672+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 27,
+  "alerts_count": 28,
   "alerts": [
+    {
+      "symbol": "HEIUSDT",
+      "base": "HEI",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.16258,
+      "price_change_pct": -3.226,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 2771983.0,
+      "volume_baseline_usdt": 282977.0,
+      "volume_ratio": 9.8,
+      "detected_at": "2026-05-30T08:04:25.492423+00:00",
+      "intensity": 2,
+      "change_5m_pct": -0.859,
+      "change_15m_pct": 0.477,
+      "change_1h_pct": -2.814,
+      "change_4h_pct": 2.674,
+      "taker_buy_ratio_1m": 0.383,
+      "taker_buy_ratio_5m": 0.414,
+      "oi_delta_5m_pct": 0.368,
+      "funding_rate_pct": 0.0025,
+      "atr_pct": 1.632,
+      "range_4h_pct": 25.62,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.16788571,
+      "suggested_tp1": 0.15462143,
+      "suggested_tp2": 0.14666286,
+      "conviction_score": 1,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "VICUSDT",
       "base": "VIC",
