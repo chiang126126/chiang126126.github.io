@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-30T13:56:51.874066+00:00",
+  "updated_at": "2026-05-30T13:58:56.247757+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 33,
+  "alerts_count": 34,
   "alerts": [
+    {
+      "symbol": "PRLUSDT",
+      "base": "PRL",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.1897,
+      "price_change_pct": 8.091,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 298167.0,
+      "volume_baseline_usdt": 9735.0,
+      "volume_ratio": 30.63,
+      "detected_at": "2026-05-30T13:58:32.756343+00:00",
+      "intensity": 3,
+      "change_5m_pct": 8.21,
+      "change_15m_pct": 8.272,
+      "change_1h_pct": 7.78,
+      "change_4h_pct": 5.738,
+      "taker_buy_ratio_1m": 0.632,
+      "taker_buy_ratio_5m": 0.587,
+      "oi_delta_5m_pct": 0.004,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.794,
+      "range_4h_pct": 8.22,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.18743929,
+      "suggested_tp1": 0.19309107,
+      "suggested_tp2": 0.19648214,
+      "conviction_score": 8,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "TAKEUSDT",
       "base": "TAKE",
