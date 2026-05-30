@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-30T00:12:37.467711+00:00",
+  "generated_at": "2026-05-30T00:14:44.519401+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 627,
@@ -35,6 +35,11 @@
     "ok": false,
     "mismatches": [
       {
+        "symbol": "AIAUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
         "symbol": "IDUSDT",
         "kind": "exchange_only",
         "message": "exchange has IDUSDT position but live doesn't track (user manual? or state lost)"
@@ -45,19 +50,14 @@
         "message": "exchange has GPSUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
+        "symbol": "ZECUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
         "symbol": "PYTHUSDT",
         "kind": "exchange_only",
         "message": "exchange has PYTHUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "KITEUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has KITEUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "CFXUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has CFXUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "BASUSDT",
@@ -70,14 +70,14 @@
         "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "ZECUSDT",
+        "symbol": "CFXUSDT",
         "kind": "exchange_only",
-        "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has CFXUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "AIAUSDT",
+        "symbol": "KITEUSDT",
         "kind": "exchange_only",
-        "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has KITEUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
@@ -85,16 +85,16 @@
       "HBARUSDT"
     ],
     "exchange_symbols": [
+      "HBARUSDT",
+      "AIAUSDT",
       "IDUSDT",
       "GPSUSDT",
+      "ZECUSDT",
       "PYTHUSDT",
-      "KITEUSDT",
-      "CFXUSDT",
       "BASUSDT",
       "PENDLEUSDT",
-      "ZECUSDT",
-      "AIAUSDT",
-      "HBARUSDT"
+      "CFXUSDT",
+      "KITEUSDT"
     ]
   },
   "open_trades": [
@@ -141,7 +141,7 @@
       "top_trader_position_ratio": null,
       "top_trader_account_ratio": null,
       "global_account_ratio": null,
-      "phase_a_mfe_pct": 0.286,
+      "phase_a_mfe_pct": 0.769,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.16,
@@ -154,11 +154,11 @@
       "btc_pct_vs_ma25_at_open": -0.079,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 0.10175,
-      "current_price": 0.10181,
-      "unrealized_pnl_usdt": 0.2752,
-      "unrealized_pnl_pct": 0.069,
-      "last_price_check_at": "2026-05-30T00:12:36.023541+00:00"
+      "phase_a_mfe_price": 0.10224,
+      "current_price": 0.10218,
+      "unrealized_pnl_usdt": 1.7296,
+      "unrealized_pnl_pct": 0.432,
+      "last_price_check_at": "2026-05-30T00:14:42.689330+00:00"
     }
   ],
   "recent_closed": [
@@ -39103,13 +39103,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73465.9,
-    "btc_ma25_1h": 73518.3,
-    "pct_vs_ma25": -0.071,
-    "change_24h_pct": -0.306,
+    "btc_price": 73469.0,
+    "btc_ma25_1h": 73518.42,
+    "pct_vs_ma25": -0.067,
+    "change_24h_pct": -0.302,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-30T00:12:37.151580+00:00"
+    "computed_at": "2026-05-30T00:14:44.208952+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
