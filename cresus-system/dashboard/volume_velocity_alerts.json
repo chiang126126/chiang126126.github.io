@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-30T20:22:12.271871+00:00",
+  "updated_at": "2026-05-30T20:24:17.030771+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 19,
+  "alerts_count": 20,
   "alerts": [
+    {
+      "symbol": "TAKEUSDT",
+      "base": "TAKE",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.02199,
+      "price_change_pct": 1.336,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 32283.0,
+      "volume_baseline_usdt": 5599.0,
+      "volume_ratio": 5.77,
+      "detected_at": "2026-05-30T20:23:59.883966+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.23,
+      "change_15m_pct": 4.071,
+      "change_1h_pct": 4.371,
+      "change_4h_pct": 4.824,
+      "taker_buy_ratio_1m": 0.507,
+      "taker_buy_ratio_5m": 0.526,
+      "oi_delta_5m_pct": 1.665,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 1.199,
+      "range_4h_pct": 9.23,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.02159464,
+      "suggested_tp1": 0.02258304,
+      "suggested_tp2": 0.02317607,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "ZROUSDT",
       "base": "ZRO",
