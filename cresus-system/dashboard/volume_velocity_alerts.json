@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-30T21:24:42.925468+00:00",
+  "updated_at": "2026-05-30T21:26:46.723587+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 15,
+  "alerts_count": 16,
   "alerts": [
+    {
+      "symbol": "TAKEUSDT",
+      "base": "TAKE",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.02161,
+      "price_change_pct": -0.506,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 20333.0,
+      "volume_baseline_usdt": 1095.0,
+      "volume_ratio": 18.58,
+      "detected_at": "2026-05-30T21:26:29.612711+00:00",
+      "intensity": 1,
+      "change_5m_pct": -1.328,
+      "change_15m_pct": -1.101,
+      "change_1h_pct": -0.37,
+      "change_4h_pct": 4.51,
+      "taker_buy_ratio_1m": 0.73,
+      "taker_buy_ratio_5m": 0.65,
+      "oi_delta_5m_pct": 0.062,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.446,
+      "range_4h_pct": 9.39,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.02175464,
+      "suggested_tp1": 0.02139304,
+      "suggested_tp2": 0.02117607,
+      "conviction_score": 0,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "TOWNSUSDT",
       "base": "TOWNS",
