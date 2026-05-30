@@ -1,35 +1,35 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-30T17:31:14.735364+00:00",
+  "generated_at": "2026-05-30T17:33:21.683209+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 690,
-    "open": 3,
-    "closed": 687,
+    "open": 2,
+    "closed": 688,
     "wins": 222,
-    "losses": 457,
-    "win_rate": 0.327,
-    "total_pnl_usdt": -111.7026,
-    "net_pnl_usdt": -218.3034,
-    "avg_pnl_usdt": -0.1626,
+    "losses": 458,
+    "win_rate": 0.326,
+    "total_pnl_usdt": -114.57,
+    "net_pnl_usdt": -221.5722,
+    "avg_pnl_usdt": -0.1665,
     "best_trade_usdt": 34.4314,
     "worst_trade_usdt": -24.1805,
-    "fees_paid_usdt": 107.2007,
-    "fees_realized_usdt": 106.6008,
-    "fees_open_usdt": 0.5999,
+    "fees_paid_usdt": 107.4021,
+    "fees_realized_usdt": 107.0022,
+    "fees_open_usdt": 0.3999,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 1199.9,
-    "free_capital_usdt": 581.2,
+    "deployed_usdt": 799.9,
+    "free_capital_usdt": 978.13,
     "max_concurrent_slots": 4,
-    "slots_used": 3
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 20.3625,
-    "deployed_usdt": 1199.9
+    "daily_pnl": 17.4951,
+    "deployed_usdt": 799.9
   },
   "reconciliation": {
     "ok": true,
@@ -37,12 +37,10 @@
     "api_failed": false,
     "live_symbols": [
       "TAUSDT",
-      "VTHOUSDT",
       "ARCUSDT"
     ],
     "exchange_symbols": [
       "TAUSDT",
-      "VTHOUSDT",
       "ARCUSDT"
     ]
   },
@@ -104,10 +102,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.08148,
-      "current_price": 0.07687,
-      "unrealized_pnl_usdt": 16.0166,
-      "unrealized_pnl_pct": 4.005,
-      "last_price_check_at": "2026-05-30T17:31:12.073605+00:00"
+      "current_price": 0.07722,
+      "unrealized_pnl_usdt": 17.9104,
+      "unrealized_pnl_pct": 4.478,
+      "last_price_check_at": "2026-05-30T17:33:19.406354+00:00"
     },
     {
       "paper_id": "ARCUSDT|LONG|2026-05-30T17:22:13.777710+00:00",
@@ -124,8 +122,8 @@
       "risk_usdt": 5.5596,
       "risk_pct": 1.39,
       "mirror_latency_sec": 18.1,
-      "sl_price": 0.07693857,
-      "sl_paper_current": 0.07671857,
+      "sl_price": 0.0778,
+      "sl_paper_current": 0.07758,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": 0.00022,
       "sl_compensation_mode": "always",
@@ -141,7 +139,7 @@
       "min_conviction_threshold": null,
       "tp1_price": 0.07887214,
       "tp2_price": 0.08016429,
-      "phase": "A",
+      "phase": "B",
       "entry_order_id": 144811295,
       "entry_client_id": "cresus_L1780161733_ARCUSDT_L_E",
       "sl_order_id": null,
@@ -152,8 +150,8 @@
       "top_trader_position_ratio": null,
       "top_trader_account_ratio": null,
       "global_account_ratio": null,
-      "phase_a_mfe_pct": 1.212,
-      "phase_b_mfe_pct": null,
+      "phase_a_mfe_pct": 1.83,
+      "phase_b_mfe_pct": 1.83,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.199985,
       "fees_are_actual": true,
@@ -165,12 +163,15 @@
       "btc_pct_vs_ma25_at_open": 0.446,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 0.07852,
-      "current_price": 0.07831,
-      "unrealized_pnl_usdt": 2.6219,
-      "unrealized_pnl_pct": 0.656,
-      "last_price_check_at": "2026-05-30T17:31:12.073605+00:00"
-    },
+      "phase_a_mfe_price": 0.079,
+      "current_price": 0.07894,
+      "unrealized_pnl_usdt": 5.8607,
+      "unrealized_pnl_pct": 1.465,
+      "last_price_check_at": "2026-05-30T17:33:19.406354+00:00",
+      "phase_b_mfe_price": 0.079
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "VTHOUSDT|SHORT|2026-05-30T17:25:40.079943+00:00",
       "trade_id": "L1780161940_VTHOUSD_S",
@@ -194,7 +195,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 3,
       "wick_filter_mode": "always",
-      "sl_breach_count": 0,
+      "sl_breach_count": 3,
       "funding_signal": "favorable",
       "funding_rate_pct_at_open": -0.6739,
       "regime_gate_enabled": true,
@@ -217,7 +218,7 @@
       "phase_a_mfe_pct": 0.41,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.2,
+      "fees_paid_usdt": 0.401433,
       "fees_are_actual": true,
       "opened_at": "2026-05-30T17:26:54.494730+00:00",
       "is_dry_run": false,
@@ -228,13 +229,21 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.0005583,
-      "current_price": 0.000559,
-      "unrealized_pnl_usdt": -0.7168,
-      "unrealized_pnl_pct": -0.179,
-      "last_price_check_at": "2026-05-30T17:31:12.073605+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.000562,
+      "unrealized_pnl_usdt": -2.8674,
+      "unrealized_pnl_pct": -0.717,
+      "last_price_check_at": "2026-05-30T17:32:48.310913+00:00",
+      "closed_at": "2026-05-30T17:32:53.790631+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.000562,
+      "realized_pnl_usdt": -2.8674,
+      "close_order_id": 111230829,
+      "close_qty": 716845.0,
+      "close_expected_price": 0.00056057,
+      "close_slippage_bps": 25.51,
+      "entry_fees_usdt": 0.2,
+      "close_fees_usdt": 0.201433
+    },
     {
       "paper_id": "GIGGLEUSDT|LONG|2026-05-30T17:07:20.595663+00:00",
       "trade_id": "L1780160840_GIGGLEU_L",
@@ -43550,13 +43559,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73944.5,
-    "btc_ma25_1h": 73612.36,
-    "pct_vs_ma25": 0.451,
-    "change_24h_pct": -0.045,
+    "btc_price": 73822.0,
+    "btc_ma25_1h": 73607.46,
+    "pct_vs_ma25": 0.291,
+    "change_24h_pct": -0.211,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-30T17:31:13.814613+00:00"
+    "computed_at": "2026-05-30T17:33:20.966062+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
