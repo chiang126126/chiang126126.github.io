@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-30T17:55:56.895965+00:00",
+  "updated_at": "2026-05-30T17:58:01.898386+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 20,
+  "alerts_count": 21,
   "alerts": [
+    {
+      "symbol": "VVVUSDT",
+      "base": "VVV",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 16.537,
+      "price_change_pct": 1.672,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 177102.0,
+      "volume_baseline_usdt": 29443.0,
+      "volume_ratio": 6.02,
+      "detected_at": "2026-05-30T17:57:13.020702+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.566,
+      "change_15m_pct": 1.925,
+      "change_1h_pct": 1.12,
+      "change_4h_pct": 0.953,
+      "taker_buy_ratio_1m": 0.662,
+      "taker_buy_ratio_5m": 0.649,
+      "oi_delta_5m_pct": 0.275,
+      "funding_rate_pct": -0.0054,
+      "atr_pct": 0.319,
+      "range_4h_pct": 3.35,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 16.48428571,
+      "suggested_tp1": 16.61607143,
+      "suggested_tp2": 16.69514286,
+      "conviction_score": 5,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "4USDT",
       "base": "4",
