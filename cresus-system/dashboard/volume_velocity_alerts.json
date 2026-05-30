@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-30T00:22:32.181333+00:00",
+  "updated_at": "2026-05-30T00:24:36.908895+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 23,
+  "alerts_count": 24,
   "alerts": [
+    {
+      "symbol": "ORCAUSDT",
+      "base": "ORCA",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 1.35,
+      "price_change_pct": 5.222,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 701477.0,
+      "volume_baseline_usdt": 4011.0,
+      "volume_ratio": 174.87,
+      "detected_at": "2026-05-30T00:24:34.923882+00:00",
+      "intensity": 3,
+      "change_5m_pct": 6.167,
+      "change_15m_pct": 5.919,
+      "change_1h_pct": 6.25,
+      "change_4h_pct": 5.019,
+      "taker_buy_ratio_1m": 0.486,
+      "taker_buy_ratio_5m": 0.554,
+      "oi_delta_5m_pct": -0.067,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.741,
+      "range_4h_pct": 7.63,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 1.335,
+      "suggested_tp1": 1.3725,
+      "suggested_tp2": 1.395,
+      "conviction_score": 3,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "GUNUSDT",
       "base": "GUN",
