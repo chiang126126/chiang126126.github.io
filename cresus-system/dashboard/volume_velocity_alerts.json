@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-30T23:16:51.471895+00:00",
+  "updated_at": "2026-05-30T23:18:54.864468+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 27,
+  "alerts_count": 28,
   "alerts": [
+    {
+      "symbol": "STABLEUSDT",
+      "base": "STABLE",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.037,
+      "price_change_pct": 2.607,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 31788.0,
+      "volume_baseline_usdt": 4168.0,
+      "volume_ratio": 7.63,
+      "detected_at": "2026-05-30T23:18:41.799638+00:00",
+      "intensity": 2,
+      "change_5m_pct": 0.987,
+      "change_15m_pct": 2.591,
+      "change_1h_pct": -0.352,
+      "change_4h_pct": -0.027,
+      "taker_buy_ratio_1m": 0.773,
+      "taker_buy_ratio_5m": 0.668,
+      "oi_delta_5m_pct": -0.032,
+      "funding_rate_pct": -0.046,
+      "atr_pct": 0.28,
+      "range_4h_pct": 4.16,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.03689643,
+      "suggested_tp1": 0.03715536,
+      "suggested_tp2": 0.03731071,
+      "conviction_score": 1,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "ZEREBROUSDT",
       "base": "ZEREBRO",
