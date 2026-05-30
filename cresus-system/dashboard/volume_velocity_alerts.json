@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-30T18:29:21.902747+00:00",
+  "updated_at": "2026-05-30T18:31:26.272776+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 22,
+  "alerts_count": 23,
   "alerts": [
+    {
+      "symbol": "HUSDT",
+      "base": "H",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.39465,
+      "price_change_pct": 3.225,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 436431.0,
+      "volume_baseline_usdt": 86799.0,
+      "volume_ratio": 5.03,
+      "detected_at": "2026-05-30T18:30:30.380545+00:00",
+      "intensity": 1,
+      "change_5m_pct": 1.369,
+      "change_15m_pct": 4.285,
+      "change_1h_pct": 2.786,
+      "change_4h_pct": 11.495,
+      "taker_buy_ratio_1m": 0.525,
+      "taker_buy_ratio_5m": 0.587,
+      "oi_delta_5m_pct": 0.073,
+      "funding_rate_pct": 0.0923,
+      "atr_pct": 0.817,
+      "range_4h_pct": 14.48,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.3882,
+      "suggested_tp1": 0.404325,
+      "suggested_tp2": 0.414,
+      "conviction_score": 5,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "RIVERUSDT",
       "base": "RIVER",
