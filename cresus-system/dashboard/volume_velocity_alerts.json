@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-30T20:36:43.445144+00:00",
+  "updated_at": "2026-05-30T20:38:49.242256+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 15,
+  "alerts_count": 16,
   "alerts": [
+    {
+      "symbol": "MBOXUSDT",
+      "base": "MBOX",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.01183,
+      "price_change_pct": -0.505,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 61676.0,
+      "volume_baseline_usdt": 1289.0,
+      "volume_ratio": 47.84,
+      "detected_at": "2026-05-30T20:38:24.145053+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.756,
+      "change_15m_pct": -0.505,
+      "change_1h_pct": -0.169,
+      "change_4h_pct": -1.254,
+      "taker_buy_ratio_1m": 0.273,
+      "taker_buy_ratio_5m": 0.321,
+      "oi_delta_5m_pct": 0.183,
+      "funding_rate_pct": 0.003,
+      "atr_pct": 0.217,
+      "range_4h_pct": 3.04,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.01185571,
+      "suggested_tp1": 0.01179143,
+      "suggested_tp2": 0.01175286,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "APRUSDT",
       "base": "APR",
