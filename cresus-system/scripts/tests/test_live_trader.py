@@ -4501,18 +4501,28 @@ class TestPhase5GPostFillEmergency(unittest.TestCase):
     # === _validate_post_fill_structure ===
 
     def test_structure_long_valid(self):
-        """LONG: sl < fill < tp1 < tp2 → True."""
+        """LONG: sl < fill < tp2 → True (即使 fill 略高于 tp1 也 OK)."""
         self.assertTrue(
             live_trader._validate_post_fill_structure(
                 "BUY", fill=100.0, sl=95.0, tp1=105.0, tp2=110.0,
             )
         )
 
-    def test_structure_long_fill_above_tp1_invalid(self):
-        """LONG: fill 已在 TP 区, 结构破坏 → False."""
-        self.assertFalse(
+    def test_structure_long_fill_slightly_above_tp1_still_valid(self):
+        """Phase 5.G-fix: fill 略高于 tp1 但低于 tp2 → True (BIOUSDT 噪音 case).
+        实际 fill 在 tp1 +/- 几 bps 是市场噪音, 进 Phase B 早一点不是灾难.
+        """
+        self.assertTrue(
             live_trader._validate_post_fill_structure(
                 "BUY", fill=106.0, sl=95.0, tp1=105.0, tp2=110.0,
+            )
+        )
+
+    def test_structure_long_fill_above_tp2_invalid(self):
+        """LONG: fill > tp2 = 利润空间为 0 → False (真灾难)."""
+        self.assertFalse(
+            live_trader._validate_post_fill_structure(
+                "BUY", fill=111.0, sl=95.0, tp1=105.0, tp2=110.0,
             )
         )
 
@@ -4525,23 +4535,33 @@ class TestPhase5GPostFillEmergency(unittest.TestCase):
         )
 
     def test_structure_short_valid(self):
-        """SHORT: sl > fill > tp1 > tp2 → True."""
+        """SHORT: sl > fill > tp2 → True."""
         self.assertTrue(
             live_trader._validate_post_fill_structure(
                 "SELL", fill=100.0, sl=105.0, tp1=95.0, tp2=90.0,
             )
         )
 
-    def test_structure_short_fill_below_tp1_invalid(self):
-        """SHORT: fill 已在 TP 区下方 → False."""
-        self.assertFalse(
+    def test_structure_short_fill_slightly_below_tp1_still_valid(self):
+        """Phase 5.G-fix: SHORT 下 fill 略低于 tp1 但高于 tp2 → True."""
+        self.assertTrue(
             live_trader._validate_post_fill_structure(
                 "SELL", fill=94.0, sl=105.0, tp1=95.0, tp2=90.0,
             )
         )
 
+    def test_structure_short_fill_below_tp2_invalid(self):
+        """SHORT: fill < tp2 = 利润空间为 0 → False."""
+        self.assertFalse(
+            live_trader._validate_post_fill_structure(
+                "SELL", fill=89.0, sl=105.0, tp1=95.0, tp2=90.0,
+            )
+        )
+
     def test_structure_missing_fields_skipped(self):
-        """字段缺/异常 (= 0) 返 True (向后兼容, 不误平)."""
+        """字段缺/异常 (= 0) 返 True (向后兼容, 不误平).
+        Phase 5.G-fix 后只依赖 fill/sl/tp2 三个字段, tp1 缺也 OK.
+        """
         self.assertTrue(
             live_trader._validate_post_fill_structure(
                 "BUY", fill=100.0, sl=0, tp1=105.0, tp2=110.0,
@@ -4550,6 +4570,11 @@ class TestPhase5GPostFillEmergency(unittest.TestCase):
         self.assertTrue(
             live_trader._validate_post_fill_structure(
                 "BUY", fill=0, sl=95.0, tp1=105.0, tp2=110.0,
+            )
+        )
+        self.assertTrue(
+            live_trader._validate_post_fill_structure(
+                "BUY", fill=100.0, sl=95.0, tp1=105.0, tp2=0,
             )
         )
 
@@ -4570,6 +4595,42 @@ class TestPhase5GPostFillEmergency(unittest.TestCase):
         self.assertGreaterEqual(LIVE_POST_FILL_MAX_DEVIATION_BPS, 100)
         # ≤ 500: 5% 是绝对上限, 再大就是 paper 数据异常
         self.assertLessEqual(LIVE_POST_FILL_MAX_DEVIATION_BPS, 500)
+
+    def test_emergency_close_returns_terminal_dict(self):
+        """Phase 5.G-fix: 应急平仓后返回 _terminal_no_retry dict, 不返 None."""
+        from binance_client import BinanceClient
+        client = MagicMock(spec=BinanceClient)
+        client.dry_run = False
+        client.get_book_ticker = MagicMock(return_value={"askPrice": "100.0", "bidPrice": "99.5"})
+        client.set_leverage = MagicMock(return_value=None)
+        # 故意构造严重偏离的 fill 触发 entry_deviation_too_high
+        client.open_position = MagicMock(return_value={
+            "avg_fill_price": 150.0,   # 50% 高于 paper_entry 100
+            "qty": 4.0, "actual_notional": 600.0,
+            "entry_order_id": "1", "entry_client_id": "c",
+            "opened_at": "2026-05-30T08:00:00+00:00",
+            "fees_paid_usdt": 0.16,
+            "_dryRun": False,
+        })
+        client.close_position = MagicMock(return_value={
+            "qty_closed": 4.0, "avg_exit_price": 150.0,
+            "realized_pnl_usdt": 0.0, "fees_paid_usdt": 0.16,
+        })
+        pt = {
+            "id": "TEST|LONG|t1", "symbol": "TESTUSDT",
+            "direction": "LONG", "entry_price": 100.0,
+            "sl": 95.0, "tp1": 105.0, "tp2": 110.0,
+            "intensity": 2,
+        }
+        result = live_trader._try_mirror_open(client, pt, dry_run=False, btc_regime=None)
+        # 不再返 None — 返 terminal dict
+        self.assertIsNotNone(result)
+        self.assertTrue(result.get("_terminal_no_retry"))
+        self.assertEqual(result["close_reason"], "entry_deviation_too_high")
+        # 应急平仓被调用
+        client.close_position.assert_called_once()
+        # PnL = -fees (entry + close ≈ 0.32)
+        self.assertLess(result["realized_pnl_usdt"], 0)
 
 
 class TestPhase5ECircuitBreaker(unittest.TestCase):

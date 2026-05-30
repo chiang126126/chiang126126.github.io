@@ -374,20 +374,25 @@ LIVE_POST_FILL_MAX_DEVIATION_BPS = 200.0
 
 def _validate_post_fill_structure(side: str, fill: float, sl: float,
                                     tp1: float, tp2: float) -> bool:
-    """Phase 5.G: 校验 fill 价是否落在 paper SL/TP1/TP2 结构内的正确区间.
+    """Phase 5.G: 校验 fill 价是否落在 paper SL/TP 结构内的"可交易"区间.
 
-    LONG  (BUY):  sl < fill < tp1 < tp2  (低 SL, 高 TP)
-    SHORT (SELL): sl > fill > tp1 > tp2  (高 SL, 低 TP)
+    LONG  (BUY):  sl < fill < tp2  (高于 SL 不会瞬触止损, 低于 TP2 还有利润空间)
+    SHORT (SELL): sl > fill > tp2
 
     任一字段缺/异常 (= 0) 返 True (向后兼容, 跳过校验).
+
+    Phase 5.G-fix (5/30): 不再要求 fill < tp1.
+    BIOUSDT 案例显示 fill 比 tp1 仅高 1.4bps 也会触发, 死循环每 5s 应急平.
+    实际上 fill 在 tp1 之上 = 进 Phase B 早一点 (SL → entry), 不是灾难.
+    真正灾难是 fill 已在 SL 区 (insta-SL) 或 TP2 之上 (无利润空间).
     """
-    if not (fill > 0 and sl > 0 and tp1 > 0 and tp2 > 0):
+    if not (fill > 0 and sl > 0 and tp2 > 0):
         return True   # 字段不全, 跳过校验避免误平
     side = (side or "").upper()
     if side == "BUY":
-        return sl < fill < tp1 < tp2
+        return sl < fill < tp2
     elif side == "SELL":
-        return sl > fill > tp1 > tp2
+        return sl > fill > tp2
     return True   # 未知 side, 跳过
 
 
@@ -1767,15 +1772,43 @@ def _try_mirror_open(
                 f"deviation={deviation_bps:.1f}bps sl={sl_price} tp1={paper_tp1} tp2={paper_tp2}). "
                 f"立即应急平仓."
             )
+            emergency_fees = 0.0
             try:
-                client.close_position(symbol=sym, side=side, trade_id=trade_id)
+                close_result = client.close_position(
+                    symbol=sym, side=side, trade_id=trade_id,
+                )
+                emergency_fees = float(close_result.get("fees_paid_usdt") or 0)
                 log.info(f"[post-fill-emergency] {sym} 应急平仓完成")
             except (BinanceError, ValueError) as e:
                 log.error(
                     f"[post-fill-emergency] {sym} 应急平仓失败 ({type(e).__name__}: {e}). "
                     f"position 留在 exchange, 下 tick recon 会识别并提示."
                 )
-            return None
+            # Phase 5.G-fix (5/30): 返回 terminal dict 标记 _terminal_no_retry,
+            # 让 main_loop 把 paper_id 加入 mirrored_paper_ids 避免每 5s 死循环
+            # 重开 + 重应急平 (BIOUSDT 案例: 烧 ~$0.32/次 round-trip fees).
+            entry_fees = float(result.get("fees_paid_usdt") or 0)
+            total_fees = entry_fees + emergency_fees
+            return {
+                "_terminal_no_retry": True,
+                "_post_fill_rejected": True,
+                "paper_id": paper_id,
+                "trade_id": trade_id,
+                "symbol": sym,
+                "side": side,
+                "direction": direction,
+                "entry_price_paper": paper_entry,
+                "avg_fill_price": actual_fill,
+                "avg_exit_price": actual_fill,   # 应急平接近 fill 价
+                "qty": float(result.get("qty") or 0),
+                "notional_usdt": float(result.get("actual_notional") or 0),
+                "fees_paid_usdt": round(total_fees, 4),
+                "closed_at": datetime.now(timezone.utc).isoformat(),
+                "opened_at": result.get("opened_at"),
+                "close_reason": emergency_reason,
+                "realized_pnl_usdt": round(-total_fees, 4),   # 损失 ≈ 双向手续费
+                "is_dry_run": bool(dry_run or result.get("_dryRun")),
+            }
 
         # 风险金额: (entry - SL) / entry × notional = "最多丢多少"
         actual_notional = float(result.get("actual_notional", 0) or 0)
@@ -2191,6 +2224,24 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
                     f"[mirror-open] {pt['symbol']} 失败, 不 blacklist, "
                     f"下 tick 重试 (或等 paper 关闭 / mirror_max_age 过期)"
                 )
+                continue
+            # Phase 5.G-fix (5/30): terminal_no_retry 信号 (post-fill 应急平后).
+            # 仓位已开 + 已平, 加入 closed_trades 留 audit, 加入 mirrored_paper_ids
+            # 防下一 tick 重复触发同一 paper_id 死循环 (BIOUSDT 案例每 5s 烧 fees).
+            if new_trade.get("_terminal_no_retry"):
+                live.setdefault("live_closed_trades", []).append(new_trade)
+                live.setdefault("mirrored_paper_ids", []).append(pt["id"])
+                log.warning(
+                    f"[mirror-terminal] {new_trade['symbol']} "
+                    f"close_reason={new_trade.get('close_reason')} "
+                    f"PnL=${new_trade.get('realized_pnl_usdt', 0):+.2f}. "
+                    f"paper_id 加入 mirrored, 不再 retry."
+                )
+                try:
+                    save_live_state(live)
+                except Exception as e:
+                    log.error(f"[state-save terminal] {new_trade['symbol']}: {e}",
+                              exc_info=True)
                 continue
             live.setdefault("live_open_trades", []).append(new_trade)
             live.setdefault("mirrored_paper_ids", []).append(pt["id"])
