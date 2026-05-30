@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-30T21:26:46.723587+00:00",
+  "updated_at": "2026-05-30T21:28:50.268779+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 16,
+  "alerts_count": 17,
   "alerts": [
+    {
+      "symbol": "ASTERUSDT",
+      "base": "ASTER",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.7772,
+      "price_change_pct": 0.739,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 912787.0,
+      "volume_baseline_usdt": 180362.0,
+      "volume_ratio": 5.06,
+      "detected_at": "2026-05-30T21:27:53.313064+00:00",
+      "intensity": 1,
+      "change_5m_pct": 1.004,
+      "change_15m_pct": 1.201,
+      "change_1h_pct": 2.54,
+      "change_4h_pct": 5.672,
+      "taker_buy_ratio_1m": 0.846,
+      "taker_buy_ratio_5m": 0.669,
+      "oi_delta_5m_pct": 0.08,
+      "funding_rate_pct": -0.0004,
+      "atr_pct": 0.407,
+      "range_4h_pct": 6.85,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.77245357,
+      "suggested_tp1": 0.78431964,
+      "suggested_tp2": 0.79143929,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "TAKEUSDT",
       "base": "TAKE",
