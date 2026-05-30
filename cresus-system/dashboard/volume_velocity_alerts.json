@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-30T03:58:49.094792+00:00",
+  "updated_at": "2026-05-30T04:00:55.716198+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 33,
+  "alerts_count": 34,
   "alerts": [
+    {
+      "symbol": "MEMEUSDT",
+      "base": "MEME",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.0005225,
+      "price_change_pct": -0.665,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 106064.0,
+      "volume_baseline_usdt": 10817.0,
+      "volume_ratio": 9.81,
+      "detected_at": "2026-05-30T04:00:36.299377+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.342,
+      "change_15m_pct": 1.392,
+      "change_1h_pct": 1.904,
+      "change_4h_pct": 4.733,
+      "taker_buy_ratio_1m": 0.241,
+      "taker_buy_ratio_5m": 0.251,
+      "oi_delta_5m_pct": 2.815,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.331,
+      "range_4h_pct": 5.7,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.00052509,
+      "suggested_tp1": 0.00051861,
+      "suggested_tp2": 0.00051472,
+      "conviction_score": 0,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "CTRUSDT",
       "base": "CTR",
