@@ -1729,6 +1729,14 @@ def _try_mirror_open(
                   exc_info=True)
         return None
 
+    # Phase 5.H (5/30) CRITICAL: result=None 表示 open_position 决定不开仓 (IOC 完全 EXPIRED
+    # 或部分成交已应急平). 此时 exchange 上无新仓位, _try_mirror_open 直接返 None 让上层
+    # 当 retryable miss 处理. 之前 panic_trade 路径会 result.get() 抛 AttributeError
+    # 再上抛, 是 5/28-5/30 14 个孤儿仓 root cause 链的第二层.
+    if result is None:
+        log.info(f"[mirror-open] {sym} {side}: open_position 返 None (无成交), 跳过")
+        return None
+
     # ━━━ 此处 result 已存在 — 仓位已实际在 Binance 开了 ━━━
     # Phase 4.X (5/26): 包裹所有 post-open 计算到 try/except.
     # 若任何字段构造失败 (paper_trade 异常值 / result 字段缺等), 不能直接 raise —
@@ -1950,6 +1958,9 @@ def _try_mirror_open(
             f"({type(e).__name__}: {e}). 仓位已在 exchange, 用最小字段记录防孤儿.",
             exc_info=True,
         )
+        # Phase 5.H: 防御性 — 即使 result 为 None (理论上不应到这里, 因为前面已经
+        # 早退 return None) 也不再二次 AttributeError 上抛.
+        r = result if isinstance(result, dict) else {}
         panic_trade = {
             "paper_id": paper_id,
             "trade_id": trade_id,
@@ -1957,19 +1968,19 @@ def _try_mirror_open(
             "side": side,
             "direction": direction,
             "entry_price_paper": paper_entry,
-            "avg_fill_price": float(result.get("avg_fill_price") or 0),
-            "qty": result.get("qty", 0),
-            "notional_usdt": float(result.get("actual_notional", 0) or 0),
+            "avg_fill_price": float(r.get("avg_fill_price") or 0),
+            "qty": r.get("qty", 0),
+            "notional_usdt": float(r.get("actual_notional", 0) or 0),
             "leverage": LIVE_LEVERAGE,
-            "sl_price": float(result.get("sl_price", sl_price) or sl_price),
+            "sl_price": float(r.get("sl_price", sl_price) or sl_price),
             "sl_paper_current": float(sl_price),
             "tp1_price": 0.0,
             "tp2_price": 0.0,
             "phase": "A",
-            "entry_order_id": result.get("entry_order_id"),
-            "entry_client_id": result.get("entry_client_id"),
-            "opened_at": result.get("opened_at"),
-            "is_dry_run": bool(dry_run or result.get("_dryRun")),
+            "entry_order_id": r.get("entry_order_id"),
+            "entry_client_id": r.get("entry_client_id"),
+            "opened_at": r.get("opened_at"),
+            "is_dry_run": bool(dry_run or r.get("_dryRun")),
             # Phase 4.Z: 即使 panic 路径也保留大户/散户多空比 (数据完整性)
             "top_trader_position_ratio": paper_trade.get("top_trader_position_ratio"),
             "top_trader_account_ratio":  paper_trade.get("top_trader_account_ratio"),

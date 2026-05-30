@@ -1015,11 +1015,36 @@ class BinanceClient:
                 client_order_id=entry_coid, dry_run=False,
             )
             entry_status = entry_resp.get("status")
+            executed_qty = float(entry_resp.get("executedQty") or 0)
             if entry_status == "EXPIRED":
-                log.info(
-                    f"[open_position] IOC limit EXPIRED — 价格已越过 {limit_price}, "
-                    f"将由上层下 tick 重试"
-                )
+                if executed_qty > 0:
+                    # Phase 5.H (5/30) CRITICAL FIX: IOC 部分成交孤儿仓 root cause.
+                    # status=EXPIRED + executedQty>0 = 一部分成交了, 剩余 expire.
+                    # 之前直接 return None 让 caller "认为没开仓", 但 exchange 上
+                    # 有 partial position → 持续累积成孤儿 (5/28-5/30 14 个孤儿 root).
+                    # 修复: 立即用 close_position (reduce_only market) 平 partial,
+                    # 然后再 return None 保持 caller 语义不变.
+                    log.warning(
+                        f"[open_position] IOC partial fill: executed {executed_qty}/{qty} "
+                        f"@ avgPrice={entry_resp.get('avgPrice')}. 立即应急平 partial position "
+                        f"防孤儿."
+                    )
+                    try:
+                        self.close_position(symbol=symbol, side=side, dry_run=False)
+                        log.info(
+                            f"[open_position] IOC partial fill 已应急平仓: {symbol}"
+                        )
+                    except (BinanceError, ValueError) as ce:
+                        log.error(
+                            f"[open_position] CRITICAL: IOC partial fill 应急平失败 "
+                            f"({type(ce).__name__}: {ce}). 需要手动平 {symbol} "
+                            f"executed_qty={executed_qty}!"
+                        )
+                else:
+                    log.info(
+                        f"[open_position] IOC limit EXPIRED — 价格已越过 {limit_price}, "
+                        f"将由上层下 tick 重试"
+                    )
                 return None
         else:
             log.info(f"open_position step 1/2: MARKET {entry_coid} {side} {qty} {symbol}")

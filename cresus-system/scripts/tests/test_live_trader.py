@@ -4489,6 +4489,38 @@ class TestPhase5ALiveNotionalByScore(unittest.TestCase):
         self.assertEqual(LIVE_MAX_DEPLOY_USDT, 2400.0)
 
 
+class TestPhase5HOrphanRootCauseFix(unittest.TestCase):
+    """Phase 5.H (5/30) CRITICAL: 修复孤儿仓 root cause.
+
+    背景: 5/28-5/30 累计 14 个孤儿仓, 27 次 AttributeError. 数据驱动诊断:
+      1. open_position IOC 部分成交时 (status=EXPIRED + executedQty>0) 返 None
+      2. 但 exchange 上有 partial position → 孤儿
+      3. _try_mirror_open 收到 None, panic_trade 路径 result.get() 二次抛错
+      4. 异常上传到 main_loop, 仓位完全无 trace
+    """
+
+    def test_try_mirror_open_returns_none_when_result_none(self):
+        """Phase 5.H: open_position 返 None 时 _try_mirror_open 早退, 不进 panic 路径."""
+        from binance_client import BinanceClient
+        client = MagicMock(spec=BinanceClient)
+        client.dry_run = False
+        client.get_book_ticker = MagicMock(return_value={"askPrice": "100.0", "bidPrice": "99.5"})
+        client.set_leverage = MagicMock(return_value=None)
+        # 模拟 open_position 返 None (IOC EXPIRED 0 fill)
+        client.open_position = MagicMock(return_value=None)
+        pt = {
+            "id": "TEST|LONG|t1", "symbol": "TESTUSDT",
+            "direction": "LONG", "entry_price": 100.0,
+            "sl": 95.0, "tp1": 105.0, "tp2": 110.0,
+            "intensity": 2,
+        }
+        # 不应抛 AttributeError, 应 cleanly 返 None
+        result = live_trader._try_mirror_open(client, pt, dry_run=False, btc_regime=None)
+        self.assertIsNone(result, "open_position 返 None 时 _try_mirror_open 必须早退返 None")
+        # close_position 不应被调用 (没有 partial position 需要清理)
+        client.close_position.assert_not_called()
+
+
 class TestPhase5GPostFillEmergency(unittest.TestCase):
     """Phase 5.G (5/28): Post-fill 应急平仓 (参考社区 shadow_entry_deviation).
 
