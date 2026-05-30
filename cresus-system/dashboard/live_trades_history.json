@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-30T15:20:16.114891+00:00",
+  "generated_at": "2026-05-30T15:22:13.601804+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 674,
-    "open": 1,
+    "total_trades": 675,
+    "open": 2,
     "closed": 673,
     "wins": 219,
     "losses": 446,
@@ -15,31 +15,33 @@
     "avg_pnl_usdt": -0.144,
     "best_trade_usdt": 34.4314,
     "worst_trade_usdt": -24.1805,
-    "fees_paid_usdt": 101.8376,
+    "fees_paid_usdt": 101.9749,
     "fees_realized_usdt": 101.6776,
-    "fees_open_usdt": 0.1599,
+    "fees_open_usdt": 0.2972,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 399.85,
-    "free_capital_usdt": 1401.43,
+    "deployed_usdt": 743.05,
+    "free_capital_usdt": 1058.09,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 35.1837,
-    "deployed_usdt": 399.85
+    "deployed_usdt": 743.05
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "WLDUSDT"
+      "WLDUSDT",
+      "PORTALUSDT"
     ],
     "exchange_symbols": [
-      "WLDUSDT"
+      "WLDUSDT",
+      "PORTALUSDT"
     ]
   },
   "open_trades": [
@@ -100,10 +102,72 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.34,
-      "current_price": 0.3403,
-      "unrealized_pnl_usdt": 2.7209,
-      "unrealized_pnl_pct": 0.68,
-      "last_price_check_at": "2026-05-30T15:20:13.404203+00:00"
+      "current_price": 0.3369,
+      "unrealized_pnl_usdt": -1.3013,
+      "unrealized_pnl_pct": -0.325,
+      "last_price_check_at": "2026-05-30T15:22:10.015139+00:00"
+    },
+    {
+      "paper_id": "PORTALUSDT|SHORT|2026-05-30T15:20:44.433427+00:00",
+      "trade_id": "L1780154444_PORTALU_S",
+      "symbol": "PORTALUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.01131,
+      "avg_fill_price": 0.01144,
+      "slippage_bps": -114.94,
+      "qty": 30000.0,
+      "notional_usdt": 343.2,
+      "leverage": 1,
+      "risk_usdt": 8.7429,
+      "risk_pct": 2.547,
+      "mirror_latency_sec": 10.5,
+      "sl_price": 0.01186143,
+      "sl_paper_current": 0.01173143,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.00013,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 3,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "favorable",
+      "funding_rate_pct_at_open": -0.9408,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "D",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.01067786,
+      "tp2_price": 0.01004571,
+      "phase": "A",
+      "entry_order_id": 150879957,
+      "entry_client_id": "cresus_L1780154444_PORTALU_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 6,
+      "alert_type": "burst",
+      "atr_pct": 1.863,
+      "top_trader_position_ratio": null,
+      "top_trader_account_ratio": null,
+      "global_account_ratio": null,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.1373,
+      "fees_are_actual": false,
+      "opened_at": "2026-05-30T15:21:52.223691+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 73933.5,
+      "btc_change_24h_at_open": 0.214,
+      "btc_pct_vs_ma25_at_open": 0.436,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.01131,
+      "current_price": 0.01156,
+      "unrealized_pnl_usdt": -3.6,
+      "unrealized_pnl_pct": -1.049,
+      "last_price_check_at": "2026-05-30T15:22:10.015139+00:00"
     }
   ],
   "recent_closed": [
@@ -42462,8 +42526,8 @@
       "direction": "LONG",
       "conviction_score": 8,
       "signal_at": "2026-05-30T13:58:57.530778+00:00",
-      "reason": "paper trade too old (4876s > 600s)",
-      "last_checked_at": "2026-05-30T15:20:13.404203+00:00"
+      "reason": "paper trade too old (4992s > 600s)",
+      "last_checked_at": "2026-05-30T15:22:10.015139+00:00"
     },
     {
       "paper_id": "APRUSDT|SHORT|2026-05-30T14:24:25.040236+00:00",
@@ -42471,8 +42535,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-30T14:25:05.457243+00:00",
-      "reason": "paper trade too old (3308s > 600s)",
-      "last_checked_at": "2026-05-30T15:20:13.404203+00:00"
+      "reason": "paper trade too old (3425s > 600s)",
+      "last_checked_at": "2026-05-30T15:22:10.015139+00:00"
     },
     {
       "paper_id": "STABLEUSDT|SHORT|2026-05-30T15:02:39.018845+00:00",
@@ -42481,7 +42545,7 @@
       "conviction_score": 5,
       "signal_at": "2026-05-30T15:02:45.508228+00:00",
       "reason": "symbol STABLEUSDT in live blacklist (历史 0 胜)",
-      "last_checked_at": "2026-05-30T15:20:13.404203+00:00"
+      "last_checked_at": "2026-05-30T15:22:10.015139+00:00"
     },
     {
       "paper_id": "HOMEUSDT|LONG|2026-05-30T15:19:17.800660+00:00",
@@ -42490,18 +42554,18 @@
       "conviction_score": 5,
       "signal_at": "2026-05-30T15:19:35.665898+00:00",
       "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-05-30T15:20:13.404203+00:00"
+      "last_checked_at": "2026-05-30T15:22:10.015139+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73910.8,
-    "btc_ma25_1h": 73611.68,
-    "pct_vs_ma25": 0.406,
-    "change_24h_pct": 0.184,
+    "btc_price": 73953.2,
+    "btc_ma25_1h": 73613.38,
+    "pct_vs_ma25": 0.462,
+    "change_24h_pct": 0.241,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-30T15:20:14.957058+00:00"
+    "computed_at": "2026-05-30T15:22:11.946301+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
