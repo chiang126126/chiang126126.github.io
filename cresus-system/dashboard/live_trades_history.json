@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-30T03:21:02.184793+00:00",
+  "generated_at": "2026-05-30T03:23:08.933863+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 639,
@@ -35,14 +35,9 @@
     "ok": false,
     "mismatches": [
       {
-        "symbol": "BASUSDT",
+        "symbol": "PENDLEUSDT",
         "kind": "exchange_only",
-        "message": "exchange has BASUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "CFXUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has CFXUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "KITEUSDT",
@@ -50,9 +45,9 @@
         "message": "exchange has KITEUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "PENDLEUSDT",
+        "symbol": "PYTHUSDT",
         "kind": "exchange_only",
-        "message": "exchange has PENDLEUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has PYTHUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "AIAUSDT",
@@ -60,45 +55,50 @@
         "message": "exchange has AIAUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
-        "symbol": "GPSUSDT",
+        "symbol": "CFXUSDT",
         "kind": "exchange_only",
-        "message": "exchange has GPSUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "PYTHUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has PYTHUSDT position but live doesn't track (user manual? or state lost)"
-      },
-      {
-        "symbol": "IDUSDT",
-        "kind": "exchange_only",
-        "message": "exchange has IDUSDT position but live doesn't track (user manual? or state lost)"
+        "message": "exchange has CFXUSDT position but live doesn't track (user manual? or state lost)"
       },
       {
         "symbol": "ZECUSDT",
         "kind": "exchange_only",
         "message": "exchange has ZECUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "BASUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has BASUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "GPSUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has GPSUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "IDUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has IDUSDT position but live doesn't track (user manual? or state lost)"
       }
     ],
     "api_failed": false,
     "live_symbols": [
       "VTHOUSDT",
-      "ZKUSDT",
-      "VICUSDT"
+      "VICUSDT",
+      "ZKUSDT"
     ],
     "exchange_symbols": [
-      "VTHOUSDT",
-      "VICUSDT",
-      "IDUSDT",
-      "BASUSDT",
-      "KITEUSDT",
       "PENDLEUSDT",
-      "AIAUSDT",
-      "GPSUSDT",
       "PYTHUSDT",
+      "KITEUSDT",
+      "AIAUSDT",
       "CFXUSDT",
       "ZKUSDT",
-      "ZECUSDT"
+      "ZECUSDT",
+      "BASUSDT",
+      "VICUSDT",
+      "GPSUSDT",
+      "VTHOUSDT",
+      "IDUSDT"
     ]
   },
   "open_trades": [
@@ -117,8 +117,8 @@
       "risk_usdt": 12.261,
       "risk_pct": 3.065,
       "mirror_latency_sec": 7.2,
-      "sl_price": 0.000521,
-      "sl_paper_current": 0.00052,
+      "sl_price": 0.00056465624,
+      "sl_paper_current": 0.00056365624,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": 1e-06,
       "sl_compensation_mode": "always",
@@ -134,7 +134,7 @@
       "min_conviction_threshold": null,
       "tp1_price": 0.00054246,
       "tp2_price": 0.00056491,
-      "phase": "B",
+      "phase": "C",
       "entry_order_id": 110511844,
       "entry_client_id": "cresus_L1780102177_VTHOUSD_L_E",
       "sl_order_id": null,
@@ -146,8 +146,8 @@
       "top_trader_account_ratio": null,
       "global_account_ratio": null,
       "phase_a_mfe_pct": 5.423,
-      "phase_b_mfe_pct": 5.423,
-      "phase_c_mfe_pct": null,
+      "phase_b_mfe_pct": 10.788,
+      "phase_c_mfe_pct": 10.788,
       "fees_paid_usdt": 0.2,
       "fees_are_actual": true,
       "opened_at": "2026-05-30T00:49:45.269685+00:00",
@@ -159,11 +159,12 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.0005482,
-      "current_price": 0.000574,
-      "unrealized_pnl_usdt": 40.691,
-      "unrealized_pnl_pct": 10.173,
-      "last_price_check_at": "2026-05-30T03:21:00.205237+00:00",
-      "phase_b_mfe_price": 0.0005482
+      "current_price": 0.000576,
+      "unrealized_pnl_usdt": 42.2265,
+      "unrealized_pnl_pct": 10.557,
+      "last_price_check_at": "2026-05-30T03:23:06.943350+00:00",
+      "phase_b_mfe_price": 0.0005761,
+      "phase_c_mfe_price": 0.0005761
     },
     {
       "paper_id": "VICUSDT|LONG|2026-05-30T03:02:03.772150+00:00",
@@ -180,8 +181,8 @@
       "risk_usdt": 2.0645,
       "risk_pct": 0.516,
       "mirror_latency_sec": 5.5,
-      "sl_price": 0.0411,
-      "sl_paper_current": 0.04122,
+      "sl_price": 0.04145241495,
+      "sl_paper_current": 0.041572414950000004,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": -0.00012,
       "sl_compensation_mode": "always",
@@ -222,10 +223,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.04191,
-      "current_price": 0.0417,
-      "unrealized_pnl_usdt": 5.8392,
-      "unrealized_pnl_pct": 1.46,
-      "last_price_check_at": "2026-05-30T03:21:00.205237+00:00",
+      "current_price": 0.0415,
+      "unrealized_pnl_usdt": 3.8928,
+      "unrealized_pnl_pct": 0.973,
+      "last_price_check_at": "2026-05-30T03:23:06.943350+00:00",
       "phase_b_mfe_price": 0.04191
     },
     {
@@ -243,8 +244,8 @@
       "risk_usdt": 2.5711,
       "risk_pct": 0.643,
       "mirror_latency_sec": 20.6,
-      "sl_price": 0.014397171999999998,
-      "sl_paper_current": 0.014377171999999999,
+      "sl_price": 0.0144071216,
+      "sl_paper_current": 0.0143871216,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": 2e-05,
       "sl_compensation_mode": "always",
@@ -272,7 +273,7 @@
       "top_trader_account_ratio": null,
       "global_account_ratio": null,
       "phase_a_mfe_pct": 0.912,
-      "phase_b_mfe_pct": 1.332,
+      "phase_b_mfe_pct": 1.403,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.16,
       "fees_are_actual": false,
@@ -285,11 +286,11 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.01439,
-      "current_price": 0.01448,
-      "unrealized_pnl_usdt": 5.6022,
-      "unrealized_pnl_pct": 1.401,
-      "last_price_check_at": "2026-05-30T03:21:00.205237+00:00",
-      "phase_b_mfe_price": 0.01445
+      "current_price": 0.01446,
+      "unrealized_pnl_usdt": 5.042,
+      "unrealized_pnl_pct": 1.261,
+      "last_price_check_at": "2026-05-30T03:23:06.943350+00:00",
+      "phase_b_mfe_price": 0.01446
     }
   ],
   "recent_closed": [
@@ -39960,13 +39961,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73712.0,
-    "btc_ma25_1h": 73540.64,
-    "pct_vs_ma25": 0.233,
-    "change_24h_pct": 0.609,
+    "btc_price": 73690.2,
+    "btc_ma25_1h": 73539.77,
+    "pct_vs_ma25": 0.205,
+    "change_24h_pct": 0.58,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-30T03:21:01.316334+00:00"
+    "computed_at": "2026-05-30T03:23:08.062109+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
