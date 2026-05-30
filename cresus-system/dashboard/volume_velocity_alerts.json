@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-30T18:18:54.429088+00:00",
+  "updated_at": "2026-05-30T18:20:59.849777+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 19,
+  "alerts_count": 20,
   "alerts": [
+    {
+      "symbol": "ORDIUSDT",
+      "base": "ORDI",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 3.477,
+      "price_change_pct": 1.607,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 455476.0,
+      "volume_baseline_usdt": 10519.0,
+      "volume_ratio": 43.3,
+      "detected_at": "2026-05-30T18:20:30.100812+00:00",
+      "intensity": 3,
+      "change_5m_pct": 2.374,
+      "change_15m_pct": 3.008,
+      "change_1h_pct": 2.826,
+      "change_4h_pct": 3.221,
+      "taker_buy_ratio_1m": 0.532,
+      "taker_buy_ratio_5m": 0.548,
+      "oi_delta_5m_pct": -0.152,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.263,
+      "range_4h_pct": 4.31,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 3.46785714,
+      "suggested_tp1": 3.49071429,
+      "suggested_tp2": 3.50442857,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "ZAMAUSDT",
       "base": "ZAMA",
