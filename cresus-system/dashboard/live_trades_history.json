@@ -1,48 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-30T16:23:47.845189+00:00",
+  "generated_at": "2026-05-30T16:27:50.322315+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 685,
-    "open": 1,
-    "closed": 684,
+    "open": 0,
+    "closed": 685,
     "wins": 222,
-    "losses": 454,
+    "losses": 455,
     "win_rate": 0.328,
-    "total_pnl_usdt": -104.4694,
-    "net_pnl_usdt": -209.9549,
-    "avg_pnl_usdt": -0.1527,
+    "total_pnl_usdt": -105.7494,
+    "net_pnl_usdt": -211.5544,
+    "avg_pnl_usdt": -0.1544,
     "best_trade_usdt": 34.4314,
     "worst_trade_usdt": -24.1805,
-    "fees_paid_usdt": 105.6455,
-    "fees_realized_usdt": 105.4855,
-    "fees_open_usdt": 0.16,
+    "fees_paid_usdt": 105.805,
+    "fees_realized_usdt": 105.805,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 400.0,
-    "free_capital_usdt": 1389.89,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 1788.45,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 27.5957,
-    "deployed_usdt": 400.0
+    "daily_pnl": 26.3157,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "GIGGLEUSDT"
-    ],
-    "exchange_symbols": [
-      "GIGGLEUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "GIGGLEUSDT|LONG|2026-05-30T16:14:17.467830+00:00",
       "trade_id": "L1780157657_GIGGLEU_L",
@@ -89,7 +86,7 @@
       "phase_a_mfe_pct": 0.064,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.16,
+      "fees_paid_usdt": 0.3195,
       "fees_are_actual": false,
       "opened_at": "2026-05-30T16:18:07.703276+00:00",
       "is_dry_run": false,
@@ -100,13 +97,21 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 31.3,
-      "current_price": 31.27,
-      "unrealized_pnl_usdt": 0.256,
-      "unrealized_pnl_pct": 0.064,
-      "last_price_check_at": "2026-05-30T16:23:46.565038+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 31.17,
+      "unrealized_pnl_usdt": -1.024,
+      "unrealized_pnl_pct": -0.256,
+      "last_price_check_at": "2026-05-30T16:25:20.415712+00:00",
+      "closed_at": "2026-05-30T16:25:34.957924+00:00",
+      "close_reason": "paper:hit_sl",
+      "avg_exit_price": 31.150000000000002,
+      "realized_pnl_usdt": -1.28,
+      "close_order_id": 186857156,
+      "close_qty": 12.8,
+      "close_expected_price": 31.17,
+      "close_slippage_bps": 6.42,
+      "entry_fees_usdt": 0.16,
+      "close_fees_usdt": 0.1595
+    },
     {
       "paper_id": "WLDUSDT|LONG|2026-05-30T15:14:26.469371+00:00",
       "trade_id": "L1780154066_WLDUSDT_L",
@@ -43210,28 +43215,19 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-30T14:25:05.457243+00:00",
-      "reason": "paper trade too old (7121s > 600s)",
-      "last_checked_at": "2026-05-30T16:23:46.565038+00:00"
-    },
-    {
-      "paper_id": "RAVEUSDT|LONG|2026-05-30T16:11:50.763214+00:00",
-      "symbol": "RAVEUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-05-30T16:12:24.643946+00:00",
-      "reason": "paper trade too old (682s > 600s)",
-      "last_checked_at": "2026-05-30T16:23:46.565038+00:00"
+      "reason": "paper trade too old (7362s > 600s)",
+      "last_checked_at": "2026-05-30T16:27:47.748077+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73899.7,
-    "btc_ma25_1h": 73615.48,
-    "pct_vs_ma25": 0.386,
-    "change_24h_pct": -0.165,
+    "btc_price": 73877.3,
+    "btc_ma25_1h": 73614.59,
+    "pct_vs_ma25": 0.357,
+    "change_24h_pct": -0.195,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-30T16:23:47.534294+00:00"
+    "computed_at": "2026-05-30T16:27:50.288587+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
