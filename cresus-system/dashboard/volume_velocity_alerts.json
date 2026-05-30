@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-30T15:32:07.720463+00:00",
+  "updated_at": "2026-05-30T15:34:18.054590+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 44,
+  "alerts_count": 45,
   "alerts": [
+    {
+      "symbol": "SEIUSDT",
+      "base": "SEI",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.0675,
+      "price_change_pct": -0.574,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 222053.0,
+      "volume_baseline_usdt": 36541.0,
+      "volume_ratio": 6.08,
+      "detected_at": "2026-05-30T15:33:30.358941+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.75,
+      "change_15m_pct": -0.192,
+      "change_1h_pct": -0.089,
+      "change_4h_pct": 2.554,
+      "taker_buy_ratio_1m": 0.099,
+      "taker_buy_ratio_5m": 0.177,
+      "oi_delta_5m_pct": 0.444,
+      "funding_rate_pct": 0.0019,
+      "atr_pct": 0.235,
+      "range_4h_pct": 3.78,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.06765857,
+      "suggested_tp1": 0.06726214,
+      "suggested_tp2": 0.06702429,
+      "conviction_score": 1,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "HOMEUSDT",
       "base": "HOME",
