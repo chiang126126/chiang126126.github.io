@@ -1,46 +1,44 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-31T03:15:13.288582+00:00",
+  "generated_at": "2026-05-31T03:17:21.336745+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 712,
-    "open": 2,
-    "closed": 710,
+    "open": 1,
+    "closed": 711,
     "wins": 228,
-    "losses": 473,
+    "losses": 474,
     "win_rate": 0.325,
-    "total_pnl_usdt": -120.4032,
-    "net_pnl_usdt": -235.7261,
-    "avg_pnl_usdt": -0.1696,
+    "total_pnl_usdt": -124.7622,
+    "net_pnl_usdt": -240.4429,
+    "avg_pnl_usdt": -0.1755,
     "best_trade_usdt": 37.2277,
     "worst_trade_usdt": -24.1805,
-    "fees_paid_usdt": 115.6829,
-    "fees_realized_usdt": 115.3229,
-    "fees_open_usdt": 0.36,
+    "fees_paid_usdt": 115.8807,
+    "fees_realized_usdt": 115.6807,
+    "fees_open_usdt": 0.2,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 799.97,
-    "free_capital_usdt": 963.94,
+    "deployed_usdt": 399.97,
+    "free_capital_usdt": 1359.38,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -13.9045,
-    "deployed_usdt": 799.97
+    "daily_pnl": -18.2635,
+    "deployed_usdt": 399.97
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "ARIAUSDT",
       "TAUSDT"
     ],
     "exchange_symbols": [
-      "ARIAUSDT",
       "TAUSDT"
     ]
   },
@@ -102,11 +100,13 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.07806,
-      "current_price": 0.07959,
-      "unrealized_pnl_usdt": -3.549,
-      "unrealized_pnl_pct": -0.887,
-      "last_price_check_at": "2026-05-31T03:15:11.378043+00:00"
-    },
+      "current_price": 0.0804,
+      "unrealized_pnl_usdt": -7.6557,
+      "unrealized_pnl_pct": -1.914,
+      "last_price_check_at": "2026-05-31T03:17:19.156367+00:00"
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "ARIAUSDT|LONG|2026-05-31T03:02:09.399736+00:00",
       "trade_id": "L1780196529_ARIAUSD_L",
@@ -130,7 +130,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 2,
       "wick_filter_mode": "always",
-      "sl_breach_count": 0,
+      "sl_breach_count": 2,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.005,
       "regime_gate_enabled": true,
@@ -153,7 +153,7 @@
       "phase_a_mfe_pct": 0.0,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.16,
+      "fees_paid_usdt": 0.35782,
       "fees_are_actual": false,
       "opened_at": "2026-05-31T03:02:37.314420+00:00",
       "is_dry_run": false,
@@ -164,13 +164,21 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.0467,
-      "current_price": 0.0465,
-      "unrealized_pnl_usdt": -2.5641,
-      "unrealized_pnl_pct": -0.641,
-      "last_price_check_at": "2026-05-31T03:15:11.378043+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.04631,
+      "unrealized_pnl_usdt": -4.188,
+      "unrealized_pnl_pct": -1.047,
+      "last_price_check_at": "2026-05-31T03:16:36.263535+00:00",
+      "closed_at": "2026-05-31T03:16:42.216041+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.04629,
+      "realized_pnl_usdt": -4.359,
+      "close_order_id": 105581569,
+      "close_qty": 8547.0,
+      "close_expected_price": 0.04635,
+      "close_slippage_bps": 12.94,
+      "entry_fees_usdt": 0.16,
+      "close_fees_usdt": 0.19782
+    },
     {
       "paper_id": "KITEUSDT|LONG|2026-05-31T02:18:21.022726+00:00",
       "trade_id": "L1780193901_KITEUSD_L",
@@ -45152,13 +45160,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 74110.8,
-    "btc_ma25_1h": 73775.94,
-    "pct_vs_ma25": 0.454,
-    "change_24h_pct": 0.841,
+    "btc_price": 74096.5,
+    "btc_ma25_1h": 73775.37,
+    "pct_vs_ma25": 0.435,
+    "change_24h_pct": 0.822,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-31T03:15:12.680782+00:00"
+    "computed_at": "2026-05-31T03:17:21.028570+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
