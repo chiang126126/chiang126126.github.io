@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-31T11:33:48.304615+00:00",
+  "updated_at": "2026-05-31T11:35:53.128473+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 13,
+  "alerts_count": 14,
   "alerts": [
+    {
+      "symbol": "CHIPUSDT",
+      "base": "CHIP",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.03835,
+      "price_change_pct": 1.001,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 328017.0,
+      "volume_baseline_usdt": 9904.0,
+      "volume_ratio": 33.12,
+      "detected_at": "2026-05-31T11:35:17.195270+00:00",
+      "intensity": 3,
+      "change_5m_pct": 0.815,
+      "change_15m_pct": 0.947,
+      "change_1h_pct": 1.347,
+      "change_4h_pct": 0.078,
+      "taker_buy_ratio_1m": 0.524,
+      "taker_buy_ratio_5m": 0.527,
+      "oi_delta_5m_pct": 0.283,
+      "funding_rate_pct": -0.015,
+      "atr_pct": 0.201,
+      "range_4h_pct": 2.82,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.03827286,
+      "suggested_tp1": 0.03846571,
+      "suggested_tp2": 0.03858143,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "MEMEUSDT",
       "base": "MEME",
