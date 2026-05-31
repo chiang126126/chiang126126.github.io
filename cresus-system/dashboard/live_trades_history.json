@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-31T03:00:59.173302+00:00",
+  "generated_at": "2026-05-31T03:02:56.623883+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 710,
-    "open": 2,
+    "total_trades": 711,
+    "open": 3,
     "closed": 708,
     "wins": 227,
     "losses": 472,
@@ -15,33 +15,35 @@
     "avg_pnl_usdt": -0.1693,
     "best_trade_usdt": 37.2277,
     "worst_trade_usdt": -24.1805,
-    "fees_paid_usdt": 115.0431,
+    "fees_paid_usdt": 115.2031,
     "fees_realized_usdt": 114.6432,
-    "fees_open_usdt": 0.4,
+    "fees_open_usdt": 0.56,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 799.91,
-    "free_capital_usdt": 965.18,
+    "deployed_usdt": 1199.91,
+    "free_capital_usdt": 565.02,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 3
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -13.3655,
-    "deployed_usdt": 799.91
+    "deployed_usdt": 1199.91
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
+      "KITEUSDT",
       "TAUSDT",
-      "KITEUSDT"
+      "ARIAUSDT"
     ],
     "exchange_symbols": [
       "KITEUSDT",
-      "TAUSDT"
+      "TAUSDT",
+      "ARIAUSDT"
     ]
   },
   "open_trades": [
@@ -90,7 +92,7 @@
       "global_account_ratio": null,
       "phase_a_mfe_pct": 0.71,
       "phase_b_mfe_pct": 1.266,
-      "phase_c_mfe_pct": 2.986,
+      "phase_c_mfe_pct": 3.287,
       "fees_paid_usdt": 0.199971,
       "fees_are_actual": true,
       "opened_at": "2026-05-31T02:18:49.177971+00:00",
@@ -102,12 +104,12 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.20437,
-      "current_price": 0.20861,
-      "unrealized_pnl_usdt": 11.4376,
-      "unrealized_pnl_pct": 2.86,
-      "last_price_check_at": "2026-05-31T03:00:56.812280+00:00",
+      "current_price": 0.20931,
+      "unrealized_pnl_usdt": 12.818,
+      "unrealized_pnl_pct": 3.205,
+      "last_price_check_at": "2026-05-31T03:02:54.113355+00:00",
       "phase_b_mfe_price": 0.2055,
-      "phase_c_mfe_price": 0.20899
+      "phase_c_mfe_price": 0.2096
     },
     {
       "paper_id": "TAUSDT|SHORT|2026-05-31T02:55:13.544429+00:00",
@@ -166,10 +168,72 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.07893,
-      "current_price": 0.08087,
-      "unrealized_pnl_usdt": -10.0386,
-      "unrealized_pnl_pct": -2.51,
-      "last_price_check_at": "2026-05-31T03:00:56.812280+00:00"
+      "current_price": 0.08012,
+      "unrealized_pnl_usdt": -6.2361,
+      "unrealized_pnl_pct": -1.559,
+      "last_price_check_at": "2026-05-31T03:02:54.113355+00:00"
+    },
+    {
+      "paper_id": "ARIAUSDT|LONG|2026-05-31T03:02:09.399736+00:00",
+      "trade_id": "L1780196529_ARIAUSD_L",
+      "symbol": "ARIAUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.0467,
+      "avg_fill_price": 0.0468,
+      "slippage_bps": 21.41,
+      "qty": 8547.0,
+      "notional_usdt": 399.9996,
+      "leverage": 1,
+      "risk_usdt": 4.7009,
+      "risk_pct": 1.175,
+      "mirror_latency_sec": 14.9,
+      "sl_price": 0.04635,
+      "sl_paper_current": 0.04625,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.0001,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 2,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "C",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.047375,
+      "tp2_price": 0.04805,
+      "phase": "A",
+      "entry_order_id": 105563886,
+      "entry_client_id": "cresus_L1780196529_ARIAUSD_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.642,
+      "top_trader_position_ratio": null,
+      "top_trader_account_ratio": null,
+      "global_account_ratio": null,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.16,
+      "fees_are_actual": false,
+      "opened_at": "2026-05-31T03:02:37.314420+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 74004.7,
+      "btc_change_24h_at_open": 0.697,
+      "btc_pct_vs_ma25_at_open": 0.316,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.0467,
+      "current_price": 0.04681,
+      "unrealized_pnl_usdt": 0.0855,
+      "unrealized_pnl_pct": 0.021,
+      "last_price_check_at": "2026-05-31T03:02:54.113355+00:00"
     }
   ],
   "recent_closed": [
@@ -45008,13 +45072,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 74004.8,
+    "btc_price": 74004.7,
     "btc_ma25_1h": 73771.7,
     "pct_vs_ma25": 0.316,
     "change_24h_pct": 0.697,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-31T03:00:58.581309+00:00"
+    "computed_at": "2026-05-31T03:02:55.636371+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
