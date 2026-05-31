@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-31T12:07:17.355673+00:00",
+  "updated_at": "2026-05-31T12:09:22.885898+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 29,
+  "alerts_count": 30,
   "alerts": [
+    {
+      "symbol": "MEMEUSDT",
+      "base": "MEME",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 0.0005705,
+      "price_change_pct": -1.875,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 159695.0,
+      "volume_baseline_usdt": 26365.0,
+      "volume_ratio": 6.06,
+      "detected_at": "2026-05-31T12:08:34.636554+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.627,
+      "change_15m_pct": -1.247,
+      "change_1h_pct": -2.977,
+      "change_4h_pct": 4.241,
+      "taker_buy_ratio_1m": 0.33,
+      "taker_buy_ratio_5m": 0.496,
+      "oi_delta_5m_pct": -1.24,
+      "funding_rate_pct": -0.1638,
+      "atr_pct": 0.605,
+      "range_4h_pct": 11.88,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.0005774,
+      "suggested_tp1": 0.00056015,
+      "suggested_tp2": 0.0005498,
+      "conviction_score": 0,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "TAKEUSDT",
       "base": "TAKE",
