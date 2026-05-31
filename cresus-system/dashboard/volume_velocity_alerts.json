@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-31T16:46:49.076915+00:00",
+  "updated_at": "2026-05-31T16:48:54.066446+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 36,
+  "alerts_count": 37,
   "alerts": [
+    {
+      "symbol": "USTCUSDT",
+      "base": "USTC",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.006938,
+      "price_change_pct": -0.502,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 119158.0,
+      "volume_baseline_usdt": 13663.0,
+      "volume_ratio": 8.72,
+      "detected_at": "2026-05-31T16:48:31.891431+00:00",
+      "intensity": 1,
+      "change_5m_pct": -1.35,
+      "change_15m_pct": -2.239,
+      "change_1h_pct": -1.727,
+      "change_4h_pct": 3.473,
+      "taker_buy_ratio_1m": 0.283,
+      "taker_buy_ratio_5m": 0.284,
+      "oi_delta_5m_pct": -0.503,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.744,
+      "range_4h_pct": 21.76,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.00704129,
+      "suggested_tp1": 0.00678307,
+      "suggested_tp2": 0.00662814,
+      "conviction_score": 0,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "ASTERUSDT",
       "base": "ASTER",
