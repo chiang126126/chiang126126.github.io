@@ -1,48 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-31T14:06:40.969355+00:00",
+  "generated_at": "2026-05-31T14:08:44.843281+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 750,
-    "open": 1,
-    "closed": 749,
+    "open": 0,
+    "closed": 750,
     "wins": 240,
-    "losses": 499,
-    "win_rate": 0.325,
-    "total_pnl_usdt": -111.4177,
-    "net_pnl_usdt": -240.391,
-    "avg_pnl_usdt": -0.1488,
+    "losses": 500,
+    "win_rate": 0.324,
+    "total_pnl_usdt": -112.8274,
+    "net_pnl_usdt": -242.2014,
+    "avg_pnl_usdt": -0.1504,
     "best_trade_usdt": 63.1301,
     "worst_trade_usdt": -24.1805,
-    "fees_paid_usdt": 129.1733,
-    "fees_realized_usdt": 128.9733,
-    "fees_open_usdt": 0.2,
+    "fees_paid_usdt": 129.374,
+    "fees_realized_usdt": 129.374,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 400.0,
-    "free_capital_usdt": 1359.41,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 1757.8,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -4.919,
-    "deployed_usdt": 400.0
+    "daily_pnl": -6.3287,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "MBOXUSDT"
-    ],
-    "exchange_symbols": [
-      "MBOXUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "MBOXUSDT|SHORT|2026-05-31T14:00:22.330510+00:00",
       "trade_id": "L1780236022_MBOXUSD_S",
@@ -66,7 +63,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 2,
       "wick_filter_mode": "always",
-      "sl_breach_count": 1,
+      "sl_breach_count": 2,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": -0.0095,
       "regime_gate_enabled": true,
@@ -89,7 +86,7 @@
       "phase_a_mfe_pct": 0.352,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.199998,
+      "fees_paid_usdt": 0.400701,
       "fees_are_actual": true,
       "opened_at": "2026-05-31T14:00:53.748376+00:00",
       "is_dry_run": false,
@@ -103,10 +100,18 @@
       "current_price": 0.01139,
       "unrealized_pnl_usdt": -1.4097,
       "unrealized_pnl_pct": -0.352,
-      "last_price_check_at": "2026-05-31T14:06:36.232570+00:00"
-    }
-  ],
-  "recent_closed": [
+      "last_price_check_at": "2026-05-31T14:06:47.107942+00:00",
+      "closed_at": "2026-05-31T14:06:53.275834+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.01139,
+      "realized_pnl_usdt": -1.4097,
+      "close_order_id": 106936450,
+      "close_qty": 35242.0,
+      "close_expected_price": 0.01138214,
+      "close_slippage_bps": 6.91,
+      "entry_fees_usdt": 0.199998,
+      "close_fees_usdt": 0.200703
+    },
     {
       "paper_id": "GUNUSDT|LONG|2026-05-31T12:48:46.033623+00:00",
       "trade_id": "L1780231726_GUNUSDT_L",
@@ -47913,26 +47918,16 @@
       "close_qty": 53792.0
     }
   ],
-  "missed_signals": [
-    {
-      "paper_id": "MANTRAUSDT|LONG|2026-05-31T14:02:04.847835+00:00",
-      "symbol": "MANTRAUSDT",
-      "direction": "LONG",
-      "conviction_score": 6,
-      "signal_at": "2026-05-31T14:02:52.100601+00:00",
-      "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-05-31T14:06:36.232570+00:00"
-    }
-  ],
+  "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73755.5,
-    "btc_ma25_1h": 73935.33,
+    "btc_price": 73755.4,
+    "btc_ma25_1h": 73935.32,
     "pct_vs_ma25": -0.243,
     "change_24h_pct": -0.197,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-31T14:06:37.755640+00:00"
+    "computed_at": "2026-05-31T14:08:44.800795+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
