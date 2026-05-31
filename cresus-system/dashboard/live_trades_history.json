@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-31T07:21:01.766745+00:00",
+  "generated_at": "2026-05-31T07:23:06.418776+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 727,
-    "open": 2,
+    "total_trades": 728,
+    "open": 3,
     "closed": 725,
     "wins": 233,
     "losses": 482,
@@ -15,33 +15,35 @@
     "avg_pnl_usdt": -0.1761,
     "best_trade_usdt": 48.6951,
     "worst_trade_usdt": -24.1805,
-    "fees_paid_usdt": 121.3894,
+    "fees_paid_usdt": 121.5893,
     "fees_realized_usdt": 121.0294,
-    "fees_open_usdt": 0.36,
+    "fees_open_usdt": 0.5599,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 799.95,
-    "free_capital_usdt": 951.0,
+    "deployed_usdt": 1199.87,
+    "free_capital_usdt": 550.88,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 3
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -21.1634,
-    "deployed_usdt": 799.95
+    "deployed_usdt": 1199.87
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "PUNDIXUSDT",
-      "STEEMUSDT"
+      "SIRENUSDT",
+      "STEEMUSDT",
+      "PUNDIXUSDT"
     ],
     "exchange_symbols": [
-      "PUNDIXUSDT",
-      "STEEMUSDT"
+      "STEEMUSDT",
+      "SIRENUSDT",
+      "PUNDIXUSDT"
     ]
   },
   "open_trades": [
@@ -88,7 +90,7 @@
       "top_trader_position_ratio": null,
       "top_trader_account_ratio": null,
       "global_account_ratio": null,
-      "phase_a_mfe_pct": 1.207,
+      "phase_a_mfe_pct": 1.334,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.16,
@@ -101,11 +103,11 @@
       "btc_pct_vs_ma25_at_open": 0.117,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 0.1555,
-      "current_price": 0.1555,
-      "unrealized_pnl_usdt": 3.3163,
-      "unrealized_pnl_pct": 0.829,
-      "last_price_check_at": "2026-05-31T07:20:58.993280+00:00"
+      "phase_a_mfe_price": 0.1553,
+      "current_price": 0.1547,
+      "unrealized_pnl_usdt": 5.3571,
+      "unrealized_pnl_pct": 1.339,
+      "last_price_check_at": "2026-05-31T07:23:04.583264+00:00"
     },
     {
       "paper_id": "STEEMUSDT|LONG|2026-05-31T07:19:01.297272+00:00",
@@ -164,10 +166,72 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.05637,
-      "current_price": 0.05573,
-      "unrealized_pnl_usdt": -5.3808,
-      "unrealized_pnl_pct": -1.345,
-      "last_price_check_at": "2026-05-31T07:20:58.993280+00:00"
+      "current_price": 0.05535,
+      "unrealized_pnl_usdt": -8.0712,
+      "unrealized_pnl_pct": -2.018,
+      "last_price_check_at": "2026-05-31T07:23:04.583264+00:00"
+    },
+    {
+      "paper_id": "SIRENUSDT|SHORT|2026-05-31T07:21:33.129964+00:00",
+      "trade_id": "L1780212093_SIRENUS_S",
+      "symbol": "SIRENUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.48,
+      "avg_fill_price": 0.4801,
+      "slippage_bps": -2.08,
+      "qty": 833.0,
+      "notional_usdt": 399.9233,
+      "leverage": 1,
+      "risk_usdt": 1.1662,
+      "risk_pct": 0.292,
+      "mirror_latency_sec": 10.5,
+      "sl_price": 0.48160000000000003,
+      "sl_paper_current": 0.4815,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.0001,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 2,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "B",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.47775,
+      "tp2_price": 0.4755,
+      "phase": "A",
+      "entry_order_id": 138063029,
+      "entry_client_id": "cresus_L1780212093_SIRENUS_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.313,
+      "top_trader_position_ratio": null,
+      "top_trader_account_ratio": null,
+      "global_account_ratio": null,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.199962,
+      "fees_are_actual": true,
+      "opened_at": "2026-05-31T07:21:56.491696+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 73921.5,
+      "btc_change_24h_at_open": 0.56,
+      "btc_pct_vs_ma25_at_open": 0.074,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.48,
+      "current_price": 0.4803,
+      "unrealized_pnl_usdt": -0.1666,
+      "unrealized_pnl_pct": -0.042,
+      "last_price_check_at": "2026-05-31T07:23:04.583264+00:00"
     }
   ],
   "recent_closed": [
@@ -46244,8 +46308,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-05-31T05:40:49.665570+00:00",
-      "reason": "paper trade too old (6009s > 600s)",
-      "last_checked_at": "2026-05-31T07:20:58.993280+00:00"
+      "reason": "paper trade too old (6135s > 600s)",
+      "last_checked_at": "2026-05-31T07:23:04.583264+00:00"
     },
     {
       "paper_id": "SPORTFUNUSDT|SHORT|2026-05-31T06:39:24.376594+00:00",
@@ -46253,8 +46317,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-05-31T06:39:40.377344+00:00",
-      "reason": "paper trade too old (2479s > 600s)",
-      "last_checked_at": "2026-05-31T07:20:58.993280+00:00"
+      "reason": "paper trade too old (2604s > 600s)",
+      "last_checked_at": "2026-05-31T07:23:04.583264+00:00"
     }
   ],
   "btc_regime_now": {
@@ -46265,7 +46329,7 @@
     "change_24h_pct": 0.56,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-31T07:21:01.148733+00:00"
+    "computed_at": "2026-05-31T07:23:05.556882+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
