@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-31T11:42:06.992926+00:00",
+  "updated_at": "2026-05-31T11:44:10.924866+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 16,
+  "alerts_count": 17,
   "alerts": [
+    {
+      "symbol": "LSKUSDT",
+      "base": "LSK",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.1129,
+      "price_change_pct": -1.225,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 248230.0,
+      "volume_baseline_usdt": 10372.0,
+      "volume_ratio": 23.93,
+      "detected_at": "2026-05-31T11:44:06.375610+00:00",
+      "intensity": 3,
+      "change_5m_pct": -1.821,
+      "change_15m_pct": -1.906,
+      "change_1h_pct": -3.413,
+      "change_4h_pct": -1.394,
+      "taker_buy_ratio_1m": 0.394,
+      "taker_buy_ratio_5m": 0.381,
+      "oi_delta_5m_pct": 0.206,
+      "funding_rate_pct": -0.0533,
+      "atr_pct": 0.5,
+      "range_4h_pct": 5.93,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.11374643,
+      "suggested_tp1": 0.11163036,
+      "suggested_tp2": 0.11036071,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "ESPORTSUSDT",
       "base": "ESPORTS",
