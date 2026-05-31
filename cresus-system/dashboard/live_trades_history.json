@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-31T13:19:33.344551+00:00",
+  "generated_at": "2026-05-31T13:21:39.612961+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 749,
@@ -36,16 +36,16 @@
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "STGUSDT",
-      "ARCUSDT",
       "TAKEUSDT",
-      "GUNUSDT"
+      "ARCUSDT",
+      "GUNUSDT",
+      "STGUSDT"
     ],
     "exchange_symbols": [
-      "GUNUSDT",
-      "ARCUSDT",
+      "TAKEUSDT",
       "STGUSDT",
-      "TAKEUSDT"
+      "GUNUSDT",
+      "ARCUSDT"
     ]
   },
   "open_trades": [
@@ -94,7 +94,7 @@
       "global_account_ratio": null,
       "phase_a_mfe_pct": 2.694,
       "phase_b_mfe_pct": 3.452,
-      "phase_c_mfe_pct": 3.504,
+      "phase_c_mfe_pct": 3.517,
       "fees_paid_usdt": 0.16,
       "fees_are_actual": false,
       "opened_at": "2026-05-31T12:34:40.091728+00:00",
@@ -106,12 +106,12 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.07442,
-      "current_price": 0.07378,
-      "unrealized_pnl_usdt": 14.4733,
-      "unrealized_pnl_pct": 3.619,
-      "last_price_check_at": "2026-05-31T13:19:30.639892+00:00",
+      "current_price": 0.07381,
+      "unrealized_pnl_usdt": 14.3165,
+      "unrealized_pnl_pct": 3.579,
+      "last_price_check_at": "2026-05-31T13:21:37.478293+00:00",
       "phase_b_mfe_price": 0.07384,
-      "phase_c_mfe_price": 0.0738
+      "phase_c_mfe_price": 0.07379
     },
     {
       "paper_id": "GUNUSDT|LONG|2026-05-31T12:48:46.033623+00:00",
@@ -158,7 +158,7 @@
       "global_account_ratio": null,
       "phase_a_mfe_pct": 4.14,
       "phase_b_mfe_pct": 5.692,
-      "phase_c_mfe_pct": 10.867,
+      "phase_c_mfe_pct": 12.29,
       "fees_paid_usdt": 0.16,
       "fees_are_actual": false,
       "opened_at": "2026-05-31T12:49:20.662593+00:00",
@@ -170,12 +170,12 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.00805,
-      "current_price": 0.00867,
-      "unrealized_pnl_usdt": 48.6412,
-      "unrealized_pnl_pct": 12.16,
-      "last_price_check_at": "2026-05-31T13:19:30.639892+00:00",
+      "current_price": 0.00875,
+      "unrealized_pnl_usdt": 52.7809,
+      "unrealized_pnl_pct": 13.195,
+      "last_price_check_at": "2026-05-31T13:21:37.478293+00:00",
       "phase_b_mfe_price": 0.00817,
-      "phase_c_mfe_price": 0.00857
+      "phase_c_mfe_price": 0.00868
     },
     {
       "paper_id": "TAKEUSDT|SHORT|2026-05-31T13:05:20.773886+00:00",
@@ -234,10 +234,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.02176,
-      "current_price": 0.02205,
-      "unrealized_pnl_usdt": -5.3308,
-      "unrealized_pnl_pct": -1.333,
-      "last_price_check_at": "2026-05-31T13:19:30.639892+00:00"
+      "current_price": 0.022,
+      "unrealized_pnl_usdt": -4.4117,
+      "unrealized_pnl_pct": -1.103,
+      "last_price_check_at": "2026-05-31T13:21:37.478293+00:00"
     },
     {
       "paper_id": "STGUSDT|LONG|2026-05-31T13:09:00.831308+00:00",
@@ -296,10 +296,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.2785,
-      "current_price": 0.2737,
-      "unrealized_pnl_usdt": -3.9069,
-      "unrealized_pnl_pct": -0.977,
-      "last_price_check_at": "2026-05-31T13:19:30.639892+00:00"
+      "current_price": 0.2732,
+      "unrealized_pnl_usdt": -4.6304,
+      "unrealized_pnl_pct": -1.158,
+      "last_price_check_at": "2026-05-31T13:21:37.478293+00:00"
     }
   ],
   "recent_closed": [
@@ -47825,7 +47825,7 @@
       "conviction_score": 5,
       "signal_at": "2026-05-31T09:27:20.931545+00:00",
       "reason": "max_concurrent reached (4/4)",
-      "last_checked_at": "2026-05-31T13:19:30.639892+00:00"
+      "last_checked_at": "2026-05-31T13:21:37.478293+00:00"
     },
     {
       "paper_id": "CTRUSDT|LONG|2026-05-31T12:42:34.502526+00:00",
@@ -47834,18 +47834,27 @@
       "conviction_score": 5,
       "signal_at": "2026-05-31T12:42:50.208219+00:00",
       "reason": "max_concurrent reached (4/4)",
-      "last_checked_at": "2026-05-31T13:19:30.639892+00:00"
+      "last_checked_at": "2026-05-31T13:21:37.478293+00:00"
+    },
+    {
+      "paper_id": "NOMUSDT|LONG|2026-05-31T13:20:06.419078+00:00",
+      "symbol": "NOMUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-05-31T13:20:25.527185+00:00",
+      "reason": "max_concurrent reached (4/4)",
+      "last_checked_at": "2026-05-31T13:21:37.478293+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73935.4,
-    "btc_ma25_1h": 73940.42,
-    "pct_vs_ma25": -0.007,
-    "change_24h_pct": 0.241,
+    "btc_price": 73956.4,
+    "btc_ma25_1h": 73941.26,
+    "pct_vs_ma25": 0.02,
+    "change_24h_pct": 0.27,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-31T13:19:32.142066+00:00"
+    "computed_at": "2026-05-31T13:21:38.427870+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
