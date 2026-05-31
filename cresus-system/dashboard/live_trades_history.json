@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-05-31T00:31:20.449699+00:00",
+  "generated_at": "2026-05-31T00:33:24.783225+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 703,
@@ -36,16 +36,16 @@
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
+      "ONDOUSDT",
       "ZEREBROUSDT",
-      "ASTERUSDT",
       "AXSUSDT",
-      "ONDOUSDT"
+      "ASTERUSDT"
     ],
     "exchange_symbols": [
-      "ASTERUSDT",
+      "ONDOUSDT",
       "ZEREBROUSDT",
       "AXSUSDT",
-      "ONDOUSDT"
+      "ASTERUSDT"
     ]
   },
   "open_trades": [
@@ -64,8 +64,8 @@
       "risk_usdt": 2.475,
       "risk_pct": 0.62,
       "mirror_latency_sec": 9.7,
-      "sl_price": 0.7639277685,
-      "sl_paper_current": 0.7641277685,
+      "sl_price": 0.769590918,
+      "sl_paper_current": 0.769790918,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": -0.0002,
       "sl_compensation_mode": "always",
@@ -81,7 +81,7 @@
       "min_conviction_threshold": null,
       "tp1_price": 0.76544464,
       "tp2_price": 0.77278929,
-      "phase": "B",
+      "phase": "C",
       "entry_order_id": 481277476,
       "entry_client_id": "cresus_L1780186180_ASTERUS_L_E",
       "sl_order_id": null,
@@ -93,8 +93,8 @@
       "top_trader_account_ratio": null,
       "global_account_ratio": null,
       "phase_a_mfe_pct": 1.016,
-      "phase_b_mfe_pct": 1.451,
-      "phase_c_mfe_pct": null,
+      "phase_b_mfe_pct": 2.203,
+      "phase_c_mfe_pct": 2.203,
       "fees_paid_usdt": 0.199707,
       "fees_are_actual": true,
       "opened_at": "2026-05-31T00:10:56.308375+00:00",
@@ -106,11 +106,12 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.7658,
-      "current_price": 0.7688,
-      "unrealized_pnl_usdt": 5.7443,
-      "unrealized_pnl_pct": 1.438,
-      "last_price_check_at": "2026-05-31T00:31:17.549592+00:00",
-      "phase_b_mfe_price": 0.7691
+      "current_price": 0.7742,
+      "unrealized_pnl_usdt": 8.5901,
+      "unrealized_pnl_pct": 2.151,
+      "last_price_check_at": "2026-05-31T00:33:22.476373+00:00",
+      "phase_b_mfe_price": 0.7748,
+      "phase_c_mfe_price": 0.7748
     },
     {
       "paper_id": "ONDOUSDT|LONG|2026-05-31T00:20:16.700611+00:00",
@@ -169,10 +170,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.3825,
-      "current_price": 0.3816,
-      "unrealized_pnl_usdt": 1.578,
-      "unrealized_pnl_pct": 0.395,
-      "last_price_check_at": "2026-05-31T00:31:17.549592+00:00"
+      "current_price": 0.3832,
+      "unrealized_pnl_usdt": 3.2612,
+      "unrealized_pnl_pct": 0.816,
+      "last_price_check_at": "2026-05-31T00:33:22.476373+00:00"
     },
     {
       "paper_id": "AXSUSDT|LONG|2026-05-31T00:20:29.157090+00:00",
@@ -231,10 +232,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 1.248,
-      "current_price": 1.245,
-      "unrealized_pnl_usdt": 0.321,
-      "unrealized_pnl_pct": 0.08,
-      "last_price_check_at": "2026-05-31T00:31:17.549592+00:00"
+      "current_price": 1.251,
+      "unrealized_pnl_usdt": 2.247,
+      "unrealized_pnl_pct": 0.563,
+      "last_price_check_at": "2026-05-31T00:33:22.476373+00:00"
     },
     {
       "paper_id": "ZEREBROUSDT|LONG|2026-05-31T00:21:10.478737+00:00",
@@ -293,10 +294,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.025529,
-      "current_price": 0.02531,
-      "unrealized_pnl_usdt": -0.7886,
-      "unrealized_pnl_pct": -0.197,
-      "last_price_check_at": "2026-05-31T00:31:17.549592+00:00"
+      "current_price": 0.02546,
+      "unrealized_pnl_usdt": 1.5772,
+      "unrealized_pnl_pct": 0.394,
+      "last_price_check_at": "2026-05-31T00:33:22.476373+00:00"
     }
   ],
   "recent_closed": [
@@ -44486,18 +44487,27 @@
       "conviction_score": 5,
       "signal_at": "2026-05-31T00:21:23.222168+00:00",
       "reason": "max_concurrent reached (4/4)",
-      "last_checked_at": "2026-05-31T00:31:17.549592+00:00"
+      "last_checked_at": "2026-05-31T00:33:22.476373+00:00"
+    },
+    {
+      "paper_id": "PENDLEUSDT|LONG|2026-05-31T00:31:04.768279+00:00",
+      "symbol": "PENDLEUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-05-31T00:31:52.566277+00:00",
+      "reason": "max_concurrent reached (4/4)",
+      "last_checked_at": "2026-05-31T00:33:22.476373+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73924.5,
-    "btc_ma25_1h": 73721.62,
-    "pct_vs_ma25": 0.275,
-    "change_24h_pct": 0.573,
+    "btc_price": 73959.9,
+    "btc_ma25_1h": 73723.03,
+    "pct_vs_ma25": 0.321,
+    "change_24h_pct": 0.622,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-05-31T00:31:19.304484+00:00"
+    "computed_at": "2026-05-31T00:33:23.639992+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
