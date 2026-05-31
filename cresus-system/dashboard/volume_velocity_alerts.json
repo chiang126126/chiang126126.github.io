@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-31T01:28:29.114335+00:00",
+  "updated_at": "2026-05-31T01:30:34.240849+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 33,
+  "alerts_count": 34,
   "alerts": [
+    {
+      "symbol": "PUNDIXUSDT",
+      "base": "PUNDIX",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.1606,
+      "price_change_pct": 5.381,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 193653.0,
+      "volume_baseline_usdt": 6486.0,
+      "volume_ratio": 29.86,
+      "detected_at": "2026-05-31T01:30:09.128545+00:00",
+      "intensity": 3,
+      "change_5m_pct": 5.363,
+      "change_15m_pct": 6.407,
+      "change_1h_pct": 4.678,
+      "change_4h_pct": 19.866,
+      "taker_buy_ratio_1m": 0.618,
+      "taker_buy_ratio_5m": 0.545,
+      "oi_delta_5m_pct": 1.641,
+      "funding_rate_pct": -0.4183,
+      "atr_pct": 1.134,
+      "range_4h_pct": 17.62,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.15695714,
+      "suggested_tp1": 0.16606429,
+      "suggested_tp2": 0.17152857,
+      "conviction_score": 7,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "ALLOUSDT",
       "base": "ALLO",
