@@ -52,7 +52,11 @@ RATE_LIMIT_WEIGHT_PER_MIN = 2400
 RATE_LIMIT_WINDOW_SEC = 60
 
 # 时间同步
-RECV_WINDOW_MS = 5000             # 短窗口防 replay attack
+# Phase 5.I (5/31): RECV_WINDOW_MS 5000 → 30000 — Mac 唤醒/NTP 漂移容忍.
+# 之前 5s 窗口下, Mac 短暂休眠唤醒后系统时钟偏 > 5s 直接 -1021 拒绝.
+# 5/31 实例: 10:00-10:30 30min 空窗后唤醒, recvWindow 不足导致后续多次失败.
+# 30000 是 Binance 推荐上限 60000 的一半, 平衡防 replay 和漂移容忍.
+RECV_WINDOW_MS = 30000            # 容忍 NTP 漂移 (was 5000)
 MAX_TIME_DRIFT_SEC = 3.0          # 漂移 >3s 拒绝下单 (Phase 2.2 用)
 
 # Retry
@@ -1558,6 +1562,17 @@ class BinanceClient:
                     )
                 # 时间漂移
                 if code == -1021:
+                    # Phase 5.I (5/31): -1021 时主动 resync 时钟, 让下次请求 (launchd
+                    # 下一 tick 或同 process 后续调用) 用 fresh offset, 不再连续失败.
+                    # 当前请求仍抛错 — URL 已签好不能改时间戳.
+                    try:
+                        drift = self.check_time_drift(sync=True)
+                        log.warning(
+                            f"[time-resync] 收到 -1021 → 重新校时, drift={drift*1000:+.0f}ms, "
+                            f"下次请求将用 fresh offset"
+                        )
+                    except Exception as resync_err:
+                        log.error(f"[time-resync] 重校时失败: {resync_err}")
                     raise BinanceTimeError(
                         f"time drift / recvWindow http={http_status} msg={msg}"
                     )

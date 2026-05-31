@@ -336,8 +336,42 @@ class TestErrorCategorization(unittest.TestCase):
         with patch("urllib.request.urlopen",
                    side_effect=_make_http_error(400, body)):
             with patch("time.sleep"):
-                with self.assertRaises(BinanceTimeError):
-                    self.client._do_request("GET", "https://x/y", signed=True)
+                with patch.object(self.client, "check_time_drift",
+                                   return_value=0.0):
+                    with self.assertRaises(BinanceTimeError):
+                        self.client._do_request("GET", "https://x/y", signed=True)
+
+    def test_time_drift_triggers_resync(self):
+        """Phase 5.I (5/31): -1021 时主动调 check_time_drift(sync=True)
+        让下一次请求 (launchd next tick) 用 fresh offset.
+        """
+        body = b'{"code":-1021,"msg":"Timestamp for this request was 1000ms ahead."}'
+        with patch("urllib.request.urlopen",
+                   side_effect=_make_http_error(400, body)):
+            with patch("time.sleep"):
+                with patch.object(self.client, "check_time_drift",
+                                   return_value=0.005) as resync_mock:
+                    with self.assertRaises(BinanceTimeError):
+                        self.client._do_request("GET", "https://x/y", signed=True)
+                    # resync 必须被调用至少一次, 且 sync=True
+                    resync_mock.assert_called_once_with(sync=True)
+
+    def test_time_drift_resync_failure_does_not_crash(self):
+        """check_time_drift 抛错时, 不应阻止 BinanceTimeError 上抛 (兜底)."""
+        body = b'{"code":-1021,"msg":"Timestamp drift"}'
+        with patch("urllib.request.urlopen",
+                   side_effect=_make_http_error(400, body)):
+            with patch("time.sleep"):
+                with patch.object(self.client, "check_time_drift",
+                                   side_effect=Exception("network down during resync")):
+                    # 仍应抛 BinanceTimeError, 不被 resync 异常掩盖
+                    with self.assertRaises(BinanceTimeError):
+                        self.client._do_request("GET", "https://x/y", signed=True)
+
+    def test_recv_window_default_is_30s(self):
+        """Phase 5.I: 默认 recvWindow 应为 30000 (容忍 Mac 唤醒后 NTP 漂移)."""
+        from binance_client import RECV_WINDOW_MS
+        self.assertEqual(RECV_WINDOW_MS, 30000)
 
     def test_network_timeout_retriable(self):
         """TimeoutError 重试 4 次, 最后抛 NetworkError."""
