@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-31T21:58:52.029577+00:00",
+  "updated_at": "2026-05-31T22:01:09.331603+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 30,
+  "alerts_count": 31,
   "alerts": [
+    {
+      "symbol": "SOXLUSDT",
+      "base": "SOXL",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 231.32,
+      "price_change_pct": -0.764,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 129647.0,
+      "volume_baseline_usdt": 9828.0,
+      "volume_ratio": 13.19,
+      "detected_at": "2026-05-31T22:00:34.107388+00:00",
+      "intensity": 1,
+      "change_5m_pct": -1.441,
+      "change_15m_pct": -1.784,
+      "change_1h_pct": -0.891,
+      "change_4h_pct": 0.234,
+      "taker_buy_ratio_1m": 0.17,
+      "taker_buy_ratio_5m": 0.252,
+      "oi_delta_5m_pct": 0.399,
+      "funding_rate_pct": 0.0755,
+      "atr_pct": 0.18,
+      "range_4h_pct": 2.27,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 231.73571429,
+      "suggested_tp1": 230.69642857,
+      "suggested_tp2": 230.07285714,
+      "conviction_score": 1,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "MBOXUSDT",
       "base": "MBOX",
