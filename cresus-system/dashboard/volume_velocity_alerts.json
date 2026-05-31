@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-31T17:11:49.310251+00:00",
+  "updated_at": "2026-05-31T17:13:53.476679+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 29,
+  "alerts_count": 30,
   "alerts": [
+    {
+      "symbol": "ZORAUSDT",
+      "base": "ZORA",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.01075,
+      "price_change_pct": 1.129,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 159163.0,
+      "volume_baseline_usdt": 23884.0,
+      "volume_ratio": 6.66,
+      "detected_at": "2026-05-31T17:13:20.778988+00:00",
+      "intensity": 1,
+      "change_5m_pct": 1.709,
+      "change_15m_pct": 2.292,
+      "change_1h_pct": 4.284,
+      "change_4h_pct": 3.578,
+      "taker_buy_ratio_1m": 0.689,
+      "taker_buy_ratio_5m": 0.576,
+      "oi_delta_5m_pct": 2.944,
+      "funding_rate_pct": -0.2212,
+      "atr_pct": 0.591,
+      "range_4h_pct": 6.05,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.01065464,
+      "suggested_tp1": 0.01089304,
+      "suggested_tp2": 0.01103607,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "GUAUSDT",
       "base": "GUA",
