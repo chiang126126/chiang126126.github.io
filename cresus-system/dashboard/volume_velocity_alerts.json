@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-31T05:15:44.865167+00:00",
+  "updated_at": "2026-05-31T05:17:50.180015+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 25,
+  "alerts_count": 26,
   "alerts": [
+    {
+      "symbol": "HIVEUSDT",
+      "base": "HIVE",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.06966,
+      "price_change_pct": 8.185,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 545000.0,
+      "volume_baseline_usdt": 9348.0,
+      "volume_ratio": 58.3,
+      "detected_at": "2026-05-31T05:17:17.096137+00:00",
+      "intensity": 3,
+      "change_5m_pct": 5.36,
+      "change_15m_pct": 8.793,
+      "change_1h_pct": 12.313,
+      "change_4h_pct": 15.396,
+      "taker_buy_ratio_1m": 0.473,
+      "taker_buy_ratio_5m": 0.484,
+      "oi_delta_5m_pct": 4.857,
+      "funding_rate_pct": -0.8384,
+      "atr_pct": 1.478,
+      "range_4h_pct": 14.84,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.06760143,
+      "suggested_tp1": 0.07274786,
+      "suggested_tp2": 0.07583571,
+      "conviction_score": 7,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "ARIAUSDT",
       "base": "ARIA",
