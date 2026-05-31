@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-31T22:24:11.996766+00:00",
+  "updated_at": "2026-05-31T22:26:15.943163+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 38,
+  "alerts_count": 39,
   "alerts": [
+    {
+      "symbol": "HEMIUSDT",
+      "base": "HEMI",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.00725,
+      "price_change_pct": -0.685,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 43569.0,
+      "volume_baseline_usdt": 2685.0,
+      "volume_ratio": 16.22,
+      "detected_at": "2026-05-31T22:26:03.667118+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.521,
+      "change_15m_pct": -0.028,
+      "change_1h_pct": -0.055,
+      "change_4h_pct": 0.083,
+      "taker_buy_ratio_1m": 0.381,
+      "taker_buy_ratio_5m": 0.428,
+      "oi_delta_5m_pct": -0.937,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.233,
+      "range_4h_pct": 3.27,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.00726686,
+      "suggested_tp1": 0.00722471,
+      "suggested_tp2": 0.00719943,
+      "conviction_score": 3,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "FIDAUSDT",
       "base": "FIDA",
