@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-01T04:22:11.681445+00:00",
+  "updated_at": "2026-06-01T04:24:17.868163+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 32,
+  "alerts_count": 33,
   "alerts": [
+    {
+      "symbol": "RIVERUSDT",
+      "base": "RIVER",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 6.57,
+      "price_change_pct": -0.77,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 465511.0,
+      "volume_baseline_usdt": 10129.0,
+      "volume_ratio": 45.96,
+      "detected_at": "2026-06-01T04:23:44.163726+00:00",
+      "intensity": 1,
+      "change_5m_pct": -1.264,
+      "change_15m_pct": -1.62,
+      "change_1h_pct": -1.885,
+      "change_4h_pct": -2.367,
+      "taker_buy_ratio_1m": 0.289,
+      "taker_buy_ratio_5m": 0.308,
+      "oi_delta_5m_pct": -0.091,
+      "funding_rate_pct": 0.008,
+      "atr_pct": 0.253,
+      "range_4h_pct": 4.55,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 6.58664286,
+      "suggested_tp1": 6.54503571,
+      "suggested_tp2": 6.52007143,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "SPORTFUNUSDT",
       "base": "SPORTFUN",
