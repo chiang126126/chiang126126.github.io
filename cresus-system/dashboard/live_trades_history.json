@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-01T05:54:14.600945+00:00",
+  "generated_at": "2026-06-01T05:56:22.694514+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 806,
@@ -36,14 +36,14 @@
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "HOMEUSDT",
+      "WLDUSDT",
       "ARUSDT",
-      "WLDUSDT"
+      "HOMEUSDT"
     ],
     "exchange_symbols": [
-      "HOMEUSDT",
+      "WLDUSDT",
       "ARUSDT",
-      "WLDUSDT"
+      "HOMEUSDT"
     ]
   },
   "open_trades": [
@@ -62,8 +62,8 @@
       "risk_usdt": 10.2658,
       "risk_pct": 2.566,
       "mirror_latency_sec": 340.5,
-      "sl_price": 0.041131999999999995,
-      "sl_paper_current": 0.041115,
+      "sl_price": 0.042198000000000006,
+      "sl_paper_current": 0.042181,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": 1.7e-05,
       "sl_compensation_mode": "always",
@@ -79,7 +79,7 @@
       "min_conviction_threshold": null,
       "tp1_price": 0.04378,
       "tp2_price": 0.045379,
-      "phase": "A",
+      "phase": "B",
       "entry_order_id": 100977886,
       "entry_client_id": "cresus_L1780292191_HOMEUSD_L_E",
       "sl_order_id": null,
@@ -90,8 +90,8 @@
       "top_trader_position_ratio": null,
       "top_trader_account_ratio": null,
       "global_account_ratio": null,
-      "phase_a_mfe_pct": 3.151,
-      "phase_b_mfe_pct": null,
+      "phase_a_mfe_pct": 4.225,
+      "phase_b_mfe_pct": 4.225,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.199997,
       "fees_are_actual": true,
@@ -103,11 +103,12 @@
       "btc_pct_vs_ma25_at_open": -0.496,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 0.04351,
-      "current_price": 0.043928,
-      "unrealized_pnl_usdt": 16.3987,
-      "unrealized_pnl_pct": 4.1,
-      "last_price_check_at": "2026-06-01T05:54:12.753191+00:00"
+      "phase_a_mfe_price": 0.043963,
+      "current_price": 0.044811,
+      "unrealized_pnl_usdt": 24.7686,
+      "unrealized_pnl_pct": 6.192,
+      "last_price_check_at": "2026-06-01T05:56:19.740186+00:00",
+      "phase_b_mfe_price": 0.043963
     },
     {
       "paper_id": "WLDUSDT|LONG|2026-06-01T05:49:02.259348+00:00",
@@ -166,10 +167,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.4052,
-      "current_price": 0.4028,
-      "unrealized_pnl_usdt": -1.4835,
-      "unrealized_pnl_pct": -0.371,
-      "last_price_check_at": "2026-06-01T05:54:12.753191+00:00"
+      "current_price": 0.3998,
+      "unrealized_pnl_usdt": -4.4505,
+      "unrealized_pnl_pct": -1.113,
+      "last_price_check_at": "2026-06-01T05:56:19.740186+00:00"
     },
     {
       "paper_id": "ARUSDT|LONG|2026-06-01T05:51:49.535141+00:00",
@@ -228,10 +229,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 2.303,
-      "current_price": 2.303,
-      "unrealized_pnl_usdt": -0.5202,
-      "unrealized_pnl_pct": -0.13,
-      "last_price_check_at": "2026-06-01T05:54:12.753191+00:00"
+      "current_price": 2.311,
+      "unrealized_pnl_usdt": 0.867,
+      "unrealized_pnl_pct": 0.217,
+      "last_price_check_at": "2026-06-01T05:56:19.740186+00:00"
     }
   ],
   "recent_closed": [
@@ -51895,7 +51896,17 @@
       "close_qty": 53792.0
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "NOMUSDT|LONG|2026-06-01T05:53:58.083108+00:00",
+      "symbol": "NOMUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-01T05:54:14.312121+00:00",
+      "reason": "circuit_breaker (4+ SL in 30min, pause until 2026-06-01T06:22:38)",
+      "last_checked_at": "2026-06-01T05:56:19.740186+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "chop",
     "btc_price": 73397.0,
@@ -51904,7 +51915,7 @@
     "change_24h_pct": -0.912,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-01T05:54:13.728840+00:00"
+    "computed_at": "2026-06-01T05:56:21.499953+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
