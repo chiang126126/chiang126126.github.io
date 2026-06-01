@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-01T20:23:20.977122+00:00",
+  "updated_at": "2026-06-01T20:25:26.929075+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 18,
+  "alerts_count": 19,
   "alerts": [
+    {
+      "symbol": "TAUSDT",
+      "base": "TA",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.09023,
+      "price_change_pct": 2.85,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 255377.0,
+      "volume_baseline_usdt": 5025.0,
+      "volume_ratio": 50.82,
+      "detected_at": "2026-06-01T20:24:59.608055+00:00",
+      "intensity": 3,
+      "change_5m_pct": 2.038,
+      "change_15m_pct": 2.119,
+      "change_1h_pct": 1.91,
+      "change_4h_pct": 7.11,
+      "taker_buy_ratio_1m": 0.694,
+      "taker_buy_ratio_5m": 0.685,
+      "oi_delta_5m_pct": -0.017,
+      "funding_rate_pct": 0.004,
+      "atr_pct": 0.673,
+      "range_4h_pct": 14.49,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.08901571,
+      "suggested_tp1": 0.09205143,
+      "suggested_tp2": 0.09387286,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "BILLUSDT",
       "base": "BILL",
