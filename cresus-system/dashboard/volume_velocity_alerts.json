@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-01T06:00:52.540560+00:00",
+  "updated_at": "2026-06-01T06:02:57.933802+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 35,
+  "alerts_count": 36,
   "alerts": [
+    {
+      "symbol": "NFPUSDT",
+      "base": "NFP",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.01075,
+      "price_change_pct": -0.922,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 71846.0,
+      "volume_baseline_usdt": 6109.0,
+      "volume_ratio": 11.76,
+      "detected_at": "2026-06-01T06:02:24.141195+00:00",
+      "intensity": 2,
+      "change_5m_pct": -1.642,
+      "change_15m_pct": -1.282,
+      "change_1h_pct": -4.263,
+      "change_4h_pct": 0.372,
+      "taker_buy_ratio_1m": 0.3,
+      "taker_buy_ratio_5m": 0.302,
+      "oi_delta_5m_pct": 0.048,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.571,
+      "range_4h_pct": 6.23,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.01084214,
+      "suggested_tp1": 0.01061179,
+      "suggested_tp2": 0.01047357,
+      "conviction_score": 1,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "KITEUSDT",
       "base": "KITE",
