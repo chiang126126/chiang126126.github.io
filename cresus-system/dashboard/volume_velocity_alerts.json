@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-01T22:24:40.745737+00:00",
+  "updated_at": "2026-06-01T22:26:46.361611+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 27,
+  "alerts_count": 28,
   "alerts": [
+    {
+      "symbol": "DEXEUSDT",
+      "base": "DEXE",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 18.351,
+      "price_change_pct": -3.441,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 140907.0,
+      "volume_baseline_usdt": 6558.0,
+      "volume_ratio": 21.49,
+      "detected_at": "2026-06-01T22:26:40.263985+00:00",
+      "intensity": 3,
+      "change_5m_pct": -2.067,
+      "change_15m_pct": -4.68,
+      "change_1h_pct": -4.075,
+      "change_4h_pct": -2.681,
+      "taker_buy_ratio_1m": 0.383,
+      "taker_buy_ratio_5m": 0.415,
+      "oi_delta_5m_pct": 0.158,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.464,
+      "range_4h_pct": 5.0,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 18.47882143,
+      "suggested_tp1": 18.15926786,
+      "suggested_tp2": 17.96753571,
+      "conviction_score": 3,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "NOKUSDT",
       "base": "NOK",
