@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-01T06:51:52.885159+00:00",
+  "generated_at": "2026-06-01T06:53:57.419708+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 813,
@@ -28,8 +28,8 @@
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 51.4397,
-    "deployed_usdt": 1577.01
+    "daily_pnl": 46.3578,
+    "deployed_usdt": 1177.03
   },
   "reconciliation": {
     "ok": true,
@@ -37,15 +37,13 @@
     "api_failed": false,
     "live_symbols": [
       "INUSDT",
-      "QUSDT",
-      "FHEUSDT",
-      "WUSDT"
+      "WUSDT",
+      "FHEUSDT"
     ],
     "exchange_symbols": [
       "INUSDT",
-      "QUSDT",
-      "FHEUSDT",
-      "WUSDT"
+      "WUSDT",
+      "FHEUSDT"
     ]
   },
   "open_trades": [
@@ -106,10 +104,10 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.767,
       "phase_a_mfe_price": 0.01251,
-      "current_price": 0.01264,
-      "unrealized_pnl_usdt": -2.1,
-      "unrealized_pnl_pct": -0.557,
-      "last_price_check_at": "2026-06-01T06:51:47.604242+00:00"
+      "current_price": 0.01265,
+      "unrealized_pnl_usdt": -2.4,
+      "unrealized_pnl_pct": -0.636,
+      "last_price_check_at": "2026-06-01T06:53:54.291295+00:00"
     },
     {
       "paper_id": "FHEUSDT|SHORT|2026-06-01T06:44:43.970617+00:00",
@@ -168,10 +166,10 @@
       "btc_sub_regime_at_open": "down_acute",
       "btc_change_3h_at_open": -1.009,
       "phase_a_mfe_price": 0.02498,
-      "current_price": 0.02605,
-      "unrealized_pnl_usdt": -2.6274,
-      "unrealized_pnl_pct": -0.657,
-      "last_price_check_at": "2026-06-01T06:51:47.604242+00:00"
+      "current_price": 0.02585,
+      "unrealized_pnl_usdt": 0.4636,
+      "unrealized_pnl_pct": 0.116,
+      "last_price_check_at": "2026-06-01T06:53:54.291295+00:00"
     },
     {
       "paper_id": "INUSDT|SHORT|2026-06-01T06:45:03.415617+00:00",
@@ -230,10 +228,10 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.826,
       "phase_a_mfe_price": 0.09055,
-      "current_price": 0.09103,
-      "unrealized_pnl_usdt": -0.3078,
-      "unrealized_pnl_pct": -0.077,
-      "last_price_check_at": "2026-06-01T06:51:47.604242+00:00"
+      "current_price": 0.0909,
+      "unrealized_pnl_usdt": 0.2638,
+      "unrealized_pnl_pct": 0.066,
+      "last_price_check_at": "2026-06-01T06:53:54.291295+00:00"
     }
   ],
   "recent_closed": [
@@ -52413,8 +52411,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-01T06:47:37.190341+00:00",
-      "reason": "max_concurrent reached (4/4)",
-      "last_checked_at": "2026-06-01T06:51:47.604242+00:00"
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.83% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-01T06:53:54.291295+00:00"
     },
     {
       "paper_id": "NOMUSDT|LONG|2026-06-01T06:47:09.621467+00:00",
@@ -52422,8 +52420,17 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-01T06:47:37.190341+00:00",
-      "reason": "max_concurrent reached (4/4)",
-      "last_checked_at": "2026-06-01T06:51:47.604242+00:00"
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.83% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-01T06:53:54.291295+00:00"
+    },
+    {
+      "paper_id": "STORJUSDT|LONG|2026-06-01T06:51:27.296343+00:00",
+      "symbol": "STORJUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-01T06:51:58.000448+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.83% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-01T06:53:54.291295+00:00"
     }
   ],
   "btc_regime_now": {
@@ -52434,7 +52441,7 @@
     "change_24h_pct": -1.254,
     "sub_regime": "down_stable",
     "change_3h_pct": -0.826,
-    "computed_at": "2026-06-01T06:51:49.309812+00:00"
+    "computed_at": "2026-06-01T06:53:56.471192+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
