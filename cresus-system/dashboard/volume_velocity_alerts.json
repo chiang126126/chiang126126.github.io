@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-01T20:44:08.988134+00:00",
+  "updated_at": "2026-06-01T20:46:12.620884+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 21,
+  "alerts_count": 22,
   "alerts": [
+    {
+      "symbol": "AVGOUSDT",
+      "base": "AVGO",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 468.95,
+      "price_change_pct": 1.52,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 93022.0,
+      "volume_baseline_usdt": 9788.0,
+      "volume_ratio": 9.5,
+      "detected_at": "2026-06-01T20:45:54.947210+00:00",
+      "intensity": 1,
+      "change_5m_pct": 1.265,
+      "change_15m_pct": 1.537,
+      "change_1h_pct": 2.151,
+      "change_4h_pct": 1.118,
+      "taker_buy_ratio_1m": 0.685,
+      "taker_buy_ratio_5m": 0.766,
+      "oi_delta_5m_pct": 1.184,
+      "funding_rate_pct": 0.0012,
+      "atr_pct": 0.209,
+      "range_4h_pct": 2.58,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 467.96785714,
+      "suggested_tp1": 470.42321429,
+      "suggested_tp2": 471.89642857,
+      "conviction_score": 5,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "GOOGLUSDT",
       "base": "GOOGL",
