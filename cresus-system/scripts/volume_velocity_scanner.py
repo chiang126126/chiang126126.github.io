@@ -94,20 +94,19 @@ PAPER_MIN_TIER     = "diamond"        # 只对钻石信号自动开仓 (高质�
 PAPER_STARTING_CAPITAL_USDT   = 2000.0  # 起始账户余额 (整个仓总额)
 PAPER_NOTIONAL_PER_TRADE_USDT = 400.0   # 每笔交易分配 ($2000 × 20%, 最多并发 5)
 
-# Phase 5.A (5/27): Conviction score 分档仓位 — 数据驱动 (1410 笔):
-#   score 5  (92%): avg +$0.92  → 基准 $400
-#   score 6-7 (7%): avg +$4.50  → 加大到 $800 (EV 5×, n=109 充分)
-#   score 8+ (0.5%): avg -$17.78 → 减半到 $200 (反向证据, n=7, 高分=过拟合警示)
-# 若 score 字段缺/异常 → 退路到 PAPER_NOTIONAL_PER_TRADE_USDT (基准).
+# Phase 5.A (5/27) + 5.K (6/1): Conviction score 分档仓位 (与 live 同步):
+#   score 5 (92%): paper EV +$0.92, 实盘减摩擦 $2-3 后净 EV ≈ 0 → $200 (5.K 减半)
+#   score 6-7 (7%): paper EV +$4.50/笔 (5×), 摩擦后净 $2-6 → $800 (5.A-restore 翻倍)
+#   score 8+ (0.5%): n=7 累计 -$118 反向证据 → $200 (Phase 5.A 原方案)
+# 字段缺 → 退路到 PAPER_NOTIONAL_PER_TRADE_USDT 基准.
 #
-# Phase 5.A-hotfix (5/28): score 6-7 临时回 $400 (跟 live 同步).
-#   live 上 DYMUSDT $800 notional = 18075 units 超 MARKET_LOT_SIZE maxQty
-#   → -4005 无法平仓 → 死循环重试. paper 同步降回避免 paper/live PnL 差异
-#   被 notional 不同放大. 等 max_qty cap 实现后恢复 $800.
+# Phase 5.A-restore + 5.K (6/1): 解除 5/28 hotfix.
+#   MAX_QTY chunking + 截断 已生效 (binance_client.py Phase 5.A-fix), 不再有
+#   -4005 死循环风险. 数据驱动 (5/31): live 净亏来自 score 5 摩擦, 而非 score 6-7.
 PAPER_NOTIONAL_BY_SCORE = {
-    5:   400.0,
-    6:   400.0,  # 临时 hotfix
-    7:   400.0,  # 临时 hotfix
+    5:   200.0,   # Phase 5.K: 400→200
+    6:   800.0,   # Phase 5.A-restore: 400→800
+    7:   800.0,   # Phase 5.A-restore: 400→800
     8:   200.0,
     9:   200.0,
     10:  200.0,

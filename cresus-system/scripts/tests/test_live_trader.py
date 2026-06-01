@@ -4462,17 +4462,16 @@ class TestPhase5ALiveNotionalByScore(unittest.TestCase):
       score 5: $400 基准, 6-7: $800 (2×), 8+: $200 (0.5×).
     """
 
-    def test_score_5_baseline(self):
+    def test_score_5_reduced_to_200(self):
+        """Phase 5.K (6/1): score 5 减半 400→200 (低 EV 缩仓)."""
         from live_trader import _live_notional_for_paper
-        self.assertEqual(_live_notional_for_paper({"conviction_score": 5}), 400.0)
+        self.assertEqual(_live_notional_for_paper({"conviction_score": 5}), 200.0)
 
-    def test_score_6_7_baseline_hotfix(self):
-        """Phase 5.A-hotfix (5/28): score 6-7 临时回 $400 (本应 $800).
-        DYMUSDT $800 = 18075 units 超 MARKET_LOT_SIZE maxQty 触发 -4005.
-        """
+    def test_score_6_7_restored_to_800(self):
+        """Phase 5.A-restore (6/1): MAX_QTY chunking 部署后恢复 $800."""
         from live_trader import _live_notional_for_paper
-        self.assertEqual(_live_notional_for_paper({"conviction_score": 6}), 400.0)
-        self.assertEqual(_live_notional_for_paper({"conviction_score": 7}), 400.0)
+        self.assertEqual(_live_notional_for_paper({"conviction_score": 6}), 800.0)
+        self.assertEqual(_live_notional_for_paper({"conviction_score": 7}), 800.0)
 
     def test_score_8_plus_halved(self):
         from live_trader import _live_notional_for_paper

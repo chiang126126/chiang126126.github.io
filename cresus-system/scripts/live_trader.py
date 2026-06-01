@@ -73,21 +73,21 @@ SYSTEM_VERSION = "V3"
 # 直接对比 paper vs live 单笔 PnL / fees / slippage 绝对值, 减少缩放噪声.
 # 风控阈值同步 20x 放大保持等效百分比 (daily DD 5%, max deploy 80%).
 LIVE_NOTIONAL_USDT = 400.0             # 每笔基准 $400 (Phase 5.A 起按 score 分档)
-# Phase 5.A (5/27) score 分档仓位 (与 paper 同步):
-#   score 5  (92%): $400 基准, 历史 EV +$0.92
-#   score 6-7 (7%): $800 (2×, 历史 EV +$4.5/笔, 5×)
-#   score 8+ (0.5%): $200 (0.5×, n=7 累计 -$118, 反向证据)
+# Phase 5.A (5/27) + 5.K (6/1) score 分档仓位 (与 paper 同步):
+#   score 5 (92%): paper EV +$0.92, 减摩擦 $2-3 后实际 EV ~0 → 减半到 $200
+#   score 6-7 (7%): paper EV +$4.50/笔, 摩擦后净 +$2-6 → 翻倍到 $800 (核心利润源)
+#   score 8+ (0.5%): n=7 累计 -$118 反向证据 → 减半 $200
 #
-# Phase 5.A-hotfix (5/28): score 6-7 临时回 $400 (跟 score 5 同).
-#   原因: DYMUSDT $800 notional = 18075 units 超过 Binance MARKET_LOT_SIZE maxQty,
-#         触发 -4005 错误无法平仓, 形成事实孤儿仓 + 死循环重试.
-#   修复方向: 1) 实施 max_qty 感知的 notional cap (per-symbol)
-#             2) close_position 实现自动 chunking (qty > maxQty 时分多笔)
-#   两个修复完成前, score 6-7 维持 $400 防止再发生.
+# Phase 5.A-restore + 5.K (6/1): 解除 5/28 hotfix.
+#   依据: Phase 5.A-fix (binance_client MAX_QTY chunking + open_position 截断)
+#   已完成 + 测试覆盖, DYMUSDT 类 -4005 死循环不可能再发生.
+#   5/31 数据验证: score 5 在 live 上 EV 接近 0 (paper $0.92 - 摩擦 $2-3),
+#   score 6-7 EV 远高 (paper $4.5 - 摩擦 $2-3 = $2-3 净). 仓位差异化是
+#   "放大已知有 EV 的, 缩小没 EV 的"的最优解.
 LIVE_NOTIONAL_BY_SCORE = {
-    5:   400.0,
-    6:   400.0,  # 临时 hotfix (本来 800), 等 max_qty cap 实现后恢复
-    7:   400.0,  # 临时 hotfix (本来 800), 等 max_qty cap 实现后恢复
+    5:   200.0,   # Phase 5.K: 400→200 (低 EV 减半)
+    6:   800.0,   # Phase 5.A-restore: 400→800 (高 EV 翻倍)
+    7:   800.0,   # Phase 5.A-restore: 400→800
     8:   200.0,
     9:   200.0,
     10:  200.0,

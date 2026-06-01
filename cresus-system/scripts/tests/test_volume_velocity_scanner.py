@@ -179,18 +179,21 @@ class TestPhase5AScoreBasedNotional(unittest.TestCase):
       score 8+ (0.5%): avg -$17.78 (n=7 反向证据) → $200 减半
     """
 
-    def test_score_5_baseline(self):
-        from volume_velocity_scanner import _notional_for_score
-        self.assertEqual(_notional_for_score(5), 400.0)
-
-    def test_score_6_7_baseline_hotfix(self):
-        """Phase 5.A-hotfix (5/28): score 6-7 临时回 $400 (本应 $800).
-        原因: DYMUSDT $800 = 18075 units 超 Binance MARKET_LOT_SIZE maxQty
-        触发 -4005. 等 max_qty cap + close chunking 实现后再恢复 $800.
+    def test_score_5_reduced_to_200(self):
+        """Phase 5.K (6/1): score 5 减半 400→200 (低 EV 信号缩仓).
+        依据 5/31 数据: paper EV +$0.92 - 实盘摩擦 $2-3 = 净 EV ≈ 0.
         """
         from volume_velocity_scanner import _notional_for_score
-        self.assertEqual(_notional_for_score(6), 400.0)
-        self.assertEqual(_notional_for_score(7), 400.0)
+        self.assertEqual(_notional_for_score(5), 200.0)
+
+    def test_score_6_7_restored_to_800(self):
+        """Phase 5.A-restore (6/1): score 6-7 恢复 $800.
+        Phase 5.A-fix MAX_QTY chunking 已部署, 不再有 -4005 死循环风险.
+        Paper EV +$4.50/笔 = 5× score 5, 翻倍 notional 捕获 EV.
+        """
+        from volume_velocity_scanner import _notional_for_score
+        self.assertEqual(_notional_for_score(6), 800.0)
+        self.assertEqual(_notional_for_score(7), 800.0)
 
     def test_score_8_plus_halved(self):
         """高分反向证据 — score 8+ 减半到 $200."""
