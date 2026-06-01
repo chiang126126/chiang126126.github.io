@@ -1723,14 +1723,15 @@ class TestSlBreachWickFilter(unittest.TestCase):
 
     def test_filter_default_min_breaches_from_config(self):
         """C 组若没 wick_filter_min_breaches 字段, fallback 到全局常数.
-        Phase 5.J (5/31): 默认 2→3, 此测试更新到 3 次确认.
+        Phase 5.J→5.M (5/31→6/1): 默认 2→3→4, 测试更新到 4 次确认.
         """
         lt = {"side": "BUY", "sl_price": 80000.0, "wick_filter_enabled": True,
               "sl_breach_count": 0}   # 注意: 无 wick_filter_min_breaches
-        # LIVE_WICK_FILTER_MIN_BREACHES 默认 3, 需 3 次连续 breach 才触发
+        # LIVE_WICK_FILTER_MIN_BREACHES 默认 4, 需 4 次连续 breach 才触发
         self.assertFalse(_check_sl_breach(lt, 79000.0))   # 1
         self.assertFalse(_check_sl_breach(lt, 79000.0))   # 2
-        self.assertTrue(_check_sl_breach(lt, 79000.0))    # 3, 触发
+        self.assertFalse(_check_sl_breach(lt, 79000.0))   # 3
+        self.assertTrue(_check_sl_breach(lt, 79000.0))    # 4, 触发
 
     def test_filter_no_breach_does_not_change_count(self):
         """C 组: 非 breach 调用不影响已有 0 计数."""
@@ -4467,10 +4468,16 @@ class TestPhase5ALiveNotionalByScore(unittest.TestCase):
         from live_trader import _live_notional_for_paper
         self.assertEqual(_live_notional_for_paper({"conviction_score": 5}), 200.0)
 
-    def test_score_6_7_restored_to_800(self):
-        """Phase 5.A-restore (6/1): MAX_QTY chunking 部署后恢复 $800."""
+    def test_score_6_stays_at_400(self):
+        """Phase 5.K-adjust (6/1): score 6 撤回 5.A-restore 的 800.
+        5/31+6/1 实盘 6 笔全亏 avg -$5.83 矛盾历史 EV +$4.34, 保守回 $400.
+        """
         from live_trader import _live_notional_for_paper
-        self.assertEqual(_live_notional_for_paper({"conviction_score": 6}), 800.0)
+        self.assertEqual(_live_notional_for_paper({"conviction_score": 6}), 400.0)
+
+    def test_score_7_restored_to_800(self):
+        """Phase 5.A-restore: score 7 维持 $800 (11 笔 avg +$4.27 验证有效)."""
+        from live_trader import _live_notional_for_paper
         self.assertEqual(_live_notional_for_paper({"conviction_score": 7}), 800.0)
 
     def test_score_8_plus_halved(self):
@@ -4492,46 +4499,48 @@ class TestPhase5ALiveNotionalByScore(unittest.TestCase):
 
 
 class TestPhase5JWickFilterThreshold(unittest.TestCase):
-    """Phase 5.J (5/31): wick filter min_breaches 2→3.
+    """Phase 5.J→5.M (5/31→6/1): wick filter min_breaches 2→3→4.
 
-    数据驱动 (5/31 24h): 64 笔 sl_breach_client -$155 total, Top 5 案例显示
-    paper hit_trail (大赢) → live sl_breach (割肉). 估计 25-35% 是 wick 误触发.
-    多 1 tick (5s) 确认可救回 16-22 笔 × avg $5 = +$80-110/天.
+    Phase 5.J (5/31): 2→3, sl_breach 64 → 27 (-58%) 已大幅改善.
+    Phase 5.M (6/1): 3→4, Top 10 失真 7/10 仍是 paper hit_trail → live sl_breach,
+                    wick filter 还有漏网. 升 4 = 20s 总确认, 预期再救 8-12 笔.
 
-    favorable funding 同步从 3 升 4, 保持 funding 友好时比 default 多 1 buffer.
+    favorable funding 同步从 4 升 5, 保持 +1 buffer 语义.
     """
 
-    def test_default_min_breaches_is_3(self):
-        """常量从 2 升到 3."""
+    def test_default_min_breaches_is_4(self):
+        """Phase 5.M: 常量从 3 升到 4."""
         from live_trader import LIVE_WICK_FILTER_MIN_BREACHES
-        self.assertEqual(LIVE_WICK_FILTER_MIN_BREACHES, 3)
+        self.assertEqual(LIVE_WICK_FILTER_MIN_BREACHES, 4)
 
-    def test_favorable_funding_min_breaches_is_4(self):
-        """default+1: favorable funding 比 default 多 1 buffer."""
+    def test_favorable_funding_min_breaches_is_5(self):
+        """default+1: favorable funding 比 default 多 1 buffer (Phase 5.M: 5)."""
         from live_trader import (LIVE_FUNDING_FAVORABLE_WICK_BREACHES,
                                    LIVE_WICK_FILTER_MIN_BREACHES)
         self.assertEqual(LIVE_FUNDING_FAVORABLE_WICK_BREACHES,
                           LIVE_WICK_FILTER_MIN_BREACHES + 1)
 
-    def test_wick_filter_needs_3_consecutive_breaches(self):
-        """实测 _check_sl_breach: 默认 2 次不再触发, 需 3 次."""
+    def test_wick_filter_needs_4_consecutive_breaches(self):
+        """实测 _check_sl_breach: Phase 5.M 需 4 次连续 breach 才触发."""
         from live_trader import _check_sl_breach
         lt = {"side": "BUY", "sl_price": 100.0, "wick_filter_enabled": True,
               "sl_breach_count": 0}
-        self.assertFalse(_check_sl_breach(lt, 99.0))   # 1 次 breach
-        self.assertFalse(_check_sl_breach(lt, 99.0))   # 2 次 breach (旧版会触发, 新版不触发)
-        self.assertTrue(_check_sl_breach(lt, 99.0))    # 3 次, 触发
+        self.assertFalse(_check_sl_breach(lt, 99.0))   # 1
+        self.assertFalse(_check_sl_breach(lt, 99.0))   # 2
+        self.assertFalse(_check_sl_breach(lt, 99.0))   # 3 (Phase 5.J 会触发, 5.M 不触发)
+        self.assertTrue(_check_sl_breach(lt, 99.0))    # 4, 触发
 
     def test_wick_filter_count_resets_on_recovery(self):
-        """breach 序列被价格回归打断, 计数清零."""
+        """breach 序列被价格回归打断, 计数清零 (Phase 5.M: 需 4 次累积)."""
         from live_trader import _check_sl_breach
         lt = {"side": "BUY", "sl_price": 100.0, "wick_filter_enabled": True,
               "sl_breach_count": 0}
         _check_sl_breach(lt, 99.0)   # cnt=1
         _check_sl_breach(lt, 101.0)  # 价格回, cnt → 0
         self.assertFalse(_check_sl_breach(lt, 99.0))   # cnt=1, 不触发
-        self.assertFalse(_check_sl_breach(lt, 99.0))   # cnt=2, 不触发
-        self.assertTrue(_check_sl_breach(lt, 99.0))    # cnt=3, 触发
+        self.assertFalse(_check_sl_breach(lt, 99.0))   # cnt=2
+        self.assertFalse(_check_sl_breach(lt, 99.0))   # cnt=3
+        self.assertTrue(_check_sl_breach(lt, 99.0))    # cnt=4, 触发
 
 
 class TestPhase5HOrphanRootCauseFix(unittest.TestCase):

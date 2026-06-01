@@ -85,9 +85,11 @@ LIVE_NOTIONAL_USDT = 400.0             # 每笔基准 $400 (Phase 5.A 起按 sco
 #   score 6-7 EV 远高 (paper $4.5 - 摩擦 $2-3 = $2-3 净). 仓位差异化是
 #   "放大已知有 EV 的, 缩小没 EV 的"的最优解.
 LIVE_NOTIONAL_BY_SCORE = {
-    5:   200.0,   # Phase 5.K: 400→200 (低 EV 减半)
-    6:   800.0,   # Phase 5.A-restore: 400→800 (高 EV 翻倍)
-    7:   800.0,   # Phase 5.A-restore: 400→800
+    5:   200.0,   # Phase 5.K: 低 EV 减半
+    6:   400.0,   # Phase 5.K-adjust (6/1): 撤回 5.A-restore 的 800.
+                  # 数据反向 (5/31+6/1 共 6 笔 avg -$5.83, n=6 但全亏).
+                  # 与历史 EV +$4.34 (n=45) 矛盾. 保守回 $400 等更多数据.
+    7:   800.0,   # Phase 5.A-restore: 高 EV 翻倍 (验证: 11 笔 avg +$4.27)
     8:   200.0,
     9:   200.0,
     10:  200.0,
@@ -245,11 +247,11 @@ LIVE_BTC_REGIME_THRESHOLD_PCT = 0.5
 # 风险: 极低. orthogonal to regime gate (D 组). 改回 'abcd' 1 行即回滚.
 # 验证窗口: 2-3 天观察新数据. 若假止损率不降到 33% 左右, 重审.
 LIVE_SL_WICK_FILTER_MODE = "always"  # Phase 4.L 推广 (was "abcd")
-LIVE_WICK_FILTER_MIN_BREACHES = 3    # Phase 5.J (5/31): 2→3, 需要连续 N 次轮询都 breach 才触发 SL.
-                                      # 数据 (5/31): 64 笔 sl_breach_client (-$155 total), Top 5
-                                      # paper hit_trail 大赢 → live sl_breach 割肉, 滑点 30-137bps.
-                                      # 推断 25-35% sl_breach 是 wick 误触发, 多 1 tick (5s) 确认
-                                      # 救回 16-22 笔 × avg $5 = +$80-110/天.
+LIVE_WICK_FILTER_MIN_BREACHES = 4    # Phase 5.M (6/1): 3→4, 数据驱动再升一档.
+                                      # Phase 5.J 5/31→6/1: sl_breach 64 → 27 (-58%) 已大幅改善,
+                                      # 但 Top 10 失真案例 7/10 仍是 paper:hit_trail → live:sl_breach,
+                                      # 即仍有 wick filter 漏网. 升 4 = 20s 确认窗口.
+                                      # 预期再救 8-12 笔 × $1.87 = +$15-22/天, 代价 -$3-5/天 (真破位多 5s).
 
 # Phase 4.M Funding-aware mirror filter (2026-05-24)
 # ==========================================
@@ -268,8 +270,8 @@ LIVE_WICK_FILTER_MIN_BREACHES = 3    # Phase 5.J (5/31): 2→3, 需要连续 N �
 LIVE_FUNDING_FAVORABLE_THRESHOLD_PCT = -0.05    # paper funding_rate_pct ≤ 此 → 友好
 LIVE_FUNDING_ADVERSE_THRESHOLD_PCT = 0.05       # ≥ 此 → 不利
 LIVE_REJECT_ADVERSE_FUNDING = True              # True: funding 不利时拒 mirror
-LIVE_FUNDING_FAVORABLE_WICK_BREACHES = 4        # Phase 5.J: 默认 3 后, 友好时 +1 = 4
-                                                 # (保持 funding favorable 比 default 更宽容的语义)
+LIVE_FUNDING_FAVORABLE_WICK_BREACHES = 5        # Phase 5.M (6/1): 默认 4 后, 友好时 +1 = 5
+                                                 # (维持 funding favorable 比 default 多 1 buffer 语义)
 
 # Phase 4.F Regime Gate (2026-05-21)
 # ==========================================

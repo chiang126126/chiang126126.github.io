@@ -186,13 +186,17 @@ class TestPhase5AScoreBasedNotional(unittest.TestCase):
         from volume_velocity_scanner import _notional_for_score
         self.assertEqual(_notional_for_score(5), 200.0)
 
-    def test_score_6_7_restored_to_800(self):
-        """Phase 5.A-restore (6/1): score 6-7 恢复 $800.
-        Phase 5.A-fix MAX_QTY chunking 已部署, 不再有 -4005 死循环风险.
-        Paper EV +$4.50/笔 = 5× score 5, 翻倍 notional 捕获 EV.
+    def test_score_6_stays_at_400(self):
+        """Phase 5.K-adjust (6/1): score 6 撤回 5.A-restore 的 800, 保持 $400.
+        5/31+6/1 实盘 6 笔 score 6 全亏 avg -$5.83, 与历史 EV +$4.34 矛盾.
+        n=6 太小不能定论, 但 risk 翻倍不值, 等更多数据.
         """
         from volume_velocity_scanner import _notional_for_score
-        self.assertEqual(_notional_for_score(6), 800.0)
+        self.assertEqual(_notional_for_score(6), 400.0)
+
+    def test_score_7_restored_to_800(self):
+        """Phase 5.A-restore: score 7 维持 $800. 5/31+6/1 共 11 笔 avg +$4.27."""
+        from volume_velocity_scanner import _notional_for_score
         self.assertEqual(_notional_for_score(7), 800.0)
 
     def test_score_8_plus_halved(self):

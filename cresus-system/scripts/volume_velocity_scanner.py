@@ -104,9 +104,10 @@ PAPER_NOTIONAL_PER_TRADE_USDT = 400.0   # 每笔交易分配 ($2000 × 20%, 最�
 #   MAX_QTY chunking + 截断 已生效 (binance_client.py Phase 5.A-fix), 不再有
 #   -4005 死循环风险. 数据驱动 (5/31): live 净亏来自 score 5 摩擦, 而非 score 6-7.
 PAPER_NOTIONAL_BY_SCORE = {
-    5:   200.0,   # Phase 5.K: 400→200
-    6:   800.0,   # Phase 5.A-restore: 400→800
-    7:   800.0,   # Phase 5.A-restore: 400→800
+    5:   200.0,   # Phase 5.K: 低 EV 减半
+    6:   400.0,   # Phase 5.K-adjust (6/1): 撤回 5.A-restore 的 800
+                  # 5/31+6/1 实盘 6 笔全亏 avg -$5.83 矛盾历史 +$4.34
+    7:   800.0,   # Phase 5.A-restore: 高 EV 翻倍
     8:   200.0,
     9:   200.0,
     10:  200.0,
