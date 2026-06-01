@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-01T15:50:41.863994+00:00",
+  "updated_at": "2026-06-01T15:52:47.059409+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 69,
+  "alerts_count": 70,
   "alerts": [
+    {
+      "symbol": "BILLUSDT",
+      "base": "BILL",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.08848,
+      "price_change_pct": -2.684,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 417650.0,
+      "volume_baseline_usdt": 44652.0,
+      "volume_ratio": 9.35,
+      "detected_at": "2026-06-01T15:52:02.595576+00:00",
+      "intensity": 2,
+      "change_5m_pct": -2.491,
+      "change_15m_pct": -2.037,
+      "change_1h_pct": -0.09,
+      "change_4h_pct": -1.569,
+      "taker_buy_ratio_1m": 0.248,
+      "taker_buy_ratio_5m": 0.316,
+      "oi_delta_5m_pct": 0.001,
+      "funding_rate_pct": 0.0476,
+      "atr_pct": 0.538,
+      "range_4h_pct": 6.85,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.08919357,
+      "suggested_tp1": 0.08740964,
+      "suggested_tp2": 0.08633929,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "EPICUSDT",
       "base": "EPIC",
