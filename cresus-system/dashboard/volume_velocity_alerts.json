@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-01T21:27:58.675811+00:00",
+  "updated_at": "2026-06-01T21:30:03.845047+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 23,
+  "alerts_count": 24,
   "alerts": [
+    {
+      "symbol": "BLUAIUSDT",
+      "base": "BLUAI",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.012981,
+      "price_change_pct": -0.635,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 101689.0,
+      "volume_baseline_usdt": 7939.0,
+      "volume_ratio": 12.81,
+      "detected_at": "2026-06-01T21:29:54.116311+00:00",
+      "intensity": 1,
+      "change_5m_pct": -3.366,
+      "change_15m_pct": -3.244,
+      "change_1h_pct": -2.78,
+      "change_4h_pct": -0.277,
+      "taker_buy_ratio_1m": 0.556,
+      "taker_buy_ratio_5m": 0.451,
+      "oi_delta_5m_pct": -0.048,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.711,
+      "range_4h_pct": 5.58,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.01311954,
+      "suggested_tp1": 0.0127732,
+      "suggested_tp2": 0.01256539,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "MYXUSDT",
       "base": "MYX",
