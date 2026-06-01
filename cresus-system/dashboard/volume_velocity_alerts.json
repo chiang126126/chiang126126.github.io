@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-01T09:52:06.176735+00:00",
+  "updated_at": "2026-06-01T09:54:11.069478+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 48,
+  "alerts_count": 49,
   "alerts": [
+    {
+      "symbol": "SLXUSDT",
+      "base": "SLX",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 0.38131,
+      "price_change_pct": -1.516,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 102015.0,
+      "volume_baseline_usdt": 14998.0,
+      "volume_ratio": 6.8,
+      "detected_at": "2026-06-01T09:53:37.880510+00:00",
+      "intensity": 1,
+      "change_5m_pct": -1.002,
+      "change_15m_pct": 0.008,
+      "change_1h_pct": -7.773,
+      "change_4h_pct": null,
+      "taker_buy_ratio_1m": 0.573,
+      "taker_buy_ratio_5m": 0.592,
+      "oi_delta_5m_pct": -0.466,
+      "funding_rate_pct": -0.741,
+      "atr_pct": 1.24,
+      "range_4h_pct": null,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.38604,
+      "suggested_tp1": 0.374215,
+      "suggested_tp2": 0.36712,
+      "conviction_score": 5,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "BASUSDT",
       "base": "BAS",
