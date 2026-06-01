@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-01T19:14:16.706631+00:00",
+  "updated_at": "2026-06-01T19:16:23.797055+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 28,
+  "alerts_count": 29,
   "alerts": [
+    {
+      "symbol": "INTCUSDT",
+      "base": "INTC",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 108.38,
+      "price_change_pct": -0.587,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 466547.0,
+      "volume_baseline_usdt": 79237.0,
+      "volume_ratio": 5.89,
+      "detected_at": "2026-06-01T19:15:26.656871+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.524,
+      "change_15m_pct": -1.195,
+      "change_1h_pct": -1.366,
+      "change_4h_pct": -2.591,
+      "taker_buy_ratio_1m": 0.327,
+      "taker_buy_ratio_5m": 0.347,
+      "oi_delta_5m_pct": 0.081,
+      "funding_rate_pct": 0.0267,
+      "atr_pct": 0.245,
+      "range_4h_pct": 4.68,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 108.645,
+      "suggested_tp1": 107.9825,
+      "suggested_tp2": 107.585,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "HEIUSDT",
       "base": "HEI",
