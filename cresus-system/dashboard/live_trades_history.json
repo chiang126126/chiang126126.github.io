@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-01T01:03:03.012440+00:00",
+  "generated_at": "2026-06-01T01:05:08.998527+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 787,
-    "open": 2,
+    "total_trades": 788,
+    "open": 3,
     "closed": 785,
     "wins": 247,
     "losses": 528,
@@ -15,21 +15,21 @@
     "avg_pnl_usdt": -0.2605,
     "best_trade_usdt": 63.1301,
     "worst_trade_usdt": -24.1805,
-    "fees_paid_usdt": 142.7724,
+    "fees_paid_usdt": 142.9723,
     "fees_realized_usdt": 142.4728,
-    "fees_open_usdt": 0.2996,
+    "fees_open_usdt": 0.4996,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 599.2,
-    "free_capital_usdt": 1053.54,
+    "deployed_usdt": 999.13,
+    "free_capital_usdt": 653.4,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 3
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -26.9852,
-    "deployed_usdt": 599.2
+    "deployed_usdt": 999.13
   },
   "reconciliation": {
     "ok": true,
@@ -37,10 +37,12 @@
     "api_failed": false,
     "live_symbols": [
       "BASUSDT",
+      "ORDIUSDT",
       "DYMUSDT"
     ],
     "exchange_symbols": [
       "BASUSDT",
+      "ORDIUSDT",
       "DYMUSDT"
     ]
   },
@@ -102,10 +104,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.02043,
-      "current_price": 0.02035,
-      "unrealized_pnl_usdt": 4.3,
-      "unrealized_pnl_pct": 2.159,
-      "last_price_check_at": "2026-06-01T01:03:00.362873+00:00",
+      "current_price": 0.02034,
+      "unrealized_pnl_usdt": 4.2,
+      "unrealized_pnl_pct": 2.108,
+      "last_price_check_at": "2026-06-01T01:05:07.177923+00:00",
       "phase_b_mfe_price": 0.02056
     },
     {
@@ -165,11 +167,73 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.028767,
-      "current_price": 0.028859,
-      "unrealized_pnl_usdt": 11.9771,
-      "unrealized_pnl_pct": 2.994,
-      "last_price_check_at": "2026-06-01T01:03:00.362873+00:00",
+      "current_price": 0.02895,
+      "unrealized_pnl_usdt": 13.2762,
+      "unrealized_pnl_pct": 3.319,
+      "last_price_check_at": "2026-06-01T01:05:07.177923+00:00",
       "phase_b_mfe_price": 0.029194
+    },
+    {
+      "paper_id": "ORDIUSDT|LONG|2026-06-01T01:02:28.881629+00:00",
+      "trade_id": "L1780275748_ORDIUSD_L",
+      "symbol": "ORDIUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 3.601,
+      "avg_fill_price": 3.603,
+      "slippage_bps": 5.55,
+      "qty": 111.0,
+      "notional_usdt": 399.933,
+      "leverage": 1,
+      "risk_usdt": 2.6957,
+      "risk_pct": 0.674,
+      "mirror_latency_sec": 13.8,
+      "sl_price": 3.5807142900000004,
+      "sl_paper_current": 3.57871429,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.002,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 2,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "D",
+      "min_conviction_threshold": null,
+      "tp1_price": 3.63442857,
+      "tp2_price": 3.66785714,
+      "phase": "A",
+      "entry_order_id": 120226174,
+      "entry_client_id": "cresus_L1780275748_ORDIUSD_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 7,
+      "alert_type": "burst",
+      "atr_pct": 0.413,
+      "top_trader_position_ratio": null,
+      "top_trader_account_ratio": null,
+      "global_account_ratio": null,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.199966,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-01T01:03:14.360534+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 73809.1,
+      "btc_change_24h_at_open": -0.292,
+      "btc_pct_vs_ma25_at_open": -0.03,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 3.601,
+      "current_price": 3.587,
+      "unrealized_pnl_usdt": -1.776,
+      "unrealized_pnl_pct": -0.444,
+      "last_price_check_at": "2026-06-01T01:05:07.177923+00:00"
     }
   ],
   "recent_closed": [
@@ -50587,8 +50651,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-01T00:46:07.426508+00:00",
-      "reason": "paper trade too old (1013s > 600s)",
-      "last_checked_at": "2026-06-01T01:03:00.362873+00:00"
+      "reason": "paper trade too old (1140s > 600s)",
+      "last_checked_at": "2026-06-01T01:05:07.177923+00:00"
     },
     {
       "paper_id": "VVVUSDT|LONG|2026-06-01T00:45:05.797116+00:00",
@@ -50596,8 +50660,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-01T00:46:07.426508+00:00",
-      "reason": "paper trade too old (1013s > 600s)",
-      "last_checked_at": "2026-06-01T01:03:00.362873+00:00"
+      "reason": "paper trade too old (1140s > 600s)",
+      "last_checked_at": "2026-06-01T01:05:07.177923+00:00"
     },
     {
       "paper_id": "SIRENUSDT|LONG|2026-06-01T00:47:37.407485+00:00",
@@ -50605,8 +50669,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-01T00:48:11.907873+00:00",
-      "reason": "paper trade too old (888s > 600s)",
-      "last_checked_at": "2026-06-01T01:03:00.362873+00:00"
+      "reason": "paper trade too old (1015s > 600s)",
+      "last_checked_at": "2026-06-01T01:05:07.177923+00:00"
     },
     {
       "paper_id": "MUUSDT|LONG|2026-06-01T00:49:22.450576+00:00",
@@ -50614,28 +50678,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-01T00:50:16.996540+00:00",
-      "reason": "paper trade too old (763s > 600s)",
-      "last_checked_at": "2026-06-01T01:03:00.362873+00:00"
-    },
-    {
-      "paper_id": "MBOXUSDT|LONG|2026-06-01T00:54:02.760344+00:00",
-      "symbol": "MBOXUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-06-01T00:54:35.615917+00:00",
-      "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-06-01T01:03:00.362873+00:00"
+      "reason": "paper trade too old (890s > 600s)",
+      "last_checked_at": "2026-06-01T01:05:07.177923+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73817.6,
-    "btc_ma25_1h": 73831.42,
-    "pct_vs_ma25": -0.019,
-    "change_24h_pct": -0.281,
+    "btc_price": 73781.2,
+    "btc_ma25_1h": 73829.96,
+    "pct_vs_ma25": -0.066,
+    "change_24h_pct": -0.33,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-01T01:03:01.552973+00:00"
+    "computed_at": "2026-06-01T01:05:08.143477+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
