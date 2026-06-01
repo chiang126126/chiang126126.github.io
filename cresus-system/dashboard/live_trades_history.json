@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-01T01:23:28.834693+00:00",
+  "generated_at": "2026-06-01T01:25:35.782479+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 788,
-    "open": 1,
+    "total_trades": 789,
+    "open": 2,
     "closed": 787,
     "wins": 248,
     "losses": 529,
@@ -15,30 +15,32 @@
     "avg_pnl_usdt": -0.2592,
     "best_trade_usdt": 63.1301,
     "worst_trade_usdt": -24.1805,
-    "fees_paid_usdt": 143.2722,
+    "fees_paid_usdt": 143.4722,
     "fees_realized_usdt": 143.0722,
-    "fees_open_usdt": 0.2,
+    "fees_open_usdt": 0.4,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 400.0,
-    "free_capital_usdt": 1252.76,
+    "deployed_usdt": 799.98,
+    "free_capital_usdt": 852.59,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -26.4602,
-    "deployed_usdt": 400.0
+    "deployed_usdt": 799.98
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "BASUSDT"
+      "BASUSDT",
+      "FHEUSDT"
     ],
     "exchange_symbols": [
+      "FHEUSDT",
       "BASUSDT"
     ]
   },
@@ -100,12 +102,74 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.028767,
-      "current_price": 0.029495,
-      "unrealized_pnl_usdt": 21.0564,
-      "unrealized_pnl_pct": 5.264,
-      "last_price_check_at": "2026-06-01T01:23:27.559236+00:00",
+      "current_price": 0.029692,
+      "unrealized_pnl_usdt": 23.8686,
+      "unrealized_pnl_pct": 5.967,
+      "last_price_check_at": "2026-06-01T01:25:33.530868+00:00",
       "phase_b_mfe_price": 0.029648,
       "phase_c_mfe_price": 0.02973
+    },
+    {
+      "paper_id": "FHEUSDT|LONG|2026-06-01T01:24:06.147267+00:00",
+      "trade_id": "L1780277046_FHEUSDT_L",
+      "symbol": "FHEUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.02573,
+      "avg_fill_price": 0.02576,
+      "slippage_bps": 11.66,
+      "qty": 15527.0,
+      "notional_usdt": 399.97552,
+      "leverage": 1,
+      "risk_usdt": 7.4308,
+      "risk_pct": 1.858,
+      "mirror_latency_sec": 9.4,
+      "sl_price": 0.025311430000000003,
+      "sl_paper_current": 0.02528143,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 3e-05,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 2,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.0145,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "A",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.02640286,
+      "tp2_price": 0.02707571,
+      "phase": "A",
+      "entry_order_id": 155623318,
+      "entry_client_id": "cresus_L1780277046_FHEUSDT_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.872,
+      "top_trader_position_ratio": null,
+      "top_trader_account_ratio": null,
+      "global_account_ratio": null,
+      "phase_a_mfe_pct": 0.078,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.199988,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-01T01:24:23.315732+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 73588.1,
+      "btc_change_24h_at_open": -0.591,
+      "btc_pct_vs_ma25_at_open": -0.317,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.02575,
+      "current_price": 0.02568,
+      "unrealized_pnl_usdt": -1.2422,
+      "unrealized_pnl_pct": -0.311,
+      "last_price_check_at": "2026-06-01T01:25:33.530868+00:00"
     }
   ],
   "recent_closed": [
@@ -50668,8 +50732,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-01T00:48:11.907873+00:00",
-      "reason": "paper trade too old (2116s > 600s)",
-      "last_checked_at": "2026-06-01T01:23:27.559236+00:00"
+      "reason": "paper trade too old (2242s > 600s)",
+      "last_checked_at": "2026-06-01T01:25:33.530868+00:00"
     },
     {
       "paper_id": "MUUSDT|LONG|2026-06-01T00:49:22.450576+00:00",
@@ -50677,19 +50741,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-01T00:50:16.996540+00:00",
-      "reason": "paper trade too old (1991s > 600s)",
-      "last_checked_at": "2026-06-01T01:23:27.559236+00:00"
+      "reason": "paper trade too old (2117s > 600s)",
+      "last_checked_at": "2026-06-01T01:25:33.530868+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 73590.2,
-    "btc_ma25_1h": 73822.32,
-    "pct_vs_ma25": -0.314,
-    "change_24h_pct": -0.588,
+    "btc_price": 73575.7,
+    "btc_ma25_1h": 73821.74,
+    "pct_vs_ma25": -0.333,
+    "change_24h_pct": -0.608,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-01T01:23:28.514660+00:00"
+    "computed_at": "2026-06-01T01:25:35.161234+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
