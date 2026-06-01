@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-01T06:13:32.595744+00:00",
+  "updated_at": "2026-06-01T06:15:37.361616+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 38,
+  "alerts_count": 39,
   "alerts": [
+    {
+      "symbol": "PRLUSDT",
+      "base": "PRL",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.201,
+      "price_change_pct": 0.802,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 19999.0,
+      "volume_baseline_usdt": 3754.0,
+      "volume_ratio": 5.33,
+      "detected_at": "2026-06-01T06:15:18.187437+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.904,
+      "change_15m_pct": 1.158,
+      "change_1h_pct": 1.107,
+      "change_4h_pct": 0.5,
+      "taker_buy_ratio_1m": 0.537,
+      "taker_buy_ratio_5m": 0.473,
+      "oi_delta_5m_pct": 0.17,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.345,
+      "range_4h_pct": 3.83,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.20030714,
+      "suggested_tp1": 0.20203929,
+      "suggested_tp2": 0.20307857,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "ZECUSDT",
       "base": "ZEC",
