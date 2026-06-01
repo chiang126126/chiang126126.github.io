@@ -245,7 +245,11 @@ LIVE_BTC_REGIME_THRESHOLD_PCT = 0.5
 # 风险: 极低. orthogonal to regime gate (D 组). 改回 'abcd' 1 行即回滚.
 # 验证窗口: 2-3 天观察新数据. 若假止损率不降到 33% 左右, 重审.
 LIVE_SL_WICK_FILTER_MODE = "always"  # Phase 4.L 推广 (was "abcd")
-LIVE_WICK_FILTER_MIN_BREACHES = 2    # 需要连续 N 次轮询都 breach 才触发 SL
+LIVE_WICK_FILTER_MIN_BREACHES = 3    # Phase 5.J (5/31): 2→3, 需要连续 N 次轮询都 breach 才触发 SL.
+                                      # 数据 (5/31): 64 笔 sl_breach_client (-$155 total), Top 5
+                                      # paper hit_trail 大赢 → live sl_breach 割肉, 滑点 30-137bps.
+                                      # 推断 25-35% sl_breach 是 wick 误触发, 多 1 tick (5s) 确认
+                                      # 救回 16-22 笔 × avg $5 = +$80-110/天.
 
 # Phase 4.M Funding-aware mirror filter (2026-05-24)
 # ==========================================
@@ -264,7 +268,8 @@ LIVE_WICK_FILTER_MIN_BREACHES = 2    # 需要连续 N 次轮询都 breach 才触
 LIVE_FUNDING_FAVORABLE_THRESHOLD_PCT = -0.05    # paper funding_rate_pct ≤ 此 → 友好
 LIVE_FUNDING_ADVERSE_THRESHOLD_PCT = 0.05       # ≥ 此 → 不利
 LIVE_REJECT_ADVERSE_FUNDING = True              # True: funding 不利时拒 mirror
-LIVE_FUNDING_FAVORABLE_WICK_BREACHES = 3        # 友好时 wick min_breaches (vs 默认 2)
+LIVE_FUNDING_FAVORABLE_WICK_BREACHES = 4        # Phase 5.J: 默认 3 后, 友好时 +1 = 4
+                                                 # (保持 funding favorable 比 default 更宽容的语义)
 
 # Phase 4.F Regime Gate (2026-05-21)
 # ==========================================
