@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-01T15:01:42.320004+00:00",
+  "generated_at": "2026-06-01T15:03:48.959274+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 822,
@@ -100,10 +100,10 @@
       "btc_sub_regime_at_open": "down_acute",
       "btc_change_3h_at_open": -1.37,
       "phase_a_mfe_price": 0.24515,
-      "current_price": 0.24698,
-      "unrealized_pnl_usdt": -2.3783,
-      "unrealized_pnl_pct": -0.595,
-      "last_price_check_at": "2026-06-01T15:01:40.465209+00:00"
+      "current_price": 0.24608,
+      "unrealized_pnl_usdt": -0.9122,
+      "unrealized_pnl_pct": -0.228,
+      "last_price_check_at": "2026-06-01T15:03:47.503314+00:00"
     }
   ],
   "recent_closed": [
@@ -53078,8 +53078,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-01T14:08:39.964518+00:00",
-      "reason": "paper trade too old (3181s > 600s)",
-      "last_checked_at": "2026-06-01T15:01:40.465209+00:00"
+      "reason": "paper trade too old (3308s > 600s)",
+      "last_checked_at": "2026-06-01T15:03:47.503314+00:00"
     },
     {
       "paper_id": "LITEUSDT|LONG|2026-06-01T14:39:55.166788+00:00",
@@ -53087,19 +53087,28 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-01T14:40:38.343536+00:00",
-      "reason": "paper trade too old (1262s > 600s)",
-      "last_checked_at": "2026-06-01T15:01:40.465209+00:00"
+      "reason": "paper trade too old (1389s > 600s)",
+      "last_checked_at": "2026-06-01T15:03:47.503314+00:00"
+    },
+    {
+      "paper_id": "PIEVERSEUSDT|LONG|2026-06-01T15:03:34.061693+00:00",
+      "symbol": "PIEVERSEUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-01T15:03:39.738208+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.79% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-01T15:03:47.503314+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 71451.3,
-    "btc_ma25_1h": 73127.93,
-    "pct_vs_ma25": -2.293,
-    "change_24h_pct": -2.937,
-    "sub_regime": "down_acute",
-    "change_3h_pct": -1.017,
-    "computed_at": "2026-06-01T15:01:41.991011+00:00"
+    "btc_price": 71617.7,
+    "btc_ma25_1h": 73134.58,
+    "pct_vs_ma25": -2.074,
+    "change_24h_pct": -2.711,
+    "sub_regime": "down_stable",
+    "change_3h_pct": -0.786,
+    "computed_at": "2026-06-01T15:03:48.643192+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
