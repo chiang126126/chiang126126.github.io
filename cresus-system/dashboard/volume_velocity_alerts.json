@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-01T19:53:55.959502+00:00",
+  "updated_at": "2026-06-01T19:56:00.682385+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 17,
+  "alerts_count": 18,
   "alerts": [
+    {
+      "symbol": "CFGUSDT",
+      "base": "CFG",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.2503,
+      "price_change_pct": 0.522,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 28339.0,
+      "volume_baseline_usdt": 5018.0,
+      "volume_ratio": 5.65,
+      "detected_at": "2026-06-01T19:55:52.012132+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.4,
+      "change_15m_pct": 0.08,
+      "change_1h_pct": 0.764,
+      "change_4h_pct": 3.169,
+      "taker_buy_ratio_1m": 0.511,
+      "taker_buy_ratio_5m": 0.479,
+      "oi_delta_5m_pct": 0.124,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.194,
+      "range_4h_pct": 3.92,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.24981429,
+      "suggested_tp1": 0.25102857,
+      "suggested_tp2": 0.25175714,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "PIEVERSEUSDT",
       "base": "PIEVERSE",
