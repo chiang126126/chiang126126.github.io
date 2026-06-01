@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-01T11:36:28.659694+00:00",
+  "updated_at": "2026-06-01T11:38:35.058949+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 51,
+  "alerts_count": 52,
   "alerts": [
+    {
+      "symbol": "ARMUSDT",
+      "base": "ARM",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 394.15,
+      "price_change_pct": -0.962,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 365385.0,
+      "volume_baseline_usdt": 71708.0,
+      "volume_ratio": 5.1,
+      "detected_at": "2026-06-01T11:37:55.599457+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.995,
+      "change_15m_pct": -1.643,
+      "change_1h_pct": -2.284,
+      "change_4h_pct": 4.177,
+      "taker_buy_ratio_1m": 0.115,
+      "taker_buy_ratio_5m": 0.213,
+      "oi_delta_5m_pct": -0.475,
+      "funding_rate_pct": 0.1685,
+      "atr_pct": 0.357,
+      "range_4h_pct": 9.26,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 396.26071429,
+      "suggested_tp1": 390.98392857,
+      "suggested_tp2": 387.81785714,
+      "conviction_score": 0,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "FORMUSDT",
       "base": "FORM",
