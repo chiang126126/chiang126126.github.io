@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-01T21:57:38.467187+00:00",
+  "generated_at": "2026-06-01T21:59:34.259014+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 823,
@@ -53148,16 +53148,26 @@
       "close_qty": 53792.0
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "ORDIUSDT|LONG|2026-06-01T21:58:36.038267+00:00",
+      "symbol": "ORDIUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-01T21:59:14.007754+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.64% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-01T21:59:32.524617+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 71015.6,
-    "btc_ma25_1h": 72592.46,
-    "pct_vs_ma25": -2.172,
-    "change_24h_pct": -3.83,
+    "btc_price": 71012.5,
+    "btc_ma25_1h": 72592.33,
+    "pct_vs_ma25": -2.176,
+    "change_24h_pct": -3.835,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.636,
-    "computed_at": "2026-06-01T21:57:38.419224+00:00"
+    "change_3h_pct": -0.64,
+    "computed_at": "2026-06-01T21:59:34.222694+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
