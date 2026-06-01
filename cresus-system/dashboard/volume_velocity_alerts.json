@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-01T07:36:11.802632+00:00",
+  "updated_at": "2026-06-01T07:38:19.953075+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 55,
+  "alerts_count": 56,
   "alerts": [
+    {
+      "symbol": "ARCUSDT",
+      "base": "ARC",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.07784,
+      "price_change_pct": -0.79,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 32727.0,
+      "volume_baseline_usdt": 3463.0,
+      "volume_ratio": 9.45,
+      "detected_at": "2026-06-01T07:38:18.572636+00:00",
+      "intensity": 1,
+      "change_5m_pct": -1.029,
+      "change_15m_pct": -0.916,
+      "change_1h_pct": -0.346,
+      "change_4h_pct": -0.625,
+      "taker_buy_ratio_1m": 0.177,
+      "taker_buy_ratio_5m": 0.281,
+      "oi_delta_5m_pct": 0.013,
+      "funding_rate_pct": 0.0054,
+      "atr_pct": 0.254,
+      "range_4h_pct": 3.04,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.07803786,
+      "suggested_tp1": 0.07754321,
+      "suggested_tp2": 0.07724643,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "AERGOUSDT",
       "base": "AERGO",
