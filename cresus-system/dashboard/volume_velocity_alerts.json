@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-01T00:12:19.928030+00:00",
+  "updated_at": "2026-06-01T00:14:25.299391+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 49,
+  "alerts_count": 50,
   "alerts": [
+    {
+      "symbol": "NFPUSDT",
+      "base": "NFP",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.01072,
+      "price_change_pct": 0.657,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 77797.0,
+      "volume_baseline_usdt": 7819.0,
+      "volume_ratio": 9.95,
+      "detected_at": "2026-06-01T00:13:35.871802+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.847,
+      "change_15m_pct": 1.325,
+      "change_1h_pct": 1.613,
+      "change_4h_pct": 4.488,
+      "taker_buy_ratio_1m": 0.554,
+      "taker_buy_ratio_5m": 0.557,
+      "oi_delta_5m_pct": 0.337,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.613,
+      "range_4h_pct": 5.5,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.01062143,
+      "suggested_tp1": 0.01086786,
+      "suggested_tp2": 0.01101571,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "ZORAUSDT",
       "base": "ZORA",
