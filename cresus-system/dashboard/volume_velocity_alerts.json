@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-02T13:49:27.147917+00:00",
+  "updated_at": "2026-06-02T13:51:32.262023+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 72,
+  "alerts_count": 73,
   "alerts": [
+    {
+      "symbol": "COHRUSDT",
+      "base": "COHR",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 408.8,
+      "price_change_pct": 2.67,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 50048.0,
+      "volume_baseline_usdt": 4673.0,
+      "volume_ratio": 10.71,
+      "detected_at": "2026-06-02T13:51:30.951187+00:00",
+      "intensity": 2,
+      "change_5m_pct": -0.507,
+      "change_15m_pct": 3.439,
+      "change_1h_pct": 7.424,
+      "change_4h_pct": 6.987,
+      "taker_buy_ratio_1m": 0.91,
+      "taker_buy_ratio_5m": 0.473,
+      "oi_delta_5m_pct": 1.114,
+      "funding_rate_pct": 0.3443,
+      "atr_pct": 0.912,
+      "range_4h_pct": 8.54,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 403.20607143,
+      "suggested_tp1": 417.19089286,
+      "suggested_tp2": 425.58178571,
+      "conviction_score": 7,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "SAHARAUSDT",
       "base": "SAHARA",
