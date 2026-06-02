@@ -1949,6 +1949,315 @@ class TestPhase5RSubRegimeAllowList(unittest.TestCase):
         self.assertTrue(live_trader._should_block_for_regime("LONG", "down", "Down_Rebound"))
 
 
+class TestPhase5SRegimeSizeMultiplier(unittest.TestCase):
+    """Phase 5.S: _regime_size_multiplier — 按 (direction, regime, sub_regime) 查 multiplier.
+
+    设计要点:
+    - 默认空 dict → 所有查询返 1.0 (= Phase 5.A 行为)
+    - lookup 优先级: 完全匹配 > (d, r, None) > (d, None, None) > 1.0
+    - clamp 到 [MIN, MAX] = [0.0, 3.0]
+    - direction 大小写 normalize, regime 大小写 normalize, sub_regime 精确匹配
+    """
+
+    def setUp(self):
+        self._orig_mult = dict(live_trader.LIVE_REGIME_SIZE_MULTIPLIER)
+
+    def tearDown(self):
+        live_trader.LIVE_REGIME_SIZE_MULTIPLIER = self._orig_mult
+
+    def test_default_empty_dict(self):
+        """默认必须空 dict — 任何启用都需显式 flip."""
+        self.assertEqual(self._orig_mult, {},
+                        "Phase 5.S 默认 LIVE_REGIME_SIZE_MULTIPLIER 必须为空 dict")
+
+    def test_default_returns_one(self):
+        """空 dict 下任何 (d, r, sub) 都返 1.0."""
+        for combo in [
+            ("LONG", "chop", None),
+            ("SHORT", "down", "down_acute"),
+            ("LONG", "up", None),
+            ("SHORT", "down", "down_rebound"),
+        ]:
+            self.assertEqual(
+                live_trader._regime_size_multiplier(*combo), 1.0,
+                f"空 dict, {combo} 应返 1.0"
+            )
+
+    def test_exact_match(self):
+        """完全匹配优先于通配."""
+        live_trader.LIVE_REGIME_SIZE_MULTIPLIER = {
+            ("SHORT", "down", "down_acute"): 1.5,
+        }
+        self.assertEqual(
+            live_trader._regime_size_multiplier("SHORT", "down", "down_acute"), 1.5
+        )
+        # 其它桶应保持 1.0
+        self.assertEqual(
+            live_trader._regime_size_multiplier("SHORT", "down", "down_stable"), 1.0
+        )
+        self.assertEqual(
+            live_trader._regime_size_multiplier("LONG", "down", "down_acute"), 1.0
+        )
+
+    def test_fallback_to_regime_wildcard(self):
+        """(d, r, None) 用于 regime 内不分 sub 的桶 (e.g. chop / up)."""
+        live_trader.LIVE_REGIME_SIZE_MULTIPLIER = {
+            ("LONG", "chop", None): 1.3,
+        }
+        self.assertEqual(
+            live_trader._regime_size_multiplier("LONG", "chop", None), 1.3
+        )
+        # sub_regime 即使有, fallback 也会命中 (d, r, None)
+        self.assertEqual(
+            live_trader._regime_size_multiplier("LONG", "chop", "anything"), 1.3
+        )
+
+    def test_fallback_to_direction_only(self):
+        """(d, None, None) 是最宽通配, 仅在更精的都没命中时用."""
+        live_trader.LIVE_REGIME_SIZE_MULTIPLIER = {
+            ("SHORT", None, None): 0.8,
+        }
+        self.assertEqual(
+            live_trader._regime_size_multiplier("SHORT", "chop", None), 0.8
+        )
+        self.assertEqual(
+            live_trader._regime_size_multiplier("SHORT", "up", None), 0.8
+        )
+        # LONG 不命中
+        self.assertEqual(
+            live_trader._regime_size_multiplier("LONG", "chop", None), 1.0
+        )
+
+    def test_lookup_priority_specific_wins(self):
+        """完全匹配 > (d, r, None) > (d, None, None)."""
+        live_trader.LIVE_REGIME_SIZE_MULTIPLIER = {
+            ("SHORT", None, None): 0.5,
+            ("SHORT", "down", None): 1.2,
+            ("SHORT", "down", "down_acute"): 2.0,
+        }
+        # 最精的胜出
+        self.assertEqual(
+            live_trader._regime_size_multiplier("SHORT", "down", "down_acute"), 2.0
+        )
+        # 没完全匹配 → 用 (d, r, None)
+        self.assertEqual(
+            live_trader._regime_size_multiplier("SHORT", "down", "down_stable"), 1.2
+        )
+        # 都没 → 用 (d, None, None)
+        self.assertEqual(
+            live_trader._regime_size_multiplier("SHORT", "chop", None), 0.5
+        )
+
+    def test_clamp_max(self):
+        """multiplier 超过 MAX 被 clamp."""
+        live_trader.LIVE_REGIME_SIZE_MULTIPLIER = {
+            ("SHORT", "down", "down_acute"): 5.0,  # 超 3.0 上限
+        }
+        self.assertEqual(
+            live_trader._regime_size_multiplier("SHORT", "down", "down_acute"),
+            live_trader.LIVE_REGIME_SIZE_MULT_MAX
+        )
+
+    def test_clamp_min(self):
+        """negative 或 < MIN 被 clamp 到 MIN."""
+        live_trader.LIVE_REGIME_SIZE_MULTIPLIER = {
+            ("LONG", "down", "down_acute"): -1.0,
+        }
+        self.assertEqual(
+            live_trader._regime_size_multiplier("LONG", "down", "down_acute"),
+            live_trader.LIVE_REGIME_SIZE_MULT_MIN
+        )
+
+    def test_zero_multiplier_allowed(self):
+        """multiplier = 0 是合法配置 (= stop mirroring 该桶)."""
+        live_trader.LIVE_REGIME_SIZE_MULTIPLIER = {
+            ("LONG", "down", "down_acute"): 0.0,
+        }
+        self.assertEqual(
+            live_trader._regime_size_multiplier("LONG", "down", "down_acute"), 0.0
+        )
+
+    def test_empty_direction_returns_one(self):
+        """direction 空字符串 fail-safe 返 1.0."""
+        live_trader.LIVE_REGIME_SIZE_MULTIPLIER = {
+            ("LONG", "down", None): 1.5,
+        }
+        self.assertEqual(live_trader._regime_size_multiplier("", "down", None), 1.0)
+
+    def test_case_normalization(self):
+        """direction / regime 大小写都接受, sub_regime 精确匹配."""
+        live_trader.LIVE_REGIME_SIZE_MULTIPLIER = {
+            ("SHORT", "down", "down_acute"): 1.7,
+        }
+        # direction 大写小写都行
+        self.assertEqual(
+            live_trader._regime_size_multiplier("short", "DOWN", "down_acute"), 1.7
+        )
+        # sub_regime 大写不匹配 (精确字符串)
+        self.assertEqual(
+            live_trader._regime_size_multiplier("SHORT", "down", "DOWN_ACUTE"), 1.0
+        )
+
+    def test_invalid_multiplier_value_safe(self):
+        """配置的 multiplier 值是非 number 时 fail-safe 返 1.0."""
+        live_trader.LIVE_REGIME_SIZE_MULTIPLIER = {
+            ("LONG", "chop", None): "1.5",  # 字符串能 float() — 可转
+        }
+        # 应该正确转
+        self.assertEqual(live_trader._regime_size_multiplier("LONG", "chop", None), 1.5)
+        # 不可转值
+        live_trader.LIVE_REGIME_SIZE_MULTIPLIER = {
+            ("LONG", "chop", None): "abc",
+        }
+        self.assertEqual(live_trader._regime_size_multiplier("LONG", "chop", None), 1.0)
+
+
+class TestPhase5SLiveNotionalForMirror(unittest.TestCase):
+    """Phase 5.S: _live_notional_for_mirror — score-based base × regime multiplier."""
+
+    def setUp(self):
+        self._orig_mult = dict(live_trader.LIVE_REGIME_SIZE_MULTIPLIER)
+
+    def tearDown(self):
+        live_trader.LIVE_REGIME_SIZE_MULTIPLIER = self._orig_mult
+
+    def test_no_btc_regime_falls_back_to_base(self):
+        """btc_regime=None → 返 base (Phase 5.A 行为)."""
+        pt = {"direction": "LONG", "conviction_score": 7}
+        result = live_trader._live_notional_for_mirror(pt, btc_regime=None)
+        self.assertEqual(result, live_trader._live_notional_for_paper(pt))
+
+    def test_empty_mult_dict_returns_base(self):
+        """空 mult dict → 返 base (mult=1.0)."""
+        pt = {"direction": "LONG", "conviction_score": 7}
+        regime = {"regime": "chop", "sub_regime": None}
+        result = live_trader._live_notional_for_mirror(pt, btc_regime=regime)
+        self.assertEqual(result, live_trader._live_notional_for_paper(pt))
+
+    def test_multiplier_applied(self):
+        """配置后 base × mult."""
+        live_trader.LIVE_REGIME_SIZE_MULTIPLIER = {
+            ("SHORT", "down", "down_acute"): 1.5,
+        }
+        pt = {"direction": "SHORT", "conviction_score": 7}
+        regime = {"regime": "down", "sub_regime": "down_acute"}
+        base = live_trader._live_notional_for_paper(pt)  # 7 → $800
+        result = live_trader._live_notional_for_mirror(pt, btc_regime=regime)
+        self.assertEqual(result, base * 1.5)  # $1200
+
+    def test_capped_by_max_notional(self):
+        """final notional 不超过 LIVE_MAX_NOTIONAL_PER_TRADE."""
+        live_trader.LIVE_REGIME_SIZE_MULTIPLIER = {
+            ("SHORT", "down", "down_acute"): 3.0,
+        }
+        pt = {"direction": "SHORT", "conviction_score": 7}  # base $800
+        regime = {"regime": "down", "sub_regime": "down_acute"}
+        result = live_trader._live_notional_for_mirror(pt, btc_regime=regime)
+        # $800 × 3.0 = $2400, 但被 cap 到 $2000
+        self.assertEqual(result, live_trader.LIVE_MAX_NOTIONAL_PER_TRADE)
+
+    def test_zero_multiplier_returns_zero(self):
+        """mult=0 → final notional = 0 (会被 is_eligible 拒)."""
+        live_trader.LIVE_REGIME_SIZE_MULTIPLIER = {
+            ("LONG", "down", "down_acute"): 0.0,
+        }
+        pt = {"direction": "LONG", "conviction_score": 7}
+        regime = {"regime": "down", "sub_regime": "down_acute"}
+        result = live_trader._live_notional_for_mirror(pt, btc_regime=regime)
+        self.assertEqual(result, 0.0)
+
+    def test_non_dict_btc_regime_falls_back(self):
+        """btc_regime 非 dict (e.g. str) → fail-safe 返 base."""
+        pt = {"direction": "LONG", "conviction_score": 7}
+        base = live_trader._live_notional_for_paper(pt)
+        self.assertEqual(
+            live_trader._live_notional_for_mirror(pt, btc_regime="chop"), base
+        )
+        self.assertEqual(
+            live_trader._live_notional_for_mirror(pt, btc_regime=42), base
+        )
+
+    def test_missing_direction_fail_safe(self):
+        """paper_trade.direction 缺 → 返 base (mult=1.0 fallback)."""
+        pt = {"conviction_score": 7}  # 无 direction
+        regime = {"regime": "down", "sub_regime": "down_acute"}
+        live_trader.LIVE_REGIME_SIZE_MULTIPLIER = {
+            ("SHORT", "down", "down_acute"): 2.0,
+        }
+        # direction="" → multiplier fallback to 1.0 → 返 base
+        result = live_trader._live_notional_for_mirror(pt, btc_regime=regime)
+        self.assertEqual(result, live_trader._live_notional_for_paper(pt))
+
+
+class TestPhase5SIsEligibleMultiplierZero(unittest.TestCase):
+    """Phase 5.S: is_eligible_for_mirror 在 multiplier=0 时 reject."""
+
+    def setUp(self):
+        self._orig_mult = dict(live_trader.LIVE_REGIME_SIZE_MULTIPLIER)
+
+    def tearDown(self):
+        live_trader.LIVE_REGIME_SIZE_MULTIPLIER = self._orig_mult
+
+    def _make_pt(self, direction, score=7, sym="ETHUSDT"):
+        return {
+            "id": f"{sym}|{direction}|2026-06-02T10:00:00.000+00:00",
+            "symbol": sym,
+            "direction": direction,
+            "conviction_score": score,
+            "entered_at": datetime.now(timezone.utc).isoformat(),
+        }
+
+    def test_default_no_mult_no_reject(self):
+        """空 mult dict → 不会因 Phase 5.S 拒."""
+        pt = self._make_pt("SHORT")
+        eligible, reason = live_trader.is_eligible_for_mirror(
+            pt, {}, datetime.now(timezone.utc),
+            btc_regime="up", btc_sub_regime=None,
+        )
+        # 不应该因 "regime size multiplier" 被拒
+        self.assertNotIn("regime size multiplier", reason)
+
+    def test_zero_mult_rejects(self):
+        """配置 mult=0 → is_eligible reject 并附带 reason."""
+        live_trader.LIVE_REGIME_SIZE_MULTIPLIER = {
+            ("LONG", "down", "down_acute"): 0.0,
+        }
+        pt = self._make_pt("LONG", sym="BTCUSDT")  # 用白名单 symbol 跳过其它 gate
+        eligible, reason = live_trader.is_eligible_for_mirror(
+            pt, {}, datetime.now(timezone.utc),
+            btc_regime="down", btc_sub_regime="down_acute",
+        )
+        # 此 trade 应被 Phase 4.J down+LONG gate 先拒 — 但若我们用 SHORT, 是 Phase 5.S 拒
+        # 用 SHORT 测 (down+SHORT 不会被 4.J 拒, 才能验 Phase 5.S 接管)
+
+    def test_zero_mult_short_rejects(self):
+        """SHORT 桶 mult=0 → Phase 5.S 接管 reject."""
+        live_trader.LIVE_REGIME_SIZE_MULTIPLIER = {
+            ("SHORT", "up", None): 0.0,
+        }
+        pt = self._make_pt("SHORT", sym="BTCUSDT")
+        eligible, reason = live_trader.is_eligible_for_mirror(
+            pt, {}, datetime.now(timezone.utc),
+            btc_regime="up", btc_sub_regime=None,
+        )
+        self.assertFalse(eligible)
+        self.assertIn("regime size multiplier=0", reason)
+        self.assertIn("Phase 5.S", reason)
+
+    def test_positive_mult_does_not_reject(self):
+        """mult > 0 → Phase 5.S 不拒 (可能其它 gate 拒, 但不是 5.S)."""
+        live_trader.LIVE_REGIME_SIZE_MULTIPLIER = {
+            ("SHORT", "down", "down_acute"): 1.5,
+        }
+        pt = self._make_pt("SHORT", sym="BTCUSDT")
+        eligible, reason = live_trader.is_eligible_for_mirror(
+            pt, {}, datetime.now(timezone.utc),
+            btc_regime="down", btc_sub_regime="down_acute",
+        )
+        # 不应有 Phase 5.S reject
+        self.assertNotIn("regime size multiplier", reason)
+
+
 class TestAbUseRegimeGate(unittest.TestCase):
     """Phase 4.F + 4.J: _ab_use_regime_gate 启用判定.
 

@@ -105,6 +105,120 @@ def _live_notional_for_paper(paper_trade: dict) -> float:
     return LIVE_NOTIONAL_BY_SCORE.get(s, LIVE_NOTIONAL_USDT)
 
 
+# ==========================================
+# Phase 5.S (2026-06-02) — Regime-aware size multiplier (默认无行为变化)
+# ==========================================
+# 触发原因: audit_sub_regime_paper_outcomes.py (realized_pnl 端) 显示各 (direction,
+#         regime, sub_regime) 桶 paper EV 差异大. 单一 score-based notional 不能
+#         体现 regime 维度的 EV 差. 例如:
+#           LONG  chop  /—            paper avg +$1.70 (n=797) — 高 EV 大样本
+#           LONG  down  /down_acute   paper avg -$0.19 (n= 76) — 唯一 marginal 负
+#           SHORT down  /down_stable  paper avg +$1.85 (n=280) — 高 EV 大样本
+#
+# 设计: 在 score-based base notional 上乘以 (direction, regime, sub_regime) 维度
+#       multiplier. 默认空 dict = 完全等同 Phase 5.A 行为, 安全可回滚.
+#
+# Lookup 优先级 (从精到泛, 用于配置灵活性):
+#   1) (direction, regime, sub_regime) 完全匹配
+#   2) (direction, regime, None)        — regime 内不分 sub 的回退
+#   3) (direction, None, None)          — 仅 direction 的回退
+#   4) 默认 1.0
+#
+# 安全设计:
+#   - multiplier ∈ [MIN, MAX] = [0.0, 3.0]
+#     0.0 = 该桶完全停 mirror (会触发 is_eligible_for_mirror reject)
+#     允许 cut to zero, 但不允许超 3x (防误配把仓位放飞)
+#   - 应用后 final_notional ≤ LIVE_MAX_NOTIONAL_PER_TRADE 兜底
+#     防 score 7 $800 × 3 = $2400 超出单仓上限
+#
+# 启用流程 (data-driven, 不要凭直觉 flip):
+#   1. 跑 scripts/audit_sub_regime_paper_outcomes.py --direction BOTH
+#   2. 看 [direction, regime, sub_regime] 桶 paper realized avg + n
+#   3. 选择 multiplier:
+#        avg > $3 且 n ≥ 100 → 候选 ×2.0 (强加杠杆)
+#        avg > $2 且 n ≥  50 → 候选 ×1.5 (中等倾斜)
+#        avg < $0 且 n ≥  50 → 候选 ×0.5 (减半) 或 ×0.0 (停)
+#        n < 30 一律默认 1.0 (样本不足)
+#   4. 部署: 修改 LIVE_REGIME_SIZE_MULTIPLIER, 重启 live-trader
+#   5. 观察 24-48h, 用 fees-aware 日志 + per-bucket PnL 复盘
+LIVE_REGIME_SIZE_MULTIPLIER: "dict[tuple[str, Optional[str], Optional[str]], float]" = {}
+LIVE_REGIME_SIZE_MULT_MIN = 0.0   # 允许 cut to zero (该桶完全停 mirror)
+LIVE_REGIME_SIZE_MULT_MAX = 3.0   # 单笔不允许超 3 倍 base
+LIVE_MAX_NOTIONAL_PER_TRADE = 2000.0  # 单笔绝对上限, multiplier 后兜底
+
+
+def _regime_size_multiplier(
+    direction: str,
+    btc_regime: Optional[str],
+    btc_sub_regime: Optional[str],
+) -> float:
+    """Phase 5.S: 查 (direction, regime, sub_regime) → size multiplier (default 1.0).
+
+    Args:
+        direction: 'LONG' / 'SHORT' (会 upper())
+        btc_regime: 'up' / 'chop' / 'down' / None (会 lower())
+        btc_sub_regime: 'down_acute' / 'down_stable' / 'down_rebound' / None
+                       (精确匹配, 不 normalize 大小写)
+
+    Returns:
+        Clamp 到 [LIVE_REGIME_SIZE_MULT_MIN, LIVE_REGIME_SIZE_MULT_MAX] 的 multiplier.
+        默认 1.0 (空 dict / 找不到匹配 / direction 空 = 完全等同 Phase 5.A 行为).
+
+    Lookup 优先级 (从精到泛):
+        1) (d, r, sub) 完全匹配
+        2) (d, r, None) regime 通配子状态 (适合 chop / up 这种无子状态的)
+        3) (d, None, None) 仅 direction 的回退 (危险, 慎用)
+        4) 1.0
+    """
+    if not direction:
+        return 1.0
+    d = direction.upper()
+    r = btc_regime.lower() if btc_regime else None
+    sub = btc_sub_regime  # 精确匹配, 不 normalize
+
+    for key in ((d, r, sub), (d, r, None), (d, None, None)):
+        if key in LIVE_REGIME_SIZE_MULTIPLIER:
+            try:
+                mult = float(LIVE_REGIME_SIZE_MULTIPLIER[key])
+            except (TypeError, ValueError):
+                return 1.0
+            # Clamp 兜底, 防误配
+            return max(LIVE_REGIME_SIZE_MULT_MIN, min(LIVE_REGIME_SIZE_MULT_MAX, mult))
+    return 1.0
+
+
+def _live_notional_for_mirror(
+    paper_trade: dict,
+    btc_regime: Optional[dict] = None,
+) -> float:
+    """Phase 5.S: 综合 score-based base × regime multiplier 算最终 notional.
+
+    base = _live_notional_for_paper(paper_trade)   (Phase 5.A score-based)
+    mult = _regime_size_multiplier(direction, regime, sub_regime)
+    final = min(base * mult, LIVE_MAX_NOTIONAL_PER_TRADE)
+
+    Args:
+        paper_trade: paper 信号
+        btc_regime: 可选, dict from _compute_btc_regime ({'regime': ..., 'sub_regime': ...})
+                    None / 非 dict → 不应用 multiplier, 返 base (Phase 5.A 行为)
+
+    Returns: float, 任何异常 fail-safe 返 base.
+    """
+    base = _live_notional_for_paper(paper_trade)
+    if not isinstance(btc_regime, dict):
+        return base
+    try:
+        direction = paper_trade.get("direction", "")
+        regime = btc_regime.get("regime")
+        sub = btc_regime.get("sub_regime")
+    except (AttributeError, TypeError):
+        return base
+    mult = _regime_size_multiplier(direction, regime, sub)
+    final = base * mult
+    # 兜底单仓上限
+    return min(final, LIVE_MAX_NOTIONAL_PER_TRADE)
+
+
 LIVE_MAX_CONCURRENT = 4                # 实盘并发上限
 LIVE_LEVERAGE = 1                      # 杠杆 1x (Phase 4.R6+ 跟 paper 一致).
                                        # PnL = notional × pct, 跟 leverage 无关 →
@@ -714,6 +828,13 @@ def is_eligible_for_mirror(
         # 每 tick 被调多次 (POLL_INTERVAL_SEC=5, 信号留存 10 分钟 → ~240 行 spam/signal).
         # 真正的 [regime-gate-allow] log 在 _try_mirror_open 实际开仓时打,
         # 通过 btc_sub_regime_at_open 字段 + log 同步, 每个 mirror 只 log 一次.
+    # 7b. Phase 5.S: regime size multiplier — 若该桶配置 mult=0.0, 等同于 reject.
+    #     仅当 btc_regime 提供且 LIVE_REGIME_SIZE_MULTIPLIER 非空时检查 (向后兼容).
+    if btc_regime is not None and LIVE_REGIME_SIZE_MULTIPLIER:
+        mult = _regime_size_multiplier(direction, btc_regime, btc_sub_regime)
+        if mult <= 0:
+            return False, (f"regime size multiplier=0 for ({direction}, "
+                          f"{btc_regime}, {btc_sub_regime or '—'}) (Phase 5.S: 该桶停 mirror)")
     # 8. Phase 4.M Funding gate: 拒 funding 不利信号 (≥ +0.05%, 任意方向)
     if LIVE_REJECT_ADVERSE_FUNDING:
         fs = _funding_signal(paper_trade)
@@ -1694,15 +1815,27 @@ def _try_mirror_open(
         log.error(f"[mirror-open FAILED] {sym}: paper trade 缺关键字段: {e}")
         return None
 
-    # Phase 5.A: 按 conviction score 决定 notional ($400 / $800 / $200)
-    trade_notional = _live_notional_for_paper(paper_trade)
+    # Phase 5.A: 按 conviction score base notional ($400 / $800 / $200)
+    # Phase 5.S: × (direction, regime, sub_regime) multiplier (default 1.0 = 无变化)
+    base_notional = _live_notional_for_paper(paper_trade)
+    trade_notional = _live_notional_for_mirror(paper_trade, btc_regime)
     score = paper_trade.get("conviction_score")
 
-    log.info(
-        f"[mirror-open] {sym} {side} notional=${trade_notional} (score={score}) "
-        f"lev={LIVE_LEVERAGE}x sl={sl_price} "
-        f"paper_id={paper_id[:40]} → trade_id={trade_id}"
-    )
+    # 仅当 multiplier 真改变了 notional 才在 log 里 highlight, 否则简洁
+    if abs(trade_notional - base_notional) > 0.01:
+        mult = trade_notional / base_notional if base_notional > 0 else 1.0
+        log.info(
+            f"[mirror-open] {sym} {side} notional=${trade_notional:.0f} "
+            f"(base=${base_notional:.0f} × Phase 5.S mult={mult:.2f}) "
+            f"score={score} lev={LIVE_LEVERAGE}x sl={sl_price} "
+            f"paper_id={paper_id[:40]} → trade_id={trade_id}"
+        )
+    else:
+        log.info(
+            f"[mirror-open] {sym} {side} notional=${trade_notional:.0f} (score={score}) "
+            f"lev={LIVE_LEVERAGE}x sl={sl_price} "
+            f"paper_id={paper_id[:40]} → trade_id={trade_id}"
+        )
 
     # 1. 强制 set_leverage (防 Binance 默认 20x; 已有相同杠杆是 idempotent).
     #    失败 → 放弃本次 mirror, 下 tick 重试 (避免误用错的杠杆开仓).
@@ -2249,7 +2382,9 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
 
             # Re-check cash reserve (mirror_candidates 计算时未含本轮已部署)
             # Phase 5.A: 用 score-based notional 而非固定 LIVE_NOTIONAL_USDT.
-            pt_notional = _live_notional_for_paper(pt)
+            # Phase 5.S: × regime multiplier — cash check 必须用 final notional, 否则
+            #            mult=1.5 时 cap 计算偏小, 会让超 cap 的 trade 漏过去开仓.
+            pt_notional = _live_notional_for_mirror(pt, btc_regime_snapshot)
             deployed_now = sum(
                 float(lt.get("notional_usdt", 0) or 0)
                 for lt in (live.get("live_open_trades") or [])
@@ -2257,7 +2392,7 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
             if deployed_now + pt_notional > LIVE_MAX_DEPLOY_USDT:
                 log.debug(
                     f"[skip-during-iter-cash] {pt['symbol']}: "
-                    f"deployed ${deployed_now:.0f} + ${pt_notional} "
+                    f"deployed ${deployed_now:.0f} + ${pt_notional:.0f} "
                     f"> cap ${LIVE_MAX_DEPLOY_USDT}"
                 )
                 continue
