@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-02T09:06:42.783984+00:00",
+  "updated_at": "2026-06-02T09:08:47.912055+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 25,
+  "alerts_count": 26,
   "alerts": [
+    {
+      "symbol": "GENIUSUSDT",
+      "base": "GENIUS",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.4568,
+      "price_change_pct": 2.652,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 260463.0,
+      "volume_baseline_usdt": 17682.0,
+      "volume_ratio": 14.73,
+      "detected_at": "2026-06-02T09:08:17.504722+00:00",
+      "intensity": 2,
+      "change_5m_pct": 2.361,
+      "change_15m_pct": 2.2,
+      "change_1h_pct": 1.381,
+      "change_4h_pct": 0.797,
+      "taker_buy_ratio_1m": 0.625,
+      "taker_buy_ratio_5m": 0.537,
+      "oi_delta_5m_pct": -0.034,
+      "funding_rate_pct": -0.0731,
+      "atr_pct": 0.488,
+      "range_4h_pct": 5.01,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.45345714,
+      "suggested_tp1": 0.46181429,
+      "suggested_tp2": 0.46682857,
+      "conviction_score": 3,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "KGENUSDT",
       "base": "KGEN",
