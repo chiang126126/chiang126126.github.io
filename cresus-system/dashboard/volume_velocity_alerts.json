@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-02T22:47:06.482421+00:00",
+  "updated_at": "2026-06-02T22:49:10.714536+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 24,
+  "alerts_count": 25,
   "alerts": [
+    {
+      "symbol": "XMRUSDT",
+      "base": "XMR",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 324.37,
+      "price_change_pct": -2.151,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 479434.0,
+      "volume_baseline_usdt": 38968.0,
+      "volume_ratio": 12.3,
+      "detected_at": "2026-06-02T22:48:28.843721+00:00",
+      "intensity": 2,
+      "change_5m_pct": -1.078,
+      "change_15m_pct": -2.342,
+      "change_1h_pct": -2.186,
+      "change_4h_pct": -2.754,
+      "taker_buy_ratio_1m": 0.363,
+      "taker_buy_ratio_5m": 0.313,
+      "oi_delta_5m_pct": 0.192,
+      "funding_rate_pct": 0.1043,
+      "atr_pct": 0.318,
+      "range_4h_pct": 3.65,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 325.40285714,
+      "suggested_tp1": 322.82071429,
+      "suggested_tp2": 321.27142857,
+      "conviction_score": 3,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "XMRUSDT",
       "base": "XMR",
