@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-02T11:47:07.263472+00:00",
+  "updated_at": "2026-06-02T11:49:11.681057+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 26,
+  "alerts_count": 27,
   "alerts": [
+    {
+      "symbol": "PIEVERSEUSDT",
+      "base": "PIEVERSE",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 1.0175,
+      "price_change_pct": -2.557,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 609831.0,
+      "volume_baseline_usdt": 52334.0,
+      "volume_ratio": 11.65,
+      "detected_at": "2026-06-02T11:48:25.890243+00:00",
+      "intensity": 2,
+      "change_5m_pct": 0.817,
+      "change_15m_pct": -1.795,
+      "change_1h_pct": 4.696,
+      "change_4h_pct": 6.66,
+      "taker_buy_ratio_1m": 0.612,
+      "taker_buy_ratio_5m": 0.559,
+      "oi_delta_5m_pct": -0.3,
+      "funding_rate_pct": 0.0118,
+      "atr_pct": 1.678,
+      "range_4h_pct": 16.5,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 1.05165714,
+      "suggested_tp1": 0.96626429,
+      "suggested_tp2": 0.91502857,
+      "conviction_score": 0,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "PUNDIXUSDT",
       "base": "PUNDIX",
