@@ -196,6 +196,12 @@ def main(argv: list[str]) -> int:
         help="只看 conviction_score >= 此值的 trade (默认 0 = 全部)",
     )
     parser.add_argument(
+        "--direction",
+        choices=["LONG", "SHORT", "BOTH"],
+        default="LONG",
+        help="审计方向 (默认 LONG; SHORT 用于找盈利金矿; BOTH 一次看完)",
+    )
+    parser.add_argument(
         "--show-trades",
         action="store_true",
         help="额外打印 down_rebound + LONG 的逐笔列表",
@@ -214,10 +220,16 @@ def main(argv: list[str]) -> int:
         return 2
 
     cutoff = datetime.now(timezone.utc) - timedelta(days=args.days)
-    # 过滤: closed + LONG + 在窗口内 + 有 entered_at + (可选) conviction 阈值
-    longs = []
+    # 过滤: closed + direction match + 在窗口内 + 有 entered_at + (可选) conviction 阈值
+    if args.direction == "BOTH":
+        allowed_dirs = {"LONG", "SHORT"}
+    else:
+        allowed_dirs = {args.direction}
+
+    trades_filt = []
     for t in closed:
-        if (t.get("direction") or "").upper() != "LONG":
+        d = (t.get("direction") or "").upper()
+        if d not in allowed_dirs:
             continue
         dt = parse_entered_at(t.get("entered_at"))
         if dt is None or dt < cutoff:
@@ -228,17 +240,18 @@ def main(argv: list[str]) -> int:
                     continue
             except (TypeError, ValueError):
                 continue
-        longs.append((t, dt))
-    if not longs:
-        print(f"[error] no LONG trades in last {args.days} days", file=sys.stderr)
+        trades_filt.append((t, dt, d))
+    if not trades_filt:
+        print(f"[error] no {args.direction} trades in last {args.days} days", file=sys.stderr)
         return 2
 
-    earliest = min(d for _, d in longs)
-    latest = max(d for _, d in longs)
+    earliest = min(d for _, d, _ in trades_filt)
+    latest = max(d for _, d, _ in trades_filt)
     # 拉 BTC 1h 多 25h buffer 才能算 entered_at 那刻的 MA25
     start_ms = int((earliest - timedelta(hours=30)).timestamp() * 1000)
     end_ms = int((latest + timedelta(hours=1)).timestamp() * 1000)
-    print(f"[audit] paper LONGs: {len(longs)} | window: {earliest.date()} → {latest.date()}")
+    dir_label = args.direction
+    print(f"[audit] paper {dir_label}: {len(trades_filt)} | window: {earliest.date()} → {latest.date()}")
     print(f"[audit] fetching BTC 1h klines {(end_ms - start_ms)/3_600_000:.0f}h...")
     try:
         klines = fetch_btc_klines_1h(start_ms, end_ms)
@@ -248,13 +261,13 @@ def main(argv: list[str]) -> int:
     print(f"[audit] fetched {len(klines)} BTC 1h candles")
     hour_close_map = index_klines_by_hour(klines)
 
-    # Bucket: (regime, sub_regime) → [pnl, pnl, ...]
-    buckets: dict[tuple[str, str | None], list[float]] = defaultdict(list)
+    # Bucket: (direction, regime, sub_regime) → [pnl, pnl, ...]
+    buckets: dict[tuple[str, str, str | None], list[float]] = defaultdict(list)
     rebound_trades_detail: list[dict] = []
     skipped_no_pnl = 0
     skipped_no_regime = 0
 
-    for trade, dt in longs:
+    for trade, dt, direction in trades_filt:
         ts_ms = int(dt.timestamp() * 1000)
         rr = compute_regime_at(ts_ms, hour_close_map)
         if rr is None:
@@ -264,9 +277,9 @@ def main(argv: list[str]) -> int:
         if pnl is None:
             skipped_no_pnl += 1
             continue
-        key = (rr["regime"], rr["sub_regime"])
+        key = (direction, rr["regime"], rr["sub_regime"])
         buckets[key].append(pnl)
-        if rr["regime"] == "down" and rr["sub_regime"] == "down_rebound":
+        if direction == "LONG" and rr["regime"] == "down" and rr["sub_regime"] == "down_rebound":
             rebound_trades_detail.append({
                 "id": trade.get("id"),
                 "symbol": trade.get("symbol"),
@@ -279,66 +292,101 @@ def main(argv: list[str]) -> int:
     print(f"[audit] tagged {sum(len(b) for b in buckets.values())} trades | "
           f"skipped: no_regime={skipped_no_regime}, no_pnl={skipped_no_pnl}")
 
-    # Print summary by (regime, sub_regime)
+    # Print summary by (direction, regime, sub_regime)
     rows = []
-    for key in sorted(buckets.keys(), key=lambda k: (k[0], k[1] or "")):
-        regime, sub = key
+    for key in sorted(buckets.keys(), key=lambda k: (k[0], k[1], k[2] or "")):
+        d, regime, sub = key
         s = summarize(buckets[key])
+        s["direction"] = d
         s["regime"] = regime
         s["sub_regime"] = sub or "—"
         rows.append(s)
     print()
-    print("=" * 90)
-    print(f"{'regime':<8} {'sub_regime':<14} {'n':>4} {'wins':>5} {'win%':>6} "
+    print("=" * 100)
+    print(f"{'dir':<6} {'regime':<8} {'sub_regime':<14} {'n':>4} {'wins':>5} {'win%':>6} "
           f"{'avg$':>8} {'med$':>8} {'total$':>10} {'min':>8} {'max':>8}")
-    print("=" * 90)
+    print("=" * 100)
     for r in rows:
-        print(f"{r['regime']:<8} {r['sub_regime']:<14} {r['count']:>4} "
+        print(f"{r['direction']:<6} {r['regime']:<8} {r['sub_regime']:<14} {r['count']:>4} "
               f"{r['wins']:>5} {r['win_rate_pct']:>6.1f} "
               f"{r['avg_pnl_usdt']:>8.2f} {r['median_pnl_usdt']:>8.2f} "
               f"{r['total_pnl_usdt']:>10.2f} {r['min']:>8.2f} {r['max']:>8.2f}")
-    print("=" * 90)
+    print("=" * 100)
 
-    # 重点关注 down + LONG 的子状态拆分
-    print()
-    print(">>> Phase 5.R 决策依据: down + LONG 按 sub_regime 拆分 <<<")
-    down_keys = [k for k in buckets if k[0] == "down"]
-    if not down_keys:
-        print("    无 down regime 的 LONG paper 数据 — 无法判断 Phase 5.R 是否值得部署")
-    else:
-        for k in sorted(down_keys, key=lambda x: x[1] or ""):
-            s = summarize(buckets[k])
-            sub_label = k[1] or "(无 sub_regime — 数据不全)"
-            print(f"    [{sub_label:<14}] n={s['count']:>3} 胜率={s['win_rate_pct']:>5.1f}% "
-                  f"avg=${s['avg_pnl_usdt']:>6.2f} total=${s['total_pnl_usdt']:>7.2f}")
-
-    # 决策建议
-    print()
-    print(">>> 建议 <<<")
-    rebound_bucket = buckets.get(("down", "down_rebound"), [])
-    if not rebound_bucket:
-        print("    ⚠️  down_rebound + LONG paper 样本 = 0 → 数据不足, 不建议 flip flag")
-    else:
-        n = len(rebound_bucket)
-        avg = mean(rebound_bucket)
-        total = sum(rebound_bucket)
-        wins = sum(1 for p in rebound_bucket if p > 0)
-        win_rate = wins / n * 100
-        if n < 20:
-            print(f"    ⚠️  down_rebound + LONG paper 样本 n={n} < 20 (统计不显著)")
-            print(f"        avg=${avg:.2f} 仅供参考, 暂不建议 flip")
-        elif avg <= 0:
-            print(f"    ❌  down_rebound + LONG paper avg=${avg:.2f} ≤ 0 (n={n})")
-            print(f"        与 Phase 4.J 结论一致 — 维持当前 default, 不放开")
-        elif avg < 0.5:
-            print(f"    🟡  down_rebound + LONG paper avg=${avg:.2f} (n={n}, 胜率 {win_rate:.1f}%)")
-            print(f"        EV 偏弱 — live 端 ~$2-3/笔执行摩擦可能吃光, 谨慎评估")
+    # 重点关注 down + LONG 的子状态拆分 (Phase 5.R 决策依据)
+    if "LONG" in allowed_dirs:
+        print()
+        print(">>> Phase 5.R 决策依据: down + LONG 按 sub_regime 拆分 <<<")
+        down_long_keys = [k for k in buckets if k[0] == "LONG" and k[1] == "down"]
+        if not down_long_keys:
+            print("    无 down regime 的 LONG paper 数据 — 无法判断 Phase 5.R 是否值得部署")
         else:
-            print(f"    ✅  down_rebound + LONG paper EV 显著为正:")
-            print(f"        n={n} 胜率={win_rate:.1f}% avg=${avg:.2f} total=${total:.2f}")
-            print(f"        建议: 在 live_trader.py flip:")
-            print(f"          LIVE_REGIME_GATE_SUB_REGIME_ALLOW = {{'down_rebound'}}")
-            print(f"        观察 24-48h live 实际表现再决定是否继续放开其它 sub_regime")
+            for k in sorted(down_long_keys, key=lambda x: x[2] or ""):
+                s = summarize(buckets[k])
+                sub_label = k[2] or "(无 sub_regime — 数据不全)"
+                print(f"    [{sub_label:<14}] n={s['count']:>3} 胜率={s['win_rate_pct']:>5.1f}% "
+                      f"avg=${s['avg_pnl_usdt']:>6.2f} total=${s['total_pnl_usdt']:>7.2f}")
+
+        # 决策建议
+        print()
+        print(">>> Phase 5.R 建议 <<<")
+        rebound_bucket = buckets.get(("LONG", "down", "down_rebound"), [])
+        if not rebound_bucket:
+            print("    ⚠️  down_rebound + LONG paper 样本 = 0 → 数据不足, 不建议 flip flag")
+        else:
+            n = len(rebound_bucket)
+            avg = mean(rebound_bucket)
+            total = sum(rebound_bucket)
+            wins = sum(1 for p in rebound_bucket if p > 0)
+            win_rate = wins / n * 100
+            if n < 20:
+                print(f"    ⚠️  down_rebound + LONG paper 样本 n={n} < 20 (统计不显著)")
+                print(f"        avg=${avg:.2f} 仅供参考, 暂不建议 flip")
+            elif avg <= 0:
+                print(f"    ❌  down_rebound + LONG paper avg=${avg:.2f} ≤ 0 (n={n})")
+                print(f"        与 Phase 4.J 结论一致 — 维持当前 default, 不放开")
+            elif avg < 0.5:
+                print(f"    🟡  down_rebound + LONG paper avg=${avg:.2f} (n={n}, 胜率 {win_rate:.1f}%)")
+                print(f"        EV 偏弱 — live 端 ~$2-3/笔执行摩擦可能吃光, 谨慎评估")
+            else:
+                print(f"    ✅  down_rebound + LONG paper EV 显著为正:")
+                print(f"        n={n} 胜率={win_rate:.1f}% avg=${avg:.2f} total=${total:.2f}")
+                print(f"        建议: 在 live_trader.py flip:")
+                print(f"          LIVE_REGIME_GATE_SUB_REGIME_ALLOW = {{'down_rebound'}}")
+                print(f"        观察 24-48h live 实际表现再决定是否继续放开其它 sub_regime")
+
+    # SHORT 端高 EV 桶 — 找盈利金矿
+    if "SHORT" in allowed_dirs:
+        print()
+        print(">>> SHORT 端 (regime, sub_regime) 拆分 — 找盈利金矿 <<<")
+        short_keys = [k for k in buckets if k[0] == "SHORT"]
+        # 按 avg PnL 降序排
+        scored = []
+        for k in short_keys:
+            b = buckets[k]
+            if len(b) < 5:
+                continue
+            avg = mean(b)
+            scored.append((k, len(b), avg, sum(b)))
+        scored.sort(key=lambda x: -x[2])
+        if not scored:
+            print("    无足够 SHORT 数据 (每桶 < 5 笔)")
+        else:
+            for k, n, avg, total in scored:
+                label = f"{k[1]}/{k[2] or '—'}"
+                tag = "✅" if avg > 0.5 else ("🟡" if avg > 0 else "❌")
+                print(f"    {tag} [{label:<22}] n={n:>3} avg=${avg:>+6.2f} total=${total:>+7.2f}")
+        # 给出 SHORT 端的行动建议
+        print()
+        print(">>> SHORT 端建议 <<<")
+        positive = [(k, n, avg, total) for k, n, avg, total in scored if avg > 0.5]
+        if positive:
+            print("    ✅ 以下 SHORT 桶是 paper 真实盈利金矿 (avg > +$0.5, n ≥ 5):")
+            for k, n, avg, total in positive:
+                print(f"        {k[1]}/{k[2] or '—'}: n={n} avg=${avg:.2f} total=${total:.2f}")
+            print("    → 考虑在 live_trader 给这些桶单独的 size_multiplier (>1.0) 倾斜资金")
+        else:
+            print("    ⚠️  无 SHORT 桶 paper EV > +$0.5 — 整体 SHORT 不够强, 不建议加杠杆")
 
     if args.show_trades and rebound_trades_detail:
         print()
