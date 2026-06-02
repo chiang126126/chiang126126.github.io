@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-02T03:18:52.647785+00:00",
+  "updated_at": "2026-06-02T03:20:57.253960+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 30,
+  "alerts_count": 31,
   "alerts": [
+    {
+      "symbol": "RIFUSDT",
+      "base": "RIF",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.08345,
+      "price_change_pct": 0.895,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 481520.0,
+      "volume_baseline_usdt": 21520.0,
+      "volume_ratio": 22.38,
+      "detected_at": "2026-06-02T03:20:40.528004+00:00",
+      "intensity": 2,
+      "change_5m_pct": 1.642,
+      "change_15m_pct": 3.428,
+      "change_1h_pct": 4.046,
+      "change_4h_pct": 1.63,
+      "taker_buy_ratio_1m": 0.638,
+      "taker_buy_ratio_5m": 0.625,
+      "oi_delta_5m_pct": 0.076,
+      "funding_rate_pct": -0.0034,
+      "atr_pct": 0.863,
+      "range_4h_pct": 9.72,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.08237,
+      "suggested_tp1": 0.08507,
+      "suggested_tp2": 0.08669,
+      "conviction_score": 4,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "MRVLUSDT",
       "base": "MRVL",
