@@ -1,50 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-02T02:21:22.443428+00:00",
+  "generated_at": "2026-06-02T02:23:26.585984+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 827,
-    "open": 2,
-    "closed": 825,
+    "open": 0,
+    "closed": 827,
     "wins": 259,
-    "losses": 556,
-    "win_rate": 0.318,
-    "total_pnl_usdt": -188.3872,
-    "net_pnl_usdt": -345.6563,
-    "avg_pnl_usdt": -0.2283,
+    "losses": 558,
+    "win_rate": 0.317,
+    "total_pnl_usdt": -194.9891,
+    "net_pnl_usdt": -353.2615,
+    "avg_pnl_usdt": -0.2358,
     "best_trade_usdt": 63.1301,
     "worst_trade_usdt": -24.1805,
-    "fees_paid_usdt": 157.7691,
-    "fees_realized_usdt": 157.2691,
-    "fees_open_usdt": 0.5,
+    "fees_paid_usdt": 158.2724,
+    "fees_realized_usdt": 158.2724,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 1000.0,
-    "free_capital_usdt": 653.85,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 1646.74,
     "max_concurrent_slots": 4,
-    "slots_used": 2
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -16.251,
-    "deployed_usdt": 1000.0
+    "daily_pnl": -22.8529,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "NFPUSDT",
-      "RONINUSDT"
-    ],
-    "exchange_symbols": [
-      "NFPUSDT",
-      "RONINUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "NFPUSDT|SHORT|2026-06-02T02:11:57.357136+00:00",
       "trade_id": "L1780366317_NFPUSDT_S",
@@ -91,7 +86,7 @@
       "phase_a_mfe_pct": 0.096,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.4,
+      "fees_paid_usdt": 0.802695,
       "fees_are_actual": true,
       "opened_at": "2026-06-02T02:12:34.592151+00:00",
       "is_dry_run": false,
@@ -102,10 +97,20 @@
       "btc_sub_regime_at_open": "down_acute",
       "btc_change_3h_at_open": -1.202,
       "phase_a_mfe_price": 0.01038,
-      "current_price": 0.01044,
-      "unrealized_pnl_usdt": -3.8499,
-      "unrealized_pnl_pct": -0.481,
-      "last_price_check_at": "2026-06-02T02:21:19.337466+00:00"
+      "current_price": 0.01046,
+      "unrealized_pnl_usdt": -5.3898,
+      "unrealized_pnl_pct": -0.674,
+      "last_price_check_at": "2026-06-02T02:22:42.768493+00:00",
+      "closed_at": "2026-06-02T02:22:57.915455+00:00",
+      "close_reason": "paper:hit_sl",
+      "avg_exit_price": 0.010459999999999999,
+      "realized_pnl_usdt": -5.3898,
+      "close_order_id": 167281173,
+      "close_qty": 76997.1,
+      "close_expected_price": 0.01046,
+      "close_slippage_bps": -0.0,
+      "entry_fees_usdt": 0.4,
+      "close_fees_usdt": 0.402695
     },
     {
       "paper_id": "RONINUSDT|SHORT|2026-06-02T02:12:02.370145+00:00",
@@ -130,7 +135,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 4,
       "wick_filter_mode": "always",
-      "sl_breach_count": 3,
+      "sl_breach_count": 4,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.005,
       "regime_gate_enabled": true,
@@ -153,7 +158,7 @@
       "phase_a_mfe_pct": 0.0,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.099998,
+      "fees_paid_usdt": 0.200602,
       "fees_are_actual": true,
       "opened_at": "2026-06-02T02:12:37.602801+00:00",
       "is_dry_run": false,
@@ -167,10 +172,18 @@
       "current_price": 0.083,
       "unrealized_pnl_usdt": -1.2121,
       "unrealized_pnl_pct": -0.606,
-      "last_price_check_at": "2026-06-02T02:21:19.337466+00:00"
-    }
-  ],
-  "recent_closed": [
+      "last_price_check_at": "2026-06-02T02:21:29.570255+00:00",
+      "closed_at": "2026-06-02T02:21:34.544308+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.083,
+      "realized_pnl_usdt": -1.2121,
+      "close_order_id": 109800584,
+      "close_qty": 2424.2,
+      "close_expected_price": 0.08292857,
+      "close_slippage_bps": 8.61,
+      "entry_fees_usdt": 0.099998,
+      "close_fees_usdt": 0.100604
+    },
     {
       "paper_id": "EPICUSDT|SHORT|2026-06-02T00:33:07.863053+00:00",
       "trade_id": "L1780360387_EPICUSD_S",
@@ -53431,19 +53444,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-02T02:16:31.310276+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_acute 3h=-1.19% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-06-02T02:21:19.337466+00:00"
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_acute 3h=-1.27% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-02T02:23:25.001597+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 70529.4,
-    "btc_ma25_1h": 72058.28,
-    "pct_vs_ma25": -2.122,
-    "change_24h_pct": -4.388,
+    "btc_price": 70469.6,
+    "btc_ma25_1h": 72055.89,
+    "pct_vs_ma25": -2.201,
+    "change_24h_pct": -4.469,
     "sub_regime": "down_acute",
-    "change_3h_pct": -1.186,
-    "computed_at": "2026-06-02T02:21:21.848267+00:00"
+    "change_3h_pct": -1.27,
+    "computed_at": "2026-06-02T02:23:26.549130+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
