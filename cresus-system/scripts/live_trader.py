@@ -710,13 +710,10 @@ def is_eligible_for_mirror(
                     sub_info += f" 3h={btc_change_3h_pct:+.2f}%"
             return False, (f"regime gate ({mode}): {btc_regime} regime + {direction} "
                           f"被拒{sub_info} (数据驱动: down+LONG 历史 0/10 胜 p=0.042)")
-        # Phase 5.R: gate 放行 down+LONG (sub_regime 在 allow-list) — log 留痕,
-        # 注意此 log 仅说明本 gate 通过, trade 仍可能在后续 funding / slippage 等 gate 被拒.
-        if (btc_regime.lower() == "down" and direction.upper() == "LONG"
-                and btc_sub_regime
-                and btc_sub_regime in LIVE_REGIME_GATE_SUB_REGIME_ALLOW):
-            log.info(f"[regime-gate-allow] {paper_id} down+LONG gate 豁免 sub={btc_sub_regime} "
-                     f"(Phase 5.R, allow={sorted(LIVE_REGIME_GATE_SUB_REGIME_ALLOW)})")
+        # Phase 5.R: gate 放行 down+LONG 时不在此处 log — is_eligible_for_mirror
+        # 每 tick 被调多次 (POLL_INTERVAL_SEC=5, 信号留存 10 分钟 → ~240 行 spam/signal).
+        # 真正的 [regime-gate-allow] log 在 _try_mirror_open 实际开仓时打,
+        # 通过 btc_sub_regime_at_open 字段 + log 同步, 每个 mirror 只 log 一次.
     # 8. Phase 4.M Funding gate: 拒 funding 不利信号 (≥ +0.05%, 任意方向)
     if LIVE_REJECT_ADVERSE_FUNDING:
         fs = _funding_signal(paper_trade)
@@ -2000,8 +1997,19 @@ def _try_mirror_open(
             live_trade["btc_pct_vs_ma25_at_open"] = btc_regime.get("pct_vs_ma25")
             # Phase 4.K Shadow Log: 在 down regime 时附带 sub_regime + 3h 动量,
             # 后续可按 sub_regime 切分 PnL, 验证 down_rebound 是否真的跟其它子状态不同.
-            live_trade["btc_sub_regime_at_open"] = btc_regime.get("sub_regime")
+            sub_regime_at_open = btc_regime.get("sub_regime")
+            live_trade["btc_sub_regime_at_open"] = sub_regime_at_open
             live_trade["btc_change_3h_at_open"] = btc_regime.get("change_3h_pct")
+            # Phase 5.R: 实际开仓时 log 一次 (每个 mirror 仅一次, 不会 spam).
+            # 仅在 allow-list 命中且属于 down+LONG 时打, 便于事后审计哪些 trade
+            # 是因 Phase 5.R 放开而 mirror.
+            if (btc_regime.get("regime") == "down"
+                    and side == "BUY"
+                    and sub_regime_at_open
+                    and sub_regime_at_open in LIVE_REGIME_GATE_SUB_REGIME_ALLOW):
+                log.info(f"[regime-gate-allow] {sym} {side} mirrored: "
+                         f"sub={sub_regime_at_open} (Phase 5.R, allow="
+                         f"{sorted(LIVE_REGIME_GATE_SUB_REGIME_ALLOW)})")
         return live_trade
     except Exception as e:
         # Phase 4.X: post-open 构造异常 — 仓位已在 exchange, 必须返回最小 live_trade

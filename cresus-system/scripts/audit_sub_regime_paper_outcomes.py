@@ -89,13 +89,22 @@ def compute_regime_at(ts_ms: int, hour_close_map: dict[int, float]) -> dict | No
 
     返回 {'regime': 'up/chop/down', 'sub_regime': '...'/None, 'pct_vs_ma25', 'change_3h_pct'}.
     任何缺失返 None.
+
+    重要 — 避免前视偏差 (audit fix):
+        Binance kline openTime=H 的 close = H+1 时刻的价 (该小时收盘价).
+        若 ts_ms=14:47, 用 hour_close_map[14:00] = 15:00 的价, 是入场之后的未来数据.
+        本函数用 "最近一根已收完整 1h" 作 closes[-1], 即 openTime ≤ floor(ts_ms) - 1h
+        的最后一根 — 入场时 live 实际能看到的最近完成 close (虽然 live 还能看到当前小时
+        的 running close, 但 audit 用上一小时 close 是无 leak 的稳健近似).
     """
-    # 对齐 ts 到小时 (向下取整)
-    hour_ms = (ts_ms // 3_600_000) * 3_600_000
-    # 取 hour_ms 这根 + 往前 24 根 = 25 根 (与 live get_klines(limit=25) 等价)
+    # 对齐 ts 到小时 (向下取整) — 这是当前正在开仓的小时
+    current_hour_ms = (ts_ms // 3_600_000) * 3_600_000
+    # 最近一根 "已完成" 的 1h: openTime = current_hour_ms - 1h (其 close = 当前小时初的价)
+    latest_complete_open = current_hour_ms - 3_600_000
+    # 取这一根 + 往前 24 根 = 25 根
     closes = []
     for i in range(24, -1, -1):
-        t = hour_ms - i * 3_600_000
+        t = latest_complete_open - i * 3_600_000
         c = hour_close_map.get(t)
         if c is None:
             return None
@@ -148,8 +157,18 @@ def parse_entered_at(s: str | None) -> datetime | None:
 
 
 def extract_pnl_usdt(trade: dict) -> float | None:
-    """优先 realized_pnl, 退路 unrealized → 都不存在就 None (跳过)."""
-    for k in ("realized_pnl_usdt", "realized_pnl", "pnl_usdt", "unrealized_usdt_pnl"):
+    """优先 realized_usdt_pnl (paper_trades_history.json 实际字段名),
+    退路 realized_pnl_usdt / realized_pnl / pnl_usdt, 最后才用 unrealized
+    (后者是开仓后某时刻快照, 非平仓 PnL — 仅在数据缺失时退化).
+    都不存在返 None (跳过).
+    """
+    for k in (
+        "realized_usdt_pnl",   # ← paper_trades_history.json 实际字段 (audit fix)
+        "realized_pnl_usdt",
+        "realized_pnl",
+        "pnl_usdt",
+        "unrealized_usdt_pnl",
+    ):
         v = trade.get(k)
         if v is not None:
             try:
@@ -218,6 +237,17 @@ def main(argv: list[str]) -> int:
     if not closed:
         print("[error] no closed paper trades", file=sys.stderr)
         return 2
+
+    # Sanity: 检测使用的 pnl 字段 (transparency — 用户能看到我们用了哪个)
+    from collections import Counter
+    field_used = Counter()
+    for t in closed[:200]:  # 抽样 200 笔够看哪个字段最先命中
+        for k in ("realized_usdt_pnl", "realized_pnl_usdt", "realized_pnl",
+                  "pnl_usdt", "unrealized_usdt_pnl"):
+            if t.get(k) is not None:
+                field_used[k] += 1
+                break
+    print(f"[audit] PnL field used (sample 200): {dict(field_used)}")
 
     cutoff = datetime.now(timezone.utc) - timedelta(days=args.days)
     # 过滤: closed + direction match + 在窗口内 + 有 entered_at + (可选) conviction 阈值
@@ -392,8 +422,9 @@ def main(argv: list[str]) -> int:
         print()
         print(">>> down_rebound + LONG 逐笔明细 <<<")
         for t in sorted(rebound_trades_detail, key=lambda x: x["entered_at"]):
+            ch3h = t["change_3h_pct"] if t["change_3h_pct"] is not None else 0.0
             print(f"    {t['entered_at']}  {t['symbol']:<14} "
-                  f"conv={t['conviction']} 3h={t['change_3h_pct']:>+6.2f}%  pnl=${t['pnl']:>+7.2f}")
+                  f"conv={t['conviction']} 3h={ch3h:>+6.2f}%  pnl=${t['pnl']:>+7.2f}")
 
     return 0
 
