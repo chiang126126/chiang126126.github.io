@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-02T09:42:15.470829+00:00",
+  "updated_at": "2026-06-02T09:44:19.408986+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 36,
+  "alerts_count": 37,
   "alerts": [
+    {
+      "symbol": "AIGENSYNUSDT",
+      "base": "AIGENSYN",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.03086,
+      "price_change_pct": -0.516,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 107813.0,
+      "volume_baseline_usdt": 8447.0,
+      "volume_ratio": 12.76,
+      "detected_at": "2026-06-02T09:43:50.562982+00:00",
+      "intensity": 1,
+      "change_5m_pct": -1.437,
+      "change_15m_pct": -1.532,
+      "change_1h_pct": -2.404,
+      "change_4h_pct": -2.742,
+      "taker_buy_ratio_1m": 0.141,
+      "taker_buy_ratio_5m": 0.198,
+      "oi_delta_5m_pct": 0.033,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.319,
+      "range_4h_pct": 5.93,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.03100786,
+      "suggested_tp1": 0.03063821,
+      "suggested_tp2": 0.03041643,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "GUAUSDT",
       "base": "GUA",
