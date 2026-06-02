@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-02T09:12:37.382358+00:00",
+  "generated_at": "2026-06-02T09:14:43.534692+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 832,
-    "open": 0,
+    "total_trades": 833,
+    "open": 1,
     "closed": 832,
     "wins": 259,
     "losses": 563,
@@ -15,30 +15,97 @@
     "avg_pnl_usdt": -0.2508,
     "best_trade_usdt": 63.1301,
     "worst_trade_usdt": -24.1805,
-    "fees_paid_usdt": 159.3588,
+    "fees_paid_usdt": 159.4586,
     "fees_realized_usdt": 159.3588,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.0999,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 1631.98,
+    "deployed_usdt": 199.7,
+    "free_capital_usdt": 1432.17,
     "max_concurrent_slots": 4,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -36.5288,
-    "deployed_usdt": 0
+    "deployed_usdt": 199.7
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "RIVERUSDT"
+    ],
+    "exchange_symbols": [
+      "RIVERUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "RIVERUSDT|SHORT|2026-06-02T09:12:32.913956+00:00",
+      "trade_id": "L1780391552_RIVERUS_S",
+      "symbol": "RIVERUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 5.892,
+      "avg_fill_price": 5.891,
+      "slippage_bps": 1.7,
+      "qty": 33.9,
+      "notional_usdt": 199.7049,
+      "leverage": 1,
+      "risk_usdt": 1.7555,
+      "risk_pct": 0.879,
+      "mirror_latency_sec": 10.9,
+      "sl_price": 5.9417857099999996,
+      "sl_paper_current": 5.94278571,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -0.001,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 4,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "B",
+      "min_conviction_threshold": null,
+      "tp1_price": 5.81582143,
+      "tp2_price": 5.73964286,
+      "phase": "A",
+      "entry_order_id": 406614385,
+      "entry_client_id": "cresus_L1780391552_RIVERUS_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.575,
+      "top_trader_position_ratio": null,
+      "top_trader_account_ratio": null,
+      "global_account_ratio": null,
+      "phase_a_mfe_pct": 0.119,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.099852,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-02T09:13:11.349012+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 69592.9,
+      "btc_change_24h_at_open": -4.473,
+      "btc_pct_vs_ma25_at_open": -2.268,
+      "btc_sub_regime_at_open": "down_stable",
+      "btc_change_3h_at_open": -0.704,
+      "phase_a_mfe_price": 5.885,
+      "current_price": 5.876,
+      "unrealized_pnl_usdt": 0.5085,
+      "unrealized_pnl_pct": 0.255,
+      "last_price_check_at": "2026-06-02T09:14:41.501668+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "ALGOUSDT|SHORT|2026-06-02T06:20:30.950257+00:00",
@@ -53804,8 +53871,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-02T07:30:29.825160+00:00",
-      "reason": "paper trade too old (6127s > 600s)",
-      "last_checked_at": "2026-06-02T09:12:36.358876+00:00"
+      "reason": "paper trade too old (6252s > 600s)",
+      "last_checked_at": "2026-06-02T09:14:41.501668+00:00"
     },
     {
       "paper_id": "EPICUSDT|LONG|2026-06-02T08:59:34.284886+00:00",
@@ -53813,19 +53880,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-02T09:00:26.351337+00:00",
-      "reason": "paper trade too old (730s > 600s)",
-      "last_checked_at": "2026-06-02T09:12:36.358876+00:00"
+      "reason": "paper trade too old (855s > 600s)",
+      "last_checked_at": "2026-06-02T09:14:41.501668+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 69594.7,
-    "btc_ma25_1h": 71207.75,
-    "pct_vs_ma25": -2.265,
-    "change_24h_pct": -4.47,
+    "btc_price": 69529.9,
+    "btc_ma25_1h": 71205.16,
+    "pct_vs_ma25": -2.353,
+    "change_24h_pct": -4.559,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.701,
-    "computed_at": "2026-06-02T09:12:37.333632+00:00"
+    "change_3h_pct": -0.794,
+    "computed_at": "2026-06-02T09:14:43.205355+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
