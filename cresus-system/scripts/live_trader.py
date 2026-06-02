@@ -105,6 +105,134 @@ def _live_notional_for_paper(paper_trade: dict) -> float:
     return LIVE_NOTIONAL_BY_SCORE.get(s, LIVE_NOTIONAL_USDT)
 
 
+# ==========================================
+# Phase 5.S (2026-06-02) — Regime-aware size multiplier (默认无行为变化)
+# ==========================================
+# 触发原因: audit_sub_regime_paper_outcomes.py (realized_pnl 端) 显示各 (direction,
+#         regime, sub_regime) 桶 paper EV 差异大. 单一 score-based notional 不能
+#         体现 regime 维度的 EV 差. 例如:
+#           LONG  chop  /—            paper avg +$1.70 (n=797) — 高 EV 大样本
+#           LONG  down  /down_acute   paper avg -$0.19 (n= 76) — 唯一 marginal 负
+#           SHORT down  /down_stable  paper avg +$1.85 (n=280) — 高 EV 大样本
+#
+# 设计: 在 score-based base notional 上乘以 (direction, regime, sub_regime) 维度
+#       multiplier. 默认空 dict = 完全等同 Phase 5.A 行为, 安全可回滚.
+#
+# Lookup 优先级 (从精到泛, 用于配置灵活性):
+#   1) (direction, regime, sub_regime) 完全匹配
+#   2) (direction, regime, None)        — regime 内不分 sub 的回退
+#   3) (direction, None, None)          — 仅 direction 的回退
+#   4) 默认 1.0
+#
+# 安全设计:
+#   - multiplier ∈ [MIN, MAX] = [0.0, 3.0]
+#     0.0 = 该桶完全停 mirror (会触发 is_eligible_for_mirror reject)
+#     允许 cut to zero, 但不允许超 3x (防误配把仓位放飞)
+#   - 应用后 final_notional ≤ LIVE_MAX_NOTIONAL_PER_TRADE 兜底
+#     防 score 7 $800 × 3 = $2400 超出单仓上限
+#
+# 启用流程 (data-driven, 不要凭直觉 flip):
+#   1. 跑 scripts/audit_sub_regime_paper_outcomes.py --direction BOTH
+#   2. 看 [direction, regime, sub_regime] 桶 paper realized avg + n
+#   3. 选择 multiplier:
+#        avg > $3 且 n ≥ 100 → 候选 ×2.0 (强加杠杆)
+#        avg > $2 且 n ≥  50 → 候选 ×1.5 (中等倾斜)
+#        avg < $0 且 n ≥  50 → 候选 ×0.5 (减半) 或 ×0.0 (停)
+#        n < 30 一律默认 1.0 (样本不足)
+#   4. 部署: 修改 LIVE_REGIME_SIZE_MULTIPLIER, 重启 live-trader
+#   5. 观察 24-48h, 用 fees-aware 日志 + per-bucket PnL 复盘
+#
+# 2026-06-02 首次启用 (基于 audit_sub_regime_paper_outcomes.py --direction BOTH
+# 跑出的 21 天 2195 笔 paper realized PnL):
+#   LONG  chop  /—            n=797 avg=+$1.70 → ×1.5 (大样本中等 EV 倾斜)
+#   SHORT down  /down_stable  n=280 avg=+$1.85 → ×1.5 (大样本中等 EV 倾斜)
+#   LONG  down  /down_acute   n= 76 avg=-$0.19 → ×0.5 (唯一 marginal 负 EV)
+#                                              注: 当前 Phase 4.J 已拒 down+LONG,
+#                                              此条目是"防御纵深" — 若未来 Phase 5.R
+#                                              放开此 sub_regime, 此 ×0.5 自动接管.
+#   其它桶未设 → mult 默认 1.0 (维持 Phase 5.A 行为)
+LIVE_REGIME_SIZE_MULTIPLIER: "dict[tuple[str, Optional[str], Optional[str]], float]" = {
+    ("LONG",  "chop", None):           1.5,
+    ("SHORT", "down", "down_stable"):  1.5,
+    ("LONG",  "down", "down_acute"):   0.5,
+}
+LIVE_REGIME_SIZE_MULT_MIN = 0.0   # 允许 cut to zero (该桶完全停 mirror)
+LIVE_REGIME_SIZE_MULT_MAX = 3.0   # 单笔不允许超 3 倍 base
+LIVE_MAX_NOTIONAL_PER_TRADE = 2000.0  # 单笔绝对上限, multiplier 后兜底
+
+
+def _regime_size_multiplier(
+    direction: str,
+    btc_regime: Optional[str],
+    btc_sub_regime: Optional[str],
+) -> float:
+    """Phase 5.S: 查 (direction, regime, sub_regime) → size multiplier (default 1.0).
+
+    Args:
+        direction: 'LONG' / 'SHORT' (会 upper())
+        btc_regime: 'up' / 'chop' / 'down' / None (会 lower())
+        btc_sub_regime: 'down_acute' / 'down_stable' / 'down_rebound' / None
+                       (精确匹配, 不 normalize 大小写)
+
+    Returns:
+        Clamp 到 [LIVE_REGIME_SIZE_MULT_MIN, LIVE_REGIME_SIZE_MULT_MAX] 的 multiplier.
+        默认 1.0 (空 dict / 找不到匹配 / direction 空 = 完全等同 Phase 5.A 行为).
+
+    Lookup 优先级 (从精到泛):
+        1) (d, r, sub) 完全匹配
+        2) (d, r, None) regime 通配子状态 (适合 chop / up 这种无子状态的)
+        3) (d, None, None) 仅 direction 的回退 (危险, 慎用)
+        4) 1.0
+    """
+    if not direction:
+        return 1.0
+    d = direction.upper()
+    r = btc_regime.lower() if btc_regime else None
+    sub = btc_sub_regime  # 精确匹配, 不 normalize
+
+    for key in ((d, r, sub), (d, r, None), (d, None, None)):
+        if key in LIVE_REGIME_SIZE_MULTIPLIER:
+            try:
+                mult = float(LIVE_REGIME_SIZE_MULTIPLIER[key])
+            except (TypeError, ValueError):
+                return 1.0
+            # Clamp 兜底, 防误配
+            return max(LIVE_REGIME_SIZE_MULT_MIN, min(LIVE_REGIME_SIZE_MULT_MAX, mult))
+    return 1.0
+
+
+def _live_notional_for_mirror(
+    paper_trade: dict,
+    btc_regime: Optional[dict] = None,
+) -> float:
+    """Phase 5.S: 综合 score-based base × regime multiplier 算最终 notional.
+
+    base = _live_notional_for_paper(paper_trade)   (Phase 5.A score-based)
+    mult = _regime_size_multiplier(direction, regime, sub_regime)
+    final = min(base * mult, LIVE_MAX_NOTIONAL_PER_TRADE)
+
+    Args:
+        paper_trade: paper 信号
+        btc_regime: 可选, dict from _compute_btc_regime ({'regime': ..., 'sub_regime': ...})
+                    None / 非 dict → 不应用 multiplier, 返 base (Phase 5.A 行为)
+
+    Returns: float, 任何异常 fail-safe 返 base.
+    """
+    base = _live_notional_for_paper(paper_trade)
+    if not isinstance(btc_regime, dict):
+        return base
+    try:
+        direction = paper_trade.get("direction", "")
+        regime = btc_regime.get("regime")
+        sub = btc_regime.get("sub_regime")
+    except (AttributeError, TypeError):
+        return base
+    mult = _regime_size_multiplier(direction, regime, sub)
+    final = base * mult
+    # 兜底单仓上限
+    return min(final, LIVE_MAX_NOTIONAL_PER_TRADE)
+
+
 LIVE_MAX_CONCURRENT = 4                # 实盘并发上限
 LIVE_LEVERAGE = 1                      # 杠杆 1x (Phase 4.R6+ 跟 paper 一致).
                                        # PnL = notional × pct, 跟 leverage 无关 →
@@ -295,6 +423,30 @@ LIVE_FUNDING_FAVORABLE_WICK_BREACHES = 5        # Phase 5.M (6/1): 默认 4 后,
 #   - _should_block_for_regime 规则不变 (仅 down + LONG)
 #   - ab_group 字段仍记录 A/B/C/D (溯源不变, 即使 D 组实质跟 A 组相同)
 LIVE_REGIME_GATE_MODE = "always"    # "off" | "abcd" (legacy 4-arm) | "always" (Phase 4.J 默认)
+
+# ==========================================
+# Phase 5.R (2026-06-02) — Sub-regime aware regime gate (默认无行为变化)
+# ==========================================
+# 触发原因: Phase 4.F/4.J 把 down+LONG 一律拒, 数据驱动 (0/10 胜 p=0.042).
+#         但 BTC down regime 并非铁板一块: Phase 4.K 已细分 down_acute (急跌) /
+#         down_stable (企稳) / down_rebound (反弹 3h 涨>0.5%). 反弹时 LONG 表现
+#         可能完全不同, 但当前 gate 不区分子状态, 把 rebound 也一刀切.
+#
+# 设计: 引入 allow-list — 列在 set 里的 sub_regime, 当 regime=down + direction=LONG
+#       同时命中时, 豁免 gate (允许 mirror). 默认 **空 set** = 与 4.J 完全一致.
+#
+# 启用前置 (用户审计, 不要凭直觉 flip):
+#   1) 跑 scripts/audit_sub_regime_paper_outcomes.py 拉 BTC 历史 1h K 线,
+#      把每笔 paper LONG trade 在 entered_at 时刻的 regime + sub_regime 重算
+#   2) 看 down + LONG 按 sub_regime 拆分的胜率 / 平均 PnL / 样本数
+#   3) 仅当 (sub == "down_rebound" 且 样本 ≥ 20 且 avg PnL > +$0.5) 才考虑放开
+#   4) 放开后用 LIVE_REGIME_GATE_SUB_REGIME_ALLOW = {"down_rebound"}, 观察 24-48h
+#
+# 安全特性:
+#   - default = set() → 任何 sub_regime 都不豁免 (与 Phase 4.J 100% 一致)
+#   - 仅影响 down + LONG 这一种组合; up / chop / SHORT 任何情形都不受影响
+#   - sub_regime = None (regime 非 down 或 klines 不足) 永远不豁免 (fail-safe)
+LIVE_REGIME_GATE_SUB_REGIME_ALLOW: set = set()  # 默认空 — 与 Phase 4.J 行为一致
 
 # 升级 SL 补偿 / wick filter 到 4-arm 一致 (B/C 分别对应)
 # Phase 4.Y (5/27): SL 补偿从 "abcd" (4-arm A/B 测试) 推广到 "always".
@@ -671,9 +823,10 @@ def is_eligible_for_mirror(
     if direction not in ("LONG", "SHORT"):
         return False, f"invalid direction {direction!r}"
     # 7. Phase 4.F regime gate (Phase 4.J 后默认 always — 全部组适用)
+    #    Phase 5.R: 传入 sub_regime, 命中 LIVE_REGIME_GATE_SUB_REGIME_ALLOW 则豁免
     # 只在 btc_regime 提供时才检查; 测试 / 旧调用不带此参数时跳过 (向后兼容)
     if btc_regime is not None and _ab_use_regime_gate(paper_id, LIVE_REGIME_GATE_MODE):
-        if _should_block_for_regime(direction, btc_regime):
+        if _should_block_for_regime(direction, btc_regime, btc_sub_regime):
             mode = LIVE_REGIME_GATE_MODE
             # Phase 4.K Shadow Log: 拒绝原因附带 sub_regime + 3h 动量,
             # 便于事后从 missed_signals 反查"down_rebound 时段被拒的 paper 信号"
@@ -685,6 +838,17 @@ def is_eligible_for_mirror(
                     sub_info += f" 3h={btc_change_3h_pct:+.2f}%"
             return False, (f"regime gate ({mode}): {btc_regime} regime + {direction} "
                           f"被拒{sub_info} (数据驱动: down+LONG 历史 0/10 胜 p=0.042)")
+        # Phase 5.R: gate 放行 down+LONG 时不在此处 log — is_eligible_for_mirror
+        # 每 tick 被调多次 (POLL_INTERVAL_SEC=5, 信号留存 10 分钟 → ~240 行 spam/signal).
+        # 真正的 [regime-gate-allow] log 在 _try_mirror_open 实际开仓时打,
+        # 通过 btc_sub_regime_at_open 字段 + log 同步, 每个 mirror 只 log 一次.
+    # 7b. Phase 5.S: regime size multiplier — 若该桶配置 mult=0.0, 等同于 reject.
+    #     仅当 btc_regime 提供且 LIVE_REGIME_SIZE_MULTIPLIER 非空时检查 (向后兼容).
+    if btc_regime is not None and LIVE_REGIME_SIZE_MULTIPLIER:
+        mult = _regime_size_multiplier(direction, btc_regime, btc_sub_regime)
+        if mult <= 0:
+            return False, (f"regime size multiplier=0 for ({direction}, "
+                          f"{btc_regime}, {btc_sub_regime or '—'}) (Phase 5.S: 该桶停 mirror)")
     # 8. Phase 4.M Funding gate: 拒 funding 不利信号 (≥ +0.05%, 任意方向)
     if LIVE_REJECT_ADVERSE_FUNDING:
         fs = _funding_signal(paper_trade)
@@ -1229,23 +1393,33 @@ def _ab_group(paper_id: str, n_groups: int = 4) -> str:
     return ["A", "B", "C", "D"][h % n_groups]
 
 
-def _should_block_for_regime(direction: str, regime: Optional[str]) -> bool:
-    """Phase 4.F regime gate 核心规则.
+def _should_block_for_regime(
+    direction: str,
+    regime: Optional[str],
+    sub_regime: Optional[str] = None,
+) -> bool:
+    """Phase 4.F regime gate 核心规则 (Phase 5.R: sub_regime aware).
 
     Args:
         direction: paper trade 方向, 'LONG' / 'SHORT' (会 upper())
         regime: 当前 BTC regime, 'up' / 'chop' / 'down' / None
+        sub_regime: 可选, Phase 4.K BTC down 内子状态. 当
+                    sub_regime ∈ LIVE_REGIME_GATE_SUB_REGIME_ALLOW 且
+                    regime=down + direction=LONG 时, 豁免本 gate (返 False).
+                    Default = None → 等同未传, 不豁免 (fail-safe).
 
     Returns:
         True 表示该 (regime, direction) 组合应该被拒绝 mirror.
 
-    当前规则:
-        - down + LONG  → True  (block, 数据驱动: 0/10 胜率 p=0.042)
-        - 其余组合     → False
+    当前规则 (Phase 5.R):
+        - down + LONG + sub_regime ∈ LIVE_REGIME_GATE_SUB_REGIME_ALLOW → False (放行)
+        - down + LONG (其它 sub_regime 或 None)                        → True  (拒)
+        - 其余组合                                                     → False
+        默认 ALLOW set = 空, 行为与 Phase 4.J 完全一致.
 
     设计原则:
         - 单功能: 只判规则, 不查 A/B/C/D 分组 (由 caller 判定是否该应用此规则)
-        - 防御性: 永远只能拒绝, 不能误开仓
+        - 防御性: 永远只能拒绝, 不能误开仓; allow-list 必须显式启用
         - 易扩展: 未来若数据证明 chop+SHORT 也该拒, 只需改这一处
     """
     if not regime or not direction:
@@ -1253,6 +1427,10 @@ def _should_block_for_regime(direction: str, regime: Optional[str]) -> bool:
     d = direction.upper()
     r = regime.lower()
     if r == "down" and d == "LONG":
+        # Phase 5.R: sub_regime 命中 allow-list → 豁免本 gate
+        # 注意: sub_regime 必须非空才能匹配, None 永远不被豁免
+        if sub_regime and sub_regime in LIVE_REGIME_GATE_SUB_REGIME_ALLOW:
+            return False
         return True
     return False
 
@@ -1651,15 +1829,27 @@ def _try_mirror_open(
         log.error(f"[mirror-open FAILED] {sym}: paper trade 缺关键字段: {e}")
         return None
 
-    # Phase 5.A: 按 conviction score 决定 notional ($400 / $800 / $200)
-    trade_notional = _live_notional_for_paper(paper_trade)
+    # Phase 5.A: 按 conviction score base notional ($400 / $800 / $200)
+    # Phase 5.S: × (direction, regime, sub_regime) multiplier (default 1.0 = 无变化)
+    base_notional = _live_notional_for_paper(paper_trade)
+    trade_notional = _live_notional_for_mirror(paper_trade, btc_regime)
     score = paper_trade.get("conviction_score")
 
-    log.info(
-        f"[mirror-open] {sym} {side} notional=${trade_notional} (score={score}) "
-        f"lev={LIVE_LEVERAGE}x sl={sl_price} "
-        f"paper_id={paper_id[:40]} → trade_id={trade_id}"
-    )
+    # 仅当 multiplier 真改变了 notional 才在 log 里 highlight, 否则简洁
+    if abs(trade_notional - base_notional) > 0.01:
+        mult = trade_notional / base_notional if base_notional > 0 else 1.0
+        log.info(
+            f"[mirror-open] {sym} {side} notional=${trade_notional:.0f} "
+            f"(base=${base_notional:.0f} × Phase 5.S mult={mult:.2f}) "
+            f"score={score} lev={LIVE_LEVERAGE}x sl={sl_price} "
+            f"paper_id={paper_id[:40]} → trade_id={trade_id}"
+        )
+    else:
+        log.info(
+            f"[mirror-open] {sym} {side} notional=${trade_notional:.0f} (score={score}) "
+            f"lev={LIVE_LEVERAGE}x sl={sl_price} "
+            f"paper_id={paper_id[:40]} → trade_id={trade_id}"
+        )
 
     # 1. 强制 set_leverage (防 Binance 默认 20x; 已有相同杠杆是 idempotent).
     #    失败 → 放弃本次 mirror, 下 tick 重试 (避免误用错的杠杆开仓).
@@ -1954,8 +2144,19 @@ def _try_mirror_open(
             live_trade["btc_pct_vs_ma25_at_open"] = btc_regime.get("pct_vs_ma25")
             # Phase 4.K Shadow Log: 在 down regime 时附带 sub_regime + 3h 动量,
             # 后续可按 sub_regime 切分 PnL, 验证 down_rebound 是否真的跟其它子状态不同.
-            live_trade["btc_sub_regime_at_open"] = btc_regime.get("sub_regime")
+            sub_regime_at_open = btc_regime.get("sub_regime")
+            live_trade["btc_sub_regime_at_open"] = sub_regime_at_open
             live_trade["btc_change_3h_at_open"] = btc_regime.get("change_3h_pct")
+            # Phase 5.R: 实际开仓时 log 一次 (每个 mirror 仅一次, 不会 spam).
+            # 仅在 allow-list 命中且属于 down+LONG 时打, 便于事后审计哪些 trade
+            # 是因 Phase 5.R 放开而 mirror.
+            if (btc_regime.get("regime") == "down"
+                    and side == "BUY"
+                    and sub_regime_at_open
+                    and sub_regime_at_open in LIVE_REGIME_GATE_SUB_REGIME_ALLOW):
+                log.info(f"[regime-gate-allow] {sym} {side} mirrored: "
+                         f"sub={sub_regime_at_open} (Phase 5.R, allow="
+                         f"{sorted(LIVE_REGIME_GATE_SUB_REGIME_ALLOW)})")
         return live_trade
     except Exception as e:
         # Phase 4.X: post-open 构造异常 — 仓位已在 exchange, 必须返回最小 live_trade
@@ -2195,7 +2396,9 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
 
             # Re-check cash reserve (mirror_candidates 计算时未含本轮已部署)
             # Phase 5.A: 用 score-based notional 而非固定 LIVE_NOTIONAL_USDT.
-            pt_notional = _live_notional_for_paper(pt)
+            # Phase 5.S: × regime multiplier — cash check 必须用 final notional, 否则
+            #            mult=1.5 时 cap 计算偏小, 会让超 cap 的 trade 漏过去开仓.
+            pt_notional = _live_notional_for_mirror(pt, btc_regime_snapshot)
             deployed_now = sum(
                 float(lt.get("notional_usdt", 0) or 0)
                 for lt in (live.get("live_open_trades") or [])
@@ -2203,7 +2406,7 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
             if deployed_now + pt_notional > LIVE_MAX_DEPLOY_USDT:
                 log.debug(
                     f"[skip-during-iter-cash] {pt['symbol']}: "
-                    f"deployed ${deployed_now:.0f} + ${pt_notional} "
+                    f"deployed ${deployed_now:.0f} + ${pt_notional:.0f} "
                     f"> cap ${LIVE_MAX_DEPLOY_USDT}"
                 )
                 continue
