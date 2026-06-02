@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-02T04:45:02.389513+00:00",
+  "updated_at": "2026-06-02T04:47:06.889776+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 44,
+  "alerts_count": 45,
   "alerts": [
+    {
+      "symbol": "STORJUSDT",
+      "base": "STORJ",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.0928,
+      "price_change_pct": -0.536,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 73921.0,
+      "volume_baseline_usdt": 1777.0,
+      "volume_ratio": 41.6,
+      "detected_at": "2026-06-02T04:46:58.961307+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.749,
+      "change_15m_pct": -0.855,
+      "change_1h_pct": -1.171,
+      "change_4h_pct": -2.006,
+      "taker_buy_ratio_1m": 0.015,
+      "taker_buy_ratio_5m": 0.031,
+      "oi_delta_5m_pct": 0.023,
+      "funding_rate_pct": -0.0004,
+      "atr_pct": 0.169,
+      "range_4h_pct": 3.45,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.09295714,
+      "suggested_tp1": 0.09256429,
+      "suggested_tp2": 0.09232857,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "MBOXUSDT",
       "base": "MBOX",
