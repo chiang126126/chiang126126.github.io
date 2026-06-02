@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-02T18:16:51.184778+00:00",
+  "generated_at": "2026-06-02T18:19:00.370106+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 854,
-    "open": 0,
+    "total_trades": 855,
+    "open": 1,
     "closed": 854,
     "wins": 268,
     "losses": 575,
@@ -15,30 +15,97 @@
     "avg_pnl_usdt": -0.2625,
     "best_trade_usdt": 63.1301,
     "worst_trade_usdt": -24.1805,
-    "fees_paid_usdt": 165.2321,
+    "fees_paid_usdt": 165.3821,
     "fees_realized_usdt": 165.2321,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.15,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 1610.6,
+    "deployed_usdt": 299.91,
+    "free_capital_usdt": 1310.55,
     "max_concurrent_slots": 4,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -52.027,
-    "deployed_usdt": 0
+    "deployed_usdt": 299.91
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "USELESSUSDT"
+    ],
+    "exchange_symbols": [
+      "USELESSUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "USELESSUSDT|SHORT|2026-06-02T18:17:34.029215+00:00",
+      "trade_id": "L1780424254_USELESS_S",
+      "symbol": "USELESSUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.09458,
+      "avg_fill_price": 0.0944,
+      "slippage_bps": 19.03,
+      "qty": 3177.0,
+      "notional_usdt": 299.9088,
+      "leverage": 1,
+      "risk_usdt": 3.5197,
+      "risk_pct": 1.174,
+      "mirror_latency_sec": 14.7,
+      "sl_price": 0.09532786,
+      "sl_paper_current": 0.09550786,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -0.00018,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 4,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.0471,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "C",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.09318821,
+      "tp2_price": 0.09179643,
+      "phase": "A",
+      "entry_order_id": 122888958,
+      "entry_client_id": "cresus_L1780424254_USELESS_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.654,
+      "top_trader_position_ratio": null,
+      "top_trader_account_ratio": null,
+      "global_account_ratio": null,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.149954,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-02T18:18:30.988957+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 67539.8,
+      "btc_change_24h_at_open": -5.499,
+      "btc_pct_vs_ma25_at_open": -3.353,
+      "btc_sub_regime_at_open": "down_stable",
+      "btc_change_3h_at_open": 0.432,
+      "phase_a_mfe_price": 0.09458,
+      "current_price": 0.0945,
+      "unrealized_pnl_usdt": -0.3177,
+      "unrealized_pnl_pct": -0.106,
+      "last_price_check_at": "2026-06-02T18:18:58.112176+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "TRIAUSDT|SHORT|2026-06-02T17:38:28.321563+00:00",
@@ -55370,28 +55437,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-02T18:11:58.675435+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=+0.43% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-06-02T18:16:49.435328+00:00"
-    },
-    {
-      "paper_id": "AAVEUSDT|LONG|2026-06-02T18:15:23.047058+00:00",
-      "symbol": "AAVEUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-06-02T18:16:11.733710+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=+0.43% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-06-02T18:16:49.435328+00:00"
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=+0.44% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-02T18:18:58.112176+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 67536.6,
-    "btc_ma25_1h": 69883.02,
-    "pct_vs_ma25": -3.358,
-    "change_24h_pct": -5.504,
+    "btc_price": 67543.2,
+    "btc_ma25_1h": 69883.28,
+    "pct_vs_ma25": -3.349,
+    "change_24h_pct": -5.494,
     "sub_regime": "down_stable",
-    "change_3h_pct": 0.427,
-    "computed_at": "2026-06-02T18:16:51.146829+00:00"
+    "change_3h_pct": 0.437,
+    "computed_at": "2026-06-02T18:19:00.049966+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
