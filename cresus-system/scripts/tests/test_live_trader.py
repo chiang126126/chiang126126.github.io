@@ -1953,7 +1953,7 @@ class TestPhase5SRegimeSizeMultiplier(unittest.TestCase):
     """Phase 5.S: _regime_size_multiplier — 按 (direction, regime, sub_regime) 查 multiplier.
 
     设计要点:
-    - 默认空 dict → 所有查询返 1.0 (= Phase 5.A 行为)
+    - 生产默认 dict 是 audit-driven 的 3 条; 测试用 setUp 清空隔离, 单独验证默认值.
     - lookup 优先级: 完全匹配 > (d, r, None) > (d, None, None) > 1.0
     - clamp 到 [MIN, MAX] = [0.0, 3.0]
     - direction 大小写 normalize, regime 大小写 normalize, sub_regime 精确匹配
@@ -1961,17 +1961,28 @@ class TestPhase5SRegimeSizeMultiplier(unittest.TestCase):
 
     def setUp(self):
         self._orig_mult = dict(live_trader.LIVE_REGIME_SIZE_MULTIPLIER)
+        # 单测期间清空 — 行为测试不应受生产默认配置干扰
+        live_trader.LIVE_REGIME_SIZE_MULTIPLIER = {}
 
     def tearDown(self):
         live_trader.LIVE_REGIME_SIZE_MULTIPLIER = self._orig_mult
 
-    def test_default_empty_dict(self):
-        """默认必须空 dict — 任何启用都需显式 flip."""
-        self.assertEqual(self._orig_mult, {},
-                        "Phase 5.S 默认 LIVE_REGIME_SIZE_MULTIPLIER 必须为空 dict")
+    def test_production_default_matches_audit_2026_06_02(self):
+        """生产默认必须 = 2026-06-02 audit 拍板的 3 条 (回归锁).
+        若有人改了, 此测试会爆 — 提醒必须有 audit 数据支持.
+        """
+        expected = {
+            ("LONG",  "chop", None):           1.5,
+            ("SHORT", "down", "down_stable"):  1.5,
+            ("LONG",  "down", "down_acute"):   0.5,
+        }
+        self.assertEqual(
+            self._orig_mult, expected,
+            "Phase 5.S 默认 LIVE_REGIME_SIZE_MULTIPLIER 与 audit 决策不一致"
+        )
 
-    def test_default_returns_one(self):
-        """空 dict 下任何 (d, r, sub) 都返 1.0."""
+    def test_empty_dict_returns_one(self):
+        """空 dict (test 隔离后) 下任何 (d, r, sub) 都返 1.0."""
         for combo in [
             ("LONG", "chop", None),
             ("SHORT", "down", "down_acute"),
@@ -2117,6 +2128,8 @@ class TestPhase5SLiveNotionalForMirror(unittest.TestCase):
 
     def setUp(self):
         self._orig_mult = dict(live_trader.LIVE_REGIME_SIZE_MULTIPLIER)
+        # 测试隔离 — 不受生产默认 mult 干扰
+        live_trader.LIVE_REGIME_SIZE_MULTIPLIER = {}
 
     def tearDown(self):
         live_trader.LIVE_REGIME_SIZE_MULTIPLIER = self._orig_mult
@@ -2194,6 +2207,8 @@ class TestPhase5SIsEligibleMultiplierZero(unittest.TestCase):
 
     def setUp(self):
         self._orig_mult = dict(live_trader.LIVE_REGIME_SIZE_MULTIPLIER)
+        # 测试隔离 — 不受生产默认 mult 干扰
+        live_trader.LIVE_REGIME_SIZE_MULTIPLIER = {}
 
     def tearDown(self):
         live_trader.LIVE_REGIME_SIZE_MULTIPLIER = self._orig_mult

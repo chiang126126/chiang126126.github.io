@@ -141,7 +141,21 @@ def _live_notional_for_paper(paper_trade: dict) -> float:
 #        n < 30 一律默认 1.0 (样本不足)
 #   4. 部署: 修改 LIVE_REGIME_SIZE_MULTIPLIER, 重启 live-trader
 #   5. 观察 24-48h, 用 fees-aware 日志 + per-bucket PnL 复盘
-LIVE_REGIME_SIZE_MULTIPLIER: "dict[tuple[str, Optional[str], Optional[str]], float]" = {}
+#
+# 2026-06-02 首次启用 (基于 audit_sub_regime_paper_outcomes.py --direction BOTH
+# 跑出的 21 天 2195 笔 paper realized PnL):
+#   LONG  chop  /—            n=797 avg=+$1.70 → ×1.5 (大样本中等 EV 倾斜)
+#   SHORT down  /down_stable  n=280 avg=+$1.85 → ×1.5 (大样本中等 EV 倾斜)
+#   LONG  down  /down_acute   n= 76 avg=-$0.19 → ×0.5 (唯一 marginal 负 EV)
+#                                              注: 当前 Phase 4.J 已拒 down+LONG,
+#                                              此条目是"防御纵深" — 若未来 Phase 5.R
+#                                              放开此 sub_regime, 此 ×0.5 自动接管.
+#   其它桶未设 → mult 默认 1.0 (维持 Phase 5.A 行为)
+LIVE_REGIME_SIZE_MULTIPLIER: "dict[tuple[str, Optional[str], Optional[str]], float]" = {
+    ("LONG",  "chop", None):           1.5,
+    ("SHORT", "down", "down_stable"):  1.5,
+    ("LONG",  "down", "down_acute"):   0.5,
+}
 LIVE_REGIME_SIZE_MULT_MIN = 0.0   # 允许 cut to zero (该桶完全停 mirror)
 LIVE_REGIME_SIZE_MULT_MAX = 3.0   # 单笔不允许超 3 倍 base
 LIVE_MAX_NOTIONAL_PER_TRADE = 2000.0  # 单笔绝对上限, multiplier 后兜底
