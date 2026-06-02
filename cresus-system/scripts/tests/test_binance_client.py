@@ -1418,6 +1418,160 @@ class TestPhase5AMaxQtyAndChunking(unittest.TestCase):
         self.assertIsNone(mock_place.call_args_list[1].kwargs["client_order_id"])
 
 
+class TestPhase5TEntryPriceSafetyAndPnlGuard(unittest.TestCase):
+    """Phase 5.T (2026-06-02 hotfix): close_position 防 Binance API entryPrice 错位 bug.
+
+    实际事件: DOGSUSDT 2026-06-02 14:31 收到 API entryPrice 4.82e-04 (10x 错,
+    真实 4.82e-05), pnl 计算 (entry - exit) * qty 把 10x entry 误差放大成
+    ~600x pnl 误差 ($3 真值 → $1803 错值).
+
+    本类覆盖:
+    - expected_entry_price 不传 → 老行为 (使用 API entryPrice)
+    - expected_entry_price 传, 与 API 一致 → 用 expected, source='expected'
+    - expected_entry_price 传, 与 API 偏离 > 1% → log warning + 用 expected
+    - PnL 绝对量 > 5×notional → realized_pnl_suspect=True + log error
+    - DOGSUSDT 真实复现: API 10x bug → expected 正确, PnL 正常
+    """
+
+    def setUp(self):
+        self.client = BinanceClient(
+            FAKE_KEY, FAKE_SECRET, testnet=True, dry_run=False,
+        )
+        self.client._bucket.acquire = MagicMock(return_value=True)
+        self.fake_filters = {
+            "step_size": 0.00001, "min_qty": 1.0, "max_qty": 100_000_000.0,
+            "market_max_qty": 100_000_000.0, "min_notional": 5.0,
+            "tick_size": 1e-8, "quantity_precision": 0, "price_precision": 8,
+            "status": "TRADING",
+        }
+
+    def _close_with_pos(
+        self, api_entry, exit_price, qty, expected_entry=None, side="SELL",
+    ):
+        """Helper: 执行一次 close_position, 返回 result + 期间 log.warning/error 计数."""
+        positions = [{
+            "symbol": "DOGSUSDT",
+            "positionAmt": str(-qty if side == "SELL" else qty),
+            "entryPrice": str(api_entry),
+        }]
+        # cum_quote 模拟 actual fills
+        mock_place = MagicMock(return_value={
+            "orderId": 999, "executedQty": str(qty),
+            "cumQuote": str(qty * exit_price), "avgPrice": str(exit_price),
+        })
+        warn_count = [0]
+        err_count = [0]
+        import binance_client as bc
+        orig_warn = bc.log.warning
+        orig_err = bc.log.error
+        bc.log.warning = lambda *a, **k: (warn_count.__setitem__(0, warn_count[0]+1), orig_warn(*a, **k))
+        bc.log.error = lambda *a, **k: (err_count.__setitem__(0, err_count[0]+1), orig_err(*a, **k))
+        try:
+            with patch.object(self.client, "get_positions", return_value=positions), \
+                 patch.object(self.client, "get_symbol_filters", return_value=self.fake_filters), \
+                 patch.object(self.client, "get_open_orders", return_value=[]), \
+                 patch.object(self.client, "place_market_order", mock_place), \
+                 patch.object(self.client, "_actual_commission_usdt", return_value=None):
+                kwargs = {"trade_id": "tphase5t"}
+                if expected_entry is not None:
+                    kwargs["expected_entry_price"] = expected_entry
+                result = self.client.close_position("DOGSUSDT", side, **kwargs)
+        finally:
+            bc.log.warning = orig_warn
+            bc.log.error = orig_err
+        return result, warn_count[0], err_count[0]
+
+    def test_no_expected_falls_back_to_api(self):
+        """不传 expected_entry_price → 用 API entryPrice (向后兼容)."""
+        result, _, _ = self._close_with_pos(
+            api_entry=4.82e-05, exit_price=4.747e-05, qty=4149377,
+        )
+        self.assertEqual(result["entry_price"], 4.82e-05)
+        self.assertEqual(result["entry_price_source"], "binance_api")
+        # PnL (entry - exit) * qty = 7.3e-7 * 4149377 ≈ $3.03
+        self.assertAlmostEqual(result["realized_pnl_usdt"], 3.029, places=2)
+        self.assertFalse(result["realized_pnl_suspect"])
+
+    def test_expected_matches_api_uses_expected(self):
+        """expected 与 API 一致 → 用 expected, source 标记 expected, 无 warning."""
+        result, warns, _ = self._close_with_pos(
+            api_entry=4.82e-05, exit_price=4.747e-05, qty=4149377,
+            expected_entry=4.82e-05,
+        )
+        self.assertEqual(result["entry_price"], 4.82e-05)
+        self.assertEqual(result["entry_price_source"], "expected")
+        self.assertEqual(warns, 0, "<1% 偏差不应 log warning")
+        self.assertAlmostEqual(result["realized_pnl_usdt"], 3.029, places=2)
+
+    def test_dogsusdt_real_bug_scenario_api_10x_off(self):
+        """实测复现: API entryPrice 10x 错, expected 是真值 → PnL 不再爆 $1803.
+
+        DOGSUSDT 14:31: API 返回 4.82e-04 (10x 错), 真实 4.82e-05.
+        老代码: PnL = (4.82e-04 - 4.747e-05) * 4149377 = $1803 ❌
+        Phase 5.T: 用 expected → PnL = (4.82e-05 - 4.747e-05) * 4149377 = $3.03 ✅
+        """
+        result, warns, _ = self._close_with_pos(
+            api_entry=4.82e-04,  # ← Binance 错值 (10x)
+            exit_price=4.747e-05,
+            qty=4149377,
+            expected_entry=4.82e-05,  # ← 本地权威 (open_position 实际成交)
+        )
+        self.assertEqual(result["entry_price"], 4.82e-05, "应用 expected 而非 API")
+        self.assertEqual(result["entry_price_source"], "expected")
+        self.assertGreater(warns, 0, "10x 偏差必须 log warning")
+        self.assertAlmostEqual(result["realized_pnl_usdt"], 3.029, places=1,
+                              msg="修复后 PnL 应回到真实 $3.03, 不再爆 $1803")
+        self.assertFalse(result["realized_pnl_suspect"],
+                        "用 expected 后 PnL 在合理范围, 不应触发 sanity flag")
+
+    def test_pnl_sanity_guard_flags_extreme(self):
+        """PnL > 5×notional → realized_pnl_suspect=True.
+
+        构造场景: 即便有 expected_entry_price, exit_price 异常仍可能让 PnL 失真.
+        e.g. exit_price 极接近 0 (币归零) → 1x notional 全赚, 5x notional 必是 bug.
+        """
+        # qty=100, expected_entry=1.0, exit=0.001 (跌 99.9% → SHORT PnL ≈ qty * 0.999)
+        # notional_at_exit = qty * exit = 100 * 0.001 = 0.1
+        # PnL = (1.0 - 0.001) * 100 = 99.9
+        # 99.9 / (5 * 0.1) = 199 > 5 → suspect
+        result, _, errs = self._close_with_pos(
+            api_entry=1.0, exit_price=0.001, qty=100,
+            expected_entry=1.0,
+        )
+        self.assertTrue(result["realized_pnl_suspect"])
+        self.assertGreater(errs, 0, "异常 PnL 必须 log error")
+
+    def test_pnl_normal_no_suspect_flag(self):
+        """正常 PnL 不应被错标 suspect."""
+        # 标准 LONG: entry 100, exit 102, qty 10 → PnL +$20, notional $1020. 远 < 5×.
+        result, _, _ = self._close_with_pos(
+            api_entry=100.0, exit_price=102.0, qty=10,
+            expected_entry=100.0, side="BUY",
+        )
+        self.assertFalse(result["realized_pnl_suspect"])
+        self.assertAlmostEqual(result["realized_pnl_usdt"], 20.0, places=2)
+
+    def test_expected_zero_or_negative_falls_back_to_api(self):
+        """expected_entry_price <= 0 (或 None) → fallback API (防误传)."""
+        result, _, _ = self._close_with_pos(
+            api_entry=4.82e-05, exit_price=4.747e-05, qty=4149377,
+            expected_entry=0.0,  # ← falsy
+        )
+        self.assertEqual(result["entry_price"], 4.82e-05)
+        self.assertEqual(result["entry_price_source"], "binance_api",
+                        "expected=0 视为未传, 回退 API")
+
+    def test_dry_run_includes_phase5t_fields(self):
+        """dry_run 也返 Phase 5.T 新字段 (供 caller 类型一致地处理)."""
+        result = self.client.close_position(
+            "BTCUSDT", "BUY", trade_id="t", dry_run=True,
+        )
+        self.assertIn("realized_pnl_suspect", result)
+        self.assertIn("entry_price_source", result)
+        self.assertEqual(result["entry_price_source"], "dry_run")
+        self.assertFalse(result["realized_pnl_suspect"])
+
+
 # ============================================================================
 
 if __name__ == "__main__":

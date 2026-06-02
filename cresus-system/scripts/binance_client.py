@@ -1308,10 +1308,20 @@ class BinanceClient:
         *,
         trade_id: Optional[str] = None,
         dry_run: Optional[bool] = None,
+        expected_entry_price: Optional[float] = None,
     ) -> dict:
         """主动平仓 (timeout / 手动 kill / TP2 触发 / 等).
 
         side: 持仓的开仓方向 (BUY=LONG, SELL=SHORT). 平仓方向自动反.
+
+        Args:
+            expected_entry_price: Phase 5.T (2026-06-02 hotfix). 可选, 调用方
+                                  本地记录的入场成交价 (open_position 返回的
+                                  avg_fill_price). 若提供, 优先使用本地权威值
+                                  计算 realized PnL — 而不是 Binance positionRisk
+                                  返回的 entryPrice (testnet 微小币上偶尔返回
+                                  10x 错值, 见 DOGSUSDT 2026-06-02 14:31 事件).
+                                  不传 → fallback 到 API entryPrice (向后兼容).
 
         流程:
         1. 拉持仓, 验证存在且方向匹配
@@ -1336,8 +1346,10 @@ class BinanceClient:
                 "side": side,
                 "qty_closed": 0.0,
                 "entry_price": 0.0,
+                "entry_price_source": "dry_run",  # Phase 5.T
                 "avg_exit_price": 0.0,
                 "realized_pnl_usdt": 0.0,
+                "realized_pnl_suspect": False,  # Phase 5.T
                 "fees_paid_usdt": 0.0,
                 "fees_are_actual": False,
                 "close_order_id": -1,
@@ -1366,7 +1378,32 @@ class BinanceClient:
                 f"(LONG={expected_long}), 实际 positionAmt={pos_amt}"
             )
         qty = abs(pos_amt)
-        entry_price = float(pos.get("entryPrice") or 0)
+        api_entry_price = float(pos.get("entryPrice") or 0)
+
+        # Phase 5.T (2026-06-02 hotfix): 防 Binance API entryPrice 错位 bug.
+        # 实际事件: DOGSUSDT 2026-06-02 14:31 收到 API entryPrice 4.82e-04 (10x 错,
+        # 真实 4.82e-05), pnl 计算 (entry - exit) * qty 把 10x entry 误差放大成
+        # ~600x pnl 误差 ($3 真值 → $1803 错值).
+        # 解法: caller 传 expected_entry_price (= 开仓时本地记录的 avg_fill_price,
+        # 是 open_position 的真实成交价, 比 API 累计均价更可信). 优先用本地权威值.
+        # 偏离 > 1% → log 警告 (帮助发现 API 异常的频率). 不传 → 保留 API 行为.
+        if expected_entry_price is not None and expected_entry_price > 0:
+            if api_entry_price > 0:
+                deviation_pct = (
+                    abs(api_entry_price - expected_entry_price)
+                    / expected_entry_price * 100.0
+                )
+                if deviation_pct > 1.0:
+                    log.warning(
+                        f"close_position {symbol}: Binance pos.entryPrice="
+                        f"{api_entry_price} 与 caller-provided "
+                        f"expected_entry_price={expected_entry_price} 偏离 "
+                        f"{deviation_pct:.2f}%, 用 expected (本地权威, "
+                        f"防 testnet 微小币 API entryPrice glitch)"
+                    )
+            entry_price = expected_entry_price
+        else:
+            entry_price = api_entry_price
 
         # 2. 撤该 symbol 所有挂单 (避免和平仓 race)
         canceled = 0
@@ -1447,6 +1484,21 @@ class BinanceClient:
         else:
             pnl = (entry_price - exit_price) * qty
 
+        # Phase 5.T 防御层: PnL 绝对量 sanity guard.
+        # 1x 杠杆下, 单笔 PnL 上限理论 = 100% × notional (币归零 SHORT 全赚 / LONG 全亏).
+        # > 5× notional 必是某个输入错位 (entry / exit / qty 任一异常). 不擦写值,
+        # 但加 realized_pnl_suspect=True 标记 + log error, 供 dashboard / 复盘核对.
+        realized_pnl_suspect = False
+        notional_at_exit = qty * exit_price if exit_price > 0 else 0.0
+        if notional_at_exit > 0 and abs(pnl) > 5.0 * notional_at_exit:
+            log.error(
+                f"close_position {symbol}: SUSPECT PnL=${pnl:.2f} > 5×notional="
+                f"${5*notional_at_exit:.2f}. entry={entry_price} exit={exit_price} "
+                f"qty={qty} side={side}. 标记 realized_pnl_suspect=True, "
+                f"数据需人工核对 (caller 应考虑传 expected_entry_price)."
+            )
+            realized_pnl_suspect = True
+
         # 实际 close commission (回退到估算)
         close_fee_estimate = round(close_cum_quote * 0.0004, 4)
         actual_close_fee = None
@@ -1463,8 +1515,14 @@ class BinanceClient:
             "side": side,
             "qty_closed": qty,
             "entry_price": entry_price,
+            "entry_price_source": (
+                "expected" if expected_entry_price is not None
+                              and expected_entry_price > 0
+                else "binance_api"
+            ),  # Phase 5.T: 让 caller / 审计知道 entry 来源
             "avg_exit_price": exit_price,
             "realized_pnl_usdt": round(pnl, 4),
+            "realized_pnl_suspect": realized_pnl_suspect,  # Phase 5.T sanity flag
             "fees_paid_usdt": close_fee,
             "fees_are_actual": close_fee_is_actual,
             "close_order_id": close_order_id_int,

@@ -1720,9 +1720,17 @@ def _try_mirror_close(
     side = live_trade.get("side", "")
     trade_id = live_trade.get("trade_id", "")
     log.info(f"[mirror-close] {sym} {side} reason={reason} trade_id={trade_id}")
+    # Phase 5.T (2026-06-02 hotfix): 传开仓时本地记录的 avg_fill_price 作为
+    # expected_entry_price, 防 Binance API positionRisk.entryPrice 在微小币上
+    # 偶尔返回 10x 错值 (DOGSUSDT 14:31 事件: PnL 从真值 $3 变成 $1803).
+    try:
+        local_entry = float(live_trade.get("avg_fill_price") or 0)
+    except (TypeError, ValueError):
+        local_entry = 0.0
     try:
         result = client.close_position(
             symbol=sym, side=side, trade_id=trade_id,
+            expected_entry_price=local_entry if local_entry > 0 else None,
         )
     except (BinanceError, ValueError) as e:
         err_str = str(e)
@@ -1764,6 +1772,9 @@ def _try_mirror_close(
     closed["realized_pnl_usdt"] = float(result.get("realized_pnl_usdt") or 0)
     closed["close_order_id"] = result.get("close_order_id")
     closed["close_qty"] = float(result.get("qty_closed") or 0)
+    # Phase 5.T: 传 sanity flags 到 trade record, 供 dashboard 显示警告
+    closed["realized_pnl_suspect"] = bool(result.get("realized_pnl_suspect", False))
+    closed["entry_price_source"] = result.get("entry_price_source", "binance_api")
 
     # 平仓 slippage (期望价 vs 实际成交).
     #   SL 触发: 期望 = sl_price (我们设的止损)
@@ -1979,8 +1990,11 @@ def _try_mirror_open(
             )
             emergency_fees = 0.0
             try:
+                # Phase 5.T: 应急平仓也传本地 actual_fill 作 expected_entry_price,
+                # 防 Binance positionRisk.entryPrice 异常导致 emergency PnL 失真.
                 close_result = client.close_position(
                     symbol=sym, side=side, trade_id=trade_id,
+                    expected_entry_price=actual_fill if actual_fill > 0 else None,
                 )
                 emergency_fees = float(close_result.get("fees_paid_usdt") or 0)
                 log.info(f"[post-fill-emergency] {sym} 应急平仓完成")
