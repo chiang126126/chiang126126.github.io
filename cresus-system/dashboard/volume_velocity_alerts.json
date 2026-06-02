@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-02T01:34:27.281339+00:00",
+  "updated_at": "2026-06-02T01:36:31.520789+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 25,
+  "alerts_count": 26,
   "alerts": [
+    {
+      "symbol": "SEIUSDT",
+      "base": "SEI",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 0.0702,
+      "price_change_pct": -1.57,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 166669.0,
+      "volume_baseline_usdt": 31108.0,
+      "volume_ratio": 5.36,
+      "detected_at": "2026-06-02T01:35:51.329050+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.835,
+      "change_15m_pct": -1.267,
+      "change_1h_pct": -1.212,
+      "change_4h_pct": -1.017,
+      "taker_buy_ratio_1m": 0.693,
+      "taker_buy_ratio_5m": 0.276,
+      "oi_delta_5m_pct": 0.044,
+      "funding_rate_pct": 0.01,
+      "atr_pct": 0.324,
+      "range_4h_pct": 3.48,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.07042714,
+      "suggested_tp1": 0.06985929,
+      "suggested_tp2": 0.06951857,
+      "conviction_score": 3,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "SEIUSDT",
       "base": "SEI",
