@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-02T22:58:25.184512+00:00",
+  "generated_at": "2026-06-02T23:00:20.816842+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 867,
@@ -58,8 +58,8 @@
       "risk_usdt": 4.581,
       "risk_pct": 1.528,
       "mirror_latency_sec": 5.1,
-      "sl_price": 228.42785714,
-      "sl_paper_current": 230.45785714,
+      "sl_price": 226.99,
+      "sl_paper_current": 229.02,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": -2.03,
       "sl_compensation_mode": "always",
@@ -75,7 +75,7 @@
       "min_conviction_threshold": null,
       "tp1_price": 226.86321429,
       "tp2_price": 224.70642857,
-      "phase": "A",
+      "phase": "B",
       "entry_order_id": 227961177,
       "entry_client_id": "cresus_L1780440750_TAOUSDT_S_E",
       "sl_order_id": null,
@@ -86,8 +86,8 @@
       "top_trader_position_ratio": null,
       "top_trader_account_ratio": null,
       "global_account_ratio": null,
-      "phase_a_mfe_pct": 0.694,
-      "phase_b_mfe_pct": null,
+      "phase_a_mfe_pct": 1.144,
+      "phase_b_mfe_pct": 1.144,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.149927,
       "fees_are_actual": true,
@@ -99,11 +99,12 @@
       "btc_pct_vs_ma25_at_open": -3.537,
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.698,
-      "phase_a_mfe_price": 227.43,
-      "current_price": 227.31,
-      "unrealized_pnl_usdt": -0.4227,
-      "unrealized_pnl_pct": -0.141,
-      "last_price_check_at": "2026-06-02T22:58:22.550153+00:00"
+      "phase_a_mfe_price": 226.4,
+      "current_price": 226.06,
+      "unrealized_pnl_usdt": 1.2285,
+      "unrealized_pnl_pct": 0.41,
+      "last_price_check_at": "2026-06-02T23:00:19.350107+00:00",
+      "phase_b_mfe_price": 226.4
     }
   ],
   "recent_closed": [
@@ -56324,16 +56325,35 @@
       "close_qty": 53792.0
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "SEIUSDT|SHORT|2026-06-02T22:59:25.461824+00:00",
+      "symbol": "SEIUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-06-02T23:00:16.064410+00:00",
+      "reason": "circuit_breaker (4+ SL in 30min, pause until 2026-06-02T23:28:11)",
+      "last_checked_at": "2026-06-02T23:00:19.350107+00:00"
+    },
+    {
+      "paper_id": "SPXUSDT|SHORT|2026-06-02T23:00:02.441176+00:00",
+      "symbol": "SPXUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-06-02T23:00:16.064410+00:00",
+      "reason": "circuit_breaker (4+ SL in 30min, pause until 2026-06-02T23:28:11)",
+      "last_checked_at": "2026-06-02T23:00:19.350107+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 66602.7,
-    "btc_ma25_1h": 69213.42,
-    "pct_vs_ma25": -3.772,
-    "change_24h_pct": -6.717,
-    "sub_regime": "down_stable",
-    "change_3h_pct": -0.949,
-    "computed_at": "2026-06-02T22:58:24.862414+00:00"
+    "btc_price": 66456.0,
+    "btc_ma25_1h": 69022.48,
+    "pct_vs_ma25": -3.718,
+    "change_24h_pct": -6.893,
+    "sub_regime": "down_acute",
+    "change_3h_pct": -1.633,
+    "computed_at": "2026-06-02T23:00:20.482385+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
