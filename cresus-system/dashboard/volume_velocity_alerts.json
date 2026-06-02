@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-02T21:58:57.495129+00:00",
+  "updated_at": "2026-06-02T22:01:04.738389+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 20,
+  "alerts_count": 21,
   "alerts": [
+    {
+      "symbol": "EPICUSDT",
+      "base": "EPIC",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.3921,
+      "price_change_pct": -1.507,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 141456.0,
+      "volume_baseline_usdt": 11116.0,
+      "volume_ratio": 12.73,
+      "detected_at": "2026-06-02T22:00:13.035569+00:00",
+      "intensity": 3,
+      "change_5m_pct": -1.728,
+      "change_15m_pct": -2.316,
+      "change_1h_pct": -1.506,
+      "change_4h_pct": 4.114,
+      "taker_buy_ratio_1m": 0.673,
+      "taker_buy_ratio_5m": 0.645,
+      "oi_delta_5m_pct": 0.045,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.556,
+      "range_4h_pct": 9.31,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.39536786,
+      "suggested_tp1": 0.38719821,
+      "suggested_tp2": 0.38229643,
+      "conviction_score": 0,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "EDGEUSDT",
       "base": "EDGE",
