@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-02T05:51:48.939609+00:00",
+  "updated_at": "2026-06-02T05:53:53.259879+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 34,
+  "alerts_count": 35,
   "alerts": [
+    {
+      "symbol": "XPLUSDT",
+      "base": "XPL",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.0927,
+      "price_change_pct": -0.856,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 286468.0,
+      "volume_baseline_usdt": 26451.0,
+      "volume_ratio": 10.83,
+      "detected_at": "2026-06-02T05:53:12.650513+00:00",
+      "intensity": 2,
+      "change_5m_pct": -1.282,
+      "change_15m_pct": -1.282,
+      "change_1h_pct": -1.387,
+      "change_4h_pct": 0.217,
+      "taker_buy_ratio_1m": 0.43,
+      "taker_buy_ratio_5m": 0.445,
+      "oi_delta_5m_pct": 0.034,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.393,
+      "range_4h_pct": 7.23,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.09324643,
+      "suggested_tp1": 0.09188036,
+      "suggested_tp2": 0.09106071,
+      "conviction_score": 1,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "PARTIUSDT",
       "base": "PARTI",
