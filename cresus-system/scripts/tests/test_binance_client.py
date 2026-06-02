@@ -1524,22 +1524,56 @@ class TestPhase5TEntryPriceSafetyAndPnlGuard(unittest.TestCase):
         self.assertFalse(result["realized_pnl_suspect"],
                         "用 expected 后 PnL 在合理范围, 不应触发 sanity flag")
 
-    def test_pnl_sanity_guard_flags_extreme(self):
-        """PnL > 5×notional → realized_pnl_suspect=True.
+    def test_pnl_sanity_guard_flags_extreme_relative_to_exit(self):
+        """PnL > 5×(qty×exit_price) → realized_pnl_suspect=True.
 
-        构造场景: 即便有 expected_entry_price, exit_price 异常仍可能让 PnL 失真.
-        e.g. exit_price 极接近 0 (币归零) → 1x notional 全赚, 5x notional 必是 bug.
+        ⚠️ 设计语义: 这是 proxy for input corruption, 不是 "PnL 大 = 假".
+        - 正常 bug 场景 (DOGSUSDT API entryPrice 10x off): guard 抓住
+        - 极端真合法场景 (LUNA-style 99.9% 崩盘 SHORT): guard 也会标记 — operator
+          需查 log 区分. suspect=True 仅是 *标记*, 不擦写 PnL, 所以即使误报真崩盘,
+          数据仍保留可查; dashboard 展示警告灯, 等人工 confirm.
+        - 设计取舍: 微小币 API 错位是真实见过的, LUNA-style 是百年遇一次的事件.
+          guard 阈值偏严 (宁可偶尔误报真崩盘也要抓住 API 错位).
+
+        本测试用全崩盘场景验证 *guard 真会触发*; 不代表崩盘 PnL = bug.
         """
         # qty=100, expected_entry=1.0, exit=0.001 (跌 99.9% → SHORT PnL ≈ qty * 0.999)
         # notional_at_exit = qty * exit = 100 * 0.001 = 0.1
         # PnL = (1.0 - 0.001) * 100 = 99.9
-        # 99.9 / (5 * 0.1) = 199 > 5 → suspect
+        # 99.9 / (5 * 0.1) = 199 > 5 → suspect (此处是 *guard 测试*, 非语义判定)
         result, _, errs = self._close_with_pos(
             api_entry=1.0, exit_price=0.001, qty=100,
             expected_entry=1.0,
         )
         self.assertTrue(result["realized_pnl_suspect"])
-        self.assertGreater(errs, 0, "异常 PnL 必须 log error")
+        self.assertGreater(errs, 0, "guard 触发必须 log error")
+        # 关键: PnL 没被擦写, 真值保留 (suspect 是 flag 不是 clamp)
+        self.assertAlmostEqual(result["realized_pnl_usdt"], 99.9, places=1)
+
+    def test_pnl_guard_catches_when_expected_also_wrong(self):
+        """双重防御: caller 传错的 expected, sanity guard 兜底 catch.
+
+        场景: caller 传 expected=10 但实际真值 1.0, exit=0.5, qty=100.
+        - 用 expected=10 算 PnL: (10 - 0.5) * 100 = $950
+        - notional_at_exit = 100 * 0.5 = $50
+        - 950 / 50 = 19 > 5 → suspect=True ✅
+
+        验证 L1 (expected override) 不是唯一防线, L3 (5×notional guard)
+        在 L1 失效时仍能标记.
+        """
+        result, _, errs = self._close_with_pos(
+            api_entry=1.0,           # API 是真值
+            exit_price=0.5,
+            qty=100,
+            expected_entry=10.0,     # caller 传错值 (10x 太大)
+        )
+        # L1 用了 expected (= 10), 算出 PnL=950
+        self.assertAlmostEqual(result["realized_pnl_usdt"], 950.0, places=1)
+        # L3 兜底标记 suspect, log error
+        self.assertTrue(result["realized_pnl_suspect"],
+                       "expected 错了, sanity guard 必须 catch")
+        self.assertGreater(errs, 0)
+        self.assertEqual(result["entry_price_source"], "expected")
 
     def test_pnl_normal_no_suspect_flag(self):
         """正常 PnL 不应被错标 suspect."""

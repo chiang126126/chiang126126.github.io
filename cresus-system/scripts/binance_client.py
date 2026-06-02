@@ -1034,7 +1034,18 @@ class BinanceClient:
                         f"防孤儿."
                     )
                     try:
-                        self.close_position(symbol=symbol, side=side, dry_run=False)
+                        # Phase 5.T: 传 partial fill 的 avgPrice 作 expected_entry_price,
+                        # 防 positionRisk API entryPrice 异常导致 emergency PnL 失真.
+                        try:
+                            ioc_partial_avg = float(entry_resp.get("avgPrice") or 0)
+                        except (TypeError, ValueError):
+                            ioc_partial_avg = 0.0
+                        self.close_position(
+                            symbol=symbol, side=side, dry_run=False,
+                            expected_entry_price=(
+                                ioc_partial_avg if ioc_partial_avg > 0 else None
+                            ),
+                        )
                         log.info(
                             f"[open_position] IOC partial fill 已应急平仓: {symbol}"
                         )

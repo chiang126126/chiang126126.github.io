@@ -2839,6 +2839,82 @@ class TestTryMirrorClose(unittest.TestCase):
         # 总额仍正确累加
         self.assertAlmostEqual(result["fees_paid_usdt"], 0.0155, places=6)
 
+    # === Phase 5.T integration: _try_mirror_close 传 avg_fill_price + 写 suspect flag ===
+
+    def test_phase5t_passes_avg_fill_price_as_expected_entry(self):
+        """Phase 5.T: _try_mirror_close 必须读 live_trade['avg_fill_price'] 并
+        作为 expected_entry_price 传给 close_position. 防 Binance API entryPrice
+        异常导致 PnL 失真 (DOGSUSDT 14:31 bug)."""
+        lt = dict(self.live_trade)
+        lt["avg_fill_price"] = 4.82e-05   # 本地权威 entry (DOGSUSDT 案例值)
+        captured = {}
+
+        def capture_close(**kwargs):
+            captured.update(kwargs)
+            return self.mock_close
+
+        with patch.object(self.client, "close_position",
+                          side_effect=capture_close):
+            _try_mirror_close(
+                self.client, lt, reason="sl_breach_client", dry_run=True,
+            )
+        self.assertEqual(captured.get("expected_entry_price"), 4.82e-05,
+                        "必须传 avg_fill_price 作 expected_entry_price")
+
+    def test_phase5t_no_avg_fill_price_passes_none(self):
+        """avg_fill_price 缺 / 为 0 → expected_entry_price=None (fallback API)."""
+        lt = dict(self.live_trade)
+        # 不设 avg_fill_price
+        captured = {}
+
+        def capture_close(**kwargs):
+            captured.update(kwargs)
+            return self.mock_close
+
+        with patch.object(self.client, "close_position",
+                          side_effect=capture_close):
+            _try_mirror_close(
+                self.client, lt, reason="sl_breach_client", dry_run=True,
+            )
+        self.assertIsNone(captured.get("expected_entry_price"),
+                         "无本地 entry → 传 None, close_position fallback API")
+
+    def test_phase5t_persists_suspect_flag_and_source(self):
+        """Phase 5.T: close 返的 realized_pnl_suspect + entry_price_source
+        必须写进 closed trade record, 供 dashboard 标红警告."""
+        lt = dict(self.live_trade)
+        lt["avg_fill_price"] = 4.82e-05
+        # 模拟 close_position 返 suspect=True (sanity guard 触发场景)
+        suspect_close = dict(self.mock_close)
+        suspect_close["realized_pnl_suspect"] = True
+        suspect_close["entry_price_source"] = "expected"
+
+        with patch.object(self.client, "close_position",
+                          return_value=suspect_close):
+            r = _try_mirror_close(
+                self.client, lt, reason="sl_breach_client", dry_run=True,
+            )
+        self.assertTrue(r["realized_pnl_suspect"])
+        self.assertEqual(r["entry_price_source"], "expected")
+
+    def test_phase5t_invalid_avg_fill_price_falls_back(self):
+        """avg_fill_price 是非数字 (TypeError/ValueError) → 不崩, 传 None."""
+        lt = dict(self.live_trade)
+        lt["avg_fill_price"] = "not-a-number"   # 故意脏数据
+        captured = {}
+
+        def capture_close(**kwargs):
+            captured.update(kwargs)
+            return self.mock_close
+
+        with patch.object(self.client, "close_position",
+                          side_effect=capture_close):
+            r = _try_mirror_close(
+                self.client, lt, reason="sl_breach_client", dry_run=True,
+            )
+        self.assertIsNone(captured.get("expected_entry_price"))
+        self.assertIsNotNone(r, "脏数据不应让 mirror close 崩")
+
 
 class TestMainLoopPhase32b(unittest.TestCase):
     """Phase 3.2.b: 三种 close 触发 + sync from paper."""
