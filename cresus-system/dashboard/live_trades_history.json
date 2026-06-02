@@ -1,29 +1,29 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-02T03:17:04.354264+00:00",
+  "generated_at": "2026-06-02T03:19:01.586724+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 828,
-    "open": 1,
-    "closed": 827,
+    "open": 0,
+    "closed": 828,
     "wins": 259,
-    "losses": 558,
+    "losses": 559,
     "win_rate": 0.317,
-    "total_pnl_usdt": -194.9891,
-    "net_pnl_usdt": -353.2615,
-    "avg_pnl_usdt": -0.2358,
+    "total_pnl_usdt": -203.3381,
+    "net_pnl_usdt": -362.0147,
+    "avg_pnl_usdt": -0.2456,
     "best_trade_usdt": 63.1301,
     "worst_trade_usdt": -24.1805,
-    "fees_paid_usdt": 158.4724,
-    "fees_realized_usdt": 158.2724,
-    "fees_open_usdt": 0.2,
+    "fees_paid_usdt": 158.6766,
+    "fees_realized_usdt": 158.6766,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 399.99,
-    "free_capital_usdt": 1246.55,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 1637.99,
     "max_concurrent_slots": 4,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
@@ -42,7 +42,8 @@
       "VICUSDT"
     ]
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "VICUSDT|SHORT|2026-06-02T03:15:51.999232+00:00",
       "trade_id": "L1780370151_VICUSDT_S",
@@ -66,7 +67,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 5,
       "wick_filter_mode": "always",
-      "sl_breach_count": 0,
+      "sl_breach_count": 3,
       "funding_signal": "favorable",
       "funding_rate_pct_at_open": -0.8577,
       "regime_gate_enabled": true,
@@ -89,7 +90,7 @@
       "phase_a_mfe_pct": 0.0,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.199996,
+      "fees_paid_usdt": 0.404167,
       "fees_are_actual": true,
       "opened_at": "2026-06-02T03:16:56.437129+00:00",
       "is_dry_run": false,
@@ -100,13 +101,21 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.504,
       "phase_a_mfe_price": 0.05256,
-      "current_price": 0.0528,
-      "unrealized_pnl_usdt": -0.759,
-      "unrealized_pnl_pct": -0.19,
-      "last_price_check_at": "2026-06-02T03:17:02.934747+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.0538,
+      "unrealized_pnl_usdt": -8.349,
+      "unrealized_pnl_pct": -2.087,
+      "last_price_check_at": "2026-06-02T03:18:47.214688+00:00",
+      "closed_at": "2026-06-02T03:19:01.540340+00:00",
+      "close_reason": "paper:hit_sl",
+      "avg_exit_price": 0.0538,
+      "realized_pnl_usdt": -8.349,
+      "close_order_id": 114931724,
+      "close_qty": 7590.0,
+      "close_expected_price": 0.0538,
+      "close_slippage_bps": 0.0,
+      "entry_fees_usdt": 0.199996,
+      "close_fees_usdt": 0.204171
+    },
     {
       "paper_id": "NFPUSDT|SHORT|2026-06-02T02:11:57.357136+00:00",
       "trade_id": "L1780366317_NFPUSDT_S",
@@ -53511,8 +53520,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-02T02:29:00.888910+00:00",
-      "reason": "paper trade too old (2882s > 600s)",
-      "last_checked_at": "2026-06-02T03:17:02.934747+00:00"
+      "reason": "paper trade too old (2997s > 600s)",
+      "last_checked_at": "2026-06-02T03:18:58.209879+00:00"
     },
     {
       "paper_id": "USUSDT|LONG|2026-06-02T03:10:29.001057+00:00",
@@ -53520,28 +53529,28 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-02T03:10:30.790124+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.49% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-06-02T03:17:02.934747+00:00"
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.43% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-02T03:18:58.209879+00:00"
     },
     {
-      "paper_id": "PRLUSDT|LONG|2026-06-02T03:12:34.192150+00:00",
-      "symbol": "PRLUSDT",
+      "paper_id": "MRVLUSDT|LONG|2026-06-02T03:18:06.545336+00:00",
+      "symbol": "MRVLUSDT",
       "direction": "LONG",
       "conviction_score": 5,
-      "signal_at": "2026-06-02T03:12:36.634478+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.49% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-06-02T03:17:02.934747+00:00"
+      "signal_at": "2026-06-02T03:18:52.979318+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.43% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-02T03:18:58.209879+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 70908.0,
-    "btc_ma25_1h": 71952.84,
-    "pct_vs_ma25": -1.452,
-    "change_24h_pct": -3.839,
+    "btc_price": 70954.1,
+    "btc_ma25_1h": 71954.69,
+    "pct_vs_ma25": -1.391,
+    "change_24h_pct": -3.777,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.493,
-    "computed_at": "2026-06-02T03:17:04.027311+00:00"
+    "change_3h_pct": -0.429,
+    "computed_at": "2026-06-02T03:18:59.733748+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
