@@ -2217,18 +2217,25 @@ class TestPhase5SIsEligibleMultiplierZero(unittest.TestCase):
         # 不应该因 "regime size multiplier" 被拒
         self.assertNotIn("regime size multiplier", reason)
 
-    def test_zero_mult_rejects(self):
-        """配置 mult=0 → is_eligible reject 并附带 reason."""
+    def test_zero_mult_long_down_blocked_by_phase4j_first(self):
+        """LONG+down 即使设 Phase 5.S mult=0, 也被 Phase 4.J gate 先拒 (gate 顺序).
+
+        验证 gate 优先级: 7 (Phase 4.J regime gate) → 7b (Phase 5.S mult=0).
+        down+LONG 命中 4.J 就 return, 不会走到 5.S → reason 是 "regime gate" 不是
+        "regime size multiplier". 这是设计上的预期, 不是 bug.
+        """
         live_trader.LIVE_REGIME_SIZE_MULTIPLIER = {
             ("LONG", "down", "down_acute"): 0.0,
         }
-        pt = self._make_pt("LONG", sym="BTCUSDT")  # 用白名单 symbol 跳过其它 gate
+        pt = self._make_pt("LONG", sym="BTCUSDT")
         eligible, reason = live_trader.is_eligible_for_mirror(
             pt, {}, datetime.now(timezone.utc),
             btc_regime="down", btc_sub_regime="down_acute",
         )
-        # 此 trade 应被 Phase 4.J down+LONG gate 先拒 — 但若我们用 SHORT, 是 Phase 5.S 拒
-        # 用 SHORT 测 (down+SHORT 不会被 4.J 拒, 才能验 Phase 5.S 接管)
+        self.assertFalse(eligible)
+        # Phase 4.J 在前, Phase 5.S 不应被触发
+        self.assertIn("regime gate", reason)
+        self.assertNotIn("size multiplier", reason)
 
     def test_zero_mult_short_rejects(self):
         """SHORT 桶 mult=0 → Phase 5.S 接管 reject."""
