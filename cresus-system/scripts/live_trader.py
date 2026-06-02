@@ -296,6 +296,30 @@ LIVE_FUNDING_FAVORABLE_WICK_BREACHES = 5        # Phase 5.M (6/1): 默认 4 后,
 #   - ab_group 字段仍记录 A/B/C/D (溯源不变, 即使 D 组实质跟 A 组相同)
 LIVE_REGIME_GATE_MODE = "always"    # "off" | "abcd" (legacy 4-arm) | "always" (Phase 4.J 默认)
 
+# ==========================================
+# Phase 5.R (2026-06-02) — Sub-regime aware regime gate (默认无行为变化)
+# ==========================================
+# 触发原因: Phase 4.F/4.J 把 down+LONG 一律拒, 数据驱动 (0/10 胜 p=0.042).
+#         但 BTC down regime 并非铁板一块: Phase 4.K 已细分 down_acute (急跌) /
+#         down_stable (企稳) / down_rebound (反弹 3h 涨>0.5%). 反弹时 LONG 表现
+#         可能完全不同, 但当前 gate 不区分子状态, 把 rebound 也一刀切.
+#
+# 设计: 引入 allow-list — 列在 set 里的 sub_regime, 当 regime=down + direction=LONG
+#       同时命中时, 豁免 gate (允许 mirror). 默认 **空 set** = 与 4.J 完全一致.
+#
+# 启用前置 (用户审计, 不要凭直觉 flip):
+#   1) 跑 scripts/audit_sub_regime_paper_outcomes.py 拉 BTC 历史 1h K 线,
+#      把每笔 paper LONG trade 在 entered_at 时刻的 regime + sub_regime 重算
+#   2) 看 down + LONG 按 sub_regime 拆分的胜率 / 平均 PnL / 样本数
+#   3) 仅当 (sub == "down_rebound" 且 样本 ≥ 20 且 avg PnL > +$0.5) 才考虑放开
+#   4) 放开后用 LIVE_REGIME_GATE_SUB_REGIME_ALLOW = {"down_rebound"}, 观察 24-48h
+#
+# 安全特性:
+#   - default = set() → 任何 sub_regime 都不豁免 (与 Phase 4.J 100% 一致)
+#   - 仅影响 down + LONG 这一种组合; up / chop / SHORT 任何情形都不受影响
+#   - sub_regime = None (regime 非 down 或 klines 不足) 永远不豁免 (fail-safe)
+LIVE_REGIME_GATE_SUB_REGIME_ALLOW: set = set()  # 默认空 — 与 Phase 4.J 行为一致
+
 # 升级 SL 补偿 / wick filter 到 4-arm 一致 (B/C 分别对应)
 # Phase 4.Y (5/27): SL 补偿从 "abcd" (4-arm A/B 测试) 推广到 "always".
 # 数据依据 (5/26 复盘 32 笔 mirror):
@@ -671,9 +695,10 @@ def is_eligible_for_mirror(
     if direction not in ("LONG", "SHORT"):
         return False, f"invalid direction {direction!r}"
     # 7. Phase 4.F regime gate (Phase 4.J 后默认 always — 全部组适用)
+    #    Phase 5.R: 传入 sub_regime, 命中 LIVE_REGIME_GATE_SUB_REGIME_ALLOW 则豁免
     # 只在 btc_regime 提供时才检查; 测试 / 旧调用不带此参数时跳过 (向后兼容)
     if btc_regime is not None and _ab_use_regime_gate(paper_id, LIVE_REGIME_GATE_MODE):
-        if _should_block_for_regime(direction, btc_regime):
+        if _should_block_for_regime(direction, btc_regime, btc_sub_regime):
             mode = LIVE_REGIME_GATE_MODE
             # Phase 4.K Shadow Log: 拒绝原因附带 sub_regime + 3h 动量,
             # 便于事后从 missed_signals 反查"down_rebound 时段被拒的 paper 信号"
@@ -685,6 +710,13 @@ def is_eligible_for_mirror(
                     sub_info += f" 3h={btc_change_3h_pct:+.2f}%"
             return False, (f"regime gate ({mode}): {btc_regime} regime + {direction} "
                           f"被拒{sub_info} (数据驱动: down+LONG 历史 0/10 胜 p=0.042)")
+        # Phase 5.R: gate 放行 down+LONG (sub_regime 在 allow-list) — log 留痕,
+        # 注意此 log 仅说明本 gate 通过, trade 仍可能在后续 funding / slippage 等 gate 被拒.
+        if (btc_regime.lower() == "down" and direction.upper() == "LONG"
+                and btc_sub_regime
+                and btc_sub_regime in LIVE_REGIME_GATE_SUB_REGIME_ALLOW):
+            log.info(f"[regime-gate-allow] {paper_id} down+LONG gate 豁免 sub={btc_sub_regime} "
+                     f"(Phase 5.R, allow={sorted(LIVE_REGIME_GATE_SUB_REGIME_ALLOW)})")
     # 8. Phase 4.M Funding gate: 拒 funding 不利信号 (≥ +0.05%, 任意方向)
     if LIVE_REJECT_ADVERSE_FUNDING:
         fs = _funding_signal(paper_trade)
@@ -1229,23 +1261,33 @@ def _ab_group(paper_id: str, n_groups: int = 4) -> str:
     return ["A", "B", "C", "D"][h % n_groups]
 
 
-def _should_block_for_regime(direction: str, regime: Optional[str]) -> bool:
-    """Phase 4.F regime gate 核心规则.
+def _should_block_for_regime(
+    direction: str,
+    regime: Optional[str],
+    sub_regime: Optional[str] = None,
+) -> bool:
+    """Phase 4.F regime gate 核心规则 (Phase 5.R: sub_regime aware).
 
     Args:
         direction: paper trade 方向, 'LONG' / 'SHORT' (会 upper())
         regime: 当前 BTC regime, 'up' / 'chop' / 'down' / None
+        sub_regime: 可选, Phase 4.K BTC down 内子状态. 当
+                    sub_regime ∈ LIVE_REGIME_GATE_SUB_REGIME_ALLOW 且
+                    regime=down + direction=LONG 时, 豁免本 gate (返 False).
+                    Default = None → 等同未传, 不豁免 (fail-safe).
 
     Returns:
         True 表示该 (regime, direction) 组合应该被拒绝 mirror.
 
-    当前规则:
-        - down + LONG  → True  (block, 数据驱动: 0/10 胜率 p=0.042)
-        - 其余组合     → False
+    当前规则 (Phase 5.R):
+        - down + LONG + sub_regime ∈ LIVE_REGIME_GATE_SUB_REGIME_ALLOW → False (放行)
+        - down + LONG (其它 sub_regime 或 None)                        → True  (拒)
+        - 其余组合                                                     → False
+        默认 ALLOW set = 空, 行为与 Phase 4.J 完全一致.
 
     设计原则:
         - 单功能: 只判规则, 不查 A/B/C/D 分组 (由 caller 判定是否该应用此规则)
-        - 防御性: 永远只能拒绝, 不能误开仓
+        - 防御性: 永远只能拒绝, 不能误开仓; allow-list 必须显式启用
         - 易扩展: 未来若数据证明 chop+SHORT 也该拒, 只需改这一处
     """
     if not regime or not direction:
@@ -1253,6 +1295,10 @@ def _should_block_for_regime(direction: str, regime: Optional[str]) -> bool:
     d = direction.upper()
     r = regime.lower()
     if r == "down" and d == "LONG":
+        # Phase 5.R: sub_regime 命中 allow-list → 豁免本 gate
+        # 注意: sub_regime 必须非空才能匹配, None 永远不被豁免
+        if sub_regime and sub_regime in LIVE_REGIME_GATE_SUB_REGIME_ALLOW:
+            return False
         return True
     return False
 

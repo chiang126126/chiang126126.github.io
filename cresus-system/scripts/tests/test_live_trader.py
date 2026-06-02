@@ -1398,15 +1398,19 @@ class TestComputeBtcRegime(unittest.TestCase):
         self.assertEqual(r["sub_regime"], "down_rebound")
         self.assertGreater(r["change_3h_pct"], 0.5)
 
-    def test_phase_4k_sub_regime_does_not_affect_gate(self):
-        """sub_regime 只是 shadow log, 不应影响 gate 行为.
-        即使 sub_regime='down_rebound' (反弹), down+LONG 仍应被 _should_block_for_regime 拒.
-        这验证 Phase 4.K 是纯观察, gate 逻辑不变."""
-        # 不论 sub_regime 是什么, gate 都看 regime='down' + direction='LONG' → 拒
-        from live_trader import _should_block_for_regime
+    def test_phase_4k_sub_regime_does_not_affect_gate_by_default(self):
+        """默认配置下 (LIVE_REGIME_GATE_SUB_REGIME_ALLOW=set()), sub_regime 不影响 gate.
+        Phase 5.R 引入了 sub_regime 参数但默认 allow-list 为空 — 行为与 4.J 一致.
+        """
+        from live_trader import _should_block_for_regime, LIVE_REGIME_GATE_SUB_REGIME_ALLOW
+        # 默认 allow-list 必须为空 (任何启用都需要显式 flip)
+        self.assertEqual(LIVE_REGIME_GATE_SUB_REGIME_ALLOW, set(),
+                        "默认 LIVE_REGIME_GATE_SUB_REGIME_ALLOW 必须为空 set, 与 4.J 行为一致")
+        # 不论 sub_regime 是什么, gate 默认都看 regime='down' + direction='LONG' → 拒
         self.assertTrue(_should_block_for_regime("LONG", "down"))
-        # sub_regime 不是 _should_block_for_regime 的参数, 不影响判定
-        # (函数签名只有 direction + regime)
+        self.assertTrue(_should_block_for_regime("LONG", "down", "down_rebound"))
+        self.assertTrue(_should_block_for_regime("LONG", "down", "down_acute"))
+        self.assertTrue(_should_block_for_regime("LONG", "down", "down_stable"))
 
 
 class TestSlCompensation(unittest.TestCase):
@@ -1848,6 +1852,101 @@ class TestShouldBlockForRegime(unittest.TestCase):
         """方向 / regime 大小写都接受."""
         self.assertTrue(live_trader._should_block_for_regime("long", "DOWN"))
         self.assertTrue(live_trader._should_block_for_regime("Long", "Down"))
+
+    def test_sub_regime_param_optional_backward_compat(self):
+        """Phase 5.R: sub_regime 参数可选, 不传 = 老行为完全一致."""
+        # 不传 sub_regime
+        self.assertTrue(live_trader._should_block_for_regime("LONG", "down"))
+        # 传 None 等同于不传
+        self.assertTrue(live_trader._should_block_for_regime("LONG", "down", None))
+        # 传 "" 也视为未命中 allow-list (空字符串 → falsy short-circuit)
+        self.assertTrue(live_trader._should_block_for_regime("LONG", "down", ""))
+
+
+class TestPhase5RSubRegimeAllowList(unittest.TestCase):
+    """Phase 5.R: _should_block_for_regime sub_regime allow-list 行为.
+
+    设计要点:
+    - 默认 LIVE_REGIME_GATE_SUB_REGIME_ALLOW = set() → 100% 等同 Phase 4.J
+    - allow-list 非空且 sub_regime 命中 → down+LONG 豁免 (return False)
+    - 仅影响 down + LONG; 其它 (regime, direction) 组合永远不受 allow-list 影响
+    - None / 空字符串 sub_regime 永远不命中 (fail-safe)
+    """
+
+    def setUp(self):
+        # 保存原值, 测试后恢复 — 避免污染其它 test
+        self._orig_allow = live_trader.LIVE_REGIME_GATE_SUB_REGIME_ALLOW.copy()
+
+    def tearDown(self):
+        live_trader.LIVE_REGIME_GATE_SUB_REGIME_ALLOW = self._orig_allow
+
+    def test_default_allow_set_is_empty(self):
+        """默认必须空 — 任何启用都需要显式 flip."""
+        self.assertEqual(self._orig_allow, set(),
+                        "Phase 5.R 默认 LIVE_REGIME_GATE_SUB_REGIME_ALLOW 必须为空 set")
+
+    def test_default_behavior_blocks_all_down_long(self):
+        """默认空 allow-list 下, 所有 sub_regime 的 down+LONG 都被拒."""
+        for sub in ("down_acute", "down_stable", "down_rebound", None, ""):
+            self.assertTrue(
+                live_trader._should_block_for_regime("LONG", "down", sub),
+                f"default 空 allow-list, sub_regime={sub!r} 应被拒"
+            )
+
+    def test_allow_rebound_only_passes_rebound(self):
+        """allow_set={'down_rebound'} → 仅 rebound 通过, acute/stable 仍拒."""
+        live_trader.LIVE_REGIME_GATE_SUB_REGIME_ALLOW = {"down_rebound"}
+        # rebound 通过
+        self.assertFalse(live_trader._should_block_for_regime("LONG", "down", "down_rebound"))
+        # acute / stable 仍被拒
+        self.assertTrue(live_trader._should_block_for_regime("LONG", "down", "down_acute"))
+        self.assertTrue(live_trader._should_block_for_regime("LONG", "down", "down_stable"))
+        # None / 空仍被拒 (fail-safe)
+        self.assertTrue(live_trader._should_block_for_regime("LONG", "down", None))
+        self.assertTrue(live_trader._should_block_for_regime("LONG", "down", ""))
+        self.assertTrue(live_trader._should_block_for_regime("LONG", "down"))
+
+    def test_allow_multiple_sub_regimes(self):
+        """allow_set 多个值 → 任一命中即放行."""
+        live_trader.LIVE_REGIME_GATE_SUB_REGIME_ALLOW = {"down_rebound", "down_stable"}
+        self.assertFalse(live_trader._should_block_for_regime("LONG", "down", "down_rebound"))
+        self.assertFalse(live_trader._should_block_for_regime("LONG", "down", "down_stable"))
+        self.assertTrue(live_trader._should_block_for_regime("LONG", "down", "down_acute"))
+
+    def test_allow_list_does_not_affect_short(self):
+        """down+SHORT 本身就不被 gate 拒, allow-list 不应改变此行为."""
+        live_trader.LIVE_REGIME_GATE_SUB_REGIME_ALLOW = {"down_rebound", "down_stable", "down_acute"}
+        for sub in ("down_acute", "down_stable", "down_rebound", None):
+            self.assertFalse(
+                live_trader._should_block_for_regime("SHORT", "down", sub),
+                f"down+SHORT 永远不被 gate 拒, sub={sub!r}"
+            )
+
+    def test_allow_list_does_not_affect_up_chop(self):
+        """up / chop regime 下, allow-list 完全无效 (本来就不被 gate 拒)."""
+        live_trader.LIVE_REGIME_GATE_SUB_REGIME_ALLOW = {"down_rebound"}
+        # up+LONG / chop+LONG 永远 False
+        self.assertFalse(live_trader._should_block_for_regime("LONG", "up", "down_rebound"))
+        self.assertFalse(live_trader._should_block_for_regime("LONG", "chop", "down_rebound"))
+        # 即便 sub_regime 给个不合理值, 也不会影响 (因为 r != "down")
+        self.assertFalse(live_trader._should_block_for_regime("LONG", "up", "anything"))
+
+    def test_allow_list_rejects_unknown_sub_regime(self):
+        """sub_regime 不在 allow 集合中, 一律拒 (open-world fail-safe)."""
+        live_trader.LIVE_REGIME_GATE_SUB_REGIME_ALLOW = {"down_rebound"}
+        self.assertTrue(live_trader._should_block_for_regime("LONG", "down", "down_supercrash"))
+        self.assertTrue(live_trader._should_block_for_regime("LONG", "down", "bullish_lol"))
+
+    def test_allow_list_case_sensitive_on_sub_regime(self):
+        """sub_regime 字符串需精确匹配 — 防止大小写笔误意外放行.
+        (down_rebound 是 _compute_btc_regime 生成的固定 token, 全小写)
+        """
+        live_trader.LIVE_REGIME_GATE_SUB_REGIME_ALLOW = {"down_rebound"}
+        # 精确匹配
+        self.assertFalse(live_trader._should_block_for_regime("LONG", "down", "down_rebound"))
+        # 大写不匹配 — 应拒
+        self.assertTrue(live_trader._should_block_for_regime("LONG", "down", "DOWN_REBOUND"))
+        self.assertTrue(live_trader._should_block_for_regime("LONG", "down", "Down_Rebound"))
 
 
 class TestAbUseRegimeGate(unittest.TestCase):
