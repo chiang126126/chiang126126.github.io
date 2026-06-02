@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-02T17:39:43.921281+00:00",
+  "generated_at": "2026-06-02T17:41:51.379267+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 854,
@@ -68,7 +68,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 4,
       "wick_filter_mode": "always",
-      "sl_breach_count": 0,
+      "sl_breach_count": 1,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.0053,
       "regime_gate_enabled": true,
@@ -102,10 +102,10 @@
       "btc_sub_regime_at_open": "down_acute",
       "btc_change_3h_at_open": -1.818,
       "phase_a_mfe_price": 0.06639,
-      "current_price": 0.06829,
-      "unrealized_pnl_usdt": -2.0713,
-      "unrealized_pnl_pct": -1.036,
-      "last_price_check_at": "2026-06-02T17:39:42.179684+00:00"
+      "current_price": 0.0691,
+      "unrealized_pnl_usdt": -4.4681,
+      "unrealized_pnl_pct": -2.234,
+      "last_price_check_at": "2026-06-02T17:41:49.242776+00:00"
     },
     {
       "paper_id": "TRIAUSDT|SHORT|2026-06-02T17:38:28.321563+00:00",
@@ -122,8 +122,8 @@
       "risk_usdt": 2.0149,
       "risk_pct": 0.672,
       "mirror_latency_sec": 9.3,
-      "sl_price": 0.03490321,
-      "sl_paper_current": 0.03495321,
+      "sl_price": 0.03472,
+      "sl_paper_current": 0.03477,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": -5e-05,
       "sl_compensation_mode": "always",
@@ -139,7 +139,7 @@
       "min_conviction_threshold": null,
       "tp1_price": 0.03449518,
       "tp2_price": 0.03422036,
-      "phase": "A",
+      "phase": "B",
       "entry_order_id": 50711694,
       "entry_client_id": "cresus_L1780421908_TRIAUSD_S_E",
       "sl_order_id": null,
@@ -150,8 +150,8 @@
       "top_trader_position_ratio": null,
       "top_trader_account_ratio": null,
       "global_account_ratio": null,
-      "phase_a_mfe_pct": 0.0,
-      "phase_b_mfe_pct": null,
+      "phase_a_mfe_pct": 1.093,
+      "phase_b_mfe_pct": 1.093,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.14999,
       "fees_are_actual": true,
@@ -163,11 +163,12 @@
       "btc_pct_vs_ma25_at_open": -3.432,
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.616,
-      "phase_a_mfe_price": 0.03477,
-      "current_price": 0.03473,
-      "unrealized_pnl_usdt": -0.0864,
-      "unrealized_pnl_pct": -0.029,
-      "last_price_check_at": "2026-06-02T17:39:42.179684+00:00"
+      "phase_a_mfe_price": 0.03439,
+      "current_price": 0.03442,
+      "unrealized_pnl_usdt": 2.592,
+      "unrealized_pnl_pct": 0.864,
+      "last_price_check_at": "2026-06-02T17:41:49.242776+00:00",
+      "phase_b_mfe_price": 0.03439
     }
   ],
   "recent_closed": [
@@ -55351,8 +55352,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-02T16:22:34.030558+00:00",
-      "reason": "paper trade too old (4628s > 600s)",
-      "last_checked_at": "2026-06-02T17:39:42.179684+00:00"
+      "reason": "paper trade too old (4755s > 600s)",
+      "last_checked_at": "2026-06-02T17:41:49.242776+00:00"
     },
     {
       "paper_id": "PHAROSUSDT|SHORT|2026-06-02T16:34:30.727729+00:00",
@@ -55360,8 +55361,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-06-02T16:35:06.002783+00:00",
-      "reason": "paper trade too old (3876s > 600s)",
-      "last_checked_at": "2026-06-02T17:39:42.179684+00:00"
+      "reason": "paper trade too old (4003s > 600s)",
+      "last_checked_at": "2026-06-02T17:41:49.242776+00:00"
     },
     {
       "paper_id": "ONDOUSDT|LONG|2026-06-02T17:08:04.533874+00:00",
@@ -55369,8 +55370,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-02T17:08:57.472796+00:00",
-      "reason": "paper trade too old (1845s > 600s)",
-      "last_checked_at": "2026-06-02T17:39:42.179684+00:00"
+      "reason": "paper trade too old (1972s > 600s)",
+      "last_checked_at": "2026-06-02T17:41:49.242776+00:00"
     },
     {
       "paper_id": "HEIUSDT|LONG|2026-06-02T17:33:56.336252+00:00",
@@ -55378,19 +55379,28 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-02T17:34:21.905193+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.60% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-06-02T17:39:42.179684+00:00"
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.74% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-02T17:41:49.242776+00:00"
+    },
+    {
+      "paper_id": "ENAUSDT|LONG|2026-06-02T17:39:43.031002+00:00",
+      "symbol": "ENAUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-02T17:40:40.532859+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.74% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-02T17:41:49.242776+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 67657.6,
-    "btc_ma25_1h": 70054.57,
-    "pct_vs_ma25": -3.422,
-    "change_24h_pct": -5.545,
+    "btc_price": 67563.8,
+    "btc_ma25_1h": 70050.82,
+    "pct_vs_ma25": -3.55,
+    "change_24h_pct": -5.676,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.605,
-    "computed_at": "2026-06-02T17:39:43.310508+00:00"
+    "change_3h_pct": -0.743,
+    "computed_at": "2026-06-02T17:41:50.794604+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
