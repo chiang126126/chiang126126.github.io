@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-02T01:42:45.037188+00:00",
+  "updated_at": "2026-06-02T01:44:49.535337+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 26,
+  "alerts_count": 27,
   "alerts": [
+    {
+      "symbol": "PARTIUSDT",
+      "base": "PARTI",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.05238,
+      "price_change_pct": -0.683,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 95137.0,
+      "volume_baseline_usdt": 9121.0,
+      "volume_ratio": 10.43,
+      "detected_at": "2026-06-02T01:44:31.970028+00:00",
+      "intensity": 1,
+      "change_5m_pct": 1.835,
+      "change_15m_pct": 0.803,
+      "change_1h_pct": 2.448,
+      "change_4h_pct": 4.416,
+      "taker_buy_ratio_1m": 0.513,
+      "taker_buy_ratio_5m": 0.575,
+      "oi_delta_5m_pct": 0.098,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.68,
+      "range_4h_pct": 6.03,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.05291464,
+      "suggested_tp1": 0.05157804,
+      "suggested_tp2": 0.05077607,
+      "conviction_score": 0,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "NOMUSDT",
       "base": "NOM",
