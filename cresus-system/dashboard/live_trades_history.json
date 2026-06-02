@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-02T15:17:36.005074+00:00",
+  "generated_at": "2026-06-02T15:19:40.994566+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 847,
@@ -36,14 +36,14 @@
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "JTOUSDT",
       "XLMUSDT",
-      "AIAUSDT"
+      "AIAUSDT",
+      "JTOUSDT"
     ],
     "exchange_symbols": [
-      "JTOUSDT",
+      "AIAUSDT",
       "XLMUSDT",
-      "AIAUSDT"
+      "JTOUSDT"
     ]
   },
   "open_trades": [
@@ -107,7 +107,7 @@
       "current_price": 0.0676,
       "unrealized_pnl_usdt": -0.0296,
       "unrealized_pnl_pct": -0.015,
-      "last_price_check_at": "2026-06-02T15:17:33.854624+00:00"
+      "last_price_check_at": "2026-06-02T15:19:38.606470+00:00"
     },
     {
       "paper_id": "JTOUSDT|SHORT|2026-06-02T14:37:52.938490+00:00",
@@ -166,10 +166,10 @@
       "btc_sub_regime_at_open": "down_acute",
       "btc_change_3h_at_open": -1.386,
       "phase_a_mfe_price": 0.5974,
-      "current_price": 0.5991,
-      "unrealized_pnl_usdt": 1.4233,
-      "unrealized_pnl_pct": 0.713,
-      "last_price_check_at": "2026-06-02T15:17:33.854624+00:00"
+      "current_price": 0.6024,
+      "unrealized_pnl_usdt": 0.331,
+      "unrealized_pnl_pct": 0.166,
+      "last_price_check_at": "2026-06-02T15:19:38.606470+00:00"
     },
     {
       "paper_id": "XLMUSDT|SHORT|2026-06-02T15:05:41.746851+00:00",
@@ -186,8 +186,8 @@
       "risk_usdt": 2.0257,
       "risk_pct": 1.013,
       "mirror_latency_sec": 14.2,
-      "sl_price": 0.2195,
-      "sl_paper_current": 0.21984,
+      "sl_price": 0.21852869065,
+      "sl_paper_current": 0.21886869065,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": -0.00034,
       "sl_compensation_mode": "always",
@@ -228,10 +228,10 @@
       "btc_sub_regime_at_open": "down_acute",
       "btc_change_3h_at_open": -1.626,
       "phase_a_mfe_price": 0.21701,
-      "current_price": 0.21767,
-      "unrealized_pnl_usdt": 1.6671,
-      "unrealized_pnl_pct": 0.834,
-      "last_price_check_at": "2026-06-02T15:17:33.854624+00:00",
+      "current_price": 0.2179,
+      "unrealized_pnl_usdt": 1.4576,
+      "unrealized_pnl_pct": 0.729,
+      "last_price_check_at": "2026-06-02T15:19:38.606470+00:00",
       "phase_b_mfe_price": 0.21701
     }
   ],
@@ -54820,8 +54820,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-02T14:43:05.871066+00:00",
-      "reason": "paper trade too old (2068s > 600s)",
-      "last_checked_at": "2026-06-02T15:17:33.854624+00:00"
+      "reason": "paper trade too old (2193s > 600s)",
+      "last_checked_at": "2026-06-02T15:19:38.606470+00:00"
     },
     {
       "paper_id": "KGENUSDT|LONG|2026-06-02T14:53:25.658849+00:00",
@@ -54829,17 +54829,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-02T14:53:35.693093+00:00",
-      "reason": "paper trade too old (1438s > 600s)",
-      "last_checked_at": "2026-06-02T15:17:33.854624+00:00"
-    },
-    {
-      "paper_id": "CHIPUSDT|SHORT|2026-06-02T15:01:26.276070+00:00",
-      "symbol": "CHIPUSDT",
-      "direction": "SHORT",
-      "conviction_score": 5,
-      "signal_at": "2026-06-02T15:02:16.646663+00:00",
-      "reason": "paper trade too old (917s > 600s)",
-      "last_checked_at": "2026-06-02T15:17:33.854624+00:00"
+      "reason": "paper trade too old (1563s > 600s)",
+      "last_checked_at": "2026-06-02T15:19:38.606470+00:00"
     },
     {
       "paper_id": "BIOUSDT|LONG|2026-06-02T15:08:16.717977+00:00",
@@ -54847,8 +54838,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-02T15:08:47.018327+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_acute 3h=-1.89% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-06-02T15:17:33.854624+00:00"
+      "reason": "paper trade too old (652s > 600s)",
+      "last_checked_at": "2026-06-02T15:19:38.606470+00:00"
     },
     {
       "paper_id": "RIFUSDT|LONG|2026-06-02T15:12:20.937678+00:00",
@@ -54856,19 +54847,28 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-02T15:12:58.184815+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_acute 3h=-1.89% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-06-02T15:17:33.854624+00:00"
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_acute 3h=-1.90% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-02T15:19:38.606470+00:00"
+    },
+    {
+      "paper_id": "TRIAUSDT|SHORT|2026-06-02T15:19:22.803968+00:00",
+      "symbol": "TRIAUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-06-02T15:19:24.435364+00:00",
+      "reason": "funding adverse (0.0507% ≥ 0.05%) (Phase 4.M: paper 历史人均 -$0.85, 不利 mirror)",
+      "last_checked_at": "2026-06-02T15:19:38.606470+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 67754.2,
-    "btc_ma25_1h": 70373.9,
-    "pct_vs_ma25": -3.723,
-    "change_24h_pct": -4.75,
+    "btc_price": 67749.2,
+    "btc_ma25_1h": 70373.7,
+    "pct_vs_ma25": -3.729,
+    "change_24h_pct": -4.757,
     "sub_regime": "down_acute",
-    "change_3h_pct": -1.893,
-    "computed_at": "2026-06-02T15:17:35.123765+00:00"
+    "change_3h_pct": -1.9,
+    "computed_at": "2026-06-02T15:19:40.125966+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
