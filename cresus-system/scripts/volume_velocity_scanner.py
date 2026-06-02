@@ -1032,12 +1032,18 @@ def _compute_conviction(a: VelocityAlert, winrate_summary: Optional[dict],
     - 多窗口对齐: 1h+4h 都同向 +2 (强对齐), 单边同向 +1
 
     Phase 5.A (5/27) 增: macro regime 联动减分.
-    - ALT_SEASON_RUNNING + LONG: -1 分 (数据: 156 笔 avg +$0.06, win 33%, 准负 EV)
+    - ALT_SEASON_RUNNING + LONG: -1 分 (paper 数据: 准负 EV)
 
     Phase 5.B (5/27) 增: BTC regime trend-aligned bonus.
     - BTC up + LONG: +1 (顺势)
     - BTC down + SHORT: +1 (顺势)
     - BTC down + LONG: 已在 live_trader 硬拒, scanner 不再加分
+
+    Phase 5.N (6/1) 增: live 实盘亏损陷阱 -1 分.
+    数据驱动 (live 830 笔):
+    - RANGE_BORING + SHORT: live avg -$1.45, 震荡 SHORT 缺方向性
+    - ALT_SEASON_RUNNING + SHORT: live avg -$1.81, 反向追单陷阱
+    保留: RISK_OFF + SHORT (live avg +$0.64, 唯一稳定盈利组合)
     """
     is_long = (a.direction == "LONG")
 
@@ -1106,6 +1112,20 @@ def _compute_conviction(a: VelocityAlert, winrate_summary: Optional[dict],
     # 数据驱动 (1410 笔): ALT_SEASON_RUNNING+LONG n=156 avg +$0.06 win 33%, 准负 EV.
     # 软减分而非硬拒, 让其他维度强信号仍可救到 diamond.
     if regime == "ALT_SEASON_RUNNING" and is_long:
+        score -= 1
+
+    # 6.N. Phase 5.N (6/1) regime + direction live 实盘亏损陷阱 -1 分.
+    # 数据驱动 (5/26+ live 830 笔):
+    #   RANGE_BORING + SHORT: 128 笔 live avg -$1.45 (vs paper avg +$1.06,
+    #     摩擦完全吃掉 EV. 震荡市场 SHORT 缺方向性, wick 反复打 trail).
+    #   ALT_SEASON_RUNNING + SHORT: 27 笔 live avg -$1.81 (反向追单陷阱,
+    #     上涨行情逆向 SL 触发率 64%).
+    # -1 conviction 过滤掉这两个组合中的 score 5 边缘信号 (~85%), 保留高分 6-7.
+    # 预期: 避亏 ~$14/天 (基于 14 天历史回测).
+    # 不动: ALT_SEASON + LONG (已 Phase 5.A 处理) / RISK_OFF + SHORT (唯一 live 盈利)
+    if regime == "RANGE_BORING" and not is_long:
+        score -= 1
+    elif regime == "ALT_SEASON_RUNNING" and not is_long:
         score -= 1
 
     # 7. Phase 5.B BTC regime trend-aligned bonus

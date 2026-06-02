@@ -246,13 +246,16 @@ class TestPhase5AAltSeasonPenalty(unittest.TestCase):
         self.assertEqual(score_alt, max(0, score_no_regime - 1),
                           "ALT_SEASON_RUNNING+LONG 应减 1 (但不低于 0)")
 
-    def test_alt_season_short_no_penalty(self):
-        """ALT_SEASON_RUNNING + SHORT → 不减分 (数据未显示需要)."""
+    def test_alt_season_short_now_gets_penalty(self):
+        """Phase 5.N (6/1): ALT_SEASON_RUNNING + SHORT 现在也减分.
+        旧 Phase 5.A 只减 LONG, 5.N 基于 live 数据 (-$1.81 avg) 补上 SHORT 减分.
+        """
         from volume_velocity_scanner import _compute_conviction
         a = self._make_alert(direction="SHORT", change_1h=-2.0, change_4h=-2.0)
         score_no_regime, _ = _compute_conviction(a, None, regime=None)
         score_alt, _ = _compute_conviction(a, None, regime="ALT_SEASON_RUNNING")
-        self.assertEqual(score_alt, score_no_regime, "ALT_SEASON_RUNNING+SHORT 不应减分")
+        self.assertEqual(score_alt, max(0, score_no_regime - 1),
+                          "Phase 5.N: ALT_SEASON_RUNNING+SHORT 应 -1 (live 反向追单陷阱)")
 
     def test_other_regimes_no_penalty(self):
         """RISK_OFF / RANGE_BORING 等其他 regime 不减分."""
@@ -271,6 +274,72 @@ class TestPhase5AAltSeasonPenalty(unittest.TestCase):
                               funding=0.0, oi_delta=-1.0)
         score, _ = _compute_conviction(a, None, regime="ALT_SEASON_RUNNING")
         self.assertGreaterEqual(score, 0)
+
+
+class TestPhase5NRegimeShortPenalty(unittest.TestCase):
+    """Phase 5.N (6/1): regime + direction live 亏损陷阱 -1 conviction.
+
+    数据驱动 (5/26+ live 830 笔):
+      RANGE_BORING + SHORT:        128 笔 avg -$1.45 ⚠️
+      ALT_SEASON_RUNNING + SHORT:   27 笔 avg -$1.81 ⚠️
+    保留: RISK_OFF + SHORT (live avg +$0.64, 唯一稳定盈利)
+    """
+
+    def _make_short_alert(self):
+        from volume_velocity_scanner import VelocityAlert
+        return VelocityAlert(
+            symbol="BTCUSDT", base="BTC", direction="SHORT",
+            alert_type="burst", price=100.0, price_change_pct=-2.5,
+            metric_window_min=1, volume_1m_usdt=100000,
+            volume_baseline_usdt=10000, volume_ratio=10.0,
+            detected_at="2026-06-01T00:00:00+00:00", intensity=2,
+            change_1h_pct=-2.0, change_4h_pct=-2.0,
+            funding_rate_pct=0.5, oi_delta_5m_pct=-1.0,
+        )
+
+    def test_range_boring_short_penalized(self):
+        """RANGE_BORING + SHORT 应 -1 分 (live 实盘亏损陷阱)."""
+        from volume_velocity_scanner import _compute_conviction
+        a = self._make_short_alert()
+        base, _ = _compute_conviction(a, None, regime=None)
+        penalized, _ = _compute_conviction(a, None, regime="RANGE_BORING")
+        self.assertEqual(penalized, max(0, base - 1),
+                          "Phase 5.N: RANGE_BORING+SHORT 应减 1 分")
+
+    def test_alt_season_short_penalized(self):
+        """ALT_SEASON_RUNNING + SHORT 应 -1 分."""
+        from volume_velocity_scanner import _compute_conviction
+        a = self._make_short_alert()
+        base, _ = _compute_conviction(a, None, regime=None)
+        penalized, _ = _compute_conviction(a, None, regime="ALT_SEASON_RUNNING")
+        self.assertEqual(penalized, max(0, base - 1),
+                          "Phase 5.N: ALT_SEASON_RUNNING+SHORT 应减 1 分")
+
+    def test_risk_off_short_not_penalized(self):
+        """RISK_OFF + SHORT 不减分 (这是 live 唯一盈利组合, 必须保留)."""
+        from volume_velocity_scanner import _compute_conviction
+        a = self._make_short_alert()
+        base, _ = _compute_conviction(a, None, regime=None)
+        risk_off, _ = _compute_conviction(a, None, regime="RISK_OFF")
+        self.assertEqual(risk_off, base,
+                          "Phase 5.N: RISK_OFF+SHORT 不应减分 (唯一 live 盈利)")
+
+    def test_range_boring_long_not_penalized(self):
+        """RANGE_BORING + LONG 不减分 (LONG 是 break-even, 不是亏损陷阱)."""
+        from volume_velocity_scanner import _compute_conviction, VelocityAlert
+        # 构造 LONG 信号
+        a = VelocityAlert(
+            symbol="BTCUSDT", base="BTC", direction="LONG",
+            alert_type="burst", price=100.0, price_change_pct=2.5,
+            metric_window_min=1, volume_1m_usdt=100000,
+            volume_baseline_usdt=10000, volume_ratio=10.0,
+            detected_at="2026-06-01T00:00:00+00:00", intensity=2,
+            change_1h_pct=2.0, change_4h_pct=2.0,
+            funding_rate_pct=0.5, oi_delta_5m_pct=1.0,
+        )
+        base, _ = _compute_conviction(a, None, regime=None)
+        rb_long, _ = _compute_conviction(a, None, regime="RANGE_BORING")
+        self.assertEqual(rb_long, base, "RANGE_BORING+LONG 不减分")
 
 
 class TestPhase5BBtcRegimeBonus(unittest.TestCase):
