@@ -233,9 +233,13 @@ LIVE_CB_PAUSE_MIN = 30                # L2 pause duration
 
 ### 部署 mainnet pilot
 1. Binance 子账户 + API key(Reading + Futures only,关 Withdrawals)
-2. `~/cresus-bot/binance_keys_mainnet.json` 文件(testnet=false)
-3. `touch ~/.allow-live` 二级安全闸门
-4. plist 加 `EnvironmentVariables` 块:
+2. **🚨 子账户 Position Mode 必须 One-way**(Phase 6.A-fix3 启动会强制检测):
+   - 路径:子账户登录 → USDT-M Futures → 右上角 Preference → Position Mode
+   - 切到 **One-way Mode**(默认可能是 Hedge,切换需无持仓 + 无挂单)
+   - 若是 Hedge Mode 启动,bot 会 SystemExit 报错并给清晰修复指引
+3. `~/cresus-bot/binance_keys_mainnet.json` 文件(testnet=false)
+4. `touch ~/.allow-live` 二级安全闸门
+5. plist 加 `EnvironmentVariables` 块:
    ```xml
    <key>EnvironmentVariables</key>
    <dict>
