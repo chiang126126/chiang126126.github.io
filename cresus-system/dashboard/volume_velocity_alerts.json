@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-03T00:40:40.302321+00:00",
+  "updated_at": "2026-06-03T00:42:45.603013+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 30,
+  "alerts_count": 31,
   "alerts": [
+    {
+      "symbol": "NOKUSDT",
+      "base": "NOK",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 17.28,
+      "price_change_pct": 2.128,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 231239.0,
+      "volume_baseline_usdt": 42638.0,
+      "volume_ratio": 5.42,
+      "detected_at": "2026-06-03T00:42:03.798988+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.518,
+      "change_15m_pct": 2.069,
+      "change_1h_pct": 2.859,
+      "change_4h_pct": 2.25,
+      "taker_buy_ratio_1m": 0.203,
+      "taker_buy_ratio_5m": 0.31,
+      "oi_delta_5m_pct": 1.155,
+      "funding_rate_pct": 0.3529,
+      "atr_pct": 0.661,
+      "range_4h_pct": 5.79,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 17.10857143,
+      "suggested_tp1": 17.53714286,
+      "suggested_tp2": 17.79428571,
+      "conviction_score": 7,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "COHRUSDT",
       "base": "COHR",
