@@ -5427,19 +5427,34 @@ function renderLivePanel(data) {
   }
 
   // OBS mode banner (顶部突出, 让用户知道当前是观察模式)
+  // Phase 6.A: mainnet_pilot 模式下 OBS=true 是设计预期 (mainnet 所有 symbol 可交易,
+  // 用 slippage / regime / funding gate 替代白名单), 这种场景换 banner 显示绿色 PILOT 状态.
   const obsMode = config.observation_mode === true;
-  if (obsMode) {
+  const isMainnetPilot = config.cresus_mode === 'mainnet_pilot';
+  if (isMainnetPilot) {
+    // 🟢 主网 PILOT 模式 banner — 替代 OBS 老 warning
+    const capital = config.pilot_capital_usdt || config.starting_capital_usdt;
+    body = `<div class="live-recon-warning" style="background:rgba(80,200,120,0.10);border-left:3px solid #50c878">
+      🟢 <strong>MAINNET PILOT 模式</strong> — 真实资金 $${capital} · 单笔上限 $${config.notional_per_trade_usdt} · 并发 ${config.max_concurrent} · 日熔断 -$${config.daily_dd_limit_usdt}
+      <br><span style="font-size:10px;opacity:0.85">OBS=true 在主网下是设计预期 (用 slippage/regime/funding gate 替代白名单). 累计 DD ≥ ${config.total_dd_limit_pct}% → KILL SWITCH 自动暂停.</span>
+    </div>` + body;
+  } else if (obsMode) {
     body = `<div class="live-recon-warning" style="background:rgba(255,200,0,0.10);border-left:3px solid #ffb84d">
       🟡 <strong>OBS MODE 观察期</strong> — 跳过白名单, mirror paper 所有 diamond signal.
-      <br><span style="font-size:10px;opacity:0.85">实盘前必须改 LIVE_OBSERVATION_MODE=False 恢复严格白名单 (BTC/ETH/SOL)</span>
+      <br><span style="font-size:10px;opacity:0.85">实盘前必须改 LIVE_OBSERVATION_MODE=False 恢复严格白名单 (BTC/ETH/SOL), 或设 CRESUS_MODE=mainnet_pilot 用真钱小金额 pilot</span>
     </div>` + body;
   }
 
   // 完全空状态 (没开过任何交易) → 显示等待提示
   if (totalTrades === 0) {
-    const waitMsg = obsMode
-      ? `⏳ 等待 paper 触发任意 diamond signal (OBS 模式)`
-      : `⏳ 等待 paper 触发白名单内 (${(config.symbol_whitelist || []).join('/')}) 钻石信号`;
+    let waitMsg;
+    if (isMainnetPilot) {
+      waitMsg = `⏳ 等待 paper 触发首笔 diamond signal → mirror 到主网 ($${config.notional_per_trade_usdt}/笔)`;
+    } else if (obsMode) {
+      waitMsg = `⏳ 等待 paper 触发任意 diamond signal (OBS 模式)`;
+    } else {
+      waitMsg = `⏳ 等待 paper 触发白名单内 (${(config.symbol_whitelist || []).join('/')}) 钻石信号`;
+    }
     body += `<div class="paper-section-title">${waitMsg}</div>`;
   }
 

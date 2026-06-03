@@ -1374,6 +1374,10 @@ def publish_live_history(
             "regime_gate_mode": LIVE_REGIME_GATE_MODE,
             "min_conviction_score": LIVE_MIN_CONVICTION_SCORE,
             "observation_mode": LIVE_OBSERVATION_MODE,
+            # Phase 6.A: 让 dashboard 知道当前是不是 mainnet_pilot 模式,
+            # 避免显示过时的 "实盘前必须改 OBS=False" 提示.
+            "cresus_mode": CRESUS_MODE,
+            "pilot_capital_usdt": PILOT_CAPITAL if CRESUS_MODE == 'mainnet_pilot' else None,
         },
     }
     try:
