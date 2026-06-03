@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-03T12:57:40.806645+00:00",
+  "updated_at": "2026-06-03T12:59:44.952265+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 33,
+  "alerts_count": 34,
   "alerts": [
+    {
+      "symbol": "EDGEUSDT",
+      "base": "EDGE",
+      "direction": "SHORT",
+      "alert_type": "burst",
+      "price": 0.6212,
+      "price_change_pct": -0.64,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 150409.0,
+      "volume_baseline_usdt": 19003.0,
+      "volume_ratio": 7.91,
+      "detected_at": "2026-06-03T12:58:59.945716+00:00",
+      "intensity": 1,
+      "change_5m_pct": -0.955,
+      "change_15m_pct": -0.225,
+      "change_1h_pct": -3.908,
+      "change_4h_pct": -3.834,
+      "taker_buy_ratio_1m": 0.307,
+      "taker_buy_ratio_5m": 0.313,
+      "oi_delta_5m_pct": 0.032,
+      "funding_rate_pct": 0.0094,
+      "atr_pct": 0.33,
+      "range_4h_pct": 7.74,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.624275,
+      "suggested_tp1": 0.6165875,
+      "suggested_tp2": 0.611975,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "CUSDT",
       "base": "C",
