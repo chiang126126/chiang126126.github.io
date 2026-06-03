@@ -557,24 +557,49 @@ class TestTryMirrorOpen(unittest.TestCase):
         self.assertIsNone(result)
 
     def test_set_leverage_called_before_open(self):
-        """每次 mirror_open 前必须调 set_leverage(LIVE_LEVERAGE), 防止 Binance 默认 20x."""
+        """每次 mirror_open 前必须调 set_leverage(LIVE_LEVERAGE), 防止 Binance 默认 20x.
+
+        Phase 6.A-margin: 同时验证 set_margin_type(ISOLATED) 也被调,
+        顺序为 set_leverage → set_margin_type → open_position.
+        """
         order = []
         def lev_call(symbol, lev, **kw):
             order.append(("lev", symbol, lev))
             return {"_dryRun": True, "leverage": lev, "symbol": symbol}
+        def mt_call(symbol, mt, **kw):
+            order.append(("mt", symbol, mt))
+            return {"_dryRun": True, "marginType": mt, "symbol": symbol}
         def open_call(**kw):
             order.append(("open", kw["symbol"]))
             return self.mock_open_result
         with patch.object(self.client, "set_leverage", side_effect=lev_call), \
+             patch.object(self.client, "set_margin_type", side_effect=mt_call), \
              patch.object(self.client, "open_position", side_effect=open_call):
             r = _try_mirror_open(self.client, self.paper_trade, dry_run=True)
         self.assertIsNotNone(r)
-        # set_leverage 必须先于 open_position
+        # 顺序: set_leverage → set_margin_type → open
         self.assertEqual(order[0][0], "lev")
         self.assertEqual(order[0][1], "BTCUSDT")
         self.assertEqual(order[0][2], live_trader.LIVE_LEVERAGE)
-        self.assertEqual(order[1][0], "open")
+        self.assertEqual(order[1][0], "mt")
+        self.assertEqual(order[1][1], "BTCUSDT")
+        self.assertEqual(order[1][2], "ISOLATED")
+        self.assertEqual(order[2][0], "open")
         # live_trade 中应记录 leverage
+        self.assertEqual(r["leverage"], live_trader.LIVE_LEVERAGE)
+
+    def test_set_margin_type_failure_does_not_block_open(self):
+        """Phase 6.A-margin: set_margin_type 失败 (e.g. -4046 已被 swallow,
+        但若是 -2019 余额不足等其它错) 不应 block 开仓 — 只 warn 后继续."""
+        with patch.object(self.client, "set_leverage",
+                          return_value={"_dryRun": True}), \
+             patch.object(self.client, "set_margin_type",
+                          side_effect=BinanceError("unexpected error code")), \
+             patch.object(self.client, "open_position",
+                          return_value=self.mock_open_result):
+            r = _try_mirror_open(self.client, self.paper_trade, dry_run=True)
+        # 开仓仍然成功 (margin type 切失败只 warn 不阻塞)
+        self.assertIsNotNone(r)
         self.assertEqual(r["leverage"], live_trader.LIVE_LEVERAGE)
 
     def test_set_leverage_failure_aborts_mirror(self):

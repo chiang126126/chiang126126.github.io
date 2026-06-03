@@ -2001,6 +2001,31 @@ def _try_mirror_open(
         )
         return None
 
+    # Phase 6.A-margin: 强制 ISOLATED margin 模式 (防 Binance 默认 CROSS).
+    # 必要性: Cross margin 让所有仓位共享抵押, 单笔大亏拖累其它. Isolated
+    # 单仓独立, 单笔最大亏 = 该仓 notional. 1x leverage 下风险等价但管理更
+    # 清晰. set_margin_type 幂等 — 已 ISOLATED 返 -4046 已被 binance_client
+    # 内部 swallow 视为成功. 失败仅 warn, 不阻塞开仓 (cross 也能跑, 只是不
+    # 优先, 比直接 fail 更柔性).
+    try:
+        client.set_margin_type(sym, "ISOLATED")
+    except (BinanceError, ValueError) as e:
+        # 异常但不阻塞 — bot 仍会以 Cross 模式开仓 (Binance 账户级别默认),
+        # 不会因 margin mode 切换失败放弃信号
+        if "-1121" in str(e):
+            _EXCHANGE_UNAVAILABLE_SYMBOLS.add(sym)
+            log.warning(f"[mirror-open] {sym}: set_margin_type -1121 skip session")
+            return None
+        log.warning(
+            f"[mirror-open] {sym}: set_margin_type(ISOLATED) 失败 "
+            f"({type(e).__name__}: {e}) — 继续用账户默认模式开仓"
+        )
+    except Exception as e:
+        log.warning(
+            f"[mirror-open] {sym}: set_margin_type unexpected "
+            f"({type(e).__name__}: {e}) — 继续开仓"
+        )
+
     # Phase 4.V: 取实时盘口价用于 IOC 限价入场 (价格有硬上限, 不追价).
     # LONG: ask (我们要吃的卖一价); SHORT: bid (我们要打的买一价).
     # 失败时 fallback None → open_position 回退到市价单 (向后兼容).
