@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-03T02:49:37.163160+00:00",
+  "updated_at": "2026-06-03T02:51:49.183439+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 29,
+  "alerts_count": 30,
   "alerts": [
+    {
+      "symbol": "APRUSDT",
+      "base": "APR",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.25478,
+      "price_change_pct": 4.022,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 303345.0,
+      "volume_baseline_usdt": 49394.0,
+      "volume_ratio": 6.14,
+      "detected_at": "2026-06-03T02:51:06.224070+00:00",
+      "intensity": 1,
+      "change_5m_pct": 4.092,
+      "change_15m_pct": 1.858,
+      "change_1h_pct": 8.594,
+      "change_4h_pct": 5.118,
+      "taker_buy_ratio_1m": 0.459,
+      "taker_buy_ratio_5m": 0.598,
+      "oi_delta_5m_pct": 0.382,
+      "funding_rate_pct": 0.0545,
+      "atr_pct": 1.263,
+      "range_4h_pct": 16.38,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.24834286,
+      "suggested_tp1": 0.26443571,
+      "suggested_tp2": 0.27409143,
+      "conviction_score": 5,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "KGENUSDT",
       "base": "KGEN",
