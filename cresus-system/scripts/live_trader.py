@@ -2879,14 +2879,14 @@ def _cli_main() -> int:
                     "Cresus 设计是 One-way Mode (每 symbol 单方向).\n"
                     "Hedge Mode 下所有开仓会失败 -4061 'position side does not match'.\n"
                     "\n"
-                    "修复 (子账户 UI 操作):\n"
-                    "  1. 登录 cresus-pilot 子账户\n"
-                    "  2. USDT-M Futures → 右上角 Preference → Position Mode\n"
+                    "修复 (子账户 UI 操作 — 最可靠):\n"
+                    "  1. 登录 cresus-pilot 子账户 (必须子账户身份, 不是主账户)\n"
+                    "  2. USDT-M Futures → 右上角设置 ⚙️ → Preference → Position Mode\n"
                     "  3. 切换 Hedge Mode → One-way Mode (子账户必须无持仓)\n"
                     "  4. 重启 live-trader: launchctl unload + load\n"
                     "\n"
-                    "或代码强切 (谨慎, 改账户全局设置):\n"
-                    "  python3 -c \"import sys; sys.path.insert(0,'/Users/hong/chiang126126.github.io/cresus-system/scripts'); from binance_client import BinanceClient; import json; k=json.load(open('/Users/hong/cresus-bot/binance_keys_mainnet.json')); BinanceClient(k['api_key'],k['api_secret'],testnet=False).set_position_mode(False)\""
+                    "或代码强切 (注意 dry_run=False 必传, 否则不真切):\n"
+                    "  python3 -c \"import sys, json; sys.path.insert(0,'/Users/hong/chiang126126.github.io/cresus-system/scripts'); from binance_client import BinanceClient; k=json.load(open('/Users/hong/cresus-bot/binance_keys_mainnet.json')); c=BinanceClient(k['api_key'],k['api_secret'],testnet=False,dry_run=False); print(c.set_position_mode(False, dry_run=False))\""
                 )
         except BinanceError as e:
             # API 失败 (网络等), 不强行阻塞 — 让用户先尝试启动, 后续会有 -4061
