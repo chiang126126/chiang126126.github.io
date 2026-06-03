@@ -264,6 +264,9 @@ LIVE_CB_PAUSE_MIN = 30                # L2 pause duration
 
 | 日期 | Commit | 变更 |
 |---|---|---|
+| 2026-06-03 | (手动) | **Paper engine 部署修复** — copy 最新 volume_velocity_scanner.py 从 repo 到 `~/cresus-bot/scripts/`(此目录不是 git checkout,自 5/14 一直跑老代码)+ reset paper state 到 $600。Paper 现在跟 live 同款 sizing/资金。 |
+| 2026-06-03 | `60215ef5e` | Phase 6.A paper sync — paper engine CRESUS_MODE-aware override |
+| 2026-06-03 | `cfbf9a8d5` | Playbook 29 初稿 |
 | 2026-06-03 | `c7ff52e05` | Phase 6.A-fix2: LIVE_HISTORY 改回单一路径修 dashboard 同步 |
 | 2026-06-03 | `dca67a8a1` | Phase 6.A-fix: $LIVE_STARTING_CAPITAL / kill switch / LIVE_NOTIONAL / state 文件独立 |
 | 2026-06-03 | `e2db198a4` | Phase 6.A-margin: 自动 ISOLATED margin |
@@ -296,3 +299,57 @@ LIVE_CB_PAUSE_MIN = 30                # L2 pause duration
 ## 15. 反馈机制
 
 观察期(头 1 周)发现的任何问题在 commit message 标 `Phase 6.A-fix-XYZ` 并更新本文档 §13 更新日志。
+
+---
+
+## 16. ⚠️ 已知 architecture gap(后续待修)
+
+### 16.1 — Paper engine 部署不在 git checkout
+
+**问题**:`~/cresus-bot/scripts/` **不是 git 仓库**,paper engine `volume_velocity_scanner.py` 在该目录下,**手动 cp 部署**。自 2026-05-14 起,该副本一直冻在那一刻 — 期间我们 push 到 repo 的所有 paper 优化(Phase 5.A 分档仓位 / Phase 5.K 调整 / Phase 5.B BTC trend conviction 等)**实际上没有在 paper 端生效过**。
+
+**影响**:
+- 之前 paper engine 表面"按 score 分档",实际 fall through 到 `PAPER_NOTIONAL_PER_TRADE_USDT = 400` 默认
+- audit 数据基于的 paper PnL 可能有偏差
+- paper-live 对比的"paper 端"实际跑的是 5/14 之前的策略
+
+**触发时机**:Phase 6.A 启用 mainnet pilot 时,paper engine 没用 `CRESUS_MODE` 行为暴露此问题。
+
+**临时修复**(2026-06-03):
+```bash
+cp ~/chiang126126.github.io/cresus-system/scripts/volume_velocity_scanner.py \
+   ~/cresus-bot/scripts/volume_velocity_scanner.py
+launchctl unload && launchctl load ~/Library/LaunchAgents/com.cresus.velocity-scanner.plist
+```
+
+**长期修复(待做)**:`~/cresus-bot/scripts/` 改成 git checkout(symlink to repo 或定期自动 sync 脚本)。
+
+### 16.2 — Live trader 部署链路 vs Paper engine 部署链路
+
+| | live trader | paper engine |
+|---|---|---|
+| plist `ProgramArguments` | 直接指向 `~/chiang126126.github.io/cresus-system/scripts/live_trader.py` ✅ | 通过 `~/cresus-bot/scripts/run_velocity_scanner.sh` → `~/cresus-bot/scripts/volume_velocity_scanner.py` ❌ |
+| 受 git pull 影响 | 立刻生效 | **不受影响**(需手动 cp 后才生效) |
+
+→ Mainnet pilot 期间所有 paper 相关 code change **必须同时 cp 到 `~/cresus-bot/scripts/`** 才生效。建议每次 git pull 后跑:
+```bash
+cp ~/chiang126126.github.io/cresus-system/scripts/volume_velocity_scanner.py ~/cresus-bot/scripts/volume_velocity_scanner.py
+launchctl unload ~/Library/LaunchAgents/com.cresus.velocity-scanner.plist
+launchctl load ~/Library/LaunchAgents/com.cresus.velocity-scanner.plist
+```
+
+### 16.3 — Paper engine 内部 state 文件清单(reset 时要全包)
+
+私有(.开头,paper engine 读写):
+- `~/cresus-bot/.paper_trades.json` ← source of truth, 主仓
+- `~/cresus-bot/.paper_shadow_trades.json` ← shadow 仓
+- `~/cresus-bot/.velocity_dedup.json` ← 去重缓存(不需 reset)
+- `~/cresus-bot/.velocity_outcomes.json` ← outcomes 缓存(不需 reset)
+- `~/cresus-bot/.velocity_tg_cooldown.json` ← TG 冷却
+- `~/cresus-bot/.velocity_email_cooldown.json` ← email 冷却
+
+公开(发布给 dashboard):
+- `~/cresus-bot/paper_trades_history.json`
+- `~/cresus-bot/paper_shadow_history.json`
+- `~/cresus-bot/volume_velocity_alerts.json`
+- `~/cresus-bot/velocity_winrate.json`
