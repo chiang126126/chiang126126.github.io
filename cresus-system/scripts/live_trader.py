@@ -537,6 +537,21 @@ if CRESUS_MODE == 'mainnet_pilot':
     # Phase 5.S multipliers 一律清空 — mainnet 数据足够后再 audit 重启用
     LIVE_REGIME_SIZE_MULTIPLIER = {}
 
+    # Phase 6.A-fix: 启动资金 & 累计 DD kill switch 跟实际 pilot 资金对齐.
+    # 默认 $2000 / 5% (testnet 时代) 在 mainnet $600 启动瞬间触发 (因 $600 < $1900).
+    LIVE_STARTING_CAPITAL_USDT = PILOT_CAPITAL
+    LIVE_TOTAL_DD_LIMIT_PCT = 30.0      # 30% pilot 累计 DD — 例 $600 → 跌破 $420 停
+
+    # Phase 6.A-fix: LIVE_NOTIONAL_USDT 仅用于 log 显示 (功能上由 LIVE_NOTIONAL_BY_SCORE
+    # 接管). 设为 max(by_score.values()) 使 log "config: notional=$X" 反映真实最大笔.
+    LIVE_NOTIONAL_USDT = float(max(LIVE_NOTIONAL_BY_SCORE.values()))
+
+    # Phase 6.A-fix: mainnet pilot 用独立 state 文件, 不污染 testnet 状态.
+    # 老 testnet state 路径 (~/cresus-bot/.live_trades.json) 保留, 切回 testnet
+    # 时数据完整. mainnet state 从 fresh 空状态开始.
+    LIVE_STATE = Path.home() / "cresus-bot" / ".live_trades_mainnet.json"
+    LIVE_HISTORY = Path.home() / "cresus-bot" / "live_trades_history_mainnet.json"
+
 
 def _log_mainnet_pilot_banner() -> None:
     """启动 banner — 在 main() 早期调用, 让用户清晰看到生效配置."""
@@ -550,7 +565,10 @@ def _log_mainnet_pilot_banner() -> None:
     log.warning(f"  LIVE_MAX_CONCURRENT: {LIVE_MAX_CONCURRENT}")
     log.warning(f"  LIVE_MAX_DEPLOY_USDT: ${LIVE_MAX_DEPLOY_USDT:.0f}")
     log.warning(f"  LIVE_DAILY_DD_LIMIT_USDT: ${LIVE_DAILY_DD_LIMIT_USDT:.0f}")
+    log.warning(f"  LIVE_STARTING_CAPITAL_USDT: ${LIVE_STARTING_CAPITAL_USDT:.0f}  (kill switch baseline)")
+    log.warning(f"  LIVE_TOTAL_DD_LIMIT_PCT: {LIVE_TOTAL_DD_LIMIT_PCT}%  (kill switch at -${LIVE_STARTING_CAPITAL_USDT*LIVE_TOTAL_DD_LIMIT_PCT/100:.0f})")
     log.warning(f"  LIVE_REGIME_SIZE_MULTIPLIER: {LIVE_REGIME_SIZE_MULTIPLIER}  (清空)")
+    log.warning(f"  LIVE_STATE: {LIVE_STATE}  (独立 mainnet 状态)")
     log.warning(f"  BINANCE_KEYS_PATH: {os.environ.get('BINANCE_KEYS_PATH', '(default)')}")
     log.warning("=" * 72)
 
