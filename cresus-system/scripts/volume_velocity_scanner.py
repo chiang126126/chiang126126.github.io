@@ -114,6 +114,41 @@ PAPER_NOTIONAL_BY_SCORE = {
 }
 
 
+# ============================================================================
+# Phase 6.A (2026-06-03) — Paper-Live 对齐 (mainnet pilot 同步)
+# ============================================================================
+# 当 CRESUS_MODE=mainnet_pilot 启用时, paper engine 同步 live 的资金 / 仓位
+# 配置, 这样 paper PnL 和 mainnet PnL 是 apples-to-apples 可比.
+#
+# 启用方式 (跟 live_trader.py 同款 env var):
+#   CRESUS_MODE=mainnet_pilot
+#   CRESUS_PILOT_CAPITAL=600
+#
+# 不启用 (default testnet) → 保留原 $2000 / {200/400/800/200} 配置.
+#
+# 注意: paper engine 不调真钱, 仅同步 sizing + 起始资金, 不需要 ~/.allow-live.
+_PAPER_CRESUS_MODE = os.environ.get('CRESUS_MODE', 'testnet').strip().lower()
+try:
+    _PAPER_PILOT_CAPITAL = float(os.environ.get('CRESUS_PILOT_CAPITAL', '500') or 500)
+except (TypeError, ValueError):
+    _PAPER_PILOT_CAPITAL = 500.0
+
+if _PAPER_CRESUS_MODE == 'mainnet_pilot':
+    # 跟 live_trader.py mainnet_pilot 三档 tier 一致
+    if _PAPER_PILOT_CAPITAL <= 250:
+        PAPER_NOTIONAL_BY_SCORE = {5: 80, 6: 100, 7: 150, 8: 80, 9: 80, 10: 80}
+        PAPER_NOTIONAL_PER_TRADE_USDT = 80.0
+    elif _PAPER_PILOT_CAPITAL <= 600:
+        PAPER_NOTIONAL_BY_SCORE = {5: 150, 6: 200, 7: 300, 8: 150, 9: 150, 10: 150}
+        PAPER_NOTIONAL_PER_TRADE_USDT = 150.0
+    else:
+        PAPER_NOTIONAL_BY_SCORE = {5: 300, 6: 400, 7: 600, 8: 300, 9: 300, 10: 300}
+        PAPER_NOTIONAL_PER_TRADE_USDT = 300.0
+
+    # paper 起始资金跟 live pilot 一致 → PnL 可直接对比
+    PAPER_STARTING_CAPITAL_USDT = _PAPER_PILOT_CAPITAL
+
+
 def _notional_for_score(score) -> float:
     """按 conviction score 返回分配 notional. 字段异常退路到基准."""
     try:
