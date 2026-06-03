@@ -86,6 +86,28 @@ PAPER_MAX_ATR_PCT = 3.0               # Phase 5.A (5/27): 2.0→3.0 — 数据 (
 PAPER_CONSEC_SL_TRIGGER = 2           # Phase 1.2: 同 symbol 连续 SL 次数阈值 (审计: QUSDT 5/5 SL, ATA 4/4 SL)
 PAPER_CONSEC_SL_WINDOW_HOURS = 4      # Phase 1.2: 连续 SL 检测窗口 (4h 内)
 PAPER_CONSEC_SL_COOLDOWN_HOURS = 4    # Phase 1.2: 触发后冷却时长
+
+# ==========================================
+# Phase 6.B (2026-06-03) — 实战亏损反馈过滤 + 浮盈保护
+# ==========================================
+# 触发原因: 用户 6/3 实盘看到 DRAMUSDT/DYDX/BASEDUSDT/MONUSDT 等多笔 paper Phase A 止损,
+# 共同模式:
+#   - R 极小 (DRAMUSDT R=0.23%, 1 tick 就触发)
+#   - 历史 30m 胜率低 (BASEDUSDT 12% N=32, DYDX 27% N=15)
+#   - DYDX 类: 高水位接近 TP1 但回拉到 SL = "盈利后转亏"
+#
+# 当前代码只用历史胜率 *加分* (+2 或 +3), 不用作 *过滤*. 致命漏洞.
+# 当前 SL 公式 = 1.0×ATR×vol_mult, 没有绝对下限, 极小 ATR 信号 R 不足以承受 wick.
+# 当前 Phase A 阶段 SL 永不动直到 TP1, 浮盈接近 TP1 后回拉直接吃 SL.
+#
+# Phase 6.B 3 个修复 (Tier 1):
+#   A. 历史 30m 胜率 filter: < 25% AND N >= 20 → reject (BASED 类显著负 EV 信号)
+#   B. SL 绝对下限: SL distance < 0.3% → reject (DRAMUSDT 类微 R 信号)
+#   C. Breakeven shift: Phase A 浮盈达 1.0R 时 SL 移到 entry (DYDX 类盈利保护)
+PAPER_MIN_HIST_WINRATE = 0.25         # 6.B-A: 历史 30m 胜率下限 (低于此 + N 足够 → reject)
+PAPER_MIN_HIST_SAMPLE = 20            # 6.B-A: 历史样本下限 (N < 此值不应用 winrate filter, 防小样本误杀)
+PAPER_MIN_SL_DISTANCE_PCT = 0.3       # 6.B-B: SL 距入场最小 % (低于此 = R 太窄, reject)
+PAPER_BREAKEVEN_PROFIT_R = 1.0        # 6.B-C: Phase A 浮盈达 N×R 时 SL 移到 entry
 PAPER_RECENT_LIMIT = 0                # 已废弃 (改为全量发布以支持任意日期复盘, N=1000 时 ~150KB 也可接受)
 PAPER_MIN_TIER     = "diamond"        # 只对钻石信号自动开仓 (高质量 only)
 # 模拟仓金额: 总账户 $2000, 每笔分配 $400 (20%), 最多并发 5 笔
@@ -1657,10 +1679,18 @@ def _compute_free_capital(state: dict) -> float:
 
 
 def _open_paper_trade(a: VelocityAlert, state: dict, now: datetime,
-                      free_capital: float) -> Optional[dict]:
+                      free_capital: float,
+                      winrate_summary: Optional[dict] = None) -> Optional[dict]:
     """钻石信号 → 开模拟仓. 返回 trade dict (None 表示跳过).
     资金检查: 若 free_capital < PAPER_NOTIONAL_PER_TRADE_USDT 则拒开.
     初始 Phase A: SL = entry ± 1×ATR, TP1 = entry ± 1.5×ATR, TP2 = entry ± 3×ATR
+
+    Phase 6.B (2026-06-03) 新增 filters (实战亏损反馈):
+        A. 历史 30m 胜率 < PAPER_MIN_HIST_WINRATE AND N >= PAPER_MIN_HIST_SAMPLE → reject
+        B. SL distance < PAPER_MIN_SL_DISTANCE_PCT → reject
+
+    winrate_summary: 由 caller (_run_paper_trading) 传入, 用于 Tier 1A 过滤.
+        None 时跳过 winrate filter (向后兼容老 callers / 测试).
     """
     if a.conviction_tier != PAPER_MIN_TIER:
         return None
@@ -1673,6 +1703,34 @@ def _open_paper_trade(a: VelocityAlert, state: dict, now: datetime,
         return None
     if a.suggested_sl is None or a.suggested_tp1 is None or a.suggested_tp2 is None:
         return None
+
+    # Phase 6.B-A: 历史 30m 胜率 filter — 显著负 EV 的 setup 直接 reject
+    # 实战触发: BASEDUSDT 历史 12% N=32 → -1.44% 止损 (-$2.15), 类似 setup 应屏蔽
+    if winrate_summary and winrate_summary.get("by_key"):
+        wkey = f"{a.symbol}|{a.alert_type}|{a.direction}"
+        w = winrate_summary["by_key"].get(wkey)
+        if w and w.get("stages"):
+            s30 = w["stages"].get("30m")
+            if s30:
+                n = s30.get("n", 0)
+                rate = s30.get("win_rate", 0)
+                if n >= PAPER_MIN_HIST_SAMPLE and rate < PAPER_MIN_HIST_WINRATE:
+                    mu = s30.get("avg_outcome_pct", 0)
+                    _log(f"[paper] SKIP open {a.symbol} {a.direction}: "
+                         f"Phase 6.B-A 历史 30m 胜率 {rate*100:.0f}% (N={n}, μ{mu:+.2f}%) "
+                         f"< {PAPER_MIN_HIST_WINRATE*100:.0f}% — 显著负 EV setup")
+                    return None
+
+    # Phase 6.B-B: SL 绝对距离 filter — R 太窄易被 wick 扫
+    # 实战触发: DRAMUSDT ATR 0.23%, R 仅 0.23% → 1 个 tick 就 SL, 持仓 0min
+    if a.price > 0:
+        sl_dist_pct = abs(float(a.suggested_sl) - float(a.price)) / float(a.price) * 100
+        if sl_dist_pct < PAPER_MIN_SL_DISTANCE_PCT:
+            _log(f"[paper] SKIP open {a.symbol} {a.direction}: "
+                 f"Phase 6.B-B SL distance {sl_dist_pct:.2f}% < {PAPER_MIN_SL_DISTANCE_PCT}% "
+                 f"— R 太窄易被 wick 扫")
+            return None
+
     # Phase 5.A (5/27): 按 conviction score 决定 notional, 取代固定 $400.
     # score 5: $400 (基准), 6-7: $800 (高 EV 加仓), 8+: $200 (反向证据减仓).
     trade_notional = _notional_for_score(a.conviction_score)
@@ -1848,6 +1906,29 @@ def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
 
         # ===== 状态机 =====
         if phase == "A":
+            # Phase 6.B-C: 浮盈达 PAPER_BREAKEVEN_PROFIT_R 时 SL 移到 entry (盈利保护).
+            # 实战触发: DYDXUSDT 高水位接近 TP1 (+0.7%) 后回拉到 SL (-0.58%), 全程
+            # Phase A 没保护. 加 BE shift 后, 类似场景至少出 0R 而非 -1R.
+            # 不转 Phase B (那是 TP1 触发才转), 仅 Phase A 内 SL 升级.
+            if not t.get("_breakeven_shifted"):
+                try:
+                    sl_dist = abs(entry - float(t["sl"]))
+                    if sl_dist > 0:
+                        cur_profit = (cur - entry) if is_long else (entry - cur)
+                        profit_r = cur_profit / sl_dist
+                        if profit_r >= PAPER_BREAKEVEN_PROFIT_R:
+                            old_sl = t["sl"]
+                            t["sl"] = entry
+                            t["_breakeven_shifted"] = True
+                            t["_breakeven_shifted_at"] = now.isoformat()
+                            _log(
+                                f"[paper] {t['symbol']} {t['direction']} 浮盈达 "
+                                f"{profit_r:.2f}R → SL {old_sl} → entry {entry} "
+                                f"(Phase 6.B-C breakeven lock, 仍在 Phase A)"
+                            )
+                except (TypeError, ValueError, ZeroDivisionError):
+                    pass
+
             # 初始阶段: 检查 SL → TP1 (TP2 还远, 不直接跳到 C)
             if is_long:
                 if cur <= t["sl"]:
@@ -2405,7 +2486,8 @@ def _prune_old_shadow(state: dict, retention_days: int = OUTCOMES_RETENTION_DAYS
     return deleted
 
 
-def _run_paper_trading(new_alerts: List[VelocityAlert], now: datetime) -> None:
+def _run_paper_trading(new_alerts: List[VelocityAlert], now: datetime,
+                       winrate_summary: Optional[dict] = None) -> None:
     """钻石信号自动开仓 + 3 阶段动态 SL/TP 状态机 + 关仓 + 发布 history.
     + Phase 4 Shadow: premium 信号同时记录到影子追踪 (不开真仓).
     全部失败保护 — 主流程不受影响.
@@ -2431,7 +2513,8 @@ def _run_paper_trading(new_alerts: List[VelocityAlert], now: datetime) -> None:
                 skipped_capital += 1
                 _log(f"💸 {a.symbol} 钻石信号但资金不足 (free=${free_capital:.2f} < notional=${PAPER_NOTIONAL_PER_TRADE_USDT}), 跳过开仓")
                 continue
-            if _open_paper_trade(a, state, now, free_capital) is not None:
+            if _open_paper_trade(a, state, now, free_capital,
+                                  winrate_summary=winrate_summary) is not None:
                 opened_n += 1
                 free_capital -= PAPER_NOTIONAL_PER_TRADE_USDT
                 _log(f"💎 模拟开仓 {a.symbol} {a.direction} @ {a.price} "
@@ -2647,8 +2730,10 @@ def run_scan() -> List[VelocityAlert]:
         _log(f"telegram push failed: {e}")
 
     # ===== Phase 4: 自动模拟仓 (仅钻石信号, 跟踪真实盈亏曲线) =====
+    # Phase 6.B (2026-06-03): 传 winrate_summary 让 _open_paper_trade 应用 Tier 1A filter
     try:
-        _run_paper_trading(new_alerts, datetime.now(timezone.utc))
+        _run_paper_trading(new_alerts, datetime.now(timezone.utc),
+                            winrate_summary=winrate_summary)
     except Exception as e:
         _log(f"paper trading failed: {e}")
 

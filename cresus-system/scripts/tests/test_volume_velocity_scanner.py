@@ -494,5 +494,221 @@ class TestPhase5CTp1PartialClose(unittest.TestCase):
         self.assertEqual(t["tp1_locked_pnl_usdt"], expected)
 
 
+class TestPhase6BLossReductionFilters(unittest.TestCase):
+    """Phase 6.B (2026-06-03): 实战亏损反馈 filter + 浮盈保护.
+
+    A. 历史 30m 胜率 < 25% AND N >= 20 → reject
+    B. SL distance < 0.3% → reject
+    C. Phase A 浮盈达 1.0R 时 SL 移到 entry (breakeven shift)
+    """
+
+    def _make_alert(self, symbol="TEST", direction="SHORT", score=5,
+                    price=100.0, sl_distance_pct=0.5, atr_pct=0.5):
+        """构造钻石 conviction VelocityAlert for testing.
+
+        sl_distance_pct: SL 距入场价的百分比 (绝对值). 函数根据 direction 自动放
+            正确方向 (LONG=入场下方 / SHORT=入场上方), 避免手写 SL/TP 顺序错.
+        """
+        from volume_velocity_scanner import VelocityAlert
+        a = VelocityAlert(
+            symbol=symbol, base=symbol.replace("USDT", ""), direction=direction,
+            alert_type="sustained", price=price,
+            price_change_pct=-2.0, metric_window_min=10,
+            volume_1m_usdt=1000.0, volume_baseline_usdt=200.0, volume_ratio=5.0,
+            detected_at="2026-06-03T20:00:00+00:00", intensity=2,
+        )
+        a.atr_pct = atr_pct
+        sl_dist = price * sl_distance_pct / 100.0
+        if direction == "LONG":
+            a.suggested_sl = price - sl_dist
+            a.suggested_tp1 = price + 1.5 * sl_dist
+            a.suggested_tp2 = price + 3.0 * sl_dist
+        else:  # SHORT
+            a.suggested_sl = price + sl_dist
+            a.suggested_tp1 = price - 1.5 * sl_dist
+            a.suggested_tp2 = price - 3.0 * sl_dist
+        a.conviction_score = score
+        a.conviction_tier = "diamond"
+        return a
+
+    def _make_state(self):
+        return {"open_trades": [], "closed_trades": []}
+
+    def _make_winrate_summary(self, symbol, direction, alert_type, n, win_rate, mu=0.0):
+        return {
+            "by_key": {
+                f"{symbol}|{alert_type}|{direction}": {
+                    "stages": {
+                        "30m": {"n": n, "win_rate": win_rate, "avg_outcome_pct": mu}
+                    }
+                }
+            }
+        }
+
+    # === Tier 1A: 历史胜率 filter ===
+
+    def test_6b_a_low_winrate_rejected(self):
+        """BASEDUSDT 12% N=32 → reject."""
+        from volume_velocity_scanner import _open_paper_trade
+        from datetime import datetime, timezone
+        a = self._make_alert(symbol="BASEDUSDT")
+        ws = self._make_winrate_summary("BASEDUSDT", "SHORT", "sustained",
+                                         n=32, win_rate=0.12, mu=-0.90)
+        result = _open_paper_trade(a, self._make_state(),
+                                    datetime.now(timezone.utc), 1000.0,
+                                    winrate_summary=ws)
+        self.assertIsNone(result, "历史 30m 胜率 12% N=32 应被 reject")
+
+    def test_6b_a_low_sample_not_rejected(self):
+        """DRAMUSDT 0% N=10 — N 不足不应被 winrate filter 拒 (会被 1B SL 距离拒)."""
+        from volume_velocity_scanner import _open_paper_trade
+        from datetime import datetime, timezone
+        # 给个充裕 SL 距离避免 1B 干扰, 单独测 1A
+        a = self._make_alert(symbol="DRAMUSDT", price=100.0, sl_distance_pct=0.5)
+        ws = self._make_winrate_summary("DRAMUSDT", "SHORT", "sustained",
+                                         n=10, win_rate=0.0, mu=-0.79)
+        result = _open_paper_trade(a, self._make_state(),
+                                    datetime.now(timezone.utc), 1000.0,
+                                    winrate_summary=ws)
+        self.assertIsNotNone(result, "N=10 < 20 不应被 winrate filter 拒")
+
+    def test_6b_a_high_winrate_passes(self):
+        """胜率 >= 25% 不应被拒."""
+        from volume_velocity_scanner import _open_paper_trade
+        from datetime import datetime, timezone
+        a = self._make_alert(symbol="MONUSDT")
+        ws = self._make_winrate_summary("MONUSDT", "SHORT", "sustained",
+                                         n=74, win_rate=0.42, mu=0.84)
+        result = _open_paper_trade(a, self._make_state(),
+                                    datetime.now(timezone.utc), 1000.0,
+                                    winrate_summary=ws)
+        self.assertIsNotNone(result, "胜率 42% N=74 应通过 1A filter")
+
+    def test_6b_a_no_winrate_data_passes(self):
+        """无 winrate_summary 时 (新 symbol / 测试) → 不应被拒 (fail-safe)."""
+        from volume_velocity_scanner import _open_paper_trade
+        from datetime import datetime, timezone
+        a = self._make_alert(symbol="NEWUSDT")
+        result = _open_paper_trade(a, self._make_state(),
+                                    datetime.now(timezone.utc), 1000.0,
+                                    winrate_summary=None)
+        self.assertIsNotNone(result, "无历史数据时不应被 1A 拒")
+
+    # === Tier 1B: SL 距离 filter ===
+
+    def test_6b_b_micro_sl_rejected(self):
+        """DRAMUSDT R=0.23% → reject."""
+        from volume_velocity_scanner import _open_paper_trade
+        from datetime import datetime, timezone
+        a = self._make_alert(symbol="DRAMUSDT", price=100.0, sl_distance_pct=0.23)
+        result = _open_paper_trade(a, self._make_state(),
+                                    datetime.now(timezone.utc), 1000.0)
+        self.assertIsNone(result, "SL 距离 0.23% < 0.3% 应被 1B reject")
+
+    def test_6b_b_normal_sl_passes(self):
+        """SL >= 0.3% 应通过."""
+        from volume_velocity_scanner import _open_paper_trade
+        from datetime import datetime, timezone
+        a = self._make_alert(symbol="NORMALUSDT", price=100.0, sl_distance_pct=0.5)
+        result = _open_paper_trade(a, self._make_state(),
+                                    datetime.now(timezone.utc), 1000.0)
+        self.assertIsNotNone(result, "SL 距离 0.5% 应通过 1B filter")
+
+    def test_6b_b_long_micro_sl_rejected(self):
+        """LONG 方向 R=0.2% 也应被拒."""
+        from volume_velocity_scanner import _open_paper_trade
+        from datetime import datetime, timezone
+        a = self._make_alert(symbol="X", direction="LONG", price=100.0,
+                              sl_distance_pct=0.2)
+        result = _open_paper_trade(a, self._make_state(),
+                                    datetime.now(timezone.utc), 1000.0)
+        self.assertIsNone(result, "LONG SL 0.2% < 0.3% 应被 1B reject")
+
+    # === Tier 1C: Breakeven shift ===
+
+    def test_6b_c_breakeven_shift_short(self):
+        """SHORT 浮盈达 1.0R 时 SL 应被移到 entry."""
+        from volume_velocity_scanner import _update_paper_trades
+        from datetime import datetime, timezone
+        # SHORT: entry 100, SL 101 (R=1%), 当前价 99 = 浮盈 1R
+        state = {"open_trades": [{
+            "symbol": "TESTUSDT", "direction": "SHORT",
+            "entry_price": 100.0, "sl": 101.0, "tp1": 98.5, "tp2": 97.0,
+            "phase": "A", "entered_at": "2026-06-03T20:00:00+00:00",
+            "atr_pct": 0.5, "notional_usdt": 150.0,
+            "high_water_mark": 99.0,
+        }], "closed_trades": []}
+        prices = {"TESTUSDT": 99.0}  # 浮盈 = 1.0R
+        closed, closed_list, transitions = _update_paper_trades(
+            state, prices, datetime.now(timezone.utc),
+        )
+        t = state["open_trades"][0]
+        self.assertEqual(t["sl"], 100.0, "SL 应移到 entry (breakeven)")
+        self.assertTrue(t.get("_breakeven_shifted"), "_breakeven_shifted flag 应为 True")
+        self.assertEqual(t["phase"], "A", "仍应在 Phase A (TP1 没触发)")
+
+    def test_6b_c_breakeven_shift_long(self):
+        """LONG 浮盈达 1.0R 时 SL 应被移到 entry."""
+        from volume_velocity_scanner import _update_paper_trades
+        from datetime import datetime, timezone
+        state = {"open_trades": [{
+            "symbol": "TESTUSDT", "direction": "LONG",
+            "entry_price": 100.0, "sl": 99.0, "tp1": 101.5, "tp2": 103.0,
+            "phase": "A", "entered_at": "2026-06-03T20:00:00+00:00",
+            "atr_pct": 0.5, "notional_usdt": 150.0,
+            "high_water_mark": 101.0,
+        }], "closed_trades": []}
+        prices = {"TESTUSDT": 101.0}  # 浮盈 = 1.0R
+        _update_paper_trades(state, prices, datetime.now(timezone.utc))
+        t = state["open_trades"][0]
+        self.assertEqual(t["sl"], 100.0, "SL 应移到 entry (breakeven)")
+        self.assertTrue(t.get("_breakeven_shifted"))
+
+    def test_6b_c_below_1r_no_shift(self):
+        """浮盈 < 1.0R 不应触发 breakeven shift."""
+        from volume_velocity_scanner import _update_paper_trades
+        from datetime import datetime, timezone
+        state = {"open_trades": [{
+            "symbol": "X", "direction": "SHORT",
+            "entry_price": 100.0, "sl": 101.0, "tp1": 98.5, "tp2": 97.0,
+            "phase": "A", "entered_at": "2026-06-03T20:00:00+00:00",
+            "atr_pct": 0.5, "notional_usdt": 150.0,
+            "high_water_mark": 99.5,
+        }], "closed_trades": []}
+        prices = {"X": 99.5}  # 浮盈 0.5R
+        _update_paper_trades(state, prices, datetime.now(timezone.utc))
+        t = state["open_trades"][0]
+        self.assertEqual(t["sl"], 101.0, "SL 不应改变 (浮盈 < 1.0R)")
+        self.assertFalse(t.get("_breakeven_shifted", False))
+
+    def test_6b_c_idempotent_no_double_shift(self):
+        """第二次 update 不应重复 shift (已 shifted flag 防御)."""
+        from volume_velocity_scanner import _update_paper_trades
+        from datetime import datetime, timezone
+        state = {"open_trades": [{
+            "symbol": "X", "direction": "SHORT",
+            "entry_price": 100.0, "sl": 101.0, "tp1": 98.5, "tp2": 97.0,
+            "phase": "A", "entered_at": "2026-06-03T20:00:00+00:00",
+            "atr_pct": 0.5, "notional_usdt": 150.0,
+            "high_water_mark": 99.0,
+        }], "closed_trades": []}
+        prices = {"X": 99.0}
+        _update_paper_trades(state, prices, datetime.now(timezone.utc))
+        # 第一次 shift, SL 现在是 100
+        t = state["open_trades"][0]
+        self.assertEqual(t["sl"], 100.0)
+        # 模拟价格回拉到 99.5 (浮盈 < 1R 但 SL 已是 100), 再 update
+        # 理论上不会再 shift (flag 已 True)
+        # 但 99.5 < SL=100 不 violates SL trigger 条件 (SHORT cur >= sl 才 trigger),
+        # 所以仍然 open. SL 应保持 100, 不再改.
+        prices2 = {"X": 99.5}
+        _update_paper_trades(state, prices2, datetime.now(timezone.utc))
+        # state 还应包含 trade (SL 100 > cur 99.5, 没触发)
+        if state["open_trades"]:
+            t2 = state["open_trades"][0]
+            self.assertEqual(t2["sl"], 100.0, "SL 不应被再次改变")
+            self.assertTrue(t2.get("_breakeven_shifted"))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
