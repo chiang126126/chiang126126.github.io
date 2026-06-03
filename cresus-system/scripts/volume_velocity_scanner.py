@@ -108,6 +108,22 @@ PAPER_MIN_HIST_WINRATE = 0.25         # 6.B-A: 历史 30m 胜率下限 (低于�
 PAPER_MIN_HIST_SAMPLE = 20            # 6.B-A: 历史样本下限 (N < 此值不应用 winrate filter, 防小样本误杀)
 PAPER_MIN_SL_DISTANCE_PCT = 0.3       # 6.B-B: SL 距入场最小 % (低于此 = R 太窄, reject)
 PAPER_BREAKEVEN_PROFIT_R = 1.0        # 6.B-C: Phase A 浮盈达 N×R 时 SL 移到 entry
+
+# ==========================================
+# Phase 6.C (2026-06-04) — 0.8R 中间保护 + Funding 方向感知评分
+# ==========================================
+# 用户审计 Phase 6.B 后提议: 在 1.0R BE 之前加 0.8R 中间保护 (更早锁住浮盈);
+# Funding 评分从 "abs(funding) >= 0.3 → +2 无方向区分" 改成方向感知 (追拥
+# 挤方向 -2, fade 拥挤方向 +2, 因为 funding 反映情绪拥挤).
+#
+# 0.8R 中间保护实现: 浮盈达 0.8R → SL 移到 entry - 0.2R (LONG) / entry + 0.2R
+# (SHORT). 即最差仍亏 0.2R, 比 BE shift (1.0R 触发) 更早, 但保留一些波动空间.
+# 用 _profit_milestone 字段记录已触发的最高里程碑 (0.8 / 1.0), 保证只前进
+# 不后退 (避免回拉到 0.8R 时再次"激活"已经过的 milestone).
+PAPER_PROFIT_PROTECT_R = 0.8          # 6.C-A: 浮盈 0.8R → SL 移到 entry ± 0.2R
+PAPER_PROTECT_BUFFER_R = 0.2          # 6.C-A: 0.8R milestone 触发后 SL 离 entry 的 buffer (0.2R = 仍允许小亏)
+PAPER_FUNDING_DIRECTION_BIAS = True   # 6.C-B: True = Funding 评分方向感知, False = 旧 abs 行为
+PAPER_MILESTONE_EPSILON = 1e-9        # 6.C-A: 浮点容差 (避免 100-99.2=0.7999... 触发不到 0.8R)
 PAPER_RECENT_LIMIT = 0                # 已废弃 (改为全量发布以支持任意日期复盘, N=1000 时 ~150KB 也可接受)
 PAPER_MIN_TIER     = "diamond"        # 只对钻石信号自动开仓 (高质量 only)
 # 模拟仓金额: 总账户 $2000, 每笔分配 $400 (20%), 最多并发 5 笔
@@ -178,6 +194,42 @@ def _notional_for_score(score) -> float:
     except (TypeError, ValueError):
         return PAPER_NOTIONAL_PER_TRADE_USDT
     return PAPER_NOTIONAL_BY_SCORE.get(s, PAPER_NOTIONAL_PER_TRADE_USDT)
+
+
+def _initial_r_distance(t: dict, entry: float) -> float:
+    """Phase 6.C: 计算 trade 的原始 1R 距离 (entry-to-initial-SL).
+
+    Robust to SL shifts (Phase 6.B-C breakeven 后 t["sl"] = entry, 距离 = 0
+    无法用作 R 计算). 优先级:
+        1. t["initial_r"]    新 trade 开仓时即记录 (Phase 6.C 起)
+        2. abs(entry - tp1) / 1.5  通过 TP1 反推 (TP1 永远 = 1.5R, 不变)
+        3. abs(entry - sl)   最后退路 (仅 SL 未移过时正确)
+
+    Returns: 1R 距离 (绝对值, 同价格单位). 异常返 0.0 (caller 应 guard).
+    """
+    if t.get("initial_r"):
+        try:
+            v = float(t["initial_r"])
+            if v > 0:
+                return v
+        except (TypeError, ValueError):
+            pass
+    tp1 = t.get("tp1")
+    if tp1 is not None and entry > 0:
+        try:
+            tp1_f = float(tp1)
+            r = abs(entry - tp1_f) / 1.5
+            if r > 0:
+                return r
+        except (TypeError, ValueError):
+            pass
+    sl = t.get("sl")
+    if sl is not None:
+        try:
+            return abs(entry - float(sl))
+        except (TypeError, ValueError):
+            pass
+    return 0.0
 
 
 def _use_tp1_partial_close(paper_id: str, mode: Optional[str] = None) -> bool:
@@ -1129,9 +1181,39 @@ def _compute_conviction(a: VelocityAlert, winrate_summary: Optional[dict],
 
     score = 0
 
-    # 1. 极端 funding (+2, 旧 +3): 单一指标降权, 不再主导
-    if a.funding_rate_pct is not None and abs(a.funding_rate_pct) >= 0.3:
-        score += 2
+    # 1. Funding 评分 — Phase 6.C-B (2026-06-04): 方向感知, 修正之前 abs 一刀切.
+    # 老逻辑: abs(funding) >= 0.3 → +2 (任何方向都加, 但跟方向逻辑不对).
+    # 新逻辑: funding 反映多头/空头拥挤度. 拥挤方向追单 = 反向风险大, 应减分;
+    #         相反方向 = fade 拥挤 = 潜在 alpha, 应加分.
+    #   funding > 0 (多头拥挤):
+    #     LONG  → 追拥挤多头, 减分
+    #     SHORT → fade 多头, 加分
+    #   funding < 0 (空头拥挤):
+    #     LONG  → fade 空头, 加分
+    #     SHORT → 追拥挤空头, 减分
+    # 阈值分层 (跟旧 abs 阈值兼容):
+    #   |funding| >= 0.3%  → ±2 (极端拥挤)
+    #   |funding| >= 0.05% → ±1 (中等拥挤)
+    if a.funding_rate_pct is not None and PAPER_FUNDING_DIRECTION_BIAS:
+        f = a.funding_rate_pct
+        crowded_long = (f > 0)        # f > 0: 多头拥挤 (多头付 funding)
+        crowded_short = (f < 0)
+        chasing_crowd = (is_long and crowded_long) or ((not is_long) and crowded_short)
+        fading_crowd = (is_long and crowded_short) or ((not is_long) and crowded_long)
+        if abs(f) >= 0.3:
+            if fading_crowd:
+                score += 2
+            elif chasing_crowd:
+                score -= 2
+        elif abs(f) >= 0.05:
+            if fading_crowd:
+                score += 1
+            elif chasing_crowd:
+                score -= 1
+    elif a.funding_rate_pct is not None and not PAPER_FUNDING_DIRECTION_BIAS:
+        # 老 abs 行为 (兼容退路, 万一新逻辑要回滚)
+        if abs(a.funding_rate_pct) >= 0.3:
+            score += 2
 
     # 2. 历史 30m 胜率: N≥10 高门槛 (+3) / N≥5 + 高胜率折扣 (+2)
     if winrate_summary and winrate_summary.get("by_key"):
@@ -1796,6 +1878,9 @@ def _open_paper_trade(a: VelocityAlert, state: dict, now: datetime,
         "sl":  a.suggested_sl,
         "tp1": a.suggested_tp1,
         "tp2": a.suggested_tp2,
+        # Phase 6.C: 原始 1R 距离 (entry-to-original-SL). SL 后续可能被 6.B-C/6.C
+        # breakeven 移动, 但 initial_r 永久保留, 供 profit_r 计算用. abs() 防方向.
+        "initial_r": abs(float(a.price) - float(a.suggested_sl)),
         "entered_at": now.isoformat(),
         "current_price": a.price,
         "unrealized_pnl_pct": 0.0,
@@ -1906,28 +1991,51 @@ def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
 
         # ===== 状态机 =====
         if phase == "A":
-            # Phase 6.B-C: 浮盈达 PAPER_BREAKEVEN_PROFIT_R 时 SL 移到 entry (盈利保护).
-            # 实战触发: DYDXUSDT 高水位接近 TP1 (+0.7%) 后回拉到 SL (-0.58%), 全程
-            # Phase A 没保护. 加 BE shift 后, 类似场景至少出 0R 而非 -1R.
-            # 不转 Phase B (那是 TP1 触发才转), 仅 Phase A 内 SL 升级.
-            if not t.get("_breakeven_shifted"):
-                try:
-                    sl_dist = abs(entry - float(t["sl"]))
-                    if sl_dist > 0:
-                        cur_profit = (cur - entry) if is_long else (entry - cur)
-                        profit_r = cur_profit / sl_dist
-                        if profit_r >= PAPER_BREAKEVEN_PROFIT_R:
-                            old_sl = t["sl"]
-                            t["sl"] = entry
-                            t["_breakeven_shifted"] = True
-                            t["_breakeven_shifted_at"] = now.isoformat()
-                            _log(
-                                f"[paper] {t['symbol']} {t['direction']} 浮盈达 "
-                                f"{profit_r:.2f}R → SL {old_sl} → entry {entry} "
-                                f"(Phase 6.B-C breakeven lock, 仍在 Phase A)"
-                            )
-                except (TypeError, ValueError, ZeroDivisionError):
-                    pass
+            # Phase 6.B-C / 6.C-A: 浮盈分级保护 (Phase A 内, 不转 Phase B).
+            # 用 _profit_milestone 字段记录已触发的最高里程碑, 保证只前进不后退:
+            #   0.8R 触发 → SL 移到 entry ± 0.2R (Phase 6.C-A 中间保护, 仍允许小亏)
+            #   1.0R 触发 → SL 移到 entry (Phase 6.B-C BE, 最差 0R)
+            # initial_r 在开仓时存档 (Phase 6.C), SL 移动后仍可正确算 profit_r.
+            try:
+                init_r = _initial_r_distance(t, entry)
+                if init_r > 0:
+                    cur_profit = (cur - entry) if is_long else (entry - cur)
+                    profit_r = cur_profit / init_r
+                    current_milestone = float(t.get("_profit_milestone") or 0.0)
+                    # Phase 6.C 部署迁移 (paranoid H1): 老 trade (Phase 6.B-C 时代开仓)
+                    # 没有 _profit_milestone 字段但已经触发 _breakeven_shifted=True →
+                    # 视为已到 1.0R milestone, 防止 0.8R 分支把已经收紧到 entry 的 SL
+                    # 重新 loosen 到 entry ± 0.2R (实战安全回退).
+                    if current_milestone == 0.0 and t.get("_breakeven_shifted"):
+                        current_milestone = PAPER_BREAKEVEN_PROFIT_R
+                    # 检查 1.0R BE shift (最高级, 优先). 用 epsilon 容差防 FP 失之毫厘.
+                    if profit_r + PAPER_MILESTONE_EPSILON >= PAPER_BREAKEVEN_PROFIT_R and current_milestone < PAPER_BREAKEVEN_PROFIT_R:
+                        old_sl = t["sl"]
+                        t["sl"] = entry
+                        t["_profit_milestone"] = PAPER_BREAKEVEN_PROFIT_R
+                        t["_breakeven_shifted"] = True   # backward compat (Phase 6.B 字段)
+                        t["_breakeven_shifted_at"] = now.isoformat()
+                        _log(
+                            f"[paper] {t['symbol']} {t['direction']} 浮盈达 "
+                            f"{profit_r:.2f}R → SL {old_sl} → entry {entry} "
+                            f"(Phase 6.B-C breakeven lock, milestone=1.0R)"
+                        )
+                    # 否则检查 0.8R 中间保护 (仅在还没到 0.8 时触发). epsilon 容差防 FP.
+                    elif profit_r + PAPER_MILESTONE_EPSILON >= PAPER_PROFIT_PROTECT_R and current_milestone < PAPER_PROFIT_PROTECT_R:
+                        # SL 移到 entry - buffer_r (LONG) / entry + buffer_r (SHORT)
+                        buffer_dist = PAPER_PROTECT_BUFFER_R * init_r
+                        new_sl = (entry - buffer_dist) if is_long else (entry + buffer_dist)
+                        old_sl = t["sl"]
+                        t["sl"] = new_sl
+                        t["_profit_milestone"] = PAPER_PROFIT_PROTECT_R
+                        t["_profit_protect_at"] = now.isoformat()
+                        _log(
+                            f"[paper] {t['symbol']} {t['direction']} 浮盈达 "
+                            f"{profit_r:.2f}R → SL {old_sl} → {new_sl} "
+                            f"(Phase 6.C-A 0.8R 保护, 最差亏 0.2R)"
+                        )
+            except (TypeError, ValueError, ZeroDivisionError):
+                pass
 
             # 初始阶段: 检查 SL → TP1 (TP2 还远, 不直接跳到 C)
             if is_long:
@@ -2311,6 +2419,9 @@ def _open_shadow_trade(a: VelocityAlert, state: dict, now: datetime) -> Optional
         "sl":  a.suggested_sl,
         "tp1": a.suggested_tp1,
         "tp2": a.suggested_tp2,
+        # Phase 6.C: 原始 1R 距离 (entry-to-original-SL). SL 后续可能被 6.B-C/6.C
+        # breakeven 移动, 但 initial_r 永久保留, 供 profit_r 计算用. abs() 防方向.
+        "initial_r": abs(float(a.price) - float(a.suggested_sl)),
         "entered_at": now.isoformat(),
         "current_price": a.price,
         "unrealized_pnl_pct": 0.0,
