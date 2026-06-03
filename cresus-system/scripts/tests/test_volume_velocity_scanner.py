@@ -710,5 +710,231 @@ class TestPhase6BLossReductionFilters(unittest.TestCase):
             self.assertTrue(t2.get("_breakeven_shifted"))
 
 
+class TestPhase6CExtendedProtection(unittest.TestCase):
+    """Phase 6.C (2026-06-04): 0.8R 中间保护 + Funding 方向感知评分.
+
+    A. 0.8R milestone: SL 移到 entry ± 0.2R (Phase A 内中间保护)
+    B. Funding 方向感知: 追拥挤方向减分, fade 拥挤方向加分
+    """
+
+    def _make_trade(self, direction="SHORT", entry=100.0, sl=101.0,
+                    tp1=None, tp2=None, hwm=None, initial_r=None):
+        """构造一个 Phase A trade dict for testing."""
+        if tp1 is None:
+            tp1 = entry - 1.5 * abs(entry - sl) if direction == "SHORT" else entry + 1.5 * abs(entry - sl)
+        if tp2 is None:
+            tp2 = entry - 3.0 * abs(entry - sl) if direction == "SHORT" else entry + 3.0 * abs(entry - sl)
+        if hwm is None:
+            hwm = entry
+        if initial_r is None:
+            initial_r = abs(entry - sl)
+        return {
+            "symbol": "TESTUSDT", "direction": direction,
+            "entry_price": entry, "sl": sl, "tp1": tp1, "tp2": tp2,
+            "initial_r": initial_r,
+            "phase": "A", "entered_at": "2026-06-03T20:00:00+00:00",
+            "atr_pct": 0.5, "notional_usdt": 150.0,
+            "high_water_mark": hwm,
+        }
+
+    # === Phase 6.C-A: 0.8R intermediate shift ===
+
+    def test_6c_a_short_0_8r_milestone(self):
+        """SHORT 浮盈 0.8R 时 SL 应移到 entry + 0.2R (不是 entry)."""
+        from volume_velocity_scanner import _update_paper_trades
+        from datetime import datetime, timezone
+        # SHORT: entry 100, SL 101 (1R=1), 当前 99.2 (浮盈 0.8R)
+        state = {"open_trades": [self._make_trade(
+            direction="SHORT", entry=100.0, sl=101.0, hwm=99.2,
+        )], "closed_trades": []}
+        prices = {"TESTUSDT": 99.2}
+        _update_paper_trades(state, prices, datetime.now(timezone.utc))
+        t = state["open_trades"][0]
+        # SL 应是 entry + 0.2R = 100 + 0.2 = 100.2
+        self.assertAlmostEqual(t["sl"], 100.2, places=3,
+                                msg="SHORT 0.8R 触发, SL 应移到 entry + 0.2R")
+        self.assertEqual(t.get("_profit_milestone"), 0.8)
+        self.assertEqual(t["phase"], "A", "仍应在 Phase A (没到 TP1)")
+
+    def test_6c_a_long_0_8r_milestone(self):
+        """LONG 浮盈 0.8R 时 SL 应移到 entry - 0.2R."""
+        from volume_velocity_scanner import _update_paper_trades
+        from datetime import datetime, timezone
+        # LONG: entry 100, SL 99 (1R=1), 当前 100.8 (浮盈 0.8R)
+        state = {"open_trades": [self._make_trade(
+            direction="LONG", entry=100.0, sl=99.0, hwm=100.8,
+        )], "closed_trades": []}
+        prices = {"TESTUSDT": 100.8}
+        _update_paper_trades(state, prices, datetime.now(timezone.utc))
+        t = state["open_trades"][0]
+        # SL 应是 entry - 0.2R = 100 - 0.2 = 99.8
+        self.assertAlmostEqual(t["sl"], 99.8, places=3)
+        self.assertEqual(t.get("_profit_milestone"), 0.8)
+
+    def test_6c_a_milestone_progression_0_8_to_1_0(self):
+        """0.8R → 1.0R 进阶: 第一次 update 触发 0.8, 第二次进 1.0."""
+        from volume_velocity_scanner import _update_paper_trades
+        from datetime import datetime, timezone
+        state = {"open_trades": [self._make_trade(
+            direction="SHORT", entry=100.0, sl=101.0, hwm=99.2,
+        )], "closed_trades": []}
+        # First update at 0.8R
+        prices = {"TESTUSDT": 99.2}
+        _update_paper_trades(state, prices, datetime.now(timezone.utc))
+        t = state["open_trades"][0]
+        self.assertAlmostEqual(t["sl"], 100.2, places=3, msg="0.8R 触发后 SL=100.2")
+        self.assertEqual(t.get("_profit_milestone"), 0.8)
+        # Second update at 1.0R
+        # hwm 跟踪 SHORT 最低价: 99.0
+        t["high_water_mark"] = 99.0
+        prices2 = {"TESTUSDT": 99.0}
+        _update_paper_trades(state, prices2, datetime.now(timezone.utc))
+        t2 = state["open_trades"][0]
+        # 1.0R 触发, SL 应移到 entry = 100
+        self.assertAlmostEqual(t2["sl"], 100.0, places=3, msg="1.0R 触发后 SL=entry=100")
+        self.assertEqual(t2.get("_profit_milestone"), 1.0)
+        # backward compat flag
+        self.assertTrue(t2.get("_breakeven_shifted"))
+
+    def test_6c_a_no_regression_when_retraces(self):
+        """到 1.0R 后再回到 0.8R 不应触发 (milestone 只前进不后退)."""
+        from volume_velocity_scanner import _update_paper_trades
+        from datetime import datetime, timezone
+        state = {"open_trades": [self._make_trade(
+            direction="SHORT", entry=100.0, sl=101.0, hwm=99.0,
+        )], "closed_trades": []}
+        # First update: 1.0R 触发, milestone=1.0, SL=100
+        prices = {"TESTUSDT": 99.0}
+        _update_paper_trades(state, prices, datetime.now(timezone.utc))
+        t = state["open_trades"][0]
+        self.assertEqual(t.get("_profit_milestone"), 1.0)
+        self.assertEqual(t["sl"], 100.0)
+        # 价格回拉到 99.5 (浮盈 0.5R, 在 0.8 以下)
+        # SL 仍是 100 (没触发 SHORT SL: cur=99.5 >= 100? No, 99.5 < 100, OK)
+        prices2 = {"TESTUSDT": 99.5}
+        _update_paper_trades(state, prices2, datetime.now(timezone.utc))
+        if state["open_trades"]:
+            t2 = state["open_trades"][0]
+            self.assertEqual(t2["sl"], 100.0, "SL 不应被回退")
+            self.assertEqual(t2.get("_profit_milestone"), 1.0)
+
+    def test_6c_a_direct_1_0r_skips_0_8(self):
+        """如果直接到 1.0R (跳过 0.8R), milestone 应直接是 1.0 不是 0.8."""
+        from volume_velocity_scanner import _update_paper_trades
+        from datetime import datetime, timezone
+        # 第一次 update 就到 1.0R: SHORT entry 100 SL 101 (R=1), 价格 99
+        state = {"open_trades": [self._make_trade(
+            direction="SHORT", entry=100.0, sl=101.0, hwm=99.0,
+        )], "closed_trades": []}
+        prices = {"TESTUSDT": 99.0}
+        _update_paper_trades(state, prices, datetime.now(timezone.utc))
+        t = state["open_trades"][0]
+        self.assertEqual(t.get("_profit_milestone"), 1.0,
+                          "应直接进 1.0 milestone, 跳过 0.8 中间步骤")
+        self.assertEqual(t["sl"], 100.0)
+
+    def test_6c_a_initial_r_field_preserved_across_shifts(self):
+        """initial_r 字段在 SL 移动后仍应正确反映原始 1R."""
+        from volume_velocity_scanner import _update_paper_trades, _initial_r_distance
+        from datetime import datetime, timezone
+        state = {"open_trades": [self._make_trade(
+            direction="SHORT", entry=100.0, sl=101.0, hwm=99.0,
+        )], "closed_trades": []}
+        # Trigger 1.0R BE, SL → 100
+        _update_paper_trades(state, {"TESTUSDT": 99.0},
+                              datetime.now(timezone.utc))
+        t = state["open_trades"][0]
+        # initial_r 应保持 1.0 (不受 SL 移动影响)
+        self.assertEqual(t.get("initial_r"), 1.0)
+        # _initial_r_distance helper 用 initial_r 仍正确
+        self.assertEqual(_initial_r_distance(t, 100.0), 1.0)
+
+    # === Phase 6.C-B: Funding direction-aware scoring ===
+    # 注意: _compute_conviction 末尾有 score = max(score, 0) 防御性 clamp,
+    # 所以 Phase 6.C-B 减分对终值影响通过 delta 验证 (baseline + funding 各打分对比),
+    # 而不是直接验证负值. clamp 后 negative 仍会落入 "regular" tier, 区别在于
+    # 当有其它正信号 (如 4h 对齐 +2) 时, 减分能拉低 final tier, 这正是目标.
+
+    def _make_alert_for_funding(self, direction, funding_pct,
+                                 baseline_aligned=False):
+        """构造 funding test 用 alert.
+
+        baseline_aligned: 是否额外加 1h/4h trend 对齐 → 让 score 有 +2 基础,
+        能观察 funding 减分把 score 拉低 (不被 max(0) clamp 掩盖).
+        """
+        from volume_velocity_scanner import VelocityAlert
+        a = VelocityAlert(
+            symbol="X", base="X", direction=direction,
+            # 用 "burst" 避免 sustained 加 +1, 让 baseline = 0 (或 +2 if aligned)
+            alert_type="burst", price=100.0,
+            price_change_pct=-2.0, metric_window_min=1,
+            volume_1m_usdt=1000.0, volume_baseline_usdt=200.0, volume_ratio=5.0,
+            detected_at="2026-06-03T20:00:00+00:00", intensity=2,
+        )
+        a.funding_rate_pct = funding_pct
+        if baseline_aligned:
+            # 1h+4h 同向 → +2 (对齐分), 不触发 4h<=-3 硬否决
+            a.change_1h_pct = 1.0 if direction == "LONG" else -1.0
+            a.change_4h_pct = 2.0 if direction == "LONG" else -2.0
+        return a
+
+    def _funding_delta(self, direction, funding_pct):
+        """计算 funding 对 score 的"原始"贡献 = baseline_score - funding_score.
+        用 baseline_aligned=True 保证 baseline 足够高 (+2), 让负值 funding 可观察.
+        return: funding_pct 加进去后相对 baseline 的 delta (正=加分, 负=减分).
+        """
+        from volume_velocity_scanner import _compute_conviction
+        a_base = self._make_alert_for_funding(direction, None,
+                                                baseline_aligned=True)
+        base_score, _ = _compute_conviction(a_base, None,
+                                              regime=None, btc_regime=None)
+        a_f = self._make_alert_for_funding(direction, funding_pct,
+                                             baseline_aligned=True)
+        f_score, _ = _compute_conviction(a_f, None,
+                                          regime=None, btc_regime=None)
+        return f_score - base_score
+
+    def test_6c_b_long_chases_crowded_long_penalized(self):
+        """LONG + funding > 0.3% (多头拥挤) → -2 delta vs baseline."""
+        delta = self._funding_delta("LONG", 0.35)
+        self.assertEqual(delta, -2, f"LONG 追拥挤多头应减 2 分, 实际 delta={delta}")
+
+    def test_6c_b_short_fades_crowded_long_rewarded(self):
+        """SHORT + funding > 0.3% (多头拥挤) → +2 delta (fade alpha)."""
+        delta = self._funding_delta("SHORT", 0.35)
+        self.assertEqual(delta, 2, f"SHORT fade 拥挤多头应 +2, 实际 delta={delta}")
+
+    def test_6c_b_long_fades_crowded_short_rewarded(self):
+        """LONG + funding < -0.3% (空头拥挤) → +2 delta."""
+        delta = self._funding_delta("LONG", -0.35)
+        self.assertEqual(delta, 2)
+
+    def test_6c_b_short_chases_crowded_short_penalized(self):
+        """SHORT + funding < -0.3% (空头拥挤) → -2 delta."""
+        delta = self._funding_delta("SHORT", -0.35)
+        self.assertEqual(delta, -2)
+
+    def test_6c_b_moderate_funding_milder_signal(self):
+        """中等 funding (0.05% ~ 0.3%) → ±1 (vs 极端 ±2)."""
+        self.assertEqual(self._funding_delta("LONG", 0.1), -1)
+        self.assertEqual(self._funding_delta("SHORT", 0.1), 1)
+        self.assertEqual(self._funding_delta("LONG", -0.1), 1)
+        self.assertEqual(self._funding_delta("SHORT", -0.1), -1)
+
+    def test_6c_b_low_funding_no_effect(self):
+        """微小 funding (|f| < 0.05%) → 0 delta (无影响)."""
+        for d in ("LONG", "SHORT"):
+            for f in (-0.04, -0.01, 0.0, 0.01, 0.04):
+                delta = self._funding_delta(d, f)
+                self.assertEqual(delta, 0,
+                                  f"低 funding |{f}|<0.05 应无影响, "
+                                  f"实际 {d}+f={f} → delta={delta}")
+
+    def test_6c_b_none_funding_no_effect(self):
+        """funding 字段缺失 → 不应崩溃, delta=0."""
+        delta = self._funding_delta("LONG", None)
+        self.assertEqual(delta, 0)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
