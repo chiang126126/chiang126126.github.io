@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-03T05:58:58.505356+00:00",
+  "updated_at": "2026-06-03T06:01:06.067277+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 64,
+  "alerts_count": 65,
   "alerts": [
+    {
+      "symbol": "CCUSDT",
+      "base": "CC",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.14936,
+      "price_change_pct": 0.62,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 83386.0,
+      "volume_baseline_usdt": 3663.0,
+      "volume_ratio": 22.76,
+      "detected_at": "2026-06-03T06:00:58.657652+00:00",
+      "intensity": 1,
+      "change_5m_pct": 0.687,
+      "change_15m_pct": 0.653,
+      "change_1h_pct": 1.764,
+      "change_4h_pct": -0.067,
+      "taker_buy_ratio_1m": 0.805,
+      "taker_buy_ratio_5m": 0.772,
+      "oi_delta_5m_pct": 0.028,
+      "funding_rate_pct": -0.0058,
+      "atr_pct": 0.122,
+      "range_4h_pct": 2.76,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.14917714,
+      "suggested_tp1": 0.14963429,
+      "suggested_tp2": 0.14990857,
+      "conviction_score": 3,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "GPSUSDT",
       "base": "GPS",
