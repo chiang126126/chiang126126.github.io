@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-03T15:22:57.891029+00:00",
+  "generated_at": "2026-06-03T15:24:59.361917+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
-    "total_trades": 887,
-    "open": 0,
+    "total_trades": 888,
+    "open": 1,
     "closed": 887,
     "wins": 277,
     "losses": 599,
@@ -15,30 +15,49 @@
     "avg_pnl_usdt": -0.3263,
     "best_trade_usdt": 63.1301,
     "worst_trade_usdt": -38.3347,
-    "fees_paid_usdt": 172.7102,
+    "fees_paid_usdt": 172.8302,
     "fees_realized_usdt": 172.7102,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.12,
     "fees_are_actual": false,
     "starting_capital_usdt": 2000.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 1537.82,
+    "deployed_usdt": 300.0,
+    "free_capital_usdt": 1237.71,
     "max_concurrent_slots": 4,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -71.0727,
-    "deployed_usdt": 799.66
+    "daily_pnl": -52.1739,
+    "deployed_usdt": 300.0
   },
   "reconciliation": {
-    "ok": true,
-    "mismatches": [],
+    "ok": false,
+    "mismatches": [
+      {
+        "symbol": "XPLUSDT",
+        "kind": "live_only",
+        "message": "live tracks XPLUSDT but exchange has no position (externally closed? or state stale)"
+      },
+      {
+        "symbol": "XANUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has XANUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "OPUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has OPUSDT position but live doesn't track (user manual? or state lost)"
+      },
+      {
+        "symbol": "WLDUSDT",
+        "kind": "exchange_only",
+        "message": "exchange has WLDUSDT position but live doesn't track (user manual? or state lost)"
+      }
+    ],
     "api_failed": false,
     "live_symbols": [
-      "XANUSDT",
-      "OPUSDT",
-      "WLDUSDT"
+      "XPLUSDT"
     ],
     "exchange_symbols": [
       "XANUSDT",
@@ -46,7 +65,70 @@
       "WLDUSDT"
     ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "XPLUSDT|LONG|2026-06-03T15:15:34.979360+00:00",
+      "trade_id": "L1780499734_XPLUSDT_L",
+      "symbol": "XPLUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.0977,
+      "avg_fill_price": 0.0996,
+      "slippage_bps": 194.47,
+      "qty": 3012.0,
+      "notional_usdt": 299.9952,
+      "leverage": 1,
+      "risk_usdt": 13.3389,
+      "risk_pct": 4.446,
+      "mirror_latency_sec": 452.6,
+      "sl_price": 0.09707143,
+      "sl_paper_current": 0.09517143,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.0019,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 4,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "B",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.10149286,
+      "tp2_price": 0.10528571,
+      "phase": "A",
+      "entry_order_id": 252269029,
+      "entry_client_id": "cresus_L1780499734_XPLUSDT_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 1.294,
+      "top_trader_position_ratio": null,
+      "top_trader_account_ratio": null,
+      "global_account_ratio": null,
+      "phase_a_mfe_pct": 2.252,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.12,
+      "fees_are_actual": false,
+      "opened_at": "2026-06-03T15:23:48.377859+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 67213.3,
+      "btc_change_24h_at_open": -0.054,
+      "btc_pct_vs_ma25_at_open": 0.248,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.0999,
+      "current_price": 0.0996,
+      "unrealized_pnl_usdt": 0.0,
+      "unrealized_pnl_pct": 0.0,
+      "last_price_check_at": "2026-06-03T15:24:57.673009+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "WLDUSDT|LONG|2026-06-03T10:31:15.075628+00:00",
@@ -57779,8 +57861,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-03T14:05:21.141361+00:00",
-      "reason": "paper trade too old (4647s > 600s)",
-      "last_checked_at": "2026-06-03T15:22:47.865052+00:00"
+      "reason": "paper trade too old (4777s > 600s)",
+      "last_checked_at": "2026-06-03T15:24:57.673009+00:00"
     },
     {
       "paper_id": "ARUSDT|LONG|2026-06-03T14:48:05.857042+00:00",
@@ -57788,8 +57870,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-03T14:48:33.931376+00:00",
-      "reason": "paper trade too old (2054s > 600s)",
-      "last_checked_at": "2026-06-03T15:22:47.865052+00:00"
+      "reason": "paper trade too old (2184s > 600s)",
+      "last_checked_at": "2026-06-03T15:24:57.673009+00:00"
     },
     {
       "paper_id": "WALUSDT|SHORT|2026-06-03T15:07:33.726775+00:00",
@@ -57797,8 +57879,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-06-03T15:07:46.404711+00:00",
-      "reason": "paper trade too old (901s > 600s)",
-      "last_checked_at": "2026-06-03T15:22:47.865052+00:00"
+      "reason": "paper trade too old (1031s > 600s)",
+      "last_checked_at": "2026-06-03T15:24:57.673009+00:00"
     },
     {
       "paper_id": "EDGEUSDT|LONG|2026-06-03T15:09:05.449836+00:00",
@@ -57806,28 +57888,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-03T15:09:52.844511+00:00",
-      "reason": "paper trade too old (775s > 600s)",
-      "last_checked_at": "2026-06-03T15:22:47.865052+00:00"
-    },
-    {
-      "paper_id": "XPLUSDT|LONG|2026-06-03T15:15:34.979360+00:00",
-      "symbol": "XPLUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-06-03T15:16:15.779718+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.74% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-06-03T15:22:47.865052+00:00"
+      "reason": "paper trade too old (905s > 600s)",
+      "last_checked_at": "2026-06-03T15:24:57.673009+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 66690.0,
-    "btc_ma25_1h": 67026.36,
-    "pct_vs_ma25": -0.502,
-    "change_24h_pct": -0.832,
-    "sub_regime": "down_stable",
-    "change_3h_pct": -0.741,
-    "computed_at": "2026-06-03T15:22:49.206863+00:00"
+    "btc_price": 66367.1,
+    "btc_ma25_1h": 67013.45,
+    "pct_vs_ma25": -0.965,
+    "change_24h_pct": -1.312,
+    "sub_regime": "down_acute",
+    "change_3h_pct": -1.222,
+    "computed_at": "2026-06-03T15:24:59.039869+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
