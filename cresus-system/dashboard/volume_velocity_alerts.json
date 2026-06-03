@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-03T09:10:05.609080+00:00",
+  "updated_at": "2026-06-03T09:12:08.887727+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 21,
+  "alerts_count": 22,
   "alerts": [
+    {
+      "symbol": "VICUSDT",
+      "base": "VIC",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.05128,
+      "price_change_pct": 1.005,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 184072.0,
+      "volume_baseline_usdt": 24993.0,
+      "volume_ratio": 7.37,
+      "detected_at": "2026-06-03T09:11:48.442506+00:00",
+      "intensity": 2,
+      "change_5m_pct": 3.471,
+      "change_15m_pct": 5.222,
+      "change_1h_pct": 9.212,
+      "change_4h_pct": 9.095,
+      "taker_buy_ratio_1m": 0.506,
+      "taker_buy_ratio_5m": 0.524,
+      "oi_delta_5m_pct": 0.923,
+      "funding_rate_pct": -0.3527,
+      "atr_pct": 1.222,
+      "range_4h_pct": 14.02,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.05002714,
+      "suggested_tp1": 0.05315929,
+      "suggested_tp2": 0.05503857,
+      "conviction_score": 6,
+      "conviction_tier": "diamond"
+    },
     {
       "symbol": "STGUSDT",
       "base": "STG",
