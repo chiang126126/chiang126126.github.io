@@ -849,6 +849,38 @@ class TestPhase6CExtendedProtection(unittest.TestCase):
         # _initial_r_distance helper 用 initial_r 仍正确
         self.assertEqual(_initial_r_distance(t, 100.0), 1.0)
 
+    def test_6c_a_legacy_breakeven_not_loosened(self):
+        """Phase 6.C 部署迁移 (paranoid H1): 老 trade 已 _breakeven_shifted=True
+        但没有 _profit_milestone 字段, 下一 tick 在 0.8~1.0R 区间内不应被 0.8R
+        分支"loosen" SL 回 entry ± 0.2R.
+        """
+        from volume_velocity_scanner import _update_paper_trades
+        from datetime import datetime, timezone
+        # 模拟 Phase 6.B-C 时代开的 SHORT trade:
+        # entry=100, 原 SL=101 (1R=1), 已触发 BE → SL 现在 = 100 (entry),
+        # _breakeven_shifted=True, 但没有 _profit_milestone 字段.
+        # 当前价 99.2 = 浮盈 0.8R.
+        legacy = self._make_trade(
+            direction="SHORT", entry=100.0, sl=100.0, hwm=99.2,
+        )
+        legacy["_breakeven_shifted"] = True
+        legacy["_breakeven_shifted_at"] = "2026-06-03T19:00:00+00:00"
+        # 注意: 无 _profit_milestone 字段 (Phase 6.C 之前不存在这字段)
+        # initial_r 也无 — 模拟最老的 trade. helper 会用 sl 回退 (但此时 sl=entry=100,
+        # 距离 0 — 这是另一个 issue, 但 H1 fix 应在 helper 找不到 init_r 前就保护好).
+        # 为了测试 H1, 我们要 init_r > 0, 所以 set initial_r=1.0 模拟新格式 trade
+        # 但还是没 _profit_milestone (即 deploy 之前一 tick 开仓):
+        legacy["initial_r"] = 1.0
+
+        state = {"open_trades": [legacy], "closed_trades": []}
+        _update_paper_trades(state, {"TESTUSDT": 99.2},
+                              datetime.now(timezone.utc))
+        t = state["open_trades"][0]
+        # 关键断言: SL 必须仍 = entry (100), 不应被 0.8R 分支 loosen 回 100.2
+        self.assertEqual(t["sl"], 100.0,
+                          "老 _breakeven_shifted trade 在 0.8R 区间, SL 不应被 loosen")
+        # milestone 应该被回填为 1.0 (但持久化是否回填不强求, 关键是行为正确)
+
     # === Phase 6.C-B: Funding direction-aware scoring ===
     # 注意: _compute_conviction 末尾有 score = max(score, 0) 防御性 clamp,
     # 所以 Phase 6.C-B 减分对终值影响通过 delta 验证 (baseline + funding 各打分对比),

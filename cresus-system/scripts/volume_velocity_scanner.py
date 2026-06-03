@@ -2002,6 +2002,12 @@ def _update_paper_trades(state: dict, prices: dict, now: datetime) -> tuple:
                     cur_profit = (cur - entry) if is_long else (entry - cur)
                     profit_r = cur_profit / init_r
                     current_milestone = float(t.get("_profit_milestone") or 0.0)
+                    # Phase 6.C 部署迁移 (paranoid H1): 老 trade (Phase 6.B-C 时代开仓)
+                    # 没有 _profit_milestone 字段但已经触发 _breakeven_shifted=True →
+                    # 视为已到 1.0R milestone, 防止 0.8R 分支把已经收紧到 entry 的 SL
+                    # 重新 loosen 到 entry ± 0.2R (实战安全回退).
+                    if current_milestone == 0.0 and t.get("_breakeven_shifted"):
+                        current_milestone = PAPER_BREAKEVEN_PROFIT_R
                     # 检查 1.0R BE shift (最高级, 优先). 用 epsilon 容差防 FP 失之毫厘.
                     if profit_r + PAPER_MILESTONE_EPSILON >= PAPER_BREAKEVEN_PROFIT_R and current_milestone < PAPER_BREAKEVEN_PROFIT_R:
                         old_sl = t["sl"]
