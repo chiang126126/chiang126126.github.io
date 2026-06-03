@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-03T05:25:34.257539+00:00",
+  "updated_at": "2026-06-03T05:27:38.343641+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 67,
+  "alerts_count": 68,
   "alerts": [
+    {
+      "symbol": "CLOUSDT",
+      "base": "CLO",
+      "direction": "SHORT",
+      "alert_type": "sustained",
+      "price": 0.17419,
+      "price_change_pct": -3.789,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 336438.0,
+      "volume_baseline_usdt": 42031.0,
+      "volume_ratio": 8.0,
+      "detected_at": "2026-06-03T05:26:57.142378+00:00",
+      "intensity": 2,
+      "change_5m_pct": -3.137,
+      "change_15m_pct": -3.126,
+      "change_1h_pct": 7.63,
+      "change_4h_pct": 23.317,
+      "taker_buy_ratio_1m": 0.466,
+      "taker_buy_ratio_5m": 0.47,
+      "oi_delta_5m_pct": -1.102,
+      "funding_rate_pct": 0.1101,
+      "atr_pct": 1.728,
+      "range_4h_pct": 25.9,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.18020857,
+      "suggested_tp1": 0.16516214,
+      "suggested_tp2": 0.15613429,
+      "conviction_score": 0,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "PORTALUSDT",
       "base": "PORTAL",
