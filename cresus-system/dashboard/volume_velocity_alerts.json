@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-03T06:15:38.282615+00:00",
+  "updated_at": "2026-06-03T06:17:42.572883+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 25,
+  "alerts_count": 26,
   "alerts": [
+    {
+      "symbol": "SPCXUSDT",
+      "base": "SPCX",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 192.8,
+      "price_change_pct": 0.911,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 341499.0,
+      "volume_baseline_usdt": 34827.0,
+      "volume_ratio": 9.81,
+      "detected_at": "2026-06-03T06:16:55.540179+00:00",
+      "intensity": 2,
+      "change_5m_pct": 0.896,
+      "change_15m_pct": 0.965,
+      "change_1h_pct": 1.348,
+      "change_4h_pct": 1.342,
+      "taker_buy_ratio_1m": 0.767,
+      "taker_buy_ratio_5m": 0.688,
+      "oi_delta_5m_pct": -0.011,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.152,
+      "range_4h_pct": 3.62,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 192.50785714,
+      "suggested_tp1": 193.23821429,
+      "suggested_tp2": 193.67642857,
+      "conviction_score": 2,
+      "conviction_tier": "regular"
+    },
     {
       "symbol": "ZROUSDT",
       "base": "ZRO",
