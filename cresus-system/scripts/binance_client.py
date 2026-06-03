@@ -1726,6 +1726,17 @@ def load_credentials(keys_file: Optional[Path] = None) -> tuple:
         except Exception as e:
             raise SystemExit(f"读取 {kf} 失败: {e}")
 
+    # Phase 6.A-fix Y8: 若用户设了 BINANCE_KEYS_PATH 但文件不存在, 明确指出
+    env_path = os.environ.get("BINANCE_KEYS_PATH", "").strip()
+    if env_path and not Path(env_path).exists():
+        raise SystemExit(
+            f"🛑 BINANCE_KEYS_PATH={env_path} 指定的文件不存在.\n"
+            f"检查:\n"
+            f"  1. 文件路径拼写正确?  ls -la {env_path}\n"
+            f"  2. 文件权限是不是 600?  chmod 600 {env_path}\n"
+            f"  3. plist 中 BINANCE_KEYS_PATH 是绝对路径 (不要用 ~ 或 $HOME)"
+        )
+
     raise SystemExit(
         "未找到 Binance API 凭证. 请设置环境变量:\n"
         "  export BINANCE_API_KEY=<key>\n"

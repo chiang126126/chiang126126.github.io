@@ -16,6 +16,13 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
+# Phase 6.A-fix R7: 测试套件运行时必须以 testnet 模式导入 live_trader,
+# 不让 CRESUS_MODE=mainnet_pilot 等 env 干扰测试 (paranoid review 实测发现:
+# 设了 env 跑会让 8 个不相关测试失败).
+# 必须在 `import live_trader` 之前 pop 环境变量.
+for _env_key in ('CRESUS_MODE', 'CRESUS_PILOT_CAPITAL'):
+    os.environ.pop(_env_key, None)
+
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 
@@ -2319,28 +2326,66 @@ class TestPhase6AMainnetPilotConfig(unittest.TestCase):
             except SystemExit as e:
                 self.fail(f"non-mainnet 模式不应触发 safety check: {e}")
 
-    def test_pilot_tier_logic_correctness(self):
-        """直接验证 tier 配置的数学 (无需 env, 用导入时的常量)."""
-        import live_trader
-        # mainnet_pilot 模式下 LIVE_REGIME_SIZE_MULTIPLIER 应为空
-        # (default testnet 模式下保留原 audit 决策)
-        if live_trader.CRESUS_MODE == 'mainnet_pilot':
-            self.assertEqual(
-                live_trader.LIVE_REGIME_SIZE_MULTIPLIER, {},
-                "mainnet_pilot 模式 Phase 5.S 必须清空"
-            )
-            # 单笔 notional × max_concurrent 应 ≤ max_deploy_usdt
-            max_single = max(live_trader.LIVE_NOTIONAL_BY_SCORE.values())
-            self.assertLessEqual(
-                max_single * live_trader.LIVE_MAX_CONCURRENT,
-                live_trader.LIVE_MAX_DEPLOY_USDT * 1.5,
-                "理论最大并发部署不应过分超 deploy cap"
-            )
-            # 日熔断应 ≈ 10% 资金
-            expected = round(live_trader.PILOT_CAPITAL * 0.10, 2)
-            self.assertAlmostEqual(
-                live_trader.LIVE_DAILY_DD_LIMIT_USDT, expected, places=1
-            )
+    def test_pilot_tier_subprocess_600(self):
+        """Phase 6.A-fix R7 后, 用 subprocess 起新进程, 设 env 模拟 mainnet_pilot."""
+        import subprocess, json as json_mod
+        env = dict(os.environ)
+        env['CRESUS_MODE'] = 'mainnet_pilot'
+        env['CRESUS_PILOT_CAPITAL'] = '600'
+        # 不实际跑 live_trader main, 只 import + 验配置
+        # ~/.allow-live 用临时空文件占位 (verify_mainnet_safety 不会被 import 触发, 只在 main 触发)
+        result = subprocess.run(
+            [sys.executable, '-c', (
+                'import sys; sys.path.insert(0, "%s"); '
+                'import live_trader; '
+                'import json; '
+                'print(json.dumps({'
+                '  "mode": live_trader.CRESUS_MODE,'
+                '  "capital": live_trader.PILOT_CAPITAL,'
+                '  "notional": live_trader.LIVE_NOTIONAL_BY_SCORE,'
+                '  "max_concurrent": live_trader.LIVE_MAX_CONCURRENT,'
+                '  "max_deploy": live_trader.LIVE_MAX_DEPLOY_USDT,'
+                '  "daily_dd": live_trader.LIVE_DAILY_DD_LIMIT_USDT,'
+                '  "regime_mult": live_trader.LIVE_REGIME_SIZE_MULTIPLIER,'
+                '}))'
+            ) % str(HERE.parent)],
+            env=env, capture_output=True, text=True, timeout=30,
+        )
+        self.assertEqual(result.returncode, 0, f"subprocess fail: {result.stderr}")
+        cfg = json_mod.loads(result.stdout.strip().split('\n')[-1])
+        # 验 $600 medium tier
+        self.assertEqual(cfg['mode'], 'mainnet_pilot')
+        self.assertEqual(cfg['capital'], 600.0)
+        self.assertEqual(cfg['notional'], {'5': 150, '6': 200, '7': 300, '8': 150, '9': 150, '10': 150})
+        self.assertEqual(cfg['max_concurrent'], 2)
+        self.assertEqual(cfg['max_deploy'], 450.0)
+        self.assertEqual(cfg['daily_dd'], 60.0)  # 10% of $600
+        self.assertEqual(cfg['regime_mult'], {})  # Phase 5.S 清空
+
+    def test_pilot_invalid_mode_rejected(self):
+        """Phase 6.A-fix Y4: 非法 CRESUS_MODE → SystemExit."""
+        import subprocess
+        env = dict(os.environ)
+        env['CRESUS_MODE'] = 'unknown_mode'
+        result = subprocess.run(
+            [sys.executable, '-c', f'import sys; sys.path.insert(0, "{HERE.parent}"); import live_trader'],
+            env=env, capture_output=True, text=True, timeout=15,
+        )
+        self.assertNotEqual(result.returncode, 0, "非法 mode 应该退出")
+        self.assertIn('CRESUS_MODE', result.stderr + result.stdout)
+
+    def test_pilot_zero_capital_rejected(self):
+        """Phase 6.A-fix Y4: PILOT_CAPITAL <= 0 → SystemExit."""
+        import subprocess
+        env = dict(os.environ)
+        env['CRESUS_MODE'] = 'mainnet_pilot'
+        env['CRESUS_PILOT_CAPITAL'] = '-50'
+        result = subprocess.run(
+            [sys.executable, '-c', f'import sys; sys.path.insert(0, "{HERE.parent}"); import live_trader'],
+            env=env, capture_output=True, text=True, timeout=15,
+        )
+        self.assertNotEqual(result.returncode, 0, "负 capital 应该退出")
+        self.assertIn('CAPITAL', result.stderr + result.stdout)
 
 
 class TestAbUseRegimeGate(unittest.TestCase):

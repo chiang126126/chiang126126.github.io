@@ -495,6 +495,26 @@ try:
 except (TypeError, ValueError):
     PILOT_CAPITAL = 500.0
 
+# Phase 6.A-fix Y4: 早期 fail-fast 防止误配置
+_VALID_CRESUS_MODES = {'testnet', 'mainnet_pilot'}
+if CRESUS_MODE not in _VALID_CRESUS_MODES:
+    raise SystemExit(
+        f"🛑 CRESUS_MODE={CRESUS_MODE!r} 非法 (合法值: {sorted(_VALID_CRESUS_MODES)}). "
+        "检查 plist EnvironmentVariables 拼写."
+    )
+if CRESUS_MODE == 'mainnet_pilot' and PILOT_CAPITAL <= 0:
+    raise SystemExit(
+        f"🛑 CRESUS_PILOT_CAPITAL={PILOT_CAPITAL} 必须 > 0. "
+        "检查 plist 该 env var (字符串数字, 如 '600')."
+    )
+if CRESUS_MODE == 'mainnet_pilot' and PILOT_CAPITAL > 10000:
+    # 不阻止, 但显眼警告 — pilot 模式不该跑这么大
+    import warnings
+    warnings.warn(
+        f"⚠️  CRESUS_PILOT_CAPITAL=${PILOT_CAPITAL} > $10000 — "
+        "已超出 'pilot' 量级, 确认这是你想要的?"
+    )
+
 # 仅当显式启用 mainnet_pilot 时 override 风控参数
 if CRESUS_MODE == 'mainnet_pilot':
     # 三档 tier (按资金量自适应)
@@ -535,13 +555,16 @@ def _log_mainnet_pilot_banner() -> None:
     log.warning("=" * 72)
 
 
-def _verify_mainnet_safety(client_testnet: bool) -> None:
-    """启动安全审计 — mainnet_pilot 模式必须确认.
+def _verify_mainnet_safety(client_testnet: bool, env_testnet: bool = False) -> None:
+    """启动安全审计 — mainnet_pilot 模式必须三重一致.
 
     1. ~/.allow-live 必须存在 (binance_client _check_live_authorization 也会 enforce, 此处早期 fail-fast)
-    2. client.testnet 必须 False (防 keys 文件写错把 testnet 当 mainnet 跑)
+    2. client.testnet 必须 False (BinanceClient 构造时是不是 mainnet)
+    3. env_testnet 必须 False (keys 文件的 testnet 字段 — Phase 6.A-fix R2:
+       防 keys 文件写 testnet:true 但 mode=mainnet_pilot 的隐藏不一致, 用户
+       可能完全没察觉就跑错环境)
 
-    任一不满足 → SystemExit 中止启动.
+    任一不满足 → SystemExit 中止启动. 真钱不允许任何模糊.
     """
     if CRESUS_MODE != 'mainnet_pilot':
         return
@@ -557,6 +580,11 @@ def _verify_mainnet_safety(client_testnet: bool) -> None:
             "🛑 CRESUS_MODE=mainnet_pilot 但 BinanceClient.testnet=True 不一致! "
             "检查 BINANCE_KEYS_PATH 指向的 keys 文件是 mainnet 而非 testnet "
             "(JSON 字段 testnet 必须为 false)."
+        )
+    if env_testnet:
+        raise SystemExit(
+            "🛑 CRESUS_MODE=mainnet_pilot 但 keys 文件 testnet=true (load_credentials 报)! "
+            "Phase 6.A-fix R2: 三方一致性强制. 修改 keys 文件 testnet 字段为 false 后重启."
         )
 
 
@@ -2779,7 +2807,8 @@ def _cli_main() -> int:
     client = BinanceClient(key, secret, testnet=use_testnet, dry_run=dry_run)
 
     # Phase 6.A: mainnet pilot 启动安全验证 + banner (在任何交易动作前)
-    _verify_mainnet_safety(client.testnet)
+    # Phase 6.A-fix R2: 三方一致性 — client.testnet + keys 文件 env_testnet 都必须 False
+    _verify_mainnet_safety(client.testnet, env_testnet=env_testnet)
     _log_mainnet_pilot_banner()
 
     log.info(
