@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-03T08:36:40.702581+00:00",
+  "updated_at": "2026-06-03T08:38:44.361597+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,8 +8,38 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 9,
+  "alerts_count": 10,
   "alerts": [
+    {
+      "symbol": "CLOUSDT",
+      "base": "CLO",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.18813,
+      "price_change_pct": 2.607,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 471112.0,
+      "volume_baseline_usdt": 63423.0,
+      "volume_ratio": 7.43,
+      "detected_at": "2026-06-03T08:37:58.122987+00:00",
+      "intensity": 2,
+      "change_5m_pct": 4.022,
+      "change_15m_pct": -0.588,
+      "change_1h_pct": 15.673,
+      "change_4h_pct": 14.453,
+      "taker_buy_ratio_1m": 0.596,
+      "taker_buy_ratio_5m": 0.596,
+      "oi_delta_5m_pct": -0.265,
+      "funding_rate_pct": 0.1071,
+      "atr_pct": 1.734,
+      "range_4h_pct": 17.68,
+      "vol_mult_used": 2.0,
+      "suggested_sl": 0.18160714,
+      "suggested_tp1": 0.19791429,
+      "suggested_tp2": 0.20769857,
+      "conviction_score": 3,
+      "conviction_tier": "premium"
+    },
     {
       "symbol": "INUSDT",
       "base": "IN",
