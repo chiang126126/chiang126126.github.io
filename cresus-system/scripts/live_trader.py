@@ -550,7 +550,13 @@ if CRESUS_MODE == 'mainnet_pilot':
     # 老 testnet state 路径 (~/cresus-bot/.live_trades.json) 保留, 切回 testnet
     # 时数据完整. mainnet state 从 fresh 空状态开始.
     LIVE_STATE = Path.home() / "cresus-bot" / ".live_trades_mainnet.json"
-    LIVE_HISTORY = Path.home() / "cresus-bot" / "live_trades_history_mainnet.json"
+
+    # Phase 6.A-fix2 (2026-06-03): LIVE_HISTORY 改回单一路径 — 保持 sync
+    # 链路 (velocity_fast_sync.sh 硬编码 live_trades_history.json) 不破.
+    # 用户在切换时需手动归档 testnet 历史 (live_trades_history.testnet_archive.json),
+    # mainnet bot fresh state 启动后写空数据覆盖, dashboard 即显示纯 mainnet.
+    # 不在此处分路径的原因: 改 sync 脚本影响面大, 单一文件 + 手动归档简单稳妥.
+    # LIVE_HISTORY 保持默认 = ~/cresus-bot/live_trades_history.json (line 66)
 
 
 def _log_mainnet_pilot_banner() -> None:
@@ -568,7 +574,8 @@ def _log_mainnet_pilot_banner() -> None:
     log.warning(f"  LIVE_STARTING_CAPITAL_USDT: ${LIVE_STARTING_CAPITAL_USDT:.0f}  (kill switch baseline)")
     log.warning(f"  LIVE_TOTAL_DD_LIMIT_PCT: {LIVE_TOTAL_DD_LIMIT_PCT}%  (kill switch at -${LIVE_STARTING_CAPITAL_USDT*LIVE_TOTAL_DD_LIMIT_PCT/100:.0f})")
     log.warning(f"  LIVE_REGIME_SIZE_MULTIPLIER: {LIVE_REGIME_SIZE_MULTIPLIER}  (清空)")
-    log.warning(f"  LIVE_STATE: {LIVE_STATE}  (独立 mainnet 状态)")
+    log.warning(f"  LIVE_STATE: {LIVE_STATE}  (独立 mainnet 私有状态)")
+    log.warning(f"  LIVE_HISTORY: {LIVE_HISTORY}  (公共发布 → sync 到 dashboard)")
     log.warning(f"  BINANCE_KEYS_PATH: {os.environ.get('BINANCE_KEYS_PATH', '(default)')}")
     log.warning("=" * 72)
 
