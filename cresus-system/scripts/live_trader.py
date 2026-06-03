@@ -43,6 +43,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os         # Phase 6.A: CRESUS_MODE env var 切换 mainnet pilot
 import time
 import hashlib    # Phase 4.D: A/B 分组用 MD5 (确定性, 跨进程一致)
 from datetime import datetime, timezone, timedelta
@@ -473,6 +474,90 @@ POLL_INTERVAL_SEC = 5                   # --loop 模式 poll 间隔 (Phase 4.V 5
 STATE_VERSION = "1.0"
 
 log = logging.getLogger(__name__)
+
+
+# ============================================================================
+# Phase 6.A (2026-06-03) — Mainnet Pilot Mode
+# ============================================================================
+# 启用方式: plist 设环境变量
+#   CRESUS_MODE=mainnet_pilot
+#   CRESUS_PILOT_CAPITAL=600         (实际资金量, 决定 tier)
+#   BINANCE_KEYS_PATH=/Users/.../binance_keys_mainnet.json  (主网 key)
+#
+# 设计原则:
+#   - default (无 CRESUS_MODE) = testnet 原行为, 完全不影响现有跑
+#   - mainnet_pilot 模式按资金量分 3 tier 强制 reset 风控参数
+#   - Phase 5.S multipliers 一律清空 (在 mainnet 重新积累数据再启用)
+#   - 启动 banner 高亮 mainnet 状态, 防误启动
+CRESUS_MODE = os.environ.get('CRESUS_MODE', 'testnet').strip().lower()
+try:
+    PILOT_CAPITAL = float(os.environ.get('CRESUS_PILOT_CAPITAL', '500') or 500)
+except (TypeError, ValueError):
+    PILOT_CAPITAL = 500.0
+
+# 仅当显式启用 mainnet_pilot 时 override 风控参数
+if CRESUS_MODE == 'mainnet_pilot':
+    # 三档 tier (按资金量自适应)
+    if PILOT_CAPITAL <= 250:
+        LIVE_NOTIONAL_BY_SCORE = {5: 80, 6: 100, 7: 150, 8: 80, 9: 80, 10: 80}
+        LIVE_MAX_CONCURRENT = 1
+        LIVE_MAX_DEPLOY_USDT = 180.0
+    elif PILOT_CAPITAL <= 600:
+        LIVE_NOTIONAL_BY_SCORE = {5: 150, 6: 200, 7: 300, 8: 150, 9: 150, 10: 150}
+        LIVE_MAX_CONCURRENT = 2
+        LIVE_MAX_DEPLOY_USDT = 450.0
+    else:
+        LIVE_NOTIONAL_BY_SCORE = {5: 300, 6: 400, 7: 600, 8: 300, 9: 300, 10: 300}
+        LIVE_MAX_CONCURRENT = 3
+        LIVE_MAX_DEPLOY_USDT = 900.0
+
+    # 10% 日熔断 — 例 $600 → -$60 触发暂停
+    LIVE_DAILY_DD_LIMIT_USDT = round(PILOT_CAPITAL * 0.10, 2)
+
+    # Phase 5.S multipliers 一律清空 — mainnet 数据足够后再 audit 重启用
+    LIVE_REGIME_SIZE_MULTIPLIER = {}
+
+
+def _log_mainnet_pilot_banner() -> None:
+    """启动 banner — 在 main() 早期调用, 让用户清晰看到生效配置."""
+    if CRESUS_MODE != 'mainnet_pilot':
+        return
+    log.warning("=" * 72)
+    log.warning("🔴🔴🔴  MAINNET PILOT MODE — 真实资金交易  🔴🔴🔴")
+    log.warning("=" * 72)
+    log.warning(f"  CRESUS_PILOT_CAPITAL: ${PILOT_CAPITAL:.0f}")
+    log.warning(f"  LIVE_NOTIONAL_BY_SCORE: {LIVE_NOTIONAL_BY_SCORE}")
+    log.warning(f"  LIVE_MAX_CONCURRENT: {LIVE_MAX_CONCURRENT}")
+    log.warning(f"  LIVE_MAX_DEPLOY_USDT: ${LIVE_MAX_DEPLOY_USDT:.0f}")
+    log.warning(f"  LIVE_DAILY_DD_LIMIT_USDT: ${LIVE_DAILY_DD_LIMIT_USDT:.0f}")
+    log.warning(f"  LIVE_REGIME_SIZE_MULTIPLIER: {LIVE_REGIME_SIZE_MULTIPLIER}  (清空)")
+    log.warning(f"  BINANCE_KEYS_PATH: {os.environ.get('BINANCE_KEYS_PATH', '(default)')}")
+    log.warning("=" * 72)
+
+
+def _verify_mainnet_safety(client_testnet: bool) -> None:
+    """启动安全审计 — mainnet_pilot 模式必须确认.
+
+    1. ~/.allow-live 必须存在 (binance_client _check_live_authorization 也会 enforce, 此处早期 fail-fast)
+    2. client.testnet 必须 False (防 keys 文件写错把 testnet 当 mainnet 跑)
+
+    任一不满足 → SystemExit 中止启动.
+    """
+    if CRESUS_MODE != 'mainnet_pilot':
+        return
+    from pathlib import Path
+    allow = Path.home() / ".allow-live"
+    if not allow.exists():
+        raise SystemExit(
+            "🛑 CRESUS_MODE=mainnet_pilot 但 ~/.allow-live 不存在. "
+            "明确创建: touch ~/.allow-live (创建后随时 rm 可一键禁用)."
+        )
+    if client_testnet:
+        raise SystemExit(
+            "🛑 CRESUS_MODE=mainnet_pilot 但 BinanceClient.testnet=True 不一致! "
+            "检查 BINANCE_KEYS_PATH 指向的 keys 文件是 mainnet 而非 testnet "
+            "(JSON 字段 testnet 必须为 false)."
+        )
 
 
 # ============================================================================
@@ -2668,18 +2753,35 @@ def _cli_main() -> int:
     use_testnet = not args.mainnet
     dry_run = not args.live
 
-    # 🛑 安全锁: LIVE_OBSERVATION_MODE + --live 互斥 (不允许观察模式 + 真钱)
+    # Phase 6.A: mainnet_pilot 模式自动 force mainnet + --live (无需手动加 CLI flag)
+    if CRESUS_MODE == 'mainnet_pilot':
+        if dry_run:
+            raise SystemExit(
+                "🛑 CRESUS_MODE=mainnet_pilot 必须配合 --live (真钱模式). "
+                "dry_run 无意义."
+            )
+        use_testnet = False  # 强制主网
+        # ~/.allow-live + keys 文件 testnet=false 双确认 (在 _verify_mainnet_safety)
+
     # 🛑 安全锁: OBS mode + 主网 + 真单 = 真钱风险, reject.
-    # (testnet + OBS + --live 是 OK 的: testnet 钱用于观察真订单流程)
-    if LIVE_OBSERVATION_MODE and not dry_run and not use_testnet:
+    # Phase 6.A: mainnet_pilot 例外 — 用 slippage / regime / funding 等其它 gate
+    # 替代 symbol 白名单. paper signal 在 mainnet 全部 symbol 可交易, OBS=True 合理.
+    # (testnet + OBS + --live 也 OK: testnet 钱观察真订单流程)
+    if LIVE_OBSERVATION_MODE and not dry_run and not use_testnet and CRESUS_MODE != 'mainnet_pilot':
         raise SystemExit(
             "🛑 LIVE_OBSERVATION_MODE=True + 主网 + --live = 真钱风险.\n"
             "观察模式跳过 symbol 白名单, 跟主网严格白名单不兼容.\n"
             "修复方案 1: 改 LIVE_OBSERVATION_MODE=False (恢复严格白名单)\n"
-            "修复方案 2: 不带 --mainnet (用 testnet 真单观察)"
+            "修复方案 2: 不带 --mainnet (用 testnet 真单观察)\n"
+            "修复方案 3: 设 CRESUS_MODE=mainnet_pilot (小金额 pilot, 用其它 gate 过滤)"
         )
 
     client = BinanceClient(key, secret, testnet=use_testnet, dry_run=dry_run)
+
+    # Phase 6.A: mainnet pilot 启动安全验证 + banner (在任何交易动作前)
+    _verify_mainnet_safety(client.testnet)
+    _log_mainnet_pilot_banner()
+
     log.info(
         f"live_trader started: {client} dry_run={dry_run} "
         f"testnet={use_testnet} once={not args.loop}"

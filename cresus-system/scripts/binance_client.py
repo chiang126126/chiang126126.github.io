@@ -1689,6 +1689,11 @@ def load_credentials(keys_file: Optional[Path] = None) -> tuple:
 
     Returns: (api_key, api_secret, testnet_bool)
     Raises: SystemExit 如果没找到.
+
+    路径优先级 (Phase 6.A 2026-06-03):
+        1. 函数参数 keys_file (显式指定)
+        2. env BINANCE_KEYS_PATH (供 plist 切换 testnet / mainnet keys 文件)
+        3. DEFAULT_KEYS_FILE (~/.cresus-bot/binance_keys.json)
     """
     # 1. 环境变量优先
     env_key = os.environ.get("BINANCE_API_KEY", "").strip()
@@ -1698,7 +1703,11 @@ def load_credentials(keys_file: Optional[Path] = None) -> tuple:
     if env_key and env_secret:
         return env_key, env_secret, env_testnet_bool
 
-    # 2. 文件 fallback
+    # 2. 文件 fallback — 路径选择
+    if keys_file is None:
+        env_path = os.environ.get("BINANCE_KEYS_PATH", "").strip()
+        if env_path:
+            keys_file = Path(env_path)
     kf = keys_file or DEFAULT_KEYS_FILE
     if kf.exists():
         try:

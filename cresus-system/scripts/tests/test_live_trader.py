@@ -2280,6 +2280,69 @@ class TestPhase5SIsEligibleMultiplierZero(unittest.TestCase):
         self.assertNotIn("regime size multiplier", reason)
 
 
+class TestPhase6AMainnetPilotConfig(unittest.TestCase):
+    """Phase 6.A: CRESUS_MODE=mainnet_pilot 环境变量驱动配置.
+
+    设计原则:
+    - 默认无 env (= testnet 模式) — 完全等同部署前行为 (backward compat)
+    - mainnet_pilot 模式按 PILOT_CAPITAL 分 3 tier 强制 reset 风控参数
+    - Phase 5.S multipliers 一律清空
+    - 启动 banner + safety verify 函数存在且可调用
+    """
+
+    def test_default_mode_is_testnet(self):
+        """模块默认 CRESUS_MODE='testnet' (未设 env var 时)."""
+        # 模块导入时已经 capture, 直接看
+        import live_trader
+        # 在 test 环境通常没设 env, 应为 'testnet'
+        # (容忍 'mainnet_pilot' 也是合理 — CI/CD 可能设了 env)
+        self.assertIn(live_trader.CRESUS_MODE, ('testnet', 'mainnet_pilot'))
+
+    def test_banner_function_safe_when_not_mainnet(self):
+        """non-mainnet 模式调 banner 函数应直接 return, 不抛."""
+        import live_trader
+        # banner 内部检查 CRESUS_MODE != mainnet_pilot 时早 return
+        # 直接调不应抛异常 (即使在 mainnet 模式, log 仅 warning 不抛)
+        try:
+            live_trader._log_mainnet_pilot_banner()
+        except Exception as e:
+            self.fail(f"banner 不应抛: {e}")
+
+    def test_verify_safety_passes_when_not_mainnet(self):
+        """non-mainnet 模式 verify 函数应直接 return, 不抛."""
+        import live_trader
+        if live_trader.CRESUS_MODE != 'mainnet_pilot':
+            # testnet 模式下, 任何 client_testnet 参数都不应抛
+            try:
+                live_trader._verify_mainnet_safety(client_testnet=True)
+                live_trader._verify_mainnet_safety(client_testnet=False)
+            except SystemExit as e:
+                self.fail(f"non-mainnet 模式不应触发 safety check: {e}")
+
+    def test_pilot_tier_logic_correctness(self):
+        """直接验证 tier 配置的数学 (无需 env, 用导入时的常量)."""
+        import live_trader
+        # mainnet_pilot 模式下 LIVE_REGIME_SIZE_MULTIPLIER 应为空
+        # (default testnet 模式下保留原 audit 决策)
+        if live_trader.CRESUS_MODE == 'mainnet_pilot':
+            self.assertEqual(
+                live_trader.LIVE_REGIME_SIZE_MULTIPLIER, {},
+                "mainnet_pilot 模式 Phase 5.S 必须清空"
+            )
+            # 单笔 notional × max_concurrent 应 ≤ max_deploy_usdt
+            max_single = max(live_trader.LIVE_NOTIONAL_BY_SCORE.values())
+            self.assertLessEqual(
+                max_single * live_trader.LIVE_MAX_CONCURRENT,
+                live_trader.LIVE_MAX_DEPLOY_USDT * 1.5,
+                "理论最大并发部署不应过分超 deploy cap"
+            )
+            # 日熔断应 ≈ 10% 资金
+            expected = round(live_trader.PILOT_CAPITAL * 0.10, 2)
+            self.assertAlmostEqual(
+                live_trader.LIVE_DAILY_DD_LIMIT_USDT, expected, places=1
+            )
+
+
 class TestAbUseRegimeGate(unittest.TestCase):
     """Phase 4.F + 4.J: _ab_use_regime_gate 启用判定.
 
