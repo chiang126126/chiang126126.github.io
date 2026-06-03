@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-03T07:11:25.958929+00:00",
+  "generated_at": "2026-06-03T07:13:30.164180+00:00",
   "session_started_at": "2026-05-15T15:46:53.341788+00:00",
   "stats": {
     "total_trades": 882,
@@ -29,14 +29,18 @@
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -64.7886,
-    "deployed_usdt": 0
+    "deployed_usdt": 200.0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "XANUSDT"
+    ],
+    "exchange_symbols": [
+      "XANUSDT"
+    ]
   },
   "open_trades": [
     {
@@ -96,10 +100,10 @@
       "btc_sub_regime_at_open": "down_rebound",
       "btc_change_3h_at_open": 0.752,
       "phase_a_mfe_price": 0.010588,
-      "current_price": 0.01069,
-      "unrealized_pnl_usdt": -0.0,
-      "unrealized_pnl_pct": -0.0,
-      "last_price_check_at": "2026-06-03T07:11:21.808596+00:00"
+      "current_price": 0.01066,
+      "unrealized_pnl_usdt": 0.5613,
+      "unrealized_pnl_pct": 0.281,
+      "last_price_check_at": "2026-06-03T07:13:28.382758+00:00"
     }
   ],
   "recent_closed": [
@@ -57385,8 +57389,8 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-03T05:54:50.191201+00:00",
-      "reason": "paper trade too old (4592s > 600s)",
-      "last_checked_at": "2026-06-03T07:11:21.808596+00:00"
+      "reason": "paper trade too old (4718s > 600s)",
+      "last_checked_at": "2026-06-03T07:13:28.382758+00:00"
     },
     {
       "paper_id": "WLDUSDT|LONG|2026-06-03T07:08:58.088368+00:00",
@@ -57394,28 +57398,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-03T07:09:57.136347+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_rebound 3h=+0.75% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-06-03T07:11:21.808596+00:00"
-    },
-    {
-      "paper_id": "XANUSDT|SHORT|2026-06-03T07:09:31.360888+00:00",
-      "symbol": "XANUSDT",
-      "direction": "SHORT",
-      "conviction_score": 5,
-      "signal_at": "2026-06-03T07:09:57.136347+00:00",
-      "reason": "pre_slippage_too_high (+118.3bps > 100bps intensity=1)",
-      "last_checked_at": "2026-06-03T07:11:10.815405+00:00"
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_rebound 3h=+0.98% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-03T07:13:28.382758+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 66949.3,
-    "btc_ma25_1h": 67741.88,
-    "pct_vs_ma25": -1.17,
-    "change_24h_pct": -4.478,
+    "btc_price": 67098.2,
+    "btc_ma25_1h": 67747.83,
+    "pct_vs_ma25": -0.959,
+    "change_24h_pct": -4.265,
     "sub_regime": "down_rebound",
-    "change_3h_pct": 0.752,
-    "computed_at": "2026-06-03T07:11:23.353352+00:00"
+    "change_3h_pct": 0.976,
+    "computed_at": "2026-06-03T07:13:29.841388+00:00"
   },
   "config": {
     "starting_capital_usdt": 2000.0,
