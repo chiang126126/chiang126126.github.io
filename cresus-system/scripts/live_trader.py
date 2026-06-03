@@ -2865,6 +2865,34 @@ def _cli_main() -> int:
     _verify_mainnet_safety(client.testnet, env_testnet=env_testnet)
     _log_mainnet_pilot_banner()
 
+    # Phase 6.A-fix3 (2026-06-03): 检测 Binance 子账户 position mode.
+    # cresus 设计是 One-way Mode (每 symbol 单方向). 若账户是 Hedge Mode 启动会
+    # 持续 -4061 失败 + log spam (实测 BCHUSDT/APEUSDT 14+ 次重试均失败).
+    # 检测到 Hedge Mode + mainnet_pilot → SystemExit 给清晰指引, 比让 bot 默默
+    # 烧 API quota 强.
+    if CRESUS_MODE == 'mainnet_pilot' and not dry_run and not use_testnet:
+        try:
+            pos_mode = client.get_position_mode()
+            if pos_mode.get('dualSidePosition'):
+                raise SystemExit(
+                    "🛑 Binance 子账户当前是 Hedge Mode (双向持仓).\n"
+                    "Cresus 设计是 One-way Mode (每 symbol 单方向).\n"
+                    "Hedge Mode 下所有开仓会失败 -4061 'position side does not match'.\n"
+                    "\n"
+                    "修复 (子账户 UI 操作):\n"
+                    "  1. 登录 cresus-pilot 子账户\n"
+                    "  2. USDT-M Futures → 右上角 Preference → Position Mode\n"
+                    "  3. 切换 Hedge Mode → One-way Mode (子账户必须无持仓)\n"
+                    "  4. 重启 live-trader: launchctl unload + load\n"
+                    "\n"
+                    "或代码强切 (谨慎, 改账户全局设置):\n"
+                    "  python3 -c \"import sys; sys.path.insert(0,'/Users/hong/chiang126126.github.io/cresus-system/scripts'); from binance_client import BinanceClient; import json; k=json.load(open('/Users/hong/cresus-bot/binance_keys_mainnet.json')); BinanceClient(k['api_key'],k['api_secret'],testnet=False).set_position_mode(False)\""
+                )
+        except BinanceError as e:
+            # API 失败 (网络等), 不强行阻塞 — 让用户先尝试启动, 后续会有 -4061
+            # 错误自然冒出
+            log.warning(f"无法检测 position mode (网络?): {type(e).__name__}: {e}")
+
     log.info(
         f"live_trader started: {client} dry_run={dry_run} "
         f"testnet={use_testnet} once={not args.loop}"
