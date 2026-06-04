@@ -517,21 +517,38 @@ if CRESUS_MODE == 'mainnet_pilot' and PILOT_CAPITAL > 10000:
 
 # 仅当显式启用 mainnet_pilot 时 override 风控参数
 if CRESUS_MODE == 'mainnet_pilot':
-    # 三档 tier (按资金量自适应)
+    # 四档 tier (按资金量自适应). 2026-06-04 重构:
+    #   - 加入 $601-1200 中间档, 保持 $600 档同 notional 但 deploy cap 动态 80%,
+    #     让资金涨到 ~$750 时能 3 笔 score 6 满载, ~$1125 时能 3 笔 score 7 满载.
+    #   - 之前 else 档 ($601+) 直接跳到 $300/$400/$600 大 notional, 太激进 (e.g.
+    #     $700 资金 + $600/笔 = 86% 单笔暴露). 现在 $1200+ 才升级大 notional.
+    #   - Dynamic deploy = capital × 0.80, 保留 20% margin buffer 防 cascade liquidation.
     if PILOT_CAPITAL <= 250:
         LIVE_NOTIONAL_BY_SCORE = {5: 80, 6: 100, 7: 150, 8: 80, 9: 80, 10: 80}
         LIVE_MAX_CONCURRENT = 1
         LIVE_MAX_DEPLOY_USDT = 180.0
     elif PILOT_CAPITAL <= 600:
         LIVE_NOTIONAL_BY_SCORE = {5: 150, 6: 200, 7: 300, 8: 150, 9: 150, 10: 150}
-        LIVE_MAX_CONCURRENT = 3   # 2026-06-04: 2 → 3, 避免错过高 conviction 信号 (如 VICUSDT score 6).
+        LIVE_MAX_CONCURRENT = 3   # 2026-06-04: 2 → 3, 避免错过高 conviction 信号.
                                   #   deploy cap $450 仍兜底 — 3 笔 score 6 ($600) 会被 cap 拦, 自动放 2 笔.
-                                  #   仅 3 笔均为 $150 小笔 (score 5/8/9/10) 时才能真满 slot.
         LIVE_MAX_DEPLOY_USDT = 450.0
-    else:
+    elif PILOT_CAPITAL <= 1200:
+        # 2026-06-04 新增中间档: notional 与 $600 档一致, 但 deploy cap 跟资金 80% scale.
+        # 资金成长曲线 (3 笔满载可行性):
+        #   $750: deploy=$600, 3 score 6 ($600) ✅, 3 score 7 ($900) ❌
+        #   $900: deploy=$720, 3 score 6 ✅
+        #   $1125: deploy=$900, 3 score 6 ✅, 3 score 7 ($900) ✅
+        #   $1200: deploy=$960, 3 score 6+7 ✅
+        LIVE_NOTIONAL_BY_SCORE = {5: 150, 6: 200, 7: 300, 8: 150, 9: 150, 10: 150}
+        LIVE_MAX_CONCURRENT = 3
+        LIVE_MAX_DEPLOY_USDT = round(PILOT_CAPITAL * 0.80, 0)
+    else:   # PILOT_CAPITAL > $1200
+        # 大资金档: 单笔 notional 翻倍 (利润绝对值更有意义), deploy cap 同样动态 80%.
+        # 注意跨过 $1200 边界时, 单笔 notional 翻倍但 max_concurrent 不变 — 用户主动
+        # 升档 (改 env var), 隐含同意承担更大单笔暴露.
         LIVE_NOTIONAL_BY_SCORE = {5: 300, 6: 400, 7: 600, 8: 300, 9: 300, 10: 300}
         LIVE_MAX_CONCURRENT = 3
-        LIVE_MAX_DEPLOY_USDT = 900.0
+        LIVE_MAX_DEPLOY_USDT = round(PILOT_CAPITAL * 0.80, 0)
 
     # 10% 日熔断 — 例 $600 → -$60 触发暂停
     LIVE_DAILY_DD_LIMIT_USDT = round(PILOT_CAPITAL * 0.10, 2)

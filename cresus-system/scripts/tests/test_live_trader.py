@@ -2387,6 +2387,54 @@ class TestPhase6AMainnetPilotConfig(unittest.TestCase):
         self.assertEqual(cfg['daily_dd'], 60.0)  # 10% of $600
         self.assertEqual(cfg['regime_mult'], {})  # Phase 5.S 清空
 
+    def _run_pilot_tier_subprocess(self, capital_str):
+        """Helper: 用 subprocess 模拟 mainnet_pilot + 指定 capital, 返回配置 dict."""
+        import subprocess, json as json_mod
+        env = dict(os.environ)
+        env['CRESUS_MODE'] = 'mainnet_pilot'
+        env['CRESUS_PILOT_CAPITAL'] = capital_str
+        result = subprocess.run(
+            [sys.executable, '-c', (
+                'import sys; sys.path.insert(0, "%s"); '
+                'import live_trader; '
+                'import json; '
+                'print(json.dumps({'
+                '  "capital": live_trader.PILOT_CAPITAL,'
+                '  "notional": live_trader.LIVE_NOTIONAL_BY_SCORE,'
+                '  "max_concurrent": live_trader.LIVE_MAX_CONCURRENT,'
+                '  "max_deploy": live_trader.LIVE_MAX_DEPLOY_USDT,'
+                '}))'
+            ) % str(HERE.parent)],
+            env=env, capture_output=True, text=True, timeout=30,
+        )
+        self.assertEqual(result.returncode, 0, f"subprocess fail: {result.stderr}")
+        return json_mod.loads(result.stdout.strip().split('\n')[-1])
+
+    def test_pilot_tier_subprocess_750_middle_tier(self):
+        """2026-06-04 新增中间档: $601-1200. $750 应能 3 笔 score 6 满载 ($600 = 80% × $750)."""
+        cfg = self._run_pilot_tier_subprocess('750')
+        self.assertEqual(cfg['capital'], 750.0)
+        # 中间档 notional 跟 $600 档一致
+        self.assertEqual(cfg['notional'], {'5': 150, '6': 200, '7': 300, '8': 150, '9': 150, '10': 150})
+        self.assertEqual(cfg['max_concurrent'], 3)
+        self.assertEqual(cfg['max_deploy'], 600.0)  # 750 × 0.80
+        # Sanity: 3 笔 score 6 ($600) 应 ≤ deploy cap → 可同时开
+        self.assertGreaterEqual(cfg['max_deploy'], 3 * cfg['notional']['6'])
+
+    def test_pilot_tier_subprocess_1125_three_score7(self):
+        """$1125 应能 3 笔 score 7 满载 ($900 = 80% × $1125)."""
+        cfg = self._run_pilot_tier_subprocess('1125')
+        self.assertEqual(cfg['notional']['7'], 300)  # 仍是中间档 notional
+        self.assertEqual(cfg['max_deploy'], 900.0)  # 1125 × 0.80
+        self.assertGreaterEqual(cfg['max_deploy'], 3 * cfg['notional']['7'])
+
+    def test_pilot_tier_subprocess_1500_large_tier(self):
+        """>$1200 升大档: notional 翻倍 (5:300/6:400/7:600), deploy 仍 80%."""
+        cfg = self._run_pilot_tier_subprocess('1500')
+        self.assertEqual(cfg['notional'], {'5': 300, '6': 400, '7': 600, '8': 300, '9': 300, '10': 300})
+        self.assertEqual(cfg['max_concurrent'], 3)
+        self.assertEqual(cfg['max_deploy'], 1200.0)  # 1500 × 0.80
+
     def test_pilot_invalid_mode_rejected(self):
         """Phase 6.A-fix Y4: 非法 CRESUS_MODE → SystemExit."""
         import subprocess
