@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-04T18:07:04.876624+00:00",
+  "generated_at": "2026-06-04T18:09:11.938376+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 48,
@@ -29,16 +29,18 @@
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -31.5482,
-    "deployed_usdt": 149.97
+    "deployed_usdt": 348.28
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "JTOUSDT"
+      "JTOUSDT",
+      "SPCXUSDT"
     ],
     "exchange_symbols": [
+      "SPCXUSDT",
       "JTOUSDT"
     ]
   },
@@ -86,7 +88,7 @@
       "top_trader_position_ratio": 1.5146,
       "top_trader_account_ratio": 1.8719,
       "global_account_ratio": 1.791,
-      "phase_a_mfe_pct": 0.139,
+      "phase_a_mfe_pct": 0.244,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.074985,
@@ -99,11 +101,11 @@
       "btc_pct_vs_ma25_at_open": -0.927,
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.852,
-      "phase_a_mfe_price": 0.5737,
-      "current_price": 0.5713,
-      "unrealized_pnl_usdt": 0.8613,
-      "unrealized_pnl_pct": 0.574,
-      "last_price_check_at": "2026-06-04T18:07:01.347050+00:00"
+      "phase_a_mfe_price": 0.5731,
+      "current_price": 0.5726,
+      "unrealized_pnl_usdt": 0.522,
+      "unrealized_pnl_pct": 0.348,
+      "last_price_check_at": "2026-06-04T18:09:10.427243+00:00"
     },
     {
       "paper_id": "SPCXUSDT|SHORT|2026-06-04T18:05:54.668219+00:00",
@@ -162,10 +164,10 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.935,
       "phase_a_mfe_price": 172.35,
-      "current_price": 172.46,
-      "unrealized_pnl_usdt": -0.023,
-      "unrealized_pnl_pct": -0.012,
-      "last_price_check_at": "2026-06-04T18:07:01.347050+00:00"
+      "current_price": 172.16,
+      "unrealized_pnl_usdt": 0.322,
+      "unrealized_pnl_pct": 0.162,
+      "last_price_check_at": "2026-06-04T18:09:10.427243+00:00"
     }
   ],
   "recent_closed": [
@@ -3579,26 +3581,16 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [
-    {
-      "paper_id": "SPCXUSDT|SHORT|2026-06-04T18:05:54.668219+00:00",
-      "symbol": "SPCXUSDT",
-      "direction": "SHORT",
-      "conviction_score": 6,
-      "signal_at": "2026-06-04T18:06:43.939312+00:00",
-      "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-06-04T18:06:49.859680+00:00"
-    }
-  ],
+  "missed_signals": [],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 63267.5,
-    "btc_ma25_1h": 63911.12,
-    "pct_vs_ma25": -1.007,
-    "change_24h_pct": -4.15,
-    "sub_regime": "down_stable",
-    "change_3h_pct": -0.935,
-    "computed_at": "2026-06-04T18:07:02.298653+00:00"
+    "btc_price": 63225.9,
+    "btc_ma25_1h": 63909.45,
+    "pct_vs_ma25": -1.07,
+    "change_24h_pct": -4.213,
+    "sub_regime": "down_acute",
+    "change_3h_pct": -1.0,
+    "computed_at": "2026-06-04T18:09:11.383720+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
