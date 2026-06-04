@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-04T02:09:29.822690+00:00",
+  "generated_at": "2026-06-04T02:11:36.709455+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 14,
-    "open": 0,
+    "total_trades": 15,
+    "open": 1,
     "closed": 14,
     "wins": 4,
     "losses": 10,
@@ -15,30 +15,97 @@
     "avg_pnl_usdt": -0.549,
     "best_trade_usdt": 2.8115,
     "worst_trade_usdt": -3.7076,
-    "fees_paid_usdt": 1.9955,
+    "fees_paid_usdt": 2.0955,
     "fees_realized_usdt": 1.9955,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.1,
     "fees_are_actual": true,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 590.32,
+    "deployed_usdt": 200.09,
+    "free_capital_usdt": 390.13,
     "max_concurrent_slots": 2,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 3.18,
-    "deployed_usdt": 0
+    "deployed_usdt": 200.09
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "SUIUSDT"
+    ],
+    "exchange_symbols": [
+      "SUIUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "SUIUSDT|SHORT|2026-06-04T02:07:06.417863+00:00",
+      "trade_id": "L1780538826_SUIUSDT_S",
+      "symbol": "SUIUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.7701,
+      "avg_fill_price": 0.7684,
+      "slippage_bps": 22.08,
+      "qty": 260.4,
+      "notional_usdt": 200.09136,
+      "leverage": 1,
+      "risk_usdt": 4.6723,
+      "risk_pct": 2.335,
+      "mirror_latency_sec": 25.6,
+      "sl_price": 0.7846428599999999,
+      "sl_paper_current": 0.78634286,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -0.0017,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 4,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": -0.0095,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "B",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.74573571,
+      "tp2_price": 0.72137143,
+      "phase": "A",
+      "entry_order_id": 39378669735,
+      "entry_client_id": "cresus_L1780538826_SUIUSDT_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 6,
+      "alert_type": "sustained",
+      "atr_pct": 1.055,
+      "top_trader_position_ratio": 1.7494,
+      "top_trader_account_ratio": 2.1928,
+      "global_account_ratio": 1.7816,
+      "phase_a_mfe_pct": 0.091,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.100046,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-04T02:10:13.286384+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 62006.5,
+      "btc_change_24h_at_open": -6.88,
+      "btc_pct_vs_ma25_at_open": -5.823,
+      "btc_sub_regime_at_open": "down_acute",
+      "btc_change_3h_at_open": -3.293,
+      "phase_a_mfe_price": 0.7694,
+      "current_price": 0.7765,
+      "unrealized_pnl_usdt": -2.1092,
+      "unrealized_pnl_pct": -1.054,
+      "last_price_check_at": "2026-06-04T02:11:35.443259+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "ZECUSDT|SHORT|2026-06-04T01:22:25.705899+00:00",
@@ -1084,42 +1151,24 @@
   ],
   "missed_signals": [
     {
-      "paper_id": "RENDERUSDT|SHORT|2026-06-04T01:52:28.602096+00:00",
-      "symbol": "RENDERUSDT",
-      "direction": "SHORT",
-      "conviction_score": 6,
-      "signal_at": "2026-06-04T01:54:18.938383+00:00",
-      "reason": "paper trade too old (910s > 600s)",
-      "last_checked_at": "2026-06-04T02:09:28.543966+00:00"
-    },
-    {
       "paper_id": "TRUMPUSDT|SHORT|2026-06-04T01:52:35.574038+00:00",
       "symbol": "TRUMPUSDT",
       "direction": "SHORT",
       "conviction_score": 6,
       "signal_at": "2026-06-04T01:54:18.938383+00:00",
-      "reason": "paper trade too old (910s > 600s)",
-      "last_checked_at": "2026-06-04T02:09:28.543966+00:00"
-    },
-    {
-      "paper_id": "PENGUUSDT|SHORT|2026-06-04T01:52:38.853672+00:00",
-      "symbol": "PENGUUSDT",
-      "direction": "SHORT",
-      "conviction_score": 5,
-      "signal_at": "2026-06-04T01:54:18.938383+00:00",
-      "reason": "paper trade too old (910s > 600s)",
-      "last_checked_at": "2026-06-04T02:09:28.543966+00:00"
+      "reason": "paper trade too old (1037s > 600s)",
+      "last_checked_at": "2026-06-04T02:11:35.443259+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 62072.1,
-    "btc_ma25_1h": 65842.68,
-    "pct_vs_ma25": -5.727,
-    "change_24h_pct": -6.782,
+    "btc_price": 62230.1,
+    "btc_ma25_1h": 65849.0,
+    "pct_vs_ma25": -5.496,
+    "change_24h_pct": -6.545,
     "sub_regime": "down_acute",
-    "change_3h_pct": -3.19,
-    "computed_at": "2026-06-04T02:09:29.819876+00:00"
+    "change_3h_pct": -2.944,
+    "computed_at": "2026-06-04T02:11:36.406754+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
