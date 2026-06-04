@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-04T00:17:38.712510+00:00",
+  "generated_at": "2026-06-04T00:19:35.964617+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 9,
@@ -100,10 +100,10 @@
       "btc_sub_regime_at_open": "down_acute",
       "btc_change_3h_at_open": -2.192,
       "phase_a_mfe_price": 0.07,
-      "current_price": 0.07032,
-      "unrealized_pnl_usdt": -0.7115,
-      "unrealized_pnl_pct": -0.474,
-      "last_price_check_at": "2026-06-04T00:17:37.108186+00:00"
+      "current_price": 0.07018,
+      "unrealized_pnl_usdt": -0.4115,
+      "unrealized_pnl_pct": -0.274,
+      "last_price_check_at": "2026-06-04T00:19:34.378762+00:00"
     }
   ],
   "recent_closed": [
@@ -701,16 +701,26 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "SUSHIUSDT|LONG|2026-06-04T00:17:28.863622+00:00",
+      "symbol": "SUSHIUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-04T00:17:57.768908+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_acute 3h=-2.30% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-04T00:19:34.378762+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 64255.7,
-    "btc_ma25_1h": 66263.48,
-    "pct_vs_ma25": -3.03,
-    "change_24h_pct": -3.953,
+    "btc_price": 64227.8,
+    "btc_ma25_1h": 66262.36,
+    "pct_vs_ma25": -3.07,
+    "change_24h_pct": -3.995,
     "sub_regime": "down_acute",
-    "change_3h_pct": -2.256,
-    "computed_at": "2026-06-04T00:17:38.433847+00:00"
+    "change_3h_pct": -2.298,
+    "computed_at": "2026-06-04T00:19:35.681691+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
