@@ -269,6 +269,15 @@ LIVE_RECON_IGNORE_SYMBOLS = {
     "AZTECUSDT",  # 2026-05-26: testnet 价格归零, -2020 Unable to fill, -$86.52 锁住
 }
 
+# Phase 6.D (2026-06-04): 用户在 Binance 后台手动一键平仓 → live state 卡死场景.
+# 原逻辑只在"主动尝试关仓时碰到 no_position"才能 self-heal (already_closed_externally),
+# 但当 Phase A 没有 SL/TP trigger 又远没到 4h timeout 时, live 一直傻等, dashboard
+# 显示对账失败警告但无动作. 用户报: 06-04 ONDOUSDT SHORT 手动平后卡 45min.
+#
+# 新行为: reconcile 检测到 live_only mismatch 连续 N tick 持续存在 → 自动 mark
+# already_closed_externally_auto, 不再等被动 trigger. 仍需 N ticks 防 API 闪挂误杀.
+LIVE_RECON_AUTO_HEAL_TICKS = 3   # 30s loop × 3 = ~90s confirm 后才动手
+
 # Phase 4.H Conviction filter (2026-05-22 部署) / Phase 4.R7 (2026-05-24 关闭)
 # ==============================================================================
 # 4.H 部署时论据 (回看不充分):
@@ -1268,6 +1277,71 @@ def check_position_reconciliation(
         "live_symbols": list(live_symbols),
         "exchange_symbols": list(exchange_symbols),
     }
+
+
+def _auto_heal_live_only_mismatches(
+    live_state: dict, recon: dict, now: datetime,
+) -> list:
+    """Phase 6.D: 连续 LIVE_RECON_AUTO_HEAL_TICKS tick 的 live_only mismatch 自动清理.
+
+    应用场景: 用户在 Binance 后台手动一键平仓后, live state 卡在 open_trades 直到
+    超时 / SL / TP 才会被动 self-heal. 这里改成主动 — 连续 N tick 确认仓位真消失,
+    就把它移到 closed_trades (close_reason='already_closed_externally_auto'),
+    立即解锁 max_concurrent slot 让新信号能开.
+
+    API 失败时 (api_failed=True) 不动 counter, 防止网络闪挂误杀.
+
+    Returns: list of auto-healed trade dicts (供日志 / 通知用), 可能为空.
+    """
+    if recon.get("api_failed"):
+        return []
+    streak = live_state.setdefault("_live_only_streak", {})
+    mismatch_syms = {
+        m["symbol"] for m in (recon.get("mismatches") or [])
+        if m.get("kind") == "live_only"
+    }
+    # 1. 不在本 tick mismatch 列表的 symbol → 重置 streak (恢复了 / 从未真不一致)
+    for sym in list(streak.keys()):
+        if sym not in mismatch_syms:
+            del streak[sym]
+    # 2. 在 mismatch 列表的 symbol → streak +1, 检查阈值
+    healed = []
+    open_trades = live_state.get("live_open_trades") or []
+    closed_trades = live_state.setdefault("live_closed_trades", [])
+    for sym in mismatch_syms:
+        streak[sym] = streak.get(sym, 0) + 1
+        if streak[sym] < LIVE_RECON_AUTO_HEAL_TICKS:
+            continue
+        # 阈值到 — 找出该 symbol 的 live_open_trade 移到 closed
+        kept = []
+        target = None
+        for t in open_trades:
+            if t.get("symbol") == sym and target is None:
+                target = t
+            else:
+                kept.append(t)
+        if target is None:
+            # symbol 不在 open_trades 了? 说明并发清理过, 直接清 streak
+            del streak[sym]
+            continue
+        target = dict(target)
+        target["closed_at"] = now.isoformat()
+        target["close_reason"] = "already_closed_externally_auto"
+        target["realized_pnl_usdt"] = 0.0
+        target["close_qty"] = 0.0
+        target["avg_exit_price"] = 0.0
+        target["_auto_heal_streak_ticks"] = streak[sym]
+        closed_trades.append(target)
+        live_state["live_open_trades"] = kept
+        open_trades = kept
+        healed.append(target)
+        del streak[sym]
+        log.warning(
+            f"[recon-auto-heal] {sym}: live_only mismatch 持续 "
+            f"{LIVE_RECON_AUTO_HEAL_TICKS} ticks, 自动 mark "
+            f"already_closed_externally_auto. Trade entered={target.get('entered_at')}"
+        )
+    return healed
 
 
 def _compute_live_stats(live_state: dict) -> dict:
@@ -2459,6 +2533,9 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
             log.debug(f"[recon] API failed, skipped reconciliation this tick")
         else:
             log.debug(f"[recon] OK ({len(recon['live_symbols'])} symbols matched)")
+        # Phase 6.D: 连续 N tick live_only mismatch → 自动清理 (用户后台一键平仓场景).
+        # api_failed 时函数内部 skip, 不动 counter.
+        _auto_heal_live_only_mismatches(live, recon, datetime.now(timezone.utc))
 
     # Phase 4.C BTC regime 取样 — 本 tick 内所有 mirror_open 共享同一 snapshot.
     # 单次 1h kline 调用, 节省 API. 失败返 None → trade 不打 regime 标签 (不阻止 mirror).

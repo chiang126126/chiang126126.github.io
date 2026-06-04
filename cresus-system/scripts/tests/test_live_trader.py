@@ -5650,5 +5650,121 @@ class TestPhase5AExternalCloseRecovery(unittest.TestCase):
         self.assertEqual(result["symbol"], "DYMUSDT")
 
 
+class TestPhase6DAutoHealLiveOnly(unittest.TestCase):
+    """Phase 6.D (2026-06-04): 用户后台手动一键平仓 → live state 自动清理.
+
+    场景: 用户在 Binance UI 一键平仓后, reconcile 检测到 live_only mismatch,
+    但 live_trader 没有主动关仓 trigger (SL/TP/timeout 都没到) → state 卡住.
+    新行为: 连续 LIVE_RECON_AUTO_HEAL_TICKS=3 tick 检测到, 主动 mark
+    already_closed_externally_auto.
+    """
+
+    def setUp(self):
+        from datetime import datetime, timezone
+        from live_trader import _auto_heal_live_only_mismatches
+        self._heal = _auto_heal_live_only_mismatches
+        self.now = datetime(2026, 6, 4, 12, 0, 0, tzinfo=timezone.utc)
+        self.live_state = {
+            "live_open_trades": [
+                {"symbol": "ONDOUSDT", "direction": "SHORT",
+                 "entry_price": 0.3568, "sl": 0.3620, "entered_at": "2026-06-04T11:00:00+00:00"},
+                {"symbol": "BTCUSDT", "direction": "LONG",
+                 "entry_price": 50000, "sl": 49000, "entered_at": "2026-06-04T11:30:00+00:00"},
+            ],
+            "live_closed_trades": [],
+        }
+
+    def _recon_with_mismatch(self, *live_only_syms, api_failed=False):
+        return {
+            "ok": not live_only_syms,
+            "api_failed": api_failed,
+            "mismatches": [{"symbol": s, "kind": "live_only", "message": ""}
+                           for s in live_only_syms],
+            "live_symbols": [t["symbol"] for t in self.live_state["live_open_trades"]],
+            "exchange_symbols": [],
+        }
+
+    def test_increments_streak_below_threshold(self):
+        """N-1 tick mismatch: streak 累计但还没动手."""
+        recon = self._recon_with_mismatch("ONDOUSDT")
+        for _ in range(2):  # < LIVE_RECON_AUTO_HEAL_TICKS=3
+            healed = self._heal(self.live_state, recon, self.now)
+            self.assertEqual(healed, [])
+        self.assertEqual(self.live_state["_live_only_streak"]["ONDOUSDT"], 2)
+        # open_trades 还在
+        syms = [t["symbol"] for t in self.live_state["live_open_trades"]]
+        self.assertIn("ONDOUSDT", syms)
+
+    def test_heals_at_threshold(self):
+        """连续 3 tick mismatch → 自动清理."""
+        recon = self._recon_with_mismatch("ONDOUSDT")
+        for tick in range(3):
+            healed = self._heal(self.live_state, recon, self.now)
+        self.assertEqual(len(healed), 1)
+        self.assertEqual(healed[0]["symbol"], "ONDOUSDT")
+        self.assertEqual(healed[0]["close_reason"], "already_closed_externally_auto")
+        self.assertEqual(healed[0]["realized_pnl_usdt"], 0.0)
+        self.assertEqual(healed[0]["_auto_heal_streak_ticks"], 3)
+        # open_trades 只剩 BTCUSDT
+        syms = [t["symbol"] for t in self.live_state["live_open_trades"]]
+        self.assertEqual(syms, ["BTCUSDT"])
+        # closed_trades 多了 ONDOUSDT
+        closed_syms = [t["symbol"] for t in self.live_state["live_closed_trades"]]
+        self.assertEqual(closed_syms, ["ONDOUSDT"])
+        # streak 已清
+        self.assertNotIn("ONDOUSDT", self.live_state.get("_live_only_streak", {}))
+
+    def test_streak_resets_when_mismatch_disappears(self):
+        """tick 1 mismatch → tick 2 恢复 → streak 应重置, 不应继续累计."""
+        recon_bad = self._recon_with_mismatch("ONDOUSDT")
+        recon_ok = self._recon_with_mismatch()  # 无 mismatch
+        self._heal(self.live_state, recon_bad, self.now)
+        self.assertEqual(self.live_state["_live_only_streak"]["ONDOUSDT"], 1)
+        # mismatch 消失
+        self._heal(self.live_state, recon_ok, self.now)
+        self.assertNotIn("ONDOUSDT", self.live_state.get("_live_only_streak", {}))
+        # 再来 2 tick 不够触发
+        for _ in range(2):
+            healed = self._heal(self.live_state, recon_bad, self.now)
+            self.assertEqual(healed, [])
+        self.assertEqual(self.live_state["_live_only_streak"]["ONDOUSDT"], 2)
+
+    def test_api_failed_skips_counter(self):
+        """API 失败 tick 不动 counter (防网络闪挂误杀)."""
+        recon_fail = self._recon_with_mismatch("ONDOUSDT", api_failed=True)
+        for _ in range(10):  # 10 次 API fail, 没用
+            healed = self._heal(self.live_state, recon_fail, self.now)
+            self.assertEqual(healed, [])
+        self.assertEqual(self.live_state.get("_live_only_streak", {}), {})
+        # open_trades 完全没动
+        syms = [t["symbol"] for t in self.live_state["live_open_trades"]]
+        self.assertIn("ONDOUSDT", syms)
+
+    def test_multiple_symbols_heal_independently(self):
+        """两个 symbol 同时 live_only, 各自独立计 streak, 各自独立 heal."""
+        recon = self._recon_with_mismatch("ONDOUSDT", "BTCUSDT")
+        for _ in range(3):
+            healed = self._heal(self.live_state, recon, self.now)
+        self.assertEqual(len(healed), 2)
+        healed_syms = {h["symbol"] for h in healed}
+        self.assertEqual(healed_syms, {"ONDOUSDT", "BTCUSDT"})
+        self.assertEqual(self.live_state["live_open_trades"], [])
+        self.assertEqual(len(self.live_state["live_closed_trades"]), 2)
+
+    def test_heal_idempotent_after_open_removed(self):
+        """Symbol 已经从 open_trades 消失但 streak 还在 → 仅清 streak, 不重复 heal."""
+        # 模拟竞态: streak 已经 3, 但 open_trades 被并行清理了
+        self.live_state["_live_only_streak"] = {"ONDOUSDT": 3}
+        self.live_state["live_open_trades"] = [
+            t for t in self.live_state["live_open_trades"] if t["symbol"] != "ONDOUSDT"
+        ]
+        recon = self._recon_with_mismatch("ONDOUSDT")
+        healed = self._heal(self.live_state, recon, self.now)
+        # ONDOUSDT 不在 open_trades 了 → 不应再产生 closed 记录
+        self.assertEqual(healed, [])
+        # streak 也应被清掉 (heal 函数把它当 "已处理" 重置)
+        self.assertNotIn("ONDOUSDT", self.live_state.get("_live_only_streak", {}))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
