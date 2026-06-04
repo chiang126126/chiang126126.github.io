@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-04T14:57:38.597362+00:00",
+  "generated_at": "2026-06-04T14:59:33.598871+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 36,
@@ -2705,16 +2705,26 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "HOMEUSDT|LONG|2026-06-04T14:57:07.433030+00:00",
+      "symbol": "HOMEUSDT",
+      "direction": "LONG",
+      "conviction_score": 7,
+      "signal_at": "2026-06-04T14:57:46.982805+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_rebound 3h=+2.25% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-04T14:59:32.484128+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 63874.7,
-    "btc_ma25_1h": 64336.58,
-    "pct_vs_ma25": -0.718,
-    "change_24h_pct": -4.438,
+    "btc_price": 63927.6,
+    "btc_ma25_1h": 64338.7,
+    "pct_vs_ma25": -0.639,
+    "change_24h_pct": -4.359,
     "sub_regime": "down_rebound",
-    "change_3h_pct": 2.166,
-    "computed_at": "2026-06-04T14:57:38.592500+00:00"
+    "change_3h_pct": 2.25,
+    "computed_at": "2026-06-04T14:59:33.593159+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
