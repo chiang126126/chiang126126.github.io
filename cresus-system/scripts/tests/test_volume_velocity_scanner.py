@@ -550,7 +550,7 @@ class TestPhase6BLossReductionFilters(unittest.TestCase):
     def test_6b_a_low_winrate_rejected(self):
         """BASEDUSDT 12% N=32 → reject."""
         from volume_velocity_scanner import _open_paper_trade
-        from datetime import datetime, timezone
+        from datetime import datetime, timezone, timedelta
         a = self._make_alert(symbol="BASEDUSDT")
         ws = self._make_winrate_summary("BASEDUSDT", "SHORT", "sustained",
                                          n=32, win_rate=0.12, mu=-0.90)
@@ -562,7 +562,7 @@ class TestPhase6BLossReductionFilters(unittest.TestCase):
     def test_6b_a_low_sample_not_rejected(self):
         """DRAMUSDT 0% N=10 — N 不足不应被 winrate filter 拒 (会被 1B SL 距离拒)."""
         from volume_velocity_scanner import _open_paper_trade
-        from datetime import datetime, timezone
+        from datetime import datetime, timezone, timedelta
         # 给个充裕 SL 距离避免 1B 干扰, 单独测 1A
         a = self._make_alert(symbol="DRAMUSDT", price=100.0, sl_distance_pct=0.5)
         ws = self._make_winrate_summary("DRAMUSDT", "SHORT", "sustained",
@@ -575,7 +575,7 @@ class TestPhase6BLossReductionFilters(unittest.TestCase):
     def test_6b_a_high_winrate_passes(self):
         """胜率 >= 25% 不应被拒."""
         from volume_velocity_scanner import _open_paper_trade
-        from datetime import datetime, timezone
+        from datetime import datetime, timezone, timedelta
         a = self._make_alert(symbol="MONUSDT")
         ws = self._make_winrate_summary("MONUSDT", "SHORT", "sustained",
                                          n=74, win_rate=0.42, mu=0.84)
@@ -587,7 +587,7 @@ class TestPhase6BLossReductionFilters(unittest.TestCase):
     def test_6b_a_no_winrate_data_passes(self):
         """无 winrate_summary 时 (新 symbol / 测试) → 不应被拒 (fail-safe)."""
         from volume_velocity_scanner import _open_paper_trade
-        from datetime import datetime, timezone
+        from datetime import datetime, timezone, timedelta
         a = self._make_alert(symbol="NEWUSDT")
         result = _open_paper_trade(a, self._make_state(),
                                     datetime.now(timezone.utc), 1000.0,
@@ -599,7 +599,7 @@ class TestPhase6BLossReductionFilters(unittest.TestCase):
     def test_6b_b_micro_sl_rejected(self):
         """DRAMUSDT R=0.23% → reject."""
         from volume_velocity_scanner import _open_paper_trade
-        from datetime import datetime, timezone
+        from datetime import datetime, timezone, timedelta
         a = self._make_alert(symbol="DRAMUSDT", price=100.0, sl_distance_pct=0.23)
         result = _open_paper_trade(a, self._make_state(),
                                     datetime.now(timezone.utc), 1000.0)
@@ -608,7 +608,7 @@ class TestPhase6BLossReductionFilters(unittest.TestCase):
     def test_6b_b_normal_sl_passes(self):
         """SL >= 0.3% 应通过."""
         from volume_velocity_scanner import _open_paper_trade
-        from datetime import datetime, timezone
+        from datetime import datetime, timezone, timedelta
         a = self._make_alert(symbol="NORMALUSDT", price=100.0, sl_distance_pct=0.5)
         result = _open_paper_trade(a, self._make_state(),
                                     datetime.now(timezone.utc), 1000.0)
@@ -617,7 +617,7 @@ class TestPhase6BLossReductionFilters(unittest.TestCase):
     def test_6b_b_long_micro_sl_rejected(self):
         """LONG 方向 R=0.2% 也应被拒."""
         from volume_velocity_scanner import _open_paper_trade
-        from datetime import datetime, timezone
+        from datetime import datetime, timezone, timedelta
         a = self._make_alert(symbol="X", direction="LONG", price=100.0,
                               sl_distance_pct=0.2)
         result = _open_paper_trade(a, self._make_state(),
@@ -629,12 +629,12 @@ class TestPhase6BLossReductionFilters(unittest.TestCase):
     def test_6b_c_breakeven_shift_short(self):
         """SHORT 浮盈达 1.0R 时 SL 应被移到 entry."""
         from volume_velocity_scanner import _update_paper_trades
-        from datetime import datetime, timezone
+        from datetime import datetime, timezone, timedelta
         # SHORT: entry 100, SL 101 (R=1%), 当前价 99 = 浮盈 1R
         state = {"open_trades": [{
             "symbol": "TESTUSDT", "direction": "SHORT",
             "entry_price": 100.0, "sl": 101.0, "tp1": 98.5, "tp2": 97.0,
-            "phase": "A", "entered_at": "2026-06-03T20:00:00+00:00",
+            "phase": "A", "entered_at": (datetime.now(timezone.utc) - timedelta(minutes=5)).isoformat(),
             "atr_pct": 0.5, "notional_usdt": 150.0,
             "high_water_mark": 99.0,
         }], "closed_trades": []}
@@ -650,11 +650,11 @@ class TestPhase6BLossReductionFilters(unittest.TestCase):
     def test_6b_c_breakeven_shift_long(self):
         """LONG 浮盈达 1.0R 时 SL 应被移到 entry."""
         from volume_velocity_scanner import _update_paper_trades
-        from datetime import datetime, timezone
+        from datetime import datetime, timezone, timedelta
         state = {"open_trades": [{
             "symbol": "TESTUSDT", "direction": "LONG",
             "entry_price": 100.0, "sl": 99.0, "tp1": 101.5, "tp2": 103.0,
-            "phase": "A", "entered_at": "2026-06-03T20:00:00+00:00",
+            "phase": "A", "entered_at": (datetime.now(timezone.utc) - timedelta(minutes=5)).isoformat(),
             "atr_pct": 0.5, "notional_usdt": 150.0,
             "high_water_mark": 101.0,
         }], "closed_trades": []}
@@ -667,11 +667,11 @@ class TestPhase6BLossReductionFilters(unittest.TestCase):
     def test_6b_c_below_1r_no_shift(self):
         """浮盈 < 1.0R 不应触发 breakeven shift."""
         from volume_velocity_scanner import _update_paper_trades
-        from datetime import datetime, timezone
+        from datetime import datetime, timezone, timedelta
         state = {"open_trades": [{
             "symbol": "X", "direction": "SHORT",
             "entry_price": 100.0, "sl": 101.0, "tp1": 98.5, "tp2": 97.0,
-            "phase": "A", "entered_at": "2026-06-03T20:00:00+00:00",
+            "phase": "A", "entered_at": (datetime.now(timezone.utc) - timedelta(minutes=5)).isoformat(),
             "atr_pct": 0.5, "notional_usdt": 150.0,
             "high_water_mark": 99.5,
         }], "closed_trades": []}
@@ -684,11 +684,11 @@ class TestPhase6BLossReductionFilters(unittest.TestCase):
     def test_6b_c_idempotent_no_double_shift(self):
         """第二次 update 不应重复 shift (已 shifted flag 防御)."""
         from volume_velocity_scanner import _update_paper_trades
-        from datetime import datetime, timezone
+        from datetime import datetime, timezone, timedelta
         state = {"open_trades": [{
             "symbol": "X", "direction": "SHORT",
             "entry_price": 100.0, "sl": 101.0, "tp1": 98.5, "tp2": 97.0,
-            "phase": "A", "entered_at": "2026-06-03T20:00:00+00:00",
+            "phase": "A", "entered_at": (datetime.now(timezone.utc) - timedelta(minutes=5)).isoformat(),
             "atr_pct": 0.5, "notional_usdt": 150.0,
             "high_water_mark": 99.0,
         }], "closed_trades": []}
@@ -720,6 +720,7 @@ class TestPhase6CExtendedProtection(unittest.TestCase):
     def _make_trade(self, direction="SHORT", entry=100.0, sl=101.0,
                     tp1=None, tp2=None, hwm=None, initial_r=None):
         """构造一个 Phase A trade dict for testing."""
+        from datetime import datetime, timezone, timedelta
         if tp1 is None:
             tp1 = entry - 1.5 * abs(entry - sl) if direction == "SHORT" else entry + 1.5 * abs(entry - sl)
         if tp2 is None:
@@ -732,7 +733,7 @@ class TestPhase6CExtendedProtection(unittest.TestCase):
             "symbol": "TESTUSDT", "direction": direction,
             "entry_price": entry, "sl": sl, "tp1": tp1, "tp2": tp2,
             "initial_r": initial_r,
-            "phase": "A", "entered_at": "2026-06-03T20:00:00+00:00",
+            "phase": "A", "entered_at": (datetime.now(timezone.utc) - timedelta(minutes=5)).isoformat(),
             "atr_pct": 0.5, "notional_usdt": 150.0,
             "high_water_mark": hwm,
         }
@@ -742,7 +743,7 @@ class TestPhase6CExtendedProtection(unittest.TestCase):
     def test_6c_a_short_0_8r_milestone(self):
         """SHORT 浮盈 0.8R 时 SL 应移到 entry + 0.2R (不是 entry)."""
         from volume_velocity_scanner import _update_paper_trades
-        from datetime import datetime, timezone
+        from datetime import datetime, timezone, timedelta
         # SHORT: entry 100, SL 101 (1R=1), 当前 99.2 (浮盈 0.8R)
         state = {"open_trades": [self._make_trade(
             direction="SHORT", entry=100.0, sl=101.0, hwm=99.2,
@@ -759,7 +760,7 @@ class TestPhase6CExtendedProtection(unittest.TestCase):
     def test_6c_a_long_0_8r_milestone(self):
         """LONG 浮盈 0.8R 时 SL 应移到 entry - 0.2R."""
         from volume_velocity_scanner import _update_paper_trades
-        from datetime import datetime, timezone
+        from datetime import datetime, timezone, timedelta
         # LONG: entry 100, SL 99 (1R=1), 当前 100.8 (浮盈 0.8R)
         state = {"open_trades": [self._make_trade(
             direction="LONG", entry=100.0, sl=99.0, hwm=100.8,
@@ -774,7 +775,7 @@ class TestPhase6CExtendedProtection(unittest.TestCase):
     def test_6c_a_milestone_progression_0_8_to_1_0(self):
         """0.8R → 1.0R 进阶: 第一次 update 触发 0.8, 第二次进 1.0."""
         from volume_velocity_scanner import _update_paper_trades
-        from datetime import datetime, timezone
+        from datetime import datetime, timezone, timedelta
         state = {"open_trades": [self._make_trade(
             direction="SHORT", entry=100.0, sl=101.0, hwm=99.2,
         )], "closed_trades": []}
@@ -799,7 +800,7 @@ class TestPhase6CExtendedProtection(unittest.TestCase):
     def test_6c_a_no_regression_when_retraces(self):
         """到 1.0R 后再回到 0.8R 不应触发 (milestone 只前进不后退)."""
         from volume_velocity_scanner import _update_paper_trades
-        from datetime import datetime, timezone
+        from datetime import datetime, timezone, timedelta
         state = {"open_trades": [self._make_trade(
             direction="SHORT", entry=100.0, sl=101.0, hwm=99.0,
         )], "closed_trades": []}
@@ -821,7 +822,7 @@ class TestPhase6CExtendedProtection(unittest.TestCase):
     def test_6c_a_direct_1_0r_skips_0_8(self):
         """如果直接到 1.0R (跳过 0.8R), milestone 应直接是 1.0 不是 0.8."""
         from volume_velocity_scanner import _update_paper_trades
-        from datetime import datetime, timezone
+        from datetime import datetime, timezone, timedelta
         # 第一次 update 就到 1.0R: SHORT entry 100 SL 101 (R=1), 价格 99
         state = {"open_trades": [self._make_trade(
             direction="SHORT", entry=100.0, sl=101.0, hwm=99.0,
@@ -836,7 +837,7 @@ class TestPhase6CExtendedProtection(unittest.TestCase):
     def test_6c_a_initial_r_field_preserved_across_shifts(self):
         """initial_r 字段在 SL 移动后仍应正确反映原始 1R."""
         from volume_velocity_scanner import _update_paper_trades, _initial_r_distance
-        from datetime import datetime, timezone
+        from datetime import datetime, timezone, timedelta
         state = {"open_trades": [self._make_trade(
             direction="SHORT", entry=100.0, sl=101.0, hwm=99.0,
         )], "closed_trades": []}
@@ -855,7 +856,7 @@ class TestPhase6CExtendedProtection(unittest.TestCase):
         分支"loosen" SL 回 entry ± 0.2R.
         """
         from volume_velocity_scanner import _update_paper_trades
-        from datetime import datetime, timezone
+        from datetime import datetime, timezone, timedelta
         # 模拟 Phase 6.B-C 时代开的 SHORT trade:
         # entry=100, 原 SL=101 (1R=1), 已触发 BE → SL 现在 = 100 (entry),
         # _breakeven_shifted=True, 但没有 _profit_milestone 字段.

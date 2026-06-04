@@ -2382,7 +2382,7 @@ class TestPhase6AMainnetPilotConfig(unittest.TestCase):
         self.assertEqual(cfg['mode'], 'mainnet_pilot')
         self.assertEqual(cfg['capital'], 600.0)
         self.assertEqual(cfg['notional'], {'5': 150, '6': 200, '7': 300, '8': 150, '9': 150, '10': 150})
-        self.assertEqual(cfg['max_concurrent'], 2)
+        self.assertEqual(cfg['max_concurrent'], 3)   # 2026-06-04: 2→3 (避免错过高 conviction 信号)
         self.assertEqual(cfg['max_deploy'], 450.0)
         self.assertEqual(cfg['daily_dd'], 60.0)  # 10% of $600
         self.assertEqual(cfg['regime_mult'], {})  # Phase 5.S 清空

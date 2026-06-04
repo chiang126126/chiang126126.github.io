@@ -524,7 +524,9 @@ if CRESUS_MODE == 'mainnet_pilot':
         LIVE_MAX_DEPLOY_USDT = 180.0
     elif PILOT_CAPITAL <= 600:
         LIVE_NOTIONAL_BY_SCORE = {5: 150, 6: 200, 7: 300, 8: 150, 9: 150, 10: 150}
-        LIVE_MAX_CONCURRENT = 2
+        LIVE_MAX_CONCURRENT = 3   # 2026-06-04: 2 → 3, 避免错过高 conviction 信号 (如 VICUSDT score 6).
+                                  #   deploy cap $450 仍兜底 — 3 笔 score 6 ($600) 会被 cap 拦, 自动放 2 笔.
+                                  #   仅 3 笔均为 $150 小笔 (score 5/8/9/10) 时才能真满 slot.
         LIVE_MAX_DEPLOY_USDT = 450.0
     else:
         LIVE_NOTIONAL_BY_SCORE = {5: 300, 6: 400, 7: 600, 8: 300, 9: 300, 10: 300}
