@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-04T11:51:58.637972+00:00",
+  "generated_at": "2026-06-04T11:54:01.032959+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 33,
@@ -28,19 +28,15 @@
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -16.5246,
-    "deployed_usdt": 199.92
+    "daily_pnl": -19.6534,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "EDGEUSDT"
-    ],
-    "exchange_symbols": [
-      "EDGEUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
   "open_trades": [],
   "recent_closed": [
@@ -2486,16 +2482,26 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "SIRENUSDT|LONG|2026-06-04T11:51:11.909600+00:00",
+      "symbol": "SIRENUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-04T11:51:56.280105+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_acute 3h=-1.92% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-04T11:53:59.933247+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 62375.2,
-    "btc_ma25_1h": 64697.17,
-    "pct_vs_ma25": -3.589,
-    "change_24h_pct": -6.958,
+    "btc_price": 62374.6,
+    "btc_ma25_1h": 64697.15,
+    "pct_vs_ma25": -3.59,
+    "change_24h_pct": -6.959,
     "sub_regime": "down_acute",
-    "change_3h_pct": -1.919,
-    "computed_at": "2026-06-04T11:51:56.787337+00:00"
+    "change_3h_pct": -1.92,
+    "computed_at": "2026-06-04T11:54:01.029616+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
