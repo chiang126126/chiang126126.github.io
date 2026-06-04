@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-04T00:41:00.733379+00:00",
+  "generated_at": "2026-06-04T00:43:07.204604+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
@@ -16894,6 +16894,18 @@
         }
       }
     },
+    "IPUSDT|sustained|LONG": {
+      "symbol": "IPUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -0.12
+        }
+      }
+    },
     "RONINUSDT|burst|SHORT": {
       "symbol": "RONINUSDT",
       "alert_type": "burst",
@@ -20332,9 +20344,9 @@
           "avg_outcome_pct": -0.72
         },
         "240m": {
-          "n": 5,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -0.28
+          "n": 6,
+          "win_rate": 0.167,
+          "avg_outcome_pct": -0.35
         }
       }
     },
