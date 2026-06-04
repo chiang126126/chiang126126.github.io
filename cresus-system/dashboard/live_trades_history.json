@@ -1,52 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-04T09:57:52.175563+00:00",
+  "generated_at": "2026-06-04T09:59:59.307776+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 30,
-    "open": 1,
-    "closed": 29,
+    "open": 0,
+    "closed": 30,
     "wins": 10,
     "losses": 18,
     "win_rate": 0.357,
     "total_pnl_usdt": -27.7195,
-    "net_pnl_usdt": -32.085,
-    "avg_pnl_usdt": -0.9558,
+    "net_pnl_usdt": -32.16,
+    "avg_pnl_usdt": -0.924,
     "best_trade_usdt": 3.1109,
     "worst_trade_usdt": -7.3487,
     "fees_paid_usdt": 4.4405,
-    "fees_realized_usdt": 4.3655,
-    "fees_open_usdt": 0.0751,
+    "fees_realized_usdt": 4.4405,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 150.14,
-    "free_capital_usdt": 417.7,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 567.84,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -16.8529,
-    "deployed_usdt": 150.14
+    "deployed_usdt": 0
   },
   "reconciliation": {
-    "ok": false,
-    "mismatches": [
-      {
-        "symbol": "ONDOUSDT",
-        "kind": "live_only",
-        "message": "live tracks ONDOUSDT but exchange has no position (externally closed? or state stale)"
-      }
-    ],
+    "ok": true,
+    "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "ONDOUSDT"
-    ],
+    "live_symbols": [],
     "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "ONDOUSDT|SHORT|2026-06-04T09:04:57.801166+00:00",
       "trade_id": "L1780563897_ONDOUSD_S",
@@ -104,13 +97,16 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.951,
       "phase_a_mfe_price": 0.354,
-      "current_price": 0.359,
-      "unrealized_pnl_usdt": -0.9258,
-      "unrealized_pnl_pct": -0.617,
-      "last_price_check_at": "2026-06-04T09:57:50.798023+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.3585,
+      "unrealized_pnl_usdt": -0.7154,
+      "unrealized_pnl_pct": -0.476,
+      "last_price_check_at": "2026-06-04T09:59:05.818833+00:00",
+      "closed_at": "2026-06-04T09:59:12.909595+00:00",
+      "close_reason": "already_closed_externally",
+      "realized_pnl_usdt": 0.0,
+      "close_qty": 0.0,
+      "avg_exit_price": 0.0
+    },
     {
       "paper_id": "FFUSDT|SHORT|2026-06-04T09:07:52.705778+00:00",
       "trade_id": "L1780564072_FFUSDT_S",
@@ -2270,19 +2266,19 @@
       "direction": "SHORT",
       "conviction_score": 6,
       "signal_at": "2026-06-04T09:32:02.096513+00:00",
-      "reason": "paper trade too old (1549s > 600s)",
-      "last_checked_at": "2026-06-04T09:57:50.798023+00:00"
+      "reason": "paper trade too old (1676s > 600s)",
+      "last_checked_at": "2026-06-04T09:59:58.215551+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 63154.2,
-    "btc_ma25_1h": 65075.21,
-    "pct_vs_ma25": -2.952,
-    "change_24h_pct": -5.798,
+    "btc_price": 63231.6,
+    "btc_ma25_1h": 65078.3,
+    "pct_vs_ma25": -2.838,
+    "change_24h_pct": -5.682,
     "sub_regime": "down_acute",
-    "change_3h_pct": -1.333,
-    "computed_at": "2026-06-04T09:57:51.900533+00:00"
+    "change_3h_pct": -1.212,
+    "computed_at": "2026-06-04T09:59:59.304525+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
