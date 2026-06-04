@@ -1,48 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-04T05:41:14.922658+00:00",
+  "generated_at": "2026-06-04T05:43:20.957818+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 19,
-    "open": 1,
-    "closed": 18,
-    "wins": 5,
+    "open": 0,
+    "closed": 19,
+    "wins": 6,
     "losses": 13,
-    "win_rate": 0.278,
-    "total_pnl_usdt": -18.5509,
-    "net_pnl_usdt": -21.2519,
-    "avg_pnl_usdt": -1.0306,
-    "best_trade_usdt": 2.8115,
+    "win_rate": 0.316,
+    "total_pnl_usdt": -15.44,
+    "net_pnl_usdt": -18.2894,
+    "avg_pnl_usdt": -0.8126,
+    "best_trade_usdt": 3.1109,
     "worst_trade_usdt": -5.6349,
-    "fees_paid_usdt": 2.776,
-    "fees_realized_usdt": 2.701,
-    "fees_open_usdt": 0.075,
+    "fees_paid_usdt": 2.8494,
+    "fees_realized_usdt": 2.8494,
+    "fees_open_usdt": 0,
     "fees_are_actual": true,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 150.02,
-    "free_capital_usdt": 428.65,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 581.71,
     "max_concurrent_slots": 2,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -7.6843,
-    "deployed_usdt": 150.02
+    "daily_pnl": -4.5734,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "ENAUSDT"
-    ],
-    "exchange_symbols": [
-      "ENAUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "ENAUSDT|SHORT|2026-06-04T05:02:17.201436+00:00",
       "trade_id": "L1780549337_ENAUSDT_S",
@@ -89,7 +86,7 @@
       "phase_a_mfe_pct": 1.872,
       "phase_b_mfe_pct": 3.027,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.075011,
+      "fees_paid_usdt": 0.148466,
       "fees_are_actual": true,
       "opened_at": "2026-06-04T05:03:29.578643+00:00",
       "is_dry_run": false,
@@ -100,14 +97,24 @@
       "btc_sub_regime_at_open": "down_rebound",
       "btc_change_3h_at_open": 1.38,
       "phase_a_mfe_price": 0.10276,
-      "current_price": 0.10235,
-      "unrealized_pnl_usdt": 3.6608,
-      "unrealized_pnl_pct": 2.44,
-      "last_price_check_at": "2026-06-04T05:41:13.701094+00:00",
-      "phase_b_mfe_price": 0.10155
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.10249,
+      "unrealized_pnl_usdt": 3.4606,
+      "unrealized_pnl_pct": 2.307,
+      "last_price_check_at": "2026-06-04T05:41:35.081674+00:00",
+      "phase_b_mfe_price": 0.10155,
+      "closed_at": "2026-06-04T05:41:48.933106+00:00",
+      "close_reason": "paper:hit_b_trail",
+      "avg_exit_price": 0.10273457342657343,
+      "realized_pnl_usdt": 3.1109,
+      "close_order_id": 14918527675,
+      "close_qty": 1430.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 0.10249,
+      "close_slippage_bps": 23.86,
+      "entry_fees_usdt": 0.075011,
+      "close_fees_usdt": 0.073455
+    },
     {
       "paper_id": "TONUSDT|SHORT|2026-06-04T05:04:32.445545+00:00",
       "trade_id": "L1780549472_TONUSDT_S",
@@ -1449,22 +1456,13 @@
   ],
   "missed_signals": [
     {
-      "paper_id": "JTOUSDT|SHORT|2026-06-04T05:11:17.995367+00:00",
-      "symbol": "JTOUSDT",
-      "direction": "SHORT",
-      "conviction_score": 5,
-      "signal_at": "2026-06-04T05:12:03.513671+00:00",
-      "reason": "paper trade too old (1750s > 600s)",
-      "last_checked_at": "2026-06-04T05:41:13.701094+00:00"
-    },
-    {
       "paper_id": "MEMEUSDT|LONG|2026-06-04T05:39:13.861532+00:00",
       "symbol": "MEMEUSDT",
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-04T05:39:36.508565+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_rebound 3h=+1.54% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-06-04T05:41:13.701094+00:00"
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_rebound 3h=+1.57% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-04T05:43:19.996080+00:00"
     },
     {
       "paper_id": "TRIAUSDT|LONG|2026-06-04T05:39:22.054799+00:00",
@@ -1472,19 +1470,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-04T05:39:36.508565+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_rebound 3h=+1.54% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-06-04T05:41:13.701094+00:00"
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_rebound 3h=+1.57% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-04T05:43:19.996080+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 64171.3,
-    "btc_ma25_1h": 65648.77,
-    "pct_vs_ma25": -2.251,
-    "change_24h_pct": -4.635,
+    "btc_price": 64190.5,
+    "btc_ma25_1h": 65649.54,
+    "pct_vs_ma25": -2.222,
+    "change_24h_pct": -4.606,
     "sub_regime": "down_rebound",
-    "change_3h_pct": 1.539,
-    "computed_at": "2026-06-04T05:41:14.640687+00:00"
+    "change_3h_pct": 1.57,
+    "computed_at": "2026-06-04T05:43:20.953776+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
