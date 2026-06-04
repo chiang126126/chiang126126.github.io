@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-04T16:00:51.079627+00:00",
+  "generated_at": "2026-06-04T16:02:48.617187+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 42,
@@ -100,10 +100,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 550.19,
-      "current_price": 550.33,
-      "unrealized_pnl_usdt": 0.3521,
-      "unrealized_pnl_pct": 0.177,
-      "last_price_check_at": "2026-06-04T16:00:49.514408+00:00"
+      "current_price": 547.31,
+      "unrealized_pnl_usdt": -0.7442,
+      "unrealized_pnl_pct": -0.373,
+      "last_price_check_at": "2026-06-04T16:02:47.367146+00:00"
     }
   ],
   "recent_closed": [
@@ -3144,16 +3144,26 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "STRKUSDT|LONG|2026-06-04T16:01:17.723582+00:00",
+      "symbol": "STRKUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-04T16:01:45.630149+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.64% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-04T16:02:47.367146+00:00"
+    }
+  ],
   "btc_regime_now": {
-    "regime": "chop",
-    "btc_price": 63850.1,
-    "btc_ma25_1h": 64131.65,
-    "pct_vs_ma25": -0.439,
-    "change_24h_pct": -3.312,
-    "sub_regime": null,
-    "change_3h_pct": null,
-    "computed_at": "2026-06-04T16:00:50.797702+00:00"
+    "regime": "down",
+    "btc_price": 63795.1,
+    "btc_ma25_1h": 64129.45,
+    "pct_vs_ma25": -0.521,
+    "change_24h_pct": -3.396,
+    "sub_regime": "down_stable",
+    "change_3h_pct": -0.635,
+    "computed_at": "2026-06-04T16:02:48.327082+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
