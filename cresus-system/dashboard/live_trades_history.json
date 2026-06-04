@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-04T14:59:33.598871+00:00",
+  "generated_at": "2026-06-04T15:01:39.930955+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 36,
-    "open": 0,
+    "total_trades": 37,
+    "open": 1,
     "closed": 36,
     "wins": 11,
     "losses": 23,
@@ -15,30 +15,98 @@
     "avg_pnl_usdt": -0.9532,
     "best_trade_usdt": 3.1109,
     "worst_trade_usdt": -7.3487,
-    "fees_paid_usdt": 5.3327,
+    "fees_paid_usdt": 5.4816,
     "fees_realized_usdt": 5.3327,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.1489,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 560.35,
+    "deployed_usdt": 297.89,
+    "free_capital_usdt": 262.31,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -23.45,
-    "deployed_usdt": 0
+    "deployed_usdt": 297.89
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "HOMEUSDT"
+    ],
+    "exchange_symbols": [
+      "HOMEUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "HOMEUSDT|LONG|2026-06-04T14:57:07.433030+00:00",
+      "trade_id": "L1780585027_HOMEUSD_L",
+      "symbol": "HOMEUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.041414,
+      "avg_fill_price": 0.0417158,
+      "slippage_bps": 72.87,
+      "qty": 7141.0,
+      "notional_usdt": 297.89255,
+      "leverage": 1,
+      "risk_usdt": 2.1552,
+      "risk_pct": 0.723,
+      "mirror_latency_sec": 152.1,
+      "sl_price": 0.0417158,
+      "sl_paper_current": 0.041414,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.0003018,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 5,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 1,
+      "funding_signal": "favorable",
+      "funding_rate_pct_at_open": -0.5221,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "B",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.04285336,
+      "tp2_price": 0.04429271,
+      "phase": "B",
+      "entry_order_id": 1351448677,
+      "entry_client_id": "cresus_L1780585027_HOMEUSD_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 7,
+      "alert_type": "sustained",
+      "atr_pct": 1.159,
+      "top_trader_position_ratio": 0.6133,
+      "top_trader_account_ratio": 1.1706,
+      "global_account_ratio": 1.1791,
+      "phase_a_mfe_pct": 3.801,
+      "phase_b_mfe_pct": 3.801,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.148946,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-04T15:00:19.054015+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 63901.5,
+      "btc_change_24h_at_open": -3.248,
+      "btc_pct_vs_ma25_at_open": -0.497,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.042988,
+      "phase_b_mfe_price": 0.042988,
+      "current_price": 0.041697,
+      "unrealized_pnl_usdt": -0.1343,
+      "unrealized_pnl_pct": -0.045,
+      "last_price_check_at": "2026-06-04T15:01:38.366531+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "ORCLUSDT|LONG|2026-06-04T14:08:22.944504+00:00",
@@ -2705,26 +2773,16 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [
-    {
-      "paper_id": "HOMEUSDT|LONG|2026-06-04T14:57:07.433030+00:00",
-      "symbol": "HOMEUSDT",
-      "direction": "LONG",
-      "conviction_score": 7,
-      "signal_at": "2026-06-04T14:57:46.982805+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_rebound 3h=+2.25% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-06-04T14:59:32.484128+00:00"
-    }
-  ],
+  "missed_signals": [],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 63927.6,
-    "btc_ma25_1h": 64338.7,
-    "pct_vs_ma25": -0.639,
-    "change_24h_pct": -4.359,
-    "sub_regime": "down_rebound",
-    "change_3h_pct": 2.25,
-    "computed_at": "2026-06-04T14:59:33.593159+00:00"
+    "btc_price": 63859.7,
+    "btc_ma25_1h": 64219.3,
+    "pct_vs_ma25": -0.56,
+    "change_24h_pct": -3.311,
+    "sub_regime": "down_stable",
+    "change_3h_pct": 0.191,
+    "computed_at": "2026-06-04T15:01:39.649260+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
