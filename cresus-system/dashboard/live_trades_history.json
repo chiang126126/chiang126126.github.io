@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-04T08:07:49.741441+00:00",
+  "generated_at": "2026-06-04T08:09:56.327896+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 25,
-    "open": 1,
+    "total_trades": 26,
+    "open": 2,
     "closed": 24,
     "wins": 8,
     "losses": 16,
@@ -15,31 +15,33 @@
     "avg_pnl_usdt": -0.8804,
     "best_trade_usdt": 3.1109,
     "worst_trade_usdt": -5.6349,
-    "fees_paid_usdt": 3.7268,
+    "fees_paid_usdt": 3.8018,
     "fees_realized_usdt": 3.6518,
-    "fees_open_usdt": 0.075,
+    "fees_open_usdt": 0.15,
     "fees_are_actual": true,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 150.0,
-    "free_capital_usdt": 425.14,
+    "deployed_usdt": 299.99,
+    "free_capital_usdt": 275.08,
     "max_concurrent_slots": 2,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -10.2631,
-    "deployed_usdt": 150.0
+    "deployed_usdt": 299.99
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "DOGSUSDT"
+      "DOGSUSDT",
+      "ONDOUSDT"
     ],
     "exchange_symbols": [
-      "DOGSUSDT"
+      "DOGSUSDT",
+      "ONDOUSDT"
     ]
   },
   "open_trades": [
@@ -86,7 +88,7 @@
       "top_trader_position_ratio": 2.359,
       "top_trader_account_ratio": 1.5119,
       "global_account_ratio": 1.1459,
-      "phase_a_mfe_pct": 0.024,
+      "phase_a_mfe_pct": 0.236,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.075,
@@ -99,11 +101,73 @@
       "btc_pct_vs_ma25_at_open": -2.585,
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.606,
-      "phase_a_mfe_price": 4.231e-05,
-      "current_price": 4.231e-05,
-      "unrealized_pnl_usdt": 0.0709,
-      "unrealized_pnl_pct": 0.047,
-      "last_price_check_at": "2026-06-04T08:07:48.169384+00:00"
+      "phase_a_mfe_price": 4.222e-05,
+      "current_price": 4.21e-05,
+      "unrealized_pnl_usdt": 0.815,
+      "unrealized_pnl_pct": 0.543,
+      "last_price_check_at": "2026-06-04T08:09:54.641988+00:00"
+    },
+    {
+      "paper_id": "ONDOUSDT|SHORT|2026-06-04T08:07:48.234106+00:00",
+      "trade_id": "L1780560468_ONDOUSD_S",
+      "symbol": "ONDOUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.3749,
+      "avg_fill_price": 0.3745,
+      "slippage_bps": 10.67,
+      "qty": 400.5,
+      "notional_usdt": 149.98725,
+      "leverage": 1,
+      "risk_usdt": 1.4418,
+      "risk_pct": 0.961,
+      "mirror_latency_sec": 4.9,
+      "sl_price": 0.3777,
+      "sl_paper_current": 0.3781,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -0.0004,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 4,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": -0.0005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "D",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.3701,
+      "tp2_price": 0.3653,
+      "phase": "A",
+      "entry_order_id": 9938859647,
+      "entry_client_id": "cresus_L1780560468_ONDOUSD_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "burst",
+      "atr_pct": 0.427,
+      "top_trader_position_ratio": 1.6289,
+      "top_trader_account_ratio": 2.1143,
+      "global_account_ratio": 2.0239,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.074994,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-04T08:08:56.060190+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 63516.6,
+      "btc_change_24h_at_open": -5.182,
+      "btc_pct_vs_ma25_at_open": -2.62,
+      "btc_sub_regime_at_open": "down_stable",
+      "btc_change_3h_at_open": -0.643,
+      "phase_a_mfe_price": 0.3749,
+      "current_price": 0.3744,
+      "unrealized_pnl_usdt": 0.04,
+      "unrealized_pnl_pct": 0.027,
+      "last_price_check_at": "2026-06-04T08:09:54.641988+00:00"
     }
   ],
   "recent_closed": [
@@ -1900,19 +1964,19 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-04T08:02:23.478353+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.47% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-06-04T08:07:48.169384+00:00"
+      "reason": "max_concurrent reached (2/2)",
+      "last_checked_at": "2026-06-04T08:09:54.641988+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 63624.6,
-    "btc_ma25_1h": 65229.71,
-    "pct_vs_ma25": -2.461,
-    "change_24h_pct": -5.02,
+    "btc_price": 63445.8,
+    "btc_ma25_1h": 65222.56,
+    "pct_vs_ma25": -2.724,
+    "change_24h_pct": -5.287,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.474,
-    "computed_at": "2026-06-04T08:07:49.454667+00:00"
+    "change_3h_pct": -0.754,
+    "computed_at": "2026-06-04T08:09:55.760011+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
