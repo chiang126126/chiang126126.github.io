@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-04T17:22:14.824596+00:00",
+  "generated_at": "2026-06-04T17:24:19.910552+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 45,
@@ -36,8 +36,8 @@
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "GUAUSDT",
-      "FARTCOINUSDT"
+      "FARTCOINUSDT",
+      "GUAUSDT"
     ],
     "exchange_symbols": [
       "FARTCOINUSDT",
@@ -60,8 +60,8 @@
       "risk_usdt": 4.2967,
       "risk_pct": 2.871,
       "mirror_latency_sec": 115.8,
-      "sl_price": 0.948659586,
-      "sl_paper_current": 0.947555686,
+      "sl_price": 0.944570006,
+      "sl_paper_current": 0.9434661059999999,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": 0.0011039,
       "sl_compensation_mode": "always",
@@ -89,7 +89,7 @@
       "top_trader_account_ratio": 0.8822,
       "global_account_ratio": 1.0105,
       "phase_a_mfe_pct": 4.687,
-      "phase_b_mfe_pct": 5.775,
+      "phase_b_mfe_pct": 6.181,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.074838,
       "fees_are_actual": true,
@@ -102,11 +102,11 @@
       "btc_sub_regime_at_open": "down_acute",
       "btc_change_3h_at_open": -1.008,
       "phase_a_mfe_price": 0.9375,
-      "current_price": 0.9266,
-      "unrealized_pnl_usdt": 8.8318,
-      "unrealized_pnl_pct": 5.901,
-      "last_price_check_at": "2026-06-04T17:22:13.292416+00:00",
-      "phase_b_mfe_price": 0.9268
+      "current_price": 0.9191,
+      "unrealized_pnl_usdt": 9.9718,
+      "unrealized_pnl_pct": 6.662,
+      "last_price_check_at": "2026-06-04T17:24:18.438090+00:00",
+      "phase_b_mfe_price": 0.9228
     },
     {
       "paper_id": "FARTCOINUSDT|SHORT|2026-06-04T16:52:36.460802+00:00",
@@ -168,7 +168,7 @@
       "current_price": 0.1315,
       "unrealized_pnl_usdt": 2.0254,
       "unrealized_pnl_pct": 1.35,
-      "last_price_check_at": "2026-06-04T17:22:13.292416+00:00",
+      "last_price_check_at": "2026-06-04T17:24:18.438090+00:00",
       "phase_b_mfe_price": 0.1314,
       "phase_c_mfe_price": 0.1314
     }
@@ -3359,16 +3359,26 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "GRASSUSDT|LONG|2026-06-04T17:22:58.515208+00:00",
+      "symbol": "GRASSUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-04T17:23:25.381490+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_acute 3h=-1.12% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-04T17:24:18.438090+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 63248.4,
-    "btc_ma25_1h": 64007.26,
-    "pct_vs_ma25": -1.186,
-    "change_24h_pct": -4.073,
+    "btc_price": 63207.3,
+    "btc_ma25_1h": 64005.62,
+    "pct_vs_ma25": -1.247,
+    "change_24h_pct": -4.135,
     "sub_regime": "down_acute",
-    "change_3h_pct": -1.057,
-    "computed_at": "2026-06-04T17:22:14.239037+00:00"
+    "change_3h_pct": -1.121,
+    "computed_at": "2026-06-04T17:24:19.362621+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
