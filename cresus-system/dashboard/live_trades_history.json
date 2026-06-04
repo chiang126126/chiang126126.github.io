@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-04T16:04:48.832500+00:00",
+  "generated_at": "2026-06-04T16:06:51.836032+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 43,
@@ -29,17 +29,19 @@
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -31.3216,
-    "deployed_usdt": 199.42
+    "deployed_usdt": 399.45
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "ZECUSDT"
+      "ZECUSDT",
+      "QNTXUSDT"
     ],
     "exchange_symbols": [
-      "ZECUSDT"
+      "ZECUSDT",
+      "QNTXUSDT"
     ]
   },
   "open_trades": [
@@ -100,10 +102,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 550.19,
-      "current_price": 547.89,
-      "unrealized_pnl_usdt": -0.5336,
-      "unrealized_pnl_pct": -0.268,
-      "last_price_check_at": "2026-06-04T16:04:44.982265+00:00"
+      "current_price": 547.77,
+      "unrealized_pnl_usdt": -0.5772,
+      "unrealized_pnl_pct": -0.289,
+      "last_price_check_at": "2026-06-04T16:06:50.339720+00:00"
     },
     {
       "paper_id": "QNTXUSDT|SHORT|2026-06-04T16:03:28.662870+00:00",
@@ -162,10 +164,10 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.769,
       "phase_a_mfe_price": 77.36,
-      "current_price": 78.09,
-      "unrealized_pnl_usdt": 0.1254,
-      "unrealized_pnl_pct": 0.063,
-      "last_price_check_at": "2026-06-04T16:04:44.982265+00:00"
+      "current_price": 78.23,
+      "unrealized_pnl_usdt": -0.233,
+      "unrealized_pnl_pct": -0.116,
+      "last_price_check_at": "2026-06-04T16:06:50.339720+00:00"
     }
   ],
   "recent_closed": [
@@ -3213,28 +3215,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-04T16:01:45.630149+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.77% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-06-04T16:04:44.982265+00:00"
-    },
-    {
-      "paper_id": "QNTXUSDT|SHORT|2026-06-04T16:03:28.662870+00:00",
-      "symbol": "QNTXUSDT",
-      "direction": "SHORT",
-      "conviction_score": 6,
-      "signal_at": "2026-06-04T16:04:01.645928+00:00",
-      "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-06-04T16:04:34.516174+00:00"
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.67% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-04T16:06:50.339720+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 63708.7,
-    "btc_ma25_1h": 64126.0,
-    "pct_vs_ma25": -0.651,
-    "change_24h_pct": -3.526,
+    "btc_price": 63770.9,
+    "btc_ma25_1h": 64128.48,
+    "pct_vs_ma25": -0.558,
+    "change_24h_pct": -3.432,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.769,
-    "computed_at": "2026-06-04T16:04:46.090092+00:00"
+    "change_3h_pct": -0.673,
+    "computed_at": "2026-06-04T16:06:51.275101+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
