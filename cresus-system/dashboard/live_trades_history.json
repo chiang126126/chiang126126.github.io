@@ -1,48 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-04T06:26:01.187521+00:00",
+  "generated_at": "2026-06-04T06:28:05.794973+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 21,
-    "open": 1,
-    "closed": 20,
+    "open": 0,
+    "closed": 21,
     "wins": 6,
-    "losses": 14,
-    "win_rate": 0.3,
-    "total_pnl_usdt": -18.6404,
-    "net_pnl_usdt": -21.6413,
-    "avg_pnl_usdt": -0.932,
+    "losses": 15,
+    "win_rate": 0.286,
+    "total_pnl_usdt": -22.9079,
+    "net_pnl_usdt": -26.111,
+    "avg_pnl_usdt": -1.0909,
     "best_trade_usdt": 3.1109,
     "worst_trade_usdt": -5.6349,
-    "fees_paid_usdt": 3.1009,
-    "fees_realized_usdt": 3.0009,
-    "fees_open_usdt": 0.1,
+    "fees_paid_usdt": 3.2031,
+    "fees_realized_usdt": 3.2031,
+    "fees_open_usdt": 0,
     "fees_are_actual": true,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 200.04,
-    "free_capital_usdt": 378.22,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 573.89,
     "max_concurrent_slots": 2,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -7.7738,
-    "deployed_usdt": 200.04
+    "daily_pnl": -12.0413,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "MAGMAUSDT"
-    ],
-    "exchange_symbols": [
-      "MAGMAUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "MAGMAUSDT|SHORT|2026-06-04T06:21:32.442212+00:00",
       "trade_id": "L1780554092_MAGMAUS_S",
@@ -89,7 +86,7 @@
       "phase_a_mfe_pct": 0.0,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.10002,
+      "fees_paid_usdt": 0.202174,
       "fees_are_actual": true,
       "opened_at": "2026-06-04T06:22:51.742849+00:00",
       "is_dry_run": false,
@@ -100,13 +97,23 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.015,
       "phase_a_mfe_price": 0.41156,
-      "current_price": 0.4252,
-      "unrealized_pnl_usdt": -4.4805,
-      "unrealized_pnl_pct": -2.24,
-      "last_price_check_at": "2026-06-04T06:25:59.607822+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.42317,
+      "unrealized_pnl_usdt": -3.5041,
+      "unrealized_pnl_pct": -1.752,
+      "last_price_check_at": "2026-06-04T06:26:41.866955+00:00",
+      "closed_at": "2026-06-04T06:26:55.138716+00:00",
+      "close_reason": "paper:hit_sl",
+      "avg_exit_price": 0.4247570893970894,
+      "realized_pnl_usdt": -4.2675,
+      "close_order_id": 543223896,
+      "close_qty": 481.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 0.42317,
+      "close_slippage_bps": 37.5,
+      "entry_fees_usdt": 0.10002,
+      "close_fees_usdt": 0.102154
+    },
     {
       "paper_id": "OPNUSDT|SHORT|2026-06-04T05:57:50.471532+00:00",
       "trade_id": "L1780552670_OPNUSDT_S",
@@ -1595,26 +1602,16 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [
-    {
-      "paper_id": "MEMEUSDT|LONG|2026-06-04T05:39:13.861532+00:00",
-      "symbol": "MEMEUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-06-04T05:39:36.508565+00:00",
-      "reason": "paper trade too old (2783s > 600s)",
-      "last_checked_at": "2026-06-04T06:25:59.607822+00:00"
-    }
-  ],
+  "missed_signals": [],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 64276.4,
-    "btc_ma25_1h": 65518.47,
-    "pct_vs_ma25": -1.896,
-    "change_24h_pct": -3.992,
+    "btc_price": 64238.8,
+    "btc_ma25_1h": 65516.96,
+    "pct_vs_ma25": -1.951,
+    "change_24h_pct": -4.049,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.093,
-    "computed_at": "2026-06-04T06:26:00.908958+00:00"
+    "change_3h_pct": -0.151,
+    "computed_at": "2026-06-04T06:28:05.791369+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
