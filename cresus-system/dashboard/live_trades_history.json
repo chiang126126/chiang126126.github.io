@@ -1,48 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-04T19:08:18.406295+00:00",
+  "generated_at": "2026-06-04T19:10:24.609271+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 49,
-    "open": 1,
-    "closed": 48,
-    "wins": 15,
+    "open": 0,
+    "closed": 49,
+    "wins": 16,
     "losses": 31,
-    "win_rate": 0.326,
-    "total_pnl_usdt": -44.1734,
-    "net_pnl_usdt": -51.5161,
-    "avg_pnl_usdt": -0.9203,
+    "win_rate": 0.34,
+    "total_pnl_usdt": -43.1936,
+    "net_pnl_usdt": -50.6865,
+    "avg_pnl_usdt": -0.8815,
     "best_trade_usdt": 6.7494,
     "worst_trade_usdt": -7.3487,
-    "fees_paid_usdt": 7.4175,
-    "fees_realized_usdt": 7.3427,
-    "fees_open_usdt": 0.0749,
+    "fees_paid_usdt": 7.4929,
+    "fees_realized_usdt": 7.4929,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 149.74,
-    "free_capital_usdt": 398.67,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 549.31,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -33.3068,
-    "deployed_usdt": 149.74
+    "daily_pnl": -32.327,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "ORDIUSDT"
-    ],
-    "exchange_symbols": [
-      "ORDIUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "ORDIUSDT|LONG|2026-06-04T18:34:05.127848+00:00",
       "trade_id": "L1780598045_ORDIUSD_L",
@@ -66,7 +63,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 4,
       "wick_filter_mode": "always",
-      "sl_breach_count": 0,
+      "sl_breach_count": 4,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.005,
       "regime_gate_enabled": true,
@@ -89,7 +86,7 @@
       "phase_a_mfe_pct": 0.882,
       "phase_b_mfe_pct": 1.365,
       "phase_c_mfe_pct": 1.365,
-      "fees_paid_usdt": 0.07487,
+      "fees_paid_usdt": 0.150229,
       "fees_are_actual": true,
       "opened_at": "2026-06-04T18:34:47.326456+00:00",
       "is_dry_run": false,
@@ -100,15 +97,25 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 3.547,
-      "current_price": 3.548,
-      "unrealized_pnl_usdt": 1.4058,
-      "unrealized_pnl_pct": 0.939,
-      "last_price_check_at": "2026-06-04T19:08:17.177380+00:00",
+      "current_price": 3.537,
+      "unrealized_pnl_usdt": 0.9372,
+      "unrealized_pnl_pct": 0.626,
+      "last_price_check_at": "2026-06-04T19:09:20.825345+00:00",
       "phase_b_mfe_price": 3.564,
-      "phase_c_mfe_price": 3.564
-    }
-  ],
-  "recent_closed": [
+      "phase_c_mfe_price": 3.564,
+      "closed_at": "2026-06-04T19:09:23.911152+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 3.5379999999999994,
+      "realized_pnl_usdt": 0.9798,
+      "close_order_id": 19315210498,
+      "close_qty": 42.6,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 3.54038642,
+      "close_slippage_bps": 6.74,
+      "entry_fees_usdt": 0.07487,
+      "close_fees_usdt": 0.075359
+    },
     {
       "paper_id": "JTOUSDT|SHORT|2026-06-04T18:03:49.450641+00:00",
       "trade_id": "L1780596229_JTOUSDT_S",
@@ -3672,13 +3679,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 63658.6,
-    "btc_ma25_1h": 63838.14,
-    "pct_vs_ma25": -0.281,
-    "change_24h_pct": -2.705,
+    "btc_price": 63622.6,
+    "btc_ma25_1h": 63836.7,
+    "pct_vs_ma25": -0.335,
+    "change_24h_pct": -2.76,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-04T19:08:18.124319+00:00"
+    "computed_at": "2026-06-04T19:10:24.602680+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
