@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-04T09:06:55.546823+00:00",
+  "generated_at": "2026-06-04T09:08:59.833413+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 29,
@@ -100,10 +100,10 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.951,
       "phase_a_mfe_price": 0.3552,
-      "current_price": 0.3576,
-      "unrealized_pnl_usdt": -0.3366,
-      "unrealized_pnl_pct": -0.224,
-      "last_price_check_at": "2026-06-04T09:06:53.587414+00:00"
+      "current_price": 0.3568,
+      "unrealized_pnl_usdt": -0.0,
+      "unrealized_pnl_pct": -0.0,
+      "last_price_check_at": "2026-06-04T09:08:53.593232+00:00"
     }
   ],
   "recent_closed": [
@@ -2191,16 +2191,35 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "MUUSDT|SHORT|2026-06-04T09:07:06.960179+00:00",
+      "symbol": "MUUSDT",
+      "direction": "SHORT",
+      "conviction_score": 6,
+      "signal_at": "2026-06-04T09:08:09.124539+00:00",
+      "reason": "open_failed (retry next tick)",
+      "last_checked_at": "2026-06-04T09:08:53.593232+00:00"
+    },
+    {
+      "paper_id": "FFUSDT|SHORT|2026-06-04T09:07:52.705778+00:00",
+      "symbol": "FFUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-06-04T09:08:09.124539+00:00",
+      "reason": "open_failed (retry next tick)",
+      "last_checked_at": "2026-06-04T09:08:53.593232+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 63411.6,
-    "btc_ma25_1h": 65085.5,
-    "pct_vs_ma25": -2.572,
-    "change_24h_pct": -5.414,
-    "sub_regime": "down_stable",
-    "change_3h_pct": -0.931,
-    "computed_at": "2026-06-04T09:06:55.260301+00:00"
+    "btc_price": 63286.3,
+    "btc_ma25_1h": 65080.49,
+    "pct_vs_ma25": -2.757,
+    "change_24h_pct": -5.6,
+    "sub_regime": "down_acute",
+    "change_3h_pct": -1.126,
+    "computed_at": "2026-06-04T09:08:54.579786+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
