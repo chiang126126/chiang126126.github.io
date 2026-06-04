@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-04T17:44:39.152290+00:00",
+  "generated_at": "2026-06-04T17:46:46.070125+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 45,
-    "open": 1,
+    "total_trades": 46,
+    "open": 2,
     "closed": 44,
     "wins": 13,
     "losses": 29,
@@ -15,31 +15,33 @@
     "avg_pnl_usdt": -0.9709,
     "best_trade_usdt": 6.7494,
     "worst_trade_usdt": -7.3487,
-    "fees_paid_usdt": 6.8086,
+    "fees_paid_usdt": 6.8835,
     "fees_realized_usdt": 6.7336,
-    "fees_open_usdt": 0.075,
+    "fees_open_usdt": 0.15,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 149.99,
-    "free_capital_usdt": 400.48,
+    "deployed_usdt": 299.96,
+    "free_capital_usdt": 250.44,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -31.853,
-    "deployed_usdt": 149.99
+    "deployed_usdt": 299.96
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "FARTCOINUSDT"
+      "FARTCOINUSDT",
+      "VVVUSDT"
     ],
     "exchange_symbols": [
-      "FARTCOINUSDT"
+      "FARTCOINUSDT",
+      "VVVUSDT"
     ]
   },
   "open_trades": [
@@ -100,12 +102,74 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.73,
       "phase_a_mfe_price": 0.1323,
-      "current_price": 0.1302,
-      "unrealized_pnl_usdt": 3.4881,
-      "unrealized_pnl_pct": 2.326,
-      "last_price_check_at": "2026-06-04T17:44:37.885768+00:00",
+      "current_price": 0.1304,
+      "unrealized_pnl_usdt": 3.2631,
+      "unrealized_pnl_pct": 2.176,
+      "last_price_check_at": "2026-06-04T17:46:44.379235+00:00",
       "phase_b_mfe_price": 0.1314,
       "phase_c_mfe_price": 0.1301
+    },
+    {
+      "paper_id": "VVVUSDT|SHORT|2026-06-04T17:44:02.353965+00:00",
+      "trade_id": "L1780595042_VVVUSDT_S",
+      "symbol": "VVVUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 17.404,
+      "avg_fill_price": 17.39766125,
+      "slippage_bps": 3.64,
+      "qty": 8.62,
+      "notional_usdt": 149.96784,
+      "leverage": 1,
+      "risk_usdt": 0.6617,
+      "risk_pct": 0.441,
+      "mirror_latency_sec": 40.1,
+      "sl_price": 17.46808982,
+      "sl_paper_current": 17.47442857,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -0.00633875,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 4,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "A",
+      "min_conviction_threshold": null,
+      "tp1_price": 17.29835714,
+      "tp2_price": 17.19271429,
+      "phase": "A",
+      "entry_order_id": 1696648200,
+      "entry_client_id": "cresus_L1780595042_VVVUSDT_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "burst",
+      "atr_pct": 0.405,
+      "top_trader_position_ratio": 0.5802,
+      "top_trader_account_ratio": 0.737,
+      "global_account_ratio": 0.8349,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.074984,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-04T17:45:35.791452+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 62991.9,
+      "btc_change_24h_at_open": -4.462,
+      "btc_pct_vs_ma25_at_open": -1.571,
+      "btc_sub_regime_at_open": "down_acute",
+      "btc_change_3h_at_open": -1.458,
+      "phase_a_mfe_price": 17.404,
+      "current_price": 17.407,
+      "unrealized_pnl_usdt": -0.0805,
+      "unrealized_pnl_pct": -0.054,
+      "last_price_check_at": "2026-06-04T17:46:44.379235+00:00"
     }
   ],
   "recent_closed": [
@@ -3376,19 +3440,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-04T17:31:52.107341+00:00",
-      "reason": "paper trade too old (766s > 600s)",
-      "last_checked_at": "2026-06-04T17:44:37.885768+00:00"
+      "reason": "paper trade too old (892s > 600s)",
+      "last_checked_at": "2026-06-04T17:46:44.379235+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 62991.9,
-    "btc_ma25_1h": 63997.0,
-    "pct_vs_ma25": -1.571,
-    "change_24h_pct": -4.462,
+    "btc_price": 63050.2,
+    "btc_ma25_1h": 63999.34,
+    "pct_vs_ma25": -1.483,
+    "change_24h_pct": -4.374,
     "sub_regime": "down_acute",
-    "change_3h_pct": -1.458,
-    "computed_at": "2026-06-04T17:44:38.866761+00:00"
+    "change_3h_pct": -1.367,
+    "computed_at": "2026-06-04T17:46:45.502207+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
