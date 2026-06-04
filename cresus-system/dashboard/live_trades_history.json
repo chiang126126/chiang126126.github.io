@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-04T23:47:17.786900+00:00",
+  "generated_at": "2026-06-04T23:49:14.341303+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 62,
-    "open": 1,
+    "total_trades": 63,
+    "open": 2,
     "closed": 61,
     "wins": 20,
     "losses": 39,
@@ -15,30 +15,32 @@
     "avg_pnl_usdt": -0.6334,
     "best_trade_usdt": 23.6376,
     "worst_trade_usdt": -11.8189,
-    "fees_paid_usdt": 9.8473,
+    "fees_paid_usdt": 9.9222,
     "fees_realized_usdt": 9.6974,
-    "fees_open_usdt": 0.1499,
+    "fees_open_usdt": 0.2248,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 299.85,
-    "free_capital_usdt": 251.67,
+    "deployed_usdt": 449.65,
+    "free_capital_usdt": 101.79,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -27.768,
-    "deployed_usdt": 299.85
+    "deployed_usdt": 449.65
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
+      "BTWUSDT",
       "HOMEUSDT"
     ],
     "exchange_symbols": [
+      "BTWUSDT",
       "HOMEUSDT"
     ]
   },
@@ -100,10 +102,72 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.05797,
-      "current_price": 0.057931,
-      "unrealized_pnl_usdt": 0.4043,
-      "unrealized_pnl_pct": 0.135,
-      "last_price_check_at": "2026-06-04T23:47:16.113709+00:00"
+      "current_price": 0.05735,
+      "unrealized_pnl_usdt": -2.607,
+      "unrealized_pnl_pct": -0.869,
+      "last_price_check_at": "2026-06-04T23:49:12.685874+00:00"
+    },
+    {
+      "paper_id": "BTWUSDT|LONG|2026-06-04T23:45:04.811300+00:00",
+      "trade_id": "L1780616704_BTWUSDT_L",
+      "symbol": "BTWUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.037154,
+      "avg_fill_price": 0.0376483,
+      "slippage_bps": 133.04,
+      "qty": 3979.0,
+      "notional_usdt": 149.802715,
+      "leverage": 1,
+      "risk_usdt": 10.2039,
+      "risk_pct": 6.812,
+      "mirror_latency_sec": 145.0,
+      "sl_price": 0.035578160000000005,
+      "sl_paper_current": 0.03508386,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.0004943,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 4,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "C",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.04025921,
+      "tp2_price": 0.04336443,
+      "phase": "A",
+      "entry_order_id": 12353814,
+      "entry_client_id": "cresus_L1780616704_BTWUSDT_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 2.786,
+      "top_trader_position_ratio": 0.9761,
+      "top_trader_account_ratio": 0.8574,
+      "global_account_ratio": 0.9786,
+      "phase_a_mfe_pct": 1.095,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.074901,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-04T23:48:22.700625+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 63700.0,
+      "btc_change_24h_at_open": -0.651,
+      "btc_pct_vs_ma25_at_open": 0.212,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.037561,
+      "current_price": 0.037561,
+      "unrealized_pnl_usdt": -0.3474,
+      "unrealized_pnl_pct": -0.232,
+      "last_price_check_at": "2026-06-04T23:49:12.685874+00:00"
     }
   ],
   "recent_closed": [
@@ -4640,26 +4704,16 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [
-    {
-      "paper_id": "BTWUSDT|LONG|2026-06-04T23:45:04.811300+00:00",
-      "symbol": "BTWUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-06-04T23:45:57.698374+00:00",
-      "reason": "pre_slippage_too_high (+183.3bps > 150bps intensity=2)",
-      "last_checked_at": "2026-06-04T23:47:16.113709+00:00"
-    }
-  ],
+  "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 63696.0,
-    "btc_ma25_1h": 63564.94,
-    "pct_vs_ma25": 0.206,
-    "change_24h_pct": -0.658,
+    "btc_price": 63710.8,
+    "btc_ma25_1h": 63565.53,
+    "pct_vs_ma25": 0.229,
+    "change_24h_pct": -0.635,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-04T23:47:17.216752+00:00"
+    "computed_at": "2026-06-04T23:49:13.778133+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
