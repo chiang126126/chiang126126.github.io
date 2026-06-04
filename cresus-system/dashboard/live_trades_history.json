@@ -1,29 +1,29 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-04T11:49:59.032916+00:00",
+  "generated_at": "2026-06-04T11:51:58.637972+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 33,
-    "open": 1,
-    "closed": 32,
+    "open": 0,
+    "closed": 33,
     "wins": 11,
-    "losses": 19,
-    "win_rate": 0.367,
-    "total_pnl_usdt": -27.3912,
-    "net_pnl_usdt": -32.1316,
-    "avg_pnl_usdt": -0.856,
+    "losses": 20,
+    "win_rate": 0.355,
+    "total_pnl_usdt": -30.52,
+    "net_pnl_usdt": -35.4618,
+    "avg_pnl_usdt": -0.9248,
     "best_trade_usdt": 3.1109,
     "worst_trade_usdt": -7.3487,
-    "fees_paid_usdt": 4.8403,
-    "fees_realized_usdt": 4.7404,
-    "fees_open_usdt": 0.1,
+    "fees_paid_usdt": 4.9418,
+    "fees_realized_usdt": 4.9418,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 199.92,
-    "free_capital_usdt": 367.85,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 564.54,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
@@ -42,7 +42,8 @@
       "EDGEUSDT"
     ]
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "EDGEUSDT|SHORT|2026-06-04T11:17:06.516899+00:00",
       "trade_id": "L1780571826_EDGEUSD_S",
@@ -66,7 +67,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 4,
       "wick_filter_mode": "always",
-      "sl_breach_count": 0,
+      "sl_breach_count": 4,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.005,
       "regime_gate_enabled": true,
@@ -89,7 +90,7 @@
       "phase_a_mfe_pct": 0.536,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.099958,
+      "fees_paid_usdt": 0.20148,
       "fees_are_actual": true,
       "opened_at": "2026-06-04T11:18:07.715140+00:00",
       "is_dry_run": false,
@@ -100,13 +101,23 @@
       "btc_sub_regime_at_open": "down_acute",
       "btc_change_3h_at_open": -1.865,
       "phase_a_mfe_price": 0.5568,
-      "current_price": 0.565,
-      "unrealized_pnl_usdt": -1.7889,
-      "unrealized_pnl_pct": -0.895,
-      "last_price_check_at": "2026-06-04T11:49:57.822435+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.568,
+      "unrealized_pnl_usdt": -2.8599,
+      "unrealized_pnl_pct": -1.431,
+      "last_price_check_at": "2026-06-04T11:51:55.694721+00:00",
+      "closed_at": "2026-06-04T11:51:58.634075+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.5687532212885155,
+      "realized_pnl_usdt": -3.1288,
+      "close_order_id": 567101928,
+      "close_qty": 357.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 0.5666748100000001,
+      "close_slippage_bps": 36.68,
+      "entry_fees_usdt": 0.099958,
+      "close_fees_usdt": 0.101522
+    },
     {
       "paper_id": "ESPORTSUSDT|SHORT|2026-06-04T11:28:04.347714+00:00",
       "trade_id": "L1780572484_ESPORTS_S",
@@ -2478,13 +2489,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 62462.5,
-    "btc_ma25_1h": 64700.66,
-    "pct_vs_ma25": -3.459,
-    "change_24h_pct": -6.828,
+    "btc_price": 62375.2,
+    "btc_ma25_1h": 64697.17,
+    "pct_vs_ma25": -3.589,
+    "change_24h_pct": -6.958,
     "sub_regime": "down_acute",
-    "change_3h_pct": -1.782,
-    "computed_at": "2026-06-04T11:49:58.750403+00:00"
+    "change_3h_pct": -1.919,
+    "computed_at": "2026-06-04T11:51:56.787337+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
