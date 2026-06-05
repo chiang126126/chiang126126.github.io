@@ -1,46 +1,44 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-05T16:13:30.538935+00:00",
+  "generated_at": "2026-06-05T16:15:38.182455+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 108,
-    "open": 2,
-    "closed": 106,
-    "wins": 34,
+    "open": 1,
+    "closed": 107,
+    "wins": 35,
     "losses": 70,
-    "win_rate": 0.327,
-    "total_pnl_usdt": -48.332,
-    "net_pnl_usdt": -65.2912,
-    "avg_pnl_usdt": -0.456,
+    "win_rate": 0.333,
+    "total_pnl_usdt": -45.4941,
+    "net_pnl_usdt": -62.6019,
+    "avg_pnl_usdt": -0.4252,
     "best_trade_usdt": 23.6376,
     "worst_trade_usdt": -11.8189,
-    "fees_paid_usdt": 17.1091,
-    "fees_realized_usdt": 16.9592,
-    "fees_open_usdt": 0.1498,
+    "fees_paid_usdt": 17.1827,
+    "fees_realized_usdt": 17.1078,
+    "fees_open_usdt": 0.0749,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 299.7,
-    "free_capital_usdt": 234.86,
+    "deployed_usdt": 149.73,
+    "free_capital_usdt": 387.6,
     "max_concurrent_slots": 3,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -1.413,
-    "deployed_usdt": 299.7
+    "daily_pnl": 1.4249,
+    "deployed_usdt": 149.73
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "XPLUSDT",
       "JTOUSDT"
     ],
     "exchange_symbols": [
-      "XPLUSDT",
       "JTOUSDT"
     ]
   },
@@ -102,13 +100,15 @@
       "btc_sub_regime_at_open": "down_acute",
       "btc_change_3h_at_open": -1.567,
       "phase_a_mfe_price": 0.5115,
-      "current_price": 0.4911,
-      "unrealized_pnl_usdt": 8.7799,
-      "unrealized_pnl_pct": 5.864,
-      "last_price_check_at": "2026-06-05T16:13:28.807168+00:00",
+      "current_price": 0.5012,
+      "unrealized_pnl_usdt": 5.8812,
+      "unrealized_pnl_pct": 3.928,
+      "last_price_check_at": "2026-06-05T16:15:36.410771+00:00",
       "phase_b_mfe_price": 0.5041,
       "phase_c_mfe_price": 0.4903
-    },
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "XPLUSDT|SHORT|2026-06-05T15:14:46.328769+00:00",
       "trade_id": "L1780672486_XPLUSDT_S",
@@ -132,7 +132,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 4,
       "wick_filter_mode": "always",
-      "sl_breach_count": 3,
+      "sl_breach_count": 4,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": -0.0115,
       "regime_gate_enabled": true,
@@ -155,7 +155,7 @@
       "phase_a_mfe_pct": 3.198,
       "phase_b_mfe_pct": 4.215,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.074986,
+      "fees_paid_usdt": 0.148553,
       "fees_are_actual": true,
       "opened_at": "2026-06-05T15:15:47.084357+00:00",
       "is_dry_run": false,
@@ -166,14 +166,24 @@
       "btc_sub_regime_at_open": "down_acute",
       "btc_change_3h_at_open": -2.283,
       "phase_a_mfe_price": 0.0666,
-      "current_price": 0.067,
-      "unrealized_pnl_usdt": 3.7111,
-      "unrealized_pnl_pct": 2.475,
-      "last_price_check_at": "2026-06-05T16:13:28.807168+00:00",
-      "phase_b_mfe_price": 0.0659
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.0673,
+      "unrealized_pnl_usdt": 3.0562,
+      "unrealized_pnl_pct": 2.038,
+      "last_price_check_at": "2026-06-05T16:13:38.948337+00:00",
+      "phase_b_mfe_price": 0.0659,
+      "closed_at": "2026-06-05T16:13:42.241883+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.0674,
+      "realized_pnl_usdt": 2.8379,
+      "close_order_id": 3551187105,
+      "close_qty": 2183.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 0.06664121349999999,
+      "close_slippage_bps": 113.86,
+      "entry_fees_usdt": 0.074986,
+      "close_fees_usdt": 0.073567
+    },
     {
       "paper_id": "ROBOUSDT|SHORT|2026-06-05T16:05:44.291353+00:00",
       "trade_id": "L1780675544_ROBOUSD_S",
@@ -8065,13 +8075,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 60521.1,
-    "btc_ma25_1h": 62633.66,
-    "pct_vs_ma25": -3.373,
-    "change_24h_pct": -4.735,
+    "btc_price": 60979.8,
+    "btc_ma25_1h": 62652.01,
+    "pct_vs_ma25": -2.669,
+    "change_24h_pct": -4.013,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.295,
-    "computed_at": "2026-06-05T16:13:29.967469+00:00"
+    "change_3h_pct": 0.46,
+    "computed_at": "2026-06-05T16:15:37.892598+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
