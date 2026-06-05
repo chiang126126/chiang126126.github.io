@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-05T17:51:18.067343+00:00",
+  "generated_at": "2026-06-05T17:53:26.221664+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 111,
-    "open": 1,
+    "total_trades": 112,
+    "open": 2,
     "closed": 110,
     "wins": 37,
     "losses": 71,
@@ -15,31 +15,33 @@
     "avg_pnl_usdt": -0.3903,
     "best_trade_usdt": 23.6376,
     "worst_trade_usdt": -11.8189,
-    "fees_paid_usdt": 17.6218,
+    "fees_paid_usdt": 17.6968,
     "fees_realized_usdt": 17.5618,
-    "fees_open_usdt": 0.06,
+    "fees_open_usdt": 0.1349,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 149.93,
-    "free_capital_usdt": 389.52,
+    "deployed_usdt": 299.87,
+    "free_capital_usdt": 239.5,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 3.9853,
-    "deployed_usdt": 149.93
+    "deployed_usdt": 299.87
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "FLNCUSDT"
+      "FLNCUSDT",
+      "MORPHOUSDT"
     ],
     "exchange_symbols": [
-      "FLNCUSDT"
+      "FLNCUSDT",
+      "MORPHOUSDT"
     ]
   },
   "open_trades": [
@@ -100,10 +102,72 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.094,
       "phase_a_mfe_price": 22.9,
-      "current_price": 22.97,
-      "unrealized_pnl_usdt": -0.0653,
-      "unrealized_pnl_pct": -0.044,
-      "last_price_check_at": "2026-06-05T17:51:16.463625+00:00"
+      "current_price": 22.99,
+      "unrealized_pnl_usdt": -0.1959,
+      "unrealized_pnl_pct": -0.131,
+      "last_price_check_at": "2026-06-05T17:53:24.481677+00:00"
+    },
+    {
+      "paper_id": "MORPHOUSDT|SHORT|2026-06-05T17:51:53.461184+00:00",
+      "trade_id": "L1780681913_MORPHOU_S",
+      "symbol": "MORPHOUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 1.6529,
+      "avg_fill_price": 1.65493918,
+      "slippage_bps": -12.34,
+      "qty": 90.6,
+      "notional_usdt": 149.93749,
+      "leverage": 1,
+      "risk_usdt": 0.5074,
+      "risk_pct": 0.338,
+      "mirror_latency_sec": 49.2,
+      "sl_price": 1.66257847,
+      "sl_paper_current": 1.66053929,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.00203918,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 4,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.0023,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "C",
+      "min_conviction_threshold": null,
+      "tp1_price": 1.64144107,
+      "tp2_price": 1.62998214,
+      "phase": "A",
+      "entry_order_id": 2263856771,
+      "entry_client_id": "cresus_L1780681913_MORPHOU_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "burst",
+      "atr_pct": 0.308,
+      "top_trader_position_ratio": 1.2384,
+      "top_trader_account_ratio": 1.1263,
+      "global_account_ratio": 0.8501,
+      "phase_a_mfe_pct": 0.133,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.074969,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-05T17:52:46.274429+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 60747.2,
+      "btc_change_24h_at_open": -4.352,
+      "btc_pct_vs_ma25_at_open": -2.891,
+      "btc_sub_regime_at_open": "down_stable",
+      "btc_change_3h_at_open": -0.141,
+      "phase_a_mfe_price": 1.6507,
+      "current_price": 1.6521,
+      "unrealized_pnl_usdt": 0.2572,
+      "unrealized_pnl_pct": 0.172,
+      "last_price_check_at": "2026-06-05T17:53:24.481677+00:00"
     }
   ],
   "recent_closed": [
@@ -8302,8 +8366,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-05T17:41:20.014502+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.13% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-06-05T17:51:16.463625+00:00"
+      "reason": "paper trade too old (724s > 600s)",
+      "last_checked_at": "2026-06-05T17:53:24.481677+00:00"
     },
     {
       "paper_id": "XLMUSDT|LONG|2026-06-05T17:48:51.310241+00:00",
@@ -8311,19 +8375,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-05T17:49:47.101517+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.13% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-06-05T17:51:16.463625+00:00"
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.15% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-05T17:53:24.481677+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 60752.9,
-    "btc_ma25_1h": 62556.08,
-    "pct_vs_ma25": -2.883,
-    "change_24h_pct": -4.343,
+    "btc_price": 60739.0,
+    "btc_ma25_1h": 62555.52,
+    "pct_vs_ma25": -2.904,
+    "change_24h_pct": -4.365,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.131,
-    "computed_at": "2026-06-05T17:51:17.780894+00:00"
+    "change_3h_pct": -0.154,
+    "computed_at": "2026-06-05T17:53:25.650467+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
