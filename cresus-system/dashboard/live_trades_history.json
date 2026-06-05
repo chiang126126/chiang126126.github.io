@@ -1,48 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-05T19:45:33.122389+00:00",
+  "generated_at": "2026-06-05T19:47:29.341744+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 120,
-    "open": 1,
-    "closed": 119,
-    "wins": 41,
+    "open": 0,
+    "closed": 120,
+    "wins": 42,
     "losses": 76,
-    "win_rate": 0.35,
-    "total_pnl_usdt": -47.8127,
-    "net_pnl_usdt": -66.8102,
-    "avg_pnl_usdt": -0.4018,
+    "win_rate": 0.356,
+    "total_pnl_usdt": -47.7486,
+    "net_pnl_usdt": -66.8961,
+    "avg_pnl_usdt": -0.3979,
     "best_trade_usdt": 23.6376,
     "worst_trade_usdt": -11.8189,
-    "fees_paid_usdt": 19.0725,
-    "fees_realized_usdt": 18.9975,
-    "fees_open_usdt": 0.075,
+    "fees_paid_usdt": 19.1475,
+    "fees_realized_usdt": 19.1475,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 150.06,
-    "free_capital_usdt": 383.06,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 533.1,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -0.8937,
-    "deployed_usdt": 150.06
+    "daily_pnl": -0.8296,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "STGUSDT"
-    ],
-    "exchange_symbols": [
-      "STGUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "STGUSDT|SHORT|2026-06-05T19:15:12.316691+00:00",
       "trade_id": "L1780686912_STGUSDT_S",
@@ -89,7 +86,7 @@
       "phase_a_mfe_pct": 1.112,
       "phase_b_mfe_pct": 1.112,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.075029,
+      "fees_paid_usdt": 0.150026,
       "fees_are_actual": true,
       "opened_at": "2026-06-05T19:16:03.992313+00:00",
       "is_dry_run": false,
@@ -100,14 +97,24 @@
       "btc_sub_regime_at_open": "down_acute",
       "btc_change_3h_at_open": -3.42,
       "phase_a_mfe_price": 0.2312,
-      "current_price": 0.232,
-      "unrealized_pnl_usdt": 1.3461,
-      "unrealized_pnl_pct": 0.897,
-      "last_price_check_at": "2026-06-05T19:45:31.882626+00:00",
-      "phase_b_mfe_price": 0.2312
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.2338,
+      "unrealized_pnl_usdt": 0.1923,
+      "unrealized_pnl_pct": 0.128,
+      "last_price_check_at": "2026-06-05T19:47:07.654923+00:00",
+      "phase_b_mfe_price": 0.2312,
+      "closed_at": "2026-06-05T19:47:20.586710+00:00",
+      "close_reason": "paper:hit_b_trail",
+      "avg_exit_price": 0.23399999999999999,
+      "realized_pnl_usdt": 0.0641,
+      "close_order_id": 3269256377,
+      "close_qty": 641.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 0.2338,
+      "close_slippage_bps": 8.55,
+      "entry_fees_usdt": 0.075029,
+      "close_fees_usdt": 0.074997
+    },
     {
       "paper_id": "BERAUSDT|SHORT|2026-06-05T19:01:10.902975+00:00",
       "trade_id": "L1780686070_BERAUSD_S",
@@ -8974,7 +8981,7 @@
       "conviction_score": 5,
       "signal_at": "2026-06-05T19:40:43.141386+00:00",
       "reason": "funding adverse (0.3335% ≥ 0.05%) (Phase 4.M: paper 历史人均 -$0.85, 不利 mirror)",
-      "last_checked_at": "2026-06-05T19:45:31.882626+00:00"
+      "last_checked_at": "2026-06-05T19:47:27.998137+00:00"
     },
     {
       "paper_id": "ALLOUSDT|LONG|2026-06-05T19:42:06.121074+00:00",
@@ -8982,19 +8989,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-05T19:42:56.970587+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_acute 3h=-2.59% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-06-05T19:45:31.882626+00:00"
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_acute 3h=-1.77% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-05T19:47:27.998137+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 59767.9,
-    "btc_ma25_1h": 62230.54,
-    "pct_vs_ma25": -3.957,
-    "change_24h_pct": -6.026,
+    "btc_price": 60271.9,
+    "btc_ma25_1h": 62250.7,
+    "pct_vs_ma25": -3.179,
+    "change_24h_pct": -5.233,
     "sub_regime": "down_acute",
-    "change_3h_pct": -2.592,
-    "computed_at": "2026-06-05T19:45:32.829186+00:00"
+    "change_3h_pct": -1.77,
+    "computed_at": "2026-06-05T19:47:29.328190+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
