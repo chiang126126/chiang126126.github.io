@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-05T18:15:48.580145+00:00",
+  "generated_at": "2026-06-05T18:17:56.786085+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 112,
-    "open": 1,
+    "total_trades": 113,
+    "open": 2,
     "closed": 111,
     "wins": 37,
     "losses": 72,
@@ -15,30 +15,32 @@
     "avg_pnl_usdt": -0.3937,
     "best_trade_usdt": 23.6376,
     "worst_trade_usdt": -11.8189,
-    "fees_paid_usdt": 17.757,
+    "fees_paid_usdt": 17.8348,
     "fees_realized_usdt": 17.6821,
-    "fees_open_usdt": 0.075,
+    "fees_open_usdt": 0.1527,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 149.94,
-    "free_capital_usdt": 388.6,
+    "deployed_usdt": 344.33,
+    "free_capital_usdt": 194.13,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 3.2154,
-    "deployed_usdt": 149.94
+    "deployed_usdt": 344.33
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
+      "METAUSDT",
       "MORPHOUSDT"
     ],
     "exchange_symbols": [
+      "METAUSDT",
       "MORPHOUSDT"
     ]
   },
@@ -103,7 +105,69 @@
       "current_price": 1.6495,
       "unrealized_pnl_usdt": 0.4928,
       "unrealized_pnl_pct": 0.329,
-      "last_price_check_at": "2026-06-05T18:15:47.177207+00:00"
+      "last_price_check_at": "2026-06-05T18:17:55.276371+00:00"
+    },
+    {
+      "paper_id": "METAUSDT|SHORT|2026-06-05T18:16:46.298816+00:00",
+      "trade_id": "L1780683406_METAUSD_S",
+      "symbol": "METAUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 593.66,
+      "avg_fill_price": 589.07,
+      "slippage_bps": 77.32,
+      "qty": 0.33,
+      "notional_usdt": 194.3931,
+      "leverage": 1,
+      "risk_usdt": 2.2438,
+      "risk_pct": 1.154,
+      "mirror_latency_sec": 21.1,
+      "sl_price": 591.2792857100001,
+      "sl_paper_current": 595.86928571,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -4.59,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 4,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.0,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "C",
+      "min_conviction_threshold": null,
+      "tp1_price": 590.34607143,
+      "tp2_price": 587.03214286,
+      "phase": "A",
+      "entry_order_id": 73504156,
+      "entry_client_id": "cresus_L1780683406_METAUSD_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 6,
+      "alert_type": "sustained",
+      "atr_pct": 0.372,
+      "top_trader_position_ratio": 1.3607,
+      "top_trader_account_ratio": 2.1456,
+      "global_account_ratio": 1.9369,
+      "phase_a_mfe_pct": 0.115,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.077757,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-05T18:17:37.353135+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 60596.0,
+      "btc_change_24h_at_open": -5.009,
+      "btc_pct_vs_ma25_at_open": -2.955,
+      "btc_sub_regime_at_open": "down_stable",
+      "btc_change_3h_at_open": 0.323,
+      "phase_a_mfe_price": 592.98,
+      "current_price": 588.41,
+      "unrealized_pnl_usdt": 0.2178,
+      "unrealized_pnl_pct": 0.112,
+      "last_price_check_at": "2026-06-05T18:17:55.276371+00:00"
     }
   ],
   "recent_closed": [
@@ -8376,19 +8440,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-05T17:41:20.014502+00:00",
-      "reason": "paper trade too old (2067s > 600s)",
-      "last_checked_at": "2026-06-05T18:15:47.177207+00:00"
+      "reason": "paper trade too old (2195s > 600s)",
+      "last_checked_at": "2026-06-05T18:17:55.276371+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 60563.7,
-    "btc_ma25_1h": 62439.52,
-    "pct_vs_ma25": -3.004,
-    "change_24h_pct": -5.059,
+    "btc_price": 60553.4,
+    "btc_ma25_1h": 62439.11,
+    "pct_vs_ma25": -3.02,
+    "change_24h_pct": -5.075,
     "sub_regime": "down_stable",
-    "change_3h_pct": 0.27,
-    "computed_at": "2026-06-05T18:15:48.295373+00:00"
+    "change_3h_pct": 0.253,
+    "computed_at": "2026-06-05T18:17:56.209459+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
