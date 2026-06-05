@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-05T02:09:34.465930+00:00",
+  "generated_at": "2026-06-05T02:11:42.480705+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 67,
@@ -102,10 +102,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.1842,
-      "current_price": 0.1845,
-      "unrealized_pnl_usdt": -0.1626,
-      "unrealized_pnl_pct": -0.109,
-      "last_price_check_at": "2026-06-05T02:09:32.893176+00:00"
+      "current_price": 0.1842,
+      "unrealized_pnl_usdt": 0.0813,
+      "unrealized_pnl_pct": 0.054,
+      "last_price_check_at": "2026-06-05T02:11:40.799854+00:00"
     },
     {
       "paper_id": "MEMEUSDT|SHORT|2026-06-05T02:07:14.279721+00:00",
@@ -164,10 +164,10 @@
       "btc_sub_regime_at_open": "down_acute",
       "btc_change_3h_at_open": -1.054,
       "phase_a_mfe_price": 0.0006161,
-      "current_price": 0.0006183,
-      "unrealized_pnl_usdt": -0.5846,
-      "unrealized_pnl_pct": -0.39,
-      "last_price_check_at": "2026-06-05T02:09:32.893176+00:00"
+      "current_price": 0.0006178,
+      "unrealized_pnl_usdt": -0.4628,
+      "unrealized_pnl_pct": -0.308,
+      "last_price_check_at": "2026-06-05T02:11:40.799854+00:00"
     }
   ],
   "recent_closed": [
@@ -5003,16 +5003,26 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "STGUSDT|LONG|2026-06-05T02:09:54.359875+00:00",
+      "symbol": "STGUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-05T02:10:06.251066+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.99% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-05T02:11:40.799854+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 63209.9,
-    "btc_ma25_1h": 63586.54,
-    "pct_vs_ma25": -0.592,
-    "change_24h_pct": 0.018,
-    "sub_regime": "down_acute",
-    "change_3h_pct": -1.008,
-    "computed_at": "2026-06-05T02:09:33.891599+00:00"
+    "btc_price": 63223.6,
+    "btc_ma25_1h": 63587.09,
+    "pct_vs_ma25": -0.572,
+    "change_24h_pct": 0.04,
+    "sub_regime": "down_stable",
+    "change_3h_pct": -0.986,
+    "computed_at": "2026-06-05T02:11:41.917236+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
