@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-05T16:42:05.096781+00:00",
+  "generated_at": "2026-06-05T16:44:04.104794+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 110,
@@ -36,12 +36,12 @@
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "EDGEUSDT",
-      "DRAMUSDT"
+      "DRAMUSDT",
+      "EDGEUSDT"
     ],
     "exchange_symbols": [
-      "EDGEUSDT",
-      "DRAMUSDT"
+      "DRAMUSDT",
+      "EDGEUSDT"
     ]
   },
   "open_trades": [
@@ -102,10 +102,10 @@
       "btc_sub_regime_at_open": "down_rebound",
       "btc_change_3h_at_open": 0.559,
       "phase_a_mfe_price": 0.4778,
-      "current_price": 0.4865,
-      "unrealized_pnl_usdt": -2.9929,
-      "unrealized_pnl_pct": -1.497,
-      "last_price_check_at": "2026-06-05T16:42:03.383886+00:00"
+      "current_price": 0.4861,
+      "unrealized_pnl_usdt": -2.8261,
+      "unrealized_pnl_pct": -1.414,
+      "last_price_check_at": "2026-06-05T16:44:02.595521+00:00"
     },
     {
       "paper_id": "DRAMUSDT|SHORT|2026-06-05T16:32:43.539944+00:00",
@@ -139,7 +139,7 @@
       "min_conviction_threshold": null,
       "tp1_price": 57.28053571,
       "tp2_price": 56.86107143,
-      "phase": "A",
+      "phase": "B",
       "entry_order_id": 33140124,
       "entry_client_id": "cresus_L1780677163_DRAMUSD_S_E",
       "sl_order_id": null,
@@ -150,8 +150,8 @@
       "top_trader_position_ratio": 1.723,
       "top_trader_account_ratio": 4.0968,
       "global_account_ratio": 3.4484,
-      "phase_a_mfe_pct": 0.624,
-      "phase_b_mfe_pct": null,
+      "phase_a_mfe_pct": 0.953,
+      "phase_b_mfe_pct": 0.953,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.059987,
       "fees_are_actual": true,
@@ -163,11 +163,12 @@
       "btc_pct_vs_ma25_at_open": -2.894,
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": 0.219,
-      "phase_a_mfe_price": 57.34,
-      "current_price": 57.33,
-      "unrealized_pnl_usdt": 0.91,
-      "unrealized_pnl_pct": 0.607,
-      "last_price_check_at": "2026-06-05T16:42:03.383886+00:00"
+      "phase_a_mfe_price": 57.15,
+      "current_price": 57.11,
+      "unrealized_pnl_usdt": 1.482,
+      "unrealized_pnl_pct": 0.988,
+      "last_price_check_at": "2026-06-05T16:44:02.595521+00:00",
+      "phase_b_mfe_price": 57.15
     }
   ],
   "recent_closed": [
@@ -8210,16 +8211,26 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "SOXLUSDT|SHORT|2026-06-05T16:43:02.098002+00:00",
+      "symbol": "SOXLUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-06-05T16:44:00.799769+00:00",
+      "reason": "funding adverse (0.051% ≥ 0.05%) (Phase 4.M: paper 历史人均 -$0.85, 不利 mirror)",
+      "last_checked_at": "2026-06-05T16:44:02.595521+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 60861.7,
-    "btc_ma25_1h": 62647.28,
-    "pct_vs_ma25": -2.85,
-    "change_24h_pct": -4.199,
+    "btc_price": 60813.2,
+    "btc_ma25_1h": 62645.34,
+    "pct_vs_ma25": -2.925,
+    "change_24h_pct": -4.276,
     "sub_regime": "down_stable",
-    "change_3h_pct": 0.266,
-    "computed_at": "2026-06-05T16:42:04.503447+00:00"
+    "change_3h_pct": 0.186,
+    "computed_at": "2026-06-05T16:44:03.537833+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
