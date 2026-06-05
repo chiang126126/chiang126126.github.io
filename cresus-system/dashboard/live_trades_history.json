@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-05T02:38:07.325982+00:00",
+  "generated_at": "2026-06-05T02:40:14.778000+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 67,
-    "open": 1,
+    "total_trades": 68,
+    "open": 2,
     "closed": 66,
     "wins": 21,
     "losses": 43,
@@ -15,31 +15,33 @@
     "avg_pnl_usdt": -0.5782,
     "best_trade_usdt": 23.6376,
     "worst_trade_usdt": -11.8189,
-    "fees_paid_usdt": 10.676,
+    "fees_paid_usdt": 10.751,
     "fees_realized_usdt": 10.6011,
-    "fees_open_usdt": 0.0749,
+    "fees_open_usdt": 0.1499,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 149.84,
-    "free_capital_usdt": 401.33,
+    "deployed_usdt": 299.81,
+    "free_capital_usdt": 251.28,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 8.7562,
-    "deployed_usdt": 149.84
+    "deployed_usdt": 299.81
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "PRLUSDT"
+      "PRLUSDT",
+      "FORMUSDT"
     ],
     "exchange_symbols": [
-      "PRLUSDT"
+      "PRLUSDT",
+      "FORMUSDT"
     ]
   },
   "open_trades": [
@@ -100,10 +102,72 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.1825,
-      "current_price": 0.1827,
-      "unrealized_pnl_usdt": 1.3008,
-      "unrealized_pnl_pct": 0.868,
-      "last_price_check_at": "2026-06-05T02:38:05.551951+00:00"
+      "current_price": 0.1826,
+      "unrealized_pnl_usdt": 1.3821,
+      "unrealized_pnl_pct": 0.922,
+      "last_price_check_at": "2026-06-05T02:40:13.103230+00:00"
+    },
+    {
+      "paper_id": "FORMUSDT|SHORT|2026-06-05T02:39:01.211023+00:00",
+      "trade_id": "L1780627141_FORMUSD_S",
+      "symbol": "FORMUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.2774,
+      "avg_fill_price": 0.2784,
+      "slippage_bps": -36.05,
+      "qty": 538.7,
+      "notional_usdt": 149.97408,
+      "leverage": 1,
+      "risk_usdt": 0.7138,
+      "risk_pct": 0.476,
+      "mirror_latency_sec": 12.6,
+      "sl_price": 0.280725,
+      "sl_paper_current": 0.279725,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.001,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 4,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "A",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.2739125,
+      "tp2_price": 0.270425,
+      "phase": "A",
+      "entry_order_id": 1622871400,
+      "entry_client_id": "cresus_L1780627141_FORMUSD_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "burst",
+      "atr_pct": 0.559,
+      "top_trader_position_ratio": 4.4524,
+      "top_trader_account_ratio": 2.003,
+      "global_account_ratio": 1.5562,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.074987,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-05T02:39:44.035253+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 62860.9,
+      "btc_change_24h_at_open": -0.534,
+      "btc_pct_vs_ma25_at_open": -1.119,
+      "btc_sub_regime_at_open": "down_acute",
+      "btc_change_3h_at_open": -1.554,
+      "phase_a_mfe_price": 0.2774,
+      "current_price": 0.2789,
+      "unrealized_pnl_usdt": -0.2694,
+      "unrealized_pnl_pct": -0.18,
+      "last_price_check_at": "2026-06-05T02:40:13.103230+00:00"
     }
   ],
   "recent_closed": [
@@ -5016,13 +5080,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 62905.4,
-    "btc_ma25_1h": 63574.36,
-    "pct_vs_ma25": -1.052,
-    "change_24h_pct": -0.464,
+    "btc_price": 62870.0,
+    "btc_ma25_1h": 63572.95,
+    "pct_vs_ma25": -1.106,
+    "change_24h_pct": -0.52,
     "sub_regime": "down_acute",
-    "change_3h_pct": -1.485,
-    "computed_at": "2026-06-05T02:38:07.047841+00:00"
+    "change_3h_pct": -1.54,
+    "computed_at": "2026-06-05T02:40:14.226584+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
