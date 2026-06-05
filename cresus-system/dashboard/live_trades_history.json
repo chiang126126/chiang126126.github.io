@@ -1,46 +1,44 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-05T08:59:03.425431+00:00",
+  "generated_at": "2026-06-05T09:01:10.283220+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 87,
-    "open": 2,
-    "closed": 85,
+    "open": 1,
+    "closed": 86,
     "wins": 27,
-    "losses": 56,
-    "win_rate": 0.325,
-    "total_pnl_usdt": -42.3377,
-    "net_pnl_usdt": -56.0379,
-    "avg_pnl_usdt": -0.4981,
+    "losses": 57,
+    "win_rate": 0.321,
+    "total_pnl_usdt": -48.2196,
+    "net_pnl_usdt": -62.1227,
+    "avg_pnl_usdt": -0.5607,
     "best_trade_usdt": 23.6376,
     "worst_trade_usdt": -11.8189,
-    "fees_paid_usdt": 13.8801,
-    "fees_realized_usdt": 13.7002,
-    "fees_open_usdt": 0.1799,
+    "fees_paid_usdt": 13.983,
+    "fees_realized_usdt": 13.9031,
+    "fees_open_usdt": 0.08,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 399.88,
-    "free_capital_usdt": 143.9,
+    "deployed_usdt": 199.91,
+    "free_capital_usdt": 337.89,
     "max_concurrent_slots": 3,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 4.5813,
-    "deployed_usdt": 399.88
+    "daily_pnl": -1.3006,
+    "deployed_usdt": 199.91
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "AIAUSDT",
       "FLNCUSDT"
     ],
     "exchange_symbols": [
-      "AIAUSDT",
       "FLNCUSDT"
     ]
   },
@@ -102,11 +100,13 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": 0.445,
       "phase_a_mfe_price": 26.19,
-      "current_price": 26.21,
-      "unrealized_pnl_usdt": -0.0763,
-      "unrealized_pnl_pct": -0.038,
-      "last_price_check_at": "2026-06-05T08:59:01.887388+00:00"
-    },
+      "current_price": 26.23,
+      "unrealized_pnl_usdt": -0.2289,
+      "unrealized_pnl_pct": -0.115,
+      "last_price_check_at": "2026-06-05T09:01:08.696534+00:00"
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "AIAUSDT|SHORT|2026-06-05T08:55:02.940071+00:00",
       "trade_id": "L1780649702_AIAUSDT_S",
@@ -130,7 +130,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 4,
       "wick_filter_mode": "always",
-      "sl_breach_count": 0,
+      "sl_breach_count": 4,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.0454,
       "regime_gate_enabled": true,
@@ -153,7 +153,7 @@
       "phase_a_mfe_pct": 0.341,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.099986,
+      "fees_paid_usdt": 0.202913,
       "fees_are_actual": true,
       "opened_at": "2026-06-05T08:56:08.212855+00:00",
       "is_dry_run": false,
@@ -164,13 +164,23 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.003,
       "phase_a_mfe_price": 0.05838,
-      "current_price": 0.05885,
-      "unrealized_pnl_usdt": -1.059,
-      "unrealized_pnl_pct": -0.53,
-      "last_price_check_at": "2026-06-05T08:59:01.887388+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.06022,
+      "unrealized_pnl_usdt": -5.7389,
+      "unrealized_pnl_pct": -2.87,
+      "last_price_check_at": "2026-06-05T09:00:47.304009+00:00",
+      "closed_at": "2026-06-05T09:00:51.532617+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.06026188231850117,
+      "realized_pnl_usdt": -5.8819,
+      "close_order_id": 673950561,
+      "close_qty": 3416.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 0.05990143,
+      "close_slippage_bps": 60.17,
+      "entry_fees_usdt": 0.099986,
+      "close_fees_usdt": 0.102927
+    },
     {
       "paper_id": "HMSTRUSDT|SHORT|2026-06-05T08:48:59.577311+00:00",
       "trade_id": "L1780649339_HMSTRUS_S",
@@ -6495,13 +6505,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 62408.2,
-    "btc_ma25_1h": 63265.11,
-    "pct_vs_ma25": -1.354,
-    "change_24h_pct": -1.867,
-    "sub_regime": "down_stable",
-    "change_3h_pct": 0.183,
-    "computed_at": "2026-06-05T08:59:02.846716+00:00"
+    "btc_price": 62478.3,
+    "btc_ma25_1h": 63221.29,
+    "pct_vs_ma25": -1.175,
+    "change_24h_pct": -1.2,
+    "sub_regime": "down_rebound",
+    "change_3h_pct": 0.907,
+    "computed_at": "2026-06-05T09:01:09.997640+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
