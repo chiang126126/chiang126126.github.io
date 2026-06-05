@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-05T16:17:35.235054+00:00",
+  "generated_at": "2026-06-05T16:19:43.602161+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 109,
@@ -100,10 +100,10 @@
       "btc_sub_regime_at_open": "down_rebound",
       "btc_change_3h_at_open": 0.559,
       "phase_a_mfe_price": 0.4778,
-      "current_price": 0.4822,
-      "unrealized_pnl_usdt": -1.1998,
-      "unrealized_pnl_pct": -0.6,
-      "last_price_check_at": "2026-06-05T16:17:33.939652+00:00"
+      "current_price": 0.4818,
+      "unrealized_pnl_usdt": -1.033,
+      "unrealized_pnl_pct": -0.517,
+      "last_price_check_at": "2026-06-05T16:19:42.362169+00:00"
     }
   ],
   "recent_closed": [
@@ -8146,16 +8146,26 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "ZORAUSDT|LONG|2026-06-05T16:18:04.035288+00:00",
+      "symbol": "ZORAUSDT",
+      "direction": "LONG",
+      "conviction_score": 6,
+      "signal_at": "2026-06-05T16:18:10.254928+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_rebound 3h=+0.51% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-05T16:19:42.362169+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 60769.3,
-    "btc_ma25_1h": 62643.59,
-    "pct_vs_ma25": -2.992,
-    "change_24h_pct": -4.345,
-    "sub_regime": "down_stable",
-    "change_3h_pct": 0.114,
-    "computed_at": "2026-06-05T16:17:34.943348+00:00"
+    "btc_price": 61010.9,
+    "btc_ma25_1h": 62653.25,
+    "pct_vs_ma25": -2.621,
+    "change_24h_pct": -3.964,
+    "sub_regime": "down_rebound",
+    "change_3h_pct": 0.512,
+    "computed_at": "2026-06-05T16:19:43.309861+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
