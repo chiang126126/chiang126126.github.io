@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-05T02:42:11.235658+00:00",
+  "generated_at": "2026-06-05T02:44:15.572205+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 68,
-    "open": 2,
+    "total_trades": 69,
+    "open": 3,
     "closed": 66,
     "wins": 21,
     "losses": 43,
@@ -15,21 +15,21 @@
     "avg_pnl_usdt": -0.5782,
     "best_trade_usdt": 23.6376,
     "worst_trade_usdt": -11.8189,
-    "fees_paid_usdt": 10.751,
+    "fees_paid_usdt": 10.8259,
     "fees_realized_usdt": 10.6011,
-    "fees_open_usdt": 0.1499,
+    "fees_open_usdt": 0.2249,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 299.81,
-    "free_capital_usdt": 251.28,
+    "deployed_usdt": 449.75,
+    "free_capital_usdt": 101.26,
     "max_concurrent_slots": 3,
-    "slots_used": 2
+    "slots_used": 3
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 8.7562,
-    "deployed_usdt": 299.81
+    "deployed_usdt": 449.75
   },
   "reconciliation": {
     "ok": true,
@@ -37,11 +37,13 @@
     "api_failed": false,
     "live_symbols": [
       "FORMUSDT",
-      "PRLUSDT"
+      "PRLUSDT",
+      "GIGGLEUSDT"
     ],
     "exchange_symbols": [
       "FORMUSDT",
-      "PRLUSDT"
+      "PRLUSDT",
+      "GIGGLEUSDT"
     ]
   },
   "open_trades": [
@@ -88,7 +90,7 @@
       "top_trader_position_ratio": 1.1228,
       "top_trader_account_ratio": 1.6281,
       "global_account_ratio": 1.7005,
-      "phase_a_mfe_pct": 1.139,
+      "phase_a_mfe_pct": 1.302,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.074918,
@@ -101,11 +103,11 @@
       "btc_pct_vs_ma25_at_open": -0.268,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 0.1822,
-      "current_price": 0.1822,
-      "unrealized_pnl_usdt": 1.7073,
-      "unrealized_pnl_pct": 1.139,
-      "last_price_check_at": "2026-06-05T02:42:09.588016+00:00"
+      "phase_a_mfe_price": 0.1819,
+      "current_price": 0.1821,
+      "unrealized_pnl_usdt": 1.7886,
+      "unrealized_pnl_pct": 1.194,
+      "last_price_check_at": "2026-06-05T02:44:12.611931+00:00"
     },
     {
       "paper_id": "FORMUSDT|SHORT|2026-06-05T02:39:01.211023+00:00",
@@ -164,10 +166,72 @@
       "btc_sub_regime_at_open": "down_acute",
       "btc_change_3h_at_open": -1.554,
       "phase_a_mfe_price": 0.2774,
-      "current_price": 0.2797,
-      "unrealized_pnl_usdt": -0.7003,
-      "unrealized_pnl_pct": -0.467,
-      "last_price_check_at": "2026-06-05T02:42:09.588016+00:00"
+      "current_price": 0.2786,
+      "unrealized_pnl_usdt": -0.1077,
+      "unrealized_pnl_pct": -0.072,
+      "last_price_check_at": "2026-06-05T02:44:12.611931+00:00"
+    },
+    {
+      "paper_id": "GIGGLEUSDT|SHORT|2026-06-05T02:43:39.161088+00:00",
+      "trade_id": "L1780627419_GIGGLEU_S",
+      "symbol": "GIGGLEUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 26.67,
+      "avg_fill_price": 26.68,
+      "slippage_bps": -3.75,
+      "qty": 5.62,
+      "notional_usdt": 149.9416,
+      "leverage": 1,
+      "risk_usdt": 0.4657,
+      "risk_pct": 0.311,
+      "mirror_latency_sec": 7.1,
+      "sl_price": 26.77285714,
+      "sl_paper_current": 26.76285714,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.01,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 4,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": -0.0028,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "D",
+      "min_conviction_threshold": null,
+      "tp1_price": 26.53071429,
+      "tp2_price": 26.39142857,
+      "phase": "A",
+      "entry_order_id": 2145200922,
+      "entry_client_id": "cresus_L1780627419_GIGGLEU_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "burst",
+      "atr_pct": 0.348,
+      "top_trader_position_ratio": 4.3432,
+      "top_trader_account_ratio": 1.7894,
+      "global_account_ratio": 1.263,
+      "phase_a_mfe_pct": 0.112,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.074971,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-05T02:44:05.378284+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 62678.1,
+      "btc_change_24h_at_open": -0.823,
+      "btc_pct_vs_ma25_at_open": -1.396,
+      "btc_sub_regime_at_open": "down_acute",
+      "btc_change_3h_at_open": -1.841,
+      "phase_a_mfe_price": 26.64,
+      "current_price": 26.68,
+      "unrealized_pnl_usdt": -0.0,
+      "unrealized_pnl_pct": -0.0,
+      "last_price_check_at": "2026-06-05T02:44:12.611931+00:00"
     }
   ],
   "recent_closed": [
@@ -5080,13 +5144,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 62827.2,
-    "btc_ma25_1h": 63571.24,
-    "pct_vs_ma25": -1.17,
-    "change_24h_pct": -0.587,
+    "btc_price": 62771.9,
+    "btc_ma25_1h": 63569.02,
+    "pct_vs_ma25": -1.254,
+    "change_24h_pct": -0.675,
     "sub_regime": "down_acute",
-    "change_3h_pct": -1.607,
-    "computed_at": "2026-06-05T02:42:10.683655+00:00"
+    "change_3h_pct": -1.694,
+    "computed_at": "2026-06-05T02:44:14.735028+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
