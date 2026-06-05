@@ -1,48 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-05T07:02:46.936141+00:00",
+  "generated_at": "2026-06-05T07:04:52.877713+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 79,
-    "open": 1,
-    "closed": 78,
+    "open": 0,
+    "closed": 79,
     "wins": 27,
-    "losses": 49,
-    "win_rate": 0.355,
-    "total_pnl_usdt": -27.4701,
-    "net_pnl_usdt": -39.9634,
-    "avg_pnl_usdt": -0.3522,
+    "losses": 50,
+    "win_rate": 0.351,
+    "total_pnl_usdt": -30.8883,
+    "net_pnl_usdt": -43.5832,
+    "avg_pnl_usdt": -0.391,
     "best_trade_usdt": 23.6376,
     "worst_trade_usdt": -11.8189,
-    "fees_paid_usdt": 12.5932,
-    "fees_realized_usdt": 12.4933,
-    "fees_open_usdt": 0.0999,
+    "fees_paid_usdt": 12.6949,
+    "fees_realized_usdt": 12.6949,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 199.89,
-    "free_capital_usdt": 360.04,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 556.42,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 19.4489,
-    "deployed_usdt": 199.89
+    "daily_pnl": 16.0307,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "APRUSDT"
-    ],
-    "exchange_symbols": [
-      "APRUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "APRUSDT|SHORT|2026-06-05T06:57:37.230894+00:00",
       "trade_id": "L1780642657_APRUSDT_S",
@@ -66,7 +63,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 4,
       "wick_filter_mode": "always",
-      "sl_breach_count": 3,
+      "sl_breach_count": 4,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.0212,
       "regime_gate_enabled": true,
@@ -89,7 +86,7 @@
       "phase_a_mfe_pct": 1.666,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.099947,
+      "fees_paid_usdt": 0.201603,
       "fees_are_actual": true,
       "opened_at": "2026-06-05T07:01:23.791200+00:00",
       "is_dry_run": false,
@@ -100,13 +97,23 @@
       "btc_sub_regime_at_open": "down_acute",
       "btc_change_3h_at_open": -2.696,
       "phase_a_mfe_price": 0.21362,
-      "current_price": 0.21787,
-      "unrealized_pnl_usdt": -1.4183,
-      "unrealized_pnl_pct": -0.71,
-      "last_price_check_at": "2026-06-05T07:02:45.707352+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.21975,
+      "unrealized_pnl_usdt": -3.1555,
+      "unrealized_pnl_pct": -1.579,
+      "last_price_check_at": "2026-06-05T07:02:56.307776+00:00",
+      "closed_at": "2026-06-05T07:03:00.442567+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.22003433982683984,
+      "realized_pnl_usdt": -3.4182,
+      "close_order_id": 1197469470,
+      "close_qty": 924.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 0.216335,
+      "close_slippage_bps": 171.0,
+      "entry_fees_usdt": 0.099947,
+      "close_fees_usdt": 0.101656
+    },
     {
       "paper_id": "STOUSDT|SHORT|2026-06-05T05:48:07.454213+00:00",
       "trade_id": "L1780638487_STOUSDT_S",
@@ -5913,13 +5920,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 61670.1,
-    "btc_ma25_1h": 63255.03,
-    "pct_vs_ma25": -2.506,
-    "change_24h_pct": -2.976,
+    "btc_price": 61693.1,
+    "btc_ma25_1h": 63255.95,
+    "pct_vs_ma25": -2.471,
+    "change_24h_pct": -2.94,
     "sub_regime": "down_acute",
-    "change_3h_pct": -3.018,
-    "computed_at": "2026-06-05T07:02:46.647136+00:00"
+    "change_3h_pct": -2.981,
+    "computed_at": "2026-06-05T07:04:52.868605+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
