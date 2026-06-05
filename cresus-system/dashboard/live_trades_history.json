@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-05T05:47:31.680150+00:00",
+  "generated_at": "2026-06-05T05:49:28.924797+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 76,
-    "open": 1,
+    "total_trades": 77,
+    "open": 2,
     "closed": 75,
     "wins": 25,
     "losses": 48,
@@ -15,31 +15,33 @@
     "avg_pnl_usdt": -0.4737,
     "best_trade_usdt": 23.6376,
     "worst_trade_usdt": -11.8189,
-    "fees_paid_usdt": 12.0747,
+    "fees_paid_usdt": 12.1735,
     "fees_realized_usdt": 11.9997,
-    "fees_open_usdt": 0.075,
+    "fees_open_usdt": 0.1738,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 150.04,
-    "free_capital_usdt": 402.36,
+    "deployed_usdt": 347.58,
+    "free_capital_usdt": 204.72,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 11.3907,
-    "deployed_usdt": 150.04
+    "deployed_usdt": 347.58
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "VVVUSDT"
+      "VVVUSDT",
+      "AAVEUSDT"
     ],
     "exchange_symbols": [
-      "VVVUSDT"
+      "VVVUSDT",
+      "AAVEUSDT"
     ]
   },
   "open_trades": [
@@ -100,10 +102,72 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": 0.451,
       "phase_a_mfe_price": 15.439,
-      "current_price": 15.42,
-      "unrealized_pnl_usdt": 0.307,
-      "unrealized_pnl_pct": 0.205,
-      "last_price_check_at": "2026-06-05T05:47:30.059801+00:00"
+      "current_price": 15.479,
+      "unrealized_pnl_usdt": -0.2659,
+      "unrealized_pnl_pct": -0.177,
+      "last_price_check_at": "2026-06-05T05:49:26.889886+00:00"
+    },
+    {
+      "paper_id": "AAVEUSDT|SHORT|2026-06-05T05:47:54.475021+00:00",
+      "trade_id": "L1780638474_AAVEUSD_S",
+      "symbol": "AAVEUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 68.26,
+      "avg_fill_price": 68.12,
+      "slippage_bps": 20.51,
+      "qty": 2.9,
+      "notional_usdt": 197.548,
+      "leverage": 1,
+      "risk_usdt": 1.0026,
+      "risk_pct": 0.508,
+      "mirror_latency_sec": 7.6,
+      "sl_price": 68.32571429,
+      "sl_paper_current": 68.46571429,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -0.14,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 4,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": -0.0066,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "A",
+      "min_conviction_threshold": null,
+      "tp1_price": 67.95142857,
+      "tp2_price": 67.64285714,
+      "phase": "A",
+      "entry_order_id": 26016015431,
+      "entry_client_id": "cresus_L1780638474_AAVEUSD_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 6,
+      "alert_type": "sustained",
+      "atr_pct": 0.301,
+      "top_trader_position_ratio": 2.2247,
+      "top_trader_account_ratio": 1.6932,
+      "global_account_ratio": 1.2381,
+      "phase_a_mfe_pct": 0.176,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.098774,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-05T05:49:19.896473+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 62758.3,
+      "btc_change_24h_at_open": -1.829,
+      "btc_pct_vs_ma25_at_open": -1.086,
+      "btc_sub_regime_at_open": "down_stable",
+      "btc_change_3h_at_open": 0.276,
+      "phase_a_mfe_price": 68.14,
+      "current_price": 68.16,
+      "unrealized_pnl_usdt": -0.116,
+      "unrealized_pnl_pct": -0.059,
+      "last_price_check_at": "2026-06-05T05:49:26.889886+00:00"
     }
   ],
   "recent_closed": [
@@ -5688,13 +5752,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 62672.2,
-    "btc_ma25_1h": 63444.06,
-    "pct_vs_ma25": -1.217,
-    "change_24h_pct": -1.964,
+    "btc_price": 62810.0,
+    "btc_ma25_1h": 63449.57,
+    "pct_vs_ma25": -1.008,
+    "change_24h_pct": -1.748,
     "sub_regime": "down_stable",
-    "change_3h_pct": 0.139,
-    "computed_at": "2026-06-05T05:47:31.391380+00:00"
+    "change_3h_pct": 0.359,
+    "computed_at": "2026-06-05T05:49:28.361166+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
