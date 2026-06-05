@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-05T11:38:08.567182+00:00",
+  "generated_at": "2026-06-05T11:40:11.984112+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 92,
@@ -58,8 +58,8 @@
       "risk_usdt": 6.0243,
       "risk_pct": 4.006,
       "mirror_latency_sec": 45.0,
-      "sl_price": 0.010505966925,
-      "sl_paper_current": 0.010560366925,
+      "sl_price": 0.0104987837,
+      "sl_paper_current": 0.0105531837,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": -5.44e-05,
       "sl_compensation_mode": "always",
@@ -87,7 +87,7 @@
       "top_trader_account_ratio": 1.2482,
       "global_account_ratio": 1.4655,
       "phase_a_mfe_pct": 5.415,
-      "phase_b_mfe_pct": 6.343,
+      "phase_b_mfe_pct": 6.407,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.075196,
       "fees_are_actual": true,
@@ -100,11 +100,11 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.010393,
-      "current_price": 0.010304,
-      "unrealized_pnl_usdt": 8.6601,
-      "unrealized_pnl_pct": 5.758,
-      "last_price_check_at": "2026-06-05T11:38:07.343365+00:00",
-      "phase_b_mfe_price": 0.010291
+      "current_price": 0.01027,
+      "unrealized_pnl_usdt": 9.1278,
+      "unrealized_pnl_pct": 6.069,
+      "last_price_check_at": "2026-06-05T11:40:05.507856+00:00",
+      "phase_b_mfe_price": 0.010284
     }
   ],
   "recent_closed": [
@@ -6877,16 +6877,35 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "INUSDT|LONG|2026-06-05T11:38:53.596802+00:00",
+      "symbol": "INUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-05T11:39:23.315057+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.27% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-05T11:40:05.507856+00:00"
+    },
+    {
+      "paper_id": "SLXUSDT|SHORT|2026-06-05T11:38:42.068793+00:00",
+      "symbol": "SLXUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-06-05T11:39:23.315057+00:00",
+      "reason": "open_failed (retry next tick)",
+      "last_checked_at": "2026-06-05T11:40:05.507856+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 62293.7,
-    "btc_ma25_1h": 63202.45,
-    "pct_vs_ma25": -1.438,
-    "change_24h_pct": -0.363,
+    "btc_price": 62264.4,
+    "btc_ma25_1h": 63201.28,
+    "pct_vs_ma25": -1.482,
+    "change_24h_pct": -0.41,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.218,
-    "computed_at": "2026-06-05T11:38:08.284854+00:00"
+    "change_3h_pct": -0.265,
+    "computed_at": "2026-06-05T11:40:06.913494+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
