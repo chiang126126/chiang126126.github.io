@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-05T14:02:51.364749+00:00",
+  "generated_at": "2026-06-05T14:04:53.606743+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 101,
@@ -29,16 +29,18 @@
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 1.5657,
-    "deployed_usdt": 200.03
+    "deployed_usdt": 400.03
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
+      "PUMPUSDT",
       "1000PEPEUSDT"
     ],
     "exchange_symbols": [
+      "PUMPUSDT",
       "1000PEPEUSDT"
     ]
   },
@@ -66,7 +68,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 4,
       "wick_filter_mode": "always",
-      "sl_breach_count": 2,
+      "sl_breach_count": 0,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.0016,
       "regime_gate_enabled": true,
@@ -88,7 +90,7 @@
       "global_account_ratio": 1.7871,
       "phase_a_mfe_pct": 0.59,
       "phase_b_mfe_pct": 1.78,
-      "phase_c_mfe_pct": 1.78,
+      "phase_c_mfe_pct": 1.82,
       "fees_paid_usdt": 0.100014,
       "fees_are_actual": true,
       "opened_at": "2026-06-05T13:52:44.265481+00:00",
@@ -100,12 +102,12 @@
       "btc_sub_regime_at_open": "down_acute",
       "btc_change_3h_at_open": -2.111,
       "phase_a_mfe_price": 0.0027305,
-      "current_price": 0.0027276,
-      "unrealized_pnl_usdt": 1.6149,
-      "unrealized_pnl_pct": 0.807,
-      "last_price_check_at": "2026-06-05T14:02:47.246523+00:00",
+      "current_price": 0.002698,
+      "unrealized_pnl_usdt": 3.7681,
+      "unrealized_pnl_pct": 1.884,
+      "last_price_check_at": "2026-06-05T14:04:51.654075+00:00",
       "phase_b_mfe_price": 0.0026978,
-      "phase_c_mfe_price": 0.0026978
+      "phase_c_mfe_price": 0.0026967
     },
     {
       "paper_id": "PUMPUSDT|SHORT|2026-06-05T13:57:12.869295+00:00",
@@ -122,15 +124,15 @@
       "risk_usdt": 1.4325,
       "risk_pct": 0.716,
       "mirror_latency_sec": 208.9,
-      "sl_price": 0.001487636,
-      "sl_paper_current": 0.001495636,
+      "sl_price": 0.001485,
+      "sl_paper_current": 0.001493,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": -8e-06,
       "sl_compensation_mode": "always",
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 4,
       "wick_filter_mode": "always",
-      "sl_breach_count": 1,
+      "sl_breach_count": 0,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": -0.013,
       "regime_gate_enabled": true,
@@ -139,7 +141,7 @@
       "min_conviction_threshold": null,
       "tp1_price": 0.00147323,
       "tp2_price": 0.00145346,
-      "phase": "A",
+      "phase": "B",
       "entry_order_id": 4557476348,
       "entry_client_id": "cresus_L1780667832_PUMPUSD_S_E",
       "sl_order_id": null,
@@ -150,8 +152,8 @@
       "top_trader_position_ratio": 2.6129,
       "top_trader_account_ratio": 0.9216,
       "global_account_ratio": 0.675,
-      "phase_a_mfe_pct": 0.804,
-      "phase_b_mfe_pct": null,
+      "phase_a_mfe_pct": 1.608,
+      "phase_b_mfe_pct": 1.608,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.1,
       "fees_are_actual": true,
@@ -163,11 +165,12 @@
       "btc_pct_vs_ma25_at_open": -3.095,
       "btc_sub_regime_at_open": "down_acute",
       "btc_change_3h_at_open": -1.555,
-      "phase_a_mfe_price": 0.001481,
-      "current_price": 0.001491,
-      "unrealized_pnl_usdt": -0.8081,
-      "unrealized_pnl_pct": -0.404,
-      "last_price_check_at": "2026-06-05T14:02:47.246523+00:00"
+      "phase_a_mfe_price": 0.001469,
+      "current_price": 0.001473,
+      "unrealized_pnl_usdt": 1.6162,
+      "unrealized_pnl_pct": 0.808,
+      "last_price_check_at": "2026-06-05T14:04:51.654075+00:00",
+      "phase_b_mfe_price": 0.001469
     }
   ],
   "recent_closed": [
@@ -7544,8 +7547,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-06-05T13:39:43.527119+00:00",
-      "reason": "paper trade too old (1384s > 600s)",
-      "last_checked_at": "2026-06-05T14:02:47.246523+00:00"
+      "reason": "paper trade too old (1508s > 600s)",
+      "last_checked_at": "2026-06-05T14:04:51.654075+00:00"
     },
     {
       "paper_id": "MUUSDT|SHORT|2026-06-05T13:45:33.342662+00:00",
@@ -7553,28 +7556,19 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-06-05T13:46:45.292204+00:00",
-      "reason": "paper trade too old (962s > 600s)",
-      "last_checked_at": "2026-06-05T14:02:47.246523+00:00"
-    },
-    {
-      "paper_id": "PUMPUSDT|SHORT|2026-06-05T13:57:12.869295+00:00",
-      "symbol": "PUMPUSDT",
-      "direction": "SHORT",
-      "conviction_score": 6,
-      "signal_at": "2026-06-05T13:59:21.859255+00:00",
-      "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-06-05T13:59:25.929224+00:00"
+      "reason": "paper trade too old (1086s > 600s)",
+      "last_checked_at": "2026-06-05T14:04:51.654075+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 60966.4,
-    "btc_ma25_1h": 62913.68,
-    "pct_vs_ma25": -3.095,
-    "change_24h_pct": -4.627,
+    "btc_price": 60551.9,
+    "btc_ma25_1h": 62897.1,
+    "pct_vs_ma25": -3.729,
+    "change_24h_pct": -5.275,
     "sub_regime": "down_acute",
-    "change_3h_pct": -1.555,
-    "computed_at": "2026-06-05T14:02:48.201708+00:00"
+    "change_3h_pct": -2.224,
+    "computed_at": "2026-06-05T14:04:53.023987+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
