@@ -1759,15 +1759,14 @@ class TestSlBreachWickFilter(unittest.TestCase):
 
     def test_filter_default_min_breaches_from_config(self):
         """C 组若没 wick_filter_min_breaches 字段, fallback 到全局常数.
-        Phase 5.J→5.M (5/31→6/1): 默认 2→3→4, 测试更新到 4 次确认.
+        Phase 5.J→5.M→6.E: 默认 2→3→4→6, 测试更新到 6 次确认 (跟 paper 30s 周期对齐).
         """
         lt = {"side": "BUY", "sl_price": 80000.0, "wick_filter_enabled": True,
               "sl_breach_count": 0}   # 注意: 无 wick_filter_min_breaches
-        # LIVE_WICK_FILTER_MIN_BREACHES 默认 4, 需 4 次连续 breach 才触发
-        self.assertFalse(_check_sl_breach(lt, 79000.0))   # 1
-        self.assertFalse(_check_sl_breach(lt, 79000.0))   # 2
-        self.assertFalse(_check_sl_breach(lt, 79000.0))   # 3
-        self.assertTrue(_check_sl_breach(lt, 79000.0))    # 4, 触发
+        # LIVE_WICK_FILTER_MIN_BREACHES 默认 6, 需 6 次连续 breach 才触发
+        for i in range(5):
+            self.assertFalse(_check_sl_breach(lt, 79000.0), f"breach #{i+1} 不应触发")
+        self.assertTrue(_check_sl_breach(lt, 79000.0))    # 第 6, 触发
 
     def test_filter_no_breach_does_not_change_count(self):
         """C 组: 非 breach 调用不影响已有 0 计数."""
@@ -4451,7 +4450,7 @@ class TestMirrorIterationGuards(unittest.TestCase):
                          live_trader.LIVE_FUNDING_FAVORABLE_WICK_BREACHES)
 
     def test_phase_4m_neutral_funding_uses_default_breaches(self):
-        """Phase 4.M 集成: neutral funding → wick_filter_min_breaches = 默认 2."""
+        """Phase 4.M 集成: neutral funding → wick_filter_min_breaches = 默认 (运行时动态从常量取)."""
         now = datetime.now(timezone.utc)
         self._write_paper([{
             "id": "BTCUSDT|LONG|t_neutral_funding",
@@ -5186,48 +5185,47 @@ class TestPhase5ALiveNotionalByScore(unittest.TestCase):
 
 
 class TestPhase5JWickFilterThreshold(unittest.TestCase):
-    """Phase 5.J→5.M (5/31→6/1): wick filter min_breaches 2→3→4.
+    """Phase 5.J → 5.M → 6.E: wick filter min_breaches 2→3→4→6.
 
     Phase 5.J (5/31): 2→3, sl_breach 64 → 27 (-58%) 已大幅改善.
-    Phase 5.M (6/1): 3→4, Top 10 失真 7/10 仍是 paper hit_trail → live sl_breach,
-                    wick filter 还有漏网. 升 4 = 20s 总确认, 预期再救 8-12 笔.
+    Phase 5.M (6/1): 3→4, 升 4 = 20s 总确认, 预期再救 8-12 笔.
+    Phase 6.E (6/6): 4→6, 修 paper/live polling 不对称 (paper 30s snapshot vs live 5s poll).
+                    实战 60h: 48 wick-out, $122 可救. 6 breach = 30s 确认 = 跟 paper 对齐.
 
-    favorable funding 同步从 4 升 5, 保持 +1 buffer 语义.
+    favorable funding 始终保持 +1 buffer 偏移 (现 6+1=7).
     """
 
-    def test_default_min_breaches_is_4(self):
-        """Phase 5.M: 常量从 3 升到 4."""
+    def test_default_min_breaches_is_6(self):
+        """Phase 6.E (6/6): 4 → 6 (跟 paper 30s snapshot 周期对齐)."""
         from live_trader import LIVE_WICK_FILTER_MIN_BREACHES
-        self.assertEqual(LIVE_WICK_FILTER_MIN_BREACHES, 4)
+        self.assertEqual(LIVE_WICK_FILTER_MIN_BREACHES, 6)
 
-    def test_favorable_funding_min_breaches_is_5(self):
-        """default+1: favorable funding 比 default 多 1 buffer (Phase 5.M: 5)."""
+    def test_favorable_funding_min_breaches_default_plus_1(self):
+        """funding favorable 时 default+1: 现 6 → 7 (Phase 6.E)."""
         from live_trader import (LIVE_FUNDING_FAVORABLE_WICK_BREACHES,
                                    LIVE_WICK_FILTER_MIN_BREACHES)
         self.assertEqual(LIVE_FUNDING_FAVORABLE_WICK_BREACHES,
                           LIVE_WICK_FILTER_MIN_BREACHES + 1)
 
-    def test_wick_filter_needs_4_consecutive_breaches(self):
-        """实测 _check_sl_breach: Phase 5.M 需 4 次连续 breach 才触发."""
+    def test_wick_filter_needs_6_consecutive_breaches(self):
+        """实测 _check_sl_breach: Phase 6.E 需 6 次连续 breach 才触发 (30s 确认)."""
         from live_trader import _check_sl_breach
         lt = {"side": "BUY", "sl_price": 100.0, "wick_filter_enabled": True,
               "sl_breach_count": 0}
-        self.assertFalse(_check_sl_breach(lt, 99.0))   # 1
-        self.assertFalse(_check_sl_breach(lt, 99.0))   # 2
-        self.assertFalse(_check_sl_breach(lt, 99.0))   # 3 (Phase 5.J 会触发, 5.M 不触发)
-        self.assertTrue(_check_sl_breach(lt, 99.0))    # 4, 触发
+        for i in range(5):  # 5 次都不触发
+            self.assertFalse(_check_sl_breach(lt, 99.0), f"breach #{i+1} 不应触发")
+        self.assertTrue(_check_sl_breach(lt, 99.0))    # 第 6 次触发
 
     def test_wick_filter_count_resets_on_recovery(self):
-        """breach 序列被价格回归打断, 计数清零 (Phase 5.M: 需 4 次累积)."""
+        """breach 序列被价格回归打断, 计数清零 (Phase 6.E: 需 6 次累积)."""
         from live_trader import _check_sl_breach
         lt = {"side": "BUY", "sl_price": 100.0, "wick_filter_enabled": True,
               "sl_breach_count": 0}
         _check_sl_breach(lt, 99.0)   # cnt=1
         _check_sl_breach(lt, 101.0)  # 价格回, cnt → 0
-        self.assertFalse(_check_sl_breach(lt, 99.0))   # cnt=1, 不触发
-        self.assertFalse(_check_sl_breach(lt, 99.0))   # cnt=2
-        self.assertFalse(_check_sl_breach(lt, 99.0))   # cnt=3
-        self.assertTrue(_check_sl_breach(lt, 99.0))    # cnt=4, 触发
+        for i in range(5):
+            self.assertFalse(_check_sl_breach(lt, 99.0), f"重新累积 #{i+1} 不应触发")
+        self.assertTrue(_check_sl_breach(lt, 99.0))    # cnt=6, 触发
 
 
 class TestPhase5HOrphanRootCauseFix(unittest.TestCase):
@@ -5764,6 +5762,115 @@ class TestPhase6DAutoHealLiveOnly(unittest.TestCase):
         self.assertEqual(healed, [])
         # streak 也应被清掉 (heal 函数把它当 "已处理" 重置)
         self.assertNotIn("ONDOUSDT", self.live_state.get("_live_only_streak", {}))
+
+
+class TestPhase6EWickFilterAndTracking(unittest.TestCase):
+    """Phase 6.E (2026-06-06): 修 paper/live polling 不对称的 wick-out 问题
+    + 加 MAE / close-time regime tracking 供后续验证.
+
+    背景: 60h 实盘 48 笔 wick-out (live SL 触发 / paper 同笔 trail 到盈利), $122 gap.
+    根因: paper 30s snapshot 周期 vs live 5s polling + 4 breach (20s 确认) → 不对称.
+    修复: wick filter 4 → 6 (30s 确认 = paper snapshot 等效).
+    配套: MAE tracking + btc_regime_at_close 用于 48h 后再 retro 验证效果.
+    """
+
+    def test_6e_default_wick_breaches_is_6(self):
+        """默认 wick filter 阈值从 4 升到 6."""
+        from live_trader import LIVE_WICK_FILTER_MIN_BREACHES
+        self.assertEqual(LIVE_WICK_FILTER_MIN_BREACHES, 6,
+                          "Phase 6.E: 默认 wick breaches 应 = 6 (跟 paper 30s 周期对齐)")
+
+    def test_6e_favorable_wick_breaches_is_7(self):
+        """funding favorable 时 +1 偏移 → 7 (= 默认 6+1)."""
+        from live_trader import (
+            LIVE_FUNDING_FAVORABLE_WICK_BREACHES, LIVE_WICK_FILTER_MIN_BREACHES,
+        )
+        self.assertEqual(LIVE_FUNDING_FAVORABLE_WICK_BREACHES,
+                          LIVE_WICK_FILTER_MIN_BREACHES + 1,
+                          "favorable 应跟主常量保持 +1 偏移")
+        self.assertEqual(LIVE_FUNDING_FAVORABLE_WICK_BREACHES, 7)
+
+    def test_6e_wick_filter_at_5_breaches_does_NOT_trigger(self):
+        """5 breaches < 6, 不应触发 SL (旧 4 阈值会触发)."""
+        from live_trader import _check_sl_breach
+        # SHORT trade, current > sl 是 breach
+        trade = {
+            "sl_price": 100.0, "side": "SELL",
+            "wick_filter_enabled": True,
+            "wick_filter_min_breaches": 6,
+            "sl_breach_count": 0,
+        }
+        # 连续 5 个 breach (5 × 5s = 25s)
+        triggered = False
+        for _ in range(5):
+            if _check_sl_breach(trade, 101.0):
+                triggered = True
+                break
+        self.assertFalse(triggered, "5 breach (25s) < 阈值 6 (30s), 不应触发")
+        self.assertEqual(trade["sl_breach_count"], 5)
+
+    def test_6e_wick_filter_at_6_breaches_triggers(self):
+        """第 6 个连续 breach 触发 SL."""
+        from live_trader import _check_sl_breach
+        trade = {
+            "sl_price": 100.0, "side": "SELL",
+            "wick_filter_enabled": True,
+            "wick_filter_min_breaches": 6,
+            "sl_breach_count": 0,
+        }
+        triggered_at = None
+        for i in range(7):
+            if _check_sl_breach(trade, 101.0):
+                triggered_at = i + 1
+                break
+        self.assertEqual(triggered_at, 6, "第 6 个 breach 应触发, 不应早不应晚")
+
+    # === MAE tracking ===
+
+    def test_6e_tag_close_time_regime_basic(self):
+        """close 前 _tag_close_time_regime 应把 BTC regime 写入 trade."""
+        from live_trader import _tag_close_time_regime
+        trade = {"symbol": "BTCUSDT", "direction": "LONG"}
+        live_state = {
+            "_btc_regime_now": {
+                "regime": "down",
+                "sub_regime": "down_strong",
+                "btc_price": 60500.5,
+                "pct_vs_ma25": -3.42,
+            }
+        }
+        _tag_close_time_regime(trade, live_state)
+        self.assertEqual(trade["btc_regime_at_close"], "down")
+        self.assertEqual(trade["btc_sub_regime_at_close"], "down_strong")
+        self.assertEqual(trade["btc_price_at_close"], 60500.5)
+        self.assertEqual(trade["btc_pct_vs_ma25_at_close"], -3.42)
+
+    def test_6e_tag_close_time_regime_no_snapshot_safe(self):
+        """live_state 没 _btc_regime_now 时不应崩溃, 也不写任何字段."""
+        from live_trader import _tag_close_time_regime
+        trade = {"symbol": "X"}
+        _tag_close_time_regime(trade, {})
+        self.assertNotIn("btc_regime_at_close", trade)
+        # None state
+        _tag_close_time_regime(trade, None)
+        self.assertNotIn("btc_regime_at_close", trade)
+
+    def test_6e_tag_close_time_regime_partial_snapshot(self):
+        """snapshot 只有部分字段时, 只写存在的."""
+        from live_trader import _tag_close_time_regime
+        trade = {}
+        live_state = {"_btc_regime_now": {"regime": "chop"}}  # 只有 regime
+        _tag_close_time_regime(trade, live_state)
+        self.assertEqual(trade.get("btc_regime_at_close"), "chop")
+        self.assertNotIn("btc_sub_regime_at_close", trade)
+        self.assertNotIn("btc_price_at_close", trade)
+
+    def test_6e_tag_close_time_regime_invalid_snapshot_type(self):
+        """snapshot 是非 dict 类型时 (旧数据 / corruption) 应该 safe skip."""
+        from live_trader import _tag_close_time_regime
+        trade = {}
+        _tag_close_time_regime(trade, {"_btc_regime_now": "down"})  # str instead of dict
+        self.assertNotIn("btc_regime_at_close", trade)
 
 
 if __name__ == "__main__":

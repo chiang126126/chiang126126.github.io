@@ -385,11 +385,18 @@ LIVE_BTC_REGIME_THRESHOLD_PCT = 0.5
 # 风险: 极低. orthogonal to regime gate (D 组). 改回 'abcd' 1 行即回滚.
 # 验证窗口: 2-3 天观察新数据. 若假止损率不降到 33% 左右, 重审.
 LIVE_SL_WICK_FILTER_MODE = "always"  # Phase 4.L 推广 (was "abcd")
-LIVE_WICK_FILTER_MIN_BREACHES = 4    # Phase 5.M (6/1): 3→4, 数据驱动再升一档.
-                                      # Phase 5.J 5/31→6/1: sl_breach 64 → 27 (-58%) 已大幅改善,
-                                      # 但 Top 10 失真案例 7/10 仍是 paper:hit_trail → live:sl_breach,
-                                      # 即仍有 wick filter 漏网. 升 4 = 20s 确认窗口.
-                                      # 预期再救 8-12 笔 × $1.87 = +$15-22/天, 代价 -$3-5/天 (真破位多 5s).
+LIVE_WICK_FILTER_MIN_BREACHES = 6    # Phase 6.E (2026-06-06): 4→6, 修 paper/live polling 不对称.
+                                      # 真根因 (经 6/6 复盘审计):
+                                      #   - paper 30s snapshot 间隔 (launchd StartInterval=30)
+                                      #   - live 5s polling (POLL_INTERVAL_SEC=5)
+                                      #   - 之前 4 breach = 4×5s = 20s 确认 < paper 30s 周期
+                                      #     → wick 在 20-30s 内被刺穿 live SL 触发, paper 下次 snapshot 时已恢复
+                                      # 改成 6 breach = 6×5s = 30s 确认 → 跟 paper 间隔对齐, 等效行为.
+                                      # 数据驱动: 60h 实盘 48 笔 wick-out (live SL hit, paper trail 到盈利),
+                                      #   $122 可救额. 预计回收 $60-90 ($30-45/天).
+                                      # 风险: 真破位场景 SL 慢 10s, 单笔多亏 ~0.05-0.1% notional, 微小可忽略.
+                                      # 历史 phase 注释 (旧 4 breach 决策):
+                                      #   Phase 5.M (6/1): 3→4 (sl_breach 64→27 -58%)
 
 # Phase 4.M Funding-aware mirror filter (2026-05-24)
 # ==========================================
@@ -408,7 +415,9 @@ LIVE_WICK_FILTER_MIN_BREACHES = 4    # Phase 5.M (6/1): 3→4, 数据驱动再�
 LIVE_FUNDING_FAVORABLE_THRESHOLD_PCT = -0.05    # paper funding_rate_pct ≤ 此 → 友好
 LIVE_FUNDING_ADVERSE_THRESHOLD_PCT = 0.05       # ≥ 此 → 不利
 LIVE_REJECT_ADVERSE_FUNDING = True              # True: funding 不利时拒 mirror
-LIVE_FUNDING_FAVORABLE_WICK_BREACHES = 5        # Phase 5.M (6/1): 默认 4 后, 友好时 +1 = 5
+LIVE_FUNDING_FAVORABLE_WICK_BREACHES = 7        # Phase 6.E (6/6): 默认 6 后, 友好时 +1 = 7
+                                                  # 跟主 LIVE_WICK_FILTER_MIN_BREACHES 保持 +1 偏移,
+                                                  # funding 友好 = fade 拥挤方向, 反弹/继续概率高, 容忍多 5s wick.
                                                  # (维持 funding favorable 比 default 多 1 buffer 语义)
 
 # Phase 4.F Regime Gate (2026-05-21)
@@ -1331,6 +1340,7 @@ def _auto_heal_live_only_mismatches(
         target["close_qty"] = 0.0
         target["avg_exit_price"] = 0.0
         target["_auto_heal_streak_ticks"] = streak[sym]
+        _tag_close_time_regime(target, live_state)   # Phase 6.E
         closed_trades.append(target)
         live_state["live_open_trades"] = kept
         open_trades = kept
@@ -1941,6 +1951,28 @@ def _sync_live_with_paper(live_trade: dict, paper_open_trade: dict) -> bool:
             live_trade[k] = v
             updated = True
     return updated
+
+
+def _tag_close_time_regime(live_trade: dict, live_state: dict) -> None:
+    """Phase 6.E (2026-06-06): close 前打 BTC regime snapshot 标签.
+
+    用途: 复盘 trade 时区分 "整笔在 RISK_OFF" vs "regime 中途切换" vs "整笔在非 RISK_OFF".
+    之前只有 btc_regime_at_open. close 时再打一次, 就能精准 segment regime baseline.
+
+    取自 live_state["_btc_regime_now"], 是当前 tick 计算的 BTC regime snapshot
+    (live_trader.py 主循环每 tick 刷新 1 次). 不在线再算 (省 API 调用).
+    """
+    snapshot = (live_state or {}).get("_btc_regime_now") or {}
+    if not isinstance(snapshot, dict):
+        return
+    if snapshot.get("regime"):
+        live_trade["btc_regime_at_close"] = snapshot.get("regime")
+    if snapshot.get("sub_regime"):
+        live_trade["btc_sub_regime_at_close"] = snapshot.get("sub_regime")
+    if snapshot.get("btc_price") is not None:
+        live_trade["btc_price_at_close"] = snapshot.get("btc_price")
+    if snapshot.get("pct_vs_ma25") is not None:
+        live_trade["btc_pct_vs_ma25_at_close"] = snapshot.get("pct_vs_ma25")
 
 
 def _try_mirror_close(
@@ -2785,6 +2817,7 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
         if paper_id in paper_closed_ids:
             paper_closed = paper_closed_by_id.get(paper_id, {})
             paper_reason = paper_closed.get("close_reason", "paper_closed")
+            _tag_close_time_regime(lt, live)   # Phase 6.E
             closed_lt = _try_mirror_close(
                 client, lt, reason=f"paper:{paper_reason}", dry_run=dry_run,
             )
@@ -2827,6 +2860,29 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
                 lt["unrealized_pnl_usdt"] = 0.0
                 lt["unrealized_pnl_pct"] = 0.0
             lt["last_price_check_at"] = now.isoformat()
+            # Phase 6.E (2026-06-06): per-phase MAE (Max Adverse Excursion) tracking.
+            # 用来事后量化 6→8 wick filter 改进效果 — 看 SL 被刺前最差 % 是多少,
+            # 跟 paper 的 phase_X_mfe 配对, 推断改 wick filter 后是否还会触发.
+            # LONG (side=BUY) MAE = 持仓中最低价 (% 下跌). SHORT MAE = 最高价 (% 上涨).
+            # 跟 MFE 一样 per-phase 独立, phase 切换时新 phase MAE 重新计.
+            if entry > 0:
+                phase = lt.get("phase", "A")
+                mae_pkey = f"phase_{phase.lower()}_mae_price"
+                mae_qkey = f"phase_{phase.lower()}_mae_pct"
+                cur_mae = lt.get(mae_pkey)
+                if cur_mae is None:
+                    cur_mae = entry   # 初始化 = entry (尚未浮亏)
+                # LONG 不利 = 价格下跌. SHORT 不利 = 价格上涨.
+                is_long_side = (sign == 1)
+                update = (is_long_side and current_price < cur_mae) or \
+                         (not is_long_side and current_price > cur_mae)
+                if update:
+                    lt[mae_pkey] = current_price
+                    # MAE % 永远 ≤ 0 (表示不利方向). LONG 时 negative pct, SHORT 时 negative pct.
+                    raw = (current_price - entry) / entry * 100
+                    lt[mae_qkey] = round(raw if is_long_side else -raw, 3)
+                    # 时间戳 (用来后续 reconstruct intra-bar 时序)
+                    lt[f"phase_{phase.lower()}_mae_at"] = now.isoformat()
         except Exception as e:
             log.debug(f"[live-monitor] failed to record unrealized for {lt.get('symbol')}: {e}")
 
@@ -2858,6 +2914,7 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
                     f"current={current_price} crossed sl={lt.get('sl_price')} "
                     f"(log enhance failed: {e})"
                 )
+            _tag_close_time_regime(lt, live)   # Phase 6.E
             closed_lt = _try_mirror_close(
                 client, lt, reason="sl_breach_client", dry_run=dry_run,
             )
