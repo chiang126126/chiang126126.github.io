@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-06T04:08:29.495974+00:00",
+  "generated_at": "2026-06-06T04:10:34.756260+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 131,
@@ -90,7 +90,7 @@
       "global_account_ratio": 1.8035,
       "phase_a_mfe_pct": 1.284,
       "phase_b_mfe_pct": 2.234,
-      "phase_c_mfe_pct": 2.234,
+      "phase_c_mfe_pct": 3.342,
       "fees_paid_usdt": 0.075089,
       "fees_are_actual": true,
       "opened_at": "2026-06-06T03:18:13.896598+00:00",
@@ -102,12 +102,12 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.674,
       "phase_a_mfe_price": 0.0005613,
-      "current_price": 0.0005502,
-      "unrealized_pnl_usdt": 5.0897,
-      "unrealized_pnl_pct": 3.389,
-      "last_price_check_at": "2026-06-06T04:08:27.976874+00:00",
+      "current_price": 0.0005478,
+      "unrealized_pnl_usdt": 5.7226,
+      "unrealized_pnl_pct": 3.81,
+      "last_price_check_at": "2026-06-06T04:10:33.022218+00:00",
       "phase_b_mfe_price": 0.0005559,
-      "phase_c_mfe_price": 0.0005559
+      "phase_c_mfe_price": 0.0005496
     },
     {
       "paper_id": "BIOUSDT|SHORT|2026-06-06T04:06:09.021192+00:00",
@@ -124,8 +124,8 @@
       "risk_usdt": 0.7802,
       "risk_pct": 0.52,
       "mirror_latency_sec": 21.0,
-      "sl_price": 0.025783570000000002,
-      "sl_paper_current": 0.02581357,
+      "sl_price": 0.02568,
+      "sl_paper_current": 0.02571,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": -3e-05,
       "sl_compensation_mode": "always",
@@ -141,7 +141,7 @@
       "min_conviction_threshold": null,
       "tp1_price": 0.02555464,
       "tp2_price": 0.02539929,
-      "phase": "A",
+      "phase": "B",
       "entry_order_id": 4678704348,
       "entry_client_id": "cresus_L1780718769_BIOUSDT_S_E",
       "sl_order_id": null,
@@ -152,8 +152,8 @@
       "top_trader_position_ratio": 0.9719,
       "top_trader_account_ratio": 0.9501,
       "global_account_ratio": 0.7394,
-      "phase_a_mfe_pct": 0.0,
-      "phase_b_mfe_pct": null,
+      "phase_a_mfe_pct": 0.895,
+      "phase_b_mfe_pct": 0.895,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.074998,
       "fees_are_actual": true,
@@ -165,11 +165,12 @@
       "btc_pct_vs_ma25_at_open": -1.627,
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.938,
-      "phase_a_mfe_price": 0.02571,
-      "current_price": 0.02548,
-      "unrealized_pnl_usdt": 1.1682,
-      "unrealized_pnl_pct": 0.779,
-      "last_price_check_at": "2026-06-06T04:08:27.976874+00:00"
+      "phase_a_mfe_price": 0.02548,
+      "current_price": 0.02539,
+      "unrealized_pnl_usdt": 1.6939,
+      "unrealized_pnl_pct": 1.129,
+      "last_price_check_at": "2026-06-06T04:10:33.022218+00:00",
+      "phase_b_mfe_price": 0.02548
     }
   ],
   "recent_closed": [
@@ -9781,15 +9782,6 @@
   ],
   "missed_signals": [
     {
-      "paper_id": "4USDT|SHORT|2026-06-06T03:25:59.326805+00:00",
-      "symbol": "4USDT",
-      "direction": "SHORT",
-      "conviction_score": 5,
-      "signal_at": "2026-06-06T03:26:32.009667+00:00",
-      "reason": "paper trade too old (2516s > 600s)",
-      "last_checked_at": "2026-06-06T04:08:27.976874+00:00"
-    },
-    {
       "paper_id": "BASEDUSDT|SHORT|2026-06-06T04:06:12.333773+00:00",
       "symbol": "BASEDUSDT",
       "direction": "SHORT",
@@ -9801,13 +9793,13 @@
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 60429.2,
-    "btc_ma25_1h": 61452.17,
-    "pct_vs_ma25": -1.665,
-    "change_24h_pct": -4.969,
-    "sub_regime": "down_stable",
-    "change_3h_pct": -0.977,
-    "computed_at": "2026-06-06T04:08:28.923833+00:00"
+    "btc_price": 60335.8,
+    "btc_ma25_1h": 61448.44,
+    "pct_vs_ma25": -1.811,
+    "change_24h_pct": -5.116,
+    "sub_regime": "down_acute",
+    "change_3h_pct": -1.13,
+    "computed_at": "2026-06-06T04:10:34.128961+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
