@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-06T17:36:09.114622+00:00",
+  "generated_at": "2026-06-06T17:38:11.290204+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 176,
-    "open": 2,
+    "total_trades": 177,
+    "open": 3,
     "closed": 174,
     "wins": 61,
     "losses": 111,
@@ -15,33 +15,35 @@
     "avg_pnl_usdt": -0.2709,
     "best_trade_usdt": 23.6376,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 27.9872,
+    "fees_paid_usdt": 28.0622,
     "fees_realized_usdt": 27.8373,
-    "fees_open_usdt": 0.1499,
+    "fees_open_usdt": 0.2249,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 299.74,
-    "free_capital_usdt": 225.14,
+    "deployed_usdt": 449.73,
+    "free_capital_usdt": 75.08,
     "max_concurrent_slots": 3,
-    "slots_used": 2
+    "slots_used": 3
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -1.1819,
-    "deployed_usdt": 299.74
+    "deployed_usdt": 449.73
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
+      "FIDAUSDT",
       "PLAYUSDT",
-      "FIDAUSDT"
+      "EDENUSDT"
     ],
     "exchange_symbols": [
       "FIDAUSDT",
-      "PLAYUSDT"
+      "PLAYUSDT",
+      "EDENUSDT"
     ]
   },
   "open_trades": [
@@ -102,10 +104,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.08271,
-      "current_price": 0.08239,
-      "unrealized_pnl_usdt": 0.4563,
-      "unrealized_pnl_pct": 0.304,
-      "last_price_check_at": "2026-06-06T17:36:05.054876+00:00"
+      "current_price": 0.08116,
+      "unrealized_pnl_usdt": -1.7885,
+      "unrealized_pnl_pct": -1.193,
+      "last_price_check_at": "2026-06-06T17:38:09.488611+00:00"
     },
     {
       "paper_id": "FIDAUSDT|LONG|2026-06-06T17:16:22.308964+00:00",
@@ -122,8 +124,8 @@
       "risk_usdt": 6.8946,
       "risk_pct": 4.601,
       "mirror_latency_sec": 28.5,
-      "sl_price": 0.01925143,
-      "sl_paper_current": 0.01925143,
+      "sl_price": 0.02018,
+      "sl_paper_current": 0.02018,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": 0.0,
       "sl_compensation_mode": "always",
@@ -139,7 +141,7 @@
       "min_conviction_threshold": null,
       "tp1_price": 0.02157286,
       "tp2_price": 0.02296571,
-      "phase": "A",
+      "phase": "B",
       "entry_order_id": 1888833484,
       "entry_client_id": "cresus_L1780766182_FIDAUSD_L_E",
       "sl_order_id": null,
@@ -150,8 +152,8 @@
       "top_trader_position_ratio": 1.6513,
       "top_trader_account_ratio": 0.8904,
       "global_account_ratio": 0.7928,
-      "phase_a_mfe_pct": 2.18,
-      "phase_b_mfe_pct": null,
+      "phase_a_mfe_pct": 8.573,
+      "phase_b_mfe_pct": 8.573,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.074918,
       "fees_are_actual": true,
@@ -163,11 +165,74 @@
       "btc_pct_vs_ma25_at_open": -0.266,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 0.02062,
-      "current_price": 0.02051,
-      "unrealized_pnl_usdt": 2.4503,
-      "unrealized_pnl_pct": 1.635,
-      "last_price_check_at": "2026-06-06T17:36:05.054876+00:00"
+      "phase_a_mfe_price": 0.02191,
+      "current_price": 0.02175,
+      "unrealized_pnl_usdt": 11.6572,
+      "unrealized_pnl_pct": 7.78,
+      "last_price_check_at": "2026-06-06T17:38:09.488611+00:00",
+      "phase_b_mfe_price": 0.02191
+    },
+    {
+      "paper_id": "EDENUSDT|LONG|2026-06-06T17:35:19.365783+00:00",
+      "trade_id": "L1780767319_EDENUSD_L",
+      "symbol": "EDENUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.04202,
+      "avg_fill_price": 0.042119,
+      "slippage_bps": 23.56,
+      "qty": 3561.0,
+      "notional_usdt": 149.98592,
+      "leverage": 1,
+      "risk_usdt": 1.8291,
+      "risk_pct": 1.219,
+      "mirror_latency_sec": 34.7,
+      "sl_price": 0.041704359999999996,
+      "sl_paper_current": 0.04160536,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 9.9e-05,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 4,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": -0.0111,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "C",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.04264196,
+      "tp2_price": 0.04326393,
+      "phase": "A",
+      "entry_order_id": 1127337241,
+      "entry_client_id": "cresus_L1780767319_EDENUSD_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.658,
+      "top_trader_position_ratio": 1.7887,
+      "top_trader_account_ratio": 1.0182,
+      "global_account_ratio": 0.8525,
+      "phase_a_mfe_pct": 0.476,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.074993,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-06T17:36:18.490226+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 60737.0,
+      "btc_change_24h_at_open": -0.081,
+      "btc_pct_vs_ma25_at_open": -0.177,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.04222,
+      "current_price": 0.04193,
+      "unrealized_pnl_usdt": -0.673,
+      "unrealized_pnl_pct": -0.449,
+      "last_price_check_at": "2026-06-06T17:38:09.488611+00:00"
     }
   ],
   "recent_closed": [
@@ -13129,26 +13194,16 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [
-    {
-      "paper_id": "EDENUSDT|LONG|2026-06-06T17:35:19.365783+00:00",
-      "symbol": "EDENUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-06-06T17:35:43.751894+00:00",
-      "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-06-06T17:36:05.054876+00:00"
-    }
-  ],
+  "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 60739.9,
-    "btc_ma25_1h": 60844.58,
-    "pct_vs_ma25": -0.172,
-    "change_24h_pct": -0.077,
+    "btc_price": 60680.4,
+    "btc_ma25_1h": 60842.2,
+    "pct_vs_ma25": -0.266,
+    "change_24h_pct": -0.175,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-06T17:36:06.002453+00:00"
+    "computed_at": "2026-06-06T17:38:10.437578+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
