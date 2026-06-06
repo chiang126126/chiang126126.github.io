@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-06T13:27:16.210191+00:00",
+  "generated_at": "2026-06-06T13:29:15.332718+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 162,
-    "open": 1,
+    "total_trades": 163,
+    "open": 2,
     "closed": 161,
     "wins": 56,
     "losses": 103,
@@ -15,31 +15,33 @@
     "avg_pnl_usdt": -0.3433,
     "best_trade_usdt": 23.6376,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 25.7163,
+    "fees_paid_usdt": 25.7913,
     "fees_realized_usdt": 25.6414,
-    "fees_open_usdt": 0.0749,
+    "fees_open_usdt": 0.1499,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 149.88,
-    "free_capital_usdt": 369.13,
+    "deployed_usdt": 299.71,
+    "free_capital_usdt": 219.22,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -9.3304,
-    "deployed_usdt": 149.88
+    "deployed_usdt": 299.71
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "HEIUSDT"
+      "HEIUSDT",
+      "SKYAIUSDT"
     ],
     "exchange_symbols": [
-      "HEIUSDT"
+      "HEIUSDT",
+      "SKYAIUSDT"
     ]
   },
   "open_trades": [
@@ -100,10 +102,72 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.12321,
-      "current_price": 0.12117,
-      "unrealized_pnl_usdt": -0.6352,
-      "unrealized_pnl_pct": -0.424,
-      "last_price_check_at": "2026-06-06T13:27:14.824047+00:00"
+      "current_price": 0.12253,
+      "unrealized_pnl_usdt": 1.0399,
+      "unrealized_pnl_pct": 0.694,
+      "last_price_check_at": "2026-06-06T13:29:13.826961+00:00"
+    },
+    {
+      "paper_id": "SKYAIUSDT|LONG|2026-06-06T13:27:58.559502+00:00",
+      "trade_id": "L1780752478_SKYAIUS_L",
+      "symbol": "SKYAIUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.21963,
+      "avg_fill_price": 0.2203439,
+      "slippage_bps": 32.5,
+      "qty": 680.0,
+      "notional_usdt": 149.83388,
+      "leverage": 1,
+      "risk_usdt": 1.4945,
+      "risk_pct": 0.997,
+      "mirror_latency_sec": 11.0,
+      "sl_price": 0.21885997000000001,
+      "sl_paper_current": 0.21814607,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.0007139,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 4,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.0115,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "D",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.22185589,
+      "tp2_price": 0.22408179,
+      "phase": "A",
+      "entry_order_id": 1774893053,
+      "entry_client_id": "cresus_L1780752478_SKYAIUS_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.45,
+      "top_trader_position_ratio": 2.2248,
+      "top_trader_account_ratio": 1.5082,
+      "global_account_ratio": 1.592,
+      "phase_a_mfe_pct": 0.109,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.074917,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-06T13:28:44.035569+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 60854.0,
+      "btc_change_24h_at_open": 0.253,
+      "btc_pct_vs_ma25_at_open": -0.008,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.21987,
+      "current_price": 0.21999,
+      "unrealized_pnl_usdt": -0.2407,
+      "unrealized_pnl_pct": -0.161,
+      "last_price_check_at": "2026-06-06T13:29:13.826961+00:00"
     }
   ],
   "recent_closed": [
@@ -12100,13 +12164,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 60876.9,
-    "btc_ma25_1h": 60859.9,
-    "pct_vs_ma25": 0.028,
-    "change_24h_pct": 0.291,
+    "btc_price": 60870.5,
+    "btc_ma25_1h": 60859.65,
+    "pct_vs_ma25": 0.018,
+    "change_24h_pct": 0.28,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-06T13:27:15.918114+00:00"
+    "computed_at": "2026-06-06T13:29:14.767826+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
