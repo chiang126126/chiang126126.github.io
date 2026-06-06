@@ -1,48 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-06T07:38:26.618598+00:00",
+  "generated_at": "2026-06-06T07:40:22.403333+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 142,
-    "open": 1,
-    "closed": 141,
-    "wins": 53,
+    "open": 0,
+    "closed": 142,
+    "wins": 54,
     "losses": 86,
-    "win_rate": 0.381,
-    "total_pnl_usdt": -23.4622,
-    "net_pnl_usdt": -45.9145,
-    "avg_pnl_usdt": -0.1664,
+    "win_rate": 0.386,
+    "total_pnl_usdt": -6.1822,
+    "net_pnl_usdt": -28.7931,
+    "avg_pnl_usdt": -0.0435,
     "best_trade_usdt": 23.6376,
     "worst_trade_usdt": -11.8189,
-    "fees_paid_usdt": 22.5272,
-    "fees_realized_usdt": 22.4523,
-    "fees_open_usdt": 0.075,
+    "fees_paid_usdt": 22.6109,
+    "fees_realized_usdt": 22.6109,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 149.97,
-    "free_capital_usdt": 404.04,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 571.21,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 22.4843,
-    "deployed_usdt": 149.97
+    "daily_pnl": 39.7643,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "BANKUSDT"
-    ],
-    "exchange_symbols": [
-      "BANKUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "BANKUSDT|LONG|2026-06-06T07:16:02.166617+00:00",
       "trade_id": "L1780730162_BANKUSD_L",
@@ -89,7 +86,7 @@
       "phase_a_mfe_pct": 11.7,
       "phase_b_mfe_pct": 11.7,
       "phase_c_mfe_pct": 15.638,
-      "fees_paid_usdt": 0.074987,
+      "fees_paid_usdt": 0.158614,
       "fees_are_actual": true,
       "opened_at": "2026-06-06T07:17:10.515137+00:00",
       "is_dry_run": false,
@@ -100,15 +97,25 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.0295,
-      "current_price": 0.02932,
-      "unrealized_pnl_usdt": 16.6512,
-      "unrealized_pnl_pct": 11.103,
-      "last_price_check_at": "2026-06-06T07:38:25.226661+00:00",
+      "current_price": 0.02948,
+      "unrealized_pnl_usdt": 17.5605,
+      "unrealized_pnl_pct": 11.709,
+      "last_price_check_at": "2026-06-06T07:39:19.275197+00:00",
       "phase_b_mfe_price": 0.0295,
-      "phase_c_mfe_price": 0.03054
-    }
-  ],
-  "recent_closed": [
+      "phase_c_mfe_price": 0.03054,
+      "closed_at": "2026-06-06T07:39:32.449520+00:00",
+      "close_reason": "paper:hit_trail",
+      "avg_exit_price": 0.029430654583846562,
+      "realized_pnl_usdt": 17.28,
+      "close_order_id": 1092109839,
+      "close_qty": 5683.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 0.02948,
+      "close_slippage_bps": 16.74,
+      "entry_fees_usdt": 0.074987,
+      "close_fees_usdt": 0.083627
+    },
     {
       "paper_id": "FLNCUSDT|LONG|2026-06-06T07:07:11.967404+00:00",
       "trade_id": "L1780729631_FLNCUSD_L",
@@ -10615,14 +10622,14 @@
   ],
   "missed_signals": [],
   "btc_regime_now": {
-    "regime": "down",
-    "btc_price": 60906.7,
-    "btc_ma25_1h": 61229.63,
-    "pct_vs_ma25": -0.527,
-    "change_24h_pct": -3.439,
-    "sub_regime": "down_rebound",
-    "change_3h_pct": 1.396,
-    "computed_at": "2026-06-06T07:38:26.325692+00:00"
+    "regime": "chop",
+    "btc_price": 60971.2,
+    "btc_ma25_1h": 61232.21,
+    "pct_vs_ma25": -0.426,
+    "change_24h_pct": -3.336,
+    "sub_regime": null,
+    "change_3h_pct": null,
+    "computed_at": "2026-06-06T07:40:22.388255+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
