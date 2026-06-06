@@ -1,48 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-06T10:23:26.582708+00:00",
+  "generated_at": "2026-06-06T10:25:33.063746+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 151,
-    "open": 1,
-    "closed": 150,
+    "open": 0,
+    "closed": 151,
     "wins": 56,
-    "losses": 92,
-    "win_rate": 0.378,
-    "total_pnl_usdt": -13.7627,
-    "net_pnl_usdt": -37.5741,
-    "avg_pnl_usdt": -0.0918,
+    "losses": 93,
+    "win_rate": 0.376,
+    "total_pnl_usdt": -15.6256,
+    "net_pnl_usdt": -39.5879,
+    "avg_pnl_usdt": -0.1035,
     "best_trade_usdt": 23.6376,
     "worst_trade_usdt": -11.8189,
-    "fees_paid_usdt": 23.8864,
-    "fees_realized_usdt": 23.8114,
-    "fees_open_usdt": 0.075,
+    "fees_paid_usdt": 23.9623,
+    "fees_realized_usdt": 23.9623,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 149.98,
-    "free_capital_usdt": 412.37,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 560.41,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 32.1838,
-    "deployed_usdt": 149.98
+    "daily_pnl": 30.3209,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "ENAUSDT"
-    ],
-    "exchange_symbols": [
-      "ENAUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "ENAUSDT|SHORT|2026-06-06T10:02:12.861863+00:00",
       "trade_id": "L1780740132_ENAUSDT_S",
@@ -89,7 +86,7 @@
       "phase_a_mfe_pct": 0.0,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.074991,
+      "fees_paid_usdt": 0.150913,
       "fees_are_actual": true,
       "opened_at": "2026-06-06T10:03:56.894937+00:00",
       "is_dry_run": false,
@@ -103,10 +100,20 @@
       "current_price": 0.09134,
       "unrealized_pnl_usdt": -1.6434,
       "unrealized_pnl_pct": -1.096,
-      "last_price_check_at": "2026-06-06T10:23:25.055474+00:00"
-    }
-  ],
-  "recent_closed": [
+      "last_price_check_at": "2026-06-06T10:23:25.055474+00:00",
+      "closed_at": "2026-06-06T10:23:38.805513+00:00",
+      "close_reason": "paper:hit_sl",
+      "avg_exit_price": 0.09147222289156626,
+      "realized_pnl_usdt": -1.8629,
+      "close_order_id": 14982380597,
+      "close_qty": 1660.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 0.09134,
+      "close_slippage_bps": 14.48,
+      "entry_fees_usdt": 0.074991,
+      "close_fees_usdt": 0.075922
+    },
     {
       "paper_id": "NFPUSDT|SHORT|2026-06-06T10:02:45.694709+00:00",
       "trade_id": "L1780740165_NFPUSDT_S",
@@ -11288,19 +11295,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-06T10:21:18.865407+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.59% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-06-06T10:23:25.055474+00:00"
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.60% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-06T10:25:32.105441+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 60615.0,
-    "btc_ma25_1h": 61011.3,
-    "pct_vs_ma25": -0.65,
-    "change_24h_pct": -3.032,
+    "btc_price": 60607.1,
+    "btc_ma25_1h": 61010.99,
+    "pct_vs_ma25": -0.662,
+    "change_24h_pct": -3.044,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.591,
-    "computed_at": "2026-06-06T10:23:26.248929+00:00"
+    "change_3h_pct": -0.604,
+    "computed_at": "2026-06-06T10:25:33.048348+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
