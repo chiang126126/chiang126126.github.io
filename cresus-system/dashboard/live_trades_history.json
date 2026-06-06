@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-06T20:25:22.115991+00:00",
+  "generated_at": "2026-06-06T20:27:29.281802+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 180,
-    "open": 0,
+    "total_trades": 181,
+    "open": 1,
     "closed": 180,
     "wins": 64,
     "losses": 114,
@@ -15,30 +15,100 @@
     "avg_pnl_usdt": -0.1651,
     "best_trade_usdt": 23.6376,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 28.746,
+    "fees_paid_usdt": 28.8209,
     "fees_realized_usdt": 28.746,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.0749,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 541.54,
+    "deployed_usdt": 149.84,
+    "free_capital_usdt": 391.63,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 16.2298,
-    "deployed_usdt": 0
+    "deployed_usdt": 149.84
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "GWEIUSDT"
+    ],
+    "exchange_symbols": [
+      "GWEIUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "GWEIUSDT|LONG|2026-06-06T20:23:48.390674+00:00",
+      "trade_id": "L1780777428_GWEIUSD_L",
+      "symbol": "GWEIUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.13212,
+      "avg_fill_price": 0.1315515,
+      "slippage_bps": -43.03,
+      "qty": 1139.0,
+      "notional_usdt": 149.83719,
+      "leverage": 1,
+      "risk_usdt": 0.8718,
+      "risk_pct": 0.582,
+      "mirror_latency_sec": 119.5,
+      "sl_price": 0.13021757,
+      "sl_paper_current": 0.13078607,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -0.0005685,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.0203,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "B",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.13412089,
+      "tp2_price": 0.13612179,
+      "phase": "A",
+      "entry_order_id": 657134806,
+      "entry_client_id": "cresus_L1780777428_GWEIUSD_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.673,
+      "top_trader_position_ratio": 1.1476,
+      "top_trader_account_ratio": 1.2007,
+      "global_account_ratio": 1.3821,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.074919,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-06T20:26:17.411112+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 60597.4,
+      "btc_change_24h_at_open": -1.606,
+      "btc_pct_vs_ma25_at_open": -0.482,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.13212,
+      "current_price": 0.13149,
+      "unrealized_pnl_usdt": -0.07,
+      "unrealized_pnl_pct": -0.047,
+      "last_price_check_at": "2026-06-06T20:27:27.881487+00:00",
+      "phase_a_mae_price": 0.13145,
+      "phase_a_mae_pct": -0.077,
+      "phase_a_mae_at": "2026-06-06T20:26:45.664545+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "GENIUSUSDT|LONG|2026-06-06T19:13:28.249341+00:00",
@@ -13445,26 +13515,16 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [
-    {
-      "paper_id": "GWEIUSDT|LONG|2026-06-06T20:23:48.390674+00:00",
-      "symbol": "GWEIUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-06-06T20:24:17.867630+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=+0.04% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-06-06T20:25:20.398538+00:00"
-    }
-  ],
+  "missed_signals": [],
   "btc_regime_now": {
-    "regime": "down",
-    "btc_price": 60576.7,
-    "btc_ma25_1h": 60890.32,
-    "pct_vs_ma25": -0.515,
-    "change_24h_pct": -1.639,
-    "sub_regime": "down_stable",
-    "change_3h_pct": 0.039,
-    "computed_at": "2026-06-06T20:25:22.098023+00:00"
+    "regime": "chop",
+    "btc_price": 60592.6,
+    "btc_ma25_1h": 60890.96,
+    "pct_vs_ma25": -0.49,
+    "change_24h_pct": -1.613,
+    "sub_regime": null,
+    "change_3h_pct": null,
+    "computed_at": "2026-06-06T20:27:28.989487+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
