@@ -1,47 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-06T02:28:45.559225+00:00",
+  "generated_at": "2026-06-06T02:30:53.820941+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 126,
-    "open": 2,
-    "closed": 124,
+    "open": 1,
+    "closed": 125,
     "wins": 43,
-    "losses": 79,
-    "win_rate": 0.352,
-    "total_pnl_usdt": -50.6189,
-    "net_pnl_usdt": -70.4272,
+    "losses": 80,
+    "win_rate": 0.35,
+    "total_pnl_usdt": -51.0257,
+    "net_pnl_usdt": -70.9535,
     "avg_pnl_usdt": -0.4082,
     "best_trade_usdt": 23.6376,
     "worst_trade_usdt": -11.8189,
-    "fees_paid_usdt": 19.943,
-    "fees_realized_usdt": 19.8083,
-    "fees_open_usdt": 0.1347,
+    "fees_paid_usdt": 20.0028,
+    "fees_realized_usdt": 19.9278,
+    "fees_open_usdt": 0.075,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 299.24,
-    "free_capital_usdt": 230.2,
+    "deployed_usdt": 150.04,
+    "free_capital_usdt": 378.93,
     "max_concurrent_slots": 3,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -4.6724,
-    "deployed_usdt": 299.24
+    "daily_pnl": -5.0792,
+    "deployed_usdt": 150.04
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "4USDT",
-      "CRWVUSDT"
+      "4USDT"
     ],
     "exchange_symbols": [
-      "4USDT",
-      "CRWVUSDT"
+      "4USDT"
     ]
   },
   "open_trades": [
@@ -102,13 +100,15 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.736,
       "phase_a_mfe_price": 0.008327,
-      "current_price": 0.008108,
-      "unrealized_pnl_usdt": 8.2804,
-      "unrealized_pnl_pct": 5.519,
-      "last_price_check_at": "2026-06-06T02:28:44.028558+00:00",
+      "current_price": 0.0081,
+      "unrealized_pnl_usdt": 8.4203,
+      "unrealized_pnl_pct": 5.612,
+      "last_price_check_at": "2026-06-06T02:30:52.389098+00:00",
       "phase_b_mfe_price": 0.008322,
       "phase_c_mfe_price": 0.00806
-    },
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "CRWVUSDT|SHORT|2026-06-06T02:20:08.782852+00:00",
       "trade_id": "L1780712408_CRWVUSD_S",
@@ -155,7 +155,7 @@
       "phase_a_mfe_pct": 0.0,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.059679,
+      "fees_paid_usdt": 0.119521,
       "fees_are_actual": true,
       "opened_at": "2026-06-06T02:20:37.977205+00:00",
       "is_dry_run": false,
@@ -169,10 +169,20 @@
       "current_price": 95.92,
       "unrealized_pnl_usdt": -0.4368,
       "unrealized_pnl_pct": -0.293,
-      "last_price_check_at": "2026-06-06T02:28:44.028558+00:00"
-    }
-  ],
-  "recent_closed": [
+      "last_price_check_at": "2026-06-06T02:28:44.028558+00:00",
+      "closed_at": "2026-06-06T02:28:58.861370+00:00",
+      "close_reason": "paper:hit_sl",
+      "avg_exit_price": 95.90076923076923,
+      "realized_pnl_usdt": -0.4068,
+      "close_order_id": 42167892,
+      "close_qty": 1.56,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 95.92,
+      "close_slippage_bps": -2.0,
+      "entry_fees_usdt": 0.059679,
+      "close_fees_usdt": 0.059842
+    },
     {
       "paper_id": "ALLOUSDT|SHORT|2026-06-05T23:57:24.027313+00:00",
       "trade_id": "L1780703844_ALLOUSD_S",
@@ -9406,13 +9416,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 60830.5,
-    "btc_ma25_1h": 61616.39,
-    "pct_vs_ma25": -1.275,
-    "change_24h_pct": -2.804,
+    "btc_price": 60809.5,
+    "btc_ma25_1h": 61615.55,
+    "pct_vs_ma25": -1.308,
+    "change_24h_pct": -2.838,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.314,
-    "computed_at": "2026-06-06T02:28:44.982671+00:00"
+    "change_3h_pct": -0.348,
+    "computed_at": "2026-06-06T02:30:53.530446+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
