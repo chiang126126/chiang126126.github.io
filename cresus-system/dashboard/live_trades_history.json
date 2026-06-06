@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-06T06:16:50.225986+00:00",
+  "generated_at": "2026-06-06T06:18:54.212212+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 138,
-    "open": 2,
+    "total_trades": 139,
+    "open": 3,
     "closed": 136,
     "wins": 51,
     "losses": 83,
@@ -15,21 +15,21 @@
     "avg_pnl_usdt": -0.2479,
     "best_trade_usdt": 23.6376,
     "worst_trade_usdt": -11.8189,
-    "fees_paid_usdt": 21.8375,
+    "fees_paid_usdt": 21.9125,
     "fees_realized_usdt": 21.6879,
-    "fees_open_usdt": 0.1496,
+    "fees_open_usdt": 0.2246,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 299.24,
-    "free_capital_usdt": 245.21,
+    "deployed_usdt": 449.2,
+    "free_capital_usdt": 95.17,
     "max_concurrent_slots": 3,
-    "slots_used": 2
+    "slots_used": 3
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 12.2368,
-    "deployed_usdt": 299.24
+    "deployed_usdt": 449.2
   },
   "reconciliation": {
     "ok": true,
@@ -37,10 +37,12 @@
     "api_failed": false,
     "live_symbols": [
       "SKYAIUSDT",
+      "HEIUSDT",
       "ALLOUSDT"
     ],
     "exchange_symbols": [
       "SKYAIUSDT",
+      "HEIUSDT",
       "ALLOUSDT"
     ]
   },
@@ -60,8 +62,8 @@
       "risk_usdt": 0.96,
       "risk_pct": 0.641,
       "mirror_latency_sec": 29.5,
-      "sl_price": 0.20453062884999998,
-      "sl_paper_current": 0.20499402884999998,
+      "sl_price": 0.2053930729,
+      "sl_paper_current": 0.2058564729,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": -0.0004634,
       "sl_compensation_mode": "always",
@@ -89,7 +91,7 @@
       "top_trader_account_ratio": 1.4752,
       "global_account_ratio": 1.4851,
       "phase_a_mfe_pct": 1.802,
-      "phase_b_mfe_pct": 1.832,
+      "phase_b_mfe_pct": 2.26,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.074863,
       "fees_are_actual": true,
@@ -102,11 +104,11 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.20673,
-      "current_price": 0.20646,
-      "unrealized_pnl_usdt": 2.8477,
-      "unrealized_pnl_pct": 1.902,
-      "last_price_check_at": "2026-06-06T06:16:46.381440+00:00",
-      "phase_b_mfe_price": 0.20679
+      "current_price": 0.2065,
+      "unrealized_pnl_usdt": 2.8772,
+      "unrealized_pnl_pct": 1.922,
+      "last_price_check_at": "2026-06-06T06:18:52.418482+00:00",
+      "phase_b_mfe_price": 0.20766
     },
     {
       "paper_id": "ALLOUSDT|LONG|2026-06-06T06:00:36.080904+00:00",
@@ -165,10 +167,72 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.25201,
-      "current_price": 0.25035,
-      "unrealized_pnl_usdt": 2.1985,
-      "unrealized_pnl_pct": 1.47,
-      "last_price_check_at": "2026-06-06T06:16:46.381440+00:00"
+      "current_price": 0.24995,
+      "unrealized_pnl_usdt": 1.9561,
+      "unrealized_pnl_pct": 1.308,
+      "last_price_check_at": "2026-06-06T06:18:52.418482+00:00"
+    },
+    {
+      "paper_id": "HEIUSDT|LONG|2026-06-06T06:15:47.108302+00:00",
+      "trade_id": "L1780726547_HEIUSDT_L",
+      "symbol": "HEIUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.09926,
+      "avg_fill_price": 0.0974803,
+      "slippage_bps": -179.3,
+      "qty": 1538.4,
+      "notional_usdt": 149.963723,
+      "leverage": 1,
+      "risk_usdt": 2.0268,
+      "risk_pct": 1.351,
+      "mirror_latency_sec": 58.6,
+      "sl_price": 0.09438316000000001,
+      "sl_paper_current": 0.09616286,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -0.0017797,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 4,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "D",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.10390571,
+      "tp2_price": 0.10855143,
+      "phase": "A",
+      "entry_order_id": 971256792,
+      "entry_client_id": "cresus_L1780726547_HEIUSDT_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 1.56,
+      "top_trader_position_ratio": 2.1803,
+      "top_trader_account_ratio": 1.4462,
+      "global_account_ratio": 1.0816,
+      "phase_a_mfe_pct": 1.34,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.074982,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-06T06:17:21.174602+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 61041.8,
+      "btc_change_24h_at_open": -1.413,
+      "btc_pct_vs_ma25_at_open": -0.39,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.10059,
+      "current_price": 0.10266,
+      "unrealized_pnl_usdt": 7.9685,
+      "unrealized_pnl_pct": 5.314,
+      "last_price_check_at": "2026-06-06T06:18:52.418482+00:00"
     }
   ],
   "recent_closed": [
@@ -10303,26 +10367,16 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [
-    {
-      "paper_id": "HEIUSDT|LONG|2026-06-06T06:15:47.108302+00:00",
-      "symbol": "HEIUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-06-06T06:16:22.536248+00:00",
-      "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-06-06T06:16:46.381440+00:00"
-    }
-  ],
+  "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 61052.0,
-    "btc_ma25_1h": 61281.24,
-    "pct_vs_ma25": -0.374,
-    "change_24h_pct": -1.397,
+    "btc_price": 60984.3,
+    "btc_ma25_1h": 61278.54,
+    "pct_vs_ma25": -0.48,
+    "change_24h_pct": -1.506,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-06T06:16:47.321817+00:00"
+    "computed_at": "2026-06-06T06:18:53.368660+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
