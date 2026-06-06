@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-06T10:38:00.967565+00:00",
+  "generated_at": "2026-06-06T10:40:08.109828+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 151,
@@ -11290,24 +11290,51 @@
   ],
   "missed_signals": [
     {
+      "paper_id": "CLOUSDT|SHORT|2026-06-06T10:38:36.421321+00:00",
+      "symbol": "CLOUSDT",
+      "direction": "SHORT",
+      "conviction_score": 7,
+      "signal_at": "2026-06-06T10:39:27.865751+00:00",
+      "reason": "funding adverse (0.0592% ≥ 0.05%) (Phase 4.M: paper 历史人均 -$0.85, 不利 mirror)",
+      "last_checked_at": "2026-06-06T10:40:07.173415+00:00"
+    },
+    {
+      "paper_id": "HEIUSDT|LONG|2026-06-06T10:38:43.827788+00:00",
+      "symbol": "HEIUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-06T10:39:27.865751+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_acute 3h=-1.15% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-06T10:40:07.173415+00:00"
+    },
+    {
       "paper_id": "RAVEUSDT|SHORT|2026-06-06T10:31:51.858289+00:00",
       "symbol": "RAVEUSDT",
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-06-06T10:32:45.959781+00:00",
       "reason": "circuit_breaker (4+ SL in 30min, pause until 2026-06-06T10:53:46)",
-      "last_checked_at": "2026-06-06T10:37:59.450248+00:00"
+      "last_checked_at": "2026-06-06T10:40:07.173415+00:00"
+    },
+    {
+      "paper_id": "FFUSDT|SHORT|2026-06-06T10:39:08.035232+00:00",
+      "symbol": "FFUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-06-06T10:39:27.865751+00:00",
+      "reason": "circuit_breaker (4+ SL in 30min, pause until 2026-06-06T10:53:46)",
+      "last_checked_at": "2026-06-06T10:40:07.173415+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 60283.9,
-    "btc_ma25_1h": 60998.06,
-    "pct_vs_ma25": -1.171,
-    "change_24h_pct": -3.561,
+    "btc_price": 60275.4,
+    "btc_ma25_1h": 60997.72,
+    "pct_vs_ma25": -1.184,
+    "change_24h_pct": -3.575,
     "sub_regime": "down_acute",
-    "change_3h_pct": -1.134,
-    "computed_at": "2026-06-06T10:38:00.952780+00:00"
+    "change_3h_pct": -1.148,
+    "computed_at": "2026-06-06T10:40:08.101174+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
