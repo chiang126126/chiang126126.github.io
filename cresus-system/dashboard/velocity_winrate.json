@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-06T13:03:03.747208+00:00",
+  "generated_at": "2026-06-06T13:05:08.733792+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
@@ -6427,6 +6427,18 @@
         }
       }
     },
+    "BANKUSDT|sustained|LONG": {
+      "symbol": "BANKUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 1.32
+        }
+      }
+    },
     "SOONUSDT|sustained|SHORT": {
       "symbol": "SOONUSDT",
       "alert_type": "sustained",
@@ -8347,9 +8359,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 24,
-          "win_rate": 0.375,
-          "avg_outcome_pct": 0.31
+          "n": 25,
+          "win_rate": 0.36,
+          "avg_outcome_pct": 0.29
         },
         "60m": {
           "n": 24,
