@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-06T21:28:29.275406+00:00",
+  "generated_at": "2026-06-06T21:30:36.832960+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 182,
-    "open": 0,
+    "total_trades": 183,
+    "open": 1,
     "closed": 182,
     "wins": 65,
     "losses": 115,
@@ -15,30 +15,100 @@
     "avg_pnl_usdt": -0.1658,
     "best_trade_usdt": 23.6376,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 29.0455,
+    "fees_paid_usdt": 29.1204,
     "fees_realized_usdt": 29.0455,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.075,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 540.79,
+    "deployed_usdt": 149.94,
+    "free_capital_usdt": 390.77,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 15.7772,
-    "deployed_usdt": 0
+    "deployed_usdt": 149.94
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "HYPERUSDT"
+    ],
+    "exchange_symbols": [
+      "HYPERUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "HYPERUSDT|LONG|2026-06-06T21:29:29.179119+00:00",
+      "trade_id": "L1780781369_HYPERUS_L",
+      "symbol": "HYPERUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.06855,
+      "avg_fill_price": 0.06859,
+      "slippage_bps": 5.84,
+      "qty": 2186.0,
+      "notional_usdt": 149.93774,
+      "leverage": 1,
+      "risk_usdt": 0.9049,
+      "risk_pct": 0.603,
+      "mirror_latency_sec": 13.6,
+      "sl_price": 0.06821607,
+      "sl_paper_current": 0.06817607,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 4e-05,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": -0.0046,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "A",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.06911089,
+      "tp2_price": 0.06967179,
+      "phase": "A",
+      "entry_order_id": 1340854888,
+      "entry_client_id": "cresus_L1780781369_HYPERUS_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.364,
+      "top_trader_position_ratio": 1.3576,
+      "top_trader_account_ratio": 1.0747,
+      "global_account_ratio": 0.9346,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.074969,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-06T21:29:45.116169+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 60867.2,
+      "btc_change_24h_at_open": -1.253,
+      "btc_pct_vs_ma25_at_open": 0.003,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.06855,
+      "current_price": 0.06891,
+      "unrealized_pnl_usdt": 0.6995,
+      "unrealized_pnl_pct": 0.467,
+      "last_price_check_at": "2026-06-06T21:30:35.568649+00:00",
+      "phase_a_mae_price": 0.06853,
+      "phase_a_mae_pct": -0.087,
+      "phase_a_mae_at": "2026-06-06T21:29:52.820127+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "CCUSDT|LONG|2026-06-06T21:03:53.540499+00:00",
@@ -13610,16 +13680,26 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "ESPORTSUSDT|SHORT|2026-06-06T21:28:59.721043+00:00",
+      "symbol": "ESPORTSUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-06-06T21:29:31.526509+00:00",
+      "reason": "funding adverse (0.1252% ≥ 0.05%) (Phase 4.M: paper 历史人均 -$0.85, 不利 mirror)",
+      "last_checked_at": "2026-06-06T21:30:35.568649+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 60848.8,
-    "btc_ma25_1h": 60864.9,
-    "pct_vs_ma25": -0.026,
-    "change_24h_pct": -1.283,
+    "btc_price": 60894.0,
+    "btc_ma25_1h": 60866.71,
+    "pct_vs_ma25": 0.045,
+    "change_24h_pct": -1.209,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-06T21:28:29.257336+00:00"
+    "computed_at": "2026-06-06T21:30:36.532465+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
