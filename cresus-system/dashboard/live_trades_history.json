@@ -1,29 +1,29 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-07T00:09:18.522518+00:00",
+  "generated_at": "2026-06-07T00:11:28.357509+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 189,
-    "open": 1,
-    "closed": 188,
-    "wins": 68,
+    "open": 0,
+    "closed": 189,
+    "wins": 69,
     "losses": 118,
-    "win_rate": 0.366,
-    "total_pnl_usdt": -34.6562,
-    "net_pnl_usdt": -64.7474,
-    "avg_pnl_usdt": -0.1843,
-    "best_trade_usdt": 23.6376,
+    "win_rate": 0.369,
+    "total_pnl_usdt": -10.4205,
+    "net_pnl_usdt": -40.6733,
+    "avg_pnl_usdt": -0.0551,
+    "best_trade_usdt": 24.2357,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 30.1659,
-    "fees_realized_usdt": 30.0912,
-    "fees_open_usdt": 0.0748,
+    "fees_paid_usdt": 30.2528,
+    "fees_realized_usdt": 30.2528,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 149.56,
-    "free_capital_usdt": 385.61,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 559.33,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
@@ -42,7 +42,8 @@
       "BLESSUSDT"
     ]
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "BLESSUSDT|LONG|2026-06-06T23:06:56.615465+00:00",
       "trade_id": "L1780787216_BLESSUS_L",
@@ -89,7 +90,7 @@
       "phase_a_mfe_pct": 3.146,
       "phase_b_mfe_pct": 8.68,
       "phase_c_mfe_pct": 27.197,
-      "fees_paid_usdt": 0.074782,
+      "fees_paid_usdt": 0.161682,
       "fees_are_actual": true,
       "opened_at": "2026-06-06T23:09:01.472654+00:00",
       "is_dry_run": false,
@@ -100,18 +101,31 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.005704,
-      "current_price": 0.006963,
-      "unrealized_pnl_usdt": 38.2845,
-      "unrealized_pnl_pct": 25.598,
-      "last_price_check_at": "2026-06-07T00:09:17.234282+00:00",
+      "current_price": 0.006477,
+      "unrealized_pnl_usdt": 25.1732,
+      "unrealized_pnl_pct": 16.831,
+      "last_price_check_at": "2026-06-07T00:11:14.519127+00:00",
       "phase_a_mae_price": 0.00554,
       "phase_a_mae_pct": -0.07,
       "phase_a_mae_at": "2026-06-06T23:09:08.171465+00:00",
       "phase_b_mfe_price": 0.00601,
-      "phase_c_mfe_price": 0.007034
-    }
-  ],
-  "recent_closed": [
+      "phase_c_mfe_price": 0.007034,
+      "btc_regime_at_close": "chop",
+      "btc_price_at_close": 60779.6,
+      "btc_pct_vs_ma25_at_close": 0.005,
+      "closed_at": "2026-06-07T00:11:28.339766+00:00",
+      "close_reason": "paper:hit_trail",
+      "avg_exit_price": 0.006442251760693899,
+      "realized_pnl_usdt": 24.2357,
+      "close_order_id": 1391665373,
+      "close_qty": 26978.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 0.006477,
+      "close_slippage_bps": 53.65,
+      "entry_fees_usdt": 0.074782,
+      "close_fees_usdt": 0.0869
+    },
     {
       "paper_id": "GUAUSDT|LONG|2026-06-06T23:55:11.499359+00:00",
       "trade_id": "L1780790111_GUAUSDT_L",
@@ -14168,13 +14182,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 60826.1,
-    "btc_ma25_1h": 60778.55,
-    "pct_vs_ma25": 0.078,
-    "change_24h_pct": -0.673,
+    "btc_price": 60779.6,
+    "btc_ma25_1h": 60776.69,
+    "pct_vs_ma25": 0.005,
+    "change_24h_pct": -0.749,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-07T00:09:18.224240+00:00"
+    "computed_at": "2026-06-07T00:11:26.635890+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
