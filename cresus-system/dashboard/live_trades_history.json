@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-07T13:30:18.085550+00:00",
+  "generated_at": "2026-06-07T13:32:14.552762+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 230,
-    "open": 0,
+    "total_trades": 231,
+    "open": 1,
     "closed": 230,
     "wins": 86,
     "losses": 141,
@@ -15,30 +15,100 @@
     "avg_pnl_usdt": 0.0118,
     "best_trade_usdt": 24.2357,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 36.9052,
+    "fees_paid_usdt": 37.0052,
     "fees_realized_usdt": 36.9052,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.1,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 565.81,
+    "deployed_usdt": 199.99,
+    "free_capital_usdt": 365.72,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 35.4472,
-    "deployed_usdt": 0
+    "deployed_usdt": 199.99
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "DASHUSDT"
+    ],
+    "exchange_symbols": [
+      "DASHUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "DASHUSDT|LONG|2026-06-07T13:29:51.383111+00:00",
+      "trade_id": "L1780838991_DASHUSD_L",
+      "symbol": "DASHUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 38.21,
+      "avg_fill_price": 38.05,
+      "slippage_bps": -41.87,
+      "qty": 5.256,
+      "notional_usdt": 199.9908,
+      "leverage": 1,
+      "risk_usdt": 0.5669,
+      "risk_pct": 0.283,
+      "mirror_latency_sec": 6.8,
+      "sl_price": 37.78214285999999,
+      "sl_paper_current": 37.94214286,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -0.16,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": -0.0094,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "D",
+      "min_conviction_threshold": null,
+      "tp1_price": 38.61178571,
+      "tp2_price": 39.01357143,
+      "phase": "A",
+      "entry_order_id": 10317905809,
+      "entry_client_id": "cresus_L1780838991_DASHUSD_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 6,
+      "alert_type": "sustained",
+      "atr_pct": 0.467,
+      "top_trader_position_ratio": 3.1017,
+      "top_trader_account_ratio": 1.1164,
+      "global_account_ratio": 0.9331,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.099995,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-07T13:30:51.678425+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "up",
+      "btc_price_at_open": 61760.2,
+      "btc_change_24h_at_open": 1.614,
+      "btc_pct_vs_ma25_at_open": 0.601,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 38.21,
+      "current_price": 38.21,
+      "unrealized_pnl_usdt": 0.841,
+      "unrealized_pnl_pct": 0.42,
+      "last_price_check_at": "2026-06-07T13:32:13.271608+00:00",
+      "phase_a_mae_price": 38.03,
+      "phase_a_mae_pct": -0.053,
+      "phase_a_mae_at": "2026-06-07T13:30:48.510454+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "DASHUSDT|LONG|2026-06-07T11:45:51.914369+00:00",
@@ -17488,19 +17558,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-07T12:48:02.529616+00:00",
-      "reason": "paper trade too old (2535s > 600s)",
-      "last_checked_at": "2026-06-07T13:30:17.080562+00:00"
+      "reason": "paper trade too old (2651s > 600s)",
+      "last_checked_at": "2026-06-07T13:32:13.271608+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 61812.0,
-    "btc_ma25_1h": 61393.55,
-    "pct_vs_ma25": 0.682,
-    "change_24h_pct": 1.699,
+    "btc_price": 61849.0,
+    "btc_ma25_1h": 61395.03,
+    "pct_vs_ma25": 0.739,
+    "change_24h_pct": 1.76,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-07T13:30:18.065696+00:00"
+    "computed_at": "2026-06-07T13:32:14.235540+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
