@@ -1,29 +1,29 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-07T02:01:23.074523+00:00",
+  "generated_at": "2026-06-07T02:03:22.136586+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 198,
-    "open": 1,
-    "closed": 197,
+    "open": 0,
+    "closed": 198,
     "wins": 72,
-    "losses": 123,
-    "win_rate": 0.369,
-    "total_pnl_usdt": -15.1457,
-    "net_pnl_usdt": -46.7955,
-    "avg_pnl_usdt": -0.0769,
+    "losses": 124,
+    "win_rate": 0.367,
+    "total_pnl_usdt": -16.0167,
+    "net_pnl_usdt": -47.8658,
+    "avg_pnl_usdt": -0.0809,
     "best_trade_usdt": 24.2357,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 31.7497,
-    "fees_realized_usdt": 31.6498,
-    "fees_open_usdt": 0.0998,
+    "fees_paid_usdt": 31.8491,
+    "fees_realized_usdt": 31.8491,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 199.66,
-    "free_capital_usdt": 353.44,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 552.13,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
@@ -42,7 +42,8 @@
       "GIGGLEUSDT"
     ]
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "GIGGLEUSDT|LONG|2026-06-07T01:48:35.833708+00:00",
       "trade_id": "L1780796915_GIGGLEU_L",
@@ -66,7 +67,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 6,
       "wick_filter_mode": "always",
-      "sl_breach_count": 1,
+      "sl_breach_count": 6,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.005,
       "regime_gate_enabled": true,
@@ -89,7 +90,7 @@
       "phase_a_mfe_pct": 1.654,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.09983,
+      "fees_paid_usdt": 0.199224,
       "fees_are_actual": true,
       "opened_at": "2026-06-07T01:49:47.306236+00:00",
       "is_dry_run": false,
@@ -100,16 +101,29 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 30.12,
-      "current_price": 29.67,
-      "unrealized_pnl_usdt": -0.871,
-      "unrealized_pnl_pct": -0.436,
-      "last_price_check_at": "2026-06-07T02:01:21.833449+00:00",
+      "current_price": 29.7,
+      "unrealized_pnl_usdt": -0.67,
+      "unrealized_pnl_pct": -0.336,
+      "last_price_check_at": "2026-06-07T02:03:19.276450+00:00",
       "phase_a_mae_price": 29.57,
       "phase_a_mae_pct": -0.772,
-      "phase_a_mae_at": "2026-06-07T01:51:20.336225+00:00"
-    }
-  ],
-  "recent_closed": [
+      "phase_a_mae_at": "2026-06-07T01:51:20.336225+00:00",
+      "btc_regime_at_close": "up",
+      "btc_price_at_close": 61489.1,
+      "btc_pct_vs_ma25_at_close": 1.129,
+      "closed_at": "2026-06-07T02:03:22.119845+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 29.669999999999998,
+      "realized_pnl_usdt": -0.871,
+      "close_order_id": 2148646809,
+      "close_qty": 6.7,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 29.8,
+      "close_slippage_bps": 43.62,
+      "entry_fees_usdt": 0.09983,
+      "close_fees_usdt": 0.099394
+    },
     {
       "paper_id": "IOUSDT|LONG|2026-06-07T01:09:37.014784+00:00",
       "trade_id": "L1780794577_IOUSDT_L",
@@ -14894,13 +14908,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 61429.4,
-    "btc_ma25_1h": 60800.15,
-    "pct_vs_ma25": 1.035,
-    "change_24h_pct": 0.839,
+    "btc_price": 61489.1,
+    "btc_ma25_1h": 60802.54,
+    "pct_vs_ma25": 1.129,
+    "change_24h_pct": 0.937,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-07T02:01:22.781491+00:00"
+    "computed_at": "2026-06-07T02:03:20.229126+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
