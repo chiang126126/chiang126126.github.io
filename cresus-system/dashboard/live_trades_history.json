@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-07T16:43:51.000696+00:00",
+  "generated_at": "2026-06-07T16:45:56.696172+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 239,
-    "open": 0,
+    "total_trades": 240,
+    "open": 1,
     "closed": 239,
     "wins": 89,
     "losses": 146,
@@ -15,30 +15,100 @@
     "avg_pnl_usdt": -0.0035,
     "best_trade_usdt": 24.2357,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 38.5518,
+    "fees_paid_usdt": 38.6115,
     "fees_realized_usdt": 38.5518,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.0597,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 560.62,
+    "deployed_usdt": 149.14,
+    "free_capital_usdt": 411.43,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 31.9079,
-    "deployed_usdt": 0
+    "deployed_usdt": 149.14
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "SPCXUSDT"
+    ],
+    "exchange_symbols": [
+      "SPCXUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "SPCXUSDT|LONG|2026-06-07T16:43:16.361367+00:00",
+      "trade_id": "L1780850596_SPCXUSD_L",
+      "symbol": "SPCXUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 179.03,
+      "avg_fill_price": 179.6813253,
+      "slippage_bps": 36.38,
+      "qty": 0.83,
+      "notional_usdt": 149.1355,
+      "leverage": 1,
+      "risk_usdt": 1.2832,
+      "risk_pct": 0.86,
+      "mirror_latency_sec": 23.6,
+      "sl_price": 178.78668244,
+      "sl_paper_current": 178.13535714,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.6513253,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "D",
+      "min_conviction_threshold": null,
+      "tp1_price": 180.37196429,
+      "tp2_price": 181.71392857,
+      "phase": "A",
+      "entry_order_id": 60499411,
+      "entry_client_id": "cresus_L1780850596_SPCXUSD_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.333,
+      "top_trader_position_ratio": 2.238,
+      "top_trader_account_ratio": 4.1573,
+      "global_account_ratio": 4.6883,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.059654,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-07T16:44:35.420277+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "up",
+      "btc_price_at_open": 62142.7,
+      "btc_change_24h_at_open": 2.293,
+      "btc_pct_vs_ma25_at_open": 0.98,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 179.03,
+      "current_price": 179.32,
+      "unrealized_pnl_usdt": -0.2999,
+      "unrealized_pnl_pct": -0.201,
+      "last_price_check_at": "2026-06-07T16:45:55.309941+00:00",
+      "phase_a_mae_price": 179.32,
+      "phase_a_mae_pct": -0.201,
+      "phase_a_mae_at": "2026-06-07T16:45:55.309941+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "HUSDT|LONG|2026-06-07T16:25:40.561037+00:00",
@@ -18210,19 +18280,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-07T16:35:35.556789+00:00",
-      "reason": "pre_slippage_too_high (+564.7bps > 100bps intensity=1)",
-      "last_checked_at": "2026-06-07T16:43:49.664641+00:00"
+      "reason": "paper trade too old (620s > 600s)",
+      "last_checked_at": "2026-06-07T16:45:55.309941+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 62176.0,
-    "btc_ma25_1h": 61541.01,
-    "pct_vs_ma25": 1.032,
-    "change_24h_pct": 2.348,
+    "btc_price": 62144.3,
+    "btc_ma25_1h": 61539.74,
+    "pct_vs_ma25": 0.982,
+    "change_24h_pct": 2.295,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-07T16:43:50.704188+00:00"
+    "computed_at": "2026-06-07T16:45:56.399819+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
