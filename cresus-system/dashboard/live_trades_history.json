@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-08T15:37:23.882825+00:00",
+  "generated_at": "2026-06-08T15:39:29.274885+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 303,
-    "open": 0,
+    "total_trades": 304,
+    "open": 1,
     "closed": 303,
     "wins": 106,
     "losses": 193,
@@ -15,30 +15,100 @@
     "avg_pnl_usdt": 0.0767,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 48.4691,
+    "fees_paid_usdt": 48.5441,
     "fees_realized_usdt": 48.4691,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.075,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 574.76,
+    "deployed_usdt": 149.99,
+    "free_capital_usdt": 424.7,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 38.3955,
-    "deployed_usdt": 0
+    "deployed_usdt": 149.99
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "BERAUSDT"
+    ],
+    "exchange_symbols": [
+      "BERAUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "BERAUSDT|LONG|2026-06-08T15:28:55.856460+00:00",
+      "trade_id": "L1780932535_BERAUSD_L",
+      "symbol": "BERAUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.2745,
+      "avg_fill_price": 0.2743,
+      "slippage_bps": -7.29,
+      "qty": 546.8,
+      "notional_usdt": 149.98724,
+      "leverage": 1,
+      "risk_usdt": 2.9371,
+      "risk_pct": 1.958,
+      "mirror_latency_sec": 580.0,
+      "sl_price": 0.26872856999999994,
+      "sl_paper_current": 0.26892857,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -0.0002,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": -0.0053,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "B",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.28285714,
+      "tp2_price": 0.29121429,
+      "phase": "A",
+      "entry_order_id": 3607316151,
+      "entry_client_id": "cresus_L1780932535_BERAUSD_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 1.015,
+      "top_trader_position_ratio": 2.2029,
+      "top_trader_account_ratio": 0.9916,
+      "global_account_ratio": 0.7937,
+      "phase_a_mfe_pct": 0.437,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.074994,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-08T15:39:01.988031+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "up",
+      "btc_price_at_open": 63820.8,
+      "btc_change_24h_at_open": 2.818,
+      "btc_pct_vs_ma25_at_open": 1.473,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.2757,
+      "current_price": 0.2735,
+      "unrealized_pnl_usdt": -0.4374,
+      "unrealized_pnl_pct": -0.292,
+      "last_price_check_at": "2026-06-08T15:39:27.812597+00:00",
+      "phase_a_mae_price": 0.2735,
+      "phase_a_mae_pct": -0.292,
+      "phase_a_mae_at": "2026-06-08T15:39:27.812597+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "FLNCUSDT|LONG|2026-06-08T14:47:56.161081+00:00",
@@ -23354,26 +23424,16 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [
-    {
-      "paper_id": "BERAUSDT|LONG|2026-06-08T15:28:55.856460+00:00",
-      "symbol": "BERAUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-06-08T15:29:21.948162+00:00",
-      "reason": "circuit_breaker (4+ SL in 30min, pause until 2026-06-08T15:38:56)",
-      "last_checked_at": "2026-06-08T15:37:22.742881+00:00"
-    }
-  ],
+  "missed_signals": [],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 63821.9,
-    "btc_ma25_1h": 62894.56,
-    "pct_vs_ma25": 1.474,
-    "change_24h_pct": 2.82,
+    "btc_price": 63790.5,
+    "btc_ma25_1h": 62893.3,
+    "pct_vs_ma25": 1.427,
+    "change_24h_pct": 2.769,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-08T15:37:23.857297+00:00"
+    "computed_at": "2026-06-08T15:39:28.933097+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
