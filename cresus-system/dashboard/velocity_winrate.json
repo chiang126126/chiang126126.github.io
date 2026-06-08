@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-08T05:54:57.989869+00:00",
+  "generated_at": "2026-06-08T05:57:04.889876+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
@@ -1263,9 +1263,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 15,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -0.33
+          "n": 16,
+          "win_rate": 0.312,
+          "avg_outcome_pct": -0.32
         },
         "60m": {
           "n": 15,
@@ -19523,9 +19523,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 8,
-          "win_rate": 0.375,
-          "avg_outcome_pct": 0.1
+          "n": 9,
+          "win_rate": 0.444,
+          "avg_outcome_pct": 0.37
         },
         "60m": {
           "n": 8,
@@ -23584,6 +23584,18 @@
           "n": 7,
           "win_rate": 0.571,
           "avg_outcome_pct": 0.68
+        }
+      }
+    },
+    "TSMUSDT|burst|SHORT": {
+      "symbol": "TSMUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -0.09
         }
       }
     },
