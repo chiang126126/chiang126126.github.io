@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-08T07:43:09.966421+00:00",
+  "generated_at": "2026-06-08T07:45:16.423516+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 282,
-    "open": 0,
+    "total_trades": 283,
+    "open": 1,
     "closed": 282,
     "wins": 100,
     "losses": 178,
@@ -15,30 +15,100 @@
     "avg_pnl_usdt": -0.1193,
     "best_trade_usdt": 24.2357,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 45.3986,
+    "fees_paid_usdt": 45.4736,
     "fees_realized_usdt": 45.3986,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.0749,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 520.97,
+    "deployed_usdt": 149.88,
+    "free_capital_usdt": 371.02,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -18.4665,
-    "deployed_usdt": 0
+    "deployed_usdt": 149.88
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "HEIUSDT"
+    ],
+    "exchange_symbols": [
+      "HEIUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "HEIUSDT|LONG|2026-06-08T07:42:25.033825+00:00",
+      "trade_id": "L1780904545_HEIUSDT_L",
+      "symbol": "HEIUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.09587,
+      "avg_fill_price": 0.0964967,
+      "slippage_bps": 65.37,
+      "qty": 1553.2,
+      "notional_usdt": 149.878631,
+      "leverage": 1,
+      "risk_usdt": 3.4763,
+      "risk_pct": 2.319,
+      "mirror_latency_sec": 46.4,
+      "sl_price": 0.09488527000000001,
+      "sl_paper_current": 0.09425857,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.0006267,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": -0.0013,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "B",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.09828714,
+      "tp2_price": 0.10070429,
+      "phase": "A",
+      "entry_order_id": 1037538554,
+      "entry_client_id": "cresus_L1780904545_HEIUSDT_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "burst",
+      "atr_pct": 0.84,
+      "top_trader_position_ratio": 1.5823,
+      "top_trader_account_ratio": 1.3563,
+      "global_account_ratio": 1.0912,
+      "phase_a_mfe_pct": 0.031,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.074939,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-08T07:43:55.427421+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "up",
+      "btc_price_at_open": 63075.3,
+      "btc_change_24h_at_open": 1.137,
+      "btc_pct_vs_ma25_at_open": 0.968,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.0959,
+      "current_price": 0.09662,
+      "unrealized_pnl_usdt": 0.1915,
+      "unrealized_pnl_pct": 0.128,
+      "last_price_check_at": "2026-06-08T07:45:14.913780+00:00",
+      "phase_a_mae_price": 0.09638,
+      "phase_a_mae_pct": -0.121,
+      "phase_a_mae_at": "2026-06-08T07:44:02.132705+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "PUMPUSDT|LONG|2026-06-08T07:29:13.060092+00:00",
@@ -21668,19 +21738,19 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-08T07:36:40.398655+00:00",
-      "reason": "pre_slippage_too_high (+373.1bps > 100bps intensity=1)",
-      "last_checked_at": "2026-06-08T07:43:08.696829+00:00"
+      "reason": "pre_slippage_too_high (+456.0bps > 100bps intensity=1)",
+      "last_checked_at": "2026-06-08T07:45:14.913780+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 63089.2,
-    "btc_ma25_1h": 62471.2,
-    "pct_vs_ma25": 0.989,
-    "change_24h_pct": 1.16,
+    "btc_price": 63075.5,
+    "btc_ma25_1h": 62470.65,
+    "pct_vs_ma25": 0.968,
+    "change_24h_pct": 1.138,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-08T07:43:09.660402+00:00"
+    "computed_at": "2026-06-08T07:45:15.854666+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
