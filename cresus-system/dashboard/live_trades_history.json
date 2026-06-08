@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-08T09:09:16.083733+00:00",
+  "generated_at": "2026-06-08T09:11:18.058487+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 289,
@@ -26,20 +26,24 @@
     "slots_used": 2
   },
   "risk_status": {
-    "block_new_opens": false,
-    "reasons": [],
+    "block_new_opens": true,
+    "reasons": [
+      "deployed $450.02 >= cap $450.00 (150% 现金保留触发)"
+    ],
     "daily_pnl": -15.3658,
-    "deployed_usdt": 299.99
+    "deployed_usdt": 450.02
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "MOVEUSDT"
+      "MOVEUSDT",
+      "CUSDT"
     ],
     "exchange_symbols": [
-      "MOVEUSDT"
+      "MOVEUSDT",
+      "CUSDT"
     ]
   },
   "open_trades": [
@@ -86,7 +90,7 @@
       "top_trader_position_ratio": 1.1324,
       "top_trader_account_ratio": 1.6817,
       "global_account_ratio": 1.331,
-      "phase_a_mfe_pct": 1.075,
+      "phase_a_mfe_pct": 1.536,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.149995,
@@ -99,14 +103,14 @@
       "btc_pct_vs_ma25_at_open": 1.02,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 0.01316,
-      "current_price": 0.01312,
-      "unrealized_pnl_usdt": 0.458,
-      "unrealized_pnl_pct": 0.153,
-      "last_price_check_at": "2026-06-08T09:09:10.752179+00:00",
-      "phase_a_mae_price": 0.01309,
-      "phase_a_mae_pct": -0.076,
-      "phase_a_mae_at": "2026-06-08T09:02:59.413188+00:00"
+      "phase_a_mfe_price": 0.01322,
+      "current_price": 0.01319,
+      "unrealized_pnl_usdt": 2.061,
+      "unrealized_pnl_pct": 0.687,
+      "last_price_check_at": "2026-06-08T09:11:16.145034+00:00",
+      "phase_a_mae_price": 0.01308,
+      "phase_a_mae_pct": -0.153,
+      "phase_a_mae_at": "2026-06-08T09:09:43.219871+00:00"
     },
     {
       "paper_id": "CUSDT|SHORT|2026-06-08T09:08:49.072060+00:00",
@@ -165,13 +169,13 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.09579,
-      "current_price": 0.09605,
-      "unrealized_pnl_usdt": -0.0042,
-      "unrealized_pnl_pct": -0.003,
-      "last_price_check_at": "2026-06-08T09:09:10.752179+00:00",
-      "phase_a_mae_price": 0.09605,
-      "phase_a_mae_pct": -0.003,
-      "phase_a_mae_at": "2026-06-08T09:09:10.752179+00:00"
+      "current_price": 0.09607,
+      "unrealized_pnl_usdt": -0.0355,
+      "unrealized_pnl_pct": -0.024,
+      "last_price_check_at": "2026-06-08T09:11:16.145034+00:00",
+      "phase_a_mae_price": 0.09609,
+      "phase_a_mae_pct": -0.044,
+      "phase_a_mae_at": "2026-06-08T09:09:21.470247+00:00"
     }
   ],
   "recent_closed": [
@@ -22208,19 +22212,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-08T09:09:01.154050+00:00",
-      "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-06-08T09:09:10.752179+00:00"
+      "reason": "risk_gate: deployed $450.02 >= cap $450.00 (150% 现金保留触发)",
+      "last_checked_at": "2026-06-08T09:11:16.145034+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 63197.1,
-    "btc_ma25_1h": 62522.38,
-    "pct_vs_ma25": 1.079,
-    "change_24h_pct": 1.099,
+    "btc_price": 63227.1,
+    "btc_ma25_1h": 62523.58,
+    "pct_vs_ma25": 1.125,
+    "change_24h_pct": 1.147,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-08T09:09:11.694547+00:00"
+    "computed_at": "2026-06-08T09:11:17.486464+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
