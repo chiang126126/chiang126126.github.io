@@ -477,6 +477,34 @@ LIVE_REGIME_GATE_SUB_REGIME_ALLOW: set = set()  # 默认空 — 与 Phase 4.J �
 # 预期: $7-17/天止损改善. 风险: SL 移近时 wick 触发率上升 (由 wick filter 防御).
 LIVE_SL_COMPENSATION_MODE = "always"  # "off" | "ab" (legacy) | "abc" | "abcd" | "always"
 
+# ============================================================================
+# Phase 6.F (2026-06-08) — 数据驱动黑名单 (105h 实盘 280 笔统计后)
+# ============================================================================
+# 数据 (06-04 → 06-08 09:00 UTC, 105h, paper_id 1:1 配对验证):
+#
+# B1 — conviction_score == 6: 57 笔, WR 28.1%, live -$80.07, paper +$22.11
+#      解读: 高 conviction 在 RISK_OFF + chop 期间反向 (1h/4h 趋势对齐变成追末段).
+#      paper 也仅 +$22 (小幅正), live 因执行 drag -$80 — 信号差 + 执行差双重.
+#      shadow 化保留数据观察, 不浪费真钱.
+#
+# B3 — Tier C (entry $0.1-1) + LONG + BTC regime chop: 22 笔, WR 18.2%,
+#      live -$17.81, paper +$44.98 (!).
+#      解读: 100% 执行 gap. paper 通过 trail 拿 $45, live 因 SL median 距离仅 0.10%
+#      被 tick noise wick + 滑点反而亏 $18. 不交易就净赚 $18.
+#
+# 注: B2 (conv>=7, n=10) 跟 B4 (Tier A LONG, n=19) 是边缘黑名单, 样本不够稳, 此版
+# 不实现. 等 30+ samples 再决.
+#
+# 预期 (基于 105h 数据 + paper 同子集验证):
+# - 实盘 -$3.93/天 → +$16/天, +$20/天改善 (B1 单独 +$80 / 105h, B3 单独 +$18)
+# - 总 79 笔 (28% volume) 被 shadow 化, 不动其它 201 笔
+# - 不动 W1 (Tier D + SHORT + conv5) 加注 — 等保守版 base 数据 48h 再升级
+# 保留所有 paper / shadow 数据流, 被 block 信号在 missed_signals 留档供未来 retro.
+LIVE_PHASE_6F_BLACKLIST_ENABLED = True   # 总开关 — 紧急回滚改 False, 不删代码
+LIVE_PHASE_6F_TIER_C_LOWER = 0.1         # Tier C 价格下界 (含)
+LIVE_PHASE_6F_TIER_C_UPPER = 1.0         # Tier C 价格上界 (不含)
+LIVE_PHASE_6F_BLOCK_CONV = 6             # B1: 这个 conv score 整体 block (= 6, 不是 >=6)
+
 # Phase 3.3.a/b 控制文件 (在 ~/.cresus-*)
 PAUSE_FLAG_PATH = Path.home() / ".cresus-pause"
 EMERGENCY_STOP_PATH = Path.home() / ".cresus-emergency-stop"
@@ -997,6 +1025,37 @@ def is_eligible_for_mirror(
     direction = paper_trade.get("direction", "").upper()
     if direction not in ("LONG", "SHORT"):
         return False, f"invalid direction {direction!r}"
+    # 6.F. Phase 6.F BLACKLIST — 数据驱动 (105h 280 笔统计):
+    #   B1: conv=6 (n=57 -$80, paper 也仅 +$22 → 信号差 + 执行差).
+    #   B3: Tier C ($0.1-1) + LONG + BTC chop (n=22 -$18 vs paper +$45 → 纯执行 gap).
+    # 总开关 LIVE_PHASE_6F_BLACKLIST_ENABLED, 紧急回滚改 False.
+    if LIVE_PHASE_6F_BLACKLIST_ENABLED:
+        # B1: 整桶 conv=6 不做 live (但 paper / shadow 继续跑收数据).
+        raw_conv = paper_trade.get("conviction_score")
+        try:
+            conv_val = int(raw_conv) if raw_conv is not None else None
+        except (ValueError, TypeError):
+            conv_val = None
+        if conv_val == LIVE_PHASE_6F_BLOCK_CONV:
+            return False, (
+                f"phase_6f_b1: conviction={conv_val} 历史 n=57 WR 28% -$80 "
+                f"(paper +$22 → 信号差+执行差双重, shadow 化)"
+            )
+        # B3: Tier C + LONG + BTC chop. btc_regime 为 None 时跳过 (fail-safe = 不 block).
+        try:
+            entry_price = float(paper_trade.get("entry_price") or 0)
+        except (ValueError, TypeError):
+            entry_price = 0.0
+        if (
+            btc_regime == "chop"
+            and direction == "LONG"
+            and entry_price > 0
+            and LIVE_PHASE_6F_TIER_C_LOWER <= entry_price < LIVE_PHASE_6F_TIER_C_UPPER
+        ):
+            return False, (
+                f"phase_6f_b3: Tier C (entry=${entry_price:.4f}) + LONG + BTC chop "
+                f"历史 n=22 WR 18% live -$18 vs paper +$45 (100% 执行 gap)"
+            )
     # 7. Phase 4.F regime gate (Phase 4.J 后默认 always — 全部组适用)
     #    Phase 5.R: 传入 sub_regime, 命中 LIVE_REGIME_GATE_SUB_REGIME_ALLOW 则豁免
     # 只在 btc_regime 提供时才检查; 测试 / 旧调用不带此参数时跳过 (向后兼容)
