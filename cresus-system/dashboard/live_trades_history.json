@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-09T17:48:28.505890+00:00",
+  "generated_at": "2026-06-09T17:50:34.452067+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 347,
@@ -41,9 +41,9 @@
       "BANKUSDT"
     ],
     "exchange_symbols": [
-      "DEXEUSDT",
       "HAEDALUSDT",
-      "BANKUSDT"
+      "BANKUSDT",
+      "DEXEUSDT"
     ]
   },
   "open_trades": [
@@ -104,10 +104,10 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": 0.37,
       "phase_a_mfe_price": 0.03874,
-      "current_price": 0.03873,
-      "unrealized_pnl_usdt": 0.232,
-      "unrealized_pnl_pct": 0.155,
-      "last_price_check_at": "2026-06-09T17:48:26.229646+00:00",
+      "current_price": 0.03864,
+      "unrealized_pnl_usdt": 0.58,
+      "unrealized_pnl_pct": 0.387,
+      "last_price_check_at": "2026-06-09T17:50:32.619383+00:00",
       "phase_a_mae_price": 0.03913,
       "phase_a_mae_pct": -0.877,
       "phase_a_mae_at": "2026-06-09T17:40:35.359750+00:00"
@@ -157,7 +157,7 @@
       "global_account_ratio": 0.7253,
       "phase_a_mfe_pct": 2.172,
       "phase_b_mfe_pct": 2.772,
-      "phase_c_mfe_pct": 2.772,
+      "phase_c_mfe_pct": 4.175,
       "fees_paid_usdt": 0.074937,
       "fees_are_actual": true,
       "opened_at": "2026-06-09T17:40:28.329293+00:00",
@@ -169,15 +169,15 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": 0.379,
       "phase_a_mfe_price": 19.729,
-      "current_price": 19.208,
-      "unrealized_pnl_usdt": 8.1198,
-      "unrealized_pnl_pct": 5.418,
-      "last_price_check_at": "2026-06-09T17:48:26.229646+00:00",
+      "current_price": 19.544,
+      "unrealized_pnl_usdt": 5.6402,
+      "unrealized_pnl_pct": 3.763,
+      "last_price_check_at": "2026-06-09T17:50:32.619383+00:00",
       "phase_a_mae_price": 20.346,
       "phase_a_mae_pct": -0.186,
       "phase_a_mae_at": "2026-06-09T17:40:46.056136+00:00",
       "phase_b_mfe_price": 19.608,
-      "phase_c_mfe_price": 19.608
+      "phase_c_mfe_price": 19.325
     },
     {
       "paper_id": "HAEDALUSDT|SHORT|2026-06-09T17:46:26.534817+00:00",
@@ -211,7 +211,7 @@
       "min_conviction_threshold": null,
       "tp1_price": 0.0179525,
       "tp2_price": 0.017795,
-      "phase": "A",
+      "phase": "B",
       "entry_order_id": 1422428568,
       "entry_client_id": "cresus_L1781027186_HAEDALU_S_E",
       "sl_order_id": null,
@@ -222,8 +222,8 @@
       "top_trader_position_ratio": 0.9495,
       "top_trader_account_ratio": 1.8969,
       "global_account_ratio": 1.9044,
-      "phase_a_mfe_pct": 0.828,
-      "phase_b_mfe_pct": null,
+      "phase_a_mfe_pct": 0.883,
+      "phase_b_mfe_pct": 0.883,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.074997,
       "fees_are_actual": true,
@@ -235,14 +235,18 @@
       "btc_pct_vs_ma25_at_open": -1.826,
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": 0.181,
-      "phase_a_mfe_price": 0.01796,
-      "current_price": 0.01796,
-      "unrealized_pnl_usdt": 0.3333,
-      "unrealized_pnl_pct": 0.222,
-      "last_price_check_at": "2026-06-09T17:48:26.229646+00:00",
+      "phase_a_mfe_price": 0.01795,
+      "current_price": 0.01783,
+      "unrealized_pnl_usdt": 1.4166,
+      "unrealized_pnl_pct": 0.944,
+      "last_price_check_at": "2026-06-09T17:50:32.619383+00:00",
       "phase_a_mae_price": 0.01801,
       "phase_a_mae_pct": -0.056,
-      "phase_a_mae_at": "2026-06-09T17:47:13.259956+00:00"
+      "phase_a_mae_at": "2026-06-09T17:47:13.259956+00:00",
+      "phase_b_mfe_price": 0.01795,
+      "phase_b_mae_price": 0.01801,
+      "phase_b_mae_pct": -0.056,
+      "phase_b_mae_at": "2026-06-09T17:49:08.665399+00:00"
     }
   ],
   "recent_closed": [
@@ -26875,35 +26879,16 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [
-    {
-      "paper_id": "ZECUSDT|LONG|2026-06-09T17:18:43.089978+00:00",
-      "symbol": "ZECUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-06-09T17:20:01.500277+00:00",
-      "reason": "max_concurrent reached (3/3)",
-      "last_checked_at": "2026-06-09T17:48:26.229646+00:00"
-    },
-    {
-      "paper_id": "STABLEUSDT|LONG|2026-06-09T17:26:38.761646+00:00",
-      "symbol": "STABLEUSDT",
-      "direction": "LONG",
-      "conviction_score": 6,
-      "signal_at": "2026-06-09T17:26:55.851888+00:00",
-      "reason": "symbol STABLEUSDT in live blacklist (历史 0 胜)",
-      "last_checked_at": "2026-06-09T17:48:26.229646+00:00"
-    }
-  ],
+  "missed_signals": [],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 61597.8,
-    "btc_ma25_1h": 62768.08,
-    "pct_vs_ma25": -1.864,
-    "change_24h_pct": -3.025,
+    "btc_price": 61664.8,
+    "btc_ma25_1h": 62770.76,
+    "pct_vs_ma25": -1.762,
+    "change_24h_pct": -2.919,
     "sub_regime": "down_stable",
-    "change_3h_pct": 0.14,
-    "computed_at": "2026-06-09T17:48:27.537176+00:00"
+    "change_3h_pct": 0.249,
+    "computed_at": "2026-06-09T17:50:33.563797+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
