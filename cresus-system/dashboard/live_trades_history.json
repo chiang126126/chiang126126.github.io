@@ -1,47 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-09T17:56:49.099715+00:00",
+  "generated_at": "2026-06-09T17:58:43.596394+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 347,
-    "open": 2,
-    "closed": 345,
-    "wins": 125,
+    "open": 1,
+    "closed": 346,
+    "wins": 126,
     "losses": 215,
-    "win_rate": 0.368,
-    "total_pnl_usdt": 20.6899,
-    "net_pnl_usdt": -33.9263,
-    "avg_pnl_usdt": 0.06,
+    "win_rate": 0.37,
+    "total_pnl_usdt": 26.0152,
+    "net_pnl_usdt": -28.7482,
+    "avg_pnl_usdt": 0.0752,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 54.7661,
-    "fees_realized_usdt": 54.6162,
-    "fees_open_usdt": 0.1499,
+    "fees_paid_usdt": 54.8384,
+    "fees_realized_usdt": 54.7634,
+    "fees_open_usdt": 0.075,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 299.88,
-    "free_capital_usdt": 266.05,
+    "deployed_usdt": 150.0,
+    "free_capital_usdt": 421.18,
     "max_concurrent_slots": 3,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 14.4128,
-    "deployed_usdt": 299.88
+    "daily_pnl": 19.7381,
+    "deployed_usdt": 150.0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "DEXEUSDT",
       "BANKUSDT"
     ],
     "exchange_symbols": [
-      "BANKUSDT",
-      "DEXEUSDT"
+      "BANKUSDT"
     ]
   },
   "open_trades": [
@@ -60,8 +58,8 @@
       "risk_usdt": 1.3921,
       "risk_pct": 0.928,
       "mirror_latency_sec": 60.5,
-      "sl_price": 0.03879,
-      "sl_paper_current": 0.03886,
+      "sl_price": 0.038404064700000004,
+      "sl_paper_current": 0.038474064700000005,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": -7e-05,
       "sl_compensation_mode": "always",
@@ -102,15 +100,17 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": 0.37,
       "phase_a_mfe_price": 0.03826,
-      "current_price": 0.03827,
-      "unrealized_pnl_usdt": 2.0108,
-      "unrealized_pnl_pct": 1.341,
-      "last_price_check_at": "2026-06-09T17:56:47.329801+00:00",
+      "current_price": 0.03829,
+      "unrealized_pnl_usdt": 1.9335,
+      "unrealized_pnl_pct": 1.289,
+      "last_price_check_at": "2026-06-09T17:58:41.744493+00:00",
       "phase_a_mae_price": 0.03913,
       "phase_a_mae_pct": -0.877,
       "phase_a_mae_at": "2026-06-09T17:40:35.359750+00:00",
       "phase_b_mfe_price": 0.03826
-    },
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "DEXEUSDT|SHORT|2026-06-09T17:39:30.840006+00:00",
       "trade_id": "L1781026770_DEXEUSD_S",
@@ -157,7 +157,7 @@
       "phase_a_mfe_pct": 2.172,
       "phase_b_mfe_pct": 2.772,
       "phase_c_mfe_pct": 5.112,
-      "fees_paid_usdt": 0.074937,
+      "fees_paid_usdt": 0.147212,
       "fees_are_actual": true,
       "opened_at": "2026-06-09T17:40:28.329293+00:00",
       "is_dry_run": false,
@@ -168,18 +168,32 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": 0.379,
       "phase_a_mfe_price": 19.729,
-      "current_price": 19.464,
-      "unrealized_pnl_usdt": 6.2306,
-      "unrealized_pnl_pct": 4.157,
-      "last_price_check_at": "2026-06-09T17:56:47.329801+00:00",
+      "current_price": 19.604,
+      "unrealized_pnl_usdt": 5.1974,
+      "unrealized_pnl_pct": 3.468,
+      "last_price_check_at": "2026-06-09T17:57:28.430671+00:00",
       "phase_a_mae_price": 20.346,
       "phase_a_mae_pct": -0.186,
       "phase_a_mae_at": "2026-06-09T17:40:46.056136+00:00",
       "phase_b_mfe_price": 19.608,
-      "phase_c_mfe_price": 19.136
-    }
-  ],
-  "recent_closed": [
+      "phase_c_mfe_price": 19.136,
+      "btc_regime_at_close": "down",
+      "btc_sub_regime_at_close": "down_stable",
+      "btc_price_at_close": 61697.6,
+      "btc_pct_vs_ma25_at_close": -1.712,
+      "closed_at": "2026-06-09T17:57:41.820019+00:00",
+      "close_reason": "paper:hit_trail",
+      "avg_exit_price": 19.58666124661247,
+      "realized_pnl_usdt": 5.3253,
+      "close_order_id": 1556996138,
+      "close_qty": 7.38,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 19.604,
+      "close_slippage_bps": -8.84,
+      "entry_fees_usdt": 0.074937,
+      "close_fees_usdt": 0.072275
+    },
     {
       "paper_id": "HAEDALUSDT|SHORT|2026-06-09T17:46:26.534817+00:00",
       "trade_id": "L1781027186_HAEDALU_S",
@@ -26897,13 +26911,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 61692.9,
-    "btc_ma25_1h": 62771.88,
-    "pct_vs_ma25": -1.719,
-    "change_24h_pct": -2.875,
+    "btc_price": 61707.4,
+    "btc_ma25_1h": 62772.46,
+    "pct_vs_ma25": -1.697,
+    "change_24h_pct": -2.852,
     "sub_regime": "down_stable",
-    "change_3h_pct": 0.295,
-    "computed_at": "2026-06-09T17:56:48.497721+00:00"
+    "change_3h_pct": 0.318,
+    "computed_at": "2026-06-09T17:58:43.282673+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
