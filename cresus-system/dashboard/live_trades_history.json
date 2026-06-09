@@ -1,29 +1,29 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-09T07:49:02.472688+00:00",
+  "generated_at": "2026-06-09T07:51:08.898779+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 330,
-    "open": 2,
-    "closed": 328,
-    "wins": 117,
+    "open": 1,
+    "closed": 329,
+    "wins": 118,
     "losses": 206,
-    "win_rate": 0.362,
-    "total_pnl_usdt": 10.1283,
-    "net_pnl_usdt": -42.201,
-    "avg_pnl_usdt": 0.0309,
+    "win_rate": 0.364,
+    "total_pnl_usdt": 11.384,
+    "net_pnl_usdt": -41.0957,
+    "avg_pnl_usdt": 0.0346,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 52.4792,
-    "fees_realized_usdt": 52.3293,
-    "fees_open_usdt": 0.1498,
+    "fees_paid_usdt": 52.5547,
+    "fees_realized_usdt": 52.4797,
+    "fees_open_usdt": 0.0749,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 299.66,
-    "free_capital_usdt": 257.99,
+    "deployed_usdt": 149.9,
+    "free_capital_usdt": 408.93,
     "max_concurrent_slots": 3,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
@@ -36,12 +36,12 @@
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "MEMEUSDT",
-      "HEIUSDT"
+      "HEIUSDT",
+      "MEMEUSDT"
     ],
     "exchange_symbols": [
-      "MEMEUSDT",
-      "HEIUSDT"
+      "HEIUSDT",
+      "MEMEUSDT"
     ]
   },
   "open_trades": [
@@ -102,14 +102,16 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.09252,
-      "current_price": 0.09198,
-      "unrealized_pnl_usdt": -1.3866,
-      "unrealized_pnl_pct": -0.925,
-      "last_price_check_at": "2026-06-09T07:49:00.965137+00:00",
+      "current_price": 0.09153,
+      "unrealized_pnl_usdt": -2.1132,
+      "unrealized_pnl_pct": -1.41,
+      "last_price_check_at": "2026-06-09T07:51:05.923108+00:00",
       "phase_a_mae_price": 0.09072,
       "phase_a_mae_pct": -2.282,
       "phase_a_mae_at": "2026-06-09T07:39:01.278132+00:00"
-    },
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "MEMEUSDT|LONG|2026-06-09T07:37:50.697226+00:00",
       "trade_id": "L1780990670_MEMEUSD_L",
@@ -133,7 +135,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 6,
       "wick_filter_mode": "always",
-      "sl_breach_count": 0,
+      "sl_breach_count": 3,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.005,
       "regime_gate_enabled": true,
@@ -156,7 +158,7 @@
       "phase_a_mfe_pct": 1.157,
       "phase_b_mfe_pct": 1.876,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.074882,
+      "fees_paid_usdt": 0.150392,
       "fees_are_actual": true,
       "opened_at": "2026-06-09T07:38:23.305905+00:00",
       "is_dry_run": false,
@@ -167,17 +169,30 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.0005771,
-      "current_price": 0.0005799,
-      "unrealized_pnl_usdt": 2.0419,
-      "unrealized_pnl_pct": 1.363,
-      "last_price_check_at": "2026-06-09T07:49:00.965137+00:00",
+      "current_price": 0.0005768,
+      "unrealized_pnl_usdt": 1.2304,
+      "unrealized_pnl_pct": 0.822,
+      "last_price_check_at": "2026-06-09T07:50:55.585960+00:00",
       "phase_a_mae_price": 0.0005712,
       "phase_a_mae_pct": -0.157,
       "phase_a_mae_at": "2026-06-09T07:42:11.053018+00:00",
-      "phase_b_mfe_price": 0.0005812
-    }
-  ],
-  "recent_closed": [
+      "phase_b_mfe_price": 0.0005812,
+      "btc_regime_at_close": "chop",
+      "btc_price_at_close": 63166.2,
+      "btc_pct_vs_ma25_at_close": -0.242,
+      "closed_at": "2026-06-09T07:51:08.873192+00:00",
+      "close_reason": "paper:hit_b_trail",
+      "avg_exit_price": 0.0005768969485827794,
+      "realized_pnl_usdt": 1.2557,
+      "close_order_id": 7341525875,
+      "close_qty": 261780.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 0.0005768,
+      "close_slippage_bps": -1.68,
+      "entry_fees_usdt": 0.074882,
+      "close_fees_usdt": 0.07551
+    },
     {
       "paper_id": "ZECUSDT|LONG|2026-06-09T07:02:08.924730+00:00",
       "trade_id": "L1780988528_ZECUSDT_L",
@@ -25511,13 +25526,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 63156.5,
-    "btc_ma25_1h": 63319.14,
-    "pct_vs_ma25": -0.257,
-    "change_24h_pct": -0.163,
+    "btc_price": 63166.2,
+    "btc_ma25_1h": 63319.53,
+    "pct_vs_ma25": -0.242,
+    "change_24h_pct": -0.148,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-09T07:49:01.901334+00:00"
+    "computed_at": "2026-06-09T07:51:07.044862+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
