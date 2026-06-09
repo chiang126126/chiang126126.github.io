@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-09T15:23:17.494201+00:00",
+  "generated_at": "2026-06-09T15:25:23.323210+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 339,
@@ -88,7 +88,7 @@
       "global_account_ratio": 1.0551,
       "phase_a_mfe_pct": 4.539,
       "phase_b_mfe_pct": 5.087,
-      "phase_c_mfe_pct": 6.26,
+      "phase_c_mfe_pct": 8.27,
       "fees_paid_usdt": 0.075034,
       "fees_are_actual": true,
       "opened_at": "2026-06-09T14:41:38.491011+00:00",
@@ -100,15 +100,15 @@
       "btc_sub_regime_at_open": "down_acute",
       "btc_change_3h_at_open": -1.895,
       "phase_a_mfe_price": 0.09927,
-      "current_price": 0.09678,
-      "unrealized_pnl_usdt": 10.7042,
-      "unrealized_pnl_pct": 7.133,
-      "last_price_check_at": "2026-06-09T15:23:15.830898+00:00",
+      "current_price": 0.09563,
+      "unrealized_pnl_usdt": 12.3602,
+      "unrealized_pnl_pct": 8.236,
+      "last_price_check_at": "2026-06-09T15:25:22.068536+00:00",
       "phase_a_mae_price": 0.1051,
       "phase_a_mae_pct": -0.851,
       "phase_a_mae_at": "2026-06-09T14:48:32.963878+00:00",
       "phase_b_mfe_price": 0.0987,
-      "phase_c_mfe_price": 0.09748
+      "phase_c_mfe_price": 0.09539
     }
   ],
   "recent_closed": [
@@ -26264,37 +26264,28 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-09T11:33:31.057314+00:00",
-      "reason": "paper trade too old (13785s > 600s)",
-      "last_checked_at": "2026-06-09T15:23:15.830898+00:00"
+      "reason": "paper trade too old (13911s > 600s)",
+      "last_checked_at": "2026-06-09T15:25:22.068536+00:00"
     },
     {
-      "paper_id": "IPUSDT|LONG|2026-06-09T15:08:32.249117+00:00",
-      "symbol": "IPUSDT",
-      "direction": "LONG",
+      "paper_id": "AAOIUSDT|SHORT|2026-06-09T15:23:36.481608+00:00",
+      "symbol": "AAOIUSDT",
+      "direction": "SHORT",
       "conviction_score": 5,
-      "signal_at": "2026-06-09T15:08:58.419697+00:00",
-      "reason": "paper trade too old (857s > 600s)",
-      "last_checked_at": "2026-06-09T15:23:15.830898+00:00"
-    },
-    {
-      "paper_id": "EDENUSDT|LONG|2026-06-09T15:17:13.737686+00:00",
-      "symbol": "EDENUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-06-09T15:17:46.460455+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_acute 3h=-1.91% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-06-09T15:23:15.830898+00:00"
+      "signal_at": "2026-06-09T15:24:26.191679+00:00",
+      "reason": "funding adverse (0.0698% ≥ 0.05%) (Phase 4.M: paper 历史人均 -$0.85, 不利 mirror)",
+      "last_checked_at": "2026-06-09T15:25:22.068536+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 61417.9,
-    "btc_ma25_1h": 62951.84,
-    "pct_vs_ma25": -2.437,
-    "change_24h_pct": -3.651,
+    "btc_price": 61420.7,
+    "btc_ma25_1h": 62951.96,
+    "pct_vs_ma25": -2.432,
+    "change_24h_pct": -3.647,
     "sub_regime": "down_acute",
-    "change_3h_pct": -1.907,
-    "computed_at": "2026-06-09T15:23:17.174396+00:00"
+    "change_3h_pct": -1.902,
+    "computed_at": "2026-06-09T15:25:23.019166+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
