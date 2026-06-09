@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-09T08:40:15.318270+00:00",
+  "generated_at": "2026-06-09T08:42:23.080571+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 330,
-    "open": 0,
+    "total_trades": 331,
+    "open": 1,
     "closed": 330,
     "wins": 118,
     "losses": 207,
@@ -15,30 +15,100 @@
     "avg_pnl_usdt": 0.0224,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 52.6276,
+    "fees_paid_usdt": 52.7026,
     "fees_realized_usdt": 52.6276,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.075,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 554.75,
+    "deployed_usdt": 150.08,
+    "free_capital_usdt": 404.59,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 1.1,
-    "deployed_usdt": 0
+    "deployed_usdt": 150.08
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "ZAMAUSDT"
+    ],
+    "exchange_symbols": [
+      "ZAMAUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "ZAMAUSDT|SHORT|2026-06-09T08:41:06.336463+00:00",
+      "trade_id": "L1780994466_ZAMAUSD_S",
+      "symbol": "ZAMAUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.02813,
+      "avg_fill_price": 0.0282,
+      "slippage_bps": -24.88,
+      "qty": 5322.0,
+      "notional_usdt": 150.0804,
+      "leverage": 1,
+      "risk_usdt": 0.8078,
+      "risk_pct": 0.538,
+      "mirror_latency_sec": 5.2,
+      "sl_price": 0.028421790000000002,
+      "sl_paper_current": 0.02835179,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 7e-05,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "B",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.02779732,
+      "tp2_price": 0.02746464,
+      "phase": "A",
+      "entry_order_id": 303720101,
+      "entry_client_id": "cresus_L1780994466_ZAMAUSD_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.526,
+      "top_trader_position_ratio": 1.9225,
+      "top_trader_account_ratio": 1.2717,
+      "global_account_ratio": 1.0096,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.07504,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-09T08:41:31.592753+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 62900.0,
+      "btc_change_24h_at_open": -0.318,
+      "btc_pct_vs_ma25_at_open": -0.64,
+      "btc_sub_regime_at_open": "down_stable",
+      "btc_change_3h_at_open": -0.661,
+      "phase_a_mfe_price": 0.02813,
+      "current_price": 0.02826,
+      "unrealized_pnl_usdt": -0.3193,
+      "unrealized_pnl_pct": -0.213,
+      "last_price_check_at": "2026-06-09T08:42:21.802682+00:00",
+      "phase_a_mae_price": 0.02826,
+      "phase_a_mae_pct": -0.213,
+      "phase_a_mae_at": "2026-06-09T08:42:10.845381+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "HEIUSDT|LONG|2026-06-09T07:31:10.289397+00:00",
@@ -25538,19 +25608,37 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-09T08:19:15.282281+00:00",
-      "reason": "paper trade too old (1259s > 600s)",
-      "last_checked_at": "2026-06-09T08:40:13.956437+00:00"
+      "reason": "paper trade too old (1387s > 600s)",
+      "last_checked_at": "2026-06-09T08:42:21.802682+00:00"
+    },
+    {
+      "paper_id": "POWERUSDT|SHORT|2026-06-09T08:40:26.863481+00:00",
+      "symbol": "POWERUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-06-09T08:41:26.439855+00:00",
+      "reason": "funding adverse (0.0572% ≥ 0.05%) (Phase 4.M: paper 历史人均 -$0.85, 不利 mirror)",
+      "last_checked_at": "2026-06-09T08:42:21.802682+00:00"
+    },
+    {
+      "paper_id": "CUSDT|LONG|2026-06-09T08:41:13.633394+00:00",
+      "symbol": "CUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-09T08:41:26.439855+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.57% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-09T08:42:21.802682+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 62900.6,
-    "btc_ma25_1h": 63305.34,
-    "pct_vs_ma25": -0.639,
-    "change_24h_pct": -0.317,
+    "btc_price": 62960.0,
+    "btc_ma25_1h": 63307.72,
+    "pct_vs_ma25": -0.549,
+    "change_24h_pct": -0.223,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.66,
-    "computed_at": "2026-06-09T08:40:15.289980+00:00"
+    "change_3h_pct": -0.566,
+    "computed_at": "2026-06-09T08:42:22.756991+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
