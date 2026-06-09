@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-09T05:03:28.606049+00:00",
+  "generated_at": "2026-06-09T05:05:35.693324+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 324,
-    "open": 0,
+    "total_trades": 325,
+    "open": 1,
     "closed": 324,
     "wins": 115,
     "losses": 204,
@@ -15,30 +15,97 @@
     "avg_pnl_usdt": 0.0139,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 51.728,
+    "fees_paid_usdt": 51.8029,
     "fees_realized_usdt": 51.728,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.075,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 552.79,
+    "deployed_usdt": 149.96,
+    "free_capital_usdt": 402.75,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -1.7612,
-    "deployed_usdt": 0
+    "deployed_usdt": 149.96
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "NEIROUSDT"
+    ],
+    "exchange_symbols": [
+      "NEIROUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "NEIROUSDT|LONG|2026-06-09T05:04:23.693269+00:00",
+      "trade_id": "L1780981463_NEIROUS_L",
+      "symbol": "NEIROUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 7.115e-05,
+      "avg_fill_price": 7.149e-05,
+      "slippage_bps": 47.79,
+      "qty": 2097608.0,
+      "notional_usdt": 149.95799592,
+      "leverage": 1,
+      "risk_usdt": 0.8684,
+      "risk_pct": 0.579,
+      "mirror_latency_sec": 5.4,
+      "sl_price": 7.1416e-05,
+      "sl_paper_current": 7.1076e-05,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 3.4e-07,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.0034,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "A",
+      "min_conviction_threshold": null,
+      "tp1_price": 7.171e-05,
+      "tp2_price": 7.227e-05,
+      "phase": "A",
+      "entry_order_id": 9925914921,
+      "entry_client_id": "cresus_L1780981463_NEIROUS_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.35,
+      "top_trader_position_ratio": 2.5224,
+      "top_trader_account_ratio": 1.702,
+      "global_account_ratio": 1.3827,
+      "phase_a_mfe_pct": 0.478,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.074979,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-09T05:04:44.592623+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 63274.4,
+      "btc_change_24h_at_open": 0.85,
+      "btc_pct_vs_ma25_at_open": -0.021,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 7.149e-05,
+      "current_price": 7.194e-05,
+      "unrealized_pnl_usdt": 0.9439,
+      "unrealized_pnl_pct": 0.629,
+      "last_price_check_at": "2026-06-09T05:05:34.454876+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "PIPPINUSDT|SHORT|2026-06-09T03:08:43.462741+00:00",
@@ -25058,7 +25125,7 @@
       "conviction_score": 5,
       "signal_at": "2026-06-09T04:58:05.118262+00:00",
       "reason": "funding adverse (0.0705% ≥ 0.05%) (Phase 4.M: paper 历史人均 -$0.85, 不利 mirror)",
-      "last_checked_at": "2026-06-09T05:03:27.655344+00:00"
+      "last_checked_at": "2026-06-09T05:05:34.454876+00:00"
     },
     {
       "paper_id": "IOUSDT|LONG|2026-06-09T04:59:54.434509+00:00",
@@ -25067,18 +25134,18 @@
       "conviction_score": 5,
       "signal_at": "2026-06-09T05:00:14.306849+00:00",
       "reason": "phase_6f_b3: Tier C (entry=$0.1518) + LONG + BTC chop 历史 n=22 WR 18% live -$18 vs paper +$45 (100% 执行 gap)",
-      "last_checked_at": "2026-06-09T05:03:27.655344+00:00"
+      "last_checked_at": "2026-06-09T05:05:34.454876+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 63179.7,
-    "btc_ma25_1h": 63284.14,
-    "pct_vs_ma25": -0.165,
-    "change_24h_pct": 0.7,
+    "btc_price": 63249.9,
+    "btc_ma25_1h": 63286.94,
+    "pct_vs_ma25": -0.059,
+    "change_24h_pct": 0.811,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-09T05:03:28.577429+00:00"
+    "computed_at": "2026-06-09T05:05:35.380758+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
