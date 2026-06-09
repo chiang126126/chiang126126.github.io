@@ -1,32 +1,32 @@
 {
-  "ts": "2026-06-09T01:03:05.774085+00:00",
-  "regime": "RISK_OFF",
-  "regime_zh": "风险释放",
-  "confidence": 57,
-  "judgment": "Alpha 池上涨币占比 25.2%，中位涨跌 -1.99%。 跌幅超过 3% 的币数 (198) 明显多于涨幅 (73)，市场偏空。 BTC 24h -1.35%，funding -0.0027%。 判定: 风险释放。",
+  "ts": "2026-06-09T02:03:03.758897+00:00",
+  "regime": "RANGE_BORING",
+  "regime_zh": "盘整死水",
+  "confidence": 50,
+  "judgment": "Alpha 池上涨币占比 36.0%，中位涨跌 -0.73%。 涨跌力度均衡（涨>3% 的 98 vs 跌>3% 的 110）。 BTC 24h -0.50%，funding -0.0033%。 判定: 盘整死水。",
   "support": [
-    "Alpha 池 614 币样本中，上涨 155 个 (25.2%)，中位涨跌 -1.99%，平均涨跌 -1.52%",
-    "涨幅 >3% 的币 73 个，跌幅 >3% 的币 198 个；暴涨 >10% 有 17 个，暴跌 >10% 有 19 个",
-    "Binance BTCUSDT 当前约 62,652，24h 涨幅 -1.35%，24h 区间 62,377.00 - 64,179.50",
-    "BTCUSDT 永续 funding rate 为 -0.000027 (~-0.0027%)；Fear & Greed Index 为 10 (Extreme Fear)"
+    "Alpha 池 614 币样本中，上涨 221 个 (36.0%)，中位涨跌 -0.73%，平均涨跌 -0.43%",
+    "涨幅 >3% 的币 98 个，跌幅 >3% 的币 110 个；暴涨 >10% 有 28 个，暴跌 >10% 有 17 个",
+    "Binance BTCUSDT 当前约 62,784，24h 涨幅 -0.50%，24h 区间 62,377.00 - 64,179.50",
+    "BTCUSDT 永续 funding rate 为 -0.000033 (~-0.0033%)；Fear & Greed Index 为 10 (Extreme Fear)"
   ],
   "challenge": [
-    "当前条件较为明确，主要风险是后续数据快速变化"
+    "广度 36%、中位 -0.73% 都偏中性，缺乏明确方向。这种状态通常先于波动率扩张，警惕假突破"
   ],
   "metrics": {
     "alpha_pool_size": 614,
-    "rising_count": 155,
-    "rising_pct": 0.2524,
-    "median_change_pct": -1.99,
-    "average_change_pct": -1.52,
-    "pump_3pct_count": 73,
-    "dump_3pct_count": 198,
-    "extreme_pump_10pct_count": 17,
-    "extreme_dump_10pct_count": 19,
-    "btc_price": 62652.0,
-    "btc_change_24h_pct": -1.355,
+    "rising_count": 221,
+    "rising_pct": 0.3599,
+    "median_change_pct": -0.73,
+    "average_change_pct": -0.43,
+    "pump_3pct_count": 98,
+    "dump_3pct_count": 110,
+    "extreme_pump_10pct_count": 28,
+    "extreme_dump_10pct_count": 17,
+    "btc_price": 62784.2,
+    "btc_change_24h_pct": -0.499,
     "btc_24h_range": "62,377.00 - 64,179.50",
-    "btc_funding_rate": -2.722e-05,
+    "btc_funding_rate": -3.336e-05,
     "fear_greed": 10,
     "fear_greed_classification": "Extreme Fear"
   },
