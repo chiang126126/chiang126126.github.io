@@ -1,48 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-09T17:15:53.492277+00:00",
+  "generated_at": "2026-06-09T17:17:59.347970+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 343,
-    "open": 1,
-    "closed": 342,
+    "open": 0,
+    "closed": 343,
     "wins": 124,
-    "losses": 213,
-    "win_rate": 0.368,
-    "total_pnl_usdt": 21.5103,
-    "net_pnl_usdt": -32.6555,
-    "avg_pnl_usdt": 0.0629,
+    "losses": 214,
+    "win_rate": 0.367,
+    "total_pnl_usdt": 21.0705,
+    "net_pnl_usdt": -33.2456,
+    "avg_pnl_usdt": 0.0614,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 54.2408,
-    "fees_realized_usdt": 54.1658,
-    "fees_open_usdt": 0.075,
+    "fees_paid_usdt": 54.3161,
+    "fees_realized_usdt": 54.3161,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 150.0,
-    "free_capital_usdt": 417.27,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 566.75,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 15.2332,
-    "deployed_usdt": 150.0
+    "daily_pnl": 14.7934,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "BLUAIUSDT"
-    ],
-    "exchange_symbols": [
-      "BLUAIUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "BLUAIUSDT|SHORT|2026-06-09T17:06:49.160615+00:00",
       "trade_id": "L1781024809_BLUAIUS_S",
@@ -89,7 +86,7 @@
       "phase_a_mfe_pct": 0.0,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.075,
+      "fees_paid_usdt": 0.15022,
       "fees_are_actual": true,
       "opened_at": "2026-06-09T17:07:14.964565+00:00",
       "is_dry_run": false,
@@ -100,16 +97,30 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": 0.034,
       "phase_a_mfe_price": 0.012151,
-      "current_price": 0.012203,
-      "unrealized_pnl_usdt": -0.0,
-      "unrealized_pnl_pct": -0.0,
-      "last_price_check_at": "2026-06-09T17:15:51.821911+00:00",
+      "current_price": 0.012227,
+      "unrealized_pnl_usdt": -0.295,
+      "unrealized_pnl_pct": -0.197,
+      "last_price_check_at": "2026-06-09T17:17:37.593495+00:00",
       "phase_a_mae_price": 0.01226,
       "phase_a_mae_pct": -0.467,
-      "phase_a_mae_at": "2026-06-09T17:10:22.314649+00:00"
-    }
-  ],
-  "recent_closed": [
+      "phase_a_mae_at": "2026-06-09T17:10:22.314649+00:00",
+      "btc_regime_at_close": "down",
+      "btc_sub_regime_at_close": "down_stable",
+      "btc_price_at_close": 61767.4,
+      "btc_pct_vs_ma25_at_close": -1.605,
+      "closed_at": "2026-06-09T17:17:50.977597+00:00",
+      "close_reason": "paper:hit_sl",
+      "avg_exit_price": 0.012238783273673934,
+      "realized_pnl_usdt": -0.4398,
+      "close_order_id": 696143394,
+      "close_qty": 12292.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 0.012227,
+      "close_slippage_bps": 9.64,
+      "entry_fees_usdt": 0.075,
+      "close_fees_usdt": 0.07522
+    },
     {
       "paper_id": "PENDLEUSDT|SHORT|2026-06-09T16:39:10.642037+00:00",
       "trade_id": "L1781023150_PENDLEU_S",
@@ -26580,13 +26591,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 61591.3,
-    "btc_ma25_1h": 62767.82,
-    "pct_vs_ma25": -1.874,
-    "change_24h_pct": -3.035,
+    "btc_price": 61737.6,
+    "btc_ma25_1h": 62773.67,
+    "pct_vs_ma25": -1.65,
+    "change_24h_pct": -2.805,
     "sub_regime": "down_stable",
-    "change_3h_pct": 0.13,
-    "computed_at": "2026-06-09T17:15:53.185091+00:00"
+    "change_3h_pct": 0.367,
+    "computed_at": "2026-06-09T17:17:59.319121+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
