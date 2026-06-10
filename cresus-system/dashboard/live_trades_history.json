@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-10T14:19:51.858762+00:00",
+  "generated_at": "2026-06-10T14:21:47.914683+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 377,
@@ -100,10 +100,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.15268,
-      "current_price": 0.15257,
-      "unrealized_pnl_usdt": 2.1899,
-      "unrealized_pnl_pct": 1.46,
-      "last_price_check_at": "2026-06-10T14:19:50.451621+00:00",
+      "current_price": 0.15373,
+      "unrealized_pnl_usdt": 1.0659,
+      "unrealized_pnl_pct": 0.71,
+      "last_price_check_at": "2026-06-10T14:21:46.217311+00:00",
       "phase_a_mae_price": 0.1549,
       "phase_a_mae_pct": -0.045,
       "phase_a_mae_at": "2026-06-10T14:13:57.842792+00:00"
@@ -29345,19 +29345,28 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-10T13:48:28.374088+00:00",
-      "reason": "paper trade too old (1882s > 600s)",
-      "last_checked_at": "2026-06-10T14:19:50.451621+00:00"
+      "reason": "paper trade too old (1998s > 600s)",
+      "last_checked_at": "2026-06-10T14:21:46.217311+00:00"
+    },
+    {
+      "paper_id": "UAIUSDT|LONG|2026-06-10T14:21:21.468106+00:00",
+      "symbol": "UAIUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-10T14:21:41.312923+00:00",
+      "reason": "phase_6f_b3: Tier C (entry=$0.3360) + LONG + BTC chop 历史 n=22 WR 18% live -$18 vs paper +$45 (100% 执行 gap)",
+      "last_checked_at": "2026-06-10T14:21:46.217311+00:00"
     }
   ],
   "btc_regime_now": {
-    "regime": "up",
-    "btc_price": 61880.0,
-    "btc_ma25_1h": 61567.13,
-    "pct_vs_ma25": 0.508,
-    "change_24h_pct": 0.599,
+    "regime": "chop",
+    "btc_price": 61854.8,
+    "btc_ma25_1h": 61566.12,
+    "pct_vs_ma25": 0.469,
+    "change_24h_pct": 0.558,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-10T14:19:51.557320+00:00"
+    "computed_at": "2026-06-10T14:21:47.546316+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
