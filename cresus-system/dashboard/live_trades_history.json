@@ -1,46 +1,44 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-10T08:11:12.117644+00:00",
+  "generated_at": "2026-06-10T08:13:09.540411+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 364,
-    "open": 2,
-    "closed": 362,
+    "open": 1,
+    "closed": 363,
     "wins": 132,
-    "losses": 225,
-    "win_rate": 0.37,
-    "total_pnl_usdt": 23.0979,
-    "net_pnl_usdt": -34.0375,
-    "avg_pnl_usdt": 0.0638,
+    "losses": 226,
+    "win_rate": 0.369,
+    "total_pnl_usdt": 21.6918,
+    "net_pnl_usdt": -35.5943,
+    "avg_pnl_usdt": 0.0598,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 57.2854,
-    "fees_realized_usdt": 57.1354,
-    "fees_open_usdt": 0.15,
+    "fees_paid_usdt": 57.3611,
+    "fees_realized_usdt": 57.2861,
+    "fees_open_usdt": 0.0751,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 300.07,
-    "free_capital_usdt": 265.74,
+    "deployed_usdt": 150.1,
+    "free_capital_usdt": 414.23,
     "max_concurrent_slots": 3,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 0.0282,
-    "deployed_usdt": 300.07
+    "daily_pnl": -1.3779,
+    "deployed_usdt": 150.1
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "WALUSDT",
       "CTRUSDT"
     ],
     "exchange_symbols": [
-      "WALUSDT",
       "CTRUSDT"
     ]
   },
@@ -102,14 +100,16 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.28,
       "phase_a_mfe_price": 0.01361,
-      "current_price": 0.01357,
-      "unrealized_pnl_usdt": 2.5017,
-      "unrealized_pnl_pct": 1.667,
-      "last_price_check_at": "2026-06-10T08:11:10.230866+00:00",
+      "current_price": 0.01356,
+      "unrealized_pnl_usdt": 2.6105,
+      "unrealized_pnl_pct": 1.739,
+      "last_price_check_at": "2026-06-10T08:13:08.106796+00:00",
       "phase_a_mae_price": 0.01409,
       "phase_a_mae_pct": -2.101,
       "phase_a_mae_at": "2026-06-10T07:04:13.479607+00:00"
-    },
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "WALUSDT|SHORT|2026-06-10T08:06:46.374643+00:00",
       "trade_id": "L1781078806_WALUSDT_S",
@@ -156,7 +156,7 @@
       "phase_a_mfe_pct": 0.0,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.074985,
+      "fees_paid_usdt": 0.150673,
       "fees_are_actual": true,
       "opened_at": "2026-06-10T08:07:25.599758+00:00",
       "is_dry_run": false,
@@ -167,16 +167,29 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": 0.337,
       "phase_a_mfe_price": 0.03231,
-      "current_price": 0.03254,
-      "unrealized_pnl_usdt": -0.7876,
-      "unrealized_pnl_pct": -0.525,
-      "last_price_check_at": "2026-06-10T08:11:10.230866+00:00",
-      "phase_a_mae_price": 0.03262,
-      "phase_a_mae_pct": -0.772,
-      "phase_a_mae_at": "2026-06-10T08:11:00.080450+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.03267,
+      "unrealized_pnl_usdt": -1.3899,
+      "unrealized_pnl_pct": -0.927,
+      "last_price_check_at": "2026-06-10T08:11:31.477451+00:00",
+      "phase_a_mae_price": 0.03267,
+      "phase_a_mae_pct": -0.927,
+      "phase_a_mae_at": "2026-06-10T08:11:31.477451+00:00",
+      "btc_regime_at_close": "chop",
+      "btc_price_at_close": 61652.6,
+      "btc_pct_vs_ma25_at_close": -0.316,
+      "closed_at": "2026-06-10T08:11:45.677952+00:00",
+      "close_reason": "paper:hit_sl",
+      "avg_exit_price": 0.032673500971292894,
+      "realized_pnl_usdt": -1.4061,
+      "close_order_id": 913147399,
+      "close_qty": 4633.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 0.03267,
+      "close_slippage_bps": 1.07,
+      "entry_fees_usdt": 0.074985,
+      "close_fees_usdt": 0.075688
+    },
     {
       "paper_id": "WLFIUSDT|LONG|2026-06-10T07:10:43.712563+00:00",
       "trade_id": "L1781075443_WLFIUSD_L",
@@ -28275,16 +28288,26 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "MANTRAUSDT|LONG|2026-06-10T08:11:23.811483+00:00",
+      "symbol": "MANTRAUSDT",
+      "direction": "LONG",
+      "conviction_score": 6,
+      "signal_at": "2026-06-10T08:11:31.610760+00:00",
+      "reason": "phase_6f_b1: conviction=6 历史 n=57 WR 28% -$80 (paper +$22 → 信号差+执行差双重, shadow 化)",
+      "last_checked_at": "2026-06-10T08:13:08.106796+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 61629.9,
-    "btc_ma25_1h": 61846.91,
-    "pct_vs_ma25": -0.351,
-    "change_24h_pct": -1.89,
+    "btc_price": 61613.4,
+    "btc_ma25_1h": 61846.25,
+    "pct_vs_ma25": -0.376,
+    "change_24h_pct": -1.916,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-10T08:11:11.542981+00:00"
+    "computed_at": "2026-06-10T08:13:09.221835+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
