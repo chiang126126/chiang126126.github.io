@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-10T14:48:32.474807+00:00",
+  "generated_at": "2026-06-10T14:50:37.489262+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 379,
@@ -36,14 +36,14 @@
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "SKYAIUSDT",
+      "UAIUSDT",
       "OPENUSDT",
-      "UAIUSDT"
+      "SKYAIUSDT"
     ],
     "exchange_symbols": [
-      "SKYAIUSDT",
+      "UAIUSDT",
       "OPENUSDT",
-      "UAIUSDT"
+      "SKYAIUSDT"
     ]
   },
   "open_trades": [
@@ -104,10 +104,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.15148,
-      "current_price": 0.15261,
-      "unrealized_pnl_usdt": 2.1512,
-      "unrealized_pnl_pct": 1.434,
-      "last_price_check_at": "2026-06-10T14:48:30.669135+00:00",
+      "current_price": 0.15229,
+      "unrealized_pnl_usdt": 2.4613,
+      "unrealized_pnl_pct": 1.641,
+      "last_price_check_at": "2026-06-10T14:50:35.580866+00:00",
       "phase_a_mae_price": 0.1549,
       "phase_a_mae_pct": -0.045,
       "phase_a_mae_at": "2026-06-10T14:13:57.842792+00:00"
@@ -169,10 +169,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.3397,
-      "current_price": 0.3415,
-      "unrealized_pnl_usdt": 2.5868,
-      "unrealized_pnl_pct": 1.728,
-      "last_price_check_at": "2026-06-10T14:48:30.669135+00:00",
+      "current_price": 0.342,
+      "unrealized_pnl_usdt": 2.8098,
+      "unrealized_pnl_pct": 1.877,
+      "last_price_check_at": "2026-06-10T14:50:35.580866+00:00",
       "phase_a_mae_price": 0.335,
       "phase_a_mae_pct": -0.209,
       "phase_a_mae_at": "2026-06-10T14:22:39.343929+00:00",
@@ -235,13 +235,13 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.2151,
-      "current_price": 0.2151,
-      "unrealized_pnl_usdt": 0.1394,
-      "unrealized_pnl_pct": 0.093,
-      "last_price_check_at": "2026-06-10T14:48:30.669135+00:00",
-      "phase_a_mae_price": 0.2147,
-      "phase_a_mae_pct": -0.093,
-      "phase_a_mae_at": "2026-06-10T14:47:49.585426+00:00"
+      "current_price": 0.2145,
+      "unrealized_pnl_usdt": -0.2788,
+      "unrealized_pnl_pct": -0.186,
+      "last_price_check_at": "2026-06-10T14:50:35.580866+00:00",
+      "phase_a_mae_price": 0.2143,
+      "phase_a_mae_pct": -0.279,
+      "phase_a_mae_at": "2026-06-10T14:49:32.666492+00:00"
     }
   ],
   "recent_closed": [
@@ -29473,16 +29473,35 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "FFUSDT|LONG|2026-06-10T14:49:37.616965+00:00",
+      "symbol": "FFUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-10T14:50:04.043742+00:00",
+      "reason": "max_concurrent reached (3/3)",
+      "last_checked_at": "2026-06-10T14:50:35.580866+00:00"
+    },
+    {
+      "paper_id": "HEIUSDT|SHORT|2026-06-10T14:49:42.671954+00:00",
+      "symbol": "HEIUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-06-10T14:50:04.043742+00:00",
+      "reason": "max_concurrent reached (3/3)",
+      "last_checked_at": "2026-06-10T14:50:35.580866+00:00"
+    }
+  ],
   "btc_regime_now": {
-    "regime": "up",
-    "btc_price": 61911.0,
-    "btc_ma25_1h": 61568.37,
-    "pct_vs_ma25": 0.557,
-    "change_24h_pct": 0.649,
+    "regime": "chop",
+    "btc_price": 61871.3,
+    "btc_ma25_1h": 61566.78,
+    "pct_vs_ma25": 0.495,
+    "change_24h_pct": 0.585,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-10T14:48:31.610491+00:00"
+    "computed_at": "2026-06-10T14:50:36.574623+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
