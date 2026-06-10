@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-10T00:47:47.822160+00:00",
+  "generated_at": "2026-06-10T00:49:52.553796+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 352,
-    "open": 0,
+    "total_trades": 353,
+    "open": 1,
     "closed": 352,
     "wins": 127,
     "losses": 220,
@@ -15,30 +15,100 @@
     "avg_pnl_usdt": 0.0615,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 55.6654,
+    "fees_paid_usdt": 55.7404,
     "fees_realized_usdt": 55.6654,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.075,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 565.97,
+    "deployed_usdt": 150.02,
+    "free_capital_usdt": 415.88,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -1.4297,
-    "deployed_usdt": 0
+    "deployed_usdt": 150.02
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "CLOUSDT"
+    ],
+    "exchange_symbols": [
+      "CLOUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "CLOUSDT|SHORT|2026-06-10T00:45:50.853736+00:00",
+      "trade_id": "L1781052350_CLOUSDT_S",
+      "symbol": "CLOUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.10346,
+      "avg_fill_price": 0.1048386,
+      "slippage_bps": -133.25,
+      "qty": 1431.0,
+      "notional_usdt": 150.02398,
+      "leverage": 1,
+      "risk_usdt": 1.1693,
+      "risk_pct": 0.779,
+      "mirror_latency_sec": 91.7,
+      "sl_price": 0.10703431000000001,
+      "sl_paper_current": 0.10565571,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.0013786,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "B",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.10016643,
+      "tp2_price": 0.09687286,
+      "phase": "A",
+      "entry_order_id": 1082651606,
+      "entry_client_id": "cresus_L1781052350_CLOUSDT_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "burst",
+      "atr_pct": 1.061,
+      "top_trader_position_ratio": 1.474,
+      "top_trader_account_ratio": 2.0221,
+      "global_account_ratio": 1.7624,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.075012,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-10T00:47:57.719434+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 61580.8,
+      "btc_change_24h_at_open": -1.506,
+      "btc_pct_vs_ma25_at_open": -1.186,
+      "btc_sub_regime_at_open": "down_stable",
+      "btc_change_3h_at_open": -0.245,
+      "phase_a_mfe_price": 0.10346,
+      "current_price": 0.10581,
+      "unrealized_pnl_usdt": -1.3901,
+      "unrealized_pnl_pct": -0.927,
+      "last_price_check_at": "2026-06-10T00:49:50.398026+00:00",
+      "phase_a_mae_price": 0.10581,
+      "phase_a_mae_pct": -0.927,
+      "phase_a_mae_at": "2026-06-10T00:49:50.398026+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "SKYAIUSDT|SHORT|2026-06-09T23:40:10.821267+00:00",
@@ -27333,7 +27403,7 @@
       "conviction_score": 5,
       "signal_at": "2026-06-10T00:39:50.855591+00:00",
       "reason": "funding adverse (0.0834% ≥ 0.05%) (Phase 4.M: paper 历史人均 -$0.85, 不利 mirror)",
-      "last_checked_at": "2026-06-10T00:47:42.186715+00:00"
+      "last_checked_at": "2026-06-10T00:49:50.398026+00:00"
     },
     {
       "paper_id": "HYPEUSDT|SHORT|2026-06-10T00:43:06.940741+00:00",
@@ -27342,7 +27412,7 @@
       "conviction_score": 6,
       "signal_at": "2026-06-10T00:44:11.724779+00:00",
       "reason": "phase_6f_b1: conviction=6 历史 n=57 WR 28% -$80 (paper +$22 → 信号差+执行差双重, shadow 化)",
-      "last_checked_at": "2026-06-10T00:47:42.186715+00:00"
+      "last_checked_at": "2026-06-10T00:49:50.398026+00:00"
     },
     {
       "paper_id": "PLAYUSDT|SHORT|2026-06-10T00:43:25.587811+00:00",
@@ -27350,28 +27420,19 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-06-10T00:44:11.724779+00:00",
-      "reason": "pre_slippage_too_high (+175.6bps > 150bps intensity=2)",
-      "last_checked_at": "2026-06-10T00:47:42.186715+00:00"
-    },
-    {
-      "paper_id": "CLOUSDT|SHORT|2026-06-10T00:45:50.853736+00:00",
-      "symbol": "CLOUSDT",
-      "direction": "SHORT",
-      "conviction_score": 5,
-      "signal_at": "2026-06-10T00:46:26.035390+00:00",
-      "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-06-10T00:47:42.186715+00:00"
+      "reason": "pre_slippage_too_high (+151.2bps > 150bps intensity=2)",
+      "last_checked_at": "2026-06-10T00:49:50.398026+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 61529.1,
-    "btc_ma25_1h": 62318.08,
-    "pct_vs_ma25": -1.266,
-    "change_24h_pct": -1.589,
+    "btc_price": 61636.8,
+    "btc_ma25_1h": 62322.39,
+    "pct_vs_ma25": -1.1,
+    "change_24h_pct": -1.417,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.329,
-    "computed_at": "2026-06-10T00:47:43.400597+00:00"
+    "change_3h_pct": -0.155,
+    "computed_at": "2026-06-10T00:49:51.584417+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
