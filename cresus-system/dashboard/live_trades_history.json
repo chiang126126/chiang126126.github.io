@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-10T18:16:15.919762+00:00",
+  "generated_at": "2026-06-10T18:18:23.186478+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 387,
-    "open": 0,
+    "total_trades": 388,
+    "open": 1,
     "closed": 387,
     "wins": 136,
     "losses": 246,
@@ -15,30 +15,100 @@
     "avg_pnl_usdt": 0.0099,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 60.8916,
+    "fees_paid_usdt": 60.9665,
     "fees_realized_usdt": 60.8916,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.0749,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 542.95,
+    "deployed_usdt": 149.79,
+    "free_capital_usdt": 393.08,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -19.2327,
-    "deployed_usdt": 0
+    "deployed_usdt": 149.79
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "FOLKSUSDT"
+    ],
+    "exchange_symbols": [
+      "FOLKSUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "FOLKSUSDT|LONG|2026-06-10T18:16:05.492933+00:00",
+      "trade_id": "L1781115365_FOLKSUS_L",
+      "symbol": "FOLKSUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 2.509,
+      "avg_fill_price": 2.509,
+      "slippage_bps": 0.0,
+      "qty": 59.7,
+      "notional_usdt": 149.7873,
+      "leverage": 1,
+      "risk_usdt": 2.4989,
+      "risk_pct": 1.668,
+      "mirror_latency_sec": 11.7,
+      "sl_price": 2.46714286,
+      "sl_paper_current": 2.46714286,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.0475,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "D",
+      "min_conviction_threshold": null,
+      "tp1_price": 2.57178571,
+      "tp2_price": 2.63457143,
+      "phase": "A",
+      "entry_order_id": 908591049,
+      "entry_client_id": "cresus_L1781115365_FOLKSUS_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.834,
+      "top_trader_position_ratio": 1.2451,
+      "top_trader_account_ratio": 2.9888,
+      "global_account_ratio": 3.0388,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.074894,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-10T18:17:00.235384+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 61958.3,
+      "btc_change_24h_at_open": 0.327,
+      "btc_pct_vs_ma25_at_open": 0.417,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 2.509,
+      "current_price": 2.49,
+      "unrealized_pnl_usdt": -1.1343,
+      "unrealized_pnl_pct": -0.757,
+      "last_price_check_at": "2026-06-10T18:18:21.709577+00:00",
+      "phase_a_mae_price": 2.49,
+      "phase_a_mae_pct": -0.757,
+      "phase_a_mae_at": "2026-06-10T18:18:21.709577+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "JTOUSDT|LONG|2026-06-10T17:07:00.310032+00:00",
@@ -30158,19 +30228,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-10T16:01:10.901413+00:00",
-      "reason": "paper trade too old (8104s > 600s)",
-      "last_checked_at": "2026-06-10T18:16:14.729004+00:00"
+      "reason": "paper trade too old (8231s > 600s)",
+      "last_checked_at": "2026-06-10T18:18:21.709577+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 61954.6,
-    "btc_ma25_1h": 61700.82,
-    "pct_vs_ma25": 0.411,
-    "change_24h_pct": 0.321,
+    "btc_price": 61880.0,
+    "btc_ma25_1h": 61697.84,
+    "pct_vs_ma25": 0.295,
+    "change_24h_pct": 0.201,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-10T18:16:15.890288+00:00"
+    "computed_at": "2026-06-10T18:18:22.856252+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
