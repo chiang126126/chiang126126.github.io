@@ -1,48 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-10T15:23:32.615596+00:00",
+  "generated_at": "2026-06-10T15:25:28.989878+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 383,
-    "open": 1,
-    "closed": 382,
+    "open": 0,
+    "closed": 383,
     "wins": 136,
-    "losses": 241,
-    "win_rate": 0.361,
-    "total_pnl_usdt": 15.8874,
-    "net_pnl_usdt": -44.2597,
-    "avg_pnl_usdt": 0.0416,
+    "losses": 242,
+    "win_rate": 0.36,
+    "total_pnl_usdt": 14.4497,
+    "net_pnl_usdt": -45.8481,
+    "avg_pnl_usdt": 0.0377,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 60.2221,
-    "fees_realized_usdt": 60.1471,
-    "fees_open_usdt": 0.075,
+    "fees_paid_usdt": 60.2978,
+    "fees_realized_usdt": 60.2978,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 150.0,
-    "free_capital_usdt": 405.67,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 554.15,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -7.1823,
-    "deployed_usdt": 150.0
+    "daily_pnl": -8.62,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "HEIUSDT"
-    ],
-    "exchange_symbols": [
-      "HEIUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "HEIUSDT|SHORT|2026-06-10T14:49:42.671954+00:00",
       "trade_id": "L1781102982_HEIUSDT_S",
@@ -89,7 +86,7 @@
       "phase_a_mfe_pct": 0.0,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.075,
+      "fees_paid_usdt": 0.150719,
       "fees_are_actual": true,
       "opened_at": "2026-06-10T14:59:14.256449+00:00",
       "is_dry_run": false,
@@ -106,10 +103,23 @@
       "last_price_check_at": "2026-06-10T15:23:31.372695+00:00",
       "phase_a_mae_price": 0.08482,
       "phase_a_mae_pct": -0.964,
-      "phase_a_mae_at": "2026-06-10T15:23:31.372695+00:00"
-    }
-  ],
-  "recent_closed": [
+      "phase_a_mae_at": "2026-06-10T15:23:31.372695+00:00",
+      "btc_regime_at_close": "up",
+      "btc_price_at_close": 62238.0,
+      "btc_pct_vs_ma25_at_close": 1.023,
+      "closed_at": "2026-06-10T15:23:44.861137+00:00",
+      "close_reason": "paper:hit_sl",
+      "avg_exit_price": 0.08481522654718567,
+      "realized_pnl_usdt": -1.4377,
+      "close_order_id": 1050188887,
+      "close_qty": 1785.5,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 0.08482,
+      "close_slippage_bps": -0.56,
+      "entry_fees_usdt": 0.075,
+      "close_fees_usdt": 0.075719
+    },
     {
       "paper_id": "CHZUSDT|LONG|2026-06-10T14:51:26.116736+00:00",
       "trade_id": "L1781103086_CHZUSDT_L",
@@ -29828,19 +29838,19 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-10T15:12:39.676775+00:00",
-      "reason": "paper trade too old (652s > 600s)",
-      "last_checked_at": "2026-06-10T15:23:31.372695+00:00"
+      "reason": "paper trade too old (768s > 600s)",
+      "last_checked_at": "2026-06-10T15:25:28.010861+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 62238.4,
-    "btc_ma25_1h": 61607.83,
-    "pct_vs_ma25": 1.024,
-    "change_24h_pct": 1.862,
+    "btc_price": 62291.6,
+    "btc_ma25_1h": 61609.96,
+    "pct_vs_ma25": 1.106,
+    "change_24h_pct": 1.949,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-10T15:23:32.307393+00:00"
+    "computed_at": "2026-06-10T15:25:28.960646+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
