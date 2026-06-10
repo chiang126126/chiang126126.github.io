@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-10T18:30:41.792108+00:00",
+  "generated_at": "2026-06-10T18:32:49.069304+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 388,
@@ -58,8 +58,8 @@
       "risk_usdt": 2.4989,
       "risk_pct": 1.668,
       "mirror_latency_sec": 11.7,
-      "sl_price": 2.500628572,
-      "sl_paper_current": 2.500628572,
+      "sl_price": 2.509,
+      "sl_paper_current": 2.509,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": 0.0,
       "sl_compensation_mode": "always",
@@ -75,7 +75,7 @@
       "min_conviction_threshold": null,
       "tp1_price": 2.57178571,
       "tp2_price": 2.63457143,
-      "phase": "A",
+      "phase": "B",
       "entry_order_id": 908591049,
       "entry_client_id": "cresus_L1781115365_FOLKSUS_L_E",
       "sl_order_id": null,
@@ -86,8 +86,8 @@
       "top_trader_position_ratio": 1.2451,
       "top_trader_account_ratio": 2.9888,
       "global_account_ratio": 3.0388,
-      "phase_a_mfe_pct": 1.395,
-      "phase_b_mfe_pct": null,
+      "phase_a_mfe_pct": 2.91,
+      "phase_b_mfe_pct": 2.91,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.074894,
       "fees_are_actual": true,
@@ -99,14 +99,15 @@
       "btc_pct_vs_ma25_at_open": 0.417,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 2.544,
-      "current_price": 2.554,
-      "unrealized_pnl_usdt": 2.6865,
-      "unrealized_pnl_pct": 1.794,
-      "last_price_check_at": "2026-06-10T18:30:40.046195+00:00",
+      "phase_a_mfe_price": 2.582,
+      "current_price": 2.574,
+      "unrealized_pnl_usdt": 3.8805,
+      "unrealized_pnl_pct": 2.591,
+      "last_price_check_at": "2026-06-10T18:32:47.617348+00:00",
       "phase_a_mae_price": 2.489,
       "phase_a_mae_pct": -0.797,
-      "phase_a_mae_at": "2026-06-10T18:18:32.610827+00:00"
+      "phase_a_mae_at": "2026-06-10T18:18:32.610827+00:00",
+      "phase_b_mfe_price": 2.582
     }
   ],
   "recent_closed": [
@@ -30228,19 +30229,28 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-10T16:01:10.901413+00:00",
-      "reason": "paper trade too old (8969s > 600s)",
-      "last_checked_at": "2026-06-10T18:30:40.046195+00:00"
+      "reason": "paper trade too old (9097s > 600s)",
+      "last_checked_at": "2026-06-10T18:32:47.617348+00:00"
+    },
+    {
+      "paper_id": "UAIUSDT|LONG|2026-06-10T18:31:39.047783+00:00",
+      "symbol": "UAIUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-10T18:32:07.517885+00:00",
+      "reason": "phase_6f_b3: Tier C (entry=$0.3488) + LONG + BTC chop 历史 n=22 WR 18% live -$18 vs paper +$45 (100% 执行 gap)",
+      "last_checked_at": "2026-06-10T18:32:47.617348+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 61948.4,
-    "btc_ma25_1h": 61700.57,
-    "pct_vs_ma25": 0.402,
-    "change_24h_pct": 0.311,
+    "btc_price": 61914.8,
+    "btc_ma25_1h": 61699.23,
+    "pct_vs_ma25": 0.349,
+    "change_24h_pct": 0.257,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-10T18:30:41.454016+00:00"
+    "computed_at": "2026-06-10T18:32:48.758868+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
