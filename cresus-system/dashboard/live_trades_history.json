@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-10T21:53:25.325192+00:00",
+  "generated_at": "2026-06-10T21:55:22.683869+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 391,
-    "open": 0,
+    "total_trades": 392,
+    "open": 1,
     "closed": 391,
     "wins": 137,
     "losses": 249,
@@ -15,30 +15,100 @@
     "avg_pnl_usdt": -0.0174,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 61.4686,
+    "fees_paid_usdt": 61.5436,
     "fees_realized_usdt": 61.4686,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.075,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 531.71,
+    "deployed_usdt": 150.0,
+    "free_capital_usdt": 381.64,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -29.8915,
-    "deployed_usdt": 0
+    "deployed_usdt": 150.0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "FARTCOINUSDT"
+    ],
+    "exchange_symbols": [
+      "FARTCOINUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "FARTCOINUSDT|SHORT|2026-06-10T21:52:46.411693+00:00",
+      "trade_id": "L1781128366_FARTCOI_S",
+      "symbol": "FARTCOINUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.109,
+      "avg_fill_price": 0.1089,
+      "slippage_bps": 9.17,
+      "qty": 1377.4,
+      "notional_usdt": 149.99886,
+      "leverage": 1,
+      "risk_usdt": 0.5903,
+      "risk_pct": 0.394,
+      "mirror_latency_sec": 5.7,
+      "sl_price": 0.10922857,
+      "sl_paper_current": 0.10932857,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -0.0001,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "C",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.10850714,
+      "tp2_price": 0.10801429,
+      "phase": "A",
+      "entry_order_id": 11559153374,
+      "entry_client_id": "cresus_L1781128366_FARTCOI_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "burst",
+      "atr_pct": 0.301,
+      "top_trader_position_ratio": 2.0238,
+      "top_trader_account_ratio": 2.1837,
+      "global_account_ratio": 1.7956,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.074999,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-10T21:53:49.199400+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 61191.9,
+      "btc_change_24h_at_open": -0.875,
+      "btc_pct_vs_ma25_at_open": -0.749,
+      "btc_sub_regime_at_open": "down_acute",
+      "btc_change_3h_at_open": -1.074,
+      "phase_a_mfe_price": 0.109,
+      "current_price": 0.1089,
+      "unrealized_pnl_usdt": -0.0,
+      "unrealized_pnl_pct": -0.0,
+      "last_price_check_at": "2026-06-10T21:55:21.430454+00:00",
+      "phase_a_mae_price": 0.1092,
+      "phase_a_mae_pct": -0.275,
+      "phase_a_mae_at": "2026-06-10T21:54:16.770362+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "BILLUSDT|SHORT|2026-06-10T21:22:42.643099+00:00",
@@ -30479,8 +30549,8 @@
       "direction": "SHORT",
       "conviction_score": 6,
       "signal_at": "2026-06-10T20:04:04.214298+00:00",
-      "reason": "paper trade too old (6560s > 600s)",
-      "last_checked_at": "2026-06-10T21:53:24.328833+00:00"
+      "reason": "paper trade too old (6677s > 600s)",
+      "last_checked_at": "2026-06-10T21:55:21.430454+00:00"
     },
     {
       "paper_id": "SPXUSDT|SHORT|2026-06-10T21:51:03.193793+00:00",
@@ -30489,18 +30559,18 @@
       "conviction_score": 6,
       "signal_at": "2026-06-10T21:51:12.579792+00:00",
       "reason": "phase_6f_b1: conviction=6 历史 n=57 WR 28% -$80 (paper +$22 → 信号差+执行差双重, shadow 化)",
-      "last_checked_at": "2026-06-10T21:53:24.328833+00:00"
+      "last_checked_at": "2026-06-10T21:55:21.430454+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 61257.1,
-    "btc_ma25_1h": 61656.02,
-    "pct_vs_ma25": -0.647,
-    "change_24h_pct": -0.77,
+    "btc_price": 61239.4,
+    "btc_ma25_1h": 61655.32,
+    "pct_vs_ma25": -0.675,
+    "change_24h_pct": -0.798,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.968,
-    "computed_at": "2026-06-10T21:53:25.293756+00:00"
+    "change_3h_pct": -0.997,
+    "computed_at": "2026-06-10T21:55:22.373022+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
