@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-10T04:26:31.319339+00:00",
+  "generated_at": "2026-06-10T04:28:35.078031+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 356,
@@ -36,12 +36,12 @@
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "IOUSDT",
-      "SOXLUSDT"
+      "SOXLUSDT",
+      "IOUSDT"
     ],
     "exchange_symbols": [
-      "IOUSDT",
-      "SOXLUSDT"
+      "SOXLUSDT",
+      "IOUSDT"
     ]
   },
   "open_trades": [
@@ -102,10 +102,10 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.266,
       "phase_a_mfe_price": 190.98,
-      "current_price": 191.72,
-      "unrealized_pnl_usdt": 0.0858,
-      "unrealized_pnl_pct": 0.057,
-      "last_price_check_at": "2026-06-10T04:26:29.555245+00:00",
+      "current_price": 191.52,
+      "unrealized_pnl_usdt": 0.2418,
+      "unrealized_pnl_pct": 0.162,
+      "last_price_check_at": "2026-06-10T04:28:33.172817+00:00",
       "phase_a_mae_price": 192.53,
       "phase_a_mae_pct": -0.365,
       "phase_a_mae_at": "2026-06-10T04:20:58.198284+00:00"
@@ -125,8 +125,8 @@
       "risk_usdt": 1.8637,
       "risk_pct": 1.243,
       "mirror_latency_sec": 9.1,
-      "sl_price": 0.15886071,
-      "sl_paper_current": 0.15976071,
+      "sl_price": 0.158012142,
+      "sl_paper_current": 0.158912142,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": -0.0009,
       "sl_compensation_mode": "always",
@@ -153,7 +153,7 @@
       "top_trader_position_ratio": 1.2371,
       "top_trader_account_ratio": 1.2411,
       "global_account_ratio": 1.1964,
-      "phase_a_mfe_pct": 0.504,
+      "phase_a_mfe_pct": 0.567,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.074994,
@@ -166,11 +166,11 @@
       "btc_pct_vs_ma25_at_open": -1.135,
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.413,
-      "phase_a_mfe_price": 0.1579,
-      "current_price": 0.1578,
-      "unrealized_pnl_usdt": -0.0,
-      "unrealized_pnl_pct": -0.0,
-      "last_price_check_at": "2026-06-10T04:26:29.555245+00:00",
+      "phase_a_mfe_price": 0.1578,
+      "current_price": 0.1577,
+      "unrealized_pnl_usdt": 0.095,
+      "unrealized_pnl_pct": 0.063,
+      "last_price_check_at": "2026-06-10T04:28:33.172817+00:00",
       "phase_a_mae_price": 0.1583,
       "phase_a_mae_pct": -0.317,
       "phase_a_mae_at": "2026-06-10T04:23:13.330132+00:00"
@@ -27624,16 +27624,26 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "SPORTFUNUSDT|SHORT|2026-06-10T04:26:34.291410+00:00",
+      "symbol": "SPORTFUNUSDT",
+      "direction": "SHORT",
+      "conviction_score": 6,
+      "signal_at": "2026-06-10T04:26:38.427554+00:00",
+      "reason": "phase_6f_b1: conviction=6 历史 n=57 WR 28% -$80 (paper +$22 → 信号差+执行差双重, shadow 化)",
+      "last_checked_at": "2026-06-10T04:28:33.172817+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 61488.3,
-    "btc_ma25_1h": 62133.26,
-    "pct_vs_ma25": -1.038,
-    "change_24h_pct": -2.729,
+    "btc_price": 61454.9,
+    "btc_ma25_1h": 62131.92,
+    "pct_vs_ma25": -1.09,
+    "change_24h_pct": -2.782,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.312,
-    "computed_at": "2026-06-10T04:26:30.732373+00:00"
+    "change_3h_pct": -0.366,
+    "computed_at": "2026-06-10T04:28:34.491828+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
