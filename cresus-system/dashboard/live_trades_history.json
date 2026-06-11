@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-11T01:09:50.341835+00:00",
+  "generated_at": "2026-06-11T01:11:49.197249+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 397,
@@ -58,8 +58,8 @@
       "risk_usdt": 1.4476,
       "risk_pct": 1.053,
       "mirror_latency_sec": 16.8,
-      "sl_price": 1388.9312009999999,
-      "sl_paper_current": 1386.411201,
+      "sl_price": 1397.20843075,
+      "sl_paper_current": 1394.68843075,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": 2.52,
       "sl_compensation_mode": "always",
@@ -87,7 +87,7 @@
       "top_trader_account_ratio": 2.7313,
       "global_account_ratio": 2.4662,
       "phase_a_mfe_pct": 1.97,
-      "phase_b_mfe_pct": 1.97,
+      "phase_b_mfe_pct": 2.579,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.054964,
       "fees_are_actual": true,
@@ -100,14 +100,14 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 1398.6,
-      "current_price": 1397.46,
-      "unrealized_pnl_usdt": 2.336,
-      "unrealized_pnl_pct": 1.7,
-      "last_price_check_at": "2026-06-11T01:09:49.088705+00:00",
+      "current_price": 1405.5,
+      "unrealized_pnl_usdt": 3.14,
+      "unrealized_pnl_pct": 2.285,
+      "last_price_check_at": "2026-06-11T01:11:47.303460+00:00",
       "phase_a_mae_price": 1372.92,
       "phase_a_mae_pct": -0.086,
       "phase_a_mae_at": "2026-06-11T00:57:33.478170+00:00",
-      "phase_b_mfe_price": 1398.6
+      "phase_b_mfe_price": 1406.95
     }
   ],
   "recent_closed": [
@@ -30886,22 +30886,13 @@
   ],
   "missed_signals": [
     {
-      "paper_id": "IDUSDT|LONG|2026-06-11T00:30:56.546432+00:00",
-      "symbol": "IDUSDT",
-      "direction": "LONG",
-      "conviction_score": 6,
-      "signal_at": "2026-06-11T00:31:40.032247+00:00",
-      "reason": "paper trade too old (2289s > 600s)",
-      "last_checked_at": "2026-06-11T01:09:49.088705+00:00"
-    },
-    {
       "paper_id": "ASTRUSDT|LONG|2026-06-11T00:33:50.027729+00:00",
       "symbol": "ASTRUSDT",
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-11T00:33:55.880008+00:00",
-      "reason": "paper trade too old (2153s > 600s)",
-      "last_checked_at": "2026-06-11T01:09:49.088705+00:00"
+      "reason": "paper trade too old (2271s > 600s)",
+      "last_checked_at": "2026-06-11T01:11:47.303460+00:00"
     },
     {
       "paper_id": "CLOUSDT|LONG|2026-06-11T01:04:07.201677+00:00",
@@ -30909,19 +30900,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-11T01:04:15.279454+00:00",
-      "reason": "phase_6f_b3: Tier C (entry=$0.1128) + LONG + BTC chop 历史 n=22 WR 18% live -$18 vs paper +$45 (100% 执行 gap)",
-      "last_checked_at": "2026-06-11T01:09:49.088705+00:00"
+      "reason": "pre_slippage_too_high (+462.8bps > 100bps intensity=1)",
+      "last_checked_at": "2026-06-11T01:11:47.303460+00:00"
     }
   ],
   "btc_regime_now": {
-    "regime": "chop",
-    "btc_price": 61904.5,
-    "btc_ma25_1h": 61640.2,
-    "pct_vs_ma25": 0.429,
-    "change_24h_pct": 0.363,
+    "regime": "up",
+    "btc_price": 61956.1,
+    "btc_ma25_1h": 61642.27,
+    "pct_vs_ma25": 0.509,
+    "change_24h_pct": 0.446,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-11T01:09:50.032686+00:00"
+    "computed_at": "2026-06-11T01:11:48.588867+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
