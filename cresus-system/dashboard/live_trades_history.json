@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-11T02:48:03.469224+00:00",
+  "generated_at": "2026-06-11T02:50:07.705169+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 402,
-    "open": 0,
+    "total_trades": 403,
+    "open": 1,
     "closed": 402,
     "wins": 140,
     "losses": 257,
@@ -15,30 +15,100 @@
     "avg_pnl_usdt": -0.042,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 63.0133,
+    "fees_paid_usdt": 63.1632,
     "fees_realized_usdt": 63.0133,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.1499,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 520.1,
+    "deployed_usdt": 299.73,
+    "free_capital_usdt": 220.22,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -11.4001,
-    "deployed_usdt": 0
+    "deployed_usdt": 299.73
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "HIVEUSDT"
+    ],
+    "exchange_symbols": [
+      "HIVEUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "HIVEUSDT|LONG|2026-06-11T02:47:16.157886+00:00",
+      "trade_id": "L1781146036_HIVEUSD_L",
+      "symbol": "HIVEUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.05085,
+      "avg_fill_price": 0.0516072,
+      "slippage_bps": 148.91,
+      "qty": 5808.0,
+      "notional_usdt": 299.73488,
+      "leverage": 1,
+      "risk_usdt": 8.0693,
+      "risk_pct": 2.692,
+      "mirror_latency_sec": 23.7,
+      "sl_price": 0.0516072,
+      "sl_paper_current": 0.05085,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.0007572,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 7,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "favorable",
+      "funding_rate_pct_at_open": -0.1825,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "B",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.05179821,
+      "tp2_price": 0.05274643,
+      "phase": "A",
+      "entry_order_id": 1588073817,
+      "entry_client_id": "cresus_L1781146036_HIVEUSD_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 7,
+      "alert_type": "sustained",
+      "atr_pct": 0.829,
+      "top_trader_position_ratio": 1.1504,
+      "top_trader_account_ratio": 0.7328,
+      "global_account_ratio": 0.5487,
+      "phase_a_mfe_pct": 1.711,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.149867,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-11T02:48:13.003801+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "up",
+      "btc_price_at_open": 62005.8,
+      "btc_change_24h_at_open": 1.199,
+      "btc_pct_vs_ma25_at_open": 0.554,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.05172,
+      "current_price": 0.05187,
+      "unrealized_pnl_usdt": 1.5263,
+      "unrealized_pnl_pct": 0.509,
+      "last_price_check_at": "2026-06-11T02:50:06.229443+00:00",
+      "phase_a_mae_price": 0.0514,
+      "phase_a_mae_pct": -0.401,
+      "phase_a_mae_at": "2026-06-11T02:48:20.741456+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "FOLKSUSDT|LONG|2026-06-11T01:56:37.029868+00:00",
@@ -31304,37 +31374,28 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-11T00:33:55.880008+00:00",
-      "reason": "paper trade too old (8044s > 600s)",
-      "last_checked_at": "2026-06-11T02:47:59.605827+00:00"
+      "reason": "paper trade too old (8170s > 600s)",
+      "last_checked_at": "2026-06-11T02:50:06.229443+00:00"
     },
     {
-      "paper_id": "HIVEUSDT|LONG|2026-06-11T02:47:16.157886+00:00",
-      "symbol": "HIVEUSDT",
+      "paper_id": "EDENUSDT|LONG|2026-06-11T02:49:49.131551+00:00",
+      "symbol": "EDENUSDT",
       "direction": "LONG",
-      "conviction_score": 7,
-      "signal_at": "2026-06-11T02:47:49.329592+00:00",
-      "reason": "pre_slippage_too_high (+192.7bps > 150bps intensity=2)",
-      "last_checked_at": "2026-06-11T02:47:59.605827+00:00"
-    },
-    {
-      "paper_id": "AERGOUSDT|LONG|2026-06-11T02:47:27.059891+00:00",
-      "symbol": "AERGOUSDT",
-      "direction": "LONG",
-      "conviction_score": 7,
-      "signal_at": "2026-06-11T02:47:49.329592+00:00",
-      "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-06-11T02:47:59.605827+00:00"
+      "conviction_score": 6,
+      "signal_at": "2026-06-11T02:50:04.652225+00:00",
+      "reason": "phase_6f_b1: conviction=6 历史 n=57 WR 28% -$80 (paper +$22 → 信号差+执行差双重, shadow 化)",
+      "last_checked_at": "2026-06-11T02:50:06.229443+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 62001.5,
-    "btc_ma25_1h": 61664.07,
-    "pct_vs_ma25": 0.547,
-    "change_24h_pct": 1.192,
+    "btc_price": 61988.0,
+    "btc_ma25_1h": 61663.53,
+    "pct_vs_ma25": 0.526,
+    "change_24h_pct": 1.17,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-11T02:48:00.571746+00:00"
+    "computed_at": "2026-06-11T02:50:07.345412+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
