@@ -574,25 +574,22 @@ if CRESUS_MODE == 'mainnet_pilot':
         LIVE_MAX_CONCURRENT = 1
         LIVE_MAX_DEPLOY_USDT = 180.0
     elif PILOT_CAPITAL <= 600:
-        LIVE_NOTIONAL_BY_SCORE = {5: 150, 6: 200, 7: 300, 8: 150, 9: 150, 10: 150}
-        LIVE_MAX_CONCURRENT = 3   # 2026-06-04: 2 → 3, 避免错过高 conviction 信号.
-                                  #   deploy cap $450 仍兜底 — 3 笔 score 6 ($600) 会被 cap 拦, 自动放 2 笔.
-        LIVE_MAX_DEPLOY_USDT = 450.0
+        # Phase 6.G G1 (2026-06-11): notional × 2/3 防御性减仓.
+        #   原因: 170h 实盘 -$79 (-13.2%), 主因执行 drag ($66 手续费 + $27.5 bps mean close slip).
+        #   减仓 33% 后单笔最大风险下降, 给 G2 macro filter + G3 close limit-IOC 留空间验证.
+        #   原值: {5:150, 6:200, 7:300, ...}
+        #   新值: {5:100, 6:130, 7:200, ...}  (≈ × 0.67, conv=6 已被 Phase 6.F-B1 block)
+        LIVE_NOTIONAL_BY_SCORE = {5: 100, 6: 130, 7: 200, 8: 100, 9: 100, 10: 100}
+        LIVE_MAX_CONCURRENT = 3   # 不变
+        LIVE_MAX_DEPLOY_USDT = 450.0   # 不变 — cap 不绑限, 3 笔 conv5 ($300) 现在远低于 cap
     elif PILOT_CAPITAL <= 1200:
-        # 2026-06-04 新增中间档: notional 与 $600 档一致, 但 deploy cap 跟资金 80% scale.
-        # 资金成长曲线 (3 笔满载可行性):
-        #   $750: deploy=$600, 3 score 6 ($600) ✅, 3 score 7 ($900) ❌
-        #   $900: deploy=$720, 3 score 6 ✅
-        #   $1125: deploy=$900, 3 score 6 ✅, 3 score 7 ($900) ✅
-        #   $1200: deploy=$960, 3 score 6+7 ✅
-        LIVE_NOTIONAL_BY_SCORE = {5: 150, 6: 200, 7: 300, 8: 150, 9: 150, 10: 150}
+        # 2026-06-04 新增中间档. Phase 6.G G1 同步减 33%.
+        LIVE_NOTIONAL_BY_SCORE = {5: 100, 6: 130, 7: 200, 8: 100, 9: 100, 10: 100}
         LIVE_MAX_CONCURRENT = 3
         LIVE_MAX_DEPLOY_USDT = round(PILOT_CAPITAL * 0.80, 0)
     else:   # PILOT_CAPITAL > $1200
-        # 大资金档: 单笔 notional 翻倍 (利润绝对值更有意义), deploy cap 同样动态 80%.
-        # 注意跨过 $1200 边界时, 单笔 notional 翻倍但 max_concurrent 不变 — 用户主动
-        # 升档 (改 env var), 隐含同意承担更大单笔暴露.
-        LIVE_NOTIONAL_BY_SCORE = {5: 300, 6: 400, 7: 600, 8: 300, 9: 300, 10: 300}
+        # 大资金档. Phase 6.G G1: 原 {300, 400, 600, ...} → 约 × 0.67 → {200, 265, 400, ...}
+        LIVE_NOTIONAL_BY_SCORE = {5: 200, 6: 265, 7: 400, 8: 200, 9: 200, 10: 200}
         LIVE_MAX_CONCURRENT = 3
         LIVE_MAX_DEPLOY_USDT = round(PILOT_CAPITAL * 0.80, 0)
 
@@ -1025,6 +1022,22 @@ def is_eligible_for_mirror(
     direction = paper_trade.get("direction", "").upper()
     if direction not in ("LONG", "SHORT"):
         return False, f"invalid direction {direction!r}"
+    # 6.G G2. Phase 6.G (2026-06-11): Macro event blackout — 高 impact CORE 事件
+    # ±[-60, +120] 分钟内 block 新开仓. 数据驱动 (170h 实盘 retro):
+    #   CPI 06-10 单日 54 笔 -$40.02 (vs 平均 $0.19/日 → -211× outlier).
+    #   56% sl_breach (vs baseline 50%), wick filter 被 macro spike 击穿.
+    # 用现成的 macro_calendar.get_blackout_decision() — 不重复造轮子.
+    # Fail-safe: 任何 import / IO / parse 错误 → 不 block (让其它 gate 决定).
+    try:
+        from macro_calendar import get_blackout_decision
+        decision = get_blackout_decision(now=now)
+        if decision.get("blocked"):
+            return False, (
+                f"phase_6g_g2: macro blackout (tier={decision.get('tier')}) — "
+                f"{decision.get('reason') or 'high-impact event window'}"
+            )
+    except Exception as e:
+        log.debug(f"[6.G G2] macro filter skipped (fail-safe): {type(e).__name__}: {e}")
     # 6.F. Phase 6.F BLACKLIST — 数据驱动 (105h 280 笔统计):
     #   B1: conv=6 (n=57 -$80, paper 也仅 +$22 → 信号差 + 执行差).
     #   B3: Tier C ($0.1-1) + LONG + BTC chop (n=22 -$18 vs paper +$45 → 纯执行 gap).

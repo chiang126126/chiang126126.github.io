@@ -2388,7 +2388,8 @@ class TestPhase6AMainnetPilotConfig(unittest.TestCase):
         # 验 $600 medium tier
         self.assertEqual(cfg['mode'], 'mainnet_pilot')
         self.assertEqual(cfg['capital'], 600.0)
-        self.assertEqual(cfg['notional'], {'5': 150, '6': 200, '7': 300, '8': 150, '9': 150, '10': 150})
+        # Phase 6.G G1 (2026-06-11): notional 减 33% 防御性减仓
+        self.assertEqual(cfg['notional'], {'5': 100, '6': 130, '7': 200, '8': 100, '9': 100, '10': 100})
         self.assertEqual(cfg['max_concurrent'], 3)   # 2026-06-04: 2→3 (避免错过高 conviction 信号)
         self.assertEqual(cfg['max_deploy'], 450.0)
         self.assertEqual(cfg['daily_dd'], 60.0)  # 10% of $600
@@ -2418,27 +2419,26 @@ class TestPhase6AMainnetPilotConfig(unittest.TestCase):
         return json_mod.loads(result.stdout.strip().split('\n')[-1])
 
     def test_pilot_tier_subprocess_750_middle_tier(self):
-        """2026-06-04 新增中间档: $601-1200. $750 应能 3 笔 score 6 满载 ($600 = 80% × $750)."""
+        """中间档 $601-1200. Phase 6.G G1: notional 减 33% 后 deploy cap 不再紧绷."""
         cfg = self._run_pilot_tier_subprocess('750')
         self.assertEqual(cfg['capital'], 750.0)
-        # 中间档 notional 跟 $600 档一致
-        self.assertEqual(cfg['notional'], {'5': 150, '6': 200, '7': 300, '8': 150, '9': 150, '10': 150})
+        # Phase 6.G G1: 中间档 notional 跟 $600 档一致 (减 33% 后)
+        self.assertEqual(cfg['notional'], {'5': 100, '6': 130, '7': 200, '8': 100, '9': 100, '10': 100})
         self.assertEqual(cfg['max_concurrent'], 3)
         self.assertEqual(cfg['max_deploy'], 600.0)  # 750 × 0.80
-        # Sanity: 3 笔 score 6 ($600) 应 ≤ deploy cap → 可同时开
         self.assertGreaterEqual(cfg['max_deploy'], 3 * cfg['notional']['6'])
 
     def test_pilot_tier_subprocess_1125_three_score7(self):
-        """$1125 应能 3 笔 score 7 满载 ($900 = 80% × $1125)."""
+        """$1125 测试中间档 + 3 笔 score 7 cap 兼容性."""
         cfg = self._run_pilot_tier_subprocess('1125')
-        self.assertEqual(cfg['notional']['7'], 300)  # 仍是中间档 notional
+        self.assertEqual(cfg['notional']['7'], 200)  # Phase 6.G G1 减仓
         self.assertEqual(cfg['max_deploy'], 900.0)  # 1125 × 0.80
         self.assertGreaterEqual(cfg['max_deploy'], 3 * cfg['notional']['7'])
 
     def test_pilot_tier_subprocess_1500_large_tier(self):
-        """>$1200 升大档: notional 翻倍 (5:300/6:400/7:600), deploy 仍 80%."""
+        """>$1200 升大档. Phase 6.G G1: 同步减 33% → {200, 265, 400, ...}."""
         cfg = self._run_pilot_tier_subprocess('1500')
-        self.assertEqual(cfg['notional'], {'5': 300, '6': 400, '7': 600, '8': 300, '9': 300, '10': 300})
+        self.assertEqual(cfg['notional'], {'5': 200, '6': 265, '7': 400, '8': 200, '9': 200, '10': 200})
         self.assertEqual(cfg['max_concurrent'], 3)
         self.assertEqual(cfg['max_deploy'], 1200.0)  # 1500 × 0.80
 
@@ -6196,6 +6196,130 @@ class TestPhase6FBlacklist(unittest.TestCase):
         self.assertFalse(eligible)
         # 顺序: B1 在 B3 之前, 应该看到 b1 原因
         self.assertIn("phase_6f_b1", reason, "B1 应先触发 (代码顺序)")
+
+
+class TestPhase6GG1NotionalReduction(unittest.TestCase):
+    """Phase 6.G G1 (2026-06-11): notional × 2/3 防御性减仓.
+
+    数据驱动: 170h pilot -$79 主因执行 drag ($66 fees + $27.5bps close slip).
+    减仓后单笔风险下降 33%, 给 G2 macro filter + G3 close limit-IOC 验证空间.
+    """
+
+    def test_6g_g1_pilot_600_notional_reduced(self):
+        """$600 pilot tier notional 应减到 {5:100, 6:130, 7:200, ...}."""
+        import subprocess, json as json_mod
+        env = dict(os.environ)
+        env['CRESUS_MODE'] = 'mainnet_pilot'
+        env['CRESUS_PILOT_CAPITAL'] = '600'
+        result = subprocess.run(
+            [sys.executable, '-c', (
+                'import sys; sys.path.insert(0, "%s"); '
+                'import live_trader; import json; '
+                'print(json.dumps(live_trader.LIVE_NOTIONAL_BY_SCORE))'
+            ) % str(HERE.parent)],
+            env=env, capture_output=True, text=True, timeout=30,
+        )
+        self.assertEqual(result.returncode, 0, f"subprocess fail: {result.stderr}")
+        notional = json_mod.loads(result.stdout.strip().split('\n')[-1])
+        self.assertEqual(notional, {'5': 100, '6': 130, '7': 200,
+                                      '8': 100, '9': 100, '10': 100})
+
+
+class TestPhase6GG2MacroBlackout(unittest.TestCase):
+    """Phase 6.G G2 (2026-06-11): macro event blackout filter.
+
+    CPI 06-10 单日 56% sl_breach (vs baseline 50%) 验证 macro 是 mandatory.
+    用现成 macro_calendar.get_blackout_decision() — 不重复造轮子.
+    """
+
+    def setUp(self):
+        from datetime import datetime, timezone
+        self.now = datetime.now(timezone.utc)
+        self.live_state = {
+            "mirrored_paper_ids": [],
+            "live_open_trades": [],
+        }
+        # 隔离: 关 Phase 6.F (避免它先拦)
+        self._6f_patcher = patch.object(
+            live_trader, "LIVE_PHASE_6F_BLACKLIST_ENABLED", False)
+        self._6f_patcher.start()
+        self.addCleanup(self._6f_patcher.stop)
+
+    def _base_trade(self, **overrides):
+        from datetime import datetime, timezone
+        t = {
+            "id": "TESTUSDT|LONG|6g_test|2026-06-11T10:00:00+00:00",
+            "symbol": "TESTUSDT",
+            "direction": "LONG",
+            "entry_price": 5.0,
+            "conviction_score": 5,
+            "entered_at": (self.now - timedelta(seconds=10)).isoformat(),
+            "sl": 4.5, "tp1": 6.0, "tp2": 7.0,
+        }
+        t.update(overrides)
+        return t
+
+    def test_6g_g2_blocks_when_macro_decision_blocked(self):
+        """get_blackout_decision returns blocked=True → 6.G G2 拒绝."""
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True), \
+             patch("macro_calendar.get_blackout_decision",
+                   return_value={"blocked": True, "tier": "CORE",
+                                 "reason": "CPI in -25min", "threshold_bonus": 0}):
+            ok, reason = is_eligible_for_mirror(
+                self._base_trade(), self.live_state, self.now,
+                btc_regime="down",
+            )
+        self.assertFalse(ok)
+        self.assertIn("phase_6g_g2", reason)
+        self.assertIn("CORE", reason)
+
+    def test_6g_g2_pass_when_macro_decision_clear(self):
+        """get_blackout_decision returns blocked=False → 通过 G2 进入后续 gate."""
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True), \
+             patch("macro_calendar.get_blackout_decision",
+                   return_value={"blocked": False, "tier": None,
+                                 "reason": None, "threshold_bonus": 0}):
+            ok, reason = is_eligible_for_mirror(
+                self._base_trade(), self.live_state, self.now,
+                btc_regime="up",
+            )
+        # 应通过 G2 (可能被其它 gate 拒, 但不应是 g2 拒)
+        self.assertNotIn("phase_6g_g2", reason or "")
+
+    def test_6g_g2_observe_tier_does_not_block(self):
+        """OBSERVE tier (软提示) → blocked=False → 不应触发 G2 拒绝."""
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True), \
+             patch("macro_calendar.get_blackout_decision",
+                   return_value={"blocked": False, "tier": "OBSERVE",
+                                 "reason": "ISM in 20min", "threshold_bonus": 10}):
+            ok, reason = is_eligible_for_mirror(
+                self._base_trade(), self.live_state, self.now,
+                btc_regime="up",
+            )
+        self.assertNotIn("phase_6g_g2", reason or "")
+
+    def test_6g_g2_failsafe_on_import_error(self):
+        """macro_calendar 导入 / 调用错误 → fail-safe 不 block."""
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True), \
+             patch("macro_calendar.get_blackout_decision",
+                   side_effect=Exception("simulated failure")):
+            ok, reason = is_eligible_for_mirror(
+                self._base_trade(), self.live_state, self.now,
+                btc_regime="up",
+            )
+        # 不应被 G2 拒 (fail-safe), 可能被其它 gate 拒但不该是 g2
+        self.assertNotIn("phase_6g_g2", reason or "")
+
+    def test_6g_g2_failsafe_on_file_missing(self):
+        """macro_events.json 不存在 → fail-safe."""
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True), \
+             patch("macro_calendar.get_blackout_decision",
+                   side_effect=FileNotFoundError("macro_events.json")):
+            ok, reason = is_eligible_for_mirror(
+                self._base_trade(), self.live_state, self.now,
+                btc_regime="up",
+            )
+        self.assertNotIn("phase_6g_g2", reason or "")
 
 
 if __name__ == "__main__":

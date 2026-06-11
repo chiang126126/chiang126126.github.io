@@ -172,16 +172,21 @@ except (TypeError, ValueError):
     _PAPER_PILOT_CAPITAL = 500.0
 
 if _PAPER_CRESUS_MODE == 'mainnet_pilot':
-    # 跟 live_trader.py mainnet_pilot 三档 tier 一致
+    # 跟 live_trader.py mainnet_pilot tier 一致 (Phase 6.G G1: 同步减 33% 防御性减仓).
     if _PAPER_PILOT_CAPITAL <= 250:
-        PAPER_NOTIONAL_BY_SCORE = {5: 80, 6: 100, 7: 150, 8: 80, 9: 80, 10: 80}
-        PAPER_NOTIONAL_PER_TRADE_USDT = 80.0
+        PAPER_NOTIONAL_BY_SCORE = {5: 50, 6: 65, 7: 100, 8: 50, 9: 50, 10: 50}
+        PAPER_NOTIONAL_PER_TRADE_USDT = 50.0
     elif _PAPER_PILOT_CAPITAL <= 600:
-        PAPER_NOTIONAL_BY_SCORE = {5: 150, 6: 200, 7: 300, 8: 150, 9: 150, 10: 150}
-        PAPER_NOTIONAL_PER_TRADE_USDT = 150.0
+        # Phase 6.G G1: 原 {150, 200, 300, ...} → ≈ × 0.67 → {100, 130, 200, ...}
+        PAPER_NOTIONAL_BY_SCORE = {5: 100, 6: 130, 7: 200, 8: 100, 9: 100, 10: 100}
+        PAPER_NOTIONAL_PER_TRADE_USDT = 100.0
+    elif _PAPER_PILOT_CAPITAL <= 1200:
+        # 中间档 (live_trader 同款)
+        PAPER_NOTIONAL_BY_SCORE = {5: 100, 6: 130, 7: 200, 8: 100, 9: 100, 10: 100}
+        PAPER_NOTIONAL_PER_TRADE_USDT = 100.0
     else:
-        PAPER_NOTIONAL_BY_SCORE = {5: 300, 6: 400, 7: 600, 8: 300, 9: 300, 10: 300}
-        PAPER_NOTIONAL_PER_TRADE_USDT = 300.0
+        PAPER_NOTIONAL_BY_SCORE = {5: 200, 6: 265, 7: 400, 8: 200, 9: 200, 10: 200}
+        PAPER_NOTIONAL_PER_TRADE_USDT = 200.0
 
     # paper 起始资金跟 live pilot 一致 → PnL 可直接对比
     PAPER_STARTING_CAPITAL_USDT = _PAPER_PILOT_CAPITAL
@@ -1776,6 +1781,22 @@ def _open_paper_trade(a: VelocityAlert, state: dict, now: datetime,
     """
     if a.conviction_tier != PAPER_MIN_TIER:
         return None
+    # Phase 6.G G2 (2026-06-11): Macro event blackout — 跟 live_trader.py 一致行为.
+    # 数据驱动: CPI 06-10 单日 paper -$3.13 (小) / live -$40.02 (大), gap $37.
+    # 即使 paper 没受重创, 但既然 live blackout 期间不开, paper 也应同步保证
+    # apples-to-apples 对账 — 不然以后 paper 在 CPI 期间继续刷数据, gap 会假性扩大.
+    # Fail-safe: 任何异常都让 paper 继续开 (跟 live 同款防御逻辑).
+    try:
+        from macro_calendar import get_blackout_decision
+        decision = get_blackout_decision(now=now)
+        if decision.get("blocked"):
+            _log(f"[paper] SKIP open {a.symbol} {a.direction}: "
+                 f"phase_6g_g2 macro blackout (tier={decision.get('tier')}) — "
+                 f"{decision.get('reason') or 'high-impact event window'}")
+            return None
+    except Exception as e:
+        # 极保守 — log 但不挡 (跟 live 同款 fail-safe)
+        pass
     # Phase 1.3: 极高 ATR (>=2%) 信号 reject — 降低 variance, 接受失去稀有 outlier.
     # 审计 N=142: ATR 2.0-2.5% (n=6) 全亏 avg -2.89%, ATR>=2% 整体 cell 净亏.
     # 100U 实盘期核心目标是 variance 降低, 不是追 outlier.
