@@ -1,47 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-11T04:46:52.843689+00:00",
+  "generated_at": "2026-06-11T04:49:00.868844+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 411,
-    "open": 2,
-    "closed": 409,
-    "wins": 143,
+    "open": 1,
+    "closed": 410,
+    "wins": 144,
     "losses": 261,
-    "win_rate": 0.354,
-    "total_pnl_usdt": -14.1855,
-    "net_pnl_usdt": -78.3995,
-    "avg_pnl_usdt": -0.0347,
+    "win_rate": 0.356,
+    "total_pnl_usdt": -11.9668,
+    "net_pnl_usdt": -76.3319,
+    "avg_pnl_usdt": -0.0292,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 64.4388,
-    "fees_realized_usdt": 64.214,
-    "fees_open_usdt": 0.2248,
+    "fees_paid_usdt": 64.5149,
+    "fees_realized_usdt": 64.3651,
+    "fees_open_usdt": 0.1498,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 449.59,
-    "free_capital_usdt": 71.79,
+    "deployed_usdt": 299.59,
+    "free_capital_usdt": 223.93,
     "max_concurrent_slots": 3,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -8.7021,
-    "deployed_usdt": 449.59
+    "daily_pnl": -6.4834,
+    "deployed_usdt": 299.59
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "HIVEUSDT",
-      "DOGSUSDT"
+      "HIVEUSDT"
     ],
     "exchange_symbols": [
-      "HIVEUSDT",
-      "DOGSUSDT"
+      "HIVEUSDT"
     ]
   },
   "open_trades": [
@@ -102,14 +100,16 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.0532,
-      "current_price": 0.05303,
-      "unrealized_pnl_usdt": 2.7365,
-      "unrealized_pnl_pct": 0.913,
-      "last_price_check_at": "2026-06-11T04:46:51.300610+00:00",
+      "current_price": 0.05298,
+      "unrealized_pnl_usdt": 2.4514,
+      "unrealized_pnl_pct": 0.818,
+      "last_price_check_at": "2026-06-11T04:48:59.448067+00:00",
       "phase_a_mae_price": 0.05228,
       "phase_a_mae_pct": -0.514,
       "phase_a_mae_at": "2026-06-11T03:57:40.881659+00:00"
-    },
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "DOGSUSDT|LONG|2026-06-11T04:33:22.023674+00:00",
       "trade_id": "L1781152402_DOGSUSD_L",
@@ -133,7 +133,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 6,
       "wick_filter_mode": "always",
-      "sl_breach_count": 1,
+      "sl_breach_count": 6,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.005,
       "regime_gate_enabled": true,
@@ -156,7 +156,7 @@
       "phase_a_mfe_pct": 0.966,
       "phase_b_mfe_pct": 2.762,
       "phase_c_mfe_pct": 2.762,
-      "fees_paid_usdt": 0.075,
+      "fees_paid_usdt": 0.151109,
       "fees_are_actual": true,
       "opened_at": "2026-06-11T04:33:53.991259+00:00",
       "is_dry_run": false,
@@ -167,15 +167,28 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 4.496e-05,
-      "current_price": 4.548e-05,
-      "unrealized_pnl_usdt": 2.8911,
-      "unrealized_pnl_pct": 1.927,
-      "last_price_check_at": "2026-06-11T04:46:51.300610+00:00",
+      "current_price": 4.536e-05,
+      "unrealized_pnl_usdt": 2.4877,
+      "unrealized_pnl_pct": 1.658,
+      "last_price_check_at": "2026-06-11T04:47:44.810406+00:00",
       "phase_b_mfe_price": 4.576e-05,
-      "phase_c_mfe_price": 4.576e-05
-    }
-  ],
-  "recent_closed": [
+      "phase_c_mfe_price": 4.576e-05,
+      "btc_regime_at_close": "up",
+      "btc_price_at_close": 62709.8,
+      "btc_pct_vs_ma25_at_close": 1.519,
+      "closed_at": "2026-06-11T04:47:48.274188+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 4.528e-05,
+      "realized_pnl_usdt": 2.2187,
+      "close_order_id": 4141684030,
+      "close_qty": 3361721.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 4.555690720000001e-05,
+      "close_slippage_bps": 60.78,
+      "entry_fees_usdt": 0.075,
+      "close_fees_usdt": 0.076109
+    },
     {
       "paper_id": "PYTHUSDT|LONG|2026-06-11T04:11:47.444665+00:00",
       "trade_id": "L1781151107_PYTHUSD_L",
@@ -32002,8 +32015,8 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-11T04:20:36.719234+00:00",
-      "reason": "paper trade too old (1575s > 600s)",
-      "last_checked_at": "2026-06-11T04:46:51.300610+00:00"
+      "reason": "paper trade too old (1703s > 600s)",
+      "last_checked_at": "2026-06-11T04:48:59.448067+00:00"
     },
     {
       "paper_id": "CRVUSDT|LONG|2026-06-11T04:22:03.895890+00:00",
@@ -32011,8 +32024,8 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-11T04:22:46.338269+00:00",
-      "reason": "paper trade too old (1445s > 600s)",
-      "last_checked_at": "2026-06-11T04:46:51.300610+00:00"
+      "reason": "paper trade too old (1573s > 600s)",
+      "last_checked_at": "2026-06-11T04:48:59.448067+00:00"
     },
     {
       "paper_id": "HMSTRUSDT|LONG|2026-06-11T04:43:31.992178+00:00",
@@ -32021,18 +32034,18 @@
       "conviction_score": 6,
       "signal_at": "2026-06-11T04:44:27.293747+00:00",
       "reason": "phase_6f_b1: conviction=6 历史 n=57 WR 28% -$80 (paper +$22 → 信号差+执行差双重, shadow 化)",
-      "last_checked_at": "2026-06-11T04:46:51.300610+00:00"
+      "last_checked_at": "2026-06-11T04:48:59.448067+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 62676.0,
-    "btc_ma25_1h": 61770.31,
-    "pct_vs_ma25": 1.466,
-    "change_24h_pct": 2.295,
+    "btc_price": 62726.4,
+    "btc_ma25_1h": 61772.32,
+    "pct_vs_ma25": 1.545,
+    "change_24h_pct": 2.378,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-11T04:46:52.239032+00:00"
+    "computed_at": "2026-06-11T04:49:00.563548+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
