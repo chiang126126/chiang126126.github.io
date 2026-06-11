@@ -1608,6 +1608,265 @@ class TestPhase5TEntryPriceSafetyAndPnlGuard(unittest.TestCase):
 
 # ============================================================================
 
+class TestPhase6GG3CloseLimitIoc(unittest.TestCase):
+    """Phase 6.G G3 (2026-06-12): close_position LIMIT-IOC + market fallback.
+
+    数据驱动: 170h pilot close-side slip mean 27.5 bps, median 15.5 bps.
+    策略: 单 chunk 平仓时先尝试 LIMIT-IOC at mid ± 10 bps, 失败 / 部分填 fallback market.
+    多 chunk (qty > market_max) 跳过 LIMIT.
+
+    Tests 覆盖:
+      - LIMIT-IOC 全填 (limit_ioc_full)
+      - LIMIT-IOC 部分填 + market 补 (limit_ioc_partial_market)
+      - LIMIT-IOC 0 填 + market 兜底 (limit_failed_market)
+      - LIMIT-IOC API 失败 → market 兜底 (limit_failed_market)
+      - get_book_ticker 失败 → market only (market_only-ish, 但 close_method 是 market_only)
+      - 多 chunk → 跳过 LIMIT (market_only)
+      - use_limit_ioc=False → 老行为 (market_only)
+      - _calc_close_limit_price 各边界
+    """
+
+    def setUp(self):
+        from binance_client import BinanceClient
+        self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, testnet=True, dry_run=False)
+        self.client._bucket.acquire = MagicMock(return_value=True)
+        self.fake_filters = {
+            "step_size": 1.0, "min_qty": 1.0, "max_qty": 1000000.0,
+            "market_max_qty": 10000.0, "min_notional": 5.0,
+            "tick_size": 0.00001, "quantity_precision": 0, "price_precision": 5,
+            "status": "TRADING",
+        }
+        self.fake_book = {"bidPrice": "0.04395", "askPrice": "0.04405"}  # mid = 0.044
+
+    def _mock_position(self, symbol, amt):
+        return [{"symbol": symbol, "positionAmt": str(amt), "entryPrice": "0.040"}]
+
+    # === _calc_close_limit_price 数值边界 ===
+
+    def test_calc_limit_price_sell_close(self):
+        """SELL close (关 LONG): mid × (1 - X bps), round 到 tick."""
+        from binance_client import _calc_close_limit_price
+        price = _calc_close_limit_price("SELL", 100.0, 10, 0.01)
+        # mid 100 × (1 - 10 bps) = 100 × 0.999 = 99.9
+        self.assertAlmostEqual(price, 99.9, places=4)
+
+    def test_calc_limit_price_buy_close(self):
+        """BUY close (关 SHORT): mid × (1 + X bps), round 到 tick."""
+        from binance_client import _calc_close_limit_price
+        price = _calc_close_limit_price("BUY", 100.0, 10, 0.01)
+        # mid 100 × (1 + 10 bps) = 100 × 1.001 = 100.1
+        self.assertAlmostEqual(price, 100.1, places=4)
+
+    def test_calc_limit_price_zero_bps(self):
+        """0 bps = mid 不变 (round 到 tick)."""
+        from binance_client import _calc_close_limit_price
+        self.assertAlmostEqual(_calc_close_limit_price("SELL", 100.0, 0, 0.01), 100.0)
+
+    def test_calc_limit_price_invalid_side(self):
+        from binance_client import _calc_close_limit_price
+        with self.assertRaises(ValueError):
+            _calc_close_limit_price("INVALID", 100.0, 10, 0.01)
+
+    def test_calc_limit_price_invalid_mid(self):
+        from binance_client import _calc_close_limit_price
+        with self.assertRaises(ValueError):
+            _calc_close_limit_price("SELL", 0, 10, 0.01)
+
+    # === close_position with use_limit_ioc=True ===
+
+    def test_close_limit_ioc_full_fill(self):
+        """LIMIT-IOC 全成交 → 跳过 market, close_method=limit_ioc_full."""
+        qty = 5000.0
+        # LIMIT 完全成交
+        mock_limit = MagicMock(return_value={
+            "orderId": 100, "executedQty": "5000.0",
+            "cumQuote": "220.0", "avgPrice": "0.044", "status": "FILLED",
+        })
+        mock_market = MagicMock(return_value={})  # 不应被调用
+        with patch.object(self.client, "get_positions",
+                          return_value=self._mock_position("DYMUSDT", -qty)), \
+             patch.object(self.client, "get_symbol_filters", return_value=self.fake_filters), \
+             patch.object(self.client, "get_open_orders", return_value=[]), \
+             patch.object(self.client, "get_book_ticker", return_value=self.fake_book), \
+             patch.object(self.client, "place_limit_order", mock_limit), \
+             patch.object(self.client, "place_market_order", mock_market), \
+             patch.object(self.client, "_actual_commission_usdt", return_value=None):
+            result = self.client.close_position(
+                "DYMUSDT", "SELL", trade_id="t1",
+                use_limit_ioc=True, close_limit_bps=10,
+            )
+        self.assertEqual(result["close_method"], "limit_ioc_full")
+        self.assertEqual(result["limit_qty_closed"], 5000.0)
+        self.assertEqual(result["market_qty_closed"], 0.0)
+        self.assertEqual(mock_limit.call_count, 1, "应调 LIMIT 1 次")
+        self.assertEqual(mock_market.call_count, 0, "全填后不应调 market")
+        # actual_close_slip_bps 应非 None (有 mid 基准)
+        self.assertIsNotNone(result["actual_close_slip_bps"])
+
+    def test_close_limit_ioc_partial_market_fallback(self):
+        """LIMIT-IOC 部分成交 → market 补剩余, close_method=limit_ioc_partial_market."""
+        qty = 5000.0
+        # LIMIT 只填 3000 (60%), 剩 2000
+        mock_limit = MagicMock(return_value={
+            "orderId": 100, "executedQty": "3000.0",
+            "cumQuote": "132.0", "avgPrice": "0.044", "status": "PARTIALLY_FILLED",
+        })
+        # Market 补 2000
+        mock_market = MagicMock(return_value={
+            "orderId": 101, "executedQty": "2000.0",
+            "cumQuote": "88.0", "avgPrice": "0.044",
+        })
+        with patch.object(self.client, "get_positions",
+                          return_value=self._mock_position("DYMUSDT", -qty)), \
+             patch.object(self.client, "get_symbol_filters", return_value=self.fake_filters), \
+             patch.object(self.client, "get_open_orders", return_value=[]), \
+             patch.object(self.client, "get_book_ticker", return_value=self.fake_book), \
+             patch.object(self.client, "place_limit_order", mock_limit), \
+             patch.object(self.client, "place_market_order", mock_market), \
+             patch.object(self.client, "_actual_commission_usdt", return_value=None):
+            result = self.client.close_position(
+                "DYMUSDT", "SELL", trade_id="t1",
+                use_limit_ioc=True, close_limit_bps=10,
+            )
+        self.assertEqual(result["close_method"], "limit_ioc_partial_market")
+        self.assertEqual(result["limit_qty_closed"], 3000.0)
+        self.assertEqual(result["market_qty_closed"], 2000.0)
+        self.assertEqual(result["qty_closed"], 5000.0)
+        self.assertEqual(mock_market.call_count, 1, "market 关剩余 1 次")
+        # market 调用的 qty 应是 2000
+        market_qty = mock_market.call_args_list[0].kwargs["quantity"]
+        self.assertAlmostEqual(market_qty, 2000.0, places=4)
+
+    def test_close_limit_ioc_zero_fill_market_fallback(self):
+        """LIMIT-IOC 0 成交 (status=EXPIRED) → market 兜底全 qty, close_method=limit_failed_market."""
+        qty = 5000.0
+        mock_limit = MagicMock(return_value={
+            "orderId": 100, "executedQty": "0",
+            "cumQuote": "0", "avgPrice": "0", "status": "EXPIRED",
+        })
+        mock_market = MagicMock(return_value={
+            "orderId": 101, "executedQty": "5000.0",
+            "cumQuote": "220.0", "avgPrice": "0.044",
+        })
+        with patch.object(self.client, "get_positions",
+                          return_value=self._mock_position("DYMUSDT", -qty)), \
+             patch.object(self.client, "get_symbol_filters", return_value=self.fake_filters), \
+             patch.object(self.client, "get_open_orders", return_value=[]), \
+             patch.object(self.client, "get_book_ticker", return_value=self.fake_book), \
+             patch.object(self.client, "place_limit_order", mock_limit), \
+             patch.object(self.client, "place_market_order", mock_market), \
+             patch.object(self.client, "_actual_commission_usdt", return_value=None):
+            result = self.client.close_position(
+                "DYMUSDT", "SELL", trade_id="t1",
+                use_limit_ioc=True, close_limit_bps=10,
+            )
+        self.assertEqual(result["close_method"], "limit_failed_market")
+        self.assertEqual(result["limit_qty_closed"], 0.0)
+        self.assertEqual(result["market_qty_closed"], 5000.0)
+        self.assertEqual(mock_market.call_count, 1)
+
+    def test_close_limit_ioc_api_error_market_fallback(self):
+        """LIMIT-IOC API 抛错 → market 兜底 close, close_method=limit_failed_market."""
+        from binance_client import BinanceError
+        qty = 5000.0
+        mock_limit = MagicMock(side_effect=BinanceError("simulated API error"))
+        mock_market = MagicMock(return_value={
+            "orderId": 101, "executedQty": "5000.0",
+            "cumQuote": "220.0", "avgPrice": "0.044",
+        })
+        with patch.object(self.client, "get_positions",
+                          return_value=self._mock_position("DYMUSDT", -qty)), \
+             patch.object(self.client, "get_symbol_filters", return_value=self.fake_filters), \
+             patch.object(self.client, "get_open_orders", return_value=[]), \
+             patch.object(self.client, "get_book_ticker", return_value=self.fake_book), \
+             patch.object(self.client, "place_limit_order", mock_limit), \
+             patch.object(self.client, "place_market_order", mock_market), \
+             patch.object(self.client, "_actual_commission_usdt", return_value=None):
+            result = self.client.close_position(
+                "DYMUSDT", "SELL", trade_id="t1",
+                use_limit_ioc=True, close_limit_bps=10,
+            )
+        self.assertEqual(result["close_method"], "limit_failed_market")
+        self.assertEqual(result["limit_qty_closed"], 0.0)
+        self.assertEqual(mock_market.call_count, 1, "market 必须兜底关仓")
+
+    def test_close_limit_ioc_book_ticker_failure_market_fallback(self):
+        """get_book_ticker 抛错 → 跳 LIMIT 直接 market, close_method=limit_failed_market."""
+        from binance_client import BinanceError
+        qty = 5000.0
+        mock_market = MagicMock(return_value={
+            "orderId": 101, "executedQty": "5000.0",
+            "cumQuote": "220.0", "avgPrice": "0.044",
+        })
+        with patch.object(self.client, "get_positions",
+                          return_value=self._mock_position("DYMUSDT", -qty)), \
+             patch.object(self.client, "get_symbol_filters", return_value=self.fake_filters), \
+             patch.object(self.client, "get_open_orders", return_value=[]), \
+             patch.object(self.client, "get_book_ticker",
+                          side_effect=BinanceError("network error")), \
+             patch.object(self.client, "place_market_order", mock_market), \
+             patch.object(self.client, "_actual_commission_usdt", return_value=None):
+            result = self.client.close_position(
+                "DYMUSDT", "SELL", trade_id="t1",
+                use_limit_ioc=True, close_limit_bps=10,
+            )
+        # book_ticker 失败 → 不 try LIMIT → close_method = limit_failed_market
+        # (limit_qty_closed 仍 0, fallback market)
+        self.assertEqual(result["close_method"], "limit_failed_market")
+        self.assertEqual(result["limit_qty_closed"], 0.0)
+        self.assertIsNone(result["mid_at_close_attempt"], "没拿到 mid 应 None")
+        self.assertIsNone(result["actual_close_slip_bps"], "没 mid 不计算 slip")
+
+    def test_close_limit_ioc_chunked_skips_limit(self):
+        """qty > market_max → 多 chunk → 跳过 LIMIT, close_method=market_only."""
+        qty = 18075.0  # > market_max 10000
+        mock_limit = MagicMock(return_value={})  # 不应被调
+        mock_market = MagicMock(return_value={
+            "orderId": 101, "executedQty": "10000.0",
+            "cumQuote": "440.0", "avgPrice": "0.044",
+        })
+        with patch.object(self.client, "get_positions",
+                          return_value=self._mock_position("DYMUSDT", -qty)), \
+             patch.object(self.client, "get_symbol_filters", return_value=self.fake_filters), \
+             patch.object(self.client, "get_open_orders", return_value=[]), \
+             patch.object(self.client, "place_limit_order", mock_limit), \
+             patch.object(self.client, "place_market_order", mock_market), \
+             patch.object(self.client, "_actual_commission_usdt", return_value=None):
+            result = self.client.close_position(
+                "DYMUSDT", "SELL", trade_id="t1",
+                use_limit_ioc=True, close_limit_bps=10,
+            )
+        self.assertEqual(result["close_method"], "market_only")
+        self.assertEqual(result["limit_qty_closed"], 0.0)
+        self.assertEqual(mock_limit.call_count, 0, "chunked 时不应调 LIMIT")
+        self.assertEqual(mock_market.call_count, 2, "拆 2 笔 market")
+
+    def test_close_default_no_limit_ioc(self):
+        """use_limit_ioc=False (default) → 老行为, close_method=market_only."""
+        qty = 5000.0
+        mock_limit = MagicMock(return_value={})
+        mock_market = MagicMock(return_value={
+            "orderId": 999, "executedQty": "5000.0",
+            "cumQuote": "220.0", "avgPrice": "0.044",
+        })
+        with patch.object(self.client, "get_positions",
+                          return_value=self._mock_position("DYMUSDT", -qty)), \
+             patch.object(self.client, "get_symbol_filters", return_value=self.fake_filters), \
+             patch.object(self.client, "get_open_orders", return_value=[]), \
+             patch.object(self.client, "place_limit_order", mock_limit), \
+             patch.object(self.client, "place_market_order", mock_market), \
+             patch.object(self.client, "_actual_commission_usdt", return_value=None):
+            result = self.client.close_position(
+                "DYMUSDT", "SELL", trade_id="t1",
+                # use_limit_ioc 默认 False
+            )
+        self.assertEqual(result["close_method"], "market_only")
+        self.assertEqual(mock_limit.call_count, 0)
+        self.assertEqual(mock_market.call_count, 1)
+
+
+# ============================================================================
+
 if __name__ == "__main__":
     # 直接运行: python3 test_binance_client.py
     unittest.main(verbosity=2)

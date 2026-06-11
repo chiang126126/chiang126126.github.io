@@ -225,6 +225,38 @@ def round_price_to_tick(price: float, tick_size: float) -> float:
     return round(result, decimals)
 
 
+def _calc_close_limit_price(
+    close_side: str, mid_price: float, slippage_limit_bps: int,
+    tick_size: float,
+) -> float:
+    """Phase 6.G G3: 计算 close 用 LIMIT-IOC 限价.
+
+    SELL close (关 LONG): mid × (1 - X bps) — 略低于 mid 卖, 鼓励 maker 接住
+    BUY close  (关 SHORT): mid × (1 + X bps) — 略高于 mid 买, 鼓励 maker 接住
+
+    "略低/略高" 是 trade-off: 更紧 (5 bps) → 更省滑点但 fill 率低,
+                            更宽 (15 bps) → fill 率高但救的 bps 少.
+    Default 10 bps 平衡选择.
+
+    返回值已 round 到 tick_size (满足 Binance PRICE_FILTER).
+    Raises ValueError 如果输入异常.
+    """
+    if close_side not in ("BUY", "SELL"):
+        raise ValueError(f"close_side 必须 BUY/SELL, got {close_side!r}")
+    if mid_price <= 0:
+        raise ValueError(f"mid_price 必须 > 0, got {mid_price}")
+    if slippage_limit_bps < 0:
+        raise ValueError(f"slippage_limit_bps 必须 >= 0, got {slippage_limit_bps}")
+    if tick_size <= 0:
+        raise ValueError(f"tick_size 必须 > 0, got {tick_size}")
+    factor = slippage_limit_bps / 10000.0
+    if close_side == "SELL":
+        raw = mid_price * (1.0 - factor)
+    else:  # BUY
+        raw = mid_price * (1.0 + factor)
+    return round_price_to_tick(raw, tick_size)
+
+
 # ============================================================================
 # Token Bucket (rate limiting)
 # ============================================================================
@@ -1320,6 +1352,8 @@ class BinanceClient:
         trade_id: Optional[str] = None,
         dry_run: Optional[bool] = None,
         expected_entry_price: Optional[float] = None,
+        use_limit_ioc: bool = False,
+        close_limit_bps: int = 10,
     ) -> dict:
         """主动平仓 (timeout / 手动 kill / TP2 触发 / 等).
 
@@ -1327,18 +1361,25 @@ class BinanceClient:
 
         Args:
             expected_entry_price: Phase 5.T (2026-06-02 hotfix). 可选, 调用方
-                                  本地记录的入场成交价 (open_position 返回的
-                                  avg_fill_price). 若提供, 优先使用本地权威值
-                                  计算 realized PnL — 而不是 Binance positionRisk
-                                  返回的 entryPrice (testnet 微小币上偶尔返回
-                                  10x 错值, 见 DOGSUSDT 2026-06-02 14:31 事件).
-                                  不传 → fallback 到 API entryPrice (向后兼容).
+                                  本地记录的入场成交价. 若提供, 优先使用本地权威值
+                                  计算 realized PnL (防 API entryPrice glitch).
+            use_limit_ioc: Phase 6.G G3 (2026-06-12). True → 单 chunk 平仓时先
+                           尝试 LIMIT-IOC at mid ± close_limit_bps, 失败 / 部分填
+                           走 market fallback. 多 chunk (qty > market_max) 时跳过
+                           LIMIT-IOC 直接 chunked market (chunked 跟 limit 不兼容).
+                           Default False = 老行为 (market only).
+            close_limit_bps: Phase 6.G G3. LIMIT 距 mid 多远 bps. Default 10.
+                             更紧 (5) → 救更多滑点但 fill 率低
+                             更宽 (15) → fill 率高但救得少
+                             数据 170h pilot: market close mean slip 27.5 bps,
+                             10 bps LIMIT 预计救 ~10 bps × 50% fill rate = $2.5/天.
 
         流程:
         1. 拉持仓, 验证存在且方向匹配
         2. 撤该 symbol 所有挂单 (清理残留 SL/TP)
-        3. reduceOnly market 平仓
-        4. 计算 realized PnL
+        3. Phase 6.G G3: 单 chunk + use_limit_ioc → LIMIT-IOC 尝试
+        4. Market chunks 关剩余 qty (= 全部 if LIMIT 全失败 / 单 chunk; = 部分 if LIMIT partial)
+        5. 计算 realized PnL (聚合 LIMIT + Market 成交)
         """
         side = side.upper()
         if side not in ("BUY", "SELL"):
@@ -1457,31 +1498,165 @@ class BinanceClient:
         else:
             chunks = [qty]
 
-        # 逐笔执行 close (失败立即抛, 上层 _try_mirror_close 处理)
-        log.info(
-            f"close_position: market {close_side} {qty} {symbol} "
-            f"(reduceOnly, canceled {canceled} pending orders, chunks={len(chunks)})"
-        )
-        # 聚合统计 (跨多笔)
-        total_qty_closed = 0.0
-        total_cum_quote = 0.0
-        last_order_id = 0
-        last_resp: dict = {}
-        for i, chunk_qty in enumerate(chunks):
-            # 多笔时只第一笔用原 coid (Binance 不允许重复 coid)
-            chunk_coid = coid if i == 0 else None
-            chunk_resp = self.place_market_order(
-                symbol=symbol,
-                side=close_side,
-                quantity=chunk_qty,
-                reduce_only=True,
-                client_order_id=chunk_coid,
-                dry_run=False,
+        # Phase 6.G G3 (2026-06-12): LIMIT-IOC + market fallback.
+        # 仅单 chunk 时尝试 LIMIT-IOC. 多 chunk (qty > market_max) 跳过 (chunked LIMIT
+        # 复杂度不值, 大 qty 本来罕见). 任何 LIMIT 失败路径都 fallback market, 保证关仓.
+        limit_qty_closed = 0.0
+        limit_cum_quote = 0.0
+        limit_order_id = 0
+        close_method = "market_only"   # 默认 — 没尝试 LIMIT 或全部 market
+        mid_at_attempt: Optional[float] = None   # 用于计算 actual_close_slip_bps
+        if use_limit_ioc and len(chunks) == 1:
+            try:
+                tick_size = float(filters.get("tick_size") or 0) if filters else 0
+                book = self.get_book_ticker(symbol)
+                bid = float(book.get("bidPrice") or 0)
+                ask = float(book.get("askPrice") or 0)
+                if bid > 0 and ask > 0 and tick_size > 0:
+                    mid = (bid + ask) / 2.0
+                    mid_at_attempt = mid   # 留作 actual_close_slip_bps 计算基准
+                    limit_price = _calc_close_limit_price(
+                        close_side, mid, close_limit_bps, tick_size,
+                    )
+                    log.info(
+                        f"[close LIMIT-IOC] {symbol} {close_side} qty={qty} "
+                        f"bid={bid} ask={ask} mid={mid:.8f} limit={limit_price:.8f} "
+                        f"({close_limit_bps}bps from mid)"
+                    )
+                    # 用单独 coid 避免跟 market fallback 冲突 (suffix L = LIMIT)
+                    limit_coid = f"cresus_{trade_id}_CL" if trade_id else None
+                    if limit_coid:
+                        _validate_client_order_id(limit_coid)
+                    limit_resp = self.place_limit_order(
+                        symbol=symbol,
+                        side=close_side,
+                        quantity=qty,
+                        price=limit_price,
+                        time_in_force="IOC",
+                        reduce_only=True,
+                        client_order_id=limit_coid,
+                        dry_run=False,
+                    )
+                    limit_qty_closed = float(limit_resp.get("executedQty") or 0)
+                    limit_cum_quote = float(limit_resp.get("cumQuote") or 0)
+                    limit_order_id = int(limit_resp.get("orderId") or 0)
+                    fill_pct = (limit_qty_closed / qty * 100) if qty > 0 else 0
+                    log.info(
+                        f"[close LIMIT-IOC] {symbol}: filled {limit_qty_closed}/{qty} "
+                        f"({fill_pct:.1f}%) cum_quote={limit_cum_quote:.4f} "
+                        f"status={limit_resp.get('status')}"
+                    )
+                else:
+                    log.info(
+                        f"[close LIMIT-IOC] {symbol}: book/tick 数据不全 "
+                        f"(bid={bid} ask={ask} tick={tick_size}), 跳过 LIMIT 走 market"
+                    )
+            except (BinanceError, ValueError, TypeError, KeyError) as e:
+                # 任何 LIMIT-IOC 失败 → 完整 fallback market (limit_qty_closed 保持 0)
+                log.warning(
+                    f"[close LIMIT-IOC] {symbol} 失败, fallback market: "
+                    f"{type(e).__name__}: {e}"
+                )
+                limit_qty_closed = 0.0
+                limit_cum_quote = 0.0
+                limit_order_id = 0
+
+        # 计算 market 还需关多少 (= 总 qty - LIMIT 已关). 浮点 safe: 1e-8 容差.
+        remaining_qty = qty - limit_qty_closed
+        if remaining_qty < 1e-8:
+            # LIMIT 全填 → 跳过 market loop, 用 LIMIT 数据
+            close_method = "limit_ioc_full"
+            total_qty_closed = limit_qty_closed
+            total_cum_quote = limit_cum_quote
+            last_order_id = limit_order_id
+            last_resp = {}
+            log.info(
+                f"[close] {symbol}: LIMIT-IOC 全成交, 跳过 market fallback. "
+                f"close_method=limit_ioc_full"
             )
-            total_qty_closed += float(chunk_resp.get("executedQty") or chunk_qty)
-            total_cum_quote += float(chunk_resp.get("cumQuote") or 0)
-            last_order_id = int(chunk_resp.get("orderId") or last_order_id)
-            last_resp = chunk_resp
+        else:
+            # market 关剩余 (= 全 qty if 没 LIMIT 或 LIMIT 0 填; = 部分 if LIMIT partial)
+            # 若 LIMIT 部分填, market 关剩余 + close_method=limit_ioc_partial_market
+            # 若 LIMIT 0 填 (try 过但 fail), market 关全部 + close_method=limit_failed_market
+            # 若 use_limit_ioc=False, close_method=market_only (默认)
+            if limit_qty_closed > 0:
+                close_method = "limit_ioc_partial_market"
+            elif use_limit_ioc and len(chunks) == 1:
+                close_method = "limit_failed_market"
+            # else: close_method 保持 "market_only" 默认
+
+            # Phase 5.A-fix: 若 LIMIT 没全填 (remaining > 0), market 需重新拆 chunks
+            # (因 remaining_qty 可能 != 原 qty). 但 chunks 列表是基于原 qty 算的.
+            # 简化: 重新对 remaining_qty 拆 chunks (跟原算法一致).
+            if limit_qty_closed > 0:
+                # LIMIT 吃了一部分, 重新对 remaining 拆 chunks (跟 step_size 对齐)
+                step_size = float(filters.get("step_size") or 0) if filters else 0
+                if step_size > 0:
+                    remaining_qty = round_qty_down_to_step(remaining_qty, step_size)
+                if remaining_qty < 1e-8:
+                    # round 后可能为 0, 视为 LIMIT 已全填
+                    close_method = "limit_ioc_full"
+                    total_qty_closed = limit_qty_closed
+                    total_cum_quote = limit_cum_quote
+                    last_order_id = limit_order_id
+                    last_resp = {}
+                    log.info(
+                        f"[close] {symbol}: LIMIT-IOC 后 remaining 不足 step_size, "
+                        f"视为 limit_ioc_full"
+                    )
+                    # Jump 出 if/else, 进 PnL 计算
+                    # 这里我们已设 total_*, 不再进 chunks loop
+                    chunks_to_run = []
+                else:
+                    chunks_to_run = [remaining_qty] if remaining_qty <= market_max or market_max == 0 else None
+                    if chunks_to_run is None:
+                        # remaining 仍超 market_max, 重新拆
+                        chunks_to_run = []
+                        r = remaining_qty
+                        while r > market_max:
+                            chunks_to_run.append(market_max)
+                            r = round(r - market_max, 8)
+                        if r > 0:
+                            chunks_to_run.append(r)
+            else:
+                chunks_to_run = chunks   # 用原 chunks (LIMIT 没尝试 or 0 填)
+
+            # 逐笔执行 close (失败立即抛, 上层 _try_mirror_close 处理)
+            if chunks_to_run:
+                log.info(
+                    f"[close] {symbol}: market {close_side} chunks_to_run={chunks_to_run} "
+                    f"(reduceOnly, canceled {canceled} pending, close_method={close_method})"
+                )
+                # 初始化聚合 = LIMIT 已成交部分
+                total_qty_closed = limit_qty_closed
+                total_cum_quote = limit_cum_quote
+                last_order_id = limit_order_id if limit_order_id > 0 else 0
+                last_resp = {}
+                for i, chunk_qty in enumerate(chunks_to_run):
+                    # market chunk coid: 加 M suffix 区分 LIMIT-IOC 的 _CL coid
+                    if i == 0 and limit_qty_closed == 0:
+                        # LIMIT 没用 (0 填或没 try), 可以用原 coid (向后兼容)
+                        chunk_coid = coid
+                    elif i == 0:
+                        # LIMIT 部分用了 _CL coid, market fallback 用 _CM 区分
+                        chunk_coid = f"cresus_{trade_id}_CM" if trade_id else None
+                        if chunk_coid:
+                            _validate_client_order_id(chunk_coid)
+                    else:
+                        chunk_coid = None
+                    chunk_resp = self.place_market_order(
+                        symbol=symbol,
+                        side=close_side,
+                        quantity=chunk_qty,
+                        reduce_only=True,
+                        client_order_id=chunk_coid,
+                        dry_run=False,
+                    )
+                    total_qty_closed += float(chunk_resp.get("executedQty") or chunk_qty)
+                    total_cum_quote += float(chunk_resp.get("cumQuote") or 0)
+                    if chunk_resp.get("orderId"):
+                        last_order_id = int(chunk_resp.get("orderId"))
+                    last_resp = chunk_resp
         close_resp = last_resp  # 保持原 close_resp 变量名兼容下面计算
         exit_price = (total_cum_quote / total_qty_closed
                        if total_qty_closed > 0 else float(close_resp.get("avgPrice") or 0))
@@ -1521,6 +1696,15 @@ class BinanceClient:
                      if actual_close_fee is not None else close_fee_estimate)
         close_fee_is_actual = actual_close_fee is not None
 
+        # Phase 6.G G3 (2026-06-12): 计算实际 close 滑点 (vs mid_at_attempt 基准).
+        # 仅当我们 try 过 LIMIT-IOC (即 mid_at_attempt 非 None) 时算; 否则 None.
+        # 公式: |avg_exit_price - mid| / mid × 10000 (绝对 bps, 不区分方向).
+        actual_close_slip_bps: Optional[float] = None
+        if mid_at_attempt is not None and mid_at_attempt > 0 and exit_price > 0:
+            actual_close_slip_bps = round(
+                abs(exit_price - mid_at_attempt) / mid_at_attempt * 10000.0, 2,
+            )
+
         result = {
             "symbol": symbol,
             "side": side,
@@ -1539,6 +1723,13 @@ class BinanceClient:
             "close_order_id": close_order_id_int,
             "open_orders_canceled": canceled,
             "closed_at": datetime.now(timezone.utc).isoformat(),
+            # Phase 6.G G3: 新跟踪字段供 retro 量化效果
+            "close_method": close_method,                # limit_ioc_full | limit_ioc_partial_market | limit_failed_market | market_only
+            "limit_qty_closed": round(limit_qty_closed, 8),
+            "limit_cum_quote": round(limit_cum_quote, 8),
+            "market_qty_closed": round(max(0.0, qty - limit_qty_closed), 8),
+            "mid_at_close_attempt": mid_at_attempt,      # None if LIMIT not attempted
+            "actual_close_slip_bps": actual_close_slip_bps,  # None if no mid reference
         }
         log.info(
             f"✓ close_position done: {symbol} {side} qty={qty} "

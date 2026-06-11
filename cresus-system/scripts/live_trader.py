@@ -492,6 +492,35 @@ LIVE_PHASE_6H1_BLOCK_DOWN_REBOUND_SHORT = True   # 紧急回滚改 False
 LIVE_SL_COMPENSATION_MODE = "always"  # "off" | "ab" (legacy) | "abc" | "abcd" | "always"
 
 # ============================================================================
+# Phase 6.G G3 (2026-06-12) — Close-side LIMIT-IOC + market fallback
+# ============================================================================
+# 数据驱动 (170h pilot, 419 笔 close):
+#   - close-side slippage: mean 27.5 bps, median 15.5 bps, p90 74 bps
+#   - 单笔 round-trip 摩擦 ($0.16) = 50% gross PnL 被吃
+#   - 修执行成本是单一最大可修因素 (vs 加策略 gate)
+#
+# 策略 (binance_client.close_position(use_limit_ioc=True, close_limit_bps=10)):
+#   1. 单 chunk 平仓时, 先取盘口 mid
+#   2. LIMIT-IOC at mid ± 10 bps (= 比 mid 略好 10 bps 的 limit)
+#   3. IOC 立即填可填的, 剩下 cancel
+#   4. 0 / 部分 fill → fallback market 补齐
+#   5. 多 chunk (qty > market_max) 跳过 LIMIT (chunked 复杂度不值)
+#
+# 预期效果 (conservative):
+#   - 50% close 是 paper trail trigger (slow, 流动性好) → LIMIT 大概率 fill ~10 bps
+#   - 50% close 是 SL trigger (fast, adverse) → LIMIT 大概率 fail → market 27 bps (没变)
+#   - 加权 mean slip: ~17-20 bps (vs 27.5 baseline), 救 ~7-10 bps/笔
+#   - 30 笔/天 × $100 notional × 8 bps = ~$2.5/天
+#
+# 风险:
+#   - LIMIT-Market 切换延迟 100-200ms (price 期间可能继续移动) — 小
+#   - LIMIT + market 双重 API 失败 → stuck position. 缓解: 现有 retry + Phase 6.D auto-heal
+#
+# 紧急回滚: LIVE_CLOSE_USE_LIMIT_IOC = False (一行回老 market-only 行为)
+LIVE_CLOSE_USE_LIMIT_IOC = True
+LIVE_CLOSE_LIMIT_BPS = 10                # LIMIT 距 mid 多远 bps. 调紧 (5) 救更多但 fill 率低.
+
+# ============================================================================
 # Phase 6.F (2026-06-08) — 数据驱动黑名单 (105h 实盘 280 笔统计后)
 # ============================================================================
 # 数据 (06-04 → 06-08 09:00 UTC, 105h, paper_id 1:1 配对验证):
@@ -2099,6 +2128,9 @@ def _try_mirror_close(
         result = client.close_position(
             symbol=sym, side=side, trade_id=trade_id,
             expected_entry_price=local_entry if local_entry > 0 else None,
+            # Phase 6.G G3 (2026-06-12): LIMIT-IOC + market fallback 替代纯 market
+            use_limit_ioc=LIVE_CLOSE_USE_LIMIT_IOC,
+            close_limit_bps=LIVE_CLOSE_LIMIT_BPS,
         )
     except (BinanceError, ValueError) as e:
         err_str = str(e)
