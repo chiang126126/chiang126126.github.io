@@ -1,32 +1,32 @@
 {
-  "ts": "2026-06-11T00:03:04.767425+00:00",
+  "ts": "2026-06-11T01:03:05.684162+00:00",
   "regime": "RISK_OFF",
   "regime_zh": "风险释放",
-  "confidence": 75,
-  "judgment": "Alpha 池上涨币占比 19.7%，中位涨跌 -2.44%。 跌幅超过 3% 的币数 (255) 明显多于涨幅 (61)，市场偏空。 BTC 24h -0.12%，funding -0.0006%。 判定: 风险释放。",
+  "confidence": 57,
+  "judgment": "Alpha 池上涨币占比 23.7%，中位涨跌 -1.92%。 跌幅超过 3% 的币数 (203) 明显多于涨幅 (72)，市场偏空。 BTC 24h +0.03%，funding 0.0016%。 判定: 风险释放。",
   "support": [
-    "Alpha 池 625 币样本中，上涨 123 个 (19.7%)，中位涨跌 -2.44%，平均涨跌 -1.77%",
-    "涨幅 >3% 的币 61 个，跌幅 >3% 的币 255 个；暴涨 >10% 有 19 个，暴跌 >10% 有 34 个",
-    "Binance BTCUSDT 当前约 61,597，24h 涨幅 -0.12%，24h 区间 60,691.90 - 62,840.20",
-    "BTCUSDT 永续 funding rate 为 -0.000006 (~-0.0006%)；Fear & Greed Index 为 12 (Extreme Fear)"
+    "Alpha 池 625 币样本中，上涨 148 个 (23.7%)，中位涨跌 -1.92%，平均涨跌 -1.15%",
+    "涨幅 >3% 的币 72 个，跌幅 >3% 的币 203 个；暴涨 >10% 有 23 个，暴跌 >10% 有 29 个",
+    "Binance BTCUSDT 当前约 61,875，24h 涨幅 +0.03%，24h 区间 60,691.90 - 62,840.20",
+    "BTCUSDT 永续 funding rate 为 0.000016 (~0.0016%)；Fear & Greed Index 为 12 (Extreme Fear)"
   ],
   "challenge": [
-    "当前条件较为明确，主要风险是后续数据快速变化"
+    "funding 0.0016% 仍为正，并未出现极端做多拥挤后的爆仓，可能只是暂时回调而非系统性风险释放"
   ],
   "metrics": {
     "alpha_pool_size": 625,
-    "rising_count": 123,
-    "rising_pct": 0.1968,
-    "median_change_pct": -2.44,
-    "average_change_pct": -1.77,
-    "pump_3pct_count": 61,
-    "dump_3pct_count": 255,
-    "extreme_pump_10pct_count": 19,
-    "extreme_dump_10pct_count": 34,
-    "btc_price": 61596.7,
-    "btc_change_24h_pct": -0.116,
+    "rising_count": 148,
+    "rising_pct": 0.2368,
+    "median_change_pct": -1.92,
+    "average_change_pct": -1.15,
+    "pump_3pct_count": 72,
+    "dump_3pct_count": 203,
+    "extreme_pump_10pct_count": 23,
+    "extreme_dump_10pct_count": 29,
+    "btc_price": 61874.9,
+    "btc_change_24h_pct": 0.034,
     "btc_24h_range": "60,691.90 - 62,840.20",
-    "btc_funding_rate": -5.76e-06,
+    "btc_funding_rate": 1.592e-05,
     "fear_greed": 12,
     "fear_greed_classification": "Extreme Fear"
   },
