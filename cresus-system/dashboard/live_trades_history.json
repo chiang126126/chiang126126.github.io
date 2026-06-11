@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-11T17:18:44.043928+00:00",
+  "generated_at": "2026-06-11T17:20:48.918755+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 437,
-    "open": 0,
+    "total_trades": 438,
+    "open": 1,
     "closed": 437,
     "wins": 153,
     "losses": 278,
@@ -15,30 +15,100 @@
     "avg_pnl_usdt": -0.0134,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 68.2431,
+    "fees_paid_usdt": 68.2931,
     "fees_realized_usdt": 68.2431,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.05,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 525.91,
+    "deployed_usdt": 99.91,
+    "free_capital_usdt": 425.95,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -0.3612,
-    "deployed_usdt": 0
+    "deployed_usdt": 99.91
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "CATIUSDT"
+    ],
+    "exchange_symbols": [
+      "CATIUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "CATIUSDT|LONG|2026-06-11T17:18:11.467030+00:00",
+      "trade_id": "L1781198291_CATIUSD_L",
+      "symbol": "CATIUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.0577,
+      "avg_fill_price": 0.0574531,
+      "slippage_bps": -42.79,
+      "qty": 1739.0,
+      "notional_usdt": 99.91093,
+      "leverage": 1,
+      "risk_usdt": 0.8724,
+      "risk_pct": 0.873,
+      "mirror_latency_sec": 113.7,
+      "sl_price": 0.056704529999999996,
+      "sl_paper_current": 0.05695143,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -0.0002469,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "B",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.05882286,
+      "tp2_price": 0.05994571,
+      "phase": "A",
+      "entry_order_id": 1906653875,
+      "entry_client_id": "cresus_L1781198291_CATIUSD_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.649,
+      "top_trader_position_ratio": 2.3455,
+      "top_trader_account_ratio": 0.8335,
+      "global_account_ratio": 0.5775,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.049955,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-11T17:20:18.589432+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 62371.1,
+      "btc_change_24h_at_open": 0.689,
+      "btc_pct_vs_ma25_at_open": -0.013,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.0577,
+      "current_price": 0.05705,
+      "unrealized_pnl_usdt": -0.701,
+      "unrealized_pnl_pct": -0.702,
+      "last_price_check_at": "2026-06-11T17:20:47.511392+00:00",
+      "phase_a_mae_price": 0.05705,
+      "phase_a_mae_pct": -0.702,
+      "phase_a_mae_at": "2026-06-11T17:20:47.511392+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "GWEIUSDT|LONG|2026-06-11T16:34:54.441006+00:00",
@@ -34045,26 +34115,16 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [
-    {
-      "paper_id": "CATIUSDT|LONG|2026-06-11T17:18:11.467030+00:00",
-      "symbol": "CATIUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-06-11T17:18:24.928707+00:00",
-      "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-06-11T17:18:38.620704+00:00"
-    }
-  ],
+  "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 62419.4,
-    "btc_ma25_1h": 62381.12,
-    "pct_vs_ma25": 0.061,
-    "change_24h_pct": 0.767,
+    "btc_price": 62393.2,
+    "btc_ma25_1h": 62380.07,
+    "pct_vs_ma25": 0.021,
+    "change_24h_pct": 0.724,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-11T17:18:40.332093+00:00"
+    "computed_at": "2026-06-11T17:20:48.615674+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
