@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-11T04:34:23.522296+00:00",
+  "generated_at": "2026-06-11T04:36:30.802616+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 411,
@@ -36,12 +36,12 @@
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "DOGSUSDT",
-      "HIVEUSDT"
+      "HIVEUSDT",
+      "DOGSUSDT"
     ],
     "exchange_symbols": [
-      "DOGSUSDT",
-      "HIVEUSDT"
+      "HIVEUSDT",
+      "DOGSUSDT"
     ]
   },
   "open_trades": [
@@ -102,10 +102,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.05306,
-      "current_price": 0.05254,
-      "unrealized_pnl_usdt": -0.057,
-      "unrealized_pnl_pct": -0.019,
-      "last_price_check_at": "2026-06-11T04:34:21.803826+00:00",
+      "current_price": 0.05262,
+      "unrealized_pnl_usdt": 0.3991,
+      "unrealized_pnl_pct": 0.133,
+      "last_price_check_at": "2026-06-11T04:36:29.210926+00:00",
       "phase_a_mae_price": 0.05228,
       "phase_a_mae_pct": -0.514,
       "phase_a_mae_at": "2026-06-11T03:57:40.881659+00:00"
@@ -125,8 +125,8 @@
       "risk_usdt": 1.2438,
       "risk_pct": 0.829,
       "mirror_latency_sec": 13.5,
-      "sl_price": 4.434e-05,
-      "sl_paper_current": 4.425e-05,
+      "sl_price": 4.462e-05,
+      "sl_paper_current": 4.453e-05,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": 9e-08,
       "sl_compensation_mode": "always",
@@ -142,7 +142,7 @@
       "min_conviction_threshold": null,
       "tp1_price": 4.496e-05,
       "tp2_price": 4.539e-05,
-      "phase": "A",
+      "phase": "B",
       "entry_order_id": 4141597854,
       "entry_client_id": "cresus_L1781152402_DOGSUSD_L_E",
       "sl_order_id": null,
@@ -153,8 +153,8 @@
       "top_trader_position_ratio": 2.2966,
       "top_trader_account_ratio": 2.1017,
       "global_account_ratio": 1.8466,
-      "phase_a_mfe_pct": 0.292,
-      "phase_b_mfe_pct": null,
+      "phase_a_mfe_pct": 0.966,
+      "phase_b_mfe_pct": 0.966,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.075,
       "fees_are_actual": true,
@@ -166,11 +166,12 @@
       "btc_pct_vs_ma25_at_open": 1.306,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 4.466e-05,
-      "current_price": 4.467e-05,
-      "unrealized_pnl_usdt": 0.1681,
-      "unrealized_pnl_pct": 0.112,
-      "last_price_check_at": "2026-06-11T04:34:21.803826+00:00"
+      "phase_a_mfe_price": 4.496e-05,
+      "current_price": 4.518e-05,
+      "unrealized_pnl_usdt": 1.8826,
+      "unrealized_pnl_pct": 1.255,
+      "last_price_check_at": "2026-06-11T04:36:29.210926+00:00",
+      "phase_b_mfe_price": 4.496e-05
     }
   ],
   "recent_closed": [
@@ -31995,22 +31996,13 @@
   ],
   "missed_signals": [
     {
-      "paper_id": "ASTRUSDT|LONG|2026-06-11T00:33:50.027729+00:00",
-      "symbol": "ASTRUSDT",
-      "direction": "LONG",
-      "conviction_score": 6,
-      "signal_at": "2026-06-11T00:33:55.880008+00:00",
-      "reason": "paper trade too old (14426s > 600s)",
-      "last_checked_at": "2026-06-11T04:34:21.803826+00:00"
-    },
-    {
       "paper_id": "BANKUSDT|LONG|2026-06-11T04:20:24.521089+00:00",
       "symbol": "BANKUSDT",
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-11T04:20:36.719234+00:00",
-      "reason": "paper trade too old (825s > 600s)",
-      "last_checked_at": "2026-06-11T04:34:21.803826+00:00"
+      "reason": "paper trade too old (952s > 600s)",
+      "last_checked_at": "2026-06-11T04:36:29.210926+00:00"
     },
     {
       "paper_id": "CRVUSDT|LONG|2026-06-11T04:22:03.895890+00:00",
@@ -32018,19 +32010,19 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-11T04:22:46.338269+00:00",
-      "reason": "paper trade too old (695s > 600s)",
-      "last_checked_at": "2026-06-11T04:34:21.803826+00:00"
+      "reason": "paper trade too old (823s > 600s)",
+      "last_checked_at": "2026-06-11T04:36:29.210926+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 62535.4,
-    "btc_ma25_1h": 61764.68,
-    "pct_vs_ma25": 1.248,
-    "change_24h_pct": 2.066,
+    "btc_price": 62547.8,
+    "btc_ma25_1h": 61765.18,
+    "pct_vs_ma25": 1.267,
+    "change_24h_pct": 2.086,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-11T04:34:22.934029+00:00"
+    "computed_at": "2026-06-11T04:36:30.198987+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
