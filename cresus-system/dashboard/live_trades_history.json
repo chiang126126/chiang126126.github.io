@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-11T02:54:12.022077+00:00",
+  "generated_at": "2026-06-11T02:56:07.421022+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 403,
@@ -58,15 +58,15 @@
       "risk_usdt": 8.0693,
       "risk_pct": 2.692,
       "mirror_latency_sec": 23.7,
-      "sl_price": 0.0516072,
-      "sl_paper_current": 0.05085,
+      "sl_price": 0.05275249725,
+      "sl_paper_current": 0.05199529725,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": 0.0007572,
       "sl_compensation_mode": "always",
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 7,
       "wick_filter_mode": "always",
-      "sl_breach_count": 0,
+      "sl_breach_count": 6,
       "funding_signal": "favorable",
       "funding_rate_pct_at_open": -0.1825,
       "regime_gate_enabled": true,
@@ -87,7 +87,7 @@
       "top_trader_account_ratio": 0.7328,
       "global_account_ratio": 0.5487,
       "phase_a_mfe_pct": 2.439,
-      "phase_b_mfe_pct": 2.439,
+      "phase_b_mfe_pct": 3.54,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.149867,
       "fees_are_actual": true,
@@ -100,14 +100,14 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.05209,
-      "current_price": 0.05258,
-      "unrealized_pnl_usdt": 5.65,
-      "unrealized_pnl_pct": 1.885,
-      "last_price_check_at": "2026-06-11T02:54:10.336078+00:00",
+      "current_price": 0.0522,
+      "unrealized_pnl_usdt": 3.443,
+      "unrealized_pnl_pct": 1.149,
+      "last_price_check_at": "2026-06-11T02:56:03.365776+00:00",
       "phase_a_mae_price": 0.0514,
       "phase_a_mae_pct": -0.401,
       "phase_a_mae_at": "2026-06-11T02:48:20.741456+00:00",
-      "phase_b_mfe_price": 0.05209
+      "phase_b_mfe_price": 0.05265
     }
   ],
   "recent_closed": [
@@ -31375,8 +31375,8 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-11T00:33:55.880008+00:00",
-      "reason": "paper trade too old (8414s > 600s)",
-      "last_checked_at": "2026-06-11T02:54:10.336078+00:00"
+      "reason": "paper trade too old (8527s > 600s)",
+      "last_checked_at": "2026-06-11T02:56:03.365776+00:00"
     },
     {
       "paper_id": "EDENUSDT|LONG|2026-06-11T02:49:49.131551+00:00",
@@ -31385,18 +31385,27 @@
       "conviction_score": 6,
       "signal_at": "2026-06-11T02:50:04.652225+00:00",
       "reason": "phase_6f_b1: conviction=6 历史 n=57 WR 28% -$80 (paper +$22 → 信号差+执行差双重, shadow 化)",
-      "last_checked_at": "2026-06-11T02:54:10.336078+00:00"
+      "last_checked_at": "2026-06-11T02:56:03.365776+00:00"
+    },
+    {
+      "paper_id": "BLESSUSDT|LONG|2026-06-11T02:54:03.424462+00:00",
+      "symbol": "BLESSUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-11T02:54:30.376048+00:00",
+      "reason": "open_failed (retry next tick)",
+      "last_checked_at": "2026-06-11T02:56:03.365776+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 62058.1,
-    "btc_ma25_1h": 61666.33,
-    "pct_vs_ma25": 0.635,
-    "change_24h_pct": 1.284,
+    "btc_price": 62079.7,
+    "btc_ma25_1h": 61667.2,
+    "pct_vs_ma25": 0.669,
+    "change_24h_pct": 1.319,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-11T02:54:11.691454+00:00"
+    "computed_at": "2026-06-11T02:56:04.562094+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
