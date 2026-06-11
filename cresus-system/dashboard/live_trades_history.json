@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-11T03:51:27.091500+00:00",
+  "generated_at": "2026-06-11T03:53:29.249311+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 406,
-    "open": 0,
+    "total_trades": 407,
+    "open": 1,
     "closed": 406,
     "wins": 142,
     "losses": 259,
@@ -15,30 +15,100 @@
     "avg_pnl_usdt": -0.0318,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 63.7648,
+    "fees_paid_usdt": 63.9146,
     "fees_realized_usdt": 63.7648,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.1498,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 523.34,
+    "deployed_usdt": 299.59,
+    "free_capital_usdt": 223.6,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -7.4152,
-    "deployed_usdt": 0
+    "deployed_usdt": 299.59
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "HIVEUSDT"
+    ],
+    "exchange_symbols": [
+      "HIVEUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "HIVEUSDT|LONG|2026-06-11T03:46:05.564506+00:00",
+      "trade_id": "L1781149565_HIVEUSD_L",
+      "symbol": "HIVEUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.0528,
+      "avg_fill_price": 0.05255,
+      "slippage_bps": -47.35,
+      "qty": 5701.0,
+      "notional_usdt": 299.58755,
+      "leverage": 1,
+      "risk_usdt": 2.2804,
+      "risk_pct": 0.761,
+      "mirror_latency_sec": 399.0,
+      "sl_price": 0.0519,
+      "sl_paper_current": 0.05215,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -0.00025,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 7,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "favorable",
+      "funding_rate_pct_at_open": -0.5862,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "D",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.053775,
+      "tp2_price": 0.05475,
+      "phase": "A",
+      "entry_order_id": 1588579499,
+      "entry_client_id": "cresus_L1781149565_HIVEUSD_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 7,
+      "alert_type": "burst",
+      "atr_pct": 0.616,
+      "top_trader_position_ratio": 1.187,
+      "top_trader_account_ratio": 0.7498,
+      "global_account_ratio": 0.5753,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.149794,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-11T03:53:15.024757+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "up",
+      "btc_price_at_open": 62426.9,
+      "btc_change_24h_at_open": 1.477,
+      "btc_pct_vs_ma25_at_open": 1.154,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.0528,
+      "current_price": 0.05247,
+      "unrealized_pnl_usdt": -0.4561,
+      "unrealized_pnl_pct": -0.152,
+      "last_price_check_at": "2026-06-11T03:53:24.635901+00:00",
+      "phase_a_mae_price": 0.05244,
+      "phase_a_mae_pct": -0.209,
+      "phase_a_mae_at": "2026-06-11T03:53:11.801476+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "BANKUSDT|LONG|2026-06-11T03:20:24.652266+00:00",
@@ -31625,8 +31695,8 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-11T00:33:55.880008+00:00",
-      "reason": "paper trade too old (11850s > 600s)",
-      "last_checked_at": "2026-06-11T03:51:25.913817+00:00"
+      "reason": "paper trade too old (11969s > 600s)",
+      "last_checked_at": "2026-06-11T03:53:24.635901+00:00"
     },
     {
       "paper_id": "INJUSDT|LONG|2026-06-11T03:39:18.678140+00:00",
@@ -31634,8 +31704,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-11T03:40:06.270904+00:00",
-      "reason": "paper trade too old (680s > 600s)",
-      "last_checked_at": "2026-06-11T03:51:25.913817+00:00"
+      "reason": "paper trade too old (798s > 600s)",
+      "last_checked_at": "2026-06-11T03:53:24.635901+00:00"
     },
     {
       "paper_id": "TONUSDT|LONG|2026-06-11T03:45:39.958576+00:00",
@@ -31644,16 +31714,7 @@
       "conviction_score": 6,
       "signal_at": "2026-06-11T03:46:36.049894+00:00",
       "reason": "phase_6f_b1: conviction=6 历史 n=57 WR 28% -$80 (paper +$22 → 信号差+执行差双重, shadow 化)",
-      "last_checked_at": "2026-06-11T03:51:25.913817+00:00"
-    },
-    {
-      "paper_id": "HIVEUSDT|LONG|2026-06-11T03:46:05.564506+00:00",
-      "symbol": "HIVEUSDT",
-      "direction": "LONG",
-      "conviction_score": 7,
-      "signal_at": "2026-06-11T03:46:36.049894+00:00",
-      "reason": "circuit_breaker (4+ SL in 30min, pause until 2026-06-11T03:53:10)",
-      "last_checked_at": "2026-06-11T03:51:25.913817+00:00"
+      "last_checked_at": "2026-06-11T03:53:24.635901+00:00"
     },
     {
       "paper_id": "BASEDUSDT|LONG|2026-06-11T03:46:26.955681+00:00",
@@ -31661,19 +31722,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-11T03:46:36.049894+00:00",
-      "reason": "circuit_breaker (4+ SL in 30min, pause until 2026-06-11T03:53:10)",
-      "last_checked_at": "2026-06-11T03:51:25.913817+00:00"
+      "reason": "open_failed (retry next tick)",
+      "last_checked_at": "2026-06-11T03:53:24.635901+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 62432.2,
-    "btc_ma25_1h": 61714.98,
-    "pct_vs_ma25": 1.162,
-    "change_24h_pct": 1.486,
+    "btc_price": 62414.5,
+    "btc_ma25_1h": 61714.28,
+    "pct_vs_ma25": 1.135,
+    "change_24h_pct": 1.457,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-11T03:51:27.061634+00:00"
+    "computed_at": "2026-06-11T03:53:25.610445+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
