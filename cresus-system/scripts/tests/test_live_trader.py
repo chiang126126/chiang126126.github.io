@@ -1953,12 +1953,16 @@ class TestPhase5RSubRegimeAllowList(unittest.TestCase):
         self.assertTrue(live_trader._should_block_for_regime("LONG", "down", "down_acute"))
 
     def test_allow_list_does_not_affect_short(self):
-        """down+SHORT 本身就不被 gate 拒, allow-list 不应改变此行为."""
+        """down+SHORT (大多数 sub_regime) 不被 gate 拒, allow-list 不应改变此行为.
+        Phase 6.H-1 (2026-06-11) 例外: down_rebound + SHORT 现在被 block.
+        本测试只验证非 down_rebound 子状态仍然放行.
+        """
         live_trader.LIVE_REGIME_GATE_SUB_REGIME_ALLOW = {"down_rebound", "down_stable", "down_acute"}
-        for sub in ("down_acute", "down_stable", "down_rebound", None):
+        # 不含 down_rebound — 因为 Phase 6.H-1 现在 block down+SHORT+down_rebound
+        for sub in ("down_acute", "down_stable", None):
             self.assertFalse(
                 live_trader._should_block_for_regime("SHORT", "down", sub),
-                f"down+SHORT 永远不被 gate 拒, sub={sub!r}"
+                f"down+SHORT 非 rebound 子状态不被 gate 拒, sub={sub!r}"
             )
 
     def test_allow_list_does_not_affect_up_chop(self):
@@ -6320,6 +6324,81 @@ class TestPhase6GG2MacroBlackout(unittest.TestCase):
                 btc_regime="up",
             )
         self.assertNotIn("phase_6g_g2", reason or "")
+
+
+class TestPhase6H1DownReboundShortBlock(unittest.TestCase):
+    """Phase 6.H-1 (2026-06-11): block SHORT in down_rebound (陷阱反弹挤空).
+
+    数据驱动 (170h pilot): n=11 SHORT down_rebound, WR 18.2%, -$11.63.
+    跟 Phase 4.F (block down+LONG) 对称: down 时两个方向反弹都有风险.
+    """
+
+    def test_6h1_down_rebound_short_blocked(self):
+        """down + SHORT + sub_regime=down_rebound → block."""
+        from live_trader import _should_block_for_regime
+        self.assertTrue(_should_block_for_regime("SHORT", "down", "down_rebound"))
+
+    def test_6h1_down_rebound_long_still_blocked_by_4f(self):
+        """down + LONG 始终 block (Phase 4.F), 6.H-1 不影响."""
+        from live_trader import _should_block_for_regime
+        self.assertTrue(_should_block_for_regime("LONG", "down", "down_rebound"))
+
+    def test_6h1_down_acute_short_NOT_blocked(self):
+        """down + SHORT + sub=down_acute 不应 block (急跌时 SHORT OK)."""
+        from live_trader import _should_block_for_regime
+        self.assertFalse(_should_block_for_regime("SHORT", "down", "down_acute"))
+
+    def test_6h1_down_stable_short_NOT_blocked(self):
+        """down + SHORT + sub=down_stable 不应 block (横盘企稳 SHORT OK)."""
+        from live_trader import _should_block_for_regime
+        self.assertFalse(_should_block_for_regime("SHORT", "down", "down_stable"))
+
+    def test_6h1_down_short_no_sub_regime_NOT_blocked(self):
+        """down + SHORT + sub=None 不应 block (没分类 = 不豁免也不额外拒)."""
+        from live_trader import _should_block_for_regime
+        self.assertFalse(_should_block_for_regime("SHORT", "down", None))
+
+    def test_6h1_chop_short_NOT_blocked(self):
+        """chop + SHORT (任何 sub_regime) 不应被 6.H-1 拒."""
+        from live_trader import _should_block_for_regime
+        self.assertFalse(_should_block_for_regime("SHORT", "chop", "down_rebound"))
+        self.assertFalse(_should_block_for_regime("SHORT", "chop", None))
+
+    def test_6h1_up_short_NOT_blocked(self):
+        """up + SHORT 不应被 6.H-1 拒 (只在 down 触发)."""
+        from live_trader import _should_block_for_regime
+        self.assertFalse(_should_block_for_regime("SHORT", "up", "down_rebound"))
+
+    def test_6h1_disabled_via_flag(self):
+        """LIVE_PHASE_6H1_BLOCK_DOWN_REBOUND_SHORT=False → 完全禁用 (紧急回滚)."""
+        from live_trader import _should_block_for_regime
+        with patch.object(live_trader, "LIVE_PHASE_6H1_BLOCK_DOWN_REBOUND_SHORT", False):
+            self.assertFalse(_should_block_for_regime("SHORT", "down", "down_rebound"))
+        # 但 down+LONG 依然 block (4.F 行为)
+        with patch.object(live_trader, "LIVE_PHASE_6H1_BLOCK_DOWN_REBOUND_SHORT", False):
+            self.assertTrue(_should_block_for_regime("LONG", "down", "down_rebound"))
+
+
+class TestPhase6H2MacroCooldownExtension(unittest.TestCase):
+    """Phase 6.H-2 (2026-06-11): macro CORE event post-cooldown 120 → 180 min.
+    让 CPI/FOMC 类事件后多等 60min, 噪音 / spread / funding 全部回归再开新仓.
+    """
+
+    def test_6h2_core_after_min_extended(self):
+        """macro_calendar WINDOWS["CORE"]["after_min"] 应 = 180."""
+        import macro_calendar
+        self.assertEqual(macro_calendar.WINDOWS["CORE"]["after_min"], 180)
+
+    def test_6h2_core_before_min_unchanged(self):
+        """CORE before_min 不动 (60min). 我们只延长 after."""
+        import macro_calendar
+        self.assertEqual(macro_calendar.WINDOWS["CORE"]["before_min"], 60)
+
+    def test_6h2_observe_window_unchanged(self):
+        """OBSERVE 窗口不动 (我们只动 CORE)."""
+        import macro_calendar
+        self.assertEqual(macro_calendar.WINDOWS["OBSERVE"]["before_min"], 30)
+        self.assertEqual(macro_calendar.WINDOWS["OBSERVE"]["after_min"], 60)
 
 
 if __name__ == "__main__":

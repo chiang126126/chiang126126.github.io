@@ -467,6 +467,20 @@ LIVE_REGIME_GATE_MODE = "always"    # "off" | "abcd" (legacy 4-arm) | "always" (
 #   - sub_regime = None (regime 非 down 或 klines 不足) 永远不豁免 (fail-safe)
 LIVE_REGIME_GATE_SUB_REGIME_ALLOW: set = set()  # 默认空 — 与 Phase 4.J 行为一致
 
+# Phase 6.H-1 (2026-06-11) — Block SHORT in down_rebound (陷阱反弹 squeeze).
+# ============================================================================
+# 数据驱动 (170h pilot):
+#   sub_regime=down_rebound + SHORT: n=11, WR 18.2%, live -$11.63, avg -$1.06/笔.
+#   定义: BTC 在 down regime (vs MA25 < -threshold) + 3h 累计反弹 > 0.5%.
+#   机制: 反弹时 SHORT 入场, 大概率被反弹挤空 (短期 momentum 跟我们方向相反).
+#   跟 Phase 4.F (block down+LONG) 完全对称 — down 时两个方向都有反向风险.
+#
+# 安全特性:
+#   - 仅影响 down + SHORT + sub_regime=down_rebound 这一种 narrow 组合
+#   - sub_regime ≠ "down_rebound" (None / down_acute / down_stable) 不受影响
+#   - 总开关 一行回滚, paper / shadow 继续跑收数据
+LIVE_PHASE_6H1_BLOCK_DOWN_REBOUND_SHORT = True   # 紧急回滚改 False
+
 # 升级 SL 补偿 / wick filter 到 4-arm 一致 (B/C 分别对应)
 # Phase 4.Y (5/27): SL 补偿从 "abcd" (4-arm A/B 测试) 推广到 "always".
 # 数据依据 (5/26 复盘 32 笔 mirror):
@@ -1083,6 +1097,15 @@ def is_eligible_for_mirror(
                 sub_info = f" sub={btc_sub_regime}"
                 if btc_change_3h_pct is not None:
                     sub_info += f" 3h={btc_change_3h_pct:+.2f}%"
+            # Phase 6.H-1 (2026-06-11) 区分原因: down_rebound+SHORT 特殊标记便于 retro 区分
+            d = direction.upper()
+            r = btc_regime.lower() if btc_regime else ""
+            if (r == "down" and d == "SHORT" and btc_sub_regime == "down_rebound"
+                    and LIVE_PHASE_6H1_BLOCK_DOWN_REBOUND_SHORT):
+                return False, (
+                    f"phase_6h1: down+SHORT in down_rebound 陷阱反弹{sub_info} "
+                    f"(数据驱动: n=11 WR 18% -$11.63)"
+                )
             return False, (f"regime gate ({mode}): {btc_regime} regime + {direction} "
                           f"被拒{sub_info} (数据驱动: down+LONG 历史 0/10 胜 p=0.042)")
         # Phase 5.R: gate 放行 down+LONG 时不在此处 log — is_eligible_for_mirror
@@ -1749,6 +1772,12 @@ def _should_block_for_regime(
         if sub_regime and sub_regime in LIVE_REGIME_GATE_SUB_REGIME_ALLOW:
             return False
         return True
+    if r == "down" and d == "SHORT":
+        # Phase 6.H-1 (2026-06-11): block SHORT in down_rebound (陷阱反弹挤空).
+        # n=11 -$11.63 WR 18% 数据驱动, 跟 down+LONG block 对称.
+        if sub_regime == "down_rebound" and LIVE_PHASE_6H1_BLOCK_DOWN_REBOUND_SHORT:
+            return True
+        return False
     return False
 
 

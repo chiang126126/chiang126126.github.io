@@ -38,7 +38,10 @@ from typing import List, Optional
 # ============================================================================
 
 WINDOWS = {
-    "CORE":    {"before_min": 60, "after_min": 120},
+    # Phase 6.H-2 (2026-06-11): CORE after_min 120 → 180 (post-macro 噪音 cooldown 延长 1h).
+    # 数据驱动: 06-10 CPI 后 1-2h 仍是 chop_trap, BTC bouncing 但缺 follow-through.
+    # 让系统多等 60min 让流动性 / spread / funding 全部回归正常再开新仓.
+    "CORE":    {"before_min": 60, "after_min": 180},
     "OBSERVE": {"before_min": 30, "after_min": 60},
 }
 
