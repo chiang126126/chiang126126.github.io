@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-11T05:01:13.661127+00:00",
+  "generated_at": "2026-06-11T05:03:18.170354+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 412,
-    "open": 1,
+    "total_trades": 413,
+    "open": 2,
     "closed": 411,
     "wins": 145,
     "losses": 261,
@@ -15,31 +15,33 @@
     "avg_pnl_usdt": -0.0278,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 64.665,
+    "fees_paid_usdt": 64.74,
     "fees_realized_usdt": 64.5152,
-    "fees_open_usdt": 0.1498,
+    "fees_open_usdt": 0.2248,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 299.59,
-    "free_capital_usdt": 224.33,
+    "deployed_usdt": 449.54,
+    "free_capital_usdt": 74.3,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -5.939,
-    "deployed_usdt": 299.59
+    "deployed_usdt": 449.54
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "HIVEUSDT"
+      "HIVEUSDT",
+      "OPNUSDT"
     ],
     "exchange_symbols": [
-      "HIVEUSDT"
+      "HIVEUSDT",
+      "OPNUSDT"
     ]
   },
   "open_trades": [
@@ -100,13 +102,78 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.0532,
-      "current_price": 0.05276,
-      "unrealized_pnl_usdt": 1.1972,
-      "unrealized_pnl_pct": 0.4,
-      "last_price_check_at": "2026-06-11T05:01:08.566453+00:00",
+      "current_price": 0.05291,
+      "unrealized_pnl_usdt": 2.0524,
+      "unrealized_pnl_pct": 0.685,
+      "last_price_check_at": "2026-06-11T05:03:16.380173+00:00",
       "phase_a_mae_price": 0.05228,
       "phase_a_mae_pct": -0.514,
       "phase_a_mae_at": "2026-06-11T03:57:40.881659+00:00"
+    },
+    {
+      "paper_id": "OPNUSDT|LONG|2026-06-11T05:00:54.402291+00:00",
+      "trade_id": "L1781154054_OPNUSDT_L",
+      "symbol": "OPNUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.1019,
+      "avg_fill_price": 0.1018,
+      "slippage_bps": -9.81,
+      "qty": 1473.0,
+      "notional_usdt": 149.9514,
+      "leverage": 1,
+      "risk_usdt": 1.3994,
+      "risk_pct": 0.933,
+      "mirror_latency_sec": 10.8,
+      "sl_price": 0.10074999999999999,
+      "sl_paper_current": 0.10085,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -0.0001,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": -0.0052,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "B",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.103475,
+      "tp2_price": 0.10505,
+      "phase": "A",
+      "entry_order_id": 486497953,
+      "entry_client_id": "cresus_L1781154054_OPNUSDT_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "burst",
+      "atr_pct": 0.687,
+      "top_trader_position_ratio": 2.2069,
+      "top_trader_account_ratio": 1.2311,
+      "global_account_ratio": 0.9253,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.074976,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-11T05:02:18.933557+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "up",
+      "btc_price_at_open": 62562.2,
+      "btc_change_24h_at_open": 2.023,
+      "btc_pct_vs_ma25_at_open": 1.196,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.1019,
+      "current_price": 0.1022,
+      "unrealized_pnl_usdt": 0.5892,
+      "unrealized_pnl_pct": 0.393,
+      "last_price_check_at": "2026-06-11T05:03:16.380173+00:00",
+      "phase_a_mae_price": 0.1016,
+      "phase_a_mae_pct": -0.196,
+      "phase_a_mae_at": "2026-06-11T05:02:35.082143+00:00"
     }
   ],
   "recent_closed": [
@@ -32093,17 +32160,8 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-11T04:20:36.719234+00:00",
-      "reason": "paper trade too old (2432s > 600s)",
-      "last_checked_at": "2026-06-11T05:01:08.566453+00:00"
-    },
-    {
-      "paper_id": "CRVUSDT|LONG|2026-06-11T04:22:03.895890+00:00",
-      "symbol": "CRVUSDT",
-      "direction": "LONG",
-      "conviction_score": 6,
-      "signal_at": "2026-06-11T04:22:46.338269+00:00",
-      "reason": "paper trade too old (2302s > 600s)",
-      "last_checked_at": "2026-06-11T05:01:08.566453+00:00"
+      "reason": "paper trade too old (2560s > 600s)",
+      "last_checked_at": "2026-06-11T05:03:16.380173+00:00"
     },
     {
       "paper_id": "HEMIUSDT|LONG|2026-06-11T04:59:21.396304+00:00",
@@ -32112,18 +32170,18 @@
       "conviction_score": 5,
       "signal_at": "2026-06-11T04:59:36.068846+00:00",
       "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-06-11T05:01:08.566453+00:00"
+      "last_checked_at": "2026-06-11T05:02:11.944272+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 62578.9,
-    "btc_ma25_1h": 61823.36,
-    "pct_vs_ma25": 1.222,
-    "change_24h_pct": 2.05,
+    "btc_price": 62574.8,
+    "btc_ma25_1h": 61823.19,
+    "pct_vs_ma25": 1.216,
+    "change_24h_pct": 2.044,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-11T05:01:09.533765+00:00"
+    "computed_at": "2026-06-11T05:03:17.583497+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
