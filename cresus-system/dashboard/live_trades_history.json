@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-11T04:42:44.267611+00:00",
+  "generated_at": "2026-06-11T04:44:48.652479+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 411,
@@ -88,7 +88,7 @@
       "top_trader_position_ratio": 1.187,
       "top_trader_account_ratio": 0.7498,
       "global_account_ratio": 0.5753,
-      "phase_a_mfe_pct": 0.492,
+      "phase_a_mfe_pct": 0.758,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.149794,
@@ -101,11 +101,11 @@
       "btc_pct_vs_ma25_at_open": 1.154,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 0.05306,
-      "current_price": 0.05298,
-      "unrealized_pnl_usdt": 2.4514,
-      "unrealized_pnl_pct": 0.818,
-      "last_price_check_at": "2026-06-11T04:42:42.560614+00:00",
+      "phase_a_mfe_price": 0.0532,
+      "current_price": 0.05305,
+      "unrealized_pnl_usdt": 2.8505,
+      "unrealized_pnl_pct": 0.951,
+      "last_price_check_at": "2026-06-11T04:44:47.085493+00:00",
       "phase_a_mae_price": 0.05228,
       "phase_a_mae_pct": -0.514,
       "phase_a_mae_at": "2026-06-11T03:57:40.881659+00:00"
@@ -125,8 +125,8 @@
       "risk_usdt": 1.2438,
       "risk_pct": 0.829,
       "mirror_latency_sec": 13.5,
-      "sl_price": 4.5139597300000004e-05,
-      "sl_paper_current": 4.50495973e-05,
+      "sl_price": 4.555690720000001e-05,
+      "sl_paper_current": 4.5466907200000006e-05,
       "sl_compensation_enabled": true,
       "sl_compensation_offset": 9e-08,
       "sl_compensation_mode": "always",
@@ -142,7 +142,7 @@
       "min_conviction_threshold": null,
       "tp1_price": 4.496e-05,
       "tp2_price": 4.539e-05,
-      "phase": "B",
+      "phase": "C",
       "entry_order_id": 4141597854,
       "entry_client_id": "cresus_L1781152402_DOGSUSD_L_E",
       "sl_order_id": null,
@@ -154,8 +154,8 @@
       "top_trader_account_ratio": 2.1017,
       "global_account_ratio": 1.8466,
       "phase_a_mfe_pct": 0.966,
-      "phase_b_mfe_pct": 1.819,
-      "phase_c_mfe_pct": null,
+      "phase_b_mfe_pct": 2.762,
+      "phase_c_mfe_pct": 2.762,
       "fees_paid_usdt": 0.075,
       "fees_are_actual": true,
       "opened_at": "2026-06-11T04:33:53.991259+00:00",
@@ -167,11 +167,12 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 4.496e-05,
-      "current_price": 4.53e-05,
-      "unrealized_pnl_usdt": 2.286,
-      "unrealized_pnl_pct": 1.524,
-      "last_price_check_at": "2026-06-11T04:42:42.560614+00:00",
-      "phase_b_mfe_price": 4.534e-05
+      "current_price": 4.59e-05,
+      "unrealized_pnl_usdt": 4.303,
+      "unrealized_pnl_pct": 2.869,
+      "last_price_check_at": "2026-06-11T04:44:47.085493+00:00",
+      "phase_b_mfe_price": 4.576e-05,
+      "phase_c_mfe_price": 4.576e-05
     }
   ],
   "recent_closed": [
@@ -32001,8 +32002,8 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-11T04:20:36.719234+00:00",
-      "reason": "paper trade too old (1326s > 600s)",
-      "last_checked_at": "2026-06-11T04:42:42.560614+00:00"
+      "reason": "paper trade too old (1450s > 600s)",
+      "last_checked_at": "2026-06-11T04:44:47.085493+00:00"
     },
     {
       "paper_id": "CRVUSDT|LONG|2026-06-11T04:22:03.895890+00:00",
@@ -32010,19 +32011,28 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-11T04:22:46.338269+00:00",
-      "reason": "paper trade too old (1196s > 600s)",
-      "last_checked_at": "2026-06-11T04:42:42.560614+00:00"
+      "reason": "paper trade too old (1321s > 600s)",
+      "last_checked_at": "2026-06-11T04:44:47.085493+00:00"
+    },
+    {
+      "paper_id": "HMSTRUSDT|LONG|2026-06-11T04:43:31.992178+00:00",
+      "symbol": "HMSTRUSDT",
+      "direction": "LONG",
+      "conviction_score": 6,
+      "signal_at": "2026-06-11T04:44:27.293747+00:00",
+      "reason": "phase_6f_b1: conviction=6 历史 n=57 WR 28% -$80 (paper +$22 → 信号差+执行差双重, shadow 化)",
+      "last_checked_at": "2026-06-11T04:44:47.085493+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 62615.0,
-    "btc_ma25_1h": 61767.87,
-    "pct_vs_ma25": 1.371,
-    "change_24h_pct": 2.196,
+    "btc_price": 62634.9,
+    "btc_ma25_1h": 61768.66,
+    "pct_vs_ma25": 1.402,
+    "change_24h_pct": 2.228,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-11T04:42:43.688392+00:00"
+    "computed_at": "2026-06-11T04:44:48.037229+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
