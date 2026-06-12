@@ -1,46 +1,44 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-12T00:10:29.367538+00:00",
+  "generated_at": "2026-06-12T00:12:34.577156+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 453,
-    "open": 2,
-    "closed": 451,
+    "open": 1,
+    "closed": 452,
     "wins": 154,
-    "losses": 291,
-    "win_rate": 0.346,
-    "total_pnl_usdt": -10.2968,
-    "net_pnl_usdt": -79.8936,
+    "losses": 292,
+    "win_rate": 0.345,
+    "total_pnl_usdt": -10.3068,
+    "net_pnl_usdt": -79.9828,
     "avg_pnl_usdt": -0.0228,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 69.6862,
-    "fees_realized_usdt": 69.5968,
-    "fees_open_usdt": 0.0894,
+    "fees_paid_usdt": 69.7258,
+    "fees_realized_usdt": 69.676,
+    "fees_open_usdt": 0.0498,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 198.66,
-    "free_capital_usdt": 321.36,
+    "deployed_usdt": 99.6,
+    "free_capital_usdt": 420.37,
     "max_concurrent_slots": 3,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 0.0,
-    "deployed_usdt": 198.66
+    "daily_pnl": -0.01,
+    "deployed_usdt": 99.6
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "GENIUSUSDT",
-      "CRWVUSDT"
+      "GENIUSUSDT"
     ],
     "exchange_symbols": [
-      "CRWVUSDT",
       "GENIUSUSDT"
     ]
   },
@@ -102,14 +100,16 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.4717,
-      "current_price": 0.4708,
-      "unrealized_pnl_usdt": 1.1556,
-      "unrealized_pnl_pct": 1.16,
-      "last_price_check_at": "2026-06-12T00:10:27.876933+00:00",
+      "current_price": 0.472,
+      "unrealized_pnl_usdt": 1.4124,
+      "unrealized_pnl_pct": 1.418,
+      "last_price_check_at": "2026-06-12T00:12:33.112758+00:00",
       "phase_a_mae_price": 0.4651,
       "phase_a_mae_pct": -0.064,
       "phase_a_mae_at": "2026-06-11T23:38:07.977815+00:00"
-    },
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "CRWVUSDT|LONG|2026-06-12T00:09:49.472890+00:00",
       "trade_id": "L1781222989_CRWVUSD_L",
@@ -156,7 +156,7 @@
       "phase_a_mfe_pct": 0.0,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.039624,
+      "fees_paid_usdt": 0.079244,
       "fees_are_actual": true,
       "opened_at": "2026-06-12T00:10:20.904357+00:00",
       "is_dry_run": false,
@@ -167,16 +167,29 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 99.43,
-      "current_price": 98.91,
-      "unrealized_pnl_usdt": -0.15,
-      "unrealized_pnl_pct": -0.151,
-      "last_price_check_at": "2026-06-12T00:10:27.876933+00:00",
-      "phase_a_mae_price": 98.91,
-      "phase_a_mae_pct": -0.151,
-      "phase_a_mae_at": "2026-06-12T00:10:27.876933+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 98.99,
+      "unrealized_pnl_usdt": -0.07,
+      "unrealized_pnl_pct": -0.071,
+      "last_price_check_at": "2026-06-12T00:12:12.139967+00:00",
+      "phase_a_mae_price": 98.73,
+      "phase_a_mae_pct": -0.333,
+      "phase_a_mae_at": "2026-06-12T00:10:38.775212+00:00",
+      "btc_regime_at_close": "up",
+      "btc_price_at_close": 63658.0,
+      "btc_pct_vs_ma25_at_close": 1.131,
+      "closed_at": "2026-06-12T00:12:26.656636+00:00",
+      "close_reason": "paper:hit_sl",
+      "avg_exit_price": 99.05,
+      "realized_pnl_usdt": -0.01,
+      "close_order_id": 54593940,
+      "close_qty": 1.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 98.99,
+      "close_slippage_bps": -6.06,
+      "entry_fees_usdt": 0.039624,
+      "close_fees_usdt": 0.03962
+    },
     {
       "paper_id": "GRASSUSDT|LONG|2026-06-11T22:24:57.661727+00:00",
       "trade_id": "L1781216697_GRASSUS_L",
@@ -35307,13 +35320,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 63703.7,
-    "btc_ma25_1h": 62947.63,
-    "pct_vs_ma25": 1.201,
-    "change_24h_pct": 3.089,
+    "btc_price": 63664.9,
+    "btc_ma25_1h": 62946.08,
+    "pct_vs_ma25": 1.142,
+    "change_24h_pct": 3.027,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-12T00:10:28.796668+00:00"
+    "computed_at": "2026-06-12T00:12:34.189225+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
