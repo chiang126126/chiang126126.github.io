@@ -521,6 +521,39 @@ LIVE_CLOSE_USE_LIMIT_IOC = True
 LIVE_CLOSE_LIMIT_BPS = 10                # LIMIT 距 mid 多远 bps. 调紧 (5) 救更多但 fill 率低.
 
 # ============================================================================
+# Phase 6.I (2026-06-12) — 交易所侧灾难止损 (Disaster Stop)
+# ============================================================================
+# 现状漏洞: SL 是 client-side polling (每 5s 查价 + 6 breach 确认), 交易所上没有挂
+# 任何 STOP 单. 若 bot 挂 (Mac 死机 / 断网 / launchd 异常退出 + watchdog 也挂 /
+# Binance 长时间 408), 持仓完全无保护. 最坏: $100 LONG, bot 死 8h, 币崩 -40%
+# = 单笔 -$40 无人管.
+#
+# 策略: 开仓成功后, 在交易所挂一张 STOP_MARKET (closePosition=true) 灾难单,
+# stop_price 距 entry = paper_sl_distance × LIVE_DISASTER_STOP_MULTIPLIER (默认 2.5×).
+# 正常情况下 client-side SL 先动手 → close_position 撤所有挂单 → 灾难单跟着撤.
+# bot 死时, 价格穿透 disaster_stop → 交易所自动平仓 → 单笔最大亏损 ≈ 2.5× normal SL.
+#
+# 安全特性:
+# - closePosition=true: 触发整仓平, 不需要 qty (跟着持仓走, 对部分平仓兼容)
+# - price_protect=true: 防插针假触发 (Binance 要求 last/mark 差异内才触发)
+# - working_type=CONTRACT_PRICE: 跟正常 SL 一致, 不用 MARK_PRICE
+# - Clamp min_pct/max_pct: SL 极小币不至于灾难也极近, 极大币不至于太远
+# - Sanity: disaster_dist 必须 ≥ paper_sl_dist (否则拒挂, 防 multiplier 配错)
+# - Fail-safe: 挂失败仅 log warning, trade 不阻塞 (跟 set_margin_type 同款)
+# - close_position 已 cancel 所有 open orders (line 1419-1431) → 灾难单自动清理
+#
+# 风险评估:
+# - 误触发概率: 距离 2.5× normal SL + price_protect, 几乎不可能在正常波动下触发
+# - paper trail/BE 后 disaster 不动: 是设计, 灾难单是绝对地板不是 trail
+# - 不会同时双开仓: closePosition + reduceOnly 隐含 (Binance 文档保证)
+#
+# 紧急回滚: LIVE_DISASTER_STOP_ENABLED = False (一行 sed)
+LIVE_DISASTER_STOP_ENABLED = True
+LIVE_DISASTER_STOP_MULTIPLIER = 2.5    # disaster_dist = paper_sl_dist × this
+LIVE_DISASTER_STOP_MIN_PCT = 1.0       # 至少距 entry 1% (防 SL 距离极小时 disaster 也极近)
+LIVE_DISASTER_STOP_MAX_PCT = 5.0       # 至多距 entry 5% (防 SL 距离极大时 disaster 失效)
+
+# ============================================================================
 # Phase 6.F (2026-06-08) — 数据驱动黑名单 (105h 实盘 280 笔统计后)
 # ============================================================================
 # 数据 (06-04 → 06-08 09:00 UTC, 105h, paper_id 1:1 配对验证):
@@ -2209,6 +2242,150 @@ def _try_mirror_close(
     return closed
 
 
+def _calc_disaster_stop_price(
+    entry_price: float, paper_sl_price: float, direction: str,
+    multiplier: float = 2.5, min_pct: float = 1.0, max_pct: float = 5.0,
+) -> Optional[float]:
+    """Phase 6.I (2026-06-12): 计算交易所侧灾难止损价.
+
+    设计: 距 entry = clamp(paper_sl_distance × multiplier, min_pct, max_pct).
+    LONG: disaster = entry × (1 - distance%)
+    SHORT: disaster = entry × (1 + distance%)
+
+    Returns: disaster_stop_price (浮点) 或 None (输入异常时).
+    None 时调用方应跳过挂单, 不抛.
+    """
+    if entry_price <= 0 or paper_sl_price <= 0:
+        return None
+    if multiplier <= 0 or min_pct < 0 or max_pct <= min_pct:
+        return None
+    paper_sl_distance_pct = abs(entry_price - paper_sl_price) / entry_price * 100.0
+    disaster_distance_pct = paper_sl_distance_pct * multiplier
+    # Clamp: 过紧 (SL 距离极小) 用 min, 过松 (SL 距离极大) 用 max
+    disaster_distance_pct = max(min_pct, min(max_pct, disaster_distance_pct))
+
+    d = direction.upper()
+    if d == "LONG":
+        return entry_price * (1.0 - disaster_distance_pct / 100.0)
+    elif d == "SHORT":
+        return entry_price * (1.0 + disaster_distance_pct / 100.0)
+    return None
+
+
+def _place_disaster_stop(
+    client: BinanceClient, symbol: str, direction: str, trade_id: str,
+    entry_price: float, paper_sl_price: float,
+) -> Optional[float]:
+    """Phase 6.I: 开仓成功后挂交易所侧灾难止损单. 失败仅 log warning 不阻塞 trade.
+
+    Args:
+        client: BinanceClient 实例
+        symbol: 持仓 symbol
+        direction: 'LONG' / 'SHORT' (持仓方向)
+        trade_id: 用于构造 client_order_id 后缀 _DS
+        entry_price: live 实际成交价 (actual_fill, 非 paper_entry — 考虑滑点)
+        paper_sl_price: paper 端 SL 价格 (用于算 disaster_dist = paper_sl_dist × multiplier)
+
+    Returns:
+        disaster_price (浮点) 若挂成功 ✓
+        None 若:
+            - 总开关 OFF
+            - 输入异常 (entry/sl 无效, direction 不对)
+            - sanity check 失败 (disaster_dist < paper_sl_dist, 不该发生)
+            - tick_size 取不到 (符合精度风险, 跳过)
+            - API 调用失败 (BinanceError / ValueError)
+            - 意外异常 (log 后 swallow, 不阻塞 mirror_open)
+    """
+    if not LIVE_DISASTER_STOP_ENABLED:
+        return None
+    if entry_price <= 0 or paper_sl_price <= 0:
+        log.warning(
+            f"[disaster-stop] {symbol}: entry={entry_price} sl={paper_sl_price} 无效, 跳过"
+        )
+        return None
+    if direction.upper() not in ("LONG", "SHORT"):
+        log.warning(f"[disaster-stop] {symbol}: invalid direction {direction!r}, 跳过")
+        return None
+
+    disaster_price = _calc_disaster_stop_price(
+        entry_price, paper_sl_price, direction,
+        multiplier=LIVE_DISASTER_STOP_MULTIPLIER,
+        min_pct=LIVE_DISASTER_STOP_MIN_PCT,
+        max_pct=LIVE_DISASTER_STOP_MAX_PCT,
+    )
+    if disaster_price is None:
+        log.warning(f"[disaster-stop] {symbol}: 算价失败, 跳过")
+        return None
+
+    # Sanity: disaster_dist 必须严格 ≥ paper_sl_dist (否则会先于 client-side SL 触发,
+    # 失去 "bot 死时兜底" 设计意图). 极少触发 (除非 multiplier < 1 误配).
+    paper_sl_dist = abs(entry_price - paper_sl_price)
+    disaster_dist = abs(entry_price - disaster_price)
+    if disaster_dist < paper_sl_dist:
+        log.error(
+            f"[disaster-stop] {symbol}: disaster_dist={disaster_dist:.6f} "
+            f"< paper_sl_dist={paper_sl_dist:.6f} — 拒挂 (multiplier 错配或 clamp 过 tight)"
+        )
+        return None
+
+    # Round to tick_size (满足 PRICE_FILTER)
+    try:
+        from binance_client import round_price_to_tick
+        filters = client.get_symbol_filters(symbol)
+        tick_size = float(filters.get("tick_size") or 0)
+        if tick_size > 0:
+            disaster_price = round_price_to_tick(disaster_price, tick_size)
+    except (BinanceError, ValueError, KeyError, TypeError) as e:
+        log.warning(
+            f"[disaster-stop] {symbol}: 取 tick_size 失败 ({type(e).__name__}: {e}), 跳过挂单"
+        )
+        return None
+
+    # 平仓方向: LONG 持仓的灾难单是 SELL; SHORT 是 BUY
+    stop_side = "SELL" if direction.upper() == "LONG" else "BUY"
+    coid = f"cresus_{trade_id}_DS" if trade_id else None
+
+    try:
+        # Phase 6.I paranoid review MED-2 (2026-06-12): 必须用 MARK_PRICE +
+        # price_protect=False 而非原先的 CONTRACT_PRICE + price_protect=True.
+        # 原因: 灾难单要在"bot 死 + 真 flash crash"场景触发 —
+        #   - CONTRACT_PRICE (last price) 在薄盘 / 闪崩时可能被单笔奇怪成交击穿,
+        #     但 MARK_PRICE 是 Binance 的指数综合价, 抗插针更稳
+        #   - price_protect=True 在 last/mark 价差大时会**拒绝触发** —
+        #     正是 flash crash 时最容易触发的条件, 我们就失去了防护
+        # 跟正常 SL (CONTRACT_PRICE + 6-breach polling 抗 wick) 不同设计哲学:
+        # 正常 SL 有客户端 wick filter 防误触发, 灾难单没有 → 必须用 MARK_PRICE 自带抗插针
+        client.place_stop_market_order(
+            symbol=symbol,
+            side=stop_side,
+            stop_price=disaster_price,
+            close_position=True,            # 整仓平 (不需 qty, 跟着持仓走)
+            client_order_id=coid,
+            working_type="MARK_PRICE",      # 抗插针 (vs CONTRACT_PRICE 易被单笔击穿)
+            price_protect=False,            # False — 允许触发, 不被 spread 拦
+            dry_run=False,
+        )
+        log.info(
+            f"[disaster-stop] {symbol} {direction}: 挂成功 stop={disaster_price} "
+            f"(entry={entry_price} paper_sl={paper_sl_price} "
+            f"distance={disaster_dist/entry_price*100:.2f}% "
+            f"multi={LIVE_DISASTER_STOP_MULTIPLIER}×)"
+        )
+        return disaster_price
+    except (BinanceError, ValueError) as e:
+        log.warning(
+            f"[disaster-stop] {symbol} 挂失败 ({type(e).__name__}: {e}). "
+            f"trade 继续, 但失去 bot-death 保护."
+        )
+        return None
+    except Exception as e:
+        log.warning(
+            f"[disaster-stop] {symbol} 意外异常 ({type(e).__name__}: {e}), "
+            f"trade 继续 (fail-safe)"
+        )
+        return None
+
+
 def _try_mirror_open(
     client: BinanceClient,
     paper_trade: dict,
@@ -2454,6 +2631,18 @@ def _try_mirror_open(
                 "is_dry_run": bool(dry_run or result.get("_dryRun")),
             }
 
+        # Phase 6.I (2026-06-12): 挂交易所侧灾难止损单 (bot-death 保命).
+        # 在 post-fill emergency 通过后 (上面 if emergency_reason 分支已 return),
+        # 此时仓位已稳定开仓且过了校验, 这里挂灾难单.
+        # 失败不阻塞 — trade 继续 (失去保护但仍 valid). close_position 撤所有挂单
+        # 时会自动清理灾难单 (binance_client line 1419-1431 已 verified).
+        disaster_stop_price = _place_disaster_stop(
+            client=client, symbol=sym, direction=direction, trade_id=trade_id,
+            entry_price=actual_fill, paper_sl_price=sl_price,
+        )
+        disaster_stop_at = (datetime.now(timezone.utc).isoformat()
+                             if disaster_stop_price is not None else None)
+
         # 风险金额: (entry - SL) / entry × notional = "最多丢多少"
         actual_notional = float(result.get("actual_notional", 0) or 0)
         risk_usdt = 0.0
@@ -2532,6 +2721,9 @@ def _try_mirror_open(
             "mirror_latency_sec": mirror_latency_sec,
             "sl_price": final_sl,                          # SL polling 实际用此值
             "sl_paper_current": sl_paper_at_open,          # 当前 paper SL (sync 时更新)
+            # Phase 6.I (2026-06-12): 交易所侧灾难止损 (bot-death 保命)
+            "disaster_stop_price": disaster_stop_price,    # None 若挂失败或禁用
+            "disaster_stop_at": disaster_stop_at,
             "sl_compensation_enabled": sl_comp_enabled,    # B 组标记 (Phase 4.D)
             "sl_compensation_offset": sl_comp_offset,      # offset (B 组非 0; A/C 组 0)
             "sl_compensation_mode": LIVE_SL_COMPENSATION_MODE,  # 部署时模式 (溯源用)

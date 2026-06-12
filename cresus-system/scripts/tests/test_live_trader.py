@@ -6401,5 +6401,175 @@ class TestPhase6H2MacroCooldownExtension(unittest.TestCase):
         self.assertEqual(macro_calendar.WINDOWS["OBSERVE"]["after_min"], 60)
 
 
+class TestPhase6IDisasterStop(unittest.TestCase):
+    """Phase 6.I (2026-06-12): 交易所侧灾难止损 (bot-death 保命).
+
+    设计: 开仓后挂 STOP_MARKET(closePosition=true) 在 entry ± paper_sl_dist × 2.5,
+    clamp 到 [1%, 5%]. 正常 client-side SL 先关仓 → 撤所有挂单连带撤灾难单.
+    bot 挂时, 价格穿透 disaster → 交易所自动平仓.
+    """
+
+    # === _calc_disaster_stop_price 数学边界 ===
+
+    def test_6i_calc_long_basic(self):
+        """LONG entry=100, paper_sl=99.5 (0.5%), multi=2.5 → 1.25% → disaster=98.75."""
+        from live_trader import _calc_disaster_stop_price
+        price = _calc_disaster_stop_price(
+            entry_price=100.0, paper_sl_price=99.5, direction="LONG",
+            multiplier=2.5, min_pct=1.0, max_pct=5.0,
+        )
+        self.assertAlmostEqual(price, 98.75, places=4)
+
+    def test_6i_calc_short_basic(self):
+        """SHORT entry=100, paper_sl=100.5 (0.5%), multi=2.5 → 1.25% → disaster=101.25."""
+        from live_trader import _calc_disaster_stop_price
+        price = _calc_disaster_stop_price(
+            entry_price=100.0, paper_sl_price=100.5, direction="SHORT",
+            multiplier=2.5, min_pct=1.0, max_pct=5.0,
+        )
+        self.assertAlmostEqual(price, 101.25, places=4)
+
+    def test_6i_calc_min_clamp(self):
+        """paper_sl 距离极小 (0.1%) × 2.5 = 0.25% < min 1% → clamp 到 1%."""
+        from live_trader import _calc_disaster_stop_price
+        # LONG entry=100, paper_sl=99.9 (0.1%)
+        price = _calc_disaster_stop_price(
+            entry_price=100.0, paper_sl_price=99.9, direction="LONG",
+            multiplier=2.5, min_pct=1.0, max_pct=5.0,
+        )
+        # 0.1% × 2.5 = 0.25% < 1% → clamp 到 1% → disaster = 99.0
+        self.assertAlmostEqual(price, 99.0, places=4)
+
+    def test_6i_calc_max_clamp(self):
+        """paper_sl 距离 3% × 2.5 = 7.5% > max 5% → clamp 到 5%."""
+        from live_trader import _calc_disaster_stop_price
+        # LONG entry=100, paper_sl=97 (3%)
+        price = _calc_disaster_stop_price(
+            entry_price=100.0, paper_sl_price=97.0, direction="LONG",
+            multiplier=2.5, min_pct=1.0, max_pct=5.0,
+        )
+        # 3% × 2.5 = 7.5% > 5% → clamp 到 5% → disaster = 95.0
+        self.assertAlmostEqual(price, 95.0, places=4)
+
+    def test_6i_calc_invalid_inputs_return_none(self):
+        """异常输入 (entry/sl ≤ 0, direction 错) → None."""
+        from live_trader import _calc_disaster_stop_price
+        self.assertIsNone(_calc_disaster_stop_price(0, 99, "LONG"))
+        self.assertIsNone(_calc_disaster_stop_price(100, 0, "LONG"))
+        self.assertIsNone(_calc_disaster_stop_price(100, 99, "INVALID"))
+        self.assertIsNone(_calc_disaster_stop_price(100, 99, "LONG", multiplier=-1))
+
+    # === _place_disaster_stop 行为 ===
+
+    def _mock_filters(self, tick=0.01):
+        return {
+            "tick_size": tick, "step_size": 1.0, "min_qty": 1.0,
+            "max_qty": 1e9, "market_max_qty": 1e6, "min_notional": 5.0,
+            "quantity_precision": 0, "price_precision": 2, "status": "TRADING",
+        }
+
+    def test_6i_place_success_long(self):
+        """LONG 挂单成功: place_stop_market_order 收到正确参数."""
+        from live_trader import _place_disaster_stop
+        mock_client = MagicMock()
+        mock_client.get_symbol_filters.return_value = self._mock_filters(tick=0.01)
+        mock_client.place_stop_market_order.return_value = {"orderId": 999}
+        result = _place_disaster_stop(
+            client=mock_client, symbol="BTCUSDT", direction="LONG",
+            trade_id="t1", entry_price=100.0, paper_sl_price=99.5,
+        )
+        # 期望 disaster = 98.75 (round 到 tick 0.01 = 98.75)
+        self.assertAlmostEqual(result, 98.75, places=2)
+        # 验证 API call 参数
+        mock_client.place_stop_market_order.assert_called_once()
+        call_kwargs = mock_client.place_stop_market_order.call_args.kwargs
+        self.assertEqual(call_kwargs["symbol"], "BTCUSDT")
+        self.assertEqual(call_kwargs["side"], "SELL")       # LONG → SELL stop
+        self.assertAlmostEqual(call_kwargs["stop_price"], 98.75, places=2)
+        self.assertTrue(call_kwargs["close_position"])
+        # Phase 6.I MED-2: 必须 MARK_PRICE 抗插针, 不用 CONTRACT_PRICE
+        self.assertEqual(call_kwargs["working_type"], "MARK_PRICE")
+        # price_protect=False — flash crash 时 last/mark spread 大,
+        # True 会被拒触发 → 失去防护
+        self.assertFalse(call_kwargs["price_protect"])
+        self.assertEqual(call_kwargs["client_order_id"], "cresus_t1_DS")
+
+    def test_6i_place_success_short(self):
+        """SHORT 挂单成功: side=BUY, stop above entry."""
+        from live_trader import _place_disaster_stop
+        mock_client = MagicMock()
+        mock_client.get_symbol_filters.return_value = self._mock_filters(tick=0.01)
+        mock_client.place_stop_market_order.return_value = {"orderId": 999}
+        result = _place_disaster_stop(
+            client=mock_client, symbol="BTCUSDT", direction="SHORT",
+            trade_id="t1", entry_price=100.0, paper_sl_price=100.5,
+        )
+        self.assertAlmostEqual(result, 101.25, places=2)
+        call_kwargs = mock_client.place_stop_market_order.call_args.kwargs
+        self.assertEqual(call_kwargs["side"], "BUY")        # SHORT → BUY stop
+
+    def test_6i_place_disabled_skips(self):
+        """LIVE_DISASTER_STOP_ENABLED=False → 不调 API, 返 None."""
+        from live_trader import _place_disaster_stop
+        mock_client = MagicMock()
+        with patch.object(live_trader, "LIVE_DISASTER_STOP_ENABLED", False):
+            result = _place_disaster_stop(
+                client=mock_client, symbol="BTCUSDT", direction="LONG",
+                trade_id="t1", entry_price=100.0, paper_sl_price=99.5,
+            )
+        self.assertIsNone(result)
+        mock_client.place_stop_market_order.assert_not_called()
+
+    def test_6i_place_api_error_failsafe(self):
+        """API 抛 BinanceError → log warning, 返 None, trade 不阻塞."""
+        from live_trader import _place_disaster_stop
+        from binance_client import BinanceError
+        mock_client = MagicMock()
+        mock_client.get_symbol_filters.return_value = self._mock_filters(tick=0.01)
+        mock_client.place_stop_market_order.side_effect = BinanceError("simulated API down")
+        result = _place_disaster_stop(
+            client=mock_client, symbol="BTCUSDT", direction="LONG",
+            trade_id="t1", entry_price=100.0, paper_sl_price=99.5,
+        )
+        self.assertIsNone(result)   # fail-safe 返 None
+
+    def test_6i_place_invalid_entry_skips(self):
+        """entry=0 → 不挂单, 返 None."""
+        from live_trader import _place_disaster_stop
+        mock_client = MagicMock()
+        result = _place_disaster_stop(
+            client=mock_client, symbol="BTCUSDT", direction="LONG",
+            trade_id="t1", entry_price=0.0, paper_sl_price=99.5,
+        )
+        self.assertIsNone(result)
+        mock_client.place_stop_market_order.assert_not_called()
+
+    def test_6i_place_no_tick_size_skips(self):
+        """tick_size 取不到 → 跳过 (不挂未 round 价)."""
+        from live_trader import _place_disaster_stop
+        from binance_client import BinanceError
+        mock_client = MagicMock()
+        mock_client.get_symbol_filters.side_effect = BinanceError("simulated")
+        result = _place_disaster_stop(
+            client=mock_client, symbol="BTCUSDT", direction="LONG",
+            trade_id="t1", entry_price=100.0, paper_sl_price=99.5,
+        )
+        self.assertIsNone(result)
+        mock_client.place_stop_market_order.assert_not_called()
+
+    def test_6i_place_tick_rounding(self):
+        """disaster 价格 round 到 tick_size (满足 PRICE_FILTER)."""
+        from live_trader import _place_disaster_stop
+        mock_client = MagicMock()
+        # tick=0.1, 算出 98.75 → round to nearest 0.1 = 98.8
+        mock_client.get_symbol_filters.return_value = self._mock_filters(tick=0.1)
+        mock_client.place_stop_market_order.return_value = {"orderId": 999}
+        result = _place_disaster_stop(
+            client=mock_client, symbol="BTCUSDT", direction="LONG",
+            trade_id="t1", entry_price=100.0, paper_sl_price=99.5,
+        )
+        self.assertAlmostEqual(result, 98.8, places=4)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
