@@ -1,34 +1,34 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-12T12:29:20.775697+00:00",
+  "generated_at": "2026-06-12T12:31:18.797485+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 475,
+    "total_trades": 476,
     "open": 1,
-    "closed": 474,
+    "closed": 475,
     "wins": 161,
-    "losses": 307,
-    "win_rate": 0.344,
-    "total_pnl_usdt": -16.246,
-    "net_pnl_usdt": -88.283,
-    "avg_pnl_usdt": -0.0343,
+    "losses": 308,
+    "win_rate": 0.343,
+    "total_pnl_usdt": -16.3458,
+    "net_pnl_usdt": -88.4826,
+    "avg_pnl_usdt": -0.0344,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 72.0869,
-    "fees_realized_usdt": 72.037,
+    "fees_paid_usdt": 72.1867,
+    "fees_realized_usdt": 72.1368,
     "fees_open_usdt": 0.05,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
     "deployed_usdt": 99.93,
-    "free_capital_usdt": 411.74,
+    "free_capital_usdt": 411.54,
     "max_concurrent_slots": 3,
     "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -5.9492,
+    "daily_pnl": -6.049,
     "deployed_usdt": 99.93
   },
   "reconciliation": {
@@ -100,16 +100,36 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 1.453,
-      "current_price": 1.431,
-      "unrealized_pnl_usdt": -1.4452,
-      "unrealized_pnl_pct": -1.446,
-      "last_price_check_at": "2026-06-12T12:29:18.387939+00:00",
+      "current_price": 1.438,
+      "unrealized_pnl_usdt": -0.9635,
+      "unrealized_pnl_pct": -0.964,
+      "last_price_check_at": "2026-06-12T12:31:17.539415+00:00",
       "phase_a_mae_price": 1.406,
       "phase_a_mae_pct": -3.168,
       "phase_a_mae_at": "2026-06-12T12:01:25.083072+00:00"
     }
   ],
   "recent_closed": [
+    {
+      "_terminal_no_retry": true,
+      "_post_fill_rejected": true,
+      "paper_id": "ENJUSDT|LONG|2026-06-12T12:26:45.259407+00:00",
+      "trade_id": "L1781267205_ENJUSDT_L",
+      "symbol": "ENJUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.03166,
+      "avg_fill_price": 0.03126,
+      "avg_exit_price": 0.03126,
+      "qty": 3193.0,
+      "notional_usdt": 99.81318,
+      "fees_paid_usdt": 0.0998,
+      "closed_at": "2026-06-12T12:29:34.780195+00:00",
+      "opened_at": "2026-06-12T12:29:32.672773+00:00",
+      "close_reason": "post_fill_structure_invalid",
+      "realized_pnl_usdt": -0.0998,
+      "is_dry_run": false
+    },
     {
       "paper_id": "ARCUSDT|LONG|2026-06-12T11:56:07.440056+00:00",
       "trade_id": "L1781265367_ARCUSDT_L",
@@ -37037,8 +37057,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-06-12T10:53:45.892116+00:00",
-      "reason": "paper trade too old (5732s > 600s)",
-      "last_checked_at": "2026-06-12T12:29:18.387939+00:00"
+      "reason": "paper trade too old (5852s > 600s)",
+      "last_checked_at": "2026-06-12T12:31:17.539415+00:00"
     },
     {
       "paper_id": "SKYAIUSDT|LONG|2026-06-12T12:08:47.023760+00:00",
@@ -37046,28 +37066,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-12T12:09:43.966275+00:00",
-      "reason": "paper trade too old (1174s > 600s)",
-      "last_checked_at": "2026-06-12T12:29:18.387939+00:00"
-    },
-    {
-      "paper_id": "ENJUSDT|LONG|2026-06-12T12:26:45.259407+00:00",
-      "symbol": "ENJUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-06-12T12:26:50.586946+00:00",
-      "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-06-12T12:29:18.387939+00:00"
+      "reason": "paper trade too old (1294s > 600s)",
+      "last_checked_at": "2026-06-12T12:31:17.539415+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 63443.0,
-    "btc_ma25_1h": 63345.26,
-    "pct_vs_ma25": 0.154,
-    "change_24h_pct": 0.738,
+    "btc_price": 63477.1,
+    "btc_ma25_1h": 63346.62,
+    "pct_vs_ma25": 0.206,
+    "change_24h_pct": 0.792,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-12T12:29:19.353047+00:00"
+    "computed_at": "2026-06-12T12:31:18.475894+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
