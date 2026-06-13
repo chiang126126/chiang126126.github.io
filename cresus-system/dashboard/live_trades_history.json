@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-13T12:14:09.236316+00:00",
+  "generated_at": "2026-06-13T12:16:11.679898+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 518,
-    "open": 2,
+    "total_trades": 519,
+    "open": 3,
     "closed": 516,
     "wins": 176,
     "losses": 334,
@@ -15,20 +15,20 @@
     "avg_pnl_usdt": -0.048,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 76.0521,
+    "fees_paid_usdt": 76.0921,
     "fees_realized_usdt": 75.9722,
-    "fees_open_usdt": 0.0799,
+    "fees_open_usdt": 0.1199,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 199.85,
-    "free_capital_usdt": 299.34,
+    "deployed_usdt": 299.83,
+    "free_capital_usdt": 199.33,
     "max_concurrent_slots": 3,
-    "slots_used": 2
+    "slots_used": 3
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 0.3018,
+    "daily_pnl": -1.1547,
     "deployed_usdt": 299.83
   },
   "reconciliation": {
@@ -36,14 +36,14 @@
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
+      "CHIPUSDT",
       "HEMIUSDT",
-      "PYTHUSDT",
-      "ESPUSDT"
+      "PYTHUSDT"
     ],
     "exchange_symbols": [
+      "CHIPUSDT",
       "HEMIUSDT",
-      "PYTHUSDT",
-      "ESPUSDT"
+      "PYTHUSDT"
     ]
   },
   "open_trades": [
@@ -106,10 +106,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.006417,
-      "current_price": 0.006406,
-      "unrealized_pnl_usdt": 1.1033,
-      "unrealized_pnl_pct": 1.105,
-      "last_price_check_at": "2026-06-13T12:14:05.350068+00:00",
+      "current_price": 0.006389,
+      "unrealized_pnl_usdt": 0.8354,
+      "unrealized_pnl_pct": 0.836,
+      "last_price_check_at": "2026-06-13T12:16:09.872916+00:00",
       "phase_a_mae_price": 0.006281,
       "phase_a_mae_pct": -0.868,
       "phase_a_mae_at": "2026-06-13T11:25:51.969634+00:00"
@@ -176,10 +176,77 @@
       "current_price": 0.03911,
       "unrealized_pnl_usdt": -0.3312,
       "unrealized_pnl_pct": -0.331,
-      "last_price_check_at": "2026-06-13T12:14:05.350068+00:00",
+      "last_price_check_at": "2026-06-13T12:16:09.872916+00:00",
       "phase_a_mae_price": 0.03911,
       "phase_a_mae_pct": -0.331,
       "phase_a_mae_at": "2026-06-13T12:14:05.350068+00:00"
+    },
+    {
+      "paper_id": "CHIPUSDT|LONG|2026-06-13T12:13:42.308651+00:00",
+      "trade_id": "L1781352822_CHIPUSD_L",
+      "symbol": "CHIPUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.0332,
+      "avg_fill_price": 0.03327,
+      "slippage_bps": 21.08,
+      "qty": 3005.0,
+      "notional_usdt": 99.97635,
+      "leverage": 1,
+      "risk_usdt": 0.7706,
+      "risk_pct": 0.771,
+      "mirror_latency_sec": 4.2,
+      "sl_price": 0.03308357,
+      "sl_paper_current": 0.03301357,
+      "disaster_stop_price": null,
+      "disaster_stop_at": null,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 7e-05,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": -0.0037,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "D",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.03347964,
+      "tp2_price": 0.03375929,
+      "phase": "A",
+      "entry_order_id": 709578497,
+      "entry_client_id": "cresus_L1781352822_CHIPUSD_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.374,
+      "top_trader_position_ratio": 1.8404,
+      "top_trader_account_ratio": 1.0593,
+      "global_account_ratio": 0.7944,
+      "phase_a_mfe_pct": 0.301,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.04,
+      "fees_are_actual": false,
+      "opened_at": "2026-06-13T12:14:19.010475+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 63907.5,
+      "btc_change_24h_at_open": 0.747,
+      "btc_pct_vs_ma25_at_open": 0.405,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.0333,
+      "current_price": 0.03329,
+      "unrealized_pnl_usdt": 0.0601,
+      "unrealized_pnl_pct": 0.06,
+      "last_price_check_at": "2026-06-13T12:16:09.872916+00:00",
+      "phase_a_mae_price": 0.03324,
+      "phase_a_mae_pct": -0.09,
+      "phase_a_mae_at": "2026-06-13T12:14:57.238089+00:00"
     }
   ],
   "recent_closed": [
@@ -40410,26 +40477,16 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [
-    {
-      "paper_id": "ROBOUSDT|LONG|2026-06-13T12:09:39.116742+00:00",
-      "symbol": "ROBOUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-06-13T12:09:52.040818+00:00",
-      "reason": "max_concurrent reached (3/3)",
-      "last_checked_at": "2026-06-13T12:14:05.350068+00:00"
-    }
-  ],
+  "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 63913.5,
-    "btc_ma25_1h": 63650.05,
-    "pct_vs_ma25": 0.414,
+    "btc_price": 63913.2,
+    "btc_ma25_1h": 63650.04,
+    "pct_vs_ma25": 0.413,
     "change_24h_pct": 0.756,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-13T12:14:06.441146+00:00"
+    "computed_at": "2026-06-13T12:16:10.798459+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
