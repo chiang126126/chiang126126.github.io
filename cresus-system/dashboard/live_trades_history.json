@@ -1,48 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-13T00:24:06.875474+00:00",
+  "generated_at": "2026-06-13T00:26:04.155209+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 494,
-    "open": 1,
-    "closed": 493,
-    "wins": 169,
+    "open": 0,
+    "closed": 494,
+    "wins": 170,
     "losses": 318,
-    "win_rate": 0.347,
-    "total_pnl_usdt": -23.5969,
-    "net_pnl_usdt": -97.5712,
-    "avg_pnl_usdt": -0.0479,
+    "win_rate": 0.348,
+    "total_pnl_usdt": -22.5132,
+    "net_pnl_usdt": -96.5679,
+    "avg_pnl_usdt": -0.0456,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 74.0143,
-    "fees_realized_usdt": 73.9743,
-    "fees_open_usdt": 0.04,
+    "fees_paid_usdt": 74.0547,
+    "fees_realized_usdt": 74.0547,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 99.95,
-    "free_capital_usdt": 402.44,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 503.43,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 0.0,
-    "deployed_usdt": 99.95
+    "daily_pnl": 1.0837,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "RIFUSDT"
-    ],
-    "exchange_symbols": [
-      "RIFUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "RIFUSDT|LONG|2026-06-13T00:17:32.711093+00:00",
       "trade_id": "L1781309852_RIFUSDT_L",
@@ -58,8 +55,8 @@
       "risk_usdt": 1.4182,
       "risk_pct": 1.419,
       "mirror_latency_sec": 19.3,
-      "sl_price": 0.0838473,
-      "sl_paper_current": 0.08349,
+      "sl_price": 0.08593506100000001,
+      "sl_paper_current": 0.085577761,
       "disaster_stop_price": null,
       "disaster_stop_at": null,
       "sl_compensation_enabled": true,
@@ -68,7 +65,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 6,
       "wick_filter_mode": "always",
-      "sl_breach_count": 0,
+      "sl_breach_count": 6,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": -0.0274,
       "regime_gate_enabled": true,
@@ -77,7 +74,7 @@
       "min_conviction_threshold": null,
       "tp1_price": 0.08473875,
       "tp2_price": 0.0859875,
-      "phase": "B",
+      "phase": "C",
       "entry_order_id": 2437848124,
       "entry_client_id": "cresus_L1781309852_RIFUSDT_L_E",
       "sl_order_id": null,
@@ -89,9 +86,9 @@
       "top_trader_account_ratio": 0.9482,
       "global_account_ratio": 0.8382,
       "phase_a_mfe_pct": 2.132,
-      "phase_b_mfe_pct": 2.132,
-      "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.04,
+      "phase_b_mfe_pct": 3.533,
+      "phase_c_mfe_pct": 3.533,
+      "fees_paid_usdt": 0.0804,
       "fees_are_actual": false,
       "opened_at": "2026-06-13T00:18:29.277241+00:00",
       "is_dry_run": false,
@@ -102,17 +99,31 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.08527,
-      "current_price": 0.08661,
-      "unrealized_pnl_usdt": 3.2931,
-      "unrealized_pnl_pct": 3.295,
-      "last_price_check_at": "2026-06-13T00:24:05.619444+00:00",
+      "current_price": 0.08485,
+      "unrealized_pnl_usdt": 1.1952,
+      "unrealized_pnl_pct": 1.196,
+      "last_price_check_at": "2026-06-13T00:25:42.396322+00:00",
       "phase_a_mae_price": 0.08346,
       "phase_a_mae_pct": -0.462,
       "phase_a_mae_at": "2026-06-13T00:20:32.043457+00:00",
-      "phase_b_mfe_price": 0.08527
-    }
-  ],
-  "recent_closed": [
+      "phase_b_mfe_price": 0.08644,
+      "phase_c_mfe_price": 0.08644,
+      "btc_regime_at_close": "chop",
+      "btc_price_at_close": 63532.6,
+      "btc_pct_vs_ma25_at_close": 0.003,
+      "closed_at": "2026-06-13T00:25:46.142258+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.08475643456375839,
+      "realized_pnl_usdt": 1.0837,
+      "close_order_id": 2438050192,
+      "close_qty": 1192.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 0.08593506100000001,
+      "close_slippage_bps": 137.15,
+      "entry_fees_usdt": 0.04,
+      "close_fees_usdt": 0.0404
+    },
     {
       "paper_id": "RIFUSDT|LONG|2026-06-12T22:33:12.888921+00:00",
       "trade_id": "L1781303592_RIFUSDT_L",
@@ -38442,26 +38453,16 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [
-    {
-      "paper_id": "ENSOUSDT|LONG|2026-06-13T00:08:52.770930+00:00",
-      "symbol": "ENSOUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-06-13T00:09:33.692849+00:00",
-      "reason": "paper trade too old (872s > 600s)",
-      "last_checked_at": "2026-06-13T00:24:05.619444+00:00"
-    }
-  ],
+  "missed_signals": [],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 63567.8,
-    "btc_ma25_1h": 63532.3,
-    "pct_vs_ma25": 0.056,
-    "change_24h_pct": -0.078,
+    "btc_price": 63508.1,
+    "btc_ma25_1h": 63529.91,
+    "pct_vs_ma25": -0.034,
+    "change_24h_pct": -0.172,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-13T00:24:06.565155+00:00"
+    "computed_at": "2026-06-13T00:26:04.116091+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
