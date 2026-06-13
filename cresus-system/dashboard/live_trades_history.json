@@ -1,48 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-13T16:34:04.313554+00:00",
+  "generated_at": "2026-06-13T16:36:00.792178+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 536,
-    "open": 1,
-    "closed": 535,
+    "open": 0,
+    "closed": 536,
     "wins": 181,
-    "losses": 348,
+    "losses": 349,
     "win_rate": 0.342,
-    "total_pnl_usdt": -19.0128,
-    "net_pnl_usdt": -96.586,
-    "avg_pnl_usdt": -0.0355,
+    "total_pnl_usdt": -20.4686,
+    "net_pnl_usdt": -98.1212,
+    "avg_pnl_usdt": -0.0382,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 77.6132,
-    "fees_realized_usdt": 77.5732,
-    "fees_open_usdt": 0.04,
+    "fees_paid_usdt": 77.6526,
+    "fees_realized_usdt": 77.6526,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 100.0,
-    "free_capital_usdt": 403.37,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 501.88,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 4.5841,
-    "deployed_usdt": 100.0
+    "daily_pnl": 3.1283,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "NEIROUSDT"
-    ],
-    "exchange_symbols": [
-      "NEIROUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "NEIROUSDT|LONG|2026-06-13T16:17:01.341637+00:00",
       "trade_id": "L1781367421_NEIROUS_L",
@@ -68,7 +65,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 6,
       "wick_filter_mode": "always",
-      "sl_breach_count": 0,
+      "sl_breach_count": 6,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.005,
       "regime_gate_enabled": true,
@@ -91,7 +88,7 @@
       "phase_a_mfe_pct": 0.367,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.04,
+      "fees_paid_usdt": 0.0794,
       "fees_are_actual": false,
       "opened_at": "2026-06-13T16:18:04.130825+00:00",
       "is_dry_run": false,
@@ -102,16 +99,29 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 7.112e-05,
-      "current_price": 7.015e-05,
-      "unrealized_pnl_usdt": -1.1276,
-      "unrealized_pnl_pct": -1.128,
-      "last_price_check_at": "2026-06-13T16:34:03.049599+00:00",
-      "phase_a_mae_price": 7.015e-05,
-      "phase_a_mae_pct": -1.128,
-      "phase_a_mae_at": "2026-06-13T16:34:03.049599+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 6.991e-05,
+      "unrealized_pnl_usdt": -1.4658,
+      "unrealized_pnl_pct": -1.466,
+      "last_price_check_at": "2026-06-13T16:35:38.610662+00:00",
+      "phase_a_mae_price": 6.982e-05,
+      "phase_a_mae_pct": -1.593,
+      "phase_a_mae_at": "2026-06-13T16:35:18.106964+00:00",
+      "btc_regime_at_close": "chop",
+      "btc_price_at_close": 63941.2,
+      "btc_pct_vs_ma25_at_close": 0.3,
+      "closed_at": "2026-06-13T16:35:41.768792+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 6.991707442585475e-05,
+      "realized_pnl_usdt": -1.4558,
+      "close_order_id": 9937593640,
+      "close_qty": 1409443.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 7.003e-05,
+      "close_slippage_bps": 16.13,
+      "entry_fees_usdt": 0.04,
+      "close_fees_usdt": 0.0394
+    },
     {
       "paper_id": "BIOUSDT|LONG|2026-06-13T16:07:42.604429+00:00",
       "trade_id": "L1781366862_BIOUSDT_L",
@@ -41848,16 +41858,26 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "SPXUSDT|LONG|2026-06-13T16:34:34.578318+00:00",
+      "symbol": "SPXUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-13T16:34:37.623095+00:00",
+      "reason": "phase_6f_b3: Tier C (entry=$0.3311) + LONG + BTC chop 历史 n=22 WR 18% live -$18 vs paper +$45 (100% 执行 gap)",
+      "last_checked_at": "2026-06-13T16:35:59.649403+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 63993.6,
-    "btc_ma25_1h": 63751.93,
-    "pct_vs_ma25": 0.379,
-    "change_24h_pct": 0.066,
+    "btc_price": 63974.8,
+    "btc_ma25_1h": 63751.18,
+    "pct_vs_ma25": 0.351,
+    "change_24h_pct": 0.037,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-13T16:34:04.000939+00:00"
+    "computed_at": "2026-06-13T16:36:00.747048+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
