@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-13T09:02:01.144791+00:00",
+  "generated_at": "2026-06-13T09:03:58.145362+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 510,
@@ -36,12 +36,12 @@
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "BABYUSDT",
-      "MEGAUSDT"
+      "MEGAUSDT",
+      "BABYUSDT"
     ],
     "exchange_symbols": [
-      "BABYUSDT",
-      "MEGAUSDT"
+      "MEGAUSDT",
+      "BABYUSDT"
     ]
   },
   "open_trades": [
@@ -104,10 +104,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.01437,
-      "current_price": 0.01435,
-      "unrealized_pnl_usdt": 0.5606,
-      "unrealized_pnl_pct": 0.561,
-      "last_price_check_at": "2026-06-13T09:01:59.584888+00:00",
+      "current_price": 0.01437,
+      "unrealized_pnl_usdt": 0.7007,
+      "unrealized_pnl_pct": 0.701,
+      "last_price_check_at": "2026-06-13T09:03:56.544453+00:00",
       "phase_a_mae_price": 0.0142,
       "phase_a_mae_pct": -0.491,
       "phase_a_mae_at": "2026-06-13T08:42:28.466142+00:00"
@@ -127,8 +127,8 @@
       "risk_usdt": 1.6953,
       "risk_pct": 1.697,
       "mirror_latency_sec": 4.0,
-      "sl_price": 0.05392464,
-      "sl_paper_current": 0.05360464,
+      "sl_price": 0.054408928,
+      "sl_paper_current": 0.054088928,
       "disaster_stop_price": null,
       "disaster_stop_at": null,
       "sl_compensation_enabled": true,
@@ -157,7 +157,7 @@
       "top_trader_position_ratio": 1.1767,
       "top_trader_account_ratio": 1.2619,
       "global_account_ratio": 1.1954,
-      "phase_a_mfe_pct": 0.406,
+      "phase_a_mfe_pct": 0.922,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.04,
@@ -170,14 +170,14 @@
       "btc_pct_vs_ma25_at_open": 0.291,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 0.05443,
-      "current_price": 0.05436,
-      "unrealized_pnl_usdt": -0.3114,
-      "unrealized_pnl_pct": -0.312,
-      "last_price_check_at": "2026-06-13T09:01:59.584888+00:00",
-      "phase_a_mae_price": 0.05436,
-      "phase_a_mae_pct": -0.312,
-      "phase_a_mae_at": "2026-06-13T09:01:59.584888+00:00"
+      "phase_a_mfe_price": 0.05471,
+      "current_price": 0.05457,
+      "unrealized_pnl_usdt": 0.0733,
+      "unrealized_pnl_pct": 0.073,
+      "last_price_check_at": "2026-06-13T09:03:56.544453+00:00",
+      "phase_a_mae_price": 0.05416,
+      "phase_a_mae_pct": -0.679,
+      "phase_a_mae_at": "2026-06-13T09:02:10.561812+00:00"
     }
   ],
   "recent_closed": [
@@ -39754,8 +39754,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-13T08:20:16.318509+00:00",
-      "reason": "paper trade too old (2503s > 600s)",
-      "last_checked_at": "2026-06-13T09:01:59.584888+00:00"
+      "reason": "paper trade too old (2620s > 600s)",
+      "last_checked_at": "2026-06-13T09:03:56.544453+00:00"
     },
     {
       "paper_id": "RIFUSDT|LONG|2026-06-13T08:49:21.223079+00:00",
@@ -39763,19 +39763,28 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-13T08:50:21.749712+00:00",
-      "reason": "paper trade too old (698s > 600s)",
-      "last_checked_at": "2026-06-13T09:01:59.584888+00:00"
+      "reason": "paper trade too old (815s > 600s)",
+      "last_checked_at": "2026-06-13T09:03:56.544453+00:00"
+    },
+    {
+      "paper_id": "STGUSDT|LONG|2026-06-13T09:02:15.233535+00:00",
+      "symbol": "STGUSDT",
+      "direction": "LONG",
+      "conviction_score": 7,
+      "signal_at": "2026-06-13T09:03:22.826068+00:00",
+      "reason": "phase_6f_b3: Tier C (entry=$0.5166) + LONG + BTC chop 历史 n=22 WR 18% live -$18 vs paper +$45 (100% 执行 gap)",
+      "last_checked_at": "2026-06-13T09:03:56.544453+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 63786.6,
-    "btc_ma25_1h": 63631.58,
-    "pct_vs_ma25": 0.244,
-    "change_24h_pct": 0.09,
+    "btc_price": 63760.6,
+    "btc_ma25_1h": 63630.54,
+    "pct_vs_ma25": 0.204,
+    "change_24h_pct": 0.049,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-13T09:02:00.530044+00:00"
+    "computed_at": "2026-06-13T09:03:57.494467+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
