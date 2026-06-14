@@ -166,6 +166,76 @@ def _count_phase_6f_b2_partial_unblock(live_state: dict) -> tuple:
     return _count_partial_unblock_trades(live_state, "_phase_6f_b2_partial_unblock")
 
 
+def _tier_from_entry_price(entry: float) -> Optional[str]:
+    """Phase 6.L (2026-06-14): map entry_price to tier letter.
+    A: ≥$10, B: $1-$10, C: $0.1-$1, D: <$0.1, None: invalid (<=0 or non-numeric).
+    Used by Phase 6.F-B2 multi-tier filter + Phase 6.L conv=5 priority.
+    """
+    try:
+        e = float(entry)
+    except (TypeError, ValueError):
+        return None
+    if e <= 0:
+        return None
+    if e >= 10.0:
+        return "A"
+    if e >= 1.0:
+        return "B"
+    if e >= 0.1:
+        return "C"
+    return "D"
+
+
+# Phase 6.L (2026-06-14) — conv=5 优先开仓 high-EV cells
+# ============================================================================
+# 数据驱动 (1111 paper 笔 三维矩阵 audit), 用户原议 8 cells 中 4 个被 4.F/6.F-B3 已挡,
+# 剩 4 个可通行的 conv=5 high-EV cells:
+#   D 微币 + DOWN + SHORT: n=78, +$72, WR 47%
+#   C 小币 + DOWN + SHORT: n=63, +$33, WR 40%
+#   A 大币 + DOWN + SHORT: n=34, +$23, WR 56% (大币里唯一稳赚)
+#   D 微币 + CHOP + LONG:   n=142, +$34, WR 36% (n 最大)
+#
+# 机制 (Phase 5.D 排序扩展):
+#   - 现有 sort key: (-conv 降序, entered_at FIFO)
+#   - 新加 tier: 同 conv 内, priority cell 排前
+#   - 用于 slot 稀缺时 (max_concurrent 满 / deploy cap 接近) 让高 EV 优先入场
+#   - 不影响 conv=6/7+ 信号 (它们 conv 分数已高于 5, 自然排前)
+#
+# 不变项: 这些 cell 仍走完整 gate 流程 (4.F/4.M/6.F/6.G/etc), 只是排队优先.
+LIVE_PHASE_6L_CONV5_PRIORITY_CELLS = frozenset({
+    ("D", "down", "SHORT"),
+    ("C", "down", "SHORT"),
+    ("A", "down", "SHORT"),
+    ("D", "chop", "LONG"),
+})
+
+
+def _is_conv5_priority_cell(paper_trade: dict, btc_regime: Optional[str]) -> bool:
+    """Phase 6.L: 是否在 conv=5 优先开仓 4 cells 集合?
+
+    用于 mirror_candidates.sort 给同 conv 内 priority cell 排前.
+    Fail-safe: 任何字段异常 / regime 无效 → False (= 不算 priority, 按 FIFO).
+
+    仅 conv=5 适用; conv != 5 一律返 False (高 conv 已通过 score sort 自动排前).
+    """
+    try:
+        conv = int(paper_trade.get("conviction_score") or 0)
+    except (TypeError, ValueError):
+        return False
+    if conv != 5:
+        return False
+    tier = _tier_from_entry_price(paper_trade.get("entry_price"))
+    if tier is None:
+        return False
+    direction = (paper_trade.get("direction") or "").upper()
+    if direction not in ("LONG", "SHORT"):
+        return False
+    regime = (btc_regime or "").lower()
+    if regime not in ("up", "chop", "down"):
+        return False
+    return (tier, regime, direction) in LIVE_PHASE_6L_CONV5_PRIORITY_CELLS
+
+
 # ==========================================
 # Phase 5.S (2026-06-02) — Regime-aware size multiplier (默认无行为变化)
 # ==========================================
@@ -698,7 +768,11 @@ LIVE_PHASE_6F_B2_PARTIAL_UNBLOCK_ENABLED = True
 LIVE_PHASE_6F_B2_PARTIAL_NOTIONAL_USDT = 80.0    # vs 默认 conv=7 $200, 减仓 60%
 LIVE_PHASE_6F_B2_PARTIAL_MAX_TRADES = 15         # 小样本试验, 跑 15 笔后停
 LIVE_PHASE_6F_B2_PARTIAL_MAX_LOSS_USDT = 15.0    # kill switch (vs B1 $25 紧一点)
-LIVE_PHASE_6F_B2_PARTIAL_TIER_UPPER = 0.1        # 仅 Tier D 微币 (跟 B1-EXP1 v2 一致)
+# Phase 6.F-B2 v2 (2026-06-14): EXP 多 tier 支持. 用户授权 Tier D + Tier B 两个 cell:
+#   - D 微币 + CHOP + LONG: n=16 +$74 (mean +$4.64) — 唯一 n≥10 profitable
+#   - B 中币 + CHOP + LONG: n=4 +$20 (mean +$4.94) — INSUF n<10 但 mean 极高
+# Tier A ($≥10) 不放 — 数据全负. Tier C ($0.1-1) 不放 — n=5 -$4 paper.
+LIVE_PHASE_6F_B2_PARTIAL_VALID_TIERS = frozenset({"D", "B"})  # 仅 D 微币 + B 中币
 
 # Phase 3.3.a/b 控制文件 (在 ~/.cresus-*)
 PAUSE_FLAG_PATH = Path.home() / ".cresus-pause"
@@ -1292,14 +1366,15 @@ def is_eligible_for_mirror(
                 entry_price_for_b2 = float(paper_trade.get("entry_price") or 0)
             except (ValueError, TypeError):
                 entry_price_for_b2 = 0.0
+            tier_for_b2 = _tier_from_entry_price(entry_price_for_b2)
             if (LIVE_PHASE_6F_B2_PARTIAL_UNBLOCK_ENABLED
                     and direction == "LONG"
                     and btc_regime == "chop"
-                    and 0 < entry_price_for_b2 < LIVE_PHASE_6F_B2_PARTIAL_TIER_UPPER):
+                    and tier_for_b2 in LIVE_PHASE_6F_B2_PARTIAL_VALID_TIERS):
                 partial_n, partial_pnl = _count_phase_6f_b2_partial_unblock(live_state)
                 if partial_n >= LIVE_PHASE_6F_B2_PARTIAL_MAX_TRADES:
                     return False, (
-                        f"phase_6f_b2_exp1: D micro conv>=7 LONG chop 试验已跑 "
+                        f"phase_6f_b2_exp1: conv>=7 Tier{tier_for_b2} LONG chop 试验已跑 "
                         f"{partial_n}/{LIVE_PHASE_6F_B2_PARTIAL_MAX_TRADES} 笔上限, 等待 retro"
                     )
                 if partial_pnl <= -LIVE_PHASE_6F_B2_PARTIAL_MAX_LOSS_USDT:
@@ -1309,16 +1384,17 @@ def is_eligible_for_mirror(
                     )
                 paper_trade["_phase_6f_b2_partial_unblock"] = True
                 log.info(
-                    f"[phase_6f_b2_exp1] {sym} D 微币 conv={conv_val} LONG chop "
+                    f"[phase_6f_b2_exp1] {sym} Tier{tier_for_b2} conv={conv_val} LONG chop "
                     f"(entry=${entry_price_for_b2:.5f}) 试验性 unblock 通过 "
                     f"(n={partial_n+1}/{LIVE_PHASE_6F_B2_PARTIAL_MAX_TRADES}, "
                     f"cum_pnl ${partial_pnl:.2f}, notional=${LIVE_PHASE_6F_B2_PARTIAL_NOTIONAL_USDT})"
                 )
                 # 继续走后续 gate
             else:
+                tier_repr = tier_for_b2 if tier_for_b2 else "?"
                 return False, (
                     f"phase_6f_b2: conviction={conv_val} 整桶 block "
-                    f"(EXP1 仅放 D 微币 LONG chop, entry=${entry_price_for_b2:.5f} 不满足)"
+                    f"(EXP1 仅放 D/B Tier LONG chop, 实际 Tier{tier_repr} entry=${entry_price_for_b2:.5f})"
                 )
         # B3: Tier C + LONG + BTC chop. btc_regime 为 None 时跳过 (fail-safe = 不 block).
         try:
@@ -3132,9 +3208,14 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
     # Phase 5.B 已给 BTC trend-aligned (up+LONG / down+SHORT) +1 score,
     # 故 score 降序排自动让趋势对齐信号优先入场 — 无需额外的 regime alignment 逻辑.
     # 同 score 时按 entered_at FIFO (公平 + 确定性).
+    #
+    # Phase 6.L (2026-06-14): 同 conv 内, 4 个 high-EV cells (D/down/SHORT, C/down/SHORT,
+    # A/down/SHORT, D/chop/LONG) 优先排前. 仅影响 conv=5 (高 conv 已 score 优先).
+    # 用于让历史最稳定的 conv=5 cells 在 slot 稀缺时不被同分非 priority cell 挤掉.
     mirror_candidates.sort(
         key=lambda pt: (
             -int(pt.get("conviction_score") or 0),
+            0 if _is_conv5_priority_cell(pt, current_regime) else 1,
             pt.get("entered_at", ""),
         )
     )

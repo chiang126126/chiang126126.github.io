@@ -6996,5 +6996,177 @@ class TestPhase6FB2ConvHighBlock(unittest.TestCase):
         self.assertFalse(t.get("_phase_6f_b2_partial_unblock"))
 
 
+class TestPhase6LConv5Priority(unittest.TestCase):
+    """Phase 6.L (2026-06-14): conv=5 优先开仓 4 high-EV cells (sort 排前).
+
+    数据驱动 4 cells (用户原议 8 cells 减 3 down+LONG 被 4.F 挡 + 1 Tier C LONG chop 被 6.F-B3 挡):
+        D 微币 + DOWN + SHORT (n=78 +$72)
+        C 小币 + DOWN + SHORT (n=63 +$33)
+        A 大币 + DOWN + SHORT (n=34 +$23)
+        D 微币 + CHOP + LONG  (n=142 +$34)
+    """
+
+    def test_6l_d_down_short_is_priority(self):
+        """D 微币 ($0.05) + DOWN + SHORT + conv=5 → priority."""
+        from live_trader import _is_conv5_priority_cell
+        pt = {"conviction_score": 5, "entry_price": 0.05, "direction": "SHORT"}
+        self.assertTrue(_is_conv5_priority_cell(pt, "down"))
+
+    def test_6l_c_down_short_is_priority(self):
+        """C 小币 ($0.5) + DOWN + SHORT → priority."""
+        from live_trader import _is_conv5_priority_cell
+        pt = {"conviction_score": 5, "entry_price": 0.5, "direction": "SHORT"}
+        self.assertTrue(_is_conv5_priority_cell(pt, "down"))
+
+    def test_6l_a_down_short_is_priority(self):
+        """A 大币 ($50) + DOWN + SHORT → priority."""
+        from live_trader import _is_conv5_priority_cell
+        pt = {"conviction_score": 5, "entry_price": 50.0, "direction": "SHORT"}
+        self.assertTrue(_is_conv5_priority_cell(pt, "down"))
+
+    def test_6l_d_chop_long_is_priority(self):
+        """D 微币 + CHOP + LONG → priority."""
+        from live_trader import _is_conv5_priority_cell
+        pt = {"conviction_score": 5, "entry_price": 0.05, "direction": "LONG"}
+        self.assertTrue(_is_conv5_priority_cell(pt, "chop"))
+
+    def test_6l_non_priority_cells(self):
+        """非 4 cells 任何变化都不应 priority."""
+        from live_trader import _is_conv5_priority_cell
+        # 同 regime/dir 但 tier 不同 (e.g. B 中币)
+        self.assertFalse(_is_conv5_priority_cell(
+            {"conviction_score": 5, "entry_price": 5.0, "direction": "SHORT"}, "down"))
+        # 同 tier/regime 但 dir 不同 (e.g. D/down/LONG — 4.F 会挡)
+        self.assertFalse(_is_conv5_priority_cell(
+            {"conviction_score": 5, "entry_price": 0.05, "direction": "LONG"}, "down"))
+        # 同 tier/dir 但 regime 不同
+        self.assertFalse(_is_conv5_priority_cell(
+            {"conviction_score": 5, "entry_price": 0.05, "direction": "SHORT"}, "up"))
+
+    def test_6l_only_conv5_applies(self):
+        """conv != 5 一律 False (高 conv 已 score sort 排前, 不需 6.L)."""
+        from live_trader import _is_conv5_priority_cell
+        # 同 cell 但 conv=6
+        pt = {"conviction_score": 6, "entry_price": 0.05, "direction": "SHORT"}
+        self.assertFalse(_is_conv5_priority_cell(pt, "down"))
+        # conv=7
+        pt["conviction_score"] = 7
+        self.assertFalse(_is_conv5_priority_cell(pt, "down"))
+        # conv=4 (低于 diamond, 不可能到 mirror_candidates)
+        pt["conviction_score"] = 4
+        self.assertFalse(_is_conv5_priority_cell(pt, "down"))
+
+    def test_6l_invalid_inputs_safe(self):
+        """异常输入 (entry=0, regime=None, dir 错) → False, 不崩."""
+        from live_trader import _is_conv5_priority_cell
+        # entry 0
+        self.assertFalse(_is_conv5_priority_cell(
+            {"conviction_score": 5, "entry_price": 0, "direction": "SHORT"}, "down"))
+        # regime None
+        self.assertFalse(_is_conv5_priority_cell(
+            {"conviction_score": 5, "entry_price": 0.05, "direction": "SHORT"}, None))
+        # 非法 direction
+        self.assertFalse(_is_conv5_priority_cell(
+            {"conviction_score": 5, "entry_price": 0.05, "direction": "INVALID"}, "down"))
+        # 非法 regime
+        self.assertFalse(_is_conv5_priority_cell(
+            {"conviction_score": 5, "entry_price": 0.05, "direction": "SHORT"}, "weird"))
+
+    def test_tier_from_entry_price_boundaries(self):
+        """_tier_from_entry_price 边界."""
+        from live_trader import _tier_from_entry_price
+        self.assertEqual(_tier_from_entry_price(100), "A")
+        self.assertEqual(_tier_from_entry_price(10), "A")
+        self.assertEqual(_tier_from_entry_price(9.99), "B")
+        self.assertEqual(_tier_from_entry_price(1), "B")
+        self.assertEqual(_tier_from_entry_price(0.99), "C")
+        self.assertEqual(_tier_from_entry_price(0.1), "C")
+        self.assertEqual(_tier_from_entry_price(0.099), "D")
+        self.assertEqual(_tier_from_entry_price(0.001), "D")
+        self.assertIsNone(_tier_from_entry_price(0))
+        self.assertIsNone(_tier_from_entry_price(-1))
+        self.assertIsNone(_tier_from_entry_price(None))
+        self.assertIsNone(_tier_from_entry_price("abc"))
+
+
+class TestPhase6FB2TierExtension(unittest.TestCase):
+    """Phase 6.F-B2 v2 (2026-06-14): EXP 多 tier (D 微币 + B 中币 LONG chop).
+
+    用户授权 2 cells: D 微币 (entry<$0.1) AND B 中币 ($1-$10).
+    Tier A (≥$10) + Tier C ($0.1-$1) 仍 block.
+    """
+
+    def setUp(self):
+        from datetime import datetime, timezone
+        self.now = datetime.now(timezone.utc)
+
+    def _base_trade(self, conviction_score=7, entry_price=0.05, direction="LONG"):
+        from datetime import datetime, timezone, timedelta
+        return {
+            "id": "TESTUSDT|LONG|b2v2|2026-06-14T19:00:00+00:00",
+            "symbol": "TESTUSDT",
+            "direction": direction,
+            "entry_price": entry_price,
+            "conviction_score": conviction_score,
+            "entered_at": (self.now - timedelta(seconds=10)).isoformat(),
+            "sl": entry_price * 0.9, "tp1": entry_price * 1.1, "tp2": entry_price * 1.2,
+        }
+
+    def _state(self):
+        return {"mirrored_paper_ids": [], "live_open_trades": [], "live_closed_trades": []}
+
+    def test_b2_v2_tier_d_long_chop_allowed(self):
+        """Tier D 微币 ($0.05) + LONG + chop → 通过."""
+        t = self._base_trade(entry_price=0.05)
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._state(), self.now, btc_regime="chop")
+        self.assertTrue(ok, f"reason={reason}")
+        self.assertTrue(t.get("_phase_6f_b2_partial_unblock"))
+
+    def test_b2_v2_tier_b_long_chop_allowed(self):
+        """Tier B 中币 ($5) + LONG + chop → 通过 (新加 tier)."""
+        t = self._base_trade(entry_price=5.0)
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._state(), self.now, btc_regime="chop")
+        self.assertTrue(ok, f"reason={reason}")
+        self.assertTrue(t.get("_phase_6f_b2_partial_unblock"))
+
+    def test_b2_v2_tier_a_long_chop_blocked(self):
+        """Tier A 大币 ($50) → 仍 block (不在 valid_tiers)."""
+        t = self._base_trade(entry_price=50.0)
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._state(), self.now, btc_regime="chop")
+        self.assertFalse(ok)
+        self.assertIn("phase_6f_b2:", reason)
+
+    def test_b2_v2_tier_c_long_chop_blocked(self):
+        """Tier C 小币 ($0.5) → 仍 block (不在 valid_tiers, paper n=5 -$4)."""
+        t = self._base_trade(entry_price=0.5)
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._state(), self.now, btc_regime="chop")
+        self.assertFalse(ok)
+        self.assertIn("phase_6f_b2:", reason)
+
+    def test_b2_v2_boundary_1_dollar_allowed(self):
+        """entry=$1.00 = Tier B 下界, 应通过."""
+        t = self._base_trade(entry_price=1.0)
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._state(), self.now, btc_regime="chop")
+        self.assertTrue(ok, f"reason={reason}")
+
+    def test_b2_v2_boundary_10_dollar_blocked(self):
+        """entry=$10 = Tier A 下界, 应 block."""
+        t = self._base_trade(entry_price=10.0)
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._state(), self.now, btc_regime="chop")
+        self.assertFalse(ok)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
