@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-14T21:52:09.871464+00:00",
+  "generated_at": "2026-06-14T21:54:12.908655+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 606,
-    "open": 1,
+    "total_trades": 607,
+    "open": 2,
     "closed": 605,
     "wins": 201,
     "losses": 398,
@@ -15,15 +15,15 @@
     "avg_pnl_usdt": -0.0681,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 83.2181,
+    "fees_paid_usdt": 83.2581,
     "fees_realized_usdt": 83.1808,
-    "fees_open_usdt": 0.0373,
+    "fees_open_usdt": 0.0773,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 93.17,
-    "free_capital_usdt": 382.42,
+    "deployed_usdt": 193.16,
+    "free_capital_usdt": 282.39,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
@@ -104,13 +104,82 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 1554.19,
-      "current_price": 1555.0,
-      "unrealized_pnl_usdt": 0.1251,
-      "unrealized_pnl_pct": 0.134,
-      "last_price_check_at": "2026-06-14T21:52:08.429657+00:00",
+      "current_price": 1554.61,
+      "unrealized_pnl_usdt": 0.1017,
+      "unrealized_pnl_pct": 0.109,
+      "last_price_check_at": "2026-06-14T21:54:07.257645+00:00",
       "phase_a_mae_price": 1547.44,
       "phase_a_mae_pct": -0.353,
       "phase_a_mae_at": "2026-06-14T21:42:59.377833+00:00"
+    },
+    {
+      "paper_id": "ETHFIUSDT|LONG|2026-06-14T21:53:23.334784+00:00",
+      "trade_id": "L1781474003_ETHFIUS_L",
+      "symbol": "ETHFIUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.3305,
+      "avg_fill_price": 0.3288,
+      "slippage_bps": -51.44,
+      "qty": 304.1,
+      "notional_usdt": 99.98808,
+      "leverage": 1,
+      "risk_usdt": 0.0891,
+      "risk_pct": 0.089,
+      "mirror_latency_sec": 18.2,
+      "sl_price": 0.32680713999999994,
+      "sl_paper_current": 0.32850714,
+      "disaster_stop_price": null,
+      "disaster_stop_at": null,
+      "_phase_6f_b1_partial_unblock": false,
+      "_phase_6f_b2_partial_unblock": false,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -0.0017,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "B",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.33348929,
+      "tp2_price": 0.33647857,
+      "phase": "A",
+      "entry_order_id": 7709924292,
+      "entry_client_id": "cresus_L1781474003_ETHFIUS_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "burst",
+      "atr_pct": 0.402,
+      "top_trader_position_ratio": 2.393,
+      "top_trader_account_ratio": 1.8169,
+      "global_account_ratio": 1.3552,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.04,
+      "fees_are_actual": false,
+      "opened_at": "2026-06-14T21:54:10.590009+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "up",
+      "btc_price_at_open": 65425.9,
+      "btc_change_24h_at_open": 1.538,
+      "btc_pct_vs_ma25_at_open": 1.74,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.3305,
+      "current_price": 0.3287,
+      "unrealized_pnl_usdt": -0.0304,
+      "unrealized_pnl_pct": -0.03,
+      "last_price_check_at": "2026-06-14T21:54:07.257645+00:00",
+      "phase_a_mae_price": 0.3287,
+      "phase_a_mae_pct": -0.03,
+      "phase_a_mae_at": "2026-06-14T21:54:07.257645+00:00"
     }
   ],
   "recent_closed": [
@@ -47599,8 +47668,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-14T21:14:46.237003+00:00",
-      "reason": "paper trade too old (2242s > 600s)",
-      "last_checked_at": "2026-06-14T21:52:08.429657+00:00"
+      "reason": "paper trade too old (2361s > 600s)",
+      "last_checked_at": "2026-06-14T21:54:07.257645+00:00"
     },
     {
       "paper_id": "USELESSUSDT|LONG|2026-06-14T21:20:22.511386+00:00",
@@ -47608,8 +47677,8 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-14T21:20:51.545901+00:00",
-      "reason": "paper trade too old (1877s > 600s)",
-      "last_checked_at": "2026-06-14T21:52:08.429657+00:00"
+      "reason": "paper trade too old (1996s > 600s)",
+      "last_checked_at": "2026-06-14T21:54:07.257645+00:00"
     },
     {
       "paper_id": "FARTCOINUSDT|LONG|2026-06-14T21:22:35.851208+00:00",
@@ -47617,8 +47686,8 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-14T21:23:19.572637+00:00",
-      "reason": "paper trade too old (1729s > 600s)",
-      "last_checked_at": "2026-06-14T21:52:08.429657+00:00"
+      "reason": "paper trade too old (1848s > 600s)",
+      "last_checked_at": "2026-06-14T21:54:07.257645+00:00"
     },
     {
       "paper_id": "SPXUSDT|LONG|2026-06-14T21:23:11.764142+00:00",
@@ -47626,8 +47695,8 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-14T21:23:19.572637+00:00",
-      "reason": "paper trade too old (1729s > 600s)",
-      "last_checked_at": "2026-06-14T21:52:08.429657+00:00"
+      "reason": "paper trade too old (1848s > 600s)",
+      "last_checked_at": "2026-06-14T21:54:07.257645+00:00"
     },
     {
       "paper_id": "ADAUSDT|LONG|2026-06-14T21:26:50.534645+00:00",
@@ -47635,8 +47704,8 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-14T21:28:20.875945+00:00",
-      "reason": "paper trade too old (1428s > 600s)",
-      "last_checked_at": "2026-06-14T21:52:08.429657+00:00"
+      "reason": "paper trade too old (1546s > 600s)",
+      "last_checked_at": "2026-06-14T21:54:07.257645+00:00"
     },
     {
       "paper_id": "DASHUSDT|LONG|2026-06-14T21:27:19.985642+00:00",
@@ -47644,8 +47713,8 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-14T21:28:20.875945+00:00",
-      "reason": "paper trade too old (1428s > 600s)",
-      "last_checked_at": "2026-06-14T21:52:08.429657+00:00"
+      "reason": "paper trade too old (1546s > 600s)",
+      "last_checked_at": "2026-06-14T21:54:07.257645+00:00"
     },
     {
       "paper_id": "ARKMUSDT|LONG|2026-06-14T21:27:58.684026+00:00",
@@ -47653,8 +47722,8 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-14T21:28:20.875945+00:00",
-      "reason": "paper trade too old (1428s > 600s)",
-      "last_checked_at": "2026-06-14T21:52:08.429657+00:00"
+      "reason": "paper trade too old (1546s > 600s)",
+      "last_checked_at": "2026-06-14T21:54:07.257645+00:00"
     },
     {
       "paper_id": "SOXLUSDT|LONG|2026-06-14T21:38:29.875133+00:00",
@@ -47662,8 +47731,8 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-14T21:39:24.687213+00:00",
-      "reason": "paper trade too old (764s > 600s)",
-      "last_checked_at": "2026-06-14T21:52:08.429657+00:00"
+      "reason": "paper trade too old (883s > 600s)",
+      "last_checked_at": "2026-06-14T21:54:07.257645+00:00"
     },
     {
       "paper_id": "VVVUSDT|LONG|2026-06-14T21:45:42.611106+00:00",
@@ -47672,7 +47741,7 @@
       "conviction_score": 6,
       "signal_at": "2026-06-14T21:46:45.226225+00:00",
       "reason": "phase_6f_b1: conviction=6 整桶 block (EXP1 v2 仅放 D 微币 LONG chop, entry=$16.98800 不满足)",
-      "last_checked_at": "2026-06-14T21:52:08.429657+00:00"
+      "last_checked_at": "2026-06-14T21:54:07.257645+00:00"
     },
     {
       "paper_id": "PENGUUSDT|LONG|2026-06-14T21:50:31.065841+00:00",
@@ -47681,7 +47750,7 @@
       "conviction_score": 6,
       "signal_at": "2026-06-14T21:51:26.361237+00:00",
       "reason": "phase_6f_b1: conviction=6 整桶 block (EXP1 v2 仅放 D 微币 LONG chop, entry=$0.00696 不满足)",
-      "last_checked_at": "2026-06-14T21:52:08.429657+00:00"
+      "last_checked_at": "2026-06-14T21:54:07.257645+00:00"
     },
     {
       "paper_id": "APEUSDT|LONG|2026-06-14T21:51:11.109859+00:00",
@@ -47690,18 +47759,27 @@
       "conviction_score": 6,
       "signal_at": "2026-06-14T21:51:26.361237+00:00",
       "reason": "phase_6f_b1: conviction=6 整桶 block (EXP1 v2 仅放 D 微币 LONG chop, entry=$0.13080 不满足)",
-      "last_checked_at": "2026-06-14T21:52:08.429657+00:00"
+      "last_checked_at": "2026-06-14T21:54:07.257645+00:00"
+    },
+    {
+      "paper_id": "ETHFIUSDT|LONG|2026-06-14T21:53:23.334784+00:00",
+      "symbol": "ETHFIUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-14T21:53:52.361532+00:00",
+      "reason": "open_failed (retry next tick)",
+      "last_checked_at": "2026-06-14T21:53:56.872449+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 65482.5,
-    "btc_ma25_1h": 64309.32,
-    "pct_vs_ma25": 1.824,
-    "change_24h_pct": 1.625,
+    "btc_price": 65425.9,
+    "btc_ma25_1h": 64307.06,
+    "pct_vs_ma25": 1.74,
+    "change_24h_pct": 1.538,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-14T21:52:09.540848+00:00"
+    "computed_at": "2026-06-14T21:54:08.358100+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
