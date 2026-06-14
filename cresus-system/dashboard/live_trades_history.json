@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-14T04:15:58.191211+00:00",
+  "generated_at": "2026-06-14T04:17:55.264809+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 558,
@@ -58,8 +58,8 @@
       "risk_usdt": 0.1428,
       "risk_pct": 0.143,
       "mirror_latency_sec": 23.0,
-      "sl_price": 0.037536070000000005,
-      "sl_paper_current": 0.03770607,
+      "sl_price": 0.03776,
+      "sl_paper_current": 0.03793,
       "disaster_stop_price": null,
       "disaster_stop_at": null,
       "sl_compensation_enabled": true,
@@ -88,7 +88,7 @@
       "top_trader_position_ratio": 1.2656,
       "top_trader_account_ratio": 1.9412,
       "global_account_ratio": 1.9019,
-      "phase_a_mfe_pct": 0.0,
+      "phase_a_mfe_pct": 0.712,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.04,
@@ -101,14 +101,14 @@
       "btc_pct_vs_ma25_at_open": 0.557,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 0.03793,
-      "current_price": 0.03771,
-      "unrealized_pnl_usdt": -0.1324,
-      "unrealized_pnl_pct": -0.132,
-      "last_price_check_at": "2026-06-14T04:15:56.740405+00:00",
-      "phase_a_mae_price": 0.03771,
-      "phase_a_mae_pct": -0.132,
-      "phase_a_mae_at": "2026-06-14T04:15:56.740405+00:00"
+      "phase_a_mfe_price": 0.0382,
+      "current_price": 0.0381,
+      "unrealized_pnl_usdt": 0.9003,
+      "unrealized_pnl_pct": 0.9,
+      "last_price_check_at": "2026-06-14T04:17:53.666026+00:00",
+      "phase_a_mae_price": 0.03769,
+      "phase_a_mae_pct": -0.185,
+      "phase_a_mae_at": "2026-06-14T04:16:39.841127+00:00"
     }
   ],
   "recent_closed": [
@@ -43607,19 +43607,28 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-14T04:06:54.314066+00:00",
-      "reason": "funding adverse (0.0649% ≥ 0.05%) (Phase 4.M: paper 历史人均 -$0.85, 不利 mirror)",
-      "last_checked_at": "2026-06-14T04:15:56.740405+00:00"
+      "reason": "paper trade too old (659s > 600s)",
+      "last_checked_at": "2026-06-14T04:17:53.666026+00:00"
+    },
+    {
+      "paper_id": "TRADOORUSDT|LONG|2026-06-14T04:16:47.947607+00:00",
+      "symbol": "TRADOORUSDT",
+      "direction": "LONG",
+      "conviction_score": 6,
+      "signal_at": "2026-06-14T04:17:34.656109+00:00",
+      "reason": "phase_6f_b1: conviction=6 历史 n=57 WR 28% -$80 (paper +$22 → 信号差+执行差双重, shadow 化)",
+      "last_checked_at": "2026-06-14T04:17:53.666026+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 64467.2,
-    "btc_ma25_1h": 64109.92,
-    "pct_vs_ma25": 0.557,
-    "change_24h_pct": 1.563,
+    "btc_price": 64478.9,
+    "btc_ma25_1h": 64110.39,
+    "pct_vs_ma25": 0.575,
+    "change_24h_pct": 1.581,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-14T04:15:57.866718+00:00"
+    "computed_at": "2026-06-14T04:17:54.939791+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
