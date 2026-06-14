@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-14T14:15:38.683421+00:00",
+  "generated_at": "2026-06-14T14:17:37.576412+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 585,
@@ -58,8 +58,8 @@
       "risk_usdt": 1.2393,
       "risk_pct": 1.242,
       "mirror_latency_sec": 18.0,
-      "sl_price": 0.0358538964,
-      "sl_paper_current": 0.0357332964,
+      "sl_price": 0.0358737152,
+      "sl_paper_current": 0.035753115200000005,
       "disaster_stop_price": null,
       "disaster_stop_at": null,
       "_phase_6f_b1_partial_unblock": false,
@@ -90,7 +90,7 @@
       "top_trader_account_ratio": 1.3175,
       "global_account_ratio": 1.0842,
       "phase_a_mfe_pct": 1.378,
-      "phase_b_mfe_pct": 1.378,
+      "phase_b_mfe_pct": 1.434,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.0399,
       "fees_are_actual": false,
@@ -103,14 +103,14 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.03606,
-      "current_price": 0.03603,
-      "unrealized_pnl_usdt": 0.9493,
-      "unrealized_pnl_pct": 0.951,
-      "last_price_check_at": "2026-06-14T14:15:37.405156+00:00",
+      "current_price": 0.03644,
+      "unrealized_pnl_usdt": 2.0961,
+      "unrealized_pnl_pct": 2.1,
+      "last_price_check_at": "2026-06-14T14:17:36.171117+00:00",
       "phase_a_mae_price": 0.03558,
       "phase_a_mae_pct": -0.31,
       "phase_a_mae_at": "2026-06-14T13:54:21.773094+00:00",
-      "phase_b_mfe_price": 0.03606
+      "phase_b_mfe_price": 0.03608
     }
   ],
   "recent_closed": [
@@ -45835,19 +45835,28 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-14T14:03:20.685340+00:00",
-      "reason": "paper trade too old (737s > 600s)",
-      "last_checked_at": "2026-06-14T14:15:37.405156+00:00"
+      "reason": "paper trade too old (855s > 600s)",
+      "last_checked_at": "2026-06-14T14:17:36.171117+00:00"
+    },
+    {
+      "paper_id": "TRADOORUSDT|LONG|2026-06-14T14:15:15.781517+00:00",
+      "symbol": "TRADOORUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-14T14:16:16.679305+00:00",
+      "reason": "phase_6f_b3: Tier C (entry=$0.4900) + LONG + BTC chop 历史 n=22 WR 18% live -$18 vs paper +$45 (100% 执行 gap)",
+      "last_checked_at": "2026-06-14T14:17:36.171117+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 64272.4,
-    "btc_ma25_1h": 64337.79,
-    "pct_vs_ma25": -0.102,
-    "change_24h_pct": 0.129,
+    "btc_price": 64204.6,
+    "btc_ma25_1h": 64335.08,
+    "pct_vs_ma25": -0.203,
+    "change_24h_pct": 0.023,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-14T14:15:38.351820+00:00"
+    "computed_at": "2026-06-14T14:17:37.261954+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
