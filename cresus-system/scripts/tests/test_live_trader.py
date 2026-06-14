@@ -2252,6 +2252,16 @@ class TestPhase5SIsEligibleMultiplierZero(unittest.TestCase):
         self._orig_mult = dict(live_trader.LIVE_REGIME_SIZE_MULTIPLIER)
         # 测试隔离 — 不受生产默认 mult 干扰
         live_trader.LIVE_REGIME_SIZE_MULTIPLIER = {}
+        # Phase 6.F-B2 (2026-06-14): 该 test class 用 conv=7 测 5.S, 现在 conv>=7 会被 B2 拦.
+        # 关 B2 隔离 5.S 测试.
+        self._b2_patcher = patch.object(
+            live_trader, "LIVE_PHASE_6F_B2_PARTIAL_UNBLOCK_ENABLED", False)
+        self._b2_patcher.start()
+        self._b2_thresh_patcher = patch.object(
+            live_trader, "LIVE_PHASE_6F_B2_BLOCK_THRESHOLD", 99)
+        self._b2_thresh_patcher.start()
+        self.addCleanup(self._b2_patcher.stop)
+        self.addCleanup(self._b2_thresh_patcher.stop)
 
     def tearDown(self):
         live_trader.LIVE_REGIME_SIZE_MULTIPLIER = self._orig_mult
@@ -4657,8 +4667,11 @@ class TestMirrorIterationGuards(unittest.TestCase):
             "conviction_score": 7,   # 通过 4.H filter
         }])
         # 不 patch LIVE_REGIME_GATE_MODE, 用默认 'always'
+        # Phase 6.F-B2 (2026-06-14): 关 B2 隔离 (conv=7 现在会被 B2 拦, 但本测试要测 4.F)
         with patch.object(live_trader, "LIVE_SL_COMPENSATION_MODE", "off"), \
              patch.object(live_trader, "LIVE_SL_WICK_FILTER_MODE", "off"), \
+             patch.object(live_trader, "LIVE_PHASE_6F_B2_PARTIAL_UNBLOCK_ENABLED", False), \
+             patch.object(live_trader, "LIVE_PHASE_6F_B2_BLOCK_THRESHOLD", 99), \
              patch.object(live_trader, "_compute_btc_regime", return_value={
                  "regime": "down", "btc_price": 70000.0,
                  "btc_ma25_1h": 75000.0, "pct_vs_ma25": -6.67,
@@ -5988,11 +6001,17 @@ class TestPhase6FBlacklist(unittest.TestCase):
         self.assertTrue(eligible, f"conv=5 不应被 6.F block, 实际 reason={reason}")
 
     def test_6f_b1_conv7_not_blocked_by_b1(self):
-        """conv=7 不应被 B1 block (B1 严格 == 6). B2 (conv≥7) 不在 6.F 实施."""
+        """conv=7 不应被 B1 block (B1 严格 == 6).
+        Phase 6.F-B2 (2026-06-14) 后: conv=7 现在被 B2 拦, 但仍非 B1.
+        本测试只验证不是 B1 reason; B2 block 由 TestPhase6FB2ConvHighBlock 单独覆盖.
+        本测试需 patch 关 B2 以测原 B1 行为.
+        """
         from datetime import datetime, timezone
         t = self._base_paper_trade(conviction_score=7, direction="SHORT", entry_price=5.0)
         t["id"] = "X|SHORT|conv7|2026-06-08T10:00:00"
-        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True), \
+             patch.object(live_trader, "LIVE_PHASE_6F_B2_PARTIAL_UNBLOCK_ENABLED", False), \
+             patch.object(live_trader, "LIVE_PHASE_6F_B2_BLOCK_THRESHOLD", 99):
             eligible, reason = is_eligible_for_mirror(
                 t, self._base_live_state(),
                 datetime.now(timezone.utc),
@@ -6598,10 +6617,12 @@ class TestPhase6FB1EXP1PartialUnblock(unittest.TestCase):
             "id": "TESTUSDT|LONG|exp1|2026-06-14T13:00:00+00:00",
             "symbol": "TESTUSDT",
             "direction": "LONG",
-            "entry_price": 5.0,
+            # Phase 6.F-B1-EXP1 v2 (2026-06-14): 仅 Tier D 微币 (entry < $0.1) 放行,
+            # 默认 entry=0.05 让 base trade 默认通过 v2 tier 上界检查.
+            "entry_price": 0.05,
             "conviction_score": 6,   # ← 触发 6.F-B1
             "entered_at": (self.now - timedelta(seconds=10)).isoformat(),
-            "sl": 4.5, "tp1": 6.0, "tp2": 7.0,
+            "sl": 0.045, "tp1": 0.06, "tp2": 0.07,
         }
         t.update(overrides)
         return t
@@ -6758,6 +6779,221 @@ class TestPhase6FB1EXP1PartialUnblock(unittest.TestCase):
         n, pnl = _count_phase_6f_b1_partial_unblock(state)
         self.assertEqual(n, 3)   # 1 open + 2 closed (flag=True)
         self.assertAlmostEqual(pnl, -2.5 + 1.5 - 3.0, places=4)
+
+    # === Phase 6.F-B1-EXP1 v2: Tier filter (entry_price < $0.1) ===
+
+    def test_exp1_v2_tier_a_blocked(self):
+        """conv=6 + LONG + chop + Tier A ($50) → v2 拒 (≥$0.1)."""
+        t = self._base_trade(entry_price=50.0)   # Tier A 大币
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now, btc_regime="chop",
+            )
+        self.assertFalse(ok)
+        # 应被 B1 拒, 不是 EXP1 通过
+        self.assertIn("phase_6f_b1:", reason)
+        self.assertIn("entry=$50", reason)
+        self.assertFalse(t.get("_phase_6f_b1_partial_unblock"))
+
+    def test_exp1_v2_tier_b_blocked(self):
+        """conv=6 + LONG + chop + Tier B ($5) → v2 拒 (≥$0.1)."""
+        t = self._base_trade(entry_price=5.0)
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now, btc_regime="chop",
+            )
+        self.assertFalse(ok)
+        self.assertIn("phase_6f_b1:", reason)
+
+    def test_exp1_v2_tier_d_allowed(self):
+        """conv=6 + LONG + chop + Tier D ($0.05) → 通过."""
+        t = self._base_trade(entry_price=0.05)   # Tier D 微币
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now, btc_regime="chop",
+            )
+        self.assertTrue(ok, f"应通过, 实际 reason={reason}")
+        self.assertTrue(t.get("_phase_6f_b1_partial_unblock"))
+
+    def test_exp1_v2_boundary_exactly_0_1_blocked(self):
+        """entry=$0.10 边界 → 不在 <$0.1 范围内, 拒."""
+        t = self._base_trade(entry_price=0.10)
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now, btc_regime="chop",
+            )
+        self.assertFalse(ok)
+        self.assertIn("phase_6f_b1:", reason)
+
+
+class TestPhase6FB2ConvHighBlock(unittest.TestCase):
+    """Phase 6.F-B2 (2026-06-14): conv>=7 整桶 block + EXP1 partial unblock 仅 D 微币 CHOP LONG.
+
+    数据: conv=7+ 53 笔 paper +$42 但 conv=6 同款 adverse selection drag $1.79/笔.
+    唯一 n≥10 profitable cell: D/CHOP/LONG (n=16, mean +$4.64, sum +$74).
+    """
+
+    def setUp(self):
+        from datetime import datetime, timezone
+        self.now = datetime.now(timezone.utc)
+
+    def _base_trade(self, conviction_score=7, **overrides):
+        from datetime import datetime, timezone, timedelta
+        t = {
+            "id": "TESTUSDT|LONG|b2|2026-06-14T13:00:00+00:00",
+            "symbol": "TESTUSDT",
+            "direction": "LONG",
+            "entry_price": 0.05,
+            "conviction_score": conviction_score,
+            "entered_at": (self.now - timedelta(seconds=10)).isoformat(),
+            "sl": 0.045, "tp1": 0.06, "tp2": 0.07,
+        }
+        t.update(overrides)
+        return t
+
+    def _base_live_state(self):
+        return {
+            "mirrored_paper_ids": [],
+            "live_open_trades": [],
+            "live_closed_trades": [],
+        }
+
+    def test_b2_conv7_short_blocked(self):
+        """conv=7 + SHORT → block (B2 EXP 只放 LONG)."""
+        t = self._base_trade(conviction_score=7, direction="SHORT")
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now, btc_regime="chop",
+            )
+        self.assertFalse(ok)
+        self.assertIn("phase_6f_b2:", reason)
+        self.assertIn("conviction=7", reason)
+
+    def test_b2_conv7_up_blocked(self):
+        """conv=7 + LONG + BTC up → block (B2 EXP 只放 chop)."""
+        t = self._base_trade(conviction_score=7)
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now, btc_regime="up",
+            )
+        self.assertFalse(ok)
+        self.assertIn("phase_6f_b2:", reason)
+
+    def test_b2_conv7_long_chop_tier_a_blocked(self):
+        """conv=7 + LONG + chop + Tier A ($50) → block (B2 EXP 只放 Tier D)."""
+        t = self._base_trade(conviction_score=7, entry_price=50.0)
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now, btc_regime="chop",
+            )
+        self.assertFalse(ok)
+        self.assertIn("phase_6f_b2:", reason)
+
+    def test_b2_conv7_long_chop_tier_d_allowed(self):
+        """conv=7 + LONG + chop + Tier D ($0.05) → 通过, 标记 B2 flag."""
+        t = self._base_trade(conviction_score=7, entry_price=0.05)
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now, btc_regime="chop",
+            )
+        self.assertTrue(ok, f"应通过, reason={reason}")
+        self.assertTrue(t.get("_phase_6f_b2_partial_unblock"))
+        # 不应同时标 B1 flag (互斥)
+        self.assertFalse(t.get("_phase_6f_b1_partial_unblock"))
+
+    def test_b2_conv8_also_blocked_when_not_in_exp_subset(self):
+        """conv=8 (≥7 阈值) 一样进 B2. SHORT 应被拒."""
+        t = self._base_trade(conviction_score=8, direction="SHORT")
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now, btc_regime="chop",
+            )
+        self.assertFalse(ok)
+        self.assertIn("phase_6f_b2:", reason)
+        self.assertIn("conviction=8", reason)
+
+    def test_b2_conv8_tier_d_long_chop_allowed(self):
+        """conv=8 + LONG + chop + Tier D → 通过 (≥7 阈值都进 B2 EXP)."""
+        t = self._base_trade(conviction_score=8, entry_price=0.05)
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now, btc_regime="chop",
+            )
+        self.assertTrue(ok)
+        self.assertTrue(t.get("_phase_6f_b2_partial_unblock"))
+
+    def test_b2_max_trades_blocks_new(self):
+        """已跑到 max=15 笔 → 拒."""
+        t = self._base_trade(conviction_score=7, entry_price=0.05)
+        state = self._base_live_state()
+        for i in range(15):
+            state["live_closed_trades"].append({
+                "_phase_6f_b2_partial_unblock": True,
+                "realized_pnl_usdt": +0.5,
+            })
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, state, self.now, btc_regime="chop",
+            )
+        self.assertFalse(ok)
+        self.assertIn("phase_6f_b2_exp1", reason)
+        self.assertIn("15/15", reason)
+
+    def test_b2_kill_switch_at_max_loss(self):
+        """B2 累计 PnL -$15 → kill switch."""
+        t = self._base_trade(conviction_score=7, entry_price=0.05)
+        state = self._base_live_state()
+        for i in range(10):
+            state["live_closed_trades"].append({
+                "_phase_6f_b2_partial_unblock": True,
+                "realized_pnl_usdt": -1.5,
+            })
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, state, self.now, btc_regime="chop",
+            )
+        self.assertFalse(ok)
+        self.assertIn("kill switch", reason)
+        self.assertIn("-$15", reason)
+
+    def test_b2_disabled_keeps_block(self):
+        """B2 EXP disabled → conv>=7 全 block (无 EXP 放行)."""
+        t = self._base_trade(conviction_score=7, entry_price=0.05)
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True), \
+             patch.object(live_trader, "LIVE_PHASE_6F_B2_PARTIAL_UNBLOCK_ENABLED", False):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now, btc_regime="chop",
+            )
+        self.assertFalse(ok)
+        self.assertIn("phase_6f_b2:", reason)
+
+    def test_b2_notional_override_to_80(self):
+        """_live_notional_for_paper 在 B2 flag=True 时返 $80."""
+        from live_trader import _live_notional_for_paper
+        t = {"conviction_score": 7, "_phase_6f_b2_partial_unblock": True}
+        self.assertEqual(_live_notional_for_paper(t), 80.0)
+
+    def test_b2_b1_flag_priority_b1_first(self):
+        """同时设 B1 + B2 flag → notional 用 B1 ($60) 优先 (防御性)."""
+        from live_trader import _live_notional_for_paper
+        t = {
+            "conviction_score": 6,
+            "_phase_6f_b1_partial_unblock": True,
+            "_phase_6f_b2_partial_unblock": True,  # 不可能同时但测防御
+        }
+        self.assertEqual(_live_notional_for_paper(t), 60.0)
+
+    def test_b2_conv6_does_not_trigger_b2(self):
+        """conv=6 走 B1 路径, 不应进 B2 路径."""
+        t = self._base_trade(conviction_score=6, entry_price=0.05)
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now, btc_regime="chop",
+            )
+        self.assertTrue(ok)
+        # B1 flag 应被设, B2 flag 不应被设
+        self.assertTrue(t.get("_phase_6f_b1_partial_unblock"))
+        self.assertFalse(t.get("_phase_6f_b2_partial_unblock"))
 
 
 if __name__ == "__main__":
