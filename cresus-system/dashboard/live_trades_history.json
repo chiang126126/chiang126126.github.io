@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-14T04:13:50.271233+00:00",
+  "generated_at": "2026-06-14T04:15:58.191211+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 557,
-    "open": 0,
+    "total_trades": 558,
+    "open": 1,
     "closed": 557,
     "wins": 188,
     "losses": 363,
@@ -15,30 +15,102 @@
     "avg_pnl_usdt": -0.04,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 79.4101,
+    "fees_paid_usdt": 79.4501,
     "fees_realized_usdt": 79.4101,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.04,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 498.34,
+    "deployed_usdt": 99.99,
+    "free_capital_usdt": 398.31,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 1.1575,
-    "deployed_usdt": 0
+    "deployed_usdt": 99.99
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "SPORTFUNUSDT"
+    ],
+    "exchange_symbols": [
+      "SPORTFUNUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "SPORTFUNUSDT|LONG|2026-06-14T04:15:17.188273+00:00",
+      "trade_id": "L1781410517_SPORTFU_L",
+      "symbol": "SPORTFUNUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.03793,
+      "avg_fill_price": 0.03776,
+      "slippage_bps": -44.82,
+      "qty": 2648.0,
+      "notional_usdt": 99.98848,
+      "leverage": 1,
+      "risk_usdt": 0.1428,
+      "risk_pct": 0.143,
+      "mirror_latency_sec": 23.0,
+      "sl_price": 0.037536070000000005,
+      "sl_paper_current": 0.03770607,
+      "disaster_stop_price": null,
+      "disaster_stop_at": null,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -0.00017,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.038,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "A",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.03826589,
+      "tp2_price": 0.03860179,
+      "phase": "A",
+      "entry_order_id": 316292699,
+      "entry_client_id": "cresus_L1781410517_SPORTFU_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "burst",
+      "atr_pct": 0.394,
+      "top_trader_position_ratio": 1.2656,
+      "top_trader_account_ratio": 1.9412,
+      "global_account_ratio": 1.9019,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.04,
+      "fees_are_actual": false,
+      "opened_at": "2026-06-14T04:15:50.197291+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "up",
+      "btc_price_at_open": 64467.2,
+      "btc_change_24h_at_open": 1.563,
+      "btc_pct_vs_ma25_at_open": 0.557,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.03793,
+      "current_price": 0.03771,
+      "unrealized_pnl_usdt": -0.1324,
+      "unrealized_pnl_pct": -0.132,
+      "last_price_check_at": "2026-06-14T04:15:56.740405+00:00",
+      "phase_a_mae_price": 0.03771,
+      "phase_a_mae_pct": -0.132,
+      "phase_a_mae_at": "2026-06-14T04:15:56.740405+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "EDENUSDT|LONG|2026-06-14T04:04:13.273982+00:00",
@@ -43536,18 +43608,18 @@
       "conviction_score": 5,
       "signal_at": "2026-06-14T04:06:54.314066+00:00",
       "reason": "funding adverse (0.0649% ≥ 0.05%) (Phase 4.M: paper 历史人均 -$0.85, 不利 mirror)",
-      "last_checked_at": "2026-06-14T04:13:49.289786+00:00"
+      "last_checked_at": "2026-06-14T04:15:56.740405+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 64465.3,
-    "btc_ma25_1h": 64109.85,
-    "pct_vs_ma25": 0.554,
-    "change_24h_pct": 1.56,
+    "btc_price": 64467.2,
+    "btc_ma25_1h": 64109.92,
+    "pct_vs_ma25": 0.557,
+    "change_24h_pct": 1.563,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-14T04:13:50.225420+00:00"
+    "computed_at": "2026-06-14T04:15:57.866718+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
