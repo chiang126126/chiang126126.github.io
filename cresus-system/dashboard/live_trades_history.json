@@ -1,48 +1,119 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-14T21:37:53.253007+00:00",
+  "generated_at": "2026-06-14T21:40:00.289503+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 605,
+    "total_trades": 606,
     "open": 1,
-    "closed": 604,
-    "wins": 200,
+    "closed": 605,
+    "wins": 201,
     "losses": 398,
-    "win_rate": 0.334,
-    "total_pnl_usdt": -41.282,
-    "net_pnl_usdt": -124.4148,
-    "avg_pnl_usdt": -0.0683,
+    "win_rate": 0.336,
+    "total_pnl_usdt": -41.1883,
+    "net_pnl_usdt": -124.3691,
+    "avg_pnl_usdt": -0.0681,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 83.1568,
-    "fees_realized_usdt": 83.1328,
-    "fees_open_usdt": 0.024,
+    "fees_paid_usdt": 83.2181,
+    "fees_realized_usdt": 83.1808,
+    "fees_open_usdt": 0.0373,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 59.94,
-    "free_capital_usdt": 415.62,
+    "deployed_usdt": 93.17,
+    "free_capital_usdt": 382.42,
     "max_concurrent_slots": 3,
     "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -17.8704,
-    "deployed_usdt": 59.94
+    "daily_pnl": -17.7767,
+    "deployed_usdt": 93.17
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "HOLOUSDT"
+      "SKHYNIXUSDT"
     ],
     "exchange_symbols": [
-      "HOLOUSDT"
+      "SKHYNIXUSDT"
     ]
   },
   "open_trades": [
+    {
+      "paper_id": "SKHYNIXUSDT|LONG|2026-06-14T21:38:36.701082+00:00",
+      "trade_id": "L1781473116_SKHYNIX_L",
+      "symbol": "SKHYNIXUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 1551.86,
+      "avg_fill_price": 1552.915,
+      "slippage_bps": 6.8,
+      "qty": 0.06,
+      "notional_usdt": 93.1749,
+      "leverage": 1,
+      "risk_usdt": 0.3729,
+      "risk_pct": 0.4,
+      "mirror_latency_sec": 16.5,
+      "sl_price": 1547.75428571,
+      "sl_paper_current": 1546.69928571,
+      "disaster_stop_price": null,
+      "disaster_stop_at": null,
+      "_phase_6f_b1_partial_unblock": false,
+      "_phase_6f_b2_partial_unblock": false,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 1.055,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.0192,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "C",
+      "min_conviction_threshold": null,
+      "tp1_price": 1559.60107143,
+      "tp2_price": 1567.34214286,
+      "phase": "A",
+      "entry_order_id": 93575686,
+      "entry_client_id": "cresus_L1781473116_SKHYNIX_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "burst",
+      "atr_pct": 0.333,
+      "top_trader_position_ratio": 1.5523,
+      "top_trader_account_ratio": 2.4746,
+      "global_account_ratio": 2.4025,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.0373,
+      "fees_are_actual": false,
+      "opened_at": "2026-06-14T21:39:41.200208+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "up",
+      "btc_price_at_open": 64936.0,
+      "btc_change_24h_at_open": 0.777,
+      "btc_pct_vs_ma25_at_open": 1.009,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 1551.86,
+      "current_price": 1553.42,
+      "unrealized_pnl_usdt": 0.0303,
+      "unrealized_pnl_pct": 0.033,
+      "last_price_check_at": "2026-06-14T21:39:58.936232+00:00",
+      "phase_a_mae_price": 1552.6,
+      "phase_a_mae_pct": -0.02,
+      "phase_a_mae_at": "2026-06-14T21:39:48.177667+00:00"
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "HOLOUSDT|LONG|2026-06-14T21:23:02.900754+00:00",
       "trade_id": "L1781472182_HOLOUSD_L",
@@ -70,7 +141,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 6,
       "wick_filter_mode": "always",
-      "sl_breach_count": 4,
+      "sl_breach_count": 6,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.005,
       "regime_gate_enabled": true,
@@ -93,7 +164,7 @@
       "phase_a_mfe_pct": 0.881,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.024,
+      "fees_paid_usdt": 0.048,
       "fees_are_actual": false,
       "opened_at": "2026-06-14T21:29:44.412908+00:00",
       "is_dry_run": false,
@@ -104,16 +175,29 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.07096,
-      "current_price": 0.07013,
-      "unrealized_pnl_usdt": -0.1874,
-      "unrealized_pnl_pct": -0.313,
-      "last_price_check_at": "2026-06-14T21:37:51.813610+00:00",
-      "phase_a_mae_price": 0.07013,
-      "phase_a_mae_pct": -0.313,
-      "phase_a_mae_at": "2026-06-14T21:37:51.813610+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.07018,
+      "unrealized_pnl_usdt": -0.1448,
+      "unrealized_pnl_pct": -0.242,
+      "last_price_check_at": "2026-06-14T21:38:13.300690+00:00",
+      "phase_a_mae_price": 0.07011,
+      "phase_a_mae_pct": -0.341,
+      "phase_a_mae_at": "2026-06-14T21:38:02.661749+00:00",
+      "btc_regime_at_close": "up",
+      "btc_price_at_close": 64854.0,
+      "btc_pct_vs_ma25_at_close": 0.886,
+      "closed_at": "2026-06-14T21:38:17.330257+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.0704599765258216,
+      "realized_pnl_usdt": 0.0937,
+      "close_order_id": 790987826,
+      "close_qty": 852.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 0.07035,
+      "close_slippage_bps": -15.63,
+      "entry_fees_usdt": 0.024,
+      "close_fees_usdt": 0.024
+    },
     {
       "paper_id": "ZKCUSDT|LONG|2026-06-14T20:56:04.914124+00:00",
       "trade_id": "L1781470564_ZKCUSDT_L",
@@ -47515,8 +47599,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-14T21:14:46.237003+00:00",
-      "reason": "paper trade too old (1386s > 600s)",
-      "last_checked_at": "2026-06-14T21:37:51.813610+00:00"
+      "reason": "paper trade too old (1513s > 600s)",
+      "last_checked_at": "2026-06-14T21:39:58.936232+00:00"
     },
     {
       "paper_id": "USELESSUSDT|LONG|2026-06-14T21:20:22.511386+00:00",
@@ -47524,8 +47608,8 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-14T21:20:51.545901+00:00",
-      "reason": "paper trade too old (1020s > 600s)",
-      "last_checked_at": "2026-06-14T21:37:51.813610+00:00"
+      "reason": "paper trade too old (1147s > 600s)",
+      "last_checked_at": "2026-06-14T21:39:58.936232+00:00"
     },
     {
       "paper_id": "FARTCOINUSDT|LONG|2026-06-14T21:22:35.851208+00:00",
@@ -47533,8 +47617,8 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-14T21:23:19.572637+00:00",
-      "reason": "paper trade too old (872s > 600s)",
-      "last_checked_at": "2026-06-14T21:37:51.813610+00:00"
+      "reason": "paper trade too old (999s > 600s)",
+      "last_checked_at": "2026-06-14T21:39:58.936232+00:00"
     },
     {
       "paper_id": "SPXUSDT|LONG|2026-06-14T21:23:11.764142+00:00",
@@ -47542,8 +47626,8 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-14T21:23:19.572637+00:00",
-      "reason": "paper trade too old (872s > 600s)",
-      "last_checked_at": "2026-06-14T21:37:51.813610+00:00"
+      "reason": "paper trade too old (999s > 600s)",
+      "last_checked_at": "2026-06-14T21:39:58.936232+00:00"
     },
     {
       "paper_id": "ADAUSDT|LONG|2026-06-14T21:26:50.534645+00:00",
@@ -47551,8 +47635,8 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-14T21:28:20.875945+00:00",
-      "reason": "phase_6f_b1: conviction=6 整桶 block (EXP1 v2 仅放 D 微币 LONG chop, entry=$0.17100 不满足)",
-      "last_checked_at": "2026-06-14T21:37:51.813610+00:00"
+      "reason": "paper trade too old (698s > 600s)",
+      "last_checked_at": "2026-06-14T21:39:58.936232+00:00"
     },
     {
       "paper_id": "DASHUSDT|LONG|2026-06-14T21:27:19.985642+00:00",
@@ -47560,8 +47644,8 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-14T21:28:20.875945+00:00",
-      "reason": "phase_6f_b1: conviction=6 整桶 block (EXP1 v2 仅放 D 微币 LONG chop, entry=$36.24000 不满足)",
-      "last_checked_at": "2026-06-14T21:37:51.813610+00:00"
+      "reason": "paper trade too old (698s > 600s)",
+      "last_checked_at": "2026-06-14T21:39:58.936232+00:00"
     },
     {
       "paper_id": "ARKMUSDT|LONG|2026-06-14T21:27:58.684026+00:00",
@@ -47569,19 +47653,28 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-14T21:28:20.875945+00:00",
-      "reason": "phase_6f_b1: conviction=6 整桶 block (EXP1 v2 仅放 D 微币 LONG chop, entry=$0.12990 不满足)",
-      "last_checked_at": "2026-06-14T21:37:51.813610+00:00"
+      "reason": "paper trade too old (698s > 600s)",
+      "last_checked_at": "2026-06-14T21:39:58.936232+00:00"
+    },
+    {
+      "paper_id": "SOXLUSDT|LONG|2026-06-14T21:38:29.875133+00:00",
+      "symbol": "SOXLUSDT",
+      "direction": "LONG",
+      "conviction_score": 6,
+      "signal_at": "2026-06-14T21:39:24.687213+00:00",
+      "reason": "phase_6f_b1: conviction=6 整桶 block (EXP1 v2 仅放 D 微币 LONG chop, entry=$249.05000 不满足)",
+      "last_checked_at": "2026-06-14T21:39:58.936232+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 64854.4,
-    "btc_ma25_1h": 64284.2,
-    "pct_vs_ma25": 0.887,
-    "change_24h_pct": 0.651,
+    "btc_price": 64959.8,
+    "btc_ma25_1h": 64288.42,
+    "pct_vs_ma25": 1.044,
+    "change_24h_pct": 0.814,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-14T21:37:52.922517+00:00"
+    "computed_at": "2026-06-14T21:39:59.891428+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
