@@ -5945,32 +5945,34 @@ class TestPhase6FBlacklist(unittest.TestCase):
     # === B1: conviction = 6 整桶 block ===
 
     def test_6f_b1_conv6_blocked(self):
-        """conv=6 任何 tier / direction / regime 都应 block."""
+        """conv=6 非 EXP1 子集 (非 LONG-chop) 应 block. EXP1 子集见 TestPhase6FB1EXP1.
+
+        Phase 6.F-B1-EXP1 (2026-06-14) 后: conv=6 + LONG + chop 走 EXP1 partial unblock.
+        所以本测试只测 EXP1 外的组合, 验证默认 B1 block 没被破坏.
+        """
         from datetime import datetime, timezone
-        # 不同 tier / direction / regime 组合, 都因 conv=6 被 block
+        # 不同 tier / direction / regime 组合 — 全部 NOT LONG+chop, 应 block
         scenarios = [
-            (5.0, "LONG", "down"),    # Tier B
-            (50.0, "SHORT", "up"),    # Tier A
-            (0.05, "LONG", "chop"),   # Tier D
-            (0.5, "SHORT", "down"),   # Tier C
+            (5.0, "LONG", "down"),    # LONG + down (4.F gate 也会拒, 但 6.F-B1 先)
+            (50.0, "SHORT", "up"),    # Tier A SHORT
+            (0.5, "SHORT", "down"),   # Tier C SHORT
+            (5.0, "SHORT", "chop"),   # SHORT + chop (不是 LONG)
+            (5.0, "LONG", "up"),      # LONG + up (不是 chop)
         ]
         for entry, direction, regime in scenarios:
             with self.subTest(entry=entry, direction=direction, regime=regime):
                 t = self._base_paper_trade(
                     entry_price=entry, direction=direction, conviction_score=6,
                 )
-                # 改 paper_id 避免重复 mirrored 状态
                 t["id"] = f"X|{direction}|conv6_{entry}|2026-06-08T10:00:00"
-                # 用 OBS mode 跳过 symbol whitelist
                 with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
                     eligible, reason = is_eligible_for_mirror(
                         t, self._base_live_state(),
                         datetime.now(timezone.utc),
                         btc_regime=regime,
                     )
-                self.assertFalse(eligible, f"conv=6 应 block, 实际 eligible={eligible}")
+                self.assertFalse(eligible, f"conv=6 非 EXP1 子集应 block, reason={reason}")
                 self.assertIn("phase_6f_b1", reason)
-                self.assertIn("conviction=6", reason)
 
     def test_6f_b1_conv5_not_blocked(self):
         """conv=5 不应被 B1 block (只 block 等于 6)."""
@@ -6185,13 +6187,19 @@ class TestPhase6FBlacklist(unittest.TestCase):
     # === 双重 trigger 优先级 ===
 
     def test_6f_b1_priority_over_b3(self):
-        """同时触发 B1 (conv=6) + B3 条件 (Tier C LONG chop) → B1 先返回."""
+        """同时触发 B1 (conv=6) + B3 条件 (Tier C LONG chop) → B1 先返回.
+
+        Phase 6.F-B1-EXP1 后: 因为 conv=6 + LONG + chop 走 EXP1 partial unblock,
+        所以本测试需禁用 EXP1 以测原 B1 优先 B3 的逻辑.
+        EXP1 开启时 B3 会接力 block — 这个新行为由 EXP1 测试组验证.
+        """
         from datetime import datetime, timezone
         t = self._base_paper_trade(
             entry_price=0.5, direction="LONG", conviction_score=6,
         )
         t["id"] = "X|LONG|both|2026-06-08T10:00:00"
-        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True), \
+             patch.object(live_trader, "LIVE_PHASE_6F_B1_PARTIAL_UNBLOCK_ENABLED", False):
             eligible, reason = is_eligible_for_mirror(
                 t, self._base_live_state(),
                 datetime.now(timezone.utc),
@@ -6569,6 +6577,187 @@ class TestPhase6IDisasterStop(unittest.TestCase):
             trade_id="t1", entry_price=100.0, paper_sl_price=99.5,
         )
         self.assertAlmostEqual(result, 98.8, places=4)
+
+
+class TestPhase6FB1EXP1PartialUnblock(unittest.TestCase):
+    """Phase 6.F-B1-EXP1 (2026-06-14): 试验性 conv=6 LONG chop partial unblock.
+
+    数据基线: paper +$0.36/笔 (n=94), drag $0.45-1.79 → 数学不支持但用户授权.
+    强约束: max 30 笔, 累计 -$25 kill switch, notional 强制 $60 (vs 默认 $130).
+    """
+
+    def setUp(self):
+        from datetime import datetime, timezone
+        self.now = datetime.now(timezone.utc)
+        # 隔离: 把其它 gate 都关掉好测 EXP1 本身
+        # 但要保留 6.F-B1 主开关 (= True), 否则 conv=6 自动通过, 测不到 EXP1 路径
+
+    def _base_trade(self, **overrides):
+        from datetime import datetime, timezone, timedelta
+        t = {
+            "id": "TESTUSDT|LONG|exp1|2026-06-14T13:00:00+00:00",
+            "symbol": "TESTUSDT",
+            "direction": "LONG",
+            "entry_price": 5.0,
+            "conviction_score": 6,   # ← 触发 6.F-B1
+            "entered_at": (self.now - timedelta(seconds=10)).isoformat(),
+            "sl": 4.5, "tp1": 6.0, "tp2": 7.0,
+        }
+        t.update(overrides)
+        return t
+
+    def _base_live_state(self):
+        return {
+            "mirrored_paper_ids": [],
+            "live_open_trades": [],
+            "live_closed_trades": [],
+        }
+
+    # === Trigger conditions ===
+
+    def test_exp1_conv6_long_chop_allowed_when_within_limits(self):
+        """conv=6 + LONG + chop + EXP1 enabled + 未达 max → 通过."""
+        t = self._base_trade()
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now, btc_regime="chop",
+            )
+        self.assertTrue(ok, f"应通过, 实际 reason={reason}")
+        # 验证 flag 被打在 paper_trade
+        self.assertTrue(t.get("_phase_6f_b1_partial_unblock"))
+
+    def test_exp1_conv6_short_chop_still_blocked(self):
+        """conv=6 + SHORT (不是 LONG) → 维持 block."""
+        t = self._base_trade(direction="SHORT")
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now, btc_regime="chop",
+            )
+        self.assertFalse(ok)
+        self.assertIn("phase_6f_b1:", reason)
+
+    def test_exp1_conv6_long_up_still_blocked(self):
+        """conv=6 + LONG + BTC up (不是 chop) → 维持 block."""
+        t = self._base_trade()
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now, btc_regime="up",
+            )
+        self.assertFalse(ok)
+        self.assertIn("phase_6f_b1:", reason)
+
+    def test_exp1_max_trades_blocks_new(self):
+        """已跑到 max=30 笔 → re-block, kill switch 触发."""
+        t = self._base_trade()
+        state = self._base_live_state()
+        # 灌 30 笔已完成的 EXP1 trade
+        for i in range(30):
+            state["live_closed_trades"].append({
+                "_phase_6f_b1_partial_unblock": True,
+                "realized_pnl_usdt": -0.10,
+                "symbol": f"T{i}USDT",
+            })
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, state, self.now, btc_regime="chop",
+            )
+        self.assertFalse(ok)
+        self.assertIn("phase_6f_b1_exp1", reason)
+        self.assertIn("30/30", reason)
+
+    def test_exp1_kill_switch_at_max_loss(self):
+        """累计 PnL -$25 → kill switch 触发, re-block."""
+        t = self._base_trade()
+        state = self._base_live_state()
+        # 灌 25 笔, 每笔 -$1 = 累计 -$25
+        for i in range(25):
+            state["live_closed_trades"].append({
+                "_phase_6f_b1_partial_unblock": True,
+                "realized_pnl_usdt": -1.0,
+            })
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, state, self.now, btc_regime="chop",
+            )
+        self.assertFalse(ok)
+        self.assertIn("kill switch", reason)
+        self.assertIn("-$25", reason)
+
+    def test_exp1_kill_switch_includes_open_unrealized(self):
+        """累计统计包含 open trades 的 unrealized PnL."""
+        t = self._base_trade()
+        state = self._base_live_state()
+        # 1 笔 open 浮亏 -$20, 1 笔 closed -$6 = 累计 -$26
+        state["live_open_trades"].append({
+            "_phase_6f_b1_partial_unblock": True,
+            "unrealized_pnl_usdt": -20.0,
+            "symbol": "OPENUSDT",
+        })
+        state["live_closed_trades"].append({
+            "_phase_6f_b1_partial_unblock": True,
+            "realized_pnl_usdt": -6.0,
+        })
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, state, self.now, btc_regime="chop",
+            )
+        self.assertFalse(ok)
+        self.assertIn("kill switch", reason)
+
+    def test_exp1_disabled_falls_back_to_block(self):
+        """LIVE_PHASE_6F_B1_PARTIAL_UNBLOCK_ENABLED=False → 老 6.F-B1 行为, 拒."""
+        t = self._base_trade()
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True), \
+             patch.object(live_trader, "LIVE_PHASE_6F_B1_PARTIAL_UNBLOCK_ENABLED", False):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now, btc_regime="chop",
+            )
+        self.assertFalse(ok)
+        self.assertIn("phase_6f_b1:", reason)
+        # 没有标记 paper_trade
+        self.assertFalse(t.get("_phase_6f_b1_partial_unblock"))
+
+    # === Notional override ===
+
+    def test_exp1_notional_override_to_60(self):
+        """_live_notional_for_paper 在 _phase_6f_b1_partial_unblock=True 时返 $60."""
+        from live_trader import _live_notional_for_paper
+        t = {"conviction_score": 6, "_phase_6f_b1_partial_unblock": True}
+        self.assertEqual(_live_notional_for_paper(t), 60.0)
+
+    def test_exp1_normal_conv6_uses_default_notional(self):
+        """非 EXP1 的 conv=6 仍用默认 LIVE_NOTIONAL_BY_SCORE[6] ($130)."""
+        from live_trader import _live_notional_for_paper
+        t = {"conviction_score": 6}  # 无 flag
+        # Default mainnet pilot $600: LIVE_NOTIONAL_BY_SCORE[6] = 130
+        # 但环境取决于 CRESUS_MODE, 我们只测 flag 不存在时不用 $60
+        self.assertNotEqual(_live_notional_for_paper(t), 60.0)
+
+    # === Counter helper ===
+
+    def test_exp1_count_helper_empty_state(self):
+        """空 state → (0, 0.0)."""
+        from live_trader import _count_phase_6f_b1_partial_unblock
+        self.assertEqual(_count_phase_6f_b1_partial_unblock({}), (0, 0.0))
+
+    def test_exp1_count_helper_mixed(self):
+        """混合 open + closed, 只统计 EXP1 flag=True 的."""
+        from live_trader import _count_phase_6f_b1_partial_unblock
+        state = {
+            "live_open_trades": [
+                {"_phase_6f_b1_partial_unblock": True, "unrealized_pnl_usdt": -2.5},
+                {"_phase_6f_b1_partial_unblock": False, "unrealized_pnl_usdt": -10},  # 非 EXP1
+                {"unrealized_pnl_usdt": 5},  # 无 flag
+            ],
+            "live_closed_trades": [
+                {"_phase_6f_b1_partial_unblock": True, "realized_pnl_usdt": +1.5},
+                {"_phase_6f_b1_partial_unblock": True, "realized_pnl_usdt": -3.0},
+                {"_phase_6f_b1_partial_unblock": False, "realized_pnl_usdt": -20},
+            ],
+        }
+        n, pnl = _count_phase_6f_b1_partial_unblock(state)
+        self.assertEqual(n, 3)   # 1 open + 2 closed (flag=True)
+        self.assertAlmostEqual(pnl, -2.5 + 1.5 - 3.0, places=4)
 
 
 if __name__ == "__main__":

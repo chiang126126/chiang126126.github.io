@@ -98,12 +98,54 @@ LIVE_NOTIONAL_BY_SCORE = {
 
 
 def _live_notional_for_paper(paper_trade: dict) -> float:
-    """按 paper_trade.conviction_score 返回 live notional. 字段缺/异常返基准."""
+    """按 paper_trade.conviction_score 返回 live notional. 字段缺/异常返基准.
+
+    Phase 6.F-B1-EXP1 (2026-06-14): partial unblock trade 强制小 notional ($60).
+    检测 paper_trade 上的 _phase_6f_b1_partial_unblock flag (在 is_eligible_for_mirror
+    决定 partial unblock 时打的). 通过这个 flag 而非重新 check conditions, 保证
+    eligibility 跟 notional 决策一致 (race-safe).
+    """
+    # Phase 6.F-B1-EXP1 first — 试验性 trade 用小 notional 覆盖默认 score-based
+    if paper_trade.get("_phase_6f_b1_partial_unblock"):
+        return LIVE_PHASE_6F_B1_PARTIAL_NOTIONAL_USDT
     try:
         s = int(paper_trade.get("conviction_score"))
     except (TypeError, ValueError):
         return LIVE_NOTIONAL_USDT
     return LIVE_NOTIONAL_BY_SCORE.get(s, LIVE_NOTIONAL_USDT)
+
+
+def _count_phase_6f_b1_partial_unblock(live_state: dict) -> tuple:
+    """Phase 6.F-B1-EXP1: 统计试验性 partial unblock 笔数 + 累计 PnL.
+
+    Open + closed trades 都算 (open 用 unrealized_pnl, closed 用 realized_pnl).
+    用于 is_eligible_for_mirror 决策:
+        - count >= MAX_TRADES → 试验已满, 不再放新笔
+        - cum_pnl <= -MAX_LOSS → kill switch 触发, re-block
+
+    Returns: (count: int, cum_pnl: float)
+    Fail-safe: 任何异常返 (0, 0.0) — 不影响 trade 决策 (会落入 conv=6 block 默认行为).
+    """
+    count = 0
+    cum_pnl = 0.0
+    try:
+        for t in (live_state.get("live_open_trades") or []):
+            if t.get("_phase_6f_b1_partial_unblock"):
+                count += 1
+                try:
+                    cum_pnl += float(t.get("unrealized_pnl_usdt") or 0)
+                except (ValueError, TypeError):
+                    pass
+        for t in (live_state.get("live_closed_trades") or []):
+            if t.get("_phase_6f_b1_partial_unblock"):
+                count += 1
+                try:
+                    cum_pnl += float(t.get("realized_pnl_usdt") or 0)
+                except (ValueError, TypeError):
+                    pass
+    except (AttributeError, TypeError):
+        return 0, 0.0
+    return count, cum_pnl
 
 
 # ==========================================
@@ -580,6 +622,37 @@ LIVE_PHASE_6F_BLACKLIST_ENABLED = True   # 总开关 — 紧急回滚改 False, 
 LIVE_PHASE_6F_TIER_C_LOWER = 0.1         # Tier C 价格下界 (含)
 LIVE_PHASE_6F_TIER_C_UPPER = 1.0         # Tier C 价格上界 (不含)
 LIVE_PHASE_6F_BLOCK_CONV = 6             # B1: 这个 conv score 整体 block (= 6, 不是 >=6)
+
+# ============================================================================
+# Phase 6.F-B1-EXP1 (2026-06-14) — 试验性 partial unblock conv=6 LONG chop
+# ============================================================================
+# 用户授权: 在数学不支持的情况下做实验, 用强护栏限制损失.
+#
+# 数据 (06-04 → 06-13, 9 天 paper):
+#   - conv=6 LONG + BTC chop: paper n=94, +$33.85, +$0.36/笔, WR 28%
+#   - G3 post-deploy drag 估算: $0.45/笔
+#   - 实测 conv=6 整体 adverse selection drag (C1): $1.79/笔
+#   → 数学预期: live -$0.09 ~ -$1.43/笔 → 30 笔预期 -$3 ~ -$43
+#   → kill switch -$25 兜底, 单次实验最坏损失 ~ -$25 (3.6% 资金)
+#
+# 触发条件 (4 个全部要满足才放行):
+#   1. conv == 6
+#   2. direction == LONG
+#   3. btc_regime_at_decision == "chop"
+#   4. partial_unblock_count < MAX_TRADES (默认 30)
+#   5. partial_unblock_cum_pnl > -MAX_LOSS_USDT (默认 -$25, kill switch)
+#
+# 通过后:
+#   - 单笔 notional 强制 = LIVE_PHASE_6F_B1_PARTIAL_NOTIONAL_USDT ($60, 远小于默认 $130)
+#   - live_trade 打 _phase_6f_b1_partial_unblock=True flag, 单独统计
+#   - 跟正常 conv=6 block (其它子集) 共存
+#
+# 紧急回滚: LIVE_PHASE_6F_B1_PARTIAL_UNBLOCK_ENABLED = False
+# kill switch 自动 re-block: 累计达 -$25 后任何新 partial unblock 笔均被拒
+LIVE_PHASE_6F_B1_PARTIAL_UNBLOCK_ENABLED = True
+LIVE_PHASE_6F_B1_PARTIAL_NOTIONAL_USDT = 60.0    # vs 默认 conv=6 $130, 减仓 ~54%
+LIVE_PHASE_6F_B1_PARTIAL_MAX_TRADES = 30         # 跑 30 笔后自动停, 等 retro
+LIVE_PHASE_6F_B1_PARTIAL_MAX_LOSS_USDT = 25.0    # 累计达 -$25 立即重新 block
 
 # Phase 3.3.a/b 控制文件 (在 ~/.cresus-*)
 PAUSE_FLAG_PATH = Path.home() / ".cresus-pause"
@@ -1126,10 +1199,37 @@ def is_eligible_for_mirror(
         except (ValueError, TypeError):
             conv_val = None
         if conv_val == LIVE_PHASE_6F_BLOCK_CONV:
-            return False, (
-                f"phase_6f_b1: conviction={conv_val} 历史 n=57 WR 28% -$80 "
-                f"(paper +$22 → 信号差+执行差双重, shadow 化)"
-            )
+            # Phase 6.F-B1-EXP1 (2026-06-14): 试验性 partial unblock conv=6 LONG chop.
+            # 4 个条件全满足才放行: PARTIAL_UNBLOCK_ENABLED + LONG + chop + 未达 max + 未触发 kill switch.
+            # 任一不满足都维持 block (默认 6.F-B1 行为).
+            if (LIVE_PHASE_6F_B1_PARTIAL_UNBLOCK_ENABLED
+                    and direction == "LONG"
+                    and btc_regime == "chop"):
+                partial_n, partial_pnl = _count_phase_6f_b1_partial_unblock(live_state)
+                if partial_n >= LIVE_PHASE_6F_B1_PARTIAL_MAX_TRADES:
+                    return False, (
+                        f"phase_6f_b1_exp1: conv=6 LONG chop 试验已跑 "
+                        f"{partial_n}/{LIVE_PHASE_6F_B1_PARTIAL_MAX_TRADES} 笔上限, 等待 retro"
+                    )
+                if partial_pnl <= -LIVE_PHASE_6F_B1_PARTIAL_MAX_LOSS_USDT:
+                    return False, (
+                        f"phase_6f_b1_exp1: 累计 PnL ${partial_pnl:.2f} 触发 kill switch "
+                        f"(-${LIVE_PHASE_6F_B1_PARTIAL_MAX_LOSS_USDT}), 重新 block"
+                    )
+                # 通过 — 标记 paper_trade 让下游 notional 计算用 $60 + live_trade 落字段
+                paper_trade["_phase_6f_b1_partial_unblock"] = True
+                log.info(
+                    f"[phase_6f_b1_exp1] {sym} conv=6 LONG chop 试验性 unblock 通过 "
+                    f"(n={partial_n+1}/{LIVE_PHASE_6F_B1_PARTIAL_MAX_TRADES}, "
+                    f"cum_pnl ${partial_pnl:.2f}, notional=${LIVE_PHASE_6F_B1_PARTIAL_NOTIONAL_USDT})"
+                )
+                # 继续走后续 gate (regime/funding/etc), 不在此 return True
+            else:
+                # 不满足 partial unblock 条件 — 维持原 6.F-B1 block 行为
+                return False, (
+                    f"phase_6f_b1: conviction={conv_val} 历史 n=57 WR 28% -$80 "
+                    f"(paper +$22 → 信号差+执行差双重, shadow 化)"
+                )
         # B3: Tier C + LONG + BTC chop. btc_regime 为 None 时跳过 (fail-safe = 不 block).
         try:
             entry_price = float(paper_trade.get("entry_price") or 0)
@@ -2724,6 +2824,9 @@ def _try_mirror_open(
             # Phase 6.I (2026-06-12): 交易所侧灾难止损 (bot-death 保命)
             "disaster_stop_price": disaster_stop_price,    # None 若挂失败或禁用
             "disaster_stop_at": disaster_stop_at,
+            # Phase 6.F-B1-EXP1 (2026-06-14): 试验性 conv=6 LONG chop partial unblock 标记
+            # True 表示该 trade 是 EXP1 试验组, retro 时单独统计
+            "_phase_6f_b1_partial_unblock": bool(paper_trade.get("_phase_6f_b1_partial_unblock")),
             "sl_compensation_enabled": sl_comp_enabled,    # B 组标记 (Phase 4.D)
             "sl_compensation_offset": sl_comp_offset,      # offset (B 组非 0; A/C 组 0)
             "sl_compensation_mode": LIVE_SL_COMPENSATION_MODE,  # 部署时模式 (溯源用)
