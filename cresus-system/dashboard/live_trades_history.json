@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-14T21:29:45.975110+00:00",
+  "generated_at": "2026-06-14T21:31:38.820951+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 605,
@@ -29,14 +29,18 @@
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -17.8704,
-    "deployed_usdt": 0
+    "deployed_usdt": 59.94
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "HOLOUSDT"
+    ],
+    "exchange_symbols": [
+      "HOLOUSDT"
+    ]
   },
   "open_trades": [
     {
@@ -54,8 +58,8 @@
       "risk_usdt": 0.443,
       "risk_pct": 0.739,
       "mirror_latency_sec": 384.8,
-      "sl_price": 0.06984,
-      "sl_paper_current": 0.06983,
+      "sl_price": 0.07024799999999999,
+      "sl_paper_current": 0.070238,
       "disaster_stop_price": null,
       "disaster_stop_at": null,
       "_phase_6f_b1_partial_unblock": true,
@@ -86,7 +90,7 @@
       "top_trader_position_ratio": 2.665,
       "top_trader_account_ratio": 0.9099,
       "global_account_ratio": 0.8021,
-      "phase_a_mfe_pct": 0.313,
+      "phase_a_mfe_pct": 0.611,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.024,
@@ -99,11 +103,11 @@
       "btc_pct_vs_ma25_at_open": 0.456,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 0.07056,
-      "current_price": 0.07035,
-      "unrealized_pnl_usdt": 0.0,
-      "unrealized_pnl_pct": 0.0,
-      "last_price_check_at": "2026-06-14T21:29:37.976296+00:00"
+      "phase_a_mfe_price": 0.07077,
+      "current_price": 0.07101,
+      "unrealized_pnl_usdt": 0.5623,
+      "unrealized_pnl_pct": 0.938,
+      "last_price_check_at": "2026-06-14T21:31:37.528598+00:00"
     }
   ],
   "recent_closed": [
@@ -47508,8 +47512,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-14T21:14:46.237003+00:00",
-      "reason": "paper trade too old (892s > 600s)",
-      "last_checked_at": "2026-06-14T21:29:37.976296+00:00"
+      "reason": "paper trade too old (1011s > 600s)",
+      "last_checked_at": "2026-06-14T21:31:37.528598+00:00"
     },
     {
       "paper_id": "STXUSDT|LONG|2026-06-14T21:20:08.726082+00:00",
@@ -47517,8 +47521,17 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-14T21:20:51.545901+00:00",
-      "reason": "phase_6f_b1: conviction=6 整桶 block (EXP1 v2 仅放 D 微币 LONG chop, entry=$0.19600 不满足)",
-      "last_checked_at": "2026-06-14T21:29:37.976296+00:00"
+      "reason": "paper trade too old (646s > 600s)",
+      "last_checked_at": "2026-06-14T21:31:37.528598+00:00"
+    },
+    {
+      "paper_id": "USELESSUSDT|LONG|2026-06-14T21:20:22.511386+00:00",
+      "symbol": "USELESSUSDT",
+      "direction": "LONG",
+      "conviction_score": 6,
+      "signal_at": "2026-06-14T21:20:51.545901+00:00",
+      "reason": "paper trade too old (646s > 600s)",
+      "last_checked_at": "2026-06-14T21:31:37.528598+00:00"
     },
     {
       "paper_id": "FARTCOINUSDT|LONG|2026-06-14T21:22:35.851208+00:00",
@@ -47527,7 +47540,7 @@
       "conviction_score": 6,
       "signal_at": "2026-06-14T21:23:19.572637+00:00",
       "reason": "phase_6f_b1: conviction=6 整桶 block (EXP1 v2 仅放 D 微币 LONG chop, entry=$0.12140 不满足)",
-      "last_checked_at": "2026-06-14T21:29:37.976296+00:00"
+      "last_checked_at": "2026-06-14T21:31:37.528598+00:00"
     },
     {
       "paper_id": "SPXUSDT|LONG|2026-06-14T21:23:11.764142+00:00",
@@ -47536,7 +47549,7 @@
       "conviction_score": 6,
       "signal_at": "2026-06-14T21:23:19.572637+00:00",
       "reason": "phase_6f_b1: conviction=6 整桶 block (EXP1 v2 仅放 D 微币 LONG chop, entry=$0.33440 不满足)",
-      "last_checked_at": "2026-06-14T21:29:37.976296+00:00"
+      "last_checked_at": "2026-06-14T21:31:37.528598+00:00"
     },
     {
       "paper_id": "ADAUSDT|LONG|2026-06-14T21:26:50.534645+00:00",
@@ -47545,7 +47558,7 @@
       "conviction_score": 6,
       "signal_at": "2026-06-14T21:28:20.875945+00:00",
       "reason": "phase_6f_b1: conviction=6 整桶 block (EXP1 v2 仅放 D 微币 LONG chop, entry=$0.17100 不满足)",
-      "last_checked_at": "2026-06-14T21:29:37.976296+00:00"
+      "last_checked_at": "2026-06-14T21:31:37.528598+00:00"
     },
     {
       "paper_id": "DASHUSDT|LONG|2026-06-14T21:27:19.985642+00:00",
@@ -47554,7 +47567,7 @@
       "conviction_score": 6,
       "signal_at": "2026-06-14T21:28:20.875945+00:00",
       "reason": "phase_6f_b1: conviction=6 整桶 block (EXP1 v2 仅放 D 微币 LONG chop, entry=$36.24000 不满足)",
-      "last_checked_at": "2026-06-14T21:29:37.976296+00:00"
+      "last_checked_at": "2026-06-14T21:31:37.528598+00:00"
     },
     {
       "paper_id": "ARKMUSDT|LONG|2026-06-14T21:27:58.684026+00:00",
@@ -47563,36 +47576,18 @@
       "conviction_score": 6,
       "signal_at": "2026-06-14T21:28:20.875945+00:00",
       "reason": "phase_6f_b1: conviction=6 整桶 block (EXP1 v2 仅放 D 微币 LONG chop, entry=$0.12990 不满足)",
-      "last_checked_at": "2026-06-14T21:29:37.976296+00:00"
-    },
-    {
-      "paper_id": "USELESSUSDT|LONG|2026-06-14T21:20:22.511386+00:00",
-      "symbol": "USELESSUSDT",
-      "direction": "LONG",
-      "conviction_score": 6,
-      "signal_at": "2026-06-14T21:20:51.545901+00:00",
-      "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-06-14T21:29:37.976296+00:00"
-    },
-    {
-      "paper_id": "HOLOUSDT|LONG|2026-06-14T21:23:02.900754+00:00",
-      "symbol": "HOLOUSDT",
-      "direction": "LONG",
-      "conviction_score": 6,
-      "signal_at": "2026-06-14T21:23:19.572637+00:00",
-      "reason": "phase_6f_b1: conviction=6 整桶 block (EXP1 v2 仅放 D 微币 LONG chop, entry=$0.07034 不满足)",
-      "last_checked_at": "2026-06-14T21:29:27.211472+00:00"
+      "last_checked_at": "2026-06-14T21:31:37.528598+00:00"
     }
   ],
   "btc_regime_now": {
-    "regime": "chop",
-    "btc_price": 64565.7,
-    "btc_ma25_1h": 64272.65,
-    "pct_vs_ma25": 0.456,
-    "change_24h_pct": 0.203,
+    "regime": "up",
+    "btc_price": 64665.3,
+    "btc_ma25_1h": 64276.64,
+    "pct_vs_ma25": 0.605,
+    "change_24h_pct": 0.357,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-14T21:29:38.922281+00:00"
+    "computed_at": "2026-06-14T21:31:38.481215+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
