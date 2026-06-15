@@ -1,46 +1,44 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-15T00:42:21.971553+00:00",
+  "generated_at": "2026-06-15T00:44:18.323414+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 615,
-    "open": 2,
-    "closed": 613,
+    "open": 1,
+    "closed": 614,
     "wins": 202,
-    "losses": 405,
-    "win_rate": 0.333,
-    "total_pnl_usdt": -45.3477,
-    "net_pnl_usdt": -129.1608,
-    "avg_pnl_usdt": -0.074,
+    "losses": 406,
+    "win_rate": 0.332,
+    "total_pnl_usdt": -46.6639,
+    "net_pnl_usdt": -130.5561,
+    "avg_pnl_usdt": -0.076,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 83.8928,
-    "fees_realized_usdt": 83.8131,
-    "fees_open_usdt": 0.0797,
+    "fees_paid_usdt": 83.9321,
+    "fees_realized_usdt": 83.8922,
+    "fees_open_usdt": 0.0399,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 199.22,
-    "free_capital_usdt": 271.54,
+    "deployed_usdt": 99.77,
+    "free_capital_usdt": 369.63,
     "max_concurrent_slots": 3,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -1.0781,
-    "deployed_usdt": 199.22
+    "daily_pnl": -2.3943,
+    "deployed_usdt": 99.77
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "PIEVERSEUSDT",
       "UAIUSDT"
     ],
     "exchange_symbols": [
-      "PIEVERSEUSDT",
       "UAIUSDT"
     ]
   },
@@ -106,16 +104,18 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.314,
-      "current_price": 0.3182,
-      "unrealized_pnl_usdt": 3.3258,
-      "unrealized_pnl_pct": 3.333,
-      "last_price_check_at": "2026-06-15T00:42:20.424481+00:00",
+      "current_price": 0.3164,
+      "unrealized_pnl_usdt": 2.7426,
+      "unrealized_pnl_pct": 2.749,
+      "last_price_check_at": "2026-06-15T00:44:17.037185+00:00",
       "phase_a_mae_price": 0.3065,
       "phase_a_mae_pct": -0.466,
       "phase_a_mae_at": "2026-06-15T00:11:58.729363+00:00",
       "phase_b_mfe_price": 0.3163,
       "phase_c_mfe_price": 0.3185
-    },
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "PIEVERSEUSDT|LONG|2026-06-15T00:20:36.058000+00:00",
       "trade_id": "L1781482836_PIEVERS_L",
@@ -143,7 +143,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 6,
       "wick_filter_mode": "always",
-      "sl_breach_count": 0,
+      "sl_breach_count": 6,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.0414,
       "regime_gate_enabled": true,
@@ -166,7 +166,7 @@
       "phase_a_mfe_pct": 0.66,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.0398,
+      "fees_paid_usdt": 0.0791,
       "fees_are_actual": false,
       "opened_at": "2026-06-15T00:20:46.863902+00:00",
       "is_dry_run": false,
@@ -177,16 +177,29 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.7011,
-      "current_price": 0.69,
-      "unrealized_pnl_usdt": -0.7772,
-      "unrealized_pnl_pct": -0.782,
-      "last_price_check_at": "2026-06-15T00:42:20.424481+00:00",
-      "phase_a_mae_price": 0.6894,
-      "phase_a_mae_pct": -0.868,
-      "phase_a_mae_at": "2026-06-15T00:42:00.113716+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.6862,
+      "unrealized_pnl_usdt": -1.3206,
+      "unrealized_pnl_pct": -1.328,
+      "last_price_check_at": "2026-06-15T00:43:55.703510+00:00",
+      "phase_a_mae_price": 0.6862,
+      "phase_a_mae_pct": -1.328,
+      "phase_a_mae_at": "2026-06-15T00:43:55.703510+00:00",
+      "btc_regime_at_close": "up",
+      "btc_price_at_close": 65460.1,
+      "btc_pct_vs_ma25_at_close": 1.594,
+      "closed_at": "2026-06-15T00:43:59.878727+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.6862307692307692,
+      "realized_pnl_usdt": -1.3162,
+      "close_order_id": 1633606802,
+      "close_qty": 143.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 0.6895314300000001,
+      "close_slippage_bps": 47.87,
+      "entry_fees_usdt": 0.0398,
+      "close_fees_usdt": 0.0393
+    },
     {
       "paper_id": "WLDUSDT|LONG|2026-06-15T00:28:04.350203+00:00",
       "trade_id": "L1781483284_WLDUSDT_L",
@@ -48342,13 +48355,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 65483.6,
-    "btc_ma25_1h": 64433.72,
-    "pct_vs_ma25": 1.629,
-    "change_24h_pct": 1.495,
+    "btc_price": 65477.4,
+    "btc_ma25_1h": 64433.48,
+    "pct_vs_ma25": 1.62,
+    "change_24h_pct": 1.485,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-15T00:42:21.362345+00:00"
+    "computed_at": "2026-06-15T00:44:18.003213+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
