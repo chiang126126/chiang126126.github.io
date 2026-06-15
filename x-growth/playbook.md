@@ -1,102 +1,97 @@
-# 90 天作战清单 · Make Money with AI
+# 90 天作战清单 · 海外搞钱案例拆解（双平台）
 
-打勾即可执行。每周日复盘并更新此文件。
+打勾即可执行。每周日复盘并更新。
 
 ---
 
 ## Week 0 — 启动（今天，约 3h）
 
-- [ ] 升级 X Premium ($8/月) — 解锁长推文 + 算法加权 + 创作者变现资格
-- [ ] 改 X handle / 头像 / banner：传达 "AI · Income · Proof"
-- [ ] 写 bio（用 `README.md` 草稿）+ pin 一条自我介绍 Thread（说清你是谁、为什么可信、关注你能得到什么）
-- [ ] 关注 `positioning.md` 里的标杆账号，创建 X List "Money-AI Beat"
-- [ ] 订阅 `signals/sources.md` 里的 RSS（Feedly / Inoreader）
-- [ ] 注册 Typefully ($12.5/月) — 排版 Thread
-- [ ] 注册 Substack 或 beehiiv — 承接 Newsletter 流量
-- [ ] 申请 3 个 AI 工具的 affiliate（先批的先用）：Cursor、Perplexity、Gumroad、n8n、Jasper、ElevenLabs 等
-- [ ] 读完 `prompts/05-hook-library.md`，把 hook 公式存到笔记
-- [ ] **想清楚你的第一个"实证实验"**：你接下来 2 周要真实做一件"用 AI 赚钱/省钱"的事，全程记录（这是 PROOF 内容的弹药源）
+- [ ] **X**：升级 Premium ($8/月，解锁长推+变现资格)；改 handle/头像/banner，传达"海外搞钱案例拆解"；写 bio + pin 自我介绍
+- [ ] **小红书**：注册/养号，昵称含"海外搞钱/出海/副业"关键词；完善简介（引导主页/私域）
+- [ ] 关注 `positioning.md` 标杆账号，X 建 List "海外搞钱 Beat"
+- [ ] 订阅 `signals/sources.md` 信源：Indie Hackers、Starter Story、Reddit、大V RSS（Feedly）
+- [ ] 注册 Typefully（X 排版）+ 选一个图文工具做小红书封面（Canva/稿定）
+- [ ] 建私域承接：微信/公众号/知识星球（先建空壳，后续引流）
+- [ ] 读完 `prompts/05-hook-library.md`
+- [ ] **挖第一批 5 个案例**：用 `01-signal-filter.md` 从 Starter Story/Indie Hackers 找 5 个有完整数字+路径的案例，存到 backlog
 
 ---
 
 ## Phase 1 — 冷启动 (Day 1–30)
 
 ### 北极星
-- 粉丝 20 → 500
-- 月 impression 0 → 50K
-- 推文中位 impression ≥ 200
+- X 粉丝 20 → 300 / 小红书 0 → 500
+- X 月 impression 0 → 30K
+- X 推文中位 impression ≥ 150
 
 ### 每日清单（3-4h）
 
 | 时段 | 时长 | 动作 |
 |---|---|---|
-| 早 8:00 | 30min | 跑 `01-signal-filter.md`，拿当日 3 个候选选题 |
-| 早 8:30 | 90min | 写 1 条 Thread (`02-thread-draft.md`) + 1 条单推；推进当周"实证实验" |
-| 中 12:00 | 60min | 蹲 X List，给 15-20 个大 V 回复（`03-reply-shadow.md`） |
-| 晚 22:00 | 30min | 看数据，记录到 `templates/content-log.md` |
+| 早 8:00 | 30min | 跑 `01-signal-filter.md`，挖/确认当日案例 |
+| 早 8:30 | 90min | 用 `02-case-breakdown.md` 出 1 个案例的 X thread + 小红书图文 |
+| 中 12:00 | 45min | 蹲中文 X List 发 reply（`03-reply-shadow.md`） |
+| 晚 21:00 | 45min | 小红书发布（黄金时段）+ 回评论 + 记录数据 |
 
 ### 关键动作
-- [ ] **Reply 优先**：前 30 天 Reply 占比 ≥ 40%（0→500 粉最有效的杠杆）
-- [ ] **借势优先**：每个工作日扫全球 AI 头条 + 经济新闻，1h 内出一条 HOOK 推
-- [ ] 每周三柱配比：3 条 PROOF/PLAYBOOK Thread + 6-7 条单推 + 2-3 条 HOOK
-- [ ] **每周至少 1 条 PROOF**：晒真实截图/数字（哪怕很小，$5 也是真的）
-- [ ] 每周日跑 `04-weekly-review.md` 出周报
-- [ ] 找 3 个同 size 账号互动（互相涨粉）
+- [ ] **一案两发**：每个案例同时出 X thread + 小红书图文（复利）
+- [ ] **Reply 优先**（X）：前 30 天 reply 占比 ≥ 40%，专门补"海外案例细节"
+- [ ] **小红书 SEO**：标题埋关键词（海外/副业/搞钱/AI/出海），正文末尾埋话题标签
+- [ ] 每周三柱配比：4 篇 CASE + 2 篇 INSIGHT + 1 篇 HOOK
+- [ ] 每篇 CASE 必带可信度三要素（数字+来源+时间线）
+- [ ] 每周日跑 `04-weekly-review.md`
 
-### 退出 Phase 1 的判定
-满足任一：粉丝 ≥ 500 OR 单条 Thread 破 10K impression
+### 退出 Phase 1
+满足任一：X 粉 ≥ 300 OR 小红书粉 ≥ 500 OR 单篇破万阅读/曝光
 
 ---
 
 ## Phase 2 — 加速 (Day 31–60)
 
 ### 北极星
-- 粉丝 500 → 2,000
-- 月 impression 50K → 500K
-- 至少 1 篇 Thread 破 50K
+- X 1,200 / 小红书 2,000
+- X 月 impression 300K
+- 至少 1 篇爆款（X 50K imp 或小红书 10w+ 曝光）
 
 ### 关键动作
-- [ ] Reply 占比降到 20%，提高原创占比
-- [ ] 每周 2 篇招牌 Thread（深度 PLAYBOOK 或 大型 PROOF 收入报告）
-- [ ] 上线 Substack，每周 1 篇 newsletter（Thread 的扩写 + 独家 prompt）
-- [ ] 所有 Thread 末尾 CTA：subscribe newsletter（导私域）
-- [ ] 接入第一批 affiliate，自然植入工具栈推文
-- [ ] **做第一个信息产品**：把你最火的 PLAYBOOK 打包成 Gumroad 免费/$9 产品（如 "10 AI Money Prompts" / "AI Freelance Starter Kit"）
-- [ ] 探索 X 原生长文 Article — 每两周 1 篇
+- [ ] X reply 占比降到 20%，提高原创
+- [ ] 每周 2 篇招牌 CASE（深度拆 + 自制图表）+ 1 篇 INSIGHT 合集（"我拆了 30 个案例发现…"）
+- [ ] **小红书破 1000 粉 → 开通蒲公英**接品牌合作
+- [ ] 上线"海外搞钱周报"（公众号/小报童/知识星球），所有内容末尾引流
+- [ ] 私域开始沉淀，准备首个付费产品（海外案例库）
+- [ ] 接入第一批联盟（出海/AI 工具）
 
-### 退出 Phase 2 的判定
-粉丝 ≥ 2000 AND 月 impression ≥ 500K
+### 退出 Phase 2
+X 粉 ≥ 1200 AND 小红书 ≥ 2000
 
 ---
 
 ## Phase 3 — 变现启动 (Day 61–90)
 
 ### 北极星
-- 粉丝 2,000 → 5,000
-- 月 impression 500K → 5M（达成 Ads Revenue 门槛）
-- 月收入 0 → $500
+- X 3,000 / 小红书 5,000 / X 月 imp 3M+
+- 月收入 0 → 3,000+ RMB
 
 ### 关键动作
-- [ ] 申请 X Creator Ads Revenue Share
-- [ ] Gumroad 产品升级到付费档（$19-49），用免费 Thread 引流
-- [ ] Newsletter 上付费档（$5/月），给付费会员独家 agent/prompt
-- [ ] 联系 3 个 AI 工具公司谈 sponsored thread（$200-500/条）
-- [ ] 每月发 1 次"AI Side-Hustle Income Report"作为招牌内容（透明收入 = 最强信任 + 最高互动）
+- [ ] 上线付费产品：海外搞钱案例库 / 周报付费档（小报童/知识星球，¥99-199）
+- [ ] 小红书接 2-3 个品牌合作（出海工具/AI 工具/课程）
+- [ ] 私域社群（海外搞钱情报群）开始收费
+- [ ] 申请 X Ads Revenue Share（达门槛后）
+- [ ] 每月发 1 次"海外搞钱月度盘点"招牌长文
 
 ---
 
 ## Phase 4 — 滚雪球 (Day 91+)
 
-- [ ] 月收入跨 $500 → SOP 化外包选题筛选
-- [ ] 评估多平台分发（YouTube Shorts / LinkedIn / 小红书国内版）
-- [ ] 评估做付费社群（AI 搞钱实战群）
-- [ ] 评估做小课（真有料的，不割韭菜）
+- [ ] SOP 化案例筛选 + 初稿（外包/自动化）
+- [ ] 评估加 B 站/视频号（案例拆解视频）
+- [ ] 评估做训练营/陪跑（真有料）
+- [ ] 评估英文版分发（一案三语，吃英文 CPM）
 
 ---
 
-## 永不停止的事
-
-- 每周日 30min 复盘 + 更新此文件
-- 每月 1 日重读 `positioning.md`，判断赛道是否需要调整
-- 每条爆款（>10K impression）存档到 `first-week/winners.md`，提炼公式
-- **持续做真实实验** —— 没有新的真实 PROOF，账号就会退化成空谈号
+## 永不停止
+- 每周日 30min 复盘 + 更新本文件
+- 每月 1 日重读 `positioning.md`
+- 爆款（X >10K imp / 小红书 >1w 赞藏）存档到 `first-week/winners.md` 提炼公式
+- **持续挖新案例** —— 信源枯竭=账号枯竭，每周至少补 7 个新案例到 backlog

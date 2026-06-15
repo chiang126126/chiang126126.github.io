@@ -1,52 +1,56 @@
-# 周报模板
+# 周报模板（X + 小红书）
 
-每周日填，然后丢给 `prompts/04-weekly-review.md` 的 Claude prompt。
+每周日填，然后丢给 `prompts/04-weekly-review.md` 的 prompt。
 归档到 `templates/weekly-reviews/week-NN.md`。
 
 ---
 
 ## Week N（YYYY-MM-DD ~ YYYY-MM-DD）
 
-### 核心数据
-- 本周新增粉丝：___（累计 ___）
-- 本周总 impression：___
+### X 数据
+- 新增粉：___（累计 ___）
+- 总 impression：___
 - 推文中位 impression：___
-- 发布总数：___（Thread ___ / 单推 ___ / HOOK ___）
+- 发布数：Thread ___ / 单推 ___
 - Reply 总数：___
 
-### Top 5 推文
+#### X Top 5
 
-| 标题 | Pillar | impression | like | reply | RT | profile_visit | follow |
+| 标题 | 柱 | impression | like | reply | RT | 主页访问 | 涨粉 |
 |---|---|---|---|---|---|---|---|
 | 1 |  |  |  |  |  |  |  |
-| 2 |  |  |  |  |  |  |  |
-| 3 |  |  |  |  |  |  |  |
-| 4 |  |  |  |  |  |  |  |
-| 5 |  |  |  |  |  |  |  |
 
-### Bottom 3 推文
+#### X Bottom 3
 
-| 标题 | Pillar | impression | 我猜的失败原因 |
+| 标题 | 柱 | impression | 我猜的失败原因 |
 |---|---|---|---|
 | 1 |  |  |  |
-| 2 |  |  |  |
-| 3 |  |  |  |
 
-### Pillar 配比（实际 vs 目标 40/40/20）
-- PROOF：___% 
-- PLAYBOOK：___% 
+### 小红书数据
+- 新增粉：___（累计 ___）
+- 笔记数：___ / 总曝光：___
+
+#### 小红书 Top 3
+
+| 标题 | 柱 | 曝光 | 阅读 | 赞 | 收藏 | 涨粉 |
+|---|---|---|---|---|---|---|
+| 1 |  |  |  |  |  |  |
+
+### 柱配比（实际 vs 目标 60/25/15）
+- CASE：___% 
+- INSIGHT：___% 
 - HOOK：___% 
 
 ### 变现
-- affiliate 点击：___ / 成交：___ / 收入：$___
-- newsletter 新增：___（累计 ___）
-- 产品销量：___
+- 私域新增：___（累计 ___）
+- 产品/周报销量：___ / 收入：¥___
+- 联盟点击/成交：___ / 品牌合作：___
 
 ### 主观复盘
 - 本周最大的赢：
 - 本周最大的坑：
-- 当周真实实验结果：
+- 哪个案例源贡献最大：
 
 ---
 
-（以上填完，整块粘贴给 04-weekly-review.md 的 prompt）
+（填完整块粘贴给 04-weekly-review.md 的 prompt）

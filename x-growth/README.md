@@ -1,76 +1,89 @@
-# X-Growth · Make Money with AI
+# X-Growth · 海外搞钱案例拆解（中文信息差套利）
 
-**一句话定位**：在经济寒冬下，用 AI 真实搞钱——我做实验、晒真实数字和 prompt，你照着抄。
+**一句话定位**：我帮中国人读那些他们看不到的海外搞钱一手案例——真实数字、操作路径、可抄的行动步骤。
 
-**目标**：90 天内达成 X 创作者收入门槛（500+ 粉、5M impression / 3mo），并通过 AI 工具 Affiliate + 信息产品 + Newsletter 实现 $500+/月副业收入。
+**模式**：把 Indie Hackers / Starter Story / 海外大 V 的真实赚钱案例，**汉化 + 深度拆解 + 行动呼吁**，发到 **中文 X + 小红书**。
 
-## 当前定位
+**目标**：90 天内 X 达成创作者收入门槛、小红书破千粉接品牌合作，并通过私域知识付费 + 联盟 + 品牌合作实现月入副业收入。
 
-- **受众语言**：英文（流量池 50x 中文，CPM 高 5-10x）
-- **细分赛道**：Make Money with AI in a Tough Economy
-- **核心差异（护城河）**：**实证主义**。Money Twitter 满是空谈骗子；你真的在跑 Claude Code / AI agent，有截图、有真实收入数字、有可复制的 prompt。这让你在骗子堆里显得可信。
-- **Persona (X bio 草稿)**：
-  > I show you how I actually make money with AI — real agents, real prompts, real screenshots. No "$10k/mo" fantasies. Building income streams in public.
+## 为什么是这个模式
 
-## 内容三柱 (40 / 40 / 20)
+- **不需要你自己的成功案例**——你拆的是别人的真实案例（带来源链接、带数字）
+- **护城河 = 信息差**：中国受众访问不到 Indie Hackers / Starter Story / 英文大 V，你=翻译官+拆解者
+- **不虚**：每篇必有具体数字 + 原始来源 + 时间线（可信度三要素）
+- **双平台**：中文 X（thread）+ 小红书（图文，涨粉最快的中文平台）
+
+## 内容三柱 (60 / 25 / 15)
 
 | 柱 | 占比 | 类型 | 流量逻辑 |
 |---|---|---|---|
-| **PROOF** | 40% | 真实实验 / 收入报告 / 截图 / "I built X agent, here's what it earned" | 信任 — 别人空谈你有证据 |
-| **PLAYBOOK** | 40% | 可抄的 how-to / prompt / 工具栈 / 自动化步骤 | 收藏 — 实用价值高，算法爱推 |
-| **HOOK** | 20% | 借经济焦虑 + AI 热点 (裁员潮 / 经济差 / 新模型发布) 的搞钱角度 | 流量入口 — 骑大盘焦虑 |
+| **CASE 案例拆解** | 60% | 拆解一个海外真实赚钱案例（Indie Hackers/Starter Story/大V），含路径+数字+来源 | 信息差+故事性，主菜 |
+| **INSIGHT 认知方法** | 25% | 从多个案例提炼的可迁移搞钱认知、工具、方法论 | 收藏率高、立人设 |
+| **HOOK 情绪热点** | 15% | 经济焦虑 / 打工痛点 / 副业共鸣 / 海外热点借势 | 情绪共鸣，流量入口 |
+
+## 爆款 7 段结构（每篇 CASE 必用）
+
+1. **数字钩**：具体人+数字+卑微起点
+2. **共鸣**：他起步处境 = 读者处境
+3. **转折**：他做的关键决定
+4. **路径拆解**：3-5 步，每步带数字/工具/时间
+5. **关键认知**：可迁移的底层逻辑
+6. **反共识**：反直觉的一点
+7. **行动呼吁**：今天能做的一小步 + 关注/私域
+
+**可信度三要素（每篇必备）**：① 具体数字 ② 原始来源链接 ③ 时间线。
 
 ## 目录
 
 ```
 x-growth/
 ├── README.md                ← 你在这里
-├── positioning.md           ← 赛道决策记录 + ICE 矩阵
-├── playbook.md              ← 30/60/90 天作战清单
+├── positioning.md           ← 赛道决策 + ICE 矩阵 + 标杆账号
+├── playbook.md              ← 30/60/90 天作战清单（双平台）
 ├── prompts/
-│   ├── 01-signal-filter.md      情报过滤（找搞钱选题）
-│   ├── 02-thread-draft.md       Thread 起草
-│   ├── 03-reply-shadow.md       大V回复生成
+│   ├── 01-signal-filter.md      情报过滤（从海外源挖案例）
+│   ├── 02-case-breakdown.md     案例拆解（X thread + 小红书图文）
+│   ├── 03-reply-shadow.md       大V回复生成（涨粉）
 │   ├── 04-weekly-review.md      周报复盘
-│   └── 05-hook-library.md       Hook 公式库
+│   └── 05-hook-library.md       中文 Hook 公式库
 ├── signals/
-│   └── sources.md           ← RSS / Newsletter / X List 信源清单
+│   └── sources.md           ← 海外信源清单（你提供的那套）
 ├── templates/
-│   ├── content-log.md       ← 每日发布记录模板
+│   ├── content-log.md       ← 每日发布记录（X+小红书）
 │   └── weekly-review.md     ← 周报模板
 └── first-week/
-    └── day-01-07-threads.md ← 第一周 7 个 Thread 选题 + 完整草稿
+    └── day-01-07-threads.md ← 第一周 7 天内容 + 完整草稿
 ```
 
-## 量化北极星
+## 量化北极星（双平台合计）
 
 | 指标 | Day 30 | Day 60 | Day 90 |
 |---|---|---|---|
-| 粉丝 | 500 | 2,000 | 5,000 |
-| 月 impression | 50K | 500K | 5M |
-| 推文中位 impression | 200 | 1,000 | 5,000 |
-| 月收入 (USD) | 0 | 100 | 500 |
+| X 粉丝 | 300 | 1,200 | 3,000 |
+| 小红书粉丝 | 500 | 2,000 | 5,000 |
+| X 月 impression | 30K | 300K | 3M+ |
+| 月收入 (RMB) | 0 | 500 | 3,000+ |
 
-## 变现路径（按优先级）
+## 变现路径（中文优先级）
 
-1. **AI 工具 Affiliate**（最快）：Claude / ChatGPT Team / Cursor / Perplexity / n8n / Make.com / Gumroad，提成 20-40%
-2. **信息产品**：Notion 模板、prompt 包、"AI 副业搭建指南" PDF（Gumroad）
-3. **Newsletter 付费档**（Substack/beehiiv，$5/月）
-4. **X Ads Revenue Share**（达 5M impression 后）
-5. **Sponsored thread**（AI 工具公司，$200-500/条）
+1. **引流私域（微信）→ 知识付费 / 付费社群**（中文最强变现）
+2. **小红书品牌合作**（蒲公英，需 1000 粉 + 实名）
+3. **信息产品**：海外案例库 / prompt 包 / "海外搞钱周报"（知识星球 / 小报童）
+4. **联盟**：海外 AI 工具 + 出海工具返佣
+5. **X Ads Revenue Share**（达 5M impression 后，中文 CPM 偏低，次要）
 
-## 红线（搞钱赛道尤其重要）
+## 红线
 
-1. **不编造收入数字**——只晒真实的、可截图证明的。假数字是这个赛道翻车第一死因。
-2. **不承诺暴富**——"$10k/mo passive" 这类标题会吸引算法但毁掉信任，长期反噬。
-3. AI 生成内容必须标注（EU AI Act 强制）。
-4. 不做 YMYL 投资建议（不荐股、不荐币）。只讲"用 AI 提供服务/做产品赚钱"，规避金融监管。
-5. Affiliate 必须用 `#ad` / `#affiliate` 原生披露。
-6. 不买粉、不刷量。
+1. **拆解≠抄袭**：每篇标注原始来源（Source: Starter Story / @levelsio），是"我帮你读了英文" 不是"我编的"
+2. **不编造 / 不夸大数字**——以原案例披露为准
+3. **不荐股、不荐币、不做投资建议**（合规）
+4. AI 生成内容按平台规则标注
+5. 不买粉、不刷量
+6. 不碰政治
 
 ## 下一步
 
 1. 读 `positioning.md` 确认赛道
-2. 读 `playbook.md` 按 Week 0 + Day 1 清单执行
-3. 用 `prompts/01-signal-filter.md` 跑第一次选题
+2. 读 `playbook.md` 按 Week 0 清单执行
+3. 用 `prompts/01-signal-filter.md` 从信源挖第一批案例
 4. 按 `first-week/day-01-07-threads.md` 发出第一周内容

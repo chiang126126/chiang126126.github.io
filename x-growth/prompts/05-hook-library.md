@@ -1,114 +1,111 @@
-# Hook 公式库 · Make Money with AI
+# 中文 Hook 公式库 · 海外搞钱案例拆解
 
-Tweet 1 决定 80% 的展现量。这里是已验证的英文 hook 模板，按三柱标注（PROOF / PLAYBOOK / HOOK）。
+第 1 条（X）/ 封面标题（小红书）决定 80% 流量。这里是中文 hook 模板，按三柱标注（CASE / INSIGHT / HOOK）。
 
-每次跑 `02-thread-draft.md` 时让 Claude 从这里选公式。每周日复盘后新增的 hook 加到末尾，让公式库**复利增长**。
+每次跑 `02-case-breakdown.md` 让 Claude 从这里选公式。每周日复盘后把新爆款 hook 加到末尾。
 
-**铁律**：所有带数字的 hook 必须是真实的。这是这个赛道唯一的护城河。
+**铁律**：所有数字必须来自真实案例，且标注来源。虚的数字会毁掉整个账号的信任。
 
 ---
 
-## 1. The Proof Receipt (PROOF) — 最强
+## 1. 数字钩 + 卑微起点（CASE）— 最强
 
-> I made $[real number] last week with [AI thing] I built in [time]. No course, no BS. Here's the exact setup:
+> 一个[卑微身份]，[时间]做到[具体收入]。他[反共识细节]，只做对了[N]件事。
 
 **例**：
-> I made $217 last week with an AI agent I built in one afternoon. No course, no upsell. Here's the exact build, the prompt, and what it earned:
+> 一个被裁员的美国设计师，18 个月做到月入 $40k。他没投一分钱广告，只做对了 3 件事。我把完整路径扒出来了 ↓（源：Starter Story）
 
 ---
 
-## 2. The Number Shock (PROOF / PLAYBOOK)
+## 2. 一人公司（CASE）
 
-> [Specific number] [thing] in [time period] using [tool]. The breakdown:
+> 没团队、没融资，一个人 + 几个工具，[时间]做到 [MRR]。这是他的完整打法。
 
 **例**：
-> I replaced $1,400/mo of freelance work with 3 AI agents this month. Here's each one, what it does, and what it cost me to run:
+> 没团队、没融资，一个人 + 3 个 AI 工具，14 个月做到 $12k MRR。这是他每天只花 4 小时的完整打法（源：Indie Hackers）
 
 ---
 
-## 3. The Cost Receipt (PROOF)
+## 3. 反共识（INSIGHT / CASE）
 
-> I spent $[X] testing [N] AI tools so you don't have to. Only [1] is worth paying for. Here's why:
+> 国内都在卷[X]，海外早就[反直觉做法]了。我拆了 [N] 个案例，发现……
 
 **例**：
-> I spent $94 testing 11 "AI side hustle" tools this month. 9 are garbage. Here are the 2 that actually made me money:
+> 国内还在拼命招人扩团队，海外月入十万刀的几乎全是"一个人"。我拆了 30 个案例，发现他们故意不招人的 3 个原因 ↓
 
 ---
 
-## 4. The Copyable Playbook (PLAYBOOK)
+## 4. 损失厌恶 / 打工焦虑（HOOK）
 
-> [N] AI side hustles you can start this weekend with $0. With the exact tools and first step for each:
+> 你还在[旧方式]的时候，海外这群人已经用[新方式]月入[数字]了。差距在哪？
 
 **例**：
-> 6 AI side hustles you can start this weekend with $0 and no audience. Tool + first step for each one below:
+> 你还在投简历海投的时候，海外被裁的人已经靠一个 AI 小项目月入 $5k 了。差的不是运气，是这套思路 ↓
 
 ---
 
-## 5. The Prompt Drop (PLAYBOOK)
+## 5. 信息差直球（CASE / INSIGHT）
 
-> This one prompt turns [cheap AI tool] into a [valuable thing people pay for]. Steal it:
+> 这个海外案例中文圈基本没人讲过：[一句话案例]。完整拆解 ↓
 
 **例**：
-> This one prompt turns ChatGPT into a $300 brand-naming service. I'll give you the full prompt and how to sell it:
+> 这个案例中文圈几乎没人讲：一个宝妈用 AI 配音做 faceless YouTube，8 个月做到月入 $8k。完整路径我扒出来了（源：@xxx）
 
 ---
 
-## 6. The Loss Aversion (HOOK)
+## 6. 路径承诺（CASE）
 
-> If you're [doing X the old way] in 2026, you're leaving [money] on the table. Here's the AI fix:
+> [身份]从 0 到 [收入]，就 [N] 步。每一步我都标了具体数字和工具。照着抄 ↓
+
+---
+
+## 7. 合集干货（INSIGHT）— 高收藏
+
+> 我拆了 [N] 个海外月入过万的案例，总结出 [M] 个共同点。第 [k] 个反直觉。
 
 **例**：
-> If you're still writing cold emails by hand, you're losing hours and clients. Here's the AI workflow that books me meetings while I sleep:
+> 我拆了 30 个海外月入过万的独立项目，总结出 5 个共同点。第 4 个跟所有人想的相反 ↓（收藏慢慢看）
 
 ---
 
-## 7. The Layoff Hedge (HOOK)
+## 8. 经济焦虑借势（HOOK）
 
-> Layoffs are coming. The people who survive aren't the hardest workers, they're the ones with [AI-powered income hedge]. Here's how to build one:
-
----
-
-## 8. The Contrarian (HOOK / PLAYBOOK)
-
-> Everyone's selling "make money with AI" courses. The actual money is in [unsexy thing nobody mentions]. Here's what's working right now:
+> 经济越差，海外这个副业反而越火。原因反直觉，但逻辑很硬。
 
 ---
 
-## 9. The Time-Bound Update (HOOK)
+## 9. 时间线对比（CASE）
 
-> 5 ways people are making money with [new model/tool] that launched this week. #3 is already saturated, #5 is wide open:
-
----
-
-## 10. The Reframe (PLAYBOOK)
-
-> You don't need an audience to make money with AI. You need [the real thing]. Here's the proof and the playbook:
+> [时间1]他还在[惨状]，[时间2]月入[数字]。中间这[N]个月他做了什么，我逐月扒了。
 
 ---
 
-## 11. The Build Log (PROOF)
+## 10. 工具/方法直给（INSIGHT）
 
-> Day [N] building [income project] in public. Today I shipped [feature] with Claude Code in [time]. Current revenue: $[real]. The workflow:
+> 海外搞钱的人都在用、但中文圈很少提的 [N] 个工具/方法（按变现速度排序）。
 
 ---
 
-## 12. The Skill Ranking (PLAYBOOK)
+## 小红书封面标题专用（更口语、更钩）
 
-> 5 AI skills worth learning in a bad economy, ranked by how fast they make money (not by hype):
+- "被裁后他月入 4 万刀，就靠这 3 步"
+- "中文圈没人讲的海外搞钱案例（数据真实）"
+- "一个人月入 10 万刀？我扒了他的账本"
+- "海外副业天花板，普通人也能抄"
 
 ---
 
 ## 待验证（新候选，跑过数据后保留或删除）
 
-- _(Day N: 暂无，每周复盘新增 1-2 个)_
+- _(Day N：暂无，每周复盘新增 1-2 个)_
 
 ---
 
-## 反模式（已验证失败 / 危险，永远不用）
+## 反模式（永远不用）
 
-- ❌ "$10k/mo passive income" — 虚假承诺，毁信任 + 算法已识别
-- ❌ "🚨 BREAKING:" / emoji 开头 — clickbait 降权
-- ❌ "This will change your life" — 空洞
-- ❌ 任何编造的收入数字 — 翻车第一死因
-- ❌ "Thread 🧵" 开头 — 2026 算法降权
-- ❌ 荐股/荐币/"AI 选股" — YMYL 监管 + 翻车风险
+- ❌ "躺赚/暴富/财富自由/睡后收入轻松月入十万" — 虚，毁信任
+- ❌ 编造或无来源的数字 — 翻车第一死因
+- ❌ "🧵"开头 / emoji 堆砌 / 感叹号轰炸
+- ❌ 荐股/荐币/"AI 选股" — 合规风险
+- ❌ 纯翻译腔（"令人震惊的是…"）— 要像中国人说话
+- ❌ 标题党到与内容不符 — 平台限流 + 掉粉

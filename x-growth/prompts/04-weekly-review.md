@@ -1,6 +1,6 @@
 # Prompt · 周报复盘
 
-**用途**：每周日跑一次，把上周数据喂给 Claude，输出可执行的下周调整。
+**用途**：每周日跑一次，把双平台数据喂给 Claude，输出可执行的下周调整。
 
 **推荐模型**：Claude Opus 4.8
 
@@ -8,69 +8,64 @@
 
 ## 数据准备
 
-每周日从 X Analytics 导出（或手抄）填到 `templates/weekly-review.md`：
-- 本周新增粉丝
-- 本周总 impression
-- Top 5 推文（impression / like / reply / profile_visit / follow）
-- Bottom 3 推文
-- 本周 Reply 数量 + 估算带来的 profile visits
-- 本周真实搞钱进展（affiliate 点击/成交、产品销量、实验结果）
+每周日从 X Analytics + 小红书后台导出（或手抄）填到 `templates/weekly-review.md`：
+- X：新增粉、总 impression、Top5/Bottom3 推文、reply 数
+- 小红书：新增粉、笔记曝光/阅读、Top3 笔记（赞/藏/评/涨粉）
+- 变现：私域新增、产品/周报销量、联盟/品牌合作进展
 
 ---
 
 ## Prompt 本体
 
 ```
-You're the growth + monetization analyst for an English X account
-about making money with AI (edge = proof). Target pillar mix:
-40% PROOF / 40% PLAYBOOK / 20% HOOK.
+你是一个"海外搞钱案例拆解"中文账号（X+小红书双平台）的增长+变现分析师。
+目标柱配比：60% CASE / 25% INSIGHT / 15% HOOK。
 
-WEEK [N] DATA:
+第 [N] 周数据：
 """
-[paste the filled-in weekly-review.md template]
+[粘贴填好的 weekly-review.md]
 """
 
-NORTH STAR for this phase:
-[paste from playbook.md — e.g., "Day 30: 500 followers, 50K monthly
-impressions, median tweet impression ≥ 200"]
+本阶段北极星：
+[从 playbook.md 粘贴，如 "Day30：X 300粉/小红书500粉/X月曝光30K"]
 
-Analyze and output:
+分析并输出：
 
-1. **Verdict** — on track / behind / ahead. One sentence.
+1. **结论** — 达标/落后/超前，一句话。
 
-2. **Top 3 Wins** — which tweets/replies overperformed and WHY.
-   Identify the exact pattern (hook type? pillar? topic? posting
-   time? did proof/screenshots drive it?). Be specific with numbers.
+2. **Top 3 赢** — 哪几篇/回复超预期，为什么。找出确切规律
+   （钩子类型？哪个柱？哪个案例源？发布时间？是不是真实截图/数字
+   带动的？X 还是小红书更吃这个题材？）用数字说话。
 
-3. **Bottom 3 Misses** — diagnose: hook problem? wrong pillar?
-   bad time? format too long? no proof?
+3. **Bottom 3 输** — 诊断：钩子问题？选题不对？时间不对？太长？
+   缺数字/缺来源导致不可信？翻译腔太重？
 
-4. **Pillar Mix Audit** — actual vs target (40/40/20). Also compare
-   median impression AND profile-visit-rate per pillar. If PROOF
-   posts convert way better than PLAYBOOK, recommend rebalancing.
+4. **柱配比审计** — 实际 vs 目标 60/25/15。对比各柱的中位曝光和
+   涨粉率。哪个柱在哪个平台表现好就建议加权。
 
-5. **Monetization Check** — any affiliate clicks / product sales /
-   newsletter signups? Which content drove them? What to double down.
+5. **双平台对比** — 同一个案例在 X 和小红书表现差异，下周资源往哪倾斜。
 
-6. **Hook Library Update** — any new winning hook? Suggest the exact
-   line to add to prompts/05-hook-library.md.
+6. **变现检查** — 私域新增/产品销量/合作进展，哪些内容带来的，
+   下周怎么放大。
 
-7. **Next Week's 3 Bets** — concrete content directions. Each:
-   pillar, working title, why now, what real experiment backs it.
+7. **Hook 库更新** — 本周跑出的新爆款钩子，给出可加进
+   prompts/05-hook-library.md 的确切句式。
 
-8. **One Thing to Stop Doing** — be ruthless, cut lowest-ROI behavior.
+8. **下周 3 个押注** — 具体选题方向，每个：柱、拟标题、为什么现在、
+   对应哪个海外案例源。
 
-9. **Risk Flags** — impression drop, negative replies, anything
-   that smells like the account drifting into guru/hype territory
-   (which kills our proof-based trust).
+9. **要停掉的一件事** — 狠一点，砍最低 ROI 的行为。
 
-Output: clean Markdown. Be brutally honest, not encouraging.
+10. **风险旗标** — 曝光下滑、负评、账号是否在滑向"画饼/虚"
+    （会毁掉信息差信任）、来源标注是否到位。
+
+输出干净中文 Markdown，残忍诚实，别鼓励式废话。
 ```
 
 ---
 
-## 周报输出后的动作
-1. 把 "Hook Library Update" 真加进 `05-hook-library.md`
-2. 把 "Next Week's 3 Bets" 进入下周 backlog，并安排对应的真实实验
-3. 把 "One Thing to Stop Doing" 标红，下周第一天就改
+## 输出后动作
+1. "Hook 库更新"真加进 `05-hook-library.md`
+2. "下周 3 个押注"进 backlog，并去信源挖对应案例
+3. "要停掉的一件事"标红，下周第一天就改
 4. 周报归档到 `templates/weekly-reviews/week-NN.md`

@@ -1,79 +1,69 @@
-# Prompt · 大V回复生成器
+# Prompt · 大V回复生成器（涨粉）
 
-**用途**：冷启动期（Day 1-30）最重要的涨粉杠杆。每天给 15-20 个大 V 推文写有质量的 reply。
+**用途**：冷启动期最重要的涨粉杠杆。给中文搞钱大 V 的推文写有质量的 reply，引流到主页。
 
-**推荐模型**：GPT-5 或 Gemini 2.5 Pro（短文本灵活、便宜）
+**推荐模型**：GPT-5 / Gemini 2.5 Pro / Claude Haiku（短文本、便宜）
 
 ---
 
 ## 核心原则
 
-好 Reply = **同意 + 补充一个可操作的搞钱细节 + 引出疑问**。
-不是辩论、不是夸赞、不是"+1"。
-
-目标：让大 V 的关注者看到 reply 后**点进你的 profile**。
-在搞钱赛道，最强的 reply 是"我真的做了/试了，这是结果"——实证再次是护城河。
+好 Reply = **同意 + 补一个海外案例/数据 + 引出疑问**。
+你的独家弹药：**海外一手案例的具体细节**（中文大 V 和读者大多看不到）。
+目标：让大 V 的粉丝看到 reply 后**点进你主页**。
 
 ---
 
 ## Prompt 本体
 
 ```
-You're crafting a reply for an English X account about making money
-with AI (edge = proof: real numbers, real prompts, no guru BS).
-Goal: get profile clicks from the original poster's audience.
+你在为一个"海外搞钱案例拆解"中文账号写 reply（护城河=海外一手信息差）。
+目标：从原作者的粉丝里吸引点击我主页。
 
-ORIGINAL TWEET (by @[handle], a [domain] account with [N] followers):
+原推文（作者 @[handle]，[领域] 大V，[N] 粉）：
 """
-[paste the tweet here]
+[粘贴推文]
 """
 
-OP'S USUAL TOPICS: [AI tools / make money online / startups / etc.]
+作者常聊：[出海 / 独立开发 / 副业 / AI 搞钱 等]
 
-Generate 3 reply candidates. Each must:
+生成 3 个 reply 候选，每个必须：
+1. ≤140 字（中文）
+2. 补一个原作者没说的、具体的海外案例细节或数字
+   （如"海外有个类似的，@xxx 用同样思路 12个月做到 $30k MRR，
+   他多做了一步是…"）
+3. 不硬怼原作者（建立关系，不是抬杠）
+4. 结尾用一个钩子问题，或"我扒过这个案例的完整路径"（如有对应内容）
+5. 像真人圈内人说话，不要 AI 腔、不要"说得太对了"、不要 emoji 堆砌
+6. 用具体细节证明"我真的读过海外一手"
 
-1. Be <280 chars
-2. Add ONE concrete, useful thing the OP didn't say:
-   - a specific tool + what it actually costs/earns
-   - a copyable prompt or workflow tweak
-   - a real result I got ("I tried this, got X")
-3. NOT contradict the OP outright (build rapport, don't dunk)
-4. End with a hook question OR "wrote a full breakdown on this:
-   [placeholder]" if I have a relevant thread
-5. Sound like a real practitioner, not a brand. No "Great point!",
-   no emoji, no hype words ("game-changer", "insane")
-6. Show I actually do this — let specifics prove it
+每个候选附：
+  - 策略（补案例 / 补数字 / 给方法 / 引流到我的内容）
+  - 引流上限预测（低/中/高）
+  - 一个可能失败的原因
 
-For each candidate output:
-  - Strategy (add-tool / share-prompt / real-result / bridge-to-thread)
-  - Predicted upside (low/med/high) for profile clicks
-  - One reason it might fail
+最后用一句话给出最推荐的那个。
 
-Then pick your top recommendation in 1 sentence.
-
-NEVER fabricate income numbers. If I have no real result, use
-add-tool or share-prompt strategy instead.
+绝不编造数字；没有真实案例时，用"给方法/补认知"策略代替。
 ```
 
 ---
 
 ## Reply 节奏
 
-| 时段(中国) | = EST | 数量 | 目标 |
-|---|---|---|---|
-| 12:00 | 0:00 | 5 条 | 欧洲在线 + 美国睡前预埋 |
-| 22:00 | 10:00 | 10 条 | 美国早高峰 |
-| 隔天早 8:00 | — | 3-5 条 | 给昨晚爆款补一刀 |
+| 时段(北京) | 数量 | 目标 |
+|---|---|---|
+| 中午 12:00 | 5 条 | 中文搞钱大V 午间活跃 |
+| 晚 21:00 | 10 条 | 中文晚高峰 |
+| 隔天早 8:00 | 3-5 条 | 给昨晚爆推补一刀 |
 
-**周末加倍**（英文 X 周末流量 +30%）。
-
-## 蹲守优先级（每天）
+## 蹲守优先级
 1. 推文 <30min（早鸟红利）
-2. 已破 1K likes 且仍在涨
-3. 命中 PROOF / PLAYBOOK / HOOK 任一柱
+2. 已高赞且仍在涨
+3. 命中 CASE / INSIGHT / HOOK 任一柱
 
 ## 发出前自查
-- [ ] 没有编造的收入数字
-- [ ] 不是 AI 腔（像真人）
-- [ ] 没有暴富承诺、没有荐股荐币
-- [ ] OP 看到会想 RT 而不是 block
+- [ ] 海外案例细节真实（没编数字）
+- [ ] 像真人、去翻译腔
+- [ ] 无投资建议、无政治
+- [ ] 原作者看到会想点赞而非反感

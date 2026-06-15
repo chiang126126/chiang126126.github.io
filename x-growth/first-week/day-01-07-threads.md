@@ -1,101 +1,79 @@
-# 第一周作战内容 · Make Money with AI
+# 第一周作战内容 · 海外搞钱案例拆解
 
-7 天，每天 1 条主推/Thread + 1 条单推 + 15-20 条 reply。
-三柱混合，第 1 天先发"自我介绍 + 立人设"Thread（pin 置顶）。
+7 天，每天 1 个案例 → 同时出 X thread + 小红书图文。第 1 天先发"自我介绍+立人设"。
 
-> ⚠️ 所有带 $ 数字的内容**必须真实**。下面草稿里的数字是占位符 `[$你的真实数字]`，发布前用你实验的真实结果替换；如果还没有真实数字，就改成"setup / how-to"框架，不要编。
-
----
-
-## Day 1 — 自我介绍 Thread（PROOF，置顶）
-
-**目标**：让陌生人 10 秒内知道你是谁、为什么可信、关注能得到什么。
-
-**Hook 候选**（用公式 #1 Proof Receipt）：
-1. `Most "make money with AI" accounts are people who've never made a dollar with AI. I'm building income streams in public — real numbers, real prompts, real screenshots. Follow along:`
-2. `I'm running [N] AI side projects right now. Some make money, some flop. I'll show you both — the wins AND the receipts of what didn't work. Here's where I'm starting:`
-3. `The economy's brutal and everyone's selling AI courses. I'm doing the opposite: building real income with AI, in public, for free. Here's the plan and why you should watch:`
-
-**Body 大纲**：
-1. Who I am + 我每天真的在用 Claude Code / AI agent 干活（一句可信背书）
-2. 为什么开这个号：经济差 + AI 是普通人这十年最大杠杆
-3. 我的原则：不卖暴富梦、不编数字、所有方法免费给
-4. 你关注能得到什么：每周 1 个可抄的 AI 搞钱 playbook + 真实实验复盘
-5. 我现在正在做的实验（预告 Day 2-7 内容）
-6. CTA：Follow + "DM me what you'd try first"
+> ⚠️ 下面的案例是**示范模板**。Day 1 启动时，你先用 `01-signal-filter.md` 从 Starter Story / Indie Hackers 挖 7 个**真实**案例填进来，把示范数字换成真实数字 + 真实来源链接。**绝不发没核实的数字。**
 
 ---
 
-## Day 2 — PLAYBOOK Thread（最易涨粉）
+## Day 1 — 自我介绍（INSIGHT，X 置顶 + 小红书首篇）
 
-**选题**：`6 AI side hustles you can start this weekend with $0 and no audience`
+**目标**：10 秒说清你是谁、为什么可信、关注能得到什么。
 
-**Hook**（公式 #4）：
-> 6 AI side hustles you can start this weekend with $0 and no audience. Tool + exact first step for each one below. No course required:
+**X 第 1 条候选**：
+1. `中文圈讲海外搞钱的，大多自己没赚到、也没读过英文一手源。我反过来：每天扒一个海外真实赚钱案例（带数字、带来源链接），汉化拆解给你。关注我，少走弯路 ↓`
+2. `我能读英文，所以我每天泡在 Indie Hackers、Starter Story 这些中文圈进不去的地方。看到好案例就帮你扒成中文：他赚了多少、怎么做的、你能抄哪步。`
 
-**Body**（每条 1 个副业，给工具 + 第一步）：
-1. AI-powered resume/LinkedIn rewrite service（工具：ChatGPT/Claude；第一步：发 5 个免费样例到求职群）
-2. Faceless short-form content（工具：脚本用 Claude，配音 ElevenLabs *affiliate*）
-3. Local business chatbot setup（工具：n8n/Voiceflow *affiliate*）
-4. Notion/prompt template seller（工具：Gumroad *affiliate*）
-5. AI 翻译/本地化微服务（你的中英优势）
-6. Niche newsletter ghostwriting（工具：Claude）
-- CTA：subscribe newsletter 拿每个副业的完整 SOP
+**Body 大纲**：① 我是谁+我每天读哪些海外源 ② 为什么开号：海外搞钱信息差太大 ③ 我的原则：真实数字+标来源+不画饼 ④ 你能得到什么：每天一个可抄的海外案例拆解 ⑤ CTA：关注+评论"想看哪类案例"
 
-**实证加持**：选其中 1 个你真的去做了的，附截图。
+**小红书首篇**：封面"中文圈没人帮你扒的海外搞钱案例，我来" + 简介式正文 + 引导关注。
 
 ---
 
-## Day 3 — HOOK Thread（借经济焦虑）
+## Day 2 — CASE（最易涨粉，用公式#1）
 
-**选题**：`Layoffs are accelerating. Here's how to AI-proof your income in 30 days`
+**示范选题**：`被裁员的设计师，18个月做到月入 $40k，没投一分广告`
+（启动时换成你挖到的真实 Starter Story 案例）
 
-**Hook**（公式 #7）：
-> Tech layoffs hit [real number from layoffs.fyi] this year. The people who'll be fine aren't the hardest workers. They're the ones with one AI-powered income hedge. Here's how to build one in 30 days:
+**X 钩子**：
+> 一个被裁员的美国设计师，18 个月做到月入 $40k。他没投一分钱广告，只做对了 3 件事。我把他的完整路径扒出来了 ↓（源：Starter Story）
 
-**Body**：分 4 周计划，每周一个可执行动作（学技能→做样例→接第一单→自动化）。
-**信源**：layoffs.fyi 真实数据 [src]。
+**Body（7 段）**：①数字钩 ②他被裁时的窘境（共鸣）③他决定做小而美的工具而非找工作（转折）④路径：选痛点→做 MVP→在社区免费给价值导流→订阅变现（每步带数字/工具）⑤关键认知：先有受众再有产品 ⑥反共识：他全程零广告，靠"公开构建"涨粉 ⑦行动呼吁：今天去 X 关注 3 个你领域的人，开始公开构建+关注我
 
----
-
-## Day 4 — PROOF 单推 + 小实验
-
-**单推**（公式 #3 Cost Receipt）：
-> I spent $[真实金额] testing [N] "AI side hustle" tools this week. Most are repackaged ChatGPT wrappers. Only [1-2] actually helped me make money. 🧵 tomorrow. Which tool do you want me to test next?
-
-→ 引导评论（算法加权）+ 预告 Day 5 Thread。
+**小红书**：封面"被裁后月入4万刀，就这3步" + 路径分点图。
 
 ---
 
-## Day 5 — PLAYBOOK Thread（Prompt Drop，高收藏）
+## Day 3 — CASE（公式#2 一人公司）
 
-**选题**：`The one prompt that turns ChatGPT into a $300 service`
-
-**Hook**（公式 #5）：
-> This one prompt turns ChatGPT into a service people pay $200-300 for. I'll give you the full prompt and exactly how to sell it. Steal it:
-
-**Body**：完整给出 prompt（如品牌命名/落地页文案/冷邮件序列），+ 定价 + 去哪找客户（Upwork/Fiverr/本地群）+ 交付模板。
-**CTA**：完整 prompt 包在 newsletter / Gumroad。
+**示范选题**：`一个人 + 3个AI工具，14个月做到 $12k MRR`
+**X 钩子**：
+> 没团队、没融资，一个人 + 3 个 AI 工具，14 个月做到 $12k MRR（月经常性收入）。他每天只干 4 小时。完整打法 ↓（源：Indie Hackers）
+**重点**：突出"工具栈"（自然植入联盟）+ 时间线。
 
 ---
 
-## Day 6 — PROOF Thread（Build in public 收入复盘）
+## Day 4 — INSIGHT（公式#7 合集，高收藏）
 
-**选题**：`Week 1 of building AI income in public — here's what actually happened`
-
-**Hook**（公式 #11）：
-> Week 1 of building AI income in public. I promised real numbers, so here they are: [真实数字 — 哪怕是 $0 或 $12]. What worked, what flopped, and what I'm changing:
-
-**Body**：诚实复盘本周实验（含失败）。**诚实晒小数字/失败 = 这个赛道最强的信任建立**，比晒大数字更圈粉。
+**示范选题**：`我拆了30个海外月入过万的案例，发现5个共同点`
+**X 钩子**：
+> 我拆了 30 个海外月入过万的独立项目，总结出 5 个共同点。第 4 个跟所有人想的相反 ↓（建议收藏）
+**Body**：5 个共同点，每个配 1 个真实案例佐证（引用前几天 + backlog 的案例）。
+**注**：这类"合集"是涨粉+收藏神器，但要等你手里攒够真实案例。第一周可先用 3-4 个。
 
 ---
 
-## Day 7 — 周复盘 + 轻互动单推
+## Day 5 — CASE（公式#5 信息差直球）
 
-**单推**：
-> Wrapping week 1. Best thing I learned: [一句真实洞察]. If you're trying to make money with AI and stuck, reply with where you're stuck — I'll do a thread on the most common one.
+**示范选题**：`中文圈没人讲：宝妈用AI配音做faceless YouTube，8个月月入$8k`
+**重点**：强信息差 + 可操作（工具栈：脚本Claude / 配音ElevenLabs*联盟* / 剪辑）。
 
-→ 收集选题 + 拉互动 + 为第二周备弹药。
+---
+
+## Day 6 — HOOK（公式#4/#8 情绪借势）
+
+**示范选题**：`经济越差，海外这个副业反而越火（反直觉）`
+**X 钩子**：
+> 经济越差，海外这个副业需求反而暴涨。原因反直觉，但逻辑很硬，而且普通人能上手 ↓
+**Body**：用 layoffs.fyi 真实裁员数据起情绪 → 引出某类抗周期副业 → 1-2 个真实案例 → 行动呼吁。
+
+---
+
+## Day 7 — 轻互动 + 周复盘
+
+**X 单推**：
+> 第一周扒了 6 个海外搞钱案例。最大的感受：他们赢在"早开始+公开构建"，不是聪明。你想让我下周深扒哪类案例？评论告诉我（出海/AI/数字产品/faceless）
+→ 收集选题 + 拉互动。
 
 **然后**：跑 `prompts/04-weekly-review.md` 出第一份周报。
 
@@ -103,20 +81,20 @@
 
 ## 本周节奏总表
 
-| Day | 主内容 | Pillar | 单推/动作 |
+| Day | 案例/选题 | 柱 | 平台 |
 |---|---|---|---|
-| 1 | 自我介绍 Thread（置顶） | PROOF | 关注/互动引导 |
-| 2 | 6 AI side hustles | PLAYBOOK | 投票：先看哪个 |
-| 3 | AI-proof your income | HOOK | 借裁员数据 |
-| 4 | — | PROOF | Cost receipt 单推 + 预告 |
-| 5 | $300 prompt | PLAYBOOK | Prompt drop |
-| 6 | Week 1 收入复盘 | PROOF | 诚实晒数字 |
-| 7 | — | — | 收集选题 + 周报 |
+| 1 | 自我介绍（置顶） | INSIGHT | X+小红书 |
+| 2 | 被裁设计师 $40k | CASE | X+小红书 |
+| 3 | 一人公司 $12k MRR | CASE | X+小红书 |
+| 4 | 30案例5共同点 | INSIGHT | X+小红书 |
+| 5 | 宝妈 faceless YouTube | CASE | X+小红书 |
+| 6 | 经济差副业反火 | HOOK | X+小红书 |
+| 7 | 互动+周报 | — | X |
 
-每天雷打不动：12:00 发 5 条 reply，22:00 发 10 条 reply（用 `03-reply-shadow.md`）。
+每天雷打不动：中午 12:00 发 5 条 reply，晚 21:00 发 10 条 reply（用 `03-reply-shadow.md`）+ 小红书晚高峰发布。
 
 ---
 
-## 爆款存档（>10K impression 的推文搬到这里提炼公式）
+## 爆款存档（>10K imp / 小红书 >1w 赞藏 搬到这里提炼公式）
 
 _(暂空)_
