@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-15T16:28:48.252695+00:00",
+  "generated_at": "2026-06-15T16:30:49.985658+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 657,
@@ -29,19 +29,21 @@
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -14.1538,
-    "deployed_usdt": 199.76
+    "deployed_usdt": 299.5
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "ENSUSDT",
-      "SYNUSDT"
+      "SYNUSDT",
+      "XLMUSDT",
+      "ENSUSDT"
     ],
     "exchange_symbols": [
-      "ENSUSDT",
-      "SYNUSDT"
+      "SYNUSDT",
+      "XLMUSDT",
+      "ENSUSDT"
     ]
   },
   "open_trades": [
@@ -106,10 +108,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.04777,
-      "current_price": 0.04771,
-      "unrealized_pnl_usdt": 3.1814,
-      "unrealized_pnl_pct": 3.182,
-      "last_price_check_at": "2026-06-15T16:28:43.480010+00:00",
+      "current_price": 0.04715,
+      "unrealized_pnl_usdt": 1.9707,
+      "unrealized_pnl_pct": 1.971,
+      "last_price_check_at": "2026-06-15T16:30:48.180291+00:00",
       "phase_a_mae_price": 0.04622,
       "phase_a_mae_pct": -0.04,
       "phase_a_mae_at": "2026-06-15T16:19:17.903427+00:00"
@@ -175,10 +177,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 5.757,
-      "current_price": 5.768,
-      "unrealized_pnl_usdt": 1.7248,
-      "unrealized_pnl_pct": 1.728,
-      "last_price_check_at": "2026-06-15T16:28:43.480010+00:00",
+      "current_price": 5.713,
+      "unrealized_pnl_usdt": 0.7568,
+      "unrealized_pnl_pct": 0.758,
+      "last_price_check_at": "2026-06-15T16:30:48.180291+00:00",
       "phase_a_mae_price": 5.667,
       "phase_a_mae_pct": -0.053,
       "phase_a_mae_at": "2026-06-15T16:26:47.652998+00:00",
@@ -211,7 +213,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 6,
       "wick_filter_mode": "always",
-      "sl_breach_count": 0,
+      "sl_breach_count": 2,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.0067,
       "regime_gate_enabled": true,
@@ -245,10 +247,13 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.23103,
-      "current_price": 0.23108,
-      "unrealized_pnl_usdt": 0.0864,
-      "unrealized_pnl_pct": 0.087,
-      "last_price_check_at": "2026-06-15T16:28:43.480010+00:00"
+      "current_price": 0.22755,
+      "unrealized_pnl_usdt": -1.4386,
+      "unrealized_pnl_pct": -1.442,
+      "last_price_check_at": "2026-06-15T16:30:48.180291+00:00",
+      "phase_a_mae_price": 0.22727,
+      "phase_a_mae_pct": -1.564,
+      "phase_a_mae_at": "2026-06-15T16:30:37.303582+00:00"
     }
   ],
   "recent_closed": [
@@ -51893,19 +51898,19 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-06-15T16:24:26.860900+00:00",
-      "reason": "funding adverse (0.0667% ≥ 0.05%) (Phase 4.M: paper 历史人均 -$0.85, 不利 mirror)",
-      "last_checked_at": "2026-06-15T16:28:43.480010+00:00"
+      "reason": "max_concurrent reached (3/3)",
+      "last_checked_at": "2026-06-15T16:30:48.180291+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 67121.0,
-    "btc_ma25_1h": 65516.24,
-    "pct_vs_ma25": 2.449,
-    "change_24h_pct": 5.018,
+    "btc_price": 67188.1,
+    "btc_ma25_1h": 65518.93,
+    "pct_vs_ma25": 2.548,
+    "change_24h_pct": 5.123,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-15T16:28:44.589986+00:00"
+    "computed_at": "2026-06-15T16:30:49.106713+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
