@@ -36,8 +36,12 @@
 
 ---
 
-## B · 补充案例源
+## B · 补充案例源（含"怪案例"专属）
 
+- Product Hunt 历史爆款 + "weird/fun" 标签（蠢生意金矿）
+- r/InternetIsBeautiful、r/somethingimade（奇葩网站/产品）
+- "[product] sold for $X" 类报道（Flippa/Acquire 成交新闻 → 暴起暴落/退出案例）
+- 媒体猎奇报道：TheHustle、Trung Phan(@TrungTPhan)、Morning Brew 的怪生意栏目
 - Starter Story Money（细分赚钱方式）
 - Failory（失败/复盘案例，反面教材也是好选题）
 - MicroConf / MicroAcquire 博客（小型收购、估值数据）
