@@ -1,46 +1,44 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-15T05:37:22.636538+00:00",
+  "generated_at": "2026-06-15T05:39:18.841724+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 625,
-    "open": 2,
-    "closed": 623,
-    "wins": 205,
+    "open": 1,
+    "closed": 624,
+    "wins": 206,
     "losses": 411,
-    "win_rate": 0.333,
-    "total_pnl_usdt": -43.7933,
-    "net_pnl_usdt": -128.406,
-    "avg_pnl_usdt": -0.0703,
+    "win_rate": 0.334,
+    "total_pnl_usdt": -43.5627,
+    "net_pnl_usdt": -128.2555,
+    "avg_pnl_usdt": -0.0698,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 84.6927,
-    "fees_realized_usdt": 84.6127,
-    "fees_open_usdt": 0.08,
+    "fees_paid_usdt": 84.7328,
+    "fees_realized_usdt": 84.6928,
+    "fees_open_usdt": 0.04,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 199.96,
-    "free_capital_usdt": 271.56,
+    "deployed_usdt": 99.99,
+    "free_capital_usdt": 371.72,
     "max_concurrent_slots": 3,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 0.4763,
-    "deployed_usdt": 199.96
+    "daily_pnl": 0.7069,
+    "deployed_usdt": 99.99
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "ZROUSDT",
       "IOUSDT"
     ],
     "exchange_symbols": [
-      "ZROUSDT",
       "IOUSDT"
     ]
   },
@@ -109,11 +107,13 @@
       "current_price": 0.188,
       "unrealized_pnl_usdt": 0.481,
       "unrealized_pnl_pct": 0.481,
-      "last_price_check_at": "2026-06-15T05:37:21.044999+00:00",
+      "last_price_check_at": "2026-06-15T05:39:17.204242+00:00",
       "phase_a_mae_price": 0.186,
       "phase_a_mae_pct": -0.588,
       "phase_a_mae_at": "2026-06-15T04:33:19.995381+00:00"
-    },
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "ZROUSDT|LONG|2026-06-15T05:09:27.869219+00:00",
       "trade_id": "L1781500167_ZROUSDT_L",
@@ -141,7 +141,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 6,
       "wick_filter_mode": "always",
-      "sl_breach_count": 1,
+      "sl_breach_count": 2,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.005,
       "regime_gate_enabled": true,
@@ -164,7 +164,7 @@
       "phase_a_mfe_pct": 0.854,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.04,
+      "fees_paid_usdt": 0.0801,
       "fees_are_actual": false,
       "opened_at": "2026-06-15T05:10:17.984193+00:00",
       "is_dry_run": false,
@@ -175,16 +175,29 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 1.0742,
-      "current_price": 1.0613,
-      "unrealized_pnl_usdt": -0.2068,
-      "unrealized_pnl_pct": -0.207,
-      "last_price_check_at": "2026-06-15T05:37:21.044999+00:00",
+      "current_price": 1.0635,
+      "unrealized_pnl_usdt": 0.0,
+      "unrealized_pnl_pct": 0.0,
+      "last_price_check_at": "2026-06-15T05:37:31.067741+00:00",
       "phase_a_mae_price": 1.06,
       "phase_a_mae_pct": -0.329,
-      "phase_a_mae_at": "2026-06-15T05:25:37.949333+00:00"
-    }
-  ],
-  "recent_closed": [
+      "phase_a_mae_at": "2026-06-15T05:25:37.949333+00:00",
+      "btc_regime_at_close": "up",
+      "btc_price_at_close": 65688.0,
+      "btc_pct_vs_ma25_at_close": 1.575,
+      "closed_at": "2026-06-15T05:37:44.312523+00:00",
+      "close_reason": "paper:hit_sl",
+      "avg_exit_price": 1.065953085106383,
+      "realized_pnl_usdt": 0.2306,
+      "close_order_id": 6672614667,
+      "close_qty": 94.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_expected_price": 1.0635,
+      "close_slippage_bps": -23.07,
+      "entry_fees_usdt": 0.04,
+      "close_fees_usdt": 0.0401
+    },
     {
       "paper_id": "NILUSDT|LONG|2026-06-15T04:15:53.494573+00:00",
       "trade_id": "L1781496953_NILUSDT_L",
@@ -49186,13 +49199,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 65700.0,
-    "btc_ma25_1h": 64670.05,
-    "pct_vs_ma25": 1.593,
-    "change_24h_pct": 2.149,
+    "btc_price": 65674.4,
+    "btc_ma25_1h": 64669.03,
+    "pct_vs_ma25": 1.555,
+    "change_24h_pct": 2.109,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-15T05:37:22.013437+00:00"
+    "computed_at": "2026-06-15T05:39:18.521515+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
