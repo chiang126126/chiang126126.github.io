@@ -6503,7 +6503,7 @@ class TestPhase6IDisasterStop(unittest.TestCase):
         mock_client.place_stop_market_order.return_value = {"orderId": 999}
         result = _place_disaster_stop(
             client=mock_client, symbol="BTCUSDT", direction="LONG",
-            trade_id="t1", entry_price=100.0, paper_sl_price=99.5,
+            trade_id="t1", entry_price=100.0, paper_sl_price=99.5, qty=1.0,
         )
         # 期望 disaster = 98.75 (round 到 tick 0.01 = 98.75)
         self.assertAlmostEqual(result, 98.75, places=2)
@@ -6513,7 +6513,9 @@ class TestPhase6IDisasterStop(unittest.TestCase):
         self.assertEqual(call_kwargs["symbol"], "BTCUSDT")
         self.assertEqual(call_kwargs["side"], "SELL")       # LONG → SELL stop
         self.assertAlmostEqual(call_kwargs["stop_price"], 98.75, places=2)
-        self.assertTrue(call_kwargs["close_position"])
+        # Phase 6.I-fix (2026-06-15): close_position=False + quantity 模式 避开 -4120
+        self.assertFalse(call_kwargs["close_position"])
+        self.assertEqual(call_kwargs["quantity"], 1.0)
         # Phase 6.I MED-2: 必须 MARK_PRICE 抗插针, 不用 CONTRACT_PRICE
         self.assertEqual(call_kwargs["working_type"], "MARK_PRICE")
         # price_protect=False — flash crash 时 last/mark spread 大,
@@ -6529,11 +6531,14 @@ class TestPhase6IDisasterStop(unittest.TestCase):
         mock_client.place_stop_market_order.return_value = {"orderId": 999}
         result = _place_disaster_stop(
             client=mock_client, symbol="BTCUSDT", direction="SHORT",
-            trade_id="t1", entry_price=100.0, paper_sl_price=100.5,
+            trade_id="t1", entry_price=100.0, paper_sl_price=100.5, qty=2.5,
         )
         self.assertAlmostEqual(result, 101.25, places=2)
         call_kwargs = mock_client.place_stop_market_order.call_args.kwargs
         self.assertEqual(call_kwargs["side"], "BUY")        # SHORT → BUY stop
+        # Phase 6.I-fix: quantity 传 qty (=2.5)
+        self.assertEqual(call_kwargs["quantity"], 2.5)
+        self.assertFalse(call_kwargs["close_position"])
 
     def test_6i_place_disabled_skips(self):
         """LIVE_DISASTER_STOP_ENABLED=False → 不调 API, 返 None."""
@@ -6542,7 +6547,7 @@ class TestPhase6IDisasterStop(unittest.TestCase):
         with patch.object(live_trader, "LIVE_DISASTER_STOP_ENABLED", False):
             result = _place_disaster_stop(
                 client=mock_client, symbol="BTCUSDT", direction="LONG",
-                trade_id="t1", entry_price=100.0, paper_sl_price=99.5,
+                trade_id="t1", entry_price=100.0, paper_sl_price=99.5, qty=1.0,
             )
         self.assertIsNone(result)
         mock_client.place_stop_market_order.assert_not_called()
@@ -6556,7 +6561,7 @@ class TestPhase6IDisasterStop(unittest.TestCase):
         mock_client.place_stop_market_order.side_effect = BinanceError("simulated API down")
         result = _place_disaster_stop(
             client=mock_client, symbol="BTCUSDT", direction="LONG",
-            trade_id="t1", entry_price=100.0, paper_sl_price=99.5,
+            trade_id="t1", entry_price=100.0, paper_sl_price=99.5, qty=1.0,
         )
         self.assertIsNone(result)   # fail-safe 返 None
 
@@ -6566,7 +6571,18 @@ class TestPhase6IDisasterStop(unittest.TestCase):
         mock_client = MagicMock()
         result = _place_disaster_stop(
             client=mock_client, symbol="BTCUSDT", direction="LONG",
-            trade_id="t1", entry_price=0.0, paper_sl_price=99.5,
+            trade_id="t1", entry_price=0.0, paper_sl_price=99.5, qty=1.0,
+        )
+        self.assertIsNone(result)
+        mock_client.place_stop_market_order.assert_not_called()
+
+    def test_6i_place_invalid_qty_skips(self):
+        """Phase 6.I-fix (2026-06-15): qty<=0 → 不挂单, 返 None (avoid Binance reject)."""
+        from live_trader import _place_disaster_stop
+        mock_client = MagicMock()
+        result = _place_disaster_stop(
+            client=mock_client, symbol="BTCUSDT", direction="LONG",
+            trade_id="t1", entry_price=100.0, paper_sl_price=99.5, qty=0.0,
         )
         self.assertIsNone(result)
         mock_client.place_stop_market_order.assert_not_called()
@@ -6579,7 +6595,7 @@ class TestPhase6IDisasterStop(unittest.TestCase):
         mock_client.get_symbol_filters.side_effect = BinanceError("simulated")
         result = _place_disaster_stop(
             client=mock_client, symbol="BTCUSDT", direction="LONG",
-            trade_id="t1", entry_price=100.0, paper_sl_price=99.5,
+            trade_id="t1", entry_price=100.0, paper_sl_price=99.5, qty=1.0,
         )
         self.assertIsNone(result)
         mock_client.place_stop_market_order.assert_not_called()
@@ -6593,7 +6609,7 @@ class TestPhase6IDisasterStop(unittest.TestCase):
         mock_client.place_stop_market_order.return_value = {"orderId": 999}
         result = _place_disaster_stop(
             client=mock_client, symbol="BTCUSDT", direction="LONG",
-            trade_id="t1", entry_price=100.0, paper_sl_price=99.5,
+            trade_id="t1", entry_price=100.0, paper_sl_price=99.5, qty=1.0,
         )
         self.assertAlmostEqual(result, 98.8, places=4)
 

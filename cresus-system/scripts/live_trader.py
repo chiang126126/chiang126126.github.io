@@ -2474,6 +2474,14 @@ def _try_mirror_close(
     # Phase 5.T: 传 sanity flags 到 trade record, 供 dashboard 显示警告
     closed["realized_pnl_suspect"] = bool(result.get("realized_pnl_suspect", False))
     closed["entry_price_source"] = result.get("entry_price_source", "binance_api")
+    # Phase 6.G G3-fix (2026-06-15): merge close LIMIT-IOC tracking fields 到 closed dict.
+    # 之前漏了 → retro 时 close_method/actual_close_slip_bps 全空, G3 效果不可观测.
+    # 现在持久化所有 G3 跟踪字段供 dashboard + retro 用.
+    closed["close_method"] = result.get("close_method")
+    closed["actual_close_slip_bps"] = result.get("actual_close_slip_bps")
+    closed["limit_qty_closed"] = result.get("limit_qty_closed")
+    closed["market_qty_closed"] = result.get("market_qty_closed")
+    closed["mid_at_close_attempt"] = result.get("mid_at_close_attempt")
 
     # 平仓 slippage (期望价 vs 实际成交).
     #   SL 触发: 期望 = sl_price (我们设的止损)
@@ -2540,27 +2548,26 @@ def _calc_disaster_stop_price(
 
 def _place_disaster_stop(
     client: BinanceClient, symbol: str, direction: str, trade_id: str,
-    entry_price: float, paper_sl_price: float,
+    entry_price: float, paper_sl_price: float, qty: float,
 ) -> Optional[float]:
     """Phase 6.I: 开仓成功后挂交易所侧灾难止损单. 失败仅 log warning 不阻塞 trade.
+
+    Phase 6.I-fix (2026-06-15): 改用 quantity + reduceOnly 模式 (close_position=False),
+    避开 Binance "Algo Order required" -4120 错误. 原 close_position=True 触发
+    Binance 把 STOP_MARKET 归类为 Algo Order 强制走另一 endpoint.
+    现 quantity-based 跟 Phase 4.D 正常 SL 同款机制 (已验证可用).
 
     Args:
         client: BinanceClient 实例
         symbol: 持仓 symbol
         direction: 'LONG' / 'SHORT' (持仓方向)
         trade_id: 用于构造 client_order_id 后缀 _DS
-        entry_price: live 实际成交价 (actual_fill, 非 paper_entry — 考虑滑点)
-        paper_sl_price: paper 端 SL 价格 (用于算 disaster_dist = paper_sl_dist × multiplier)
+        entry_price: live 实际成交价 (actual_fill)
+        paper_sl_price: paper 端 SL 价
+        qty: 持仓数量 (= open_position 返回的 qty, 灾难单关同等量)
 
     Returns:
-        disaster_price (浮点) 若挂成功 ✓
-        None 若:
-            - 总开关 OFF
-            - 输入异常 (entry/sl 无效, direction 不对)
-            - sanity check 失败 (disaster_dist < paper_sl_dist, 不该发生)
-            - tick_size 取不到 (符合精度风险, 跳过)
-            - API 调用失败 (BinanceError / ValueError)
-            - 意外异常 (log 后 swallow, 不阻塞 mirror_open)
+        disaster_price 若挂成功; None 若失败 (fail-safe, trade 继续).
     """
     if not LIVE_DISASTER_STOP_ENABLED:
         return None
@@ -2568,6 +2575,9 @@ def _place_disaster_stop(
         log.warning(
             f"[disaster-stop] {symbol}: entry={entry_price} sl={paper_sl_price} 无效, 跳过"
         )
+        return None
+    if qty <= 0:
+        log.warning(f"[disaster-stop] {symbol}: qty={qty} 无效 (≤0), 跳过")
         return None
     if direction.upper() not in ("LONG", "SHORT"):
         log.warning(f"[disaster-stop] {symbol}: invalid direction {direction!r}, 跳过")
@@ -2583,8 +2593,7 @@ def _place_disaster_stop(
         log.warning(f"[disaster-stop] {symbol}: 算价失败, 跳过")
         return None
 
-    # Sanity: disaster_dist 必须严格 ≥ paper_sl_dist (否则会先于 client-side SL 触发,
-    # 失去 "bot 死时兜底" 设计意图). 极少触发 (除非 multiplier < 1 误配).
+    # Sanity: disaster_dist 必须严格 ≥ paper_sl_dist
     paper_sl_dist = abs(entry_price - paper_sl_price)
     disaster_dist = abs(entry_price - disaster_price)
     if disaster_dist < paper_sl_dist:
@@ -2594,7 +2603,7 @@ def _place_disaster_stop(
         )
         return None
 
-    # Round to tick_size (满足 PRICE_FILTER)
+    # Round to tick_size
     try:
         from binance_client import round_price_to_tick
         filters = client.get_symbol_filters(symbol)
@@ -2607,32 +2616,28 @@ def _place_disaster_stop(
         )
         return None
 
-    # 平仓方向: LONG 持仓的灾难单是 SELL; SHORT 是 BUY
     stop_side = "SELL" if direction.upper() == "LONG" else "BUY"
     coid = f"cresus_{trade_id}_DS" if trade_id else None
 
     try:
-        # Phase 6.I paranoid review MED-2 (2026-06-12): 必须用 MARK_PRICE +
-        # price_protect=False 而非原先的 CONTRACT_PRICE + price_protect=True.
-        # 原因: 灾难单要在"bot 死 + 真 flash crash"场景触发 —
-        #   - CONTRACT_PRICE (last price) 在薄盘 / 闪崩时可能被单笔奇怪成交击穿,
-        #     但 MARK_PRICE 是 Binance 的指数综合价, 抗插针更稳
-        #   - price_protect=True 在 last/mark 价差大时会**拒绝触发** —
-        #     正是 flash crash 时最容易触发的条件, 我们就失去了防护
-        # 跟正常 SL (CONTRACT_PRICE + 6-breach polling 抗 wick) 不同设计哲学:
-        # 正常 SL 有客户端 wick filter 防误触发, 灾难单没有 → 必须用 MARK_PRICE 自带抗插针
+        # Phase 6.I-fix (2026-06-15): 改 close_position=True → quantity+reduceOnly 模式
+        # 避开 Binance -4120 "Order type not supported (use Algo Order API)".
+        # 跟 Phase 4.D 正常 SL 用同款 (close_position=False, quantity=X) 模式,
+        # 在 /fapi/v1/order endpoint 已验证可用. 保留 MARK_PRICE 抗插针 (paranoid review MED-2).
         client.place_stop_market_order(
             symbol=symbol,
             side=stop_side,
             stop_price=disaster_price,
-            close_position=True,            # 整仓平 (不需 qty, 跟着持仓走)
+            quantity=qty,                   # NEW: 跟持仓 qty 同等
+            close_position=False,           # CHANGED: 跟正常 SL 同款模式 (place_stop_market_order
+                                            #          内部当 close_position=False 时自动加 reduceOnly=true)
             client_order_id=coid,
-            working_type="MARK_PRICE",      # 抗插针 (vs CONTRACT_PRICE 易被单笔击穿)
-            price_protect=False,            # False — 允许触发, 不被 spread 拦
+            working_type="MARK_PRICE",      # 保留: 抗插针
+            price_protect=False,            # 保留: 不被 last/mark spread 拦
             dry_run=False,
         )
         log.info(
-            f"[disaster-stop] {symbol} {direction}: 挂成功 stop={disaster_price} "
+            f"[disaster-stop] {symbol} {direction} qty={qty}: 挂成功 stop={disaster_price} "
             f"(entry={entry_price} paper_sl={paper_sl_price} "
             f"distance={disaster_dist/entry_price*100:.2f}% "
             f"multi={LIVE_DISASTER_STOP_MULTIPLIER}×)"
@@ -2902,9 +2907,15 @@ def _try_mirror_open(
         # 此时仓位已稳定开仓且过了校验, 这里挂灾难单.
         # 失败不阻塞 — trade 继续 (失去保护但仍 valid). close_position 撤所有挂单
         # 时会自动清理灾难单 (binance_client line 1419-1431 已 verified).
+        # Phase 6.I-fix (2026-06-15): 传 qty 给 quantity-based STOP_MARKET (避 -4120 Algo).
+        try:
+            ds_qty = float(result.get("qty") or 0)
+        except (TypeError, ValueError):
+            ds_qty = 0.0
         disaster_stop_price = _place_disaster_stop(
             client=client, symbol=sym, direction=direction, trade_id=trade_id,
             entry_price=actual_fill, paper_sl_price=sl_price,
+            qty=ds_qty,
         )
         disaster_stop_at = (datetime.now(timezone.utc).isoformat()
                              if disaster_stop_price is not None else None)
