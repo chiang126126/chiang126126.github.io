@@ -1,0 +1,47 @@
+name: 每日选题 (Daily Signal)
+
+# 每天定时跑：抓海外信源 → Claude 筛选 → 提交当天选题到 x-growth/automation/output/
+on:
+  schedule:
+    # UTC 0:00 = 北京时间 8:00。改这个 cron 调整时间。
+    - cron: "0 0 * * *"
+  workflow_dispatch: {}  # 也允许手动点按钮触发
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-signal
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 安装依赖
+        run: pip install -r x-growth/automation/requirements.txt
+
+      - name: 生成当天选题
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # 想省钱可在仓库 Variables 里设 ANTHROPIC_MODEL=claude-sonnet-4-6
+          ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL }}
+        run: python x-growth/automation/daily_pipeline.py
+
+      - name: 提交结果
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain x-growth/automation/output)" ]; then
+            git add x-growth/automation/output
+            git commit -m "chore: 每日选题 $(date -u +%Y-%m-%d) [skip ci]"
+            git push
+          else
+            echo "没有新选题文件，跳过提交。"
+          fi

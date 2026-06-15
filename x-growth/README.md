@@ -54,8 +54,13 @@ x-growth/
 ├── templates/
 │   ├── content-log.md       ← 每日发布记录（X+小红书）
 │   └── weekly-review.md     ← 周报模板
-└── first-week/
-    └── day-01-07-threads.md ← 第一周 7 天内容 + 完整草稿
+├── first-week/
+│   └── day-01-07-threads.md ← 第一周 7 天内容 + 完整草稿
+├── ready-to-post/           ← 可直接发布的成品（自我介绍 + 蠢生意样例）
+└── automation/              ← 每日定时产出选题（GitHub Actions + Python）
+    ├── daily_pipeline.py
+    ├── feeds.txt
+    └── README.md            ← 自动化配置说明
 ```
 
 ## 量化北极星（双平台合计）

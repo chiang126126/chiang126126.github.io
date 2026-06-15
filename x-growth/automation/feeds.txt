@@ -1,0 +1,22 @@
+# 海外"离谱搞钱"信源（RSS）
+# 一行一个 feed URL，# 开头是注释。改这里即可增删信源。
+# 抓取脚本会取每个 feed 过去 LOOKBACK_HOURS 小时内的条目。
+
+# --- 案例金矿 ---
+https://www.starterstory.com/feed
+https://www.indiehackers.com/feed.xml
+
+# --- Reddit 高赞（24h Top）---
+https://www.reddit.com/r/Entrepreneur/top/.rss?t=day
+https://www.reddit.com/r/SideProject/top/.rss?t=day
+https://www.reddit.com/r/SaaS/top/.rss?t=day
+https://www.reddit.com/r/InternetIsBeautiful/top/.rss?t=day
+https://www.reddit.com/r/somethingimade/top/.rss?t=day
+
+# --- 怪案例 / 趣闻 ---
+https://www.producthunt.com/feed
+
+# --- 大V 推文（需要时用 RSSHub/Nitter 自建实例后替换下面占位）---
+# https://<你的rsshub实例>/twitter/user/levelsio
+# https://<你的rsshub实例>/twitter/user/marc_louvion
+# https://<你的rsshub实例>/twitter/user/thedankoe
