@@ -1,29 +1,29 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-15T18:07:23.757389+00:00",
+  "generated_at": "2026-06-15T18:09:30.982407+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 663,
-    "open": 2,
-    "closed": 661,
+    "open": 1,
+    "closed": 662,
     "wins": 215,
-    "losses": 438,
+    "losses": 439,
     "win_rate": 0.329,
-    "total_pnl_usdt": -53.4317,
-    "net_pnl_usdt": -141.0656,
-    "avg_pnl_usdt": -0.0808,
+    "total_pnl_usdt": -55.1818,
+    "net_pnl_usdt": -142.895,
+    "avg_pnl_usdt": -0.0834,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 87.7139,
-    "fees_realized_usdt": 87.6339,
-    "fees_open_usdt": 0.08,
+    "fees_paid_usdt": 87.7532,
+    "fees_realized_usdt": 87.7132,
+    "fees_open_usdt": 0.04,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 199.9,
-    "free_capital_usdt": 258.95,
+    "deployed_usdt": 99.91,
+    "free_capital_usdt": 357.16,
     "max_concurrent_slots": 3,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
@@ -36,12 +36,12 @@
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "FOLKSUSDT",
-      "HMSTRUSDT"
+      "HMSTRUSDT",
+      "FOLKSUSDT"
     ],
     "exchange_symbols": [
-      "FOLKSUSDT",
-      "HMSTRUSDT"
+      "HMSTRUSDT",
+      "FOLKSUSDT"
     ]
   },
   "open_trades": [
@@ -106,14 +106,16 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 1.912,
-      "current_price": 1.887,
-      "unrealized_pnl_usdt": 0.106,
-      "unrealized_pnl_pct": 0.106,
-      "last_price_check_at": "2026-06-15T18:07:22.206716+00:00",
+      "current_price": 1.888,
+      "unrealized_pnl_usdt": 0.159,
+      "unrealized_pnl_pct": 0.159,
+      "last_price_check_at": "2026-06-15T18:09:26.554820+00:00",
       "phase_a_mae_price": 1.867,
       "phase_a_mae_pct": -0.955,
       "phase_a_mae_at": "2026-06-15T17:40:52.345403+00:00"
-    },
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "HMSTRUSDT|LONG|2026-06-15T17:58:47.153622+00:00",
       "trade_id": "L1781546327_HMSTRUS_L",
@@ -141,7 +143,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 6,
       "wick_filter_mode": "always",
-      "sl_breach_count": 0,
+      "sl_breach_count": 6,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": -0.038,
       "regime_gate_enabled": true,
@@ -164,7 +166,7 @@
       "phase_a_mfe_pct": 0.241,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.04,
+      "fees_paid_usdt": 0.0793,
       "fees_are_actual": false,
       "opened_at": "2026-06-15T17:59:25.233196+00:00",
       "is_dry_run": false,
@@ -175,16 +177,34 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.0001667,
-      "current_price": 0.0001665,
-      "unrealized_pnl_usdt": 0.4828,
-      "unrealized_pnl_pct": 0.483,
-      "last_price_check_at": "2026-06-15T18:07:22.206716+00:00",
-      "phase_a_mae_price": 0.000165,
-      "phase_a_mae_pct": -0.422,
-      "phase_a_mae_at": "2026-06-15T18:00:56.640700+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.0001627,
+      "unrealized_pnl_usdt": -1.8105,
+      "unrealized_pnl_pct": -1.811,
+      "last_price_check_at": "2026-06-15T18:09:26.554820+00:00",
+      "phase_a_mae_price": 0.0001627,
+      "phase_a_mae_pct": -1.811,
+      "phase_a_mae_at": "2026-06-15T18:09:26.554820+00:00",
+      "btc_regime_at_close": "up",
+      "btc_price_at_close": 66884.8,
+      "btc_pct_vs_ma25_at_close": 1.711,
+      "closed_at": "2026-06-15T18:09:30.945810+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.0001628,
+      "realized_pnl_usdt": -1.7501,
+      "close_order_id": 1922431236,
+      "close_qty": 603500.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_method": "limit_ioc_full",
+      "actual_close_slip_bps": 3.07,
+      "limit_qty_closed": 603500.0,
+      "market_qty_closed": 0.0,
+      "mid_at_close_attempt": 0.00016285,
+      "close_expected_price": 0.00016438,
+      "close_slippage_bps": 96.12,
+      "entry_fees_usdt": 0.04,
+      "close_fees_usdt": 0.0393
+    },
     {
       "paper_id": "SPCXUSDT|LONG|2026-06-15T17:49:18.627402+00:00",
       "trade_id": "L1781545758_SPCXUSD_L",
@@ -52452,13 +52472,13 @@
   "missed_signals": [],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 66816.5,
-    "btc_ma25_1h": 65756.99,
-    "pct_vs_ma25": 1.611,
-    "change_24h_pct": 4.754,
+    "btc_price": 66884.8,
+    "btc_ma25_1h": 65759.72,
+    "pct_vs_ma25": 1.711,
+    "change_24h_pct": 4.862,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-15T18:07:23.142730+00:00"
+    "computed_at": "2026-06-15T18:09:27.851820+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
