@@ -43,6 +43,7 @@ from __future__ import annotations
 
 import json
 import logging
+import math       # Phase 6.I-fix (2026-06-15): NaN guard for qty
 import os         # Phase 6.A: CRESUS_MODE env var 切换 mainnet pilot
 import time
 import hashlib    # Phase 4.D: A/B 分组用 MD5 (确定性, 跨进程一致)
@@ -2454,6 +2455,13 @@ def _try_mirror_close(
             closed["realized_pnl_usdt"] = 0.0   # 无法精确知道, 外部 close 时 PnL 在 binance 手动结算
             closed["close_qty"] = 0.0
             closed["avg_exit_price"] = 0.0
+            # Phase 6.G G3-fix (2026-06-15): early-return 也要把 G3 跟踪字段填 None,
+            # 保证 schema 一致 (避免 retro/dashboard 用 trade["close_method"] 时 KeyError).
+            closed["close_method"] = None
+            closed["actual_close_slip_bps"] = None
+            closed["limit_qty_closed"] = None
+            closed["market_qty_closed"] = None
+            closed["mid_at_close_attempt"] = None
             return closed
         log.error(f"[mirror-close FAILED] {sym}: {type(e).__name__}: {e}")
         return None
@@ -2576,8 +2584,10 @@ def _place_disaster_stop(
             f"[disaster-stop] {symbol}: entry={entry_price} sl={paper_sl_price} 无效, 跳过"
         )
         return None
-    if qty <= 0:
-        log.warning(f"[disaster-stop] {symbol}: qty={qty} 无效 (≤0), 跳过")
+    # Phase 6.I-fix (2026-06-15): NaN 也要拒 (NaN<=0 是 False, 会绕过 guard 进到 API call,
+    # _format_quantity 会输出 "nan" 字串被 Binance 拒, 还是同样失去保护).
+    if qty <= 0 or not math.isfinite(qty):
+        log.warning(f"[disaster-stop] {symbol}: qty={qty} 无效 (≤0 或 NaN/Inf), 跳过")
         return None
     if direction.upper() not in ("LONG", "SHORT"):
         log.warning(f"[disaster-stop] {symbol}: invalid direction {direction!r}, 跳过")

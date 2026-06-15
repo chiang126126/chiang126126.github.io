@@ -5692,6 +5692,26 @@ class TestPhase5AExternalCloseRecovery(unittest.TestCase):
         self.assertEqual(result["paper_id"], self.live_trade["paper_id"])
         self.assertEqual(result["symbol"], "DYMUSDT")
 
+    def test_synthetic_has_g3_fields_for_schema_consistency(self):
+        """Phase 6.G G3-fix (2026-06-15) paranoid review H1: 即使 early-return,
+        synthetic closed dict 也要带 G3 字段 (= None), 避免 retro/dashboard
+        用 trade["close_method"] 时 KeyError."""
+        from binance_client import BinanceError
+        self.client.close_position = MagicMock(
+            side_effect=BinanceError("当前无持仓 (positionAmt=0)")
+        )
+        result = live_trader._try_mirror_close(
+            self.client, self.live_trade, reason="test", dry_run=False,
+        )
+        # 5 个 G3 跟踪字段都要在, 取值 None (说明没走过 LIMIT-IOC path)
+        self.assertIn("close_method", result)
+        self.assertIsNone(result["close_method"])
+        self.assertIn("actual_close_slip_bps", result)
+        self.assertIsNone(result["actual_close_slip_bps"])
+        self.assertIn("limit_qty_closed", result)
+        self.assertIn("market_qty_closed", result)
+        self.assertIn("mid_at_close_attempt", result)
+
 
 class TestPhase6DAutoHealLiveOnly(unittest.TestCase):
     """Phase 6.D (2026-06-04): 用户后台手动一键平仓 → live state 自动清理.
@@ -6583,6 +6603,19 @@ class TestPhase6IDisasterStop(unittest.TestCase):
         result = _place_disaster_stop(
             client=mock_client, symbol="BTCUSDT", direction="LONG",
             trade_id="t1", entry_price=100.0, paper_sl_price=99.5, qty=0.0,
+        )
+        self.assertIsNone(result)
+        mock_client.place_stop_market_order.assert_not_called()
+
+    def test_6i_place_nan_qty_skips(self):
+        """Phase 6.I-fix (2026-06-15) paranoid review M2: qty=NaN → 不挂单
+        (NaN<=0 是 False, 必须显式 math.isfinite 拦)."""
+        from live_trader import _place_disaster_stop
+        mock_client = MagicMock()
+        result = _place_disaster_stop(
+            client=mock_client, symbol="BTCUSDT", direction="LONG",
+            trade_id="t1", entry_price=100.0, paper_sl_price=99.5,
+            qty=float("nan"),
         )
         self.assertIsNone(result)
         mock_client.place_stop_market_order.assert_not_called()
