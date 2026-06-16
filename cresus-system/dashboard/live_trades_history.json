@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-16T15:16:56.663731+00:00",
+  "generated_at": "2026-06-16T15:19:08.689620+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 683,
-    "open": 0,
+    "total_trades": 684,
+    "open": 1,
     "closed": 683,
     "wins": 222,
     "losses": 453,
@@ -15,30 +15,104 @@
     "avg_pnl_usdt": -0.0819,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 89.2876,
+    "fees_paid_usdt": 89.3276,
     "fees_realized_usdt": 89.2876,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.04,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 454.8,
+    "deployed_usdt": 99.98,
+    "free_capital_usdt": 354.78,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -1.6559,
-    "deployed_usdt": 0
+    "deployed_usdt": 99.98
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "HANAUSDT"
+    ],
+    "exchange_symbols": [
+      "HANAUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "HANAUSDT|SHORT|2026-06-16T15:18:10.279197+00:00",
+      "trade_id": "L1781623090_HANAUSD_S",
+      "symbol": "HANAUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.0407,
+      "avg_fill_price": 0.04076,
+      "slippage_bps": -14.74,
+      "qty": 2453.0,
+      "notional_usdt": 99.98428,
+      "leverage": 1,
+      "risk_usdt": 0.3075,
+      "risk_pct": 0.308,
+      "mirror_latency_sec": 13.4,
+      "sl_price": 0.04094536,
+      "sl_paper_current": 0.04088536,
+      "disaster_stop_price": null,
+      "disaster_stop_at": null,
+      "_phase_6f_b1_partial_unblock": false,
+      "_phase_6f_b2_partial_unblock": false,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 6e-05,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.0341,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "C",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.04042196,
+      "tp2_price": 0.04014393,
+      "phase": "A",
+      "entry_order_id": 588512200,
+      "entry_client_id": "cresus_L1781623090_HANAUSD_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "burst",
+      "atr_pct": 0.304,
+      "top_trader_position_ratio": 1.12,
+      "top_trader_account_ratio": 1.3793,
+      "global_account_ratio": 1.325,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.04,
+      "fees_are_actual": false,
+      "opened_at": "2026-06-16T15:18:54.848144+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 65840.0,
+      "btc_change_24h_at_open": -2.094,
+      "btc_pct_vs_ma25_at_open": -0.776,
+      "btc_sub_regime_at_open": "down_stable",
+      "btc_change_3h_at_open": -0.829,
+      "phase_a_mfe_price": 0.0407,
+      "current_price": 0.04076,
+      "unrealized_pnl_usdt": -0.0,
+      "unrealized_pnl_pct": -0.0,
+      "last_price_check_at": "2026-06-16T15:19:05.066921+00:00",
+      "phase_a_mae_price": 0.04077,
+      "phase_a_mae_pct": -0.025,
+      "phase_a_mae_at": "2026-06-16T15:18:51.846612+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "QUSDT|SHORT|2026-06-16T15:00:58.455325+00:00",
@@ -54278,33 +54352,33 @@
   ],
   "missed_signals": [
     {
-      "paper_id": "ESPORTSUSDT|SHORT|2026-06-16T14:21:33.326081+00:00",
-      "symbol": "ESPORTSUSDT",
-      "direction": "SHORT",
-      "conviction_score": 6,
-      "signal_at": "2026-06-16T14:22:20.105800+00:00",
-      "reason": "paper trade too old (3275s > 600s)",
-      "last_checked_at": "2026-06-16T15:16:55.335056+00:00"
-    },
-    {
       "paper_id": "MYXUSDT|LONG|2026-06-16T14:30:33.041669+00:00",
       "symbol": "MYXUSDT",
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-16T14:31:01.153748+00:00",
-      "reason": "paper trade too old (2754s > 600s)",
-      "last_checked_at": "2026-06-16T15:16:55.335056+00:00"
+      "reason": "paper trade too old (2884s > 600s)",
+      "last_checked_at": "2026-06-16T15:19:05.066921+00:00"
+    },
+    {
+      "paper_id": "RUNEUSDT|SHORT|2026-06-16T15:18:37.522744+00:00",
+      "symbol": "RUNEUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-06-16T15:18:41.488809+00:00",
+      "reason": "open_failed (retry next tick)",
+      "last_checked_at": "2026-06-16T15:19:05.066921+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 65832.3,
-    "btc_ma25_1h": 66354.92,
-    "pct_vs_ma25": -0.788,
-    "change_24h_pct": -2.106,
+    "btc_price": 65825.3,
+    "btc_ma25_1h": 66354.64,
+    "pct_vs_ma25": -0.798,
+    "change_24h_pct": -2.116,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.841,
-    "computed_at": "2026-06-16T15:16:56.626558+00:00"
+    "change_3h_pct": -0.851,
+    "computed_at": "2026-06-16T15:19:06.357018+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
