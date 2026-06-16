@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.cresus.sync-health</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/hong/cresus-bot/scripts/sync_health_watchdog.sh</string>
+  </array>
+  <!-- 每 10min 检测一次 — 4h alarm 阈值 → 最坏 4h10m 浮出问题 (vs incident 那次 16h) -->
+  <key>StartInterval</key>
+  <integer>600</integer>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/Users/hong/cresus-bot/logs/sync_health.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/hong/cresus-bot/logs/sync_health.err</string>
+</dict>
+</plist>
