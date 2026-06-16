@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  macOS launchd plist · 每天早 8:00 跑选题（比 cron 更可靠，关机重启后补跑）
+
+  使用步骤（一次性）：
+  1. 把这个文件里的 /ABSOLUTE/PATH/TO 替换成你本机实际路径
+     比如：/Users/你的用户名/chiang126126.github.io/x-growth/automation
+
+  2. 复制到 LaunchAgents：
+     cp com.xgrowth.daily.plist ~/Library/LaunchAgents/
+
+  3. 加载并启动：
+     launchctl load ~/Library/LaunchAgents/com.xgrowth.daily.plist
+
+  4. 验证：
+     launchctl list | grep xgrowth
+     # 看到条目 = 已注册
+
+  5. 手动立即跑一次测试：
+     launchctl start com.xgrowth.daily
+
+  卸载：
+     launchctl unload ~/Library/LaunchAgents/com.xgrowth.daily.plist
+     rm ~/Library/LaunchAgents/com.xgrowth.daily.plist
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.xgrowth.daily</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/ABSOLUTE/PATH/TO/x-growth/automation/run_daily.sh</string>
+    </array>
+
+    <!-- 每天 08:00 本地时间触发 -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>8</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <!-- 如果关机错过了，开机后补跑 -->
+    <key>RunAtLoad</key>
+    <false/>
+
+    <key>StandardOutPath</key>
+    <string>/ABSOLUTE/PATH/TO/x-growth/automation/output/launchd.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/ABSOLUTE/PATH/TO/x-growth/automation/output/launchd.log</string>
+
+    <!-- 失败后不立即重试（避免 API 循环调用） -->
+    <key>ThrottleInterval</key>
+    <integer>3600</integer>
+</dict>
+</plist>
