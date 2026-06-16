@@ -1,47 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-16T11:59:37.417214+00:00",
+  "generated_at": "2026-06-16T12:01:52.331511+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 673,
-    "open": 2,
-    "closed": 671,
-    "wins": 216,
+    "open": 1,
+    "closed": 672,
+    "wins": 217,
     "losses": 447,
-    "win_rate": 0.326,
-    "total_pnl_usdt": -59.8601,
-    "net_pnl_usdt": -148.2752,
-    "avg_pnl_usdt": -0.0892,
+    "win_rate": 0.327,
+    "total_pnl_usdt": -59.5174,
+    "net_pnl_usdt": -147.9806,
+    "avg_pnl_usdt": -0.0886,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 88.4791,
-    "fees_realized_usdt": 88.4151,
-    "fees_open_usdt": 0.064,
+    "fees_paid_usdt": 88.5032,
+    "fees_realized_usdt": 88.4632,
+    "fees_open_usdt": 0.04,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 159.96,
-    "free_capital_usdt": 291.7,
+    "deployed_usdt": 99.98,
+    "free_capital_usdt": 352.0,
     "max_concurrent_slots": 3,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -5.6055,
-    "deployed_usdt": 159.96
+    "daily_pnl": -5.2628,
+    "deployed_usdt": 99.98
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "ROSEUSDT",
-      "IDUSDT"
+      "ROSEUSDT"
     ],
     "exchange_symbols": [
-      "ROSEUSDT",
-      "IDUSDT"
+      "ROSEUSDT"
     ]
   },
   "open_trades": [
@@ -94,7 +92,7 @@
       "global_account_ratio": 1.633,
       "phase_a_mfe_pct": 1.143,
       "phase_b_mfe_pct": 1.574,
-      "phase_c_mfe_pct": 1.825,
+      "phase_c_mfe_pct": 2.647,
       "fees_paid_usdt": 0.04,
       "fees_are_actual": false,
       "opened_at": "2026-06-16T11:28:50.553452+00:00",
@@ -106,13 +104,15 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.007259,
-      "current_price": 0.007363,
-      "unrealized_pnl_usdt": 2.3203,
-      "unrealized_pnl_pct": 2.321,
-      "last_price_check_at": "2026-06-16T11:59:35.546327+00:00",
+      "current_price": 0.007302,
+      "unrealized_pnl_usdt": 1.4728,
+      "unrealized_pnl_pct": 1.473,
+      "last_price_check_at": "2026-06-16T12:01:50.823964+00:00",
       "phase_b_mfe_price": 0.00729,
-      "phase_c_mfe_price": 0.007308
-    },
+      "phase_c_mfe_price": 0.007367
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "IDUSDT|LONG|2026-06-16T11:44:30.795953+00:00",
       "trade_id": "L1781610270_IDUSDT_L",
@@ -140,7 +140,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 7,
       "wick_filter_mode": "always",
-      "sl_breach_count": 0,
+      "sl_breach_count": 7,
       "funding_signal": "favorable",
       "funding_rate_pct_at_open": -0.093,
       "regime_gate_enabled": true,
@@ -163,7 +163,7 @@
       "phase_a_mfe_pct": 1.29,
       "phase_b_mfe_pct": 1.362,
       "phase_c_mfe_pct": 1.362,
-      "fees_paid_usdt": 0.024,
+      "fees_paid_usdt": 0.0481,
       "fees_are_actual": false,
       "opened_at": "2026-06-16T11:44:51.789260+00:00",
       "is_dry_run": false,
@@ -174,18 +174,36 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.02827,
-      "current_price": 0.02823,
-      "unrealized_pnl_usdt": 0.4927,
-      "unrealized_pnl_pct": 0.821,
-      "last_price_check_at": "2026-06-16T11:59:35.546327+00:00",
+      "current_price": 0.02816,
+      "unrealized_pnl_usdt": 0.3427,
+      "unrealized_pnl_pct": 0.571,
+      "last_price_check_at": "2026-06-16T12:01:30.031760+00:00",
       "phase_a_mae_price": 0.02792,
       "phase_a_mae_pct": -0.286,
       "phase_a_mae_at": "2026-06-16T11:47:03.379027+00:00",
       "phase_b_mfe_price": 0.02829,
-      "phase_c_mfe_price": 0.02829
-    }
-  ],
-  "recent_closed": [
+      "phase_c_mfe_price": 0.02829,
+      "btc_regime_at_close": "chop",
+      "btc_price_at_close": 66440.9,
+      "btc_pct_vs_ma25_at_close": 0.005,
+      "closed_at": "2026-06-16T12:01:33.590461+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.02816,
+      "realized_pnl_usdt": 0.3427,
+      "close_order_id": 5769349340,
+      "close_qty": 2142.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_method": "limit_ioc_full",
+      "actual_close_slip_bps": 1.78,
+      "limit_qty_closed": 2142.0,
+      "market_qty_closed": 0.0,
+      "mid_at_close_attempt": 0.028165000000000003,
+      "close_expected_price": 0.0282280827,
+      "close_slippage_bps": 24.12,
+      "entry_fees_usdt": 0.024,
+      "close_fees_usdt": 0.0241
+    },
     {
       "paper_id": "SPACEUSDT|LONG|2026-06-16T00:22:21.896213+00:00",
       "trade_id": "L1781569341_SPACEUS_L",
@@ -53348,8 +53366,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-16T11:31:43.819402+00:00",
-      "reason": "paper trade too old (1672s > 600s)",
-      "last_checked_at": "2026-06-16T11:59:35.546327+00:00"
+      "reason": "paper trade too old (1807s > 600s)",
+      "last_checked_at": "2026-06-16T12:01:50.823964+00:00"
     },
     {
       "paper_id": "AEROUSDT|LONG|2026-06-16T11:54:53.679566+00:00",
@@ -53358,18 +53376,18 @@
       "conviction_score": 5,
       "signal_at": "2026-06-16T11:55:31.668035+00:00",
       "reason": "phase_6f_b3: Tier C (entry=$0.4691) + LONG + BTC chop 历史 n=22 WR 18% live -$18 vs paper +$45 (100% 执行 gap)",
-      "last_checked_at": "2026-06-16T11:59:35.546327+00:00"
+      "last_checked_at": "2026-06-16T12:01:50.823964+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 66427.8,
-    "btc_ma25_1h": 66426.51,
-    "pct_vs_ma25": 0.002,
-    "change_24h_pct": 0.356,
+    "btc_price": 66420.9,
+    "btc_ma25_1h": 66436.79,
+    "pct_vs_ma25": -0.024,
+    "change_24h_pct": -0.162,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-16T11:59:36.806130+00:00"
+    "computed_at": "2026-06-16T12:01:51.981392+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
