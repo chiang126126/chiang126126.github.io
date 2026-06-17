@@ -1,48 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-17T15:43:32.339027+00:00",
+  "generated_at": "2026-06-17T15:45:38.537326+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 717,
-    "open": 1,
-    "closed": 716,
+    "open": 0,
+    "closed": 717,
     "wins": 232,
-    "losses": 475,
+    "losses": 476,
     "win_rate": 0.328,
-    "total_pnl_usdt": -66.4777,
-    "net_pnl_usdt": -158.354,
-    "avg_pnl_usdt": -0.0928,
+    "total_pnl_usdt": -67.8089,
+    "net_pnl_usdt": -159.7656,
+    "avg_pnl_usdt": -0.0946,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 91.9162,
-    "fees_realized_usdt": 91.8763,
-    "fees_open_usdt": 0.0399,
+    "fees_paid_usdt": 91.9567,
+    "fees_realized_usdt": 91.9567,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 99.86,
-    "free_capital_usdt": 341.74,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 440.23,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -16.435,
-    "deployed_usdt": 99.86
+    "daily_pnl": -17.7662,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "RAVEUSDT"
-    ],
-    "exchange_symbols": [
-      "RAVEUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "RAVEUSDT|SHORT|2026-06-17T14:06:08.916497+00:00",
       "trade_id": "L1781705168_RAVEUSD_S",
@@ -93,7 +90,7 @@
       "phase_a_mfe_pct": 0.356,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.0399,
+      "fees_paid_usdt": 0.0804,
       "fees_are_actual": false,
       "opened_at": "2026-06-17T14:07:38.824480+00:00",
       "is_dry_run": false,
@@ -110,10 +107,28 @@
       "last_price_check_at": "2026-06-17T15:43:31.069685+00:00",
       "phase_a_mae_price": 0.2868,
       "phase_a_mae_pct": -1.379,
-      "phase_a_mae_at": "2026-06-17T15:42:47.704023+00:00"
-    }
-  ],
-  "recent_closed": [
+      "phase_a_mae_at": "2026-06-17T15:42:47.704023+00:00",
+      "btc_regime_at_close": "chop",
+      "btc_price_at_close": 65455.6,
+      "btc_pct_vs_ma25_at_close": -0.101,
+      "closed_at": "2026-06-17T15:43:45.635599+00:00",
+      "close_reason": "paper:hit_sl",
+      "avg_exit_price": 0.28667110481586405,
+      "realized_pnl_usdt": -1.3312,
+      "close_order_id": 3874918594,
+      "close_qty": 353.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_method": "limit_ioc_full",
+      "actual_close_slip_bps": 7.72,
+      "limit_qty_closed": 353.0,
+      "market_qty_closed": 0.0,
+      "mid_at_close_attempt": 0.28645,
+      "close_expected_price": 0.2866,
+      "close_slippage_bps": 2.48,
+      "entry_fees_usdt": 0.0399,
+      "close_fees_usdt": 0.0405
+    },
     {
       "paper_id": "FOLKSUSDT|LONG|2026-06-17T15:32:31.121951+00:00",
       "trade_id": "L1781710351_FOLKSUS_L",
@@ -57250,19 +57265,28 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-17T15:02:13.789710+00:00",
-      "reason": "paper trade too old (2477s > 600s)",
-      "last_checked_at": "2026-06-17T15:43:31.069685+00:00"
+      "reason": "paper trade too old (2604s > 600s)",
+      "last_checked_at": "2026-06-17T15:45:37.529369+00:00"
+    },
+    {
+      "paper_id": "AEROUSDT|LONG|2026-06-17T15:42:51.067351+00:00",
+      "symbol": "AEROUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-17T15:43:37.675824+00:00",
+      "reason": "phase_6f_b3: Tier C (entry=$0.5200) + LONG + BTC chop 历史 n=22 WR 18% live -$18 vs paper +$45 (100% 执行 gap)",
+      "last_checked_at": "2026-06-17T15:45:37.529369+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 65462.6,
-    "btc_ma25_1h": 65522.06,
-    "pct_vs_ma25": -0.091,
-    "change_24h_pct": -0.576,
+    "btc_price": 65449.3,
+    "btc_ma25_1h": 65521.52,
+    "pct_vs_ma25": -0.11,
+    "change_24h_pct": -0.596,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-17T15:43:32.010651+00:00"
+    "computed_at": "2026-06-17T15:45:38.478797+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
