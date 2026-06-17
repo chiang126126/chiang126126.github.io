@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-17T00:51:06.127934+00:00",
+  "generated_at": "2026-06-17T00:53:11.684170+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 696,
@@ -94,7 +94,7 @@
       "global_account_ratio": 1.6185,
       "phase_a_mfe_pct": 1.105,
       "phase_b_mfe_pct": 2.423,
-      "phase_c_mfe_pct": 3.605,
+      "phase_c_mfe_pct": 3.799,
       "fees_paid_usdt": 0.04,
       "fees_are_actual": false,
       "opened_at": "2026-06-17T00:09:07.675879+00:00",
@@ -106,15 +106,15 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.05216,
-      "current_price": 0.05338,
-      "unrealized_pnl_usdt": 3.3493,
-      "unrealized_pnl_pct": 3.349,
-      "last_price_check_at": "2026-06-17T00:51:03.969112+00:00",
+      "current_price": 0.05364,
+      "unrealized_pnl_usdt": 3.8526,
+      "unrealized_pnl_pct": 3.853,
+      "last_price_check_at": "2026-06-17T00:53:09.950472+00:00",
       "phase_a_mae_price": 0.05152,
       "phase_a_mae_pct": -0.252,
       "phase_a_mae_at": "2026-06-17T00:09:25.501884+00:00",
       "phase_b_mfe_price": 0.05284,
-      "phase_c_mfe_price": 0.05345
+      "phase_c_mfe_price": 0.05355
     },
     {
       "paper_id": "UNIUSDT|LONG|2026-06-17T00:37:33.665661+00:00",
@@ -163,7 +163,7 @@
       "top_trader_position_ratio": 2.4039,
       "top_trader_account_ratio": 1.7108,
       "global_account_ratio": 1.5491,
-      "phase_a_mfe_pct": 0.117,
+      "phase_a_mfe_pct": 0.41,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.0395,
@@ -176,11 +176,11 @@
       "btc_pct_vs_ma25_at_open": -0.38,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 3.417,
-      "current_price": 3.424,
-      "unrealized_pnl_usdt": 0.493,
-      "unrealized_pnl_pct": 0.499,
-      "last_price_check_at": "2026-06-17T00:51:03.969112+00:00",
+      "phase_a_mfe_price": 3.427,
+      "current_price": 3.4,
+      "unrealized_pnl_usdt": -0.203,
+      "unrealized_pnl_pct": -0.205,
+      "last_price_check_at": "2026-06-17T00:53:09.950472+00:00",
       "phase_a_mae_price": 3.375,
       "phase_a_mae_pct": -0.939,
       "phase_a_mae_at": "2026-06-17T00:39:59.149407+00:00"
@@ -55421,19 +55421,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-17T00:47:08.664455+00:00",
-      "reason": "phase_6f_b3: Tier C (entry=$0.7134) + LONG + BTC chop 历史 n=22 WR 18% live -$18 vs paper +$45 (100% 执行 gap)",
-      "last_checked_at": "2026-06-17T00:51:03.969112+00:00"
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.06% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-17T00:53:09.950472+00:00"
     }
   ],
   "btc_regime_now": {
-    "regime": "chop",
-    "btc_price": 65758.5,
-    "btc_ma25_1h": 66038.78,
-    "pct_vs_ma25": -0.424,
-    "change_24h_pct": -0.692,
-    "sub_regime": null,
-    "change_3h_pct": null,
-    "computed_at": "2026-06-17T00:51:05.498758+00:00"
+    "regime": "down",
+    "btc_price": 65699.9,
+    "btc_ma25_1h": 66036.43,
+    "pct_vs_ma25": -0.51,
+    "change_24h_pct": -0.781,
+    "sub_regime": "down_stable",
+    "change_3h_pct": -0.063,
+    "computed_at": "2026-06-17T00:53:11.074216+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
