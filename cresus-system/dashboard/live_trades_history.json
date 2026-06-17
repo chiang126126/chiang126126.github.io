@@ -1,46 +1,44 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-17T15:06:32.224827+00:00",
+  "generated_at": "2026-06-17T15:08:29.825990+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 714,
-    "open": 2,
-    "closed": 712,
+    "open": 1,
+    "closed": 713,
     "wins": 232,
-    "losses": 471,
+    "losses": 472,
     "win_rate": 0.33,
-    "total_pnl_usdt": -62.4779,
-    "net_pnl_usdt": -154.035,
-    "avg_pnl_usdt": -0.0877,
+    "total_pnl_usdt": -63.7201,
+    "net_pnl_usdt": -155.3577,
+    "avg_pnl_usdt": -0.0894,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 91.637,
-    "fees_realized_usdt": 91.5571,
-    "fees_open_usdt": 0.0799,
+    "fees_paid_usdt": 91.6775,
+    "fees_realized_usdt": 91.6376,
+    "fees_open_usdt": 0.0399,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 199.86,
-    "free_capital_usdt": 246.02,
+    "deployed_usdt": 99.86,
+    "free_capital_usdt": 344.74,
     "max_concurrent_slots": 3,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -12.4352,
-    "deployed_usdt": 199.86
+    "daily_pnl": -13.6774,
+    "deployed_usdt": 99.86
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "PIPPINUSDT",
       "RAVEUSDT"
     ],
     "exchange_symbols": [
-      "PIPPINUSDT",
       "RAVEUSDT"
     ]
   },
@@ -106,14 +104,16 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.2801,
-      "current_price": 0.2831,
-      "unrealized_pnl_usdt": -0.0706,
-      "unrealized_pnl_pct": -0.071,
-      "last_price_check_at": "2026-06-17T15:06:30.654718+00:00",
+      "current_price": 0.2821,
+      "unrealized_pnl_usdt": 0.2824,
+      "unrealized_pnl_pct": 0.283,
+      "last_price_check_at": "2026-06-17T15:08:28.369959+00:00",
       "phase_a_mae_price": 0.2846,
       "phase_a_mae_pct": -0.601,
       "phase_a_mae_at": "2026-06-17T14:46:55.879151+00:00"
-    },
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "PIPPINUSDT|SHORT|2026-06-17T14:51:07.338369+00:00",
       "trade_id": "L1781707867_PIPPINU_S",
@@ -164,7 +164,7 @@
       "phase_a_mfe_pct": 0.114,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.04,
+      "fees_paid_usdt": 0.0805,
       "fees_are_actual": false,
       "opened_at": "2026-06-17T14:55:27.837268+00:00",
       "is_dry_run": false,
@@ -181,10 +181,29 @@
       "last_price_check_at": "2026-06-17T15:06:30.654718+00:00",
       "phase_a_mae_price": 0.01775,
       "phase_a_mae_pct": -1.14,
-      "phase_a_mae_at": "2026-06-17T15:04:27.716354+00:00"
-    }
-  ],
-  "recent_closed": [
+      "phase_a_mae_at": "2026-06-17T15:04:27.716354+00:00",
+      "btc_regime_at_close": "down",
+      "btc_sub_regime_at_close": "down_stable",
+      "btc_price_at_close": 65134.1,
+      "btc_pct_vs_ma25_at_close": -0.572,
+      "closed_at": "2026-06-17T15:06:45.776548+00:00",
+      "close_reason": "paper:hit_sl",
+      "avg_exit_price": 0.01776801333801334,
+      "realized_pnl_usdt": -1.2422,
+      "close_order_id": 6588139934,
+      "close_qty": 5698.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_method": "limit_ioc_partial_market",
+      "actual_close_slip_bps": 12.97,
+      "limit_qty_closed": 1132.0,
+      "market_qty_closed": 4566.0,
+      "mid_at_close_attempt": 0.017744999999999997,
+      "close_expected_price": 0.01774,
+      "close_slippage_bps": 15.79,
+      "entry_fees_usdt": 0.04,
+      "close_fees_usdt": 0.0405
+    },
     {
       "paper_id": "JELLYJELLYUSDT|LONG|2026-06-17T14:17:27.871316+00:00",
       "trade_id": "L1781705847_JELLYJE_L",
@@ -56964,19 +56983,28 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-17T15:02:13.789710+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=+0.20% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-06-17T15:06:30.654718+00:00"
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=+0.04% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-17T15:08:28.369959+00:00"
+    },
+    {
+      "paper_id": "WIFUSDT|LONG|2026-06-17T15:05:50.625746+00:00",
+      "symbol": "WIFUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-17T15:06:35.519642+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=+0.04% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-17T15:08:28.369959+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 65135.7,
-    "btc_ma25_1h": 65508.98,
-    "pct_vs_ma25": -0.57,
-    "change_24h_pct": -1.072,
+    "btc_price": 65032.7,
+    "btc_ma25_1h": 65504.86,
+    "pct_vs_ma25": -0.721,
+    "change_24h_pct": -1.229,
     "sub_regime": "down_stable",
-    "change_3h_pct": 0.201,
-    "computed_at": "2026-06-17T15:06:31.599156+00:00"
+    "change_3h_pct": 0.042,
+    "computed_at": "2026-06-17T15:08:29.485640+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
