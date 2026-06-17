@@ -1,32 +1,32 @@
 {
-  "ts": "2026-06-17T02:03:02.516013+00:00",
-  "regime": "RANGE_BORING",
-  "regime_zh": "盘整死水",
-  "confidence": 50,
-  "judgment": "Alpha 池上涨币占比 65.5%，中位涨跌 +0.75%。 涨幅超过 3% 的币数 (137) 明显多于跌幅超过 3% 的币数 (68)，山寨内部偏强。 BTC 24h -0.58%，funding 0.0005%。 判定: 盘整死水。",
+  "ts": "2026-06-17T03:03:04.506614+00:00",
+  "regime": "ALT_SEASON_RUNNING",
+  "regime_zh": "山寨行情",
+  "confidence": 72,
+  "judgment": "Alpha 池上涨币占比 74.6%，中位涨跌 +1.69%。 涨幅超过 3% 的币数 (192) 明显多于跌幅超过 3% 的币数 (51)，山寨内部偏强。 BTC 24h +0.09%，funding -0.0022%。 判定: 山寨行情。",
   "support": [
-    "Alpha 池 627 币样本中，上涨 411 个 (65.5%)，中位涨跌 +0.75%，平均涨跌 +1.58%",
-    "涨幅 >3% 的币 137 个，跌幅 >3% 的币 68 个；暴涨 >10% 有 35 个，暴跌 >10% 有 11 个",
-    "Binance BTCUSDT 当前约 65,858，24h 涨幅 -0.58%，24h 区间 65,328.80 - 66,956.70",
-    "BTCUSDT 永续 funding rate 为 0.000005 (~0.0005%)；Fear & Greed Index 为 22 (Extreme Fear)"
+    "Alpha 池 627 币样本中，上涨 468 个 (74.6%)，中位涨跌 +1.69%，平均涨跌 +2.48%",
+    "涨幅 >3% 的币 192 个，跌幅 >3% 的币 51 个；暴涨 >10% 有 42 个，暴跌 >10% 有 11 个",
+    "Binance BTCUSDT 当前约 65,803，24h 涨幅 +0.09%，24h 区间 65,328.80 - 66,956.70",
+    "BTCUSDT 永续 funding rate 为 -0.000022 (~-0.0022%)；Fear & Greed Index 为 22 (Extreme Fear)"
   ],
   "challenge": [
-    "广度 66%、中位 +0.75% 都偏中性，缺乏明确方向。这种状态通常先于波动率扩张，警惕假突破"
+    "funding 仅 -0.0022%，离'高 funding 拥挤偏多'还有距离；若 Alpha 池上涨占比和中位涨幅回落，判断会快速弱化"
   ],
   "metrics": {
     "alpha_pool_size": 627,
-    "rising_count": 411,
-    "rising_pct": 0.6555,
-    "median_change_pct": 0.75,
-    "average_change_pct": 1.58,
-    "pump_3pct_count": 137,
-    "dump_3pct_count": 68,
-    "extreme_pump_10pct_count": 35,
+    "rising_count": 468,
+    "rising_pct": 0.7464,
+    "median_change_pct": 1.69,
+    "average_change_pct": 2.48,
+    "pump_3pct_count": 192,
+    "dump_3pct_count": 51,
+    "extreme_pump_10pct_count": 42,
     "extreme_dump_10pct_count": 11,
-    "btc_price": 65857.9,
-    "btc_change_24h_pct": -0.584,
+    "btc_price": 65803.3,
+    "btc_change_24h_pct": 0.092,
     "btc_24h_range": "65,328.80 - 66,956.70",
-    "btc_funding_rate": 5.04e-06,
+    "btc_funding_rate": -2.186e-05,
     "fear_greed": 22,
     "fear_greed_classification": "Extreme Fear"
   },
