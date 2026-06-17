@@ -1,48 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-17T23:47:04.525813+00:00",
+  "generated_at": "2026-06-17T23:49:10.717157+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 726,
-    "open": 1,
-    "closed": 725,
+    "open": 0,
+    "closed": 726,
     "wins": 235,
-    "losses": 481,
+    "losses": 482,
     "win_rate": 0.328,
-    "total_pnl_usdt": -69.2891,
-    "net_pnl_usdt": -161.8837,
-    "avg_pnl_usdt": -0.0956,
+    "total_pnl_usdt": -69.9542,
+    "net_pnl_usdt": -162.6291,
+    "avg_pnl_usdt": -0.0964,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 92.6346,
-    "fees_realized_usdt": 92.5946,
-    "fees_open_usdt": 0.04,
+    "fees_paid_usdt": 92.6749,
+    "fees_realized_usdt": 92.6749,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 99.99,
-    "free_capital_usdt": 338.08,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 437.37,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -19.2464,
-    "deployed_usdt": 99.99
+    "daily_pnl": -19.9115,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "SQDUSDT"
-    ],
-    "exchange_symbols": [
-      "SQDUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "SQDUSDT|SHORT|2026-06-17T23:44:07.415793+00:00",
       "trade_id": "L1781739847_SQDUSDT_S",
@@ -70,7 +67,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 6,
       "wick_filter_mode": "always",
-      "sl_breach_count": 0,
+      "sl_breach_count": 6,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.005,
       "regime_gate_enabled": true,
@@ -93,7 +90,7 @@
       "phase_a_mfe_pct": 0.585,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.04,
+      "fees_paid_usdt": 0.0803,
       "fees_are_actual": false,
       "opened_at": "2026-06-17T23:45:19.343558+00:00",
       "is_dry_run": false,
@@ -104,16 +101,35 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.011,
       "phase_a_mfe_price": 0.04585,
-      "current_price": 0.0458,
-      "unrealized_pnl_usdt": 0.0105,
-      "unrealized_pnl_pct": 0.01,
-      "last_price_check_at": "2026-06-17T23:47:02.900729+00:00",
-      "phase_a_mae_price": 0.04593,
-      "phase_a_mae_pct": -0.273,
-      "phase_a_mae_at": "2026-06-17T23:45:58.134105+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 0.04609,
+      "unrealized_pnl_usdt": -0.6226,
+      "unrealized_pnl_pct": -0.623,
+      "last_price_check_at": "2026-06-17T23:48:06.702752+00:00",
+      "phase_a_mae_price": 0.04609,
+      "phase_a_mae_pct": -0.623,
+      "phase_a_mae_at": "2026-06-17T23:48:06.702752+00:00",
+      "btc_regime_at_close": "down",
+      "btc_sub_regime_at_close": "down_stable",
+      "btc_price_at_close": 64428.8,
+      "btc_pct_vs_ma25_at_close": -1.242,
+      "closed_at": "2026-06-17T23:48:10.677564+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.04610949152542373,
+      "realized_pnl_usdt": -0.6651,
+      "close_order_id": 1080933402,
+      "close_qty": 2183.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_method": "limit_ioc_full",
+      "actual_close_slip_bps": 2.06,
+      "limit_qty_closed": 2183.0,
+      "market_qty_closed": 0.0,
+      "mid_at_close_attempt": 0.0461,
+      "close_expected_price": 0.0458048,
+      "close_slippage_bps": 66.52,
+      "entry_fees_usdt": 0.04,
+      "close_fees_usdt": 0.0403
+    },
     {
       "paper_id": "AEROUSDT|SHORT|2026-06-17T23:01:20.980406+00:00",
       "trade_id": "L1781737280_AEROUSD_S",
@@ -57992,19 +58008,19 @@
       "direction": "SHORT",
       "conviction_score": 6,
       "signal_at": "2026-06-17T23:32:03.887011+00:00",
-      "reason": "paper trade too old (899s > 600s)",
-      "last_checked_at": "2026-06-17T23:47:02.900729+00:00"
+      "reason": "paper trade too old (1026s > 600s)",
+      "last_checked_at": "2026-06-17T23:49:09.565284+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 64424.0,
-    "btc_ma25_1h": 65239.07,
-    "pct_vs_ma25": -1.249,
-    "change_24h_pct": -1.86,
+    "btc_price": 64474.8,
+    "btc_ma25_1h": 65241.1,
+    "pct_vs_ma25": -1.175,
+    "change_24h_pct": -1.782,
     "sub_regime": "down_stable",
-    "change_3h_pct": 0.028,
-    "computed_at": "2026-06-17T23:47:04.201152+00:00"
+    "change_3h_pct": 0.107,
+    "computed_at": "2026-06-17T23:49:10.665230+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
