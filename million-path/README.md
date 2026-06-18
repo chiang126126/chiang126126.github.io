@@ -40,6 +40,7 @@ million-path/
 | 实时行情 | BTC/ETH/SOL/BNB 价格、涨跌、走势图、**资金费率、持仓量OI** | Binance（备 CoinGecko）|
 | 趋势判断 | 核心三币 价格 vs 30 日均线 → risk-on/neutral/risk-off | Binance K线 |
 | 加密宏观 & 链上 | 总市值、BTC/ETH 占比、成交额、**DeFi TVL** | CoinGecko + DeFiLlama |
+| **MSTR 微策略** | MSTR vs BTC 走势、现价、市值、BTC 持仓净值、**mNAV 溢价/折价** | TradingView + Finnhub（经 Worker）|
 | 市场情绪 & 事件 | 恐惧贪婪指数 + 大事件/解锁日历 | alternative.me + events.json |
 | 加密新闻 | 实时加密新闻流 | CryptoCompare（直连，CORS 友好）|
 | **美股 & 宏观** | 财经日历(FOMC/CPI/非农)、指数总览、VIX、美元、美债；美联储利率/CPI；美股自选报价 | TradingView widget + FRED + Finnhub（经 Worker）|

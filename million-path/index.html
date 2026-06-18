@@ -114,7 +114,7 @@
 
   <nav class="nav">
     <a href="#sec-overview">概览</a><a href="#sec-market">行情</a><a href="#sec-trend">趋势</a>
-    <a href="#sec-macro">加密宏观</a><a href="#sec-sentiment">情绪·事件</a><a href="#sec-news">加密新闻</a>
+    <a href="#sec-macro">加密宏观</a><a href="#sec-mstr">MSTR微策略</a><a href="#sec-sentiment">情绪·事件</a><a href="#sec-news">加密新闻</a>
     <a href="#sec-us">美股·宏观</a><a href="#sec-trades">交易复盘</a><a href="#sec-stats">统计·测算</a>
   </nav>
 
@@ -123,7 +123,7 @@
     <div class="tradingview-widget-container">
       <div class="tradingview-widget-container__widget"></div>
       <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
-      {"symbols":[{"proName":"BINANCE:BTCUSDT","title":"BTC"},{"proName":"BINANCE:ETHUSDT","title":"ETH"},{"proName":"BINANCE:SOLUSDT","title":"SOL"},{"proName":"BINANCE:BNBUSDT","title":"BNB"},{"proName":"SP:SPX","title":"标普500"},{"proName":"NASDAQ:NDX","title":"纳指100"},{"proName":"TVC:DXY","title":"美元指数"},{"proName":"TVC:US10Y","title":"美债10Y"}],"showSymbolLogo":true,"colorTheme":"dark","isTransparent":true,"displayMode":"adaptive","locale":"zh_CN"}
+      {"symbols":[{"proName":"BINANCE:BTCUSDT","title":"BTC"},{"proName":"BINANCE:ETHUSDT","title":"ETH"},{"proName":"BINANCE:SOLUSDT","title":"SOL"},{"proName":"NASDAQ:MSTR","title":"MSTR微策略"},{"proName":"NASDAQ:COIN","title":"Coinbase"},{"proName":"SP:SPX","title":"标普500"},{"proName":"TVC:DXY","title":"美元指数"},{"proName":"TVC:US10Y","title":"美债10Y"}],"showSymbolLogo":true,"colorTheme":"dark","isTransparent":true,"displayMode":"adaptive","locale":"zh_CN"}
       </script>
     </div>
   </div>
@@ -167,6 +167,20 @@
     <div id="defiBox"><div class="k" style="font-size:11px;color:var(--muted);margin-bottom:6px">DeFi 总锁仓量 (TVL) · 来源 DeFiLlama</div>
       <div class="card"><div class="k">全链 DeFi TVL</div><div class="v" id="defiTotal">—</div></div>
       <div id="defiChains" style="margin-top:8px"></div></div>
+  </section>
+
+  <!-- MSTR / 微策略 -->
+  <section id="sec-mstr" class="panel">
+    <h2><span class="bar"></span>MSTR · 微策略（Strategy）· BTC 杠杆代理</h2>
+    <div class="grid g-auto" id="mstrBox" style="margin-bottom:14px"><div class="badge">…</div></div>
+    <div class="k" style="font-size:11px;color:var(--muted);margin-bottom:6px">MSTR vs BTC 走势对比（TradingView）</div>
+    <div class="tv-wrap"><div class="tradingview-widget-container">
+      <div class="tradingview-widget-container__widget"></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js" async>
+      {"symbols":[["微策略 MSTR","NASDAQ:MSTR|3M"],["BTC","BINANCE:BTCUSDT|3M"]],"chartOnly":false,"width":"100%","height":380,"locale":"zh_CN","colorTheme":"dark","isTransparent":true,"autosize":false,"showVolume":false,"showMA":false,"scalePosition":"right","scaleMode":"Normal","fontSize":"10","valuesTracking":"1","changeMode":"price-and-percent","chartType":"line","lineWidth":2}
+      </script>
+    </div></div>
+    <div class="badge" style="margin-top:8px">为何看 MSTR：它持有巨量 BTC，常作为「BTC 杠杆代理」——MSTR 抢先大涨/大跌往往领先或放大 BTC 情绪；mNAV 溢价收缩是风险偏好降温的旁证。</div>
   </section>
 
   <!-- 情绪 + 事件 -->

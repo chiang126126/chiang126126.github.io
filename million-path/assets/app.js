@@ -265,6 +265,42 @@ function workerHint() {
     按 <code>worker/README.md</code> 部署后，把地址填进 <code>config.js</code> 的 <code>WORKER_URL</code> 即可自动亮起。</div>`;
 }
 
+//==================== MSTR / 微策略（BTC 杠杆代理 + mNAV）====================
+async function loadMstr() {
+  const box = $("mstrBox");
+  const holdings = +CFG.MSTR_BTC_HOLDINGS || 0;
+  const asof = CFG.MSTR_HOLDINGS_ASOF || "";
+  if (!hasWorker()) {
+    box.innerHTML = workerHint() +
+      `<div class="badge" style="margin-top:8px">MSTR 持仓(手动)：${holdings ? fmt(holdings, 0) + " BTC（" + asof + "）" : "未填，见 config.js MSTR_BTC_HOLDINGS"}。配置 Worker 后显示实时报价与 mNAV 溢价/折价。</div>`;
+    return;
+  }
+  try {
+    const [q, prof, btcT] = await Promise.all([
+      jget(wurl("type=finnhub&path=quote&qs=symbol=MSTR")),
+      jget(wurl("type=finnhub&path=stock/profile2&qs=symbol=MSTR")).catch(() => ({})),
+      jget(`${BN_SPOT}/api/v3/ticker/price?symbol=BTCUSDT`).catch(() => null)
+    ]);
+    const price = q.c, chg = q.dp;
+    const mcap = prof.marketCapitalization ? prof.marketCapitalization * 1e6 : null; // Finnhub 单位为百万
+    const btc = btcT ? +btcT.price : null;
+    const navBtc = (holdings && btc) ? holdings * btc : null;     // BTC 持仓净值
+    const mnav = (mcap && navBtc) ? mcap / navBtc : null;          // >1 溢价，<1 折价
+    const cards = [
+      ["MSTR 现价", price == null ? "—" : "$" + fmt(price, 2), `<span class="${cls(chg)}">${pct(chg)} (当日)</span>`],
+      ["公司市值", mcap ? big(mcap) : "—", "Finnhub"],
+      ["BTC 持仓净值", navBtc ? big(navBtc) : "—", holdings ? fmt(holdings, 0) + " BTC × 实时价" : "请填 config.js"],
+      ["mNAV 溢价/折价", mnav ? mnav.toFixed(2) + "x" : "—",
+        mnav ? `<span class="${mnav >= 1 ? 'neg' : 'pos'}">${mnav >= 1 ? '溢价 +' + ((mnav - 1) * 100).toFixed(0) + '%' : '折价 ' + ((mnav - 1) * 100).toFixed(0) + '%'}</span>` : "需填持仓"],
+    ];
+    box.innerHTML = cards.map(([k, v, sub]) =>
+      `<div class="card"><div class="k">${k}</div><div class="v">${v}</div><div class="badge">${sub}</div></div>`).join("") +
+      `<div class="badge" style="grid-column:1/-1;margin-top:4px">持仓为手动维护(${asof})。mNAV>1=市场给 BTC 持仓溢价(情绪偏热)；<1=折价(情绪偏冷)，是加密情绪的重要旁证。</div>`;
+  } catch (e) {
+    box.innerHTML = `<div class="err">MSTR 数据获取失败，检查 Worker 与 FINNHUB_KEY。</div>`;
+  }
+}
+
 //==================== 交易复盘 + 统计（同源 ledger）====================
 const SAMPLE = { meta: { strategy: "MP500", start_date: "2026-06-19", initial_capital: 500, usdt_cny: 6.74, target_rmb: 1e6, target_usd: 1e6 },
   weeks: [{ week: 1, start_date: "2026-06-19", end_date: "2026-06-25", stage: "S0", regime: "neutral", equity_start: 500, equity_end: 500, target_return_pct: 0, trades: 0, win_rate_pct: null, profit_factor: null, max_drawdown_pct: 0, fees_funding_pct: 0, violations: 0 }] };
@@ -349,7 +385,7 @@ function renderCalc() {
 }
 
 //==================== 启动 ====================
-function refreshLive() { loadMarket(); loadSentiment(); loadCryptoMacro(); loadDefi(); loadCryptoNews(); loadFred(); loadUsStocks(); }
+function refreshLive() { loadMarket(); loadSentiment(); loadCryptoMacro(); loadDefi(); loadCryptoNews(); loadFred(); loadUsStocks(); loadMstr(); }
 function init() {
   ["cStart", "cRate", "cFx", "cRmb", "cUsd"].forEach(id => $(id) && $(id).addEventListener("input", renderCalc));
   $("refreshBtn") && $("refreshBtn").addEventListener("click", refreshLive);
