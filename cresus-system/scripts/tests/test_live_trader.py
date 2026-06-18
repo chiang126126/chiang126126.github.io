@@ -1249,9 +1249,9 @@ class TestDynamicSlippageThreshold(unittest.TestCase):
                               "intensity=1 阈值应为 100 bps (与 main v3 数据分析对齐)")
 
     def test_poll_interval_reduced(self):
-        """Phase 4.V: 轮询周期缩短到 5s (确保 plist 改了代码常量也同步)."""
-        self.assertEqual(POLL_INTERVAL_SEC, 5,
-                         "POLL_INTERVAL_SEC 必须是 5 (Phase 4.V), 否则 --loop 模式仍 30s")
+        """Phase 4.V → 6.O (2026-06-18): 轮询周期 30→5→2s. 跟 plist StartInterval 一致."""
+        self.assertEqual(POLL_INTERVAL_SEC, 2,
+                         "POLL_INTERVAL_SEC 必须是 2 (Phase 6.O), --loop 模式跟 launchd 一致")
 
 
 class TestComputeBtcRegime(unittest.TestCase):
@@ -7409,6 +7409,91 @@ class TestPhase6NMakerModeShadow(unittest.TestCase):
         self.assertTrue(hasattr(live_trader, "LIVE_PHASE_6N_SHADOW_LOG_ALWAYS_ON"))
         self.assertTrue(live_trader.LIVE_PHASE_6N_SHADOW_LOG_ALWAYS_ON,
                           "shadow 数据收集应永远开启 (无副作用, 历史数据先积累)")
+
+
+class TestPhase6OSLSyncAudit(unittest.TestCase):
+    """Phase 6.O (2026-06-18): SL sync 审计字段 + POLL_INTERVAL 5→2s.
+
+    背景: 16 天 mainnet audit 发现 154 笔 paper trail 赚 → live SL 砍, 累计 -$240+
+    出血. 主因之一是 sync 没跟上 paper trail-up. 加 audit 字段 forensic 反查.
+    """
+
+    def test_6o_poll_interval_reduced_to_2(self):
+        """Phase 6.O: POLL_INTERVAL_SEC 5→2 减 SL sync 延迟."""
+        self.assertEqual(live_trader.POLL_INTERVAL_SEC, 2,
+                          "POLL_INTERVAL_SEC 应改为 2s (Phase 6.O), 减 SL sync 延迟")
+
+    def test_6o_sync_records_audit_fields(self):
+        """Phase 6.O: _sync_live_with_paper 应记录 last_sl_sync_at + count + paper_sl."""
+        from live_trader import _sync_live_with_paper
+        live_trade = {
+            "symbol": "BTCUSDT", "side": "BUY", "sl_price": 99.0,
+            "phase": "A",
+        }
+        paper = {"sl": 100.0, "phase": "B"}    # paper trail SL 上移
+        updated = _sync_live_with_paper(live_trade, paper)
+        self.assertTrue(updated, "SL 变化应返 True")
+        # 关键 audit 字段
+        self.assertEqual(live_trade["sl_price"], 100.0)
+        self.assertEqual(live_trade["sl_paper_current"], 100.0)
+        self.assertIn("last_sl_sync_at", live_trade)
+        self.assertEqual(live_trade["last_sl_sync_paper_sl"], 100.0)
+        self.assertEqual(live_trade["sl_sync_count"], 1)
+        # 第二次 sync 计数应 +1
+        paper["sl"] = 101.0
+        _sync_live_with_paper(live_trade, paper)
+        self.assertEqual(live_trade["sl_sync_count"], 2)
+        self.assertEqual(live_trade["last_sl_sync_paper_sl"], 101.0)
+
+    def test_6o_no_op_sync_does_not_increment(self):
+        """Phase 6.O: SL 没变 (paper sl 跟 live sl 一致) → 不算 sync, count 不增."""
+        from live_trader import _sync_live_with_paper
+        live_trade = {
+            "symbol": "BTCUSDT", "side": "BUY", "sl_price": 99.0,
+            "phase": "A", "sl_sync_count": 5,
+        }
+        paper = {"sl": 99.0, "phase": "A"}    # 一致
+        updated = _sync_live_with_paper(live_trade, paper)
+        self.assertFalse(updated)
+        self.assertEqual(live_trade["sl_sync_count"], 5, "no-op 不该增 count")
+
+    def test_6o_initial_state_no_sync_history(self):
+        """Phase 6.O: trade 刚开仓 live_trade 不应有 sl_sync_count 字段."""
+        from live_trader import _sync_live_with_paper
+        live_trade = {"symbol": "BTCUSDT", "side": "BUY", "sl_price": 99.0, "phase": "A"}
+        # 没有任何 sync 信息
+        self.assertNotIn("last_sl_sync_at", live_trade)
+        self.assertNotIn("sl_sync_count", live_trade)
+        # 第一次 sync 后才有
+        _sync_live_with_paper(live_trade, {"sl": 100.0, "phase": "A"})
+        self.assertEqual(live_trade["sl_sync_count"], 1)
+
+    def test_6o_phase_sync_complete_coverage(self):
+        """Phase 6.O audit: 验证 _sync_live_with_paper 覆盖所有应同步的字段.
+        SL (核心) + phase 字符串 + 每 phase 的 MFE 共 8 个字段.
+        Paper 内部 tp1_hit_at/trailing_sl/high_water_mark 不在 sync 列表里 — 这是
+        正确的 (live 只需 paper 计算后的 sl 结果, 不需要重算).
+        """
+        from live_trader import _sync_live_with_paper
+        live_trade = {"symbol": "BTCUSDT", "side": "BUY", "sl_price": 99.0, "phase": "A"}
+        paper = {
+            "sl": 101.0,
+            "phase": "C",
+            "phase_a_mfe_pct": 1.5, "phase_a_mfe_price": 101.5,
+            "phase_b_mfe_pct": 2.0, "phase_b_mfe_price": 102.0,
+            "phase_c_mfe_pct": 3.0, "phase_c_mfe_price": 103.0,
+        }
+        _sync_live_with_paper(live_trade, paper)
+        # 核心 SL
+        self.assertEqual(live_trade["sl_price"], 101.0)
+        self.assertEqual(live_trade["sl_paper_current"], 101.0)
+        # Phase 字符串
+        self.assertEqual(live_trade["phase"], "C")
+        # Per-phase MFE 全部
+        for k in ("phase_a_mfe_pct", "phase_a_mfe_price",
+                  "phase_b_mfe_pct", "phase_b_mfe_price",
+                  "phase_c_mfe_pct", "phase_c_mfe_price"):
+            self.assertEqual(live_trade[k], paper[k], f"{k} 未同步")
 
 
 if __name__ == "__main__":

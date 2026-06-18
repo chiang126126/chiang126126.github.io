@@ -1165,10 +1165,28 @@ class TestActualCommission(unittest.TestCase):
         self.assertIsNone(fee)
 
     def test_empty_fills_returns_none(self):
-        """API 延迟 / 订单未 settle → 没 fills → None (上层回退估算)."""
-        with patch.object(self.client, "get_user_trades", return_value=[]):
+        """Phase 6.P: 3 次 retry 全空 → None (上层回退估算).
+        sleep 用 patch 避免 1.5s 真等."""
+        with patch.object(self.client, "get_user_trades", return_value=[]), \
+             patch("time.sleep") as mock_sleep:
             fee = self.client._actual_commission_usdt("BTCUSDT", 1)
         self.assertIsNone(fee)
+        # 验证真有 2 次 backoff sleep (0.5s + 1.0s), 不是直接返 None
+        self.assertEqual(mock_sleep.call_count, 2)
+
+    def test_phase_6p_retry_success_on_second_attempt(self):
+        """Phase 6.P (2026-06-18): 第 1 次 fills 空 (settle 延迟), 第 2 次拿到 → 不 fallback."""
+        responses = [[], [{"commission": "0.05", "commissionAsset": "USDT"}]]
+        call_count = [0]
+        def side_effect(*args, **kwargs):
+            r = responses[call_count[0]]
+            call_count[0] += 1
+            return r
+        with patch.object(self.client, "get_user_trades", side_effect=side_effect), \
+             patch("time.sleep"):
+            fee = self.client._actual_commission_usdt("BTCUSDT", 1)
+        self.assertAlmostEqual(fee, 0.05, places=6, msg="retry 后该拿到 actual fee, 不该返 None")
+        self.assertEqual(call_count[0], 2, "应该 1 次空 + 1 次成功就停, 不进第 3 次")
 
     def test_api_error_returns_none(self):
         """get_user_trades 抛异常 → 返 None (上层回退估算, 不让 close 失败)."""

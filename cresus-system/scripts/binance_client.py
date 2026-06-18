@@ -762,19 +762,35 @@ class BinanceClient:
 
         BNB-discount (commissionAsset=BNB) 情况: 本版本暂不换算, 返回 None
         让调用方 fallback 到估算. 实盘启用 BNB 折扣前再扩展.
+
+        Phase 6.P (2026-06-18): 加 0.5s × 2 次 retry 防 Binance userTrades 返
+        empty fills (订单刚 settle, API 索引延迟). 历史 mainnet 数据 65% trade
+        本来就拿到 actual fees, 但最近 50 笔 fees_are_actual=False — 怀疑 G3
+        LIMIT-IOC fill 后立即查导致 race. 加 retry 救之.
         """
-        try:
-            fills = self.get_user_trades(symbol, order_id=order_id)
-        except (BinanceError, ValueError) as e:
-            log.warning(
-                f"[fee] get_user_trades failed for "
-                f"{symbol} order_id={order_id}: {e}"
-            )
-            return None
+        import time
+        fills = None
+        for attempt in range(3):   # 0=立即, 1=+0.5s, 2=+1s
+            try:
+                fills = self.get_user_trades(symbol, order_id=order_id)
+            except (BinanceError, ValueError) as e:
+                log.warning(
+                    f"[fee] get_user_trades failed for "
+                    f"{symbol} order_id={order_id} (attempt {attempt+1}/3): {e}"
+                )
+                if attempt < 2:
+                    time.sleep(0.5 * (attempt + 1))
+                    continue
+                return None
+            if fills:
+                break
+            # empty fills, settle 延迟, 重试
+            if attempt < 2:
+                time.sleep(0.5 * (attempt + 1))
         if not fills:
             log.warning(
                 f"[fee] no fills for {symbol} order_id={order_id} "
-                f"(订单未 settle 或 API 延迟?)"
+                f"after 3 attempts (订单未 settle 或 API 延迟过长)"
             )
             return None
         total = 0.0

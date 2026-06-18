@@ -18,18 +18,25 @@
         <string>--live</string>
     </array>
 
-    <!-- Phase 4.V (5/25): 5s 轮询 — 缩短 paper 信号到 live 首次检查的延迟.
-         Rate limit 测算: ~25 weight/poll × 12 polls/min = 300 weight/min (预算 2400/min, 占用 12.5%). -->
+    <!-- Phase 6.O (2026-06-18): StartInterval 5→2s + ThrottleInterval 10→2s
+         合并把实际 tick cadence 从 ~10s 减到 ~2s.
+         数据驱动 (mainnet 16天 audit): 154 笔 paper trail 赚 → live SL 砍, 累计 -$240+.
+         主因之一是 5s+ poll 窗口里价格走 1.6% (median), live sl_paper_current 没及时跟上.
+         Rate limit 测算: ~25 weight/poll × 30 polls/min = 750 weight/min (预算 2400/min, 占用 31%).
+         安全余量充足.
+         (历史: Phase 4.V 5/25: 30→5s; 5/24 加 ThrottleInterval=10 防 crash loop) -->
     <key>StartInterval</key>
-    <integer>5</integer>
+    <integer>2</integer>
 
     <key>RunAtLoad</key>
     <true/>
 
     <!-- Phase 4.R5 (2026-05-24) — KeepAlive only on crash.
-         --once 模式正常 exit 0 后由 StartInterval=30 拉起下一轮.
-         但若 main_loop 抛未捕获异常 (exit != 0) 或 SIGKILL, 立即重启不等 30s.
-         配合 ThrottleInterval=10 防止 crash 循环刷屏. -->
+         --once 模式正常 exit 0 后由 StartInterval 拉起下一轮.
+         但若 main_loop 抛未捕获异常 (exit != 0) 或 SIGKILL, ThrottleInterval 之后重启.
+         Phase 6.O (2026-06-18): ThrottleInterval 10→2 跟 StartInterval 一致.
+         若发生 crash loop, 2s 重启间隔仍可控 (log 不会过频, 用户能看到).
+         保留 KeepAlive 仅 Crashed=true: 正常 exit 0 后还是 StartInterval 控制. -->
     <key>KeepAlive</key>
     <dict>
         <key>Crashed</key>
@@ -38,7 +45,7 @@
         <false/>
     </dict>
     <key>ThrottleInterval</key>
-    <integer>10</integer>
+    <integer>2</integer>
 
     <!-- 凭证从 ~/.cresus-bot/binance_keys.json 自动读取 (load_credentials helper).
          不在 plist 里硬编码 key (即使 plist 是私有的, 也避免事故). -->

@@ -836,7 +836,10 @@ MIRRORED_IDS_KEEP_LAST_N = 500          # mirrored_paper_ids 滚动窗口
 MISSED_SIGNALS_KEEP_LAST_N = 50         # missed_signals 滚动窗口 (诊断用)
 
 # 主循环
-POLL_INTERVAL_SEC = 5                   # --loop 模式 poll 间隔 (Phase 4.V 5/25: 30→5s)
+POLL_INTERVAL_SEC = 2                   # Phase 6.O (2026-06-18): 5→2s 减 SL sync 延迟 60%
+                                         # 数据: 154 笔 paper trail 赚 → live SL 砍, 中位 latency 16s.
+                                         # 5s poll 窗口里价格走 1.6% (median), 减到 2s 救 SL sync.
+                                         # (历史: Phase 4.V 5/25: 30→5s)
 
 # 状态文件 schema 版本
 STATE_VERSION = "1.0"
@@ -2410,6 +2413,12 @@ def _sync_live_with_paper(live_trade: dict, paper_open_trade: dict) -> bool:
 
     设计逻辑: Live trader 是 paper 的执行层. Paper 内部管理 Phase A/B/C 转换
     (TP1 命中 → SL 移 BE; TP2 → trailing), live 只需 mirror paper 当前的 sl.
+
+    Phase 6.O (2026-06-18) audit fields: 持久化最后一次 sync 信息到 live_trade,
+    SL breach 时 forensic log 用. 字段:
+      - last_sl_sync_at: ISO 时间, 上次成功更新 live sl 的时刻
+      - last_sl_sync_paper_sl: 那次 sync 时 paper 的 sl 值
+      - sl_sync_count: 累计 sync 次数
     """
     updated = False
     new_sl = paper_open_trade.get("sl")
@@ -2428,10 +2437,14 @@ def _sync_live_with_paper(live_trade: dict, paper_open_trade: dict) -> bool:
                 # Phase 4.E: SL 移动后, 之前的 breach 计数失效, 清零
                 if live_trade.get("sl_breach_count"):
                     live_trade["sl_breach_count"] = 0
+                # Phase 6.O audit: 记录 sync 信息, breach 时回溯用
+                live_trade["last_sl_sync_at"] = datetime.now(timezone.utc).isoformat()
+                live_trade["last_sl_sync_paper_sl"] = new_paper_sl
+                live_trade["sl_sync_count"] = int(live_trade.get("sl_sync_count") or 0) + 1
                 comp_note = f" (paper {new_paper_sl} + offset {offset:+.6f})" if offset != 0 else ""
                 log.info(
                     f"[sl-sync] {live_trade['symbol']}: {old} → {new_live_sl} "
-                    f"(paper phase={new_phase}){comp_note}"
+                    f"(paper phase={new_phase}){comp_note} sync#{live_trade['sl_sync_count']}"
                 )
                 updated = True
         except (ValueError, TypeError):
@@ -2532,6 +2545,10 @@ def _try_mirror_close(
             closed["limit_qty_closed"] = None
             closed["market_qty_closed"] = None
             closed["mid_at_close_attempt"] = None
+            # Phase 6.O (2026-06-18): 保 schema 一致, sync audit 字段 (live_trade 已有就保留)
+            closed.setdefault("last_sl_sync_at", live_trade.get("last_sl_sync_at"))
+            closed.setdefault("last_sl_sync_paper_sl", live_trade.get("last_sl_sync_paper_sl"))
+            closed.setdefault("sl_sync_count", live_trade.get("sl_sync_count"))
             return closed
         log.error(f"[mirror-close FAILED] {sym}: {type(e).__name__}: {e}")
         return None
@@ -2560,6 +2577,11 @@ def _try_mirror_close(
     closed["limit_qty_closed"] = result.get("limit_qty_closed")
     closed["market_qty_closed"] = result.get("market_qty_closed")
     closed["mid_at_close_attempt"] = result.get("mid_at_close_attempt")
+    # Phase 6.O (2026-06-18) audit: 持久化 SL sync 诊断字段供 retro 反查
+    # "SL breach 时 live SL 跟 paper SL 是否同步" 的根因.
+    closed["last_sl_sync_at"] = live_trade.get("last_sl_sync_at")
+    closed["last_sl_sync_paper_sl"] = live_trade.get("last_sl_sync_paper_sl")
+    closed["sl_sync_count"] = live_trade.get("sl_sync_count")
 
     # 平仓 slippage (期望价 vs 实际成交).
     #   SL 触发: 期望 = sl_price (我们设的止损)
@@ -3627,6 +3649,8 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
             # Phase 4.Y (5/27): 加强 SL-BREACH 日志, 记录完整上下文供后续审计.
             # 5/26 复盘发现 5 笔 paper hit_b_trail → live sl_breach (盈利变亏损),
             # 但没有足够日志判断是 wick 误触发还是真实 SL. 此日志填补诊断缺口.
+            # Phase 6.O (2026-06-18) audit: 加 last_sl_sync 时间 + 滞后秒数, 看 SL 早砍
+            # 是否因为 sync 没跟上 paper trail-up (154 笔同 paper_id 出血诊断).
             try:
                 entry = float(lt.get("avg_fill_price") or 0)
                 sl = float(lt.get("sl_price") or 0)
@@ -3637,13 +3661,30 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
                 breach_cnt = lt.get("sl_breach_count") or "?"
                 comp = "comp" if lt.get("sl_compensation_enabled") else "no-comp"
                 wick = "wick" if lt.get("wick_filter_enabled") else "no-wick"
+                # Phase 6.O: sync 诊断
+                last_sync_at = lt.get("last_sl_sync_at") or "never"
+                sync_count = lt.get("sl_sync_count") or 0
+                sync_lag_sec = "?"
+                if last_sync_at and last_sync_at != "never":
+                    try:
+                        t_sync = datetime.fromisoformat(last_sync_at.replace("Z","+00:00"))
+                        sync_lag_sec = f"{(now - t_sync).total_seconds():.1f}s"
+                    except (ValueError, TypeError):
+                        pass
+                # Phase 6.O 关键诊断: live_sl == sl_paper_current 时, 同步是同步上了的;
+                # 不等说明此 trade 还没 sync 过 (initial SL 未变更过), 也可能 paper trail
+                # 已经移了但 sync 尚未跑到.
+                sl_sync_state = "synced" if abs(sl - paper_sl) < 1e-9 else "DRIFT"
+                if paper_sl == 0:
+                    sl_sync_state = "no_paper_sl"
                 log.warning(
                     f"[SL-BREACH] {lt.get('symbol')} {lt.get('side')} "
                     f"phase={lt.get('phase')} "
                     f"current={current_price} live_sl={sl} paper_sl={paper_sl} "
                     f"pct_from_entry={pct_below_entry:+.2f}% slip_at_open={slip:+.1f}bps "
                     f"breach_cnt={breach_cnt} mode={comp}/{wick} "
-                    f"ab_group={lt.get('ab_group')}"
+                    f"ab_group={lt.get('ab_group')} "
+                    f"sync_state={sl_sync_state} sync_count={sync_count} sync_lag={sync_lag_sec}"
                 )
             except (ValueError, TypeError) as e:
                 log.warning(
