@@ -11,14 +11,14 @@
 
 ```
 million-path/
+├── index.html                     # ⭐ 交易驾驶舱（根目录，Pages 直接访问）
+├── data/
+│   ├── ledger.json                # 交易/复盘数据（看板读取，脚本追加）
+│   ├── ledger.sample.json         # 示例数据
+│   └── events.json                # 大事件/解锁/上币日历（手动维护）
 ├── docs/
 │   ├── MP500-v1.1.md              # 主策略文档（周节奏 + 收益预期表 + S1合约仅paper）
 │   └── weekly_review_TEMPLATE.md  # 周复盘模板（被脚本自动填充）
-├── dashboard/
-│   ├── index.html                 # 周复盘看板（KPI 表 + 权益曲线 + 复利测算器）
-│   └── data/
-│       ├── ledger.json            # 实时数据（看板读取，脚本追加）
-│       └── ledger.sample.json     # 示例数据
 ├── scripts/
 │   └── new_week.py                # 每周自动生成复盘脚手架（自动填数）
 ├── reviews/                       # 每周复盘 week-NN.md 存档
@@ -26,11 +26,17 @@ million-path/
 └── .env.example                   # 密钥占位（真实 .env 永不进 git）
 ```
 
-## 三类核心交付物
+## 看板功能（`index.html`，单文件零依赖、响应式，手机/Mac/iPad 通用）
 
-1. **策略文档** `docs/MP500-v1.1.md` — 阶段路线图、收益预期表、风控红线、配置样例。
-2. **周复盘看板** `dashboard/index.html` — 纯前端、零依赖，可直接挂 GitHub Pages。
-3. **复盘自动化** `scripts/new_week.py` — 每周一条命令生成新一周（自动结转权益/日期/阶段）。
+- **概览**：组合权益、累计收益、阶段、违规、BTC 行情状态与本周建议
+- **实时行情**：BTC/ETH/SOL/BNB 现价、24h 涨跌、高低、成交额、迷你走势图
+- **趋势判断**：核心三币「价格 vs 30 日均线」自动判定 risk-on / neutral / risk-off
+- **市场情绪**：Fear & Greed 恐惧贪婪指数
+- **大事件日历**：宏观/解锁/上币（来自 `data/events.json`，自己维护）
+- **交易复盘**：周 KPI 明细表 + 权益曲线
+- **数据统计 & 复利测算器**
+
+> 数据源：行情/K线 Binance（备用 CoinGecko）、情绪 alternative.me。均为浏览器直连的免费公开 API，**真实实时**。Binance 在部分地区受限时自动切 CoinGecko。新闻类「大事件」在纯静态托管下无法真正实时，故用手动维护的 `events.json`。
 
 ## 每周怎么用（90 秒）
 
@@ -38,7 +44,7 @@ million-path/
 # 1) 周一：生成本周复盘脚手架（自动结转上周权益、填好周次/日期/阶段）
 python scripts/new_week.py --regime risk-on      # 或 neutral / risk-off
 
-# 2) 周日：在 reviews/week-NN.md 和 dashboard/data/ledger.json
+# 2) 周日：在 reviews/week-NN.md 和 data/ledger.json
 #    填【需手填】字段（equity_end / 笔数 / 胜率 / 盈亏比 / 回撤 / 费用 / 违规）
 
 # 3) 看板自动重算周收益、累计收益、回撤、违规，并画权益曲线
@@ -47,13 +53,16 @@ python scripts/new_week.py --regime risk-on      # 或 neutral / risk-off
 ## 本地预览看板
 
 ```bash
-cd dashboard && python3 -m http.server 8000   # 浏览器打开 http://localhost:8000
+python3 -m http.server 8000   # 在仓库根目录运行，浏览器打开 http://localhost:8000
 ```
-（直接双击 `index.html` 也能看：fetch 失败会自动回退内置示例数据。）
+（直接双击 `index.html` 也能看；行情需联网，复盘/测算离线可用，fetch 失败自动回退示例数据。）
 
-## 挂到 GitHub Pages
+## 挂到 GitHub Pages（手机/Mac/iPad 随时打开）
 
-把本目录推到独立仓库后，在仓库 Settings → Pages 选择分支与 `/dashboard` 目录（或把 `dashboard/` 内容放到仓库根）。看板即可在线访问。
+1. 仓库 **Settings → Pages**
+2. Source 选 **Deploy from a branch**，Branch 选 **main**、目录选 **`/ (root)`**，保存
+3. 等 1–2 分钟，访问 `https://<你的用户名>.github.io/million-path/`
+4. 在手机/iPad Safari 打开该网址 → 分享 → **添加到主屏幕**，就像 App 一样随时看
 
 ---
 

@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0a0e17" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<title>Million Path · 百万之路 · 交易驾驶舱</title>
+<style>
+  :root{
+    --bg:#0a0e17; --bg2:#0e1422; --panel:#121a2b; --panel2:#16203455;
+    --border:#1f2c44; --text:#eaf1fb; --muted:#8aa0bd;
+    --gold:#f0b90b; --gold2:#ffd966; --green:#16c784; --red:#ea3943;
+    --blue:#3b82f6; --chip:#1a2540;
+    --shadow:0 8px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"微软雅黑","PingFang SC",Segoe UI,Roboto,Helvetica,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(240,185,11,.10), transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, rgba(22,199,132,.08), transparent 55%),
+      var(--bg);
+    color:var(--text);line-height:1.55;padding:18px;max-width:1180px;margin:0 auto;
+    padding-bottom:60px}
+  a{color:var(--gold2)}
+  h1{font-size:20px;margin:0;letter-spacing:.5px}
+  h2{font-size:15px;margin:0 0 12px;display:flex;align-items:center;gap:8px;color:var(--text)}
+  h2 .bar{width:4px;height:16px;background:linear-gradient(var(--gold),var(--gold2));border-radius:3px}
+  .topbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:6px}
+  .brand{display:flex;align-items:center;gap:10px}
+  .logo{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-weight:800;color:#1a1200;
+    background:linear-gradient(135deg,var(--gold2),var(--gold));box-shadow:0 4px 14px rgba(240,185,11,.4)}
+  .sub{color:var(--muted);font-size:12px}
+  .refresh{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+  .btn{background:var(--chip);border:1px solid var(--border);color:var(--text);border-radius:8px;
+    padding:7px 12px;font-size:13px;cursor:pointer;transition:.15s}
+  .btn:active{transform:scale(.96)} .btn:hover{border-color:var(--gold)}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
+  @keyframes pulse{50%{opacity:.4}}
+  .panel{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--border);
+    border-radius:14px;padding:16px;margin:14px 0;box-shadow:var(--shadow)}
+  .grid{display:grid;gap:12px}
+  .g-auto{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+  .g-coins{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+  /* HERO */
+  .hero{background:
+      linear-gradient(135deg, rgba(240,185,11,.16), rgba(22,199,132,.08) 60%, transparent),
+      linear-gradient(180deg,var(--panel),var(--bg2));
+    border:1px solid #2a3a5c}
+  .hero-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px}
+  @media(max-width:720px){.hero-grid{grid-template-columns:1fr}}
+  .equity{font-size:40px;font-weight:800;background:linear-gradient(135deg,var(--gold2),var(--gold));
+    -webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.1}
+  .equity small{font-size:15px;color:var(--muted);-webkit-text-fill-color:var(--muted)}
+  .kv{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px}
+  .kv div{font-size:12px;color:var(--muted)}
+  .kv b{display:block;font-size:17px;color:var(--text);font-weight:700;margin-top:2px}
+  .card{background:var(--panel2);border:1px solid var(--border);border-radius:11px;padding:13px}
+  .card .k{font-size:11px;color:var(--muted)} .card .v{font-size:19px;font-weight:700;margin-top:3px}
+  .pos{color:var(--green)} .neg{color:var(--red)} .warn{color:var(--red);font-weight:800}
+  .chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+  .risk-on{background:rgba(22,199,132,.16);color:var(--green)}
+  .neutral{background:rgba(240,185,11,.16);color:var(--gold2)}
+  .risk-off{background:rgba(234,57,67,.16);color:var(--red)}
+  /* coin cards */
+  .coin{position:relative;overflow:hidden}
+  .coin .row{display:flex;justify-content:space-between;align-items:flex-start}
+  .coin .nm{font-weight:800;font-size:16px} .coin .px{font-size:22px;font-weight:800;margin-top:2px}
+  .coin .meta{font-size:11px;color:var(--muted);margin-top:8px;display:flex;justify-content:space-between;gap:8px}
+  .spark{width:100%;height:46px;margin-top:8px}
+  .tag{font-size:10px;padding:2px 7px;border-radius:6px;font-weight:700}
+  /* table */
+  .tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{width:100%;border-collapse:collapse;font-size:13px;min-width:560px}
+  th,td{padding:9px 10px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap}
+  th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
+  th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.3px}
+  tr:last-child td{border-bottom:none}
+  /* events */
+  .ev{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+  .ev:last-child{border-bottom:none}
+  .ev .d{font-size:12px;color:var(--muted);min-width:64px;font-variant-numeric:tabular-nums}
+  .ev .t{flex:1}.ev .t b{font-size:14px}.ev .t p{margin:2px 0 0;font-size:12px;color:var(--muted)}
+  .imp-high{border-left:3px solid var(--red)} .imp-medium{border-left:3px solid var(--gold)} .imp-low{border-left:3px solid var(--blue)}
+  .evtag{font-size:10px;padding:2px 7px;border-radius:6px;background:var(--chip);color:var(--muted)}
+  .soon{background:rgba(240,185,11,.16);color:var(--gold2)}
+  /* gauge */
+  .gauge-wrap{text-align:center}
+  .gauge-val{font-size:34px;font-weight:800}
+  .gbar{height:10px;border-radius:6px;margin:10px 0 6px;
+    background:linear-gradient(90deg,#ea3943,#f0b90b 50%,#16c784)}
+  .gmark{position:relative;height:0}
+  .gmark span{position:absolute;top:-15px;transform:translateX(-50%);width:2px;height:16px;background:#fff;border-radius:2px}
+  /* calc */
+  .calc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:12px}
+  label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px}
+  input,select{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);
+    border-radius:8px;padding:9px;font-size:14px}
+  input:focus,select:focus{outline:none;border-color:var(--gold)}
+  .result{background:var(--chip);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:14px}
+  .result b{color:var(--gold2)}
+  svg{display:block}
+  .foot{color:var(--muted);font-size:11px;margin-top:24px;border-top:1px solid var(--border);padding-top:14px}
+  code{background:var(--chip);padding:1px 5px;border-radius:4px;font-size:11px}
+  .err{color:var(--red);font-size:12px} .badge{font-size:11px;color:var(--muted)}
+  .nav{position:sticky;top:0;z-index:9;display:flex;gap:6px;overflow-x:auto;padding:8px 0;margin:-4px -4px 4px;
+    background:linear-gradient(var(--bg),rgba(10,14,23,.85));backdrop-filter:blur(8px)}
+  .nav a{flex:0 0 auto;font-size:12px;color:var(--muted);text-decoration:none;padding:6px 11px;border-radius:8px;
+    border:1px solid transparent}
+  .nav a:hover{color:var(--text);border-color:var(--border)}
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">M</div>
+      <div>
+        <h1>Million Path · 百万之路</h1>
+        <div class="sub">MP500 交易驾驶舱 · 500U → 100万 · 风控优先</div>
+      </div>
+    </div>
+    <div class="refresh">
+      <span class="dot" id="liveDot"></span>
+      <span id="updated">加载中…</span>
+      <button class="btn" id="refreshBtn">↻ 刷新</button>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <a href="#sec-overview">概览</a>
+    <a href="#sec-market">实时行情</a>
+    <a href="#sec-trend">趋势判断</a>
+    <a href="#sec-sentiment">情绪·大事件</a>
+    <a href="#sec-trades">交易复盘</a>
+    <a href="#sec-stats">统计·测算</a>
+  </nav>
+
+  <!-- 概览 -->
+  <section id="sec-overview" class="panel hero">
+    <div class="hero-grid">
+      <div>
+        <div class="sub">组合权益 (USDT)</div>
+        <div class="equity" id="heroEquity">—</div>
+        <div class="kv">
+          <div>累计收益<b id="heroCum">—</b></div>
+          <div>当前阶段<b id="heroStage">—</b></div>
+          <div>已运行<b id="heroWeeks">—</b></div>
+          <div>累计违规<b id="heroViol">—</b></div>
+        </div>
+      </div>
+      <div>
+        <div class="sub">BTC 行情状态（30 日均线法）</div>
+        <div style="margin:8px 0"><span class="chip" id="heroRegime">判定中…</span></div>
+        <div class="card" style="margin-top:8px">
+          <div class="k">本周建议（按行情）</div>
+          <div class="v" id="heroAdvice" style="font-size:14px">—</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 实时行情 -->
+  <section id="sec-market" class="panel">
+    <h2><span class="bar"></span>实时行情 · 核心池</h2>
+    <div class="grid g-coins" id="coinGrid"><div class="badge">加载行情中…</div></div>
+    <div class="badge" style="margin-top:10px" id="mktSrc"></div>
+  </section>
+
+  <!-- 趋势判断 -->
+  <section id="sec-trend" class="panel">
+    <h2><span class="bar"></span>趋势判断 · 站上/跌破 30 日线</h2>
+    <div class="tablewrap">
+      <table id="trendTbl">
+        <thead><tr><th>标的</th><th>状态</th><th>现价</th><th>30日均线</th><th>偏离</th><th>解读</th></tr></thead>
+        <tbody id="trendBody"><tr><td>计算中…</td></tr></tbody>
+      </table>
+    </div>
+    <div class="badge" style="margin-top:10px">规则：价格站上 30 日 SMA 视为偏多（risk-on），跌破视为偏空（risk-off），±1% 内视为震荡（neutral）。只做右交易，不接飞刀。</div>
+  </section>
+
+  <!-- 情绪 + 大事件 -->
+  <section id="sec-sentiment" class="panel">
+    <h2><span class="bar"></span>市场情绪 & 大事件日历</h2>
+    <div class="grid" style="grid-template-columns:1fr 1.6fr;gap:18px" id="sentGrid">
+      <div class="card gauge-wrap">
+        <div class="k">恐惧贪婪指数 (Fear & Greed)</div>
+        <div class="gauge-val" id="fngVal">—</div>
+        <div class="gbar"></div>
+        <div class="gmark"><span id="fngMark" style="left:50%"></span></div>
+        <div class="badge" id="fngLabel" style="margin-top:8px">—</div>
+      </div>
+      <div>
+        <div class="k" style="font-size:11px;color:var(--muted);margin-bottom:6px">大事件 / 解锁 / 上币（手动维护 data/events.json）</div>
+        <div id="eventsList"><div class="badge">加载事件中…</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 交易复盘 -->
+  <section id="sec-trades" class="panel">
+    <h2><span class="bar"></span>交易情况 & 周复盘</h2>
+    <div class="grid g-auto" id="reviewCards" style="margin-bottom:14px"></div>
+    <div style="margin:6px 0 14px"><div class="k" style="font-size:11px;color:var(--muted);margin-bottom:6px">权益曲线</div><div id="equityChart"></div></div>
+    <div class="tablewrap">
+      <table id="kpi">
+        <thead><tr>
+          <th>周</th><th>日期</th><th>阶段</th><th>行情</th><th>周收益</th><th>目标</th>
+          <th>笔数</th><th>胜率</th><th>盈亏比</th><th>回撤</th><th>费用%</th><th>违规</th>
+        </tr></thead>
+        <tbody id="kpiBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 统计 + 测算 -->
+  <section id="sec-stats" class="panel">
+    <h2><span class="bar"></span>数据统计 & 复利测算器</h2>
+    <div class="grid g-auto" id="statCards" style="margin-bottom:16px"></div>
+    <div class="calc-grid">
+      <div><label>起始资金 (USDT)</label><input id="cStart" type="number" value="500"></div>
+      <div><label>周收益率 (%)</label><input id="cRate" type="number" value="2.5" step="0.1"></div>
+      <div><label>USDT/CNY</label><input id="cFx" type="number" value="6.74" step="0.01"></div>
+      <div><label>目标人民币</label><input id="cRmb" type="number" value="1000000"></div>
+      <div><label>目标美元</label><input id="cUsd" type="number" value="1000000"></div>
+    </div>
+    <div class="result" id="calcOut"></div>
+    <div class="tablewrap" style="margin-top:12px">
+      <table>
+        <thead><tr><th>周化</th><th>年化(复利)</th><th>→ 目标人民币</th><th>→ 目标美元</th></tr></thead>
+        <tbody id="scenBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="foot">
+    <b>数据来源</b>：行情/K线 Binance（备用 CoinGecko）；情绪 alternative.me Fear&amp;Greed；事件为手动维护 <code>data/events.json</code>；交易数据 <code>data/ledger.json</code>。行情每 60 秒自动刷新。<br>
+    ⚠️ 本看板为纪律与复盘工具，行情数据仅供参考、可能延迟或因网络/地区受限；<b>不构成投资建议</b>，加密交易可能损失全部本金。任何收益目标必须服从风控。
+  </div>
+
+<script>
+//==================== 工具 ====================
+const $=id=>document.getElementById(id);
+const fmt=(n,d=2)=>n==null||isNaN(n)?"—":Number(n).toLocaleString("en-US",{maximumFractionDigits:d});
+const pct=n=>n==null||isNaN(n)?"—":(n>0?"+":"")+fmt(n,2)+"%";
+const money=n=>n==null?"—":"$"+fmt(n, n<10?4:n<1000?2:0);
+const cls=n=>n==null?"":(n>=0?"pos":"neg");
+const todayISO=()=>new Date().toISOString().slice(0,10);
+
+const CORE=[
+  {sym:"BTCUSDT",cg:"bitcoin",name:"BTC"},
+  {sym:"ETHUSDT",cg:"ethereum",name:"ETH"},
+  {sym:"SOLUSDT",cg:"solana",name:"SOL"},
+  {sym:"BNBUSDT",cg:"binancecoin",name:"BNB"},
+];
+const CORE3=["BTC","ETH","SOL"]; // 趋势判断核心
+
+//==================== 行情 ====================
+async function fetchTickers(){
+  const syms=encodeURIComponent(JSON.stringify(CORE.map(c=>c.sym)));
+  try{
+    const r=await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbols=${syms}`);
+    if(!r.ok)throw 0; const d=await r.json();
+    return {src:"Binance",rows:CORE.map(c=>{const x=d.find(o=>o.symbol===c.sym)||{};
+      return {...c,price:+x.lastPrice,chg:+x.priceChangePercent,high:+x.highPrice,low:+x.lowPrice,vol:+x.quoteVolume};})};
+  }catch(e){
+    const ids=CORE.map(c=>c.cg).join(",");
+    const r=await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true`);
+    const d=await r.json();
+    return {src:"CoinGecko（Binance 不可用，已切备用源）",rows:CORE.map(c=>{const x=d[c.cg]||{};
+      return {...c,price:x.usd,chg:x.usd_24h_change,high:null,low:null,vol:x.usd_24h_vol};})};
+  }
+}
+async function fetchCloses(c){
+  try{
+    const r=await fetch(`https://api.binance.com/api/v3/klines?symbol=${c.sym}&interval=1d&limit=31`);
+    if(!r.ok)throw 0; const d=await r.json(); return d.map(k=>+k[4]);
+  }catch(e){
+    const r=await fetch(`https://api.coingecko.com/api/v3/coins/${c.cg}/market_chart?vs_currency=usd&days=30&interval=daily`);
+    const d=await r.json(); return (d.prices||[]).map(p=>p[1]);
+  }
+}
+async function fetchFNG(){
+  const r=await fetch("https://api.alternative.me/fng/?limit=1"); const d=await r.json(); return d.data[0];
+}
+
+//==================== 渲染：行情卡片 + 趋势 ====================
+function sparkSVG(vals,up){
+  if(!vals||vals.length<2)return"";
+  const W=240,H=46,min=Math.min(...vals),max=Math.max(...vals),rng=max-min||1;
+  const x=i=>i*W/(vals.length-1),y=v=>H-2-(v-min)/rng*(H-4);
+  const dpath=vals.map((v,i)=>(i?"L":"M")+x(i).toFixed(1)+" "+y(v).toFixed(1)).join(" ");
+  const col=up?"#16c784":"#ea3943";
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    <defs><linearGradient id="g${up?1:0}" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="${col}" stop-opacity=".35"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
+    <path d="${dpath} L ${W} ${H} L 0 ${H} Z" fill="url(#g${up?1:0})"/>
+    <path d="${dpath}" fill="none" stroke="${col}" stroke-width="2"/></svg>`;
+}
+function regimeOf(price,sma){
+  if(price==null||sma==null)return{key:"neutral",label:"数据不足"};
+  const dev=(price/sma-1)*100;
+  if(dev>=1)return{key:"risk-on",label:"站上30日线",dev};
+  if(dev<=-1)return{key:"risk-off",label:"跌破30日线",dev};
+  return{key:"neutral",label:"贴近30日线·震荡",dev};
+}
+const ADVICE={
+  "risk-on":"仓位上限 60–80%｜目标 +3%~+5%｜顺势做多，趋势单拿盈亏比",
+  "neutral":"仓位上限 0–30%｜目标 0%~+2%｜少打，只做高分信号",
+  "risk-off":"仓位上限 0–20%｜目标 0%（保本第一）｜多拿 USDT，可小仓做空(S2后)"
+};
+
+async function loadMarket(){
+  let tick;
+  try{ tick=await fetchTickers(); }
+  catch(e){ $("coinGrid").innerHTML=`<div class="err">行情源暂不可用（可能网络/地区限制）。复盘与测算功能不受影响。</div>`;
+    $("mktSrc").textContent=""; return; }
+  $("mktSrc").textContent="数据源："+tick.src;
+
+  // 卡片 + 取K线算SMA/趋势
+  const closesArr=await Promise.all(CORE.map(c=>fetchCloses(c).catch(()=>[])));
+  $("coinGrid").innerHTML=tick.rows.map((c,i)=>{
+    const closes=closesArr[i]; const up=c.chg>=0;
+    return `<div class="card coin">
+      <div class="row"><div><div class="nm">${c.name}<span class="badge"> /USDT</span></div>
+        <div class="px">${money(c.price)}</div></div>
+        <div class="tag ${up?'risk-on':'risk-off'}">${pct(c.chg)}</div></div>
+      ${sparkSVG(closes.slice(-30),up)}
+      <div class="meta"><span>高 ${money(c.high)}</span><span>低 ${money(c.low)}</span>
+        <span>额 ${c.vol?'$'+fmt(c.vol/1e6,0)+'M':'—'}</span></div>
+    </div>`;
+  }).join("");
+
+  // 趋势表（核心三币）
+  const tb=tick.rows.map((c,i)=>{
+    const closes=closesArr[i]; if(!CORE3.includes(c.name))return null;
+    const sma=closes.length>=30? closes.slice(-30).reduce((a,b)=>a+b,0)/30 : null;
+    const rg=regimeOf(c.price,sma);
+    return `<tr>
+      <td><b>${c.name}</b></td>
+      <td><span class="chip ${rg.key}">${rg.label}</span></td>
+      <td>${money(c.price)}</td><td>${money(sma)}</td>
+      <td class="${cls(rg.dev)}">${rg.dev==null?'—':pct(rg.dev)}</td>
+      <td class="badge">${rg.key==='risk-on'?'偏多，可顺势':rg.key==='risk-off'?'偏空，防守为主':'方向不明，少动'}</td>
+    </tr>`;
+  }).filter(Boolean).join("");
+  $("trendBody").innerHTML=tb||`<tr><td colspan="6" class="badge">K线数据暂不可用</td></tr>`;
+
+  // 用 BTC 趋势驱动 Hero
+  const btc=tick.rows.find(c=>c.name==="BTC");
+  const btcCloses=closesArr[CORE.findIndex(c=>c.name==="BTC")]||[];
+  const btcSma=btcCloses.length>=30?btcCloses.slice(-30).reduce((a,b)=>a+b,0)/30:null;
+  const brg=regimeOf(btc?.price,btcSma);
+  const hr=$("heroRegime"); hr.className="chip "+brg.key;
+  hr.textContent=`BTC ${brg.label}${brg.dev!=null?'（'+pct(brg.dev)+'）':''}`;
+  $("heroAdvice").textContent=ADVICE[brg.key];
+
+  $("updated").textContent="更新于 "+new Date().toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit"});
+}
+
+//==================== 情绪 + 事件 ====================
+async function loadSentiment(){
+  try{
+    const f=await fetchFNG(); const v=+f.value;
+    $("fngVal").textContent=v;
+    $("fngVal").style.color=v<25?"#ea3943":v<45?"#f0b90b":v<55?"#cbd5e1":v<75?"#84cc16":"#16c784";
+    $("fngMark").style.left=v+"%";
+    const map={"Extreme Fear":"极度恐惧","Fear":"恐惧","Neutral":"中性","Greed":"贪婪","Extreme Greed":"极度贪婪"};
+    $("fngLabel").textContent=(map[f.value_classification]||f.value_classification)+" · 数值越低越恐慌（潜在机会），越高越贪婪（注意风险）";
+  }catch(e){ $("fngVal").textContent="—"; $("fngLabel").innerHTML='<span class="err">情绪指数暂不可用</span>'; }
+}
+async function loadEvents(){
+  let data; try{ data=await (await fetch("./data/events.json",{cache:"no-store"})).json(); }
+  catch(e){ $("eventsList").innerHTML='<span class="badge">未找到 data/events.json</span>'; return; }
+  const today=todayISO();
+  const evs=(data.events||[]).slice().sort((a,b)=>a.date<b.date?-1:1);
+  $("eventsList").innerHTML=evs.map(e=>{
+    const soon=e.date>=today;
+    return `<div class="ev imp-${e.impact||'low'}">
+      <div class="d">${e.date.slice(5)}<br><span class="evtag ${soon?'soon':''}">${soon?'未来':'已过'}</span></div>
+      <div class="t"><b>${e.title}</b> <span class="evtag">${e.type||''}</span>
+        <p>${e.note||''}</p></div></div>`;
+  }).join("")||'<span class="badge">暂无事件，去 data/events.json 添加</span>';
+}
+
+//==================== 交易复盘 + 统计 ====================
+const SAMPLE={meta:{strategy:"MP500",start_date:"2026-06-19",initial_capital:500,usdt_cny:6.74,target_rmb:1e6,target_usd:1e6},
+  weeks:[{week:1,start_date:"2026-06-19",end_date:"2026-06-25",stage:"S0",regime:"neutral",equity_start:500,equity_end:500,target_return_pct:0,trades:0,win_rate_pct:null,profit_factor:null,max_drawdown_pct:0,fees_funding_pct:0,violations:0}]};
+
+function equityChart(vals,base){
+  const el=$("equityChart"); if(!vals.length){el.innerHTML='<span class="badge">暂无数据</span>';return;}
+  const data=[base,...vals],W=1000,H=170,pad=26;
+  const min=Math.min(...data),max=Math.max(...data),rng=max-min||1;
+  const x=i=>pad+i*(W-2*pad)/(data.length-1||1),y=v=>H-pad-(v-min)/rng*(H-2*pad);
+  const dp=data.map((v,i)=>(i?"L":"M")+x(i).toFixed(1)+" "+y(v).toFixed(1)).join(" ");
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:170px" preserveAspectRatio="none">
+    <defs><linearGradient id="eg" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#f0b90b" stop-opacity=".3"/><stop offset="1" stop-color="#f0b90b" stop-opacity="0"/></linearGradient></defs>
+    <path d="${dp} L ${x(data.length-1)} ${H-pad} L ${pad} ${H-pad} Z" fill="url(#eg)"/>
+    <path d="${dp}" fill="none" stroke="#f0b90b" stroke-width="2.5"/>
+    <text x="${pad}" y="16" fill="#8aa0bd" font-size="13">峰值 ${fmt(max,0)}U</text>
+    <text x="${pad}" y="${H-7}" fill="#8aa0bd" font-size="13">谷值 ${fmt(min,0)}U</text></svg>`;
+}
+function renderLedger(d){
+  const m=d.meta,w=d.weeks||[];
+  let peak=m.initial_capital,maxDD=0;
+  w.forEach(x=>{x._ret=x.equity_start?((x.equity_end/x.equity_start)-1)*100:null;
+    peak=Math.max(peak,x.equity_end);maxDD=Math.max(maxDD,(peak-x.equity_end)/peak*100);});
+  const last=w[w.length-1]||{equity_end:m.initial_capital,stage:"S0"};
+  const cum=((last.equity_end/m.initial_capital)-1)*100;
+  const viol=w.reduce((s,x)=>s+(x.violations||0),0);
+  const rets=w.filter(x=>x._ret!=null).map(x=>x._ret);
+  const avg=rets.length?rets.reduce((a,b)=>a+b,0)/rets.length:null;
+  const wr=w.filter(x=>x.win_rate_pct!=null);const avgWr=wr.length?wr.reduce((a,b)=>a+b.win_rate_pct,0)/wr.length:null;
+  const pf=w.filter(x=>x.profit_factor!=null);const avgPf=pf.length?pf.reduce((a,b)=>a+b.profit_factor,0)/pf.length:null;
+
+  $("heroEquity").innerHTML=fmt(last.equity_end,0)+' <small>USDT</small>';
+  $("heroCum").innerHTML=`<span class="${cls(cum)}">${pct(cum)}</span>`;
+  $("heroStage").textContent=last.stage;
+  $("heroWeeks").textContent=w.length+" 周";
+  $("heroViol").innerHTML=`<span class="${viol>0?'warn':'pos'}">${viol}</span>`;
+
+  $("reviewCards").innerHTML=[
+    ["当前权益",fmt(last.equity_end,0)+" U"],["累计收益",`<span class="${cls(cum)}">${pct(cum)}</span>`],
+    ["平均周收益",`<span class="${cls(avg)}">${pct(avg)}</span>`],["最大回撤",fmt(maxDD,1)+"%"],
+  ].map(([k,v])=>`<div class="card"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
+
+  $("statCards").innerHTML=[
+    ["总周数",w.length],["平均胜率",avgWr==null?"—":fmt(avgWr,0)+"%"],
+    ["平均盈亏比",fmt(avgPf,2)],["最大回撤",fmt(maxDD,1)+"%"],
+    ["累计违规",`<span class="${viol>0?'warn':'pos'}">${viol}</span>`],["目标(USD)","$1,000,000"],
+  ].map(([k,v])=>`<div class="card"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
+
+  $("kpiBody").innerHTML=w.map(x=>`<tr>
+    <td>${x.week}</td><td>${x.start_date}</td><td>${x.stage}</td>
+    <td><span class="chip ${x.regime}">${x.regime}</span></td>
+    <td class="${cls(x._ret)}">${pct(x._ret)}</td>
+    <td>${x.target_return_pct!=null?x.target_return_pct+"%":"—"}</td>
+    <td>${x.trades??"—"}</td><td>${x.win_rate_pct!=null?x.win_rate_pct+"%":"—"}</td>
+    <td>${fmt(x.profit_factor)}</td><td>${x.max_drawdown_pct!=null?x.max_drawdown_pct+"%":"—"}</td>
+    <td>${x.fees_funding_pct!=null?x.fees_funding_pct+"%":"—"}</td>
+    <td class="${x.violations>0?'warn':''}">${x.violations??0}</td></tr>`).join("");
+
+  equityChart(w.map(x=>x.equity_end),m.initial_capital);
+  return m;
+}
+async function loadLedger(){
+  let d; try{ d=await (await fetch("./data/ledger.json",{cache:"no-store"})).json(); }
+  catch(e){ d=SAMPLE; }
+  const m=renderLedger(d);
+  // 用 ledger 的汇率/目标填充测算器默认值
+  if(m){ $("cFx").value=m.usdt_cny||6.74; $("cStart").value=m.initial_capital||500;
+    $("cRmb").value=m.target_rmb||1e6; $("cUsd").value=m.target_usd||1e6; renderCalc(); }
+}
+
+//==================== 复利测算 ====================
+const weeksTo=(s,r,t)=>r<=0?(t<=s?0:Infinity):Math.log(t/s)/Math.log(1+r);
+const dur=w=>!isFinite(w)?"—":`${Math.round(w)} 周 (${(w/52).toFixed(1)} 年)`;
+function renderCalc(){
+  const s=+$("cStart").value,r=(+$("cRate").value)/100,fx=+$("cFx").value,rmb=+$("cRmb").value,usd=+$("cUsd").value;
+  const tR=rmb/fx,tU=usd,yr=(Math.pow(1+r,52)-1)*100;
+  $("calcOut").innerHTML=`周化 <b>${(r*100).toFixed(1)}%</b> ≈ 年化(复利) <b>${fmt(yr,0)}%</b><br>`+
+    `${fmt(rmb,0)} 人民币 ≈ <b>${fmt(tR,0)} U</b> → 需 <b>${dur(weeksTo(s,r,tR))}</b><br>`+
+    `${fmt(usd,0)} 美元 ≈ <b>${fmt(tU,0)} U</b> → 需 <b>${dur(weeksTo(s,r,tU))}</b>`;
+  $("scenBody").innerHTML=[0.02,0.025,0.03,0.05,0.08,0.10].map(rr=>{
+    const y=(Math.pow(1+rr,52)-1)*100;
+    return `<tr><td>${(rr*100).toFixed(1)}%</td><td>${fmt(y,0)}%</td><td>${dur(weeksTo(s,rr,tR))}</td><td>${dur(weeksTo(s,rr,tU))}</td></tr>`;
+  }).join("");
+}
+["cStart","cRate","cFx","cRmb","cUsd"].forEach(id=>$(id).addEventListener("input",renderCalc));
+
+//==================== 启动 ====================
+function refreshAll(){ loadMarket(); loadSentiment(); }
+loadLedger(); loadEvents(); refreshAll(); renderCalc();
+$("refreshBtn").addEventListener("click",refreshAll);
+setInterval(refreshAll,60000);
+</script>
+</body>
+</html>

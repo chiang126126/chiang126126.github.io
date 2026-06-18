@@ -23,8 +23,8 @@ from datetime import date, timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-LEDGER = ROOT / "dashboard" / "data" / "ledger.json"
-SAMPLE = ROOT / "dashboard" / "data" / "ledger.sample.json"
+LEDGER = ROOT / "data" / "ledger.json"
+SAMPLE = ROOT / "data" / "ledger.sample.json"
 TEMPLATE = ROOT / "docs" / "weekly_review_TEMPLATE.md"
 REVIEWS = ROOT / "reviews"
 
