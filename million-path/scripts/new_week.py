@@ -14,6 +14,8 @@ MP500 / Million Path — 周复盘自动化脚本
   python scripts/new_week.py                # 生成下一周
   python scripts/new_week.py --regime risk-on   # 同时预填本周行情判断
 """
+from __future__ import annotations  # 兼容 Python 3.7+（避免 `str | None` 在旧版报错）
+
 import argparse
 import json
 import shutil
