@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-18T19:37:37.457376+00:00",
+  "generated_at": "2026-06-18T19:39:42.806691+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 747,
@@ -60,8 +60,8 @@
       "risk_usdt": 0.7906,
       "risk_pct": 0.79,
       "mirror_latency_sec": 15.5,
-      "sl_price": 0.01018928506,
-      "sl_paper_current": 0.01020928506,
+      "sl_price": 0.010182243480000002,
+      "sl_paper_current": 0.010202243480000001,
       "disaster_stop_price": null,
       "disaster_stop_at": null,
       "maker_shadow_data": {
@@ -102,7 +102,7 @@
       "top_trader_account_ratio": 0.5763,
       "global_account_ratio": 0.5179,
       "phase_a_mfe_pct": 0.915,
-      "phase_b_mfe_pct": 1.236,
+      "phase_b_mfe_pct": 1.304,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.04,
       "fees_are_actual": false,
@@ -115,17 +115,17 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.068,
       "phase_a_mfe_price": 0.010182,
-      "current_price": 0.010142,
-      "unrealized_pnl_usdt": 1.1117,
-      "unrealized_pnl_pct": 1.112,
-      "last_price_check_at": "2026-06-18T19:37:35.910122+00:00",
+      "current_price": 0.01018,
+      "unrealized_pnl_usdt": 0.7412,
+      "unrealized_pnl_pct": 0.741,
+      "last_price_check_at": "2026-06-18T19:39:41.259804+00:00",
       "phase_a_mae_price": 0.01026,
       "phase_a_mae_pct": -0.039,
       "phase_a_mae_at": "2026-06-18T19:13:52.004310+00:00",
-      "last_sl_sync_at": "2026-06-18T19:35:37.650028+00:00",
-      "last_sl_sync_paper_sl": 0.01020928506,
-      "sl_sync_count": 5,
-      "phase_b_mfe_price": 0.010149
+      "last_sl_sync_at": "2026-06-18T19:37:44.939188+00:00",
+      "last_sl_sync_paper_sl": 0.010202243480000001,
+      "sl_sync_count": 6,
+      "phase_b_mfe_price": 0.010142
     },
     {
       "paper_id": "USUSDT|SHORT|2026-06-18T19:30:51.971059+00:00",
@@ -197,10 +197,10 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": 0.189,
       "phase_a_mfe_price": 0.014887,
-      "current_price": 0.014927,
-      "unrealized_pnl_usdt": -0.3006,
-      "unrealized_pnl_pct": -0.3,
-      "last_price_check_at": "2026-06-18T19:37:35.910122+00:00",
+      "current_price": 0.014917,
+      "unrealized_pnl_usdt": -0.2333,
+      "unrealized_pnl_pct": -0.233,
+      "last_price_check_at": "2026-06-18T19:39:41.259804+00:00",
       "phase_a_mae_price": 0.014953,
       "phase_a_mae_pct": -0.475,
       "phase_a_mae_at": "2026-06-18T19:36:26.152016+00:00"
@@ -59937,16 +59937,26 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "EVAAUSDT|SHORT|2026-06-18T19:36:58.507905+00:00",
+      "symbol": "EVAAUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-06-18T19:37:39.999516+00:00",
+      "reason": "phase_6m: Tier C 小币 (entry=$0.6650) 整体 block — 13 天 195 笔 -$96 (drag $1.30/笔, 全 tier 最高)",
+      "last_checked_at": "2026-06-18T19:39:41.259804+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 62815.6,
-    "btc_ma25_1h": 63901.52,
-    "pct_vs_ma25": -1.699,
-    "change_24h_pct": -2.265,
+    "btc_price": 62865.1,
+    "btc_ma25_1h": 63903.5,
+    "pct_vs_ma25": -1.625,
+    "change_24h_pct": -2.188,
     "sub_regime": "down_stable",
-    "change_3h_pct": 0.242,
-    "computed_at": "2026-06-18T19:37:36.854796+00:00"
+    "change_3h_pct": 0.321,
+    "computed_at": "2026-06-18T19:39:42.190618+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
