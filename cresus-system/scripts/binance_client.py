@@ -763,14 +763,18 @@ class BinanceClient:
         BNB-discount (commissionAsset=BNB) 情况: 本版本暂不换算, 返回 None
         让调用方 fallback 到估算. 实盘启用 BNB 折扣前再扩展.
 
-        Phase 6.P (2026-06-18): 加 0.5s × 2 次 retry 防 Binance userTrades 返
-        empty fills (订单刚 settle, API 索引延迟). 历史 mainnet 数据 65% trade
-        本来就拿到 actual fees, 但最近 50 笔 fees_are_actual=False — 怀疑 G3
-        LIMIT-IOC fill 后立即查导致 race. 加 retry 救之.
+        Phase 6.P (2026-06-18): 加 0.25s + 0.5s = max 0.75s 总 backoff retry
+        防 Binance userTrades 返 empty fills (订单刚 settle, API 索引延迟).
+        历史 65% trade 本来就拿到 actual fees, 最近 50 笔 fees_are_actual=False
+        100% 怀疑 G3 LIMIT-IOC fill 后立即查导致 race.
+
+        paranoid review (2026-06-18) #1: 同 fn 被 entry path 也调用; 配 Phase 6.O
+        POLL_INTERVAL=2s, 长 backoff (原 1.5s) 会让 entry tick 阻塞下个 tick.
+        backoff 缩到 0.25s/0.5s, 总 max 0.75s 平衡 fee 准确率跟 tick cadence.
         """
-        import time
+        backoffs = (0.25, 0.5)   # 累计 max 0.75s, 平衡 fee 准确率跟 tick 节奏
         fills = None
-        for attempt in range(3):   # 0=立即, 1=+0.5s, 2=+1s
+        for attempt in range(3):   # 0=立即, 1=+0.25s, 2=+0.5s (共 max 0.75s)
             try:
                 fills = self.get_user_trades(symbol, order_id=order_id)
             except (BinanceError, ValueError) as e:
@@ -779,14 +783,14 @@ class BinanceClient:
                     f"{symbol} order_id={order_id} (attempt {attempt+1}/3): {e}"
                 )
                 if attempt < 2:
-                    time.sleep(0.5 * (attempt + 1))
+                    time.sleep(backoffs[attempt])
                     continue
                 return None
             if fills:
                 break
             # empty fills, settle 延迟, 重试
             if attempt < 2:
-                time.sleep(0.5 * (attempt + 1))
+                time.sleep(backoffs[attempt])
         if not fills:
             log.warning(
                 f"[fee] no fills for {symbol} order_id={order_id} "
