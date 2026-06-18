@@ -390,6 +390,11 @@ LIVE_SYMBOL_BLACKLIST = [
     # 已释放 (5/25): DODOXUSDT / NMRUSDT / PLAYUSDT / GUAUSDT
     #   原因: 拉黑后 paper 0 新信号 (scanner 自然淘汰), 样本 n≤4 统计不显著.
     #   Phase 4.U/4.V 新策略下重新开放, 若 paper 再出信号可积累新样本复审.
+    # Phase 6.M (2026-06-16) — mainnet 13 天 audit, n≥6 + avg≤-$2 重亏 symbol 加入:
+    "FOLKSUSDT",   # 7 笔 -$15.52 (avg -$2.22), 双向都亏, 用户明确指定
+    "ESPORTSUSDT", # 7 笔 -$15.44 (avg -$2.21), avg ≤ -$2 强证据
+    "ALLOUSDT",    # 6 笔 -$15.14 (avg -$2.52)
+    "FLNCUSDT",    # 6 笔 -$12.94 (avg -$2.16)
 ]
 
 # Phase 4.W (5/26): Reconciliation 忽略列表 — testnet 上"无法平仓"的僵尸合约.
@@ -774,6 +779,53 @@ LIVE_PHASE_6F_B2_PARTIAL_MAX_LOSS_USDT = 15.0    # kill switch (vs B1 $25 紧一
 #   - B 中币 + CHOP + LONG: n=4 +$20 (mean +$4.94) — INSUF n<10 但 mean 极高
 # Tier A ($≥10) 不放 — 数据全负. Tier C ($0.1-1) 不放 — n=5 -$4 paper.
 LIVE_PHASE_6F_B2_PARTIAL_VALID_TIERS = frozenset({"D", "B"})  # 仅 D 微币 + B 中币
+
+# ============================================================================
+# Phase 6.M (2026-06-16) — C 小币 tier 整体 block + 单 symbol 黑名单扩展
+# ============================================================================
+# 数据驱动 (671 笔 mainnet 13 天, $600 pilot 累计 -$148 net):
+#   C 小币 tier ($0.1 ≤ entry < $1.0):
+#     - 全 tier: n=195 net=-$96.65 (drag $1.30/笔, 全 tier 最高)
+#     - C 小币 up LONG c5:    n=96  -$15.37 (avg -$0.16)  ❌
+#     - C 小币 chop LONG c5:  n=22  -$21.10 (avg -$0.96)  ❌ (Phase 6.F-B3 已 block)
+#     - C 小币 down SHORT c5: n=51  -$9.62  (avg -$0.19)  ❌
+#     - C 小币 chop SHORT c5: n=6   +$4.69  (avg +$0.78)  🟡 唯一边际盈利,
+#                                                           但 n<10 INSUF, 不可信
+#     - 所有其它 cell (conv=6/7, up/down SHORT, etc): 全负
+#   paper EV +$0.81/笔, live -$0.49/笔, drag $1.30/笔 (全 tier 最高).
+#
+# 决策: block 整个 C 小币 tier 无例外, 节流 15 笔/天 ≈ 省 $20/天 drag.
+# 同时取消 Phase 6.F-B3 (子集) 的特殊 log — 被 6.M 完全覆盖.
+# 紧急回滚: LIVE_PHASE_6M_TIER_C_FULL_BLOCK_ENABLED = False
+LIVE_PHASE_6M_TIER_C_FULL_BLOCK_ENABLED = True
+
+# ============================================================================
+# Phase 6.N (2026-06-16) — Maker mode 开仓 (LIMIT post-only) feature flag
+# ============================================================================
+# 设计: 默认 market taker (fees 0.05%/单 ≈ 0.10%/round-trip = 0.13%/笔).
+# Maker mode: 开仓时挂 LIMIT post-only 在 bid (LONG) / ask (SHORT) 价位.
+#   - 成功 fill → 享受 maker rebate / 减少 fees 70%+
+#   - 未在 LIVE_PHASE_6N_MAKER_TIMEOUT_SEC 内 fill → fallback (market or skip)
+#
+# fees 节省预期: 0.13%/笔 → 0.04%/笔 (3.3× 减), 50 笔/天 × $100 notional × 0.09% = 省 $4.5/天
+# 月化 +$135.
+#
+# **危险**: 信号延迟. paper 假设瞬时 fill, 但 maker 等 X 秒后市场已走. 需要:
+#   1. paper-live 信号延迟容忍度评估 (paper trade entered_at vs live placement)
+#   2. fill 率监控 (期望 > 50% 后再开 100%)
+#   3. fallback 策略选择: market (保 fill 但负 selection) or skip (更稳但损 alpha)
+#
+# 状态: 部署到 main 但**默认禁用** (LIVE_PHASE_6N_MAKER_MODE_ENABLED = False).
+# 启用方式: 改 False → "shadow" (跑代码逻辑但不挂单, 测信号路径) → "canary_10pct"
+# (10% 流量) → "full". 渐进开放. 必须先看 100+ 笔 shadow 数据.
+LIVE_PHASE_6N_MAKER_MODE_ENABLED = False         # 总开关 默认 OFF (实际挂 maker 单)
+LIVE_PHASE_6N_MAKER_MODE = "shadow"                # shadow / canary_10pct / canary_50pct / full
+LIVE_PHASE_6N_MAKER_TIMEOUT_SEC = 8               # 等 8s 不 fill 就 fallback
+LIVE_PHASE_6N_MAKER_FALLBACK = "skip"              # "skip" or "market"
+LIVE_PHASE_6N_MAKER_PRICE_OFFSET_BPS = 0.0        # 0 = 挂在 bid/ask, 正数 = 更激进 (向 mid 靠)
+# Phase 6.N shadow 数据收集开关 — 跟 main flag 独立, default 永远开 (无副作用,
+# 只填字段) 让历史数据先积累. 把 "or True" 拆成命名常量, 防未来重构者误删.
+LIVE_PHASE_6N_SHADOW_LOG_ALWAYS_ON = True
 
 # Phase 3.3.a/b 控制文件 (在 ~/.cresus-*)
 PAUSE_FLAG_PATH = Path.home() / ".cresus-pause"
@@ -1308,10 +1360,28 @@ def is_eligible_for_mirror(
             )
     except Exception as e:
         log.debug(f"[6.G G2] macro filter skipped (fail-safe): {type(e).__name__}: {e}")
+    # Phase 6.M (2026-06-16): C 小币 tier ($0.1 ≤ entry < $1.0) 整体 block.
+    # 数据: mainnet 13 天 195 笔 -$96.65 (drag $1.30/笔, 全 tier 最高).
+    # paper EV +$0.81 vs live -$0.49, gap $1.30 全 tier 最严重.
+    # 一刀切 — 任何 conv/direction/regime, 比 Phase 6.F-B3 (仅 LONG chop) 严格.
+    # 节流 15 笔/天 ≈ 省 $20/天 drag.
+    # 紧急回滚: LIVE_PHASE_6M_TIER_C_FULL_BLOCK_ENABLED = False
+    if LIVE_PHASE_6M_TIER_C_FULL_BLOCK_ENABLED:
+        try:
+            entry_price_for_6m = float(paper_trade.get("entry_price") or 0)
+        except (ValueError, TypeError):
+            entry_price_for_6m = 0.0
+        if (entry_price_for_6m > 0
+                and LIVE_PHASE_6F_TIER_C_LOWER <= entry_price_for_6m < LIVE_PHASE_6F_TIER_C_UPPER):
+            return False, (
+                f"phase_6m: Tier C 小币 (entry=${entry_price_for_6m:.4f}) "
+                f"整体 block — 13 天 195 笔 -$96 (drag $1.30/笔, 全 tier 最高)"
+            )
     # 6.F. Phase 6.F BLACKLIST — 数据驱动 (105h 280 笔统计):
     #   B1: conv=6 (n=57 -$80, paper 也仅 +$22 → 信号差 + 执行差).
     #   B3: Tier C ($0.1-1) + LONG + BTC chop (n=22 -$18 vs paper +$45 → 纯执行 gap).
     # 总开关 LIVE_PHASE_6F_BLACKLIST_ENABLED, 紧急回滚改 False.
+    # 注: Phase 6.M (上方) 已 cover 全部 Tier C, 6.F-B3 实际不会再触发, 保留代码备 6.M 关闭时退路.
     if LIVE_PHASE_6F_BLACKLIST_ENABLED:
         # B1: 整桶 conv=6 不做 live (但 paper / shadow 继续跑收数据).
         raw_conv = paper_trade.get("conviction_score")
@@ -2775,12 +2845,54 @@ def _try_mirror_open(
     # LONG: ask (我们要吃的卖一价); SHORT: bid (我们要打的买一价).
     # 失败时 fallback None → open_position 回退到市价单 (向后兼容).
     entry_limit_price: Optional[float] = None
+    maker_shadow_data: Optional[dict] = None   # Phase 6.N shadow log
     try:
         bt = client.get_book_ticker(sym)
         side_key = "askPrice" if side == "BUY" else "bidPrice"
         raw_px = float(bt.get(side_key) or 0)
         if raw_px > 0:
             entry_limit_price = raw_px
+        # Phase 6.N (2026-06-16) Maker Shadow Mode: 记录"若用 maker 会挂在哪个价位"
+        # + paper-live 信号延迟, 给未来真 maker 实现做数据基础.
+        # 不改实际行为 — 仍走 IOC market 路径. 即使 main flag OFF 也收集 shadow 数据
+        # (用独立的 SHADOW_LOG_ALWAYS_ON 常量, 防止被误重构).
+        if LIVE_PHASE_6N_SHADOW_LOG_ALWAYS_ON or LIVE_PHASE_6N_MAKER_MODE_ENABLED:
+            try:
+                bid_px = float(bt.get("bidPrice") or 0)
+                ask_px = float(bt.get("askPrice") or 0)
+                if bid_px > 0 and ask_px > 0:
+                    # maker 挂单价: LONG 挂在 bid (做 maker 买, 等卖家来打), SHORT 挂在 ask
+                    maker_px = bid_px if side == "BUY" else ask_px
+                    # paper signal age = paper entered_at → 现在
+                    paper_entered_at = paper_trade.get("entered_at")
+                    paper_age_sec = None
+                    if paper_entered_at:
+                        try:
+                            t_paper = datetime.fromisoformat(
+                                paper_entered_at.replace("Z","+00:00"))
+                            paper_age_sec = (datetime.now(timezone.utc) - t_paper).total_seconds()
+                        except (ValueError, TypeError):
+                            pass
+                    # paranoid review C1 fix (2026-06-16): maker_vs_market_bps 仅在
+                    # entry_limit_price 有效时计算, 防 None - float 抛 TypeError 被
+                    # 上面 except 吞掉 → maker_shadow_data 静默丢失.
+                    maker_vs_market_bps = None
+                    if entry_limit_price is not None and entry_limit_price > 0:
+                        if side == "BUY":
+                            maker_vs_market_bps = (entry_limit_price - maker_px) / maker_px * 10000
+                        else:
+                            maker_vs_market_bps = (maker_px - entry_limit_price) / maker_px * 10000
+                    maker_shadow_data = {
+                        "maker_price_would_have_been": maker_px,
+                        "current_bid": bid_px,
+                        "current_ask": ask_px,
+                        "spread_bps": (ask_px - bid_px) / ((ask_px+bid_px)/2) * 10000,
+                        "market_fill_price": entry_limit_price,
+                        "paper_signal_age_sec": paper_age_sec,
+                        "maker_vs_market_bps": maker_vs_market_bps,
+                    }
+            except (ValueError, TypeError, KeyError, ZeroDivisionError):
+                pass
     except (BinanceError, ValueError, KeyError, TypeError) as e:
         log.warning(f"[mirror-open] {sym}: bookTicker 失败 ({e}), 回退市价单")
 
@@ -3011,6 +3123,9 @@ def _try_mirror_open(
             # Phase 6.I (2026-06-12): 交易所侧灾难止损 (bot-death 保命)
             "disaster_stop_price": disaster_stop_price,    # None 若挂失败或禁用
             "disaster_stop_at": disaster_stop_at,
+            # Phase 6.N (2026-06-16) Maker Shadow: 若启用 maker 会挂在哪里 + spread + 延迟.
+            # 不改实际行为, 仅记录数据为未来 maker mode 启用做评估基础.
+            "maker_shadow_data": maker_shadow_data,
             # Phase 6.F-B1-EXP1 v2 (2026-06-14): 试验性 conv=6 D 微币 LONG chop partial unblock 标记
             # True 表示该 trade 是 B1 EXP 试验组, retro 时单独统计
             "_phase_6f_b1_partial_unblock": bool(paper_trade.get("_phase_6f_b1_partial_unblock")),

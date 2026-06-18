@@ -3977,12 +3977,15 @@ class TestMirrorIterationGuards(unittest.TestCase):
         """关键 bug fix: state 被清后, exchange 有但 live 不知 → 跳过 mirror."""
         now = datetime.now(timezone.utc)
         # paper 有 STORJUSDT signal
+        # Phase 6.M (2026-06-16) blocks all Tier C ($0.1-1) — bump entry_price to
+        # Tier B 范围 ($1-10) 避开 6.M 干扰本 orphan 测试 (本测试关心 orphan-block 逻辑,
+        # 不关心 tier 过滤). 原 0.1089 在 Tier C 会被 6.M 抢先 block.
         self._write_paper([{
             "id": "STORJUSDT|LONG|2026-05-15T15:00:00+00:00",
             "symbol": "STORJUSDT",
             "direction": "LONG",
             "entered_at": (now - timedelta(seconds=60)).isoformat(),
-            "entry_price": 0.1089, "sl": 0.1073,
+            "entry_price": 5.0, "sl": 4.9,
         }])
         # exchange 已经有 STORJUSDT 持仓 (上次 mirror 留下的孤儿)
         mock_positions = [{"symbol": "STORJUSDT", "positionAmt": "183.0"}]
@@ -5988,9 +5991,10 @@ class TestPhase6FBlacklist(unittest.TestCase):
         scenarios = [
             (5.0, "LONG", "down"),    # LONG + down (4.F gate 也会拒, 但 6.F-B1 先)
             (50.0, "SHORT", "up"),    # Tier A SHORT
-            (0.5, "SHORT", "down"),   # Tier C SHORT
             (5.0, "SHORT", "chop"),   # SHORT + chop (不是 LONG)
             (5.0, "LONG", "up"),      # LONG + up (不是 chop)
+            # 注: 不再用 Tier C (entry $0.1-1) 测 conv=6, 因为 Phase 6.M (2026-06-16)
+            # 已 cover 整个 Tier C, 会先于 B1 触发. 改用 Tier B ($1-10).
         ]
         for entry, direction, regime in scenarios:
             with self.subTest(entry=entry, direction=direction, regime=regime):
@@ -6057,9 +6061,11 @@ class TestPhase6FBlacklist(unittest.TestCase):
                           "缺 conv 字段不应触发 B1")
 
     # === B3: Tier C + LONG + BTC chop ===
+    # 注: Phase 6.M (2026-06-16) 已 cover 全 Tier C. 以下 B3 子集测试都 patch
+    # LIVE_PHASE_6M_TIER_C_FULL_BLOCK_ENABLED=False 维持 B3 单元测试隔离性, 防 6.M 关闭时 B3 退路失灵.
 
     def test_6f_b3_tier_c_long_chop_blocked(self):
-        """Tier C ($0.1-1) + LONG + BTC chop = block."""
+        """Tier C ($0.1-1) + LONG + BTC chop = block (B3 单独测, 6.M 关闭)."""
         from datetime import datetime, timezone
         for entry in [0.1, 0.5, 0.99]:   # 含下界, 不含上界
             with self.subTest(entry=entry):
@@ -6067,7 +6073,8 @@ class TestPhase6FBlacklist(unittest.TestCase):
                     entry_price=entry, direction="LONG", conviction_score=5,
                 )
                 t["id"] = f"X|LONG|tierC_{entry}|2026-06-08T10:00:00"
-                with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+                with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True), \
+                     patch.object(live_trader, "LIVE_PHASE_6M_TIER_C_FULL_BLOCK_ENABLED", False):
                     eligible, reason = is_eligible_for_mirror(
                         t, self._base_live_state(),
                         datetime.now(timezone.utc),
@@ -6077,19 +6084,20 @@ class TestPhase6FBlacklist(unittest.TestCase):
                 self.assertIn("phase_6f_b3", reason)
 
     def test_6f_b3_tier_c_short_not_blocked(self):
-        """Tier C + SHORT + chop 不应被 block (B3 仅 LONG)."""
+        """Tier C + SHORT + chop 不应被 B3 block (B3 仅 LONG). 同时关 6.M 测 B3."""
         from datetime import datetime, timezone
         t = self._base_paper_trade(
             entry_price=0.5, direction="SHORT", conviction_score=5,
         )
         t["id"] = "X|SHORT|tierC|2026-06-08T10:00:00"
-        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True), \
+             patch.object(live_trader, "LIVE_PHASE_6M_TIER_C_FULL_BLOCK_ENABLED", False):
             eligible, reason = is_eligible_for_mirror(
                 t, self._base_live_state(),
                 datetime.now(timezone.utc),
                 btc_regime="chop",
             )
-        self.assertTrue(eligible, f"Tier C SHORT 不应 block, 实际 reason={reason}")
+        self.assertTrue(eligible, f"Tier C SHORT 不应被 B3 block, 实际 reason={reason}")
 
     def test_6f_b3_tier_c_long_down_not_blocked_by_6f(self):
         """Tier C LONG + regime=down: 6.F B3 不应触发 (只针对 chop).
@@ -6113,13 +6121,15 @@ class TestPhase6FBlacklist(unittest.TestCase):
     def test_6f_b3_tier_c_long_up_not_blocked(self):
         """Tier C + LONG + BTC up: 6.F B3 不触发, 也不被 4.F 拦 (up+LONG 通过).
         这是 6.F B3 的 negative control — 同样 Tier+direction 但 regime 不同, 应通过.
+        6.M 关闭, 否则会被 6.M block.
         """
         from datetime import datetime, timezone
         t = self._base_paper_trade(
             entry_price=0.5, direction="LONG", conviction_score=5,
         )
         t["id"] = "X|LONG|up|2026-06-08T10:00:00"
-        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True), \
+             patch.object(live_trader, "LIVE_PHASE_6M_TIER_C_FULL_BLOCK_ENABLED", False):
             eligible, reason = is_eligible_for_mirror(
                 t, self._base_live_state(),
                 datetime.now(timezone.utc),
@@ -6188,19 +6198,163 @@ class TestPhase6FBlacklist(unittest.TestCase):
         self.assertFalse(eligible, "$0.10 应入 Tier C 被 block")
 
     def test_6f_b3_btc_regime_none_not_blocked(self):
-        """btc_regime=None (API 失败) → 不 block (fail-safe)."""
+        """btc_regime=None (API 失败) → B3 不 block (fail-safe). 6.M 关闭测 B3."""
         from datetime import datetime, timezone
         t = self._base_paper_trade(
             entry_price=0.5, direction="LONG", conviction_score=5,
         )
         t["id"] = "X|LONG|noregime|2026-06-08T10:00:00"
-        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True), \
+             patch.object(live_trader, "LIVE_PHASE_6M_TIER_C_FULL_BLOCK_ENABLED", False):
             eligible, reason = is_eligible_for_mirror(
                 t, self._base_live_state(),
                 datetime.now(timezone.utc),
                 btc_regime=None,
             )
-        self.assertTrue(eligible, "btc_regime=None 应 fail-safe 不 block")
+        self.assertTrue(eligible, "btc_regime=None 应 B3 fail-safe 不 block")
+
+    # ========================================================================
+    # Phase 6.M (2026-06-16): C 小币 tier 整体 block — 测试集
+    # ========================================================================
+
+    def test_6m_tier_c_long_chop_blocked(self):
+        """Phase 6.M: Tier C LONG chop 被 6.M block (reason 含 phase_6m)."""
+        from datetime import datetime, timezone
+        t = self._base_paper_trade(entry_price=0.5, direction="LONG", conviction_score=5)
+        t["id"] = "X|LONG|6m_chop|2026-06-16T10:00:00"
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            eligible, reason = is_eligible_for_mirror(
+                t, self._base_live_state(),
+                datetime.now(timezone.utc),
+                btc_regime="chop",
+            )
+        self.assertFalse(eligible)
+        self.assertIn("phase_6m", reason)
+
+    def test_6m_tier_c_short_blocked(self):
+        """Phase 6.M: Tier C SHORT 任何 regime 都 block (跟 B3 区别 — B3 仅 LONG)."""
+        from datetime import datetime, timezone
+        for regime in ("up", "chop", "down"):
+            with self.subTest(regime=regime):
+                t = self._base_paper_trade(
+                    entry_price=0.5, direction="SHORT", conviction_score=5,
+                )
+                t["id"] = f"X|SHORT|6m_{regime}|2026-06-16T10:00:00"
+                with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+                    eligible, reason = is_eligible_for_mirror(
+                        t, self._base_live_state(),
+                        datetime.now(timezone.utc),
+                        btc_regime=regime,
+                    )
+                self.assertFalse(eligible, f"6.M 应 block Tier C SHORT {regime}")
+                self.assertIn("phase_6m", reason)
+
+    def test_6m_tier_c_long_up_blocked(self):
+        """Phase 6.M: Tier C LONG up 也 block (跟 B3 区别 — B3 仅 chop)."""
+        from datetime import datetime, timezone
+        t = self._base_paper_trade(entry_price=0.5, direction="LONG", conviction_score=5)
+        t["id"] = "X|LONG|6m_up|2026-06-16T10:00:00"
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            eligible, reason = is_eligible_for_mirror(
+                t, self._base_live_state(),
+                datetime.now(timezone.utc),
+                btc_regime="up",
+            )
+        self.assertFalse(eligible)
+        self.assertIn("phase_6m", reason)
+
+    def test_6m_tier_d_not_blocked(self):
+        """Phase 6.M: Tier D (<$0.1) 不 block — 6.M 仅 cover Tier C."""
+        from datetime import datetime, timezone
+        t = self._base_paper_trade(entry_price=0.05, direction="LONG", conviction_score=5)
+        t["id"] = "X|LONG|6m_tierD|2026-06-16T10:00:00"
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            eligible, reason = is_eligible_for_mirror(
+                t, self._base_live_state(),
+                datetime.now(timezone.utc),
+                btc_regime="chop",
+            )
+        self.assertTrue(eligible, f"Tier D 不应被 6.M block, 实际 reason={reason}")
+
+    def test_6m_tier_b_not_blocked(self):
+        """Phase 6.M: Tier B ($1-10) 不 block."""
+        from datetime import datetime, timezone
+        t = self._base_paper_trade(entry_price=5.0, direction="LONG", conviction_score=5)
+        t["id"] = "X|LONG|6m_tierB|2026-06-16T10:00:00"
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            eligible, reason = is_eligible_for_mirror(
+                t, self._base_live_state(),
+                datetime.now(timezone.utc),
+                btc_regime="chop",
+            )
+        self.assertTrue(eligible, f"Tier B 不应被 6.M block, 实际 reason={reason}")
+
+    def test_6m_tier_c_boundary_upper_not_blocked(self):
+        """Phase 6.M 上界: entry == $1.0 进 Tier B 不 block."""
+        from datetime import datetime, timezone
+        t = self._base_paper_trade(entry_price=1.0, direction="LONG", conviction_score=5)
+        t["id"] = "X|LONG|6m_boundary|2026-06-16T10:00:00"
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            eligible, reason = is_eligible_for_mirror(
+                t, self._base_live_state(),
+                datetime.now(timezone.utc),
+                btc_regime="up",
+            )
+        self.assertTrue(eligible, f"$1.0 应入 Tier B 不 block, 实际 reason={reason}")
+
+    def test_6m_tier_c_boundary_lower_blocked(self):
+        """Phase 6.M 下界包含: entry == $0.1 在 Tier C 内 → block."""
+        from datetime import datetime, timezone
+        t = self._base_paper_trade(entry_price=0.1, direction="LONG", conviction_score=5)
+        t["id"] = "X|LONG|6m_lower|2026-06-16T10:00:00"
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            eligible, reason = is_eligible_for_mirror(
+                t, self._base_live_state(),
+                datetime.now(timezone.utc),
+                btc_regime="up",
+            )
+        self.assertFalse(eligible)
+        self.assertIn("phase_6m", reason)
+
+    def test_6m_disabled_falls_back_to_b3(self):
+        """Phase 6.M=False → 退回 Phase 6.F B3 (Tier C LONG chop 仍 block)."""
+        from datetime import datetime, timezone
+        t = self._base_paper_trade(entry_price=0.5, direction="LONG", conviction_score=5)
+        t["id"] = "X|LONG|6m_off|2026-06-16T10:00:00"
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True), \
+             patch.object(live_trader, "LIVE_PHASE_6M_TIER_C_FULL_BLOCK_ENABLED", False):
+            eligible, reason = is_eligible_for_mirror(
+                t, self._base_live_state(),
+                datetime.now(timezone.utc),
+                btc_regime="chop",
+            )
+        self.assertFalse(eligible)
+        self.assertIn("phase_6f_b3", reason)
+        self.assertNotIn("phase_6m", reason)
+
+    def test_6m_blacklisted_symbol_folksusdt(self):
+        """Phase 6.M C 项: FOLKSUSDT 已加入 LIVE_SYMBOL_BLACKLIST."""
+        self.assertIn("FOLKSUSDT", live_trader.LIVE_SYMBOL_BLACKLIST)
+        self.assertIn("ESPORTSUSDT", live_trader.LIVE_SYMBOL_BLACKLIST)
+        self.assertIn("ALLOUSDT", live_trader.LIVE_SYMBOL_BLACKLIST)
+        self.assertIn("FLNCUSDT", live_trader.LIVE_SYMBOL_BLACKLIST)
+
+    def test_6m_folksusdt_actually_rejected(self):
+        """Phase 6.M C: FOLKSUSDT 实际 mirror 时被拒 (经 symbol blacklist gate)."""
+        from datetime import datetime, timezone
+        t = self._base_paper_trade(
+            entry_price=0.5, direction="LONG", conviction_score=5,
+        )
+        t["symbol"] = "FOLKSUSDT"
+        t["id"] = "FOLKSUSDT|LONG|6m_C|2026-06-16T10:00:00"
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            eligible, reason = is_eligible_for_mirror(
+                t, self._base_live_state(),
+                datetime.now(timezone.utc),
+                btc_regime="up",
+            )
+        self.assertFalse(eligible)
+        self.assertIn("blacklist", reason)
 
     # === 总开关 ===
 
@@ -6237,8 +6391,11 @@ class TestPhase6FBlacklist(unittest.TestCase):
             entry_price=0.5, direction="LONG", conviction_score=6,
         )
         t["id"] = "X|LONG|both|2026-06-08T10:00:00"
+        # 2026-06-16: Phase 6.M (Tier C 全 block) 在 B1/B3 之前触发 — patch off 6.M
+        # 才能测 B1 vs B3 优先级 (B1 在 B3 之前).
         with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True), \
-             patch.object(live_trader, "LIVE_PHASE_6F_B1_PARTIAL_UNBLOCK_ENABLED", False):
+             patch.object(live_trader, "LIVE_PHASE_6F_B1_PARTIAL_UNBLOCK_ENABLED", False), \
+             patch.object(live_trader, "LIVE_PHASE_6M_TIER_C_FULL_BLOCK_ENABLED", False):
             eligible, reason = is_eligible_for_mirror(
                 t, self._base_live_state(),
                 datetime.now(timezone.utc),
@@ -6865,9 +7022,10 @@ class TestPhase6FB1EXP1PartialUnblock(unittest.TestCase):
         self.assertTrue(t.get("_phase_6f_b1_partial_unblock"))
 
     def test_exp1_v2_boundary_exactly_0_1_blocked(self):
-        """entry=$0.10 边界 → 不在 <$0.1 范围内, 拒."""
+        """entry=$0.10 边界 → B1-EXP1 v2 拒 (不在 <$0.1 范围内). 关 6.M 测 B1 边界."""
         t = self._base_trade(entry_price=0.10)
-        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True), \
+             patch.object(live_trader, "LIVE_PHASE_6M_TIER_C_FULL_BLOCK_ENABLED", False):
             ok, reason = is_eligible_for_mirror(
                 t, self._base_live_state(), self.now, btc_regime="chop",
             )
@@ -7192,9 +7350,10 @@ class TestPhase6FB2TierExtension(unittest.TestCase):
         self.assertIn("phase_6f_b2:", reason)
 
     def test_b2_v2_tier_c_long_chop_blocked(self):
-        """Tier C 小币 ($0.5) → 仍 block (不在 valid_tiers, paper n=5 -$4)."""
+        """Tier C 小币 ($0.5) → B2 v2 仍 block (不在 valid_tiers). 关 6.M 测 B2 独立."""
         t = self._base_trade(entry_price=0.5)
-        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True), \
+             patch.object(live_trader, "LIVE_PHASE_6M_TIER_C_FULL_BLOCK_ENABLED", False):
             ok, reason = is_eligible_for_mirror(
                 t, self._state(), self.now, btc_regime="chop")
         self.assertFalse(ok)
@@ -7215,6 +7374,41 @@ class TestPhase6FB2TierExtension(unittest.TestCase):
             ok, reason = is_eligible_for_mirror(
                 t, self._state(), self.now, btc_regime="chop")
         self.assertFalse(ok)
+
+
+class TestPhase6NMakerModeShadow(unittest.TestCase):
+    """Phase 6.N (2026-06-16): Maker mode feature flag + shadow data 收集.
+
+    今天只部署 shadow 模式 (maker_shadow_data 字段会被填). 实际 maker 挂单逻辑
+    需要单独 session 实现 + shadow 数据先行积累 100+ 笔评估可行性.
+    """
+
+    def test_6n_maker_mode_disabled_by_default(self):
+        """Phase 6.N main flag 默认 False — 不能意外打开 maker 挂单."""
+        self.assertFalse(live_trader.LIVE_PHASE_6N_MAKER_MODE_ENABLED,
+                          "LIVE_PHASE_6N_MAKER_MODE_ENABLED 必须默认 False, "
+                          "不能在没有 shadow 数据评估前意外切到 maker")
+
+    def test_6n_maker_mode_default_is_shadow(self):
+        """Phase 6.N 默认 mode 是 'shadow' — 即使启用 main flag 也只走 shadow 路径."""
+        self.assertEqual(live_trader.LIVE_PHASE_6N_MAKER_MODE, "shadow")
+
+    def test_6n_default_fallback_is_skip(self):
+        """Phase 6.N 默认 fallback 是 'skip' — 失 fill 不 fallback 到 market
+        (避免 maker 失败时被 front-runner 反向打)."""
+        self.assertEqual(live_trader.LIVE_PHASE_6N_MAKER_FALLBACK, "skip")
+
+    def test_6n_timeout_sane(self):
+        """Phase 6.N timeout 应在合理范围 (3-30s)."""
+        self.assertGreaterEqual(live_trader.LIVE_PHASE_6N_MAKER_TIMEOUT_SEC, 3)
+        self.assertLessEqual(live_trader.LIVE_PHASE_6N_MAKER_TIMEOUT_SEC, 30)
+
+    def test_6n_shadow_log_always_on_constant_exists(self):
+        """Phase 6.N paranoid review H1 fix: 显式命名常量 SHADOW_LOG_ALWAYS_ON
+        替代代码中 `or True` 模式 — 防未来误删."""
+        self.assertTrue(hasattr(live_trader, "LIVE_PHASE_6N_SHADOW_LOG_ALWAYS_ON"))
+        self.assertTrue(live_trader.LIVE_PHASE_6N_SHADOW_LOG_ALWAYS_ON,
+                          "shadow 数据收集应永远开启 (无副作用, 历史数据先积累)")
 
 
 if __name__ == "__main__":
