@@ -6,7 +6,7 @@
 window.MP_CONFIG = {
   // —— Cloudflare Worker 地址（部署后填，见 worker/README.md）——
   // 留空：美联储宏观 / 美股实时报价 / RSS 新闻 这几个板块会自动隐藏，其余照常工作。
-  WORKER_URL: "",
+  WORKER_URL: "https://mp500-proxy.mangzi141800.workers.dev",
 
   // —— 可选：Marketaux 美股新闻 key（免费 100 次/日，marketaux.com 注册）——
   // 这是低风险 key（只读、低额度）。建议去 Marketaux 后台设置域名白名单。留空则用 TradingView 新闻替代。
