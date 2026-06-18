@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-18T15:40:41.431371+00:00",
+  "generated_at": "2026-06-18T15:42:43.620183+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 735,
-    "open": 0,
+    "total_trades": 736,
+    "open": 1,
     "closed": 735,
     "wins": 237,
     "losses": 489,
@@ -15,30 +15,113 @@
     "avg_pnl_usdt": -0.0962,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 93.3948,
+    "fees_paid_usdt": 93.4348,
     "fees_realized_usdt": 93.3948,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.04,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 435.9,
+    "deployed_usdt": 100.04,
+    "free_capital_usdt": 335.82,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -0.7551,
-    "deployed_usdt": 0
+    "deployed_usdt": 100.04
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "BIOUSDT"
+    ],
+    "exchange_symbols": [
+      "BIOUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "BIOUSDT|SHORT|2026-06-18T15:40:07.504514+00:00",
+      "trade_id": "L1781797207_BIOUSDT_S",
+      "symbol": "BIOUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.0344,
+      "avg_fill_price": 0.0342356,
+      "slippage_bps": 47.79,
+      "qty": 2922.0,
+      "notional_usdt": 100.03628,
+      "leverage": 1,
+      "risk_usdt": 1.357,
+      "risk_pct": 1.356,
+      "mirror_latency_sec": 7.0,
+      "sl_price": 0.0345356,
+      "sl_paper_current": 0.0347,
+      "disaster_stop_price": null,
+      "disaster_stop_at": null,
+      "maker_shadow_data": {
+        "maker_price_would_have_been": 0.03423,
+        "current_bid": 0.03422,
+        "current_ask": 0.03423,
+        "spread_bps": 2.921840759677465,
+        "market_fill_price": 0.03422,
+        "paper_signal_age_sec": 5.128697,
+        "maker_vs_market_bps": 2.921413964357617
+      },
+      "_phase_6f_b1_partial_unblock": false,
+      "_phase_6f_b2_partial_unblock": false,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -0.0001644,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "C",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.03395,
+      "tp2_price": 0.0335,
+      "phase": "A",
+      "entry_order_id": 4736513818,
+      "entry_client_id": "cresus_L1781797207_BIOUSDT_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "burst",
+      "atr_pct": 0.581,
+      "top_trader_position_ratio": 1.6394,
+      "top_trader_account_ratio": 1.4522,
+      "global_account_ratio": 1.2852,
+      "phase_a_mfe_pct": 0.436,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.04,
+      "fees_are_actual": false,
+      "opened_at": "2026-06-18T15:41:12.042038+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 62771.6,
+      "btc_change_24h_at_open": -4.476,
+      "btc_pct_vs_ma25_at_open": -2.548,
+      "btc_sub_regime_at_open": "down_acute",
+      "btc_change_3h_at_open": -2.447,
+      "phase_a_mfe_price": 0.03425,
+      "current_price": 0.03422,
+      "unrealized_pnl_usdt": 0.0456,
+      "unrealized_pnl_pct": 0.046,
+      "last_price_check_at": "2026-06-18T15:42:42.344533+00:00",
+      "phase_a_mae_price": 0.03426,
+      "phase_a_mae_pct": -0.071,
+      "phase_a_mae_at": "2026-06-18T15:41:26.766634+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "CFGUSDT|SHORT|2026-06-18T04:03:18.873661+00:00",
@@ -58755,8 +58838,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-06-18T15:31:47.100400+00:00",
-      "reason": "funding adverse (0.0775% ≥ 0.05%) (Phase 4.M: paper 历史人均 -$0.85, 不利 mirror)",
-      "last_checked_at": "2026-06-18T15:40:40.119819+00:00"
+      "reason": "paper trade too old (655s > 600s)",
+      "last_checked_at": "2026-06-18T15:42:42.344533+00:00"
     },
     {
       "paper_id": "FARTCOINUSDT|SHORT|2026-06-18T15:30:59.501896+00:00",
@@ -58764,8 +58847,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-06-18T15:31:47.100400+00:00",
-      "reason": "phase_6m: Tier C 小币 (entry=$0.1262) 整体 block — 13 天 195 笔 -$96 (drag $1.30/笔, 全 tier 最高)",
-      "last_checked_at": "2026-06-18T15:40:40.119819+00:00"
+      "reason": "paper trade too old (655s > 600s)",
+      "last_checked_at": "2026-06-18T15:42:42.344533+00:00"
     },
     {
       "paper_id": "RAVEUSDT|SHORT|2026-06-18T15:38:06.734106+00:00",
@@ -58774,18 +58857,27 @@
       "conviction_score": 5,
       "signal_at": "2026-06-18T15:38:39.445741+00:00",
       "reason": "phase_6m: Tier C 小币 (entry=$0.2749) 整体 block — 13 天 195 笔 -$96 (drag $1.30/笔, 全 tier 最高)",
-      "last_checked_at": "2026-06-18T15:40:40.119819+00:00"
+      "last_checked_at": "2026-06-18T15:42:42.344533+00:00"
+    },
+    {
+      "paper_id": "CRVUSDT|SHORT|2026-06-18T15:40:15.603833+00:00",
+      "symbol": "CRVUSDT",
+      "direction": "SHORT",
+      "conviction_score": 6,
+      "signal_at": "2026-06-18T15:41:05.035025+00:00",
+      "reason": "phase_6m: Tier C 小币 (entry=$0.2189) 整体 block — 13 天 195 笔 -$96 (drag $1.30/笔, 全 tier 最高)",
+      "last_checked_at": "2026-06-18T15:42:42.344533+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 62695.4,
-    "btc_ma25_1h": 64410.0,
-    "pct_vs_ma25": -2.662,
-    "change_24h_pct": -4.592,
+    "btc_price": 62708.4,
+    "btc_ma25_1h": 64410.52,
+    "pct_vs_ma25": -2.643,
+    "change_24h_pct": -4.572,
     "sub_regime": "down_acute",
-    "change_3h_pct": -2.565,
-    "computed_at": "2026-06-18T15:40:41.373520+00:00"
+    "change_3h_pct": -2.545,
+    "computed_at": "2026-06-18T15:42:43.287377+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
