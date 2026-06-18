@@ -1,0 +1,63 @@
+{
+  "meta": {
+    "strategy": "MP500 / Million Path",
+    "start_date": "2026-06-19",
+    "initial_capital": 500,
+    "usdt_cny": 6.74,
+    "target_rmb": 1000000,
+    "target_usd": 1000000
+  },
+  "weeks": [
+    {
+      "week": 1,
+      "start_date": "2026-06-19",
+      "end_date": "2026-06-25",
+      "stage": "S0",
+      "regime": "neutral",
+      "equity_start": 500,
+      "equity_end": 500,
+      "target_return_pct": 0,
+      "trades": 0,
+      "win_rate_pct": null,
+      "profit_factor": null,
+      "max_drawdown_pct": 0,
+      "fees_funding_pct": 0,
+      "violations": 0,
+      "notes": "S0 启动周：系统跑通，全部 paper，不动本金。"
+    },
+    {
+      "week": 2,
+      "start_date": "2026-06-26",
+      "end_date": "2026-07-02",
+      "stage": "S0",
+      "regime": "risk-on",
+      "equity_start": 500,
+      "equity_end": 500,
+      "target_return_pct": 0,
+      "trades": 6,
+      "win_rate_pct": 50,
+      "profit_factor": 1.4,
+      "max_drawdown_pct": 0,
+      "fees_funding_pct": 0,
+      "violations": 0,
+      "notes": "Paper 现货+合约样本累积中。真仓不动。"
+    },
+    {
+      "week": 3,
+      "start_date": "2026-07-03",
+      "end_date": "2026-07-09",
+      "stage": "S0",
+      "regime": "neutral",
+      "equity_start": 500,
+      "equity_end": 500,
+      "target_return_pct": 0,
+      "trades": 4,
+      "win_rate_pct": 50,
+      "profit_factor": 1.6,
+      "max_drawdown_pct": 0,
+      "fees_funding_pct": 0,
+      "violations": 0,
+      "notes": "Paper 期望转正趋势，继续攒样本。"
+    }
+  ]
+}
