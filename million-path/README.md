@@ -12,10 +12,16 @@
 ```
 million-path/
 ├── index.html                     # ⭐ 交易驾驶舱（根目录，Pages 直接访问）
+├── config.js                      # 看板配置（Worker 地址、可选 key）—— 改这里
+├── assets/
+│   └── app.js                     # 看板逻辑（各数据面板独立容错）
 ├── data/
 │   ├── ledger.json                # 交易/复盘数据（看板读取，脚本追加）
 │   ├── ledger.sample.json         # 示例数据
 │   └── events.json                # 大事件/解锁/上币日历（手动维护）
+├── worker/
+│   ├── worker.js                  # Cloudflare Worker 代理（隐藏 key：FRED/Finnhub/RSS）
+│   └── README.md                  # Worker 部署指南
 ├── docs/
 │   ├── MP500-v1.1.md              # 主策略文档（周节奏 + 收益预期表 + S1合约仅paper）
 │   └── weekly_review_TEMPLATE.md  # 周复盘模板（被脚本自动填充）
@@ -26,17 +32,25 @@ million-path/
 └── .env.example                   # 密钥占位（真实 .env 永不进 git）
 ```
 
-## 看板功能（`index.html`，单文件零依赖、响应式，手机/Mac/iPad 通用）
+## 看板功能（响应式，手机/Mac/iPad 通用）
 
-- **概览**：组合权益、累计收益、阶段、违规、BTC 行情状态与本周建议
-- **实时行情**：BTC/ETH/SOL/BNB 现价、24h 涨跌、高低、成交额、迷你走势图
-- **趋势判断**：核心三币「价格 vs 30 日均线」自动判定 risk-on / neutral / risk-off
-- **市场情绪**：Fear & Greed 恐惧贪婪指数
-- **大事件日历**：宏观/解锁/上币（来自 `data/events.json`，自己维护）
-- **交易复盘**：周 KPI 明细表 + 权益曲线
-- **数据统计 & 复利测算器**
+| 板块 | 内容 | 数据源 |
+|---|---|---|
+| 概览 | 权益、累计收益、阶段、违规、BTC 行情状态 + 本周建议 | ledger + 实时 |
+| 实时行情 | BTC/ETH/SOL/BNB 价格、涨跌、走势图、**资金费率、持仓量OI** | Binance（备 CoinGecko）|
+| 趋势判断 | 核心三币 价格 vs 30 日均线 → risk-on/neutral/risk-off | Binance K线 |
+| 加密宏观 & 链上 | 总市值、BTC/ETH 占比、成交额、**DeFi TVL** | CoinGecko + DeFiLlama |
+| 市场情绪 & 事件 | 恐惧贪婪指数 + 大事件/解锁日历 | alternative.me + events.json |
+| 加密新闻 | 实时加密新闻流 | CryptoCompare（直连，CORS 友好）|
+| **美股 & 宏观** | 财经日历(FOMC/CPI/非农)、指数总览、VIX、美元、美债；美联储利率/CPI；美股自选报价 | TradingView widget + FRED + Finnhub（经 Worker）|
+| 交易复盘 | 周 KPI 表 + 权益曲线 | ledger |
+| 统计 & 测算 | 胜率/盈亏比/回撤汇总 + 复利测算器 | ledger |
 
-> 数据源：行情/K线 Binance（备用 CoinGecko）、情绪 alternative.me。均为浏览器直连的免费公开 API，**真实实时**。Binance 在部分地区受限时自动切 CoinGecko。新闻类「大事件」在纯静态托管下无法真正实时，故用手动维护的 `events.json`。
+### 数据源分层（纯静态站可用性）
+- **零配置即用**（浏览器直连、无 key）：Binance、CoinGecko、DeFiLlama、alternative.me、CryptoCompare、TradingView widget。
+- **需免费 Worker**（隐藏 key）：FRED（美联储宏观）、Finnhub（美股实时报价）、品牌 RSS。部署见 [`worker/README.md`](worker/README.md)，把地址填进 `config.js` 的 `WORKER_URL` 即自动亮起；**不配也不影响其它板块**。
+
+> ⚠️ 网上很多旧教程提到的 CryptoPanic 免费 API 已于 2026-04 停服，本项目不使用。所有「未实测」的 CORS 上线前请用浏览器 DevTools 各发一次 fetch 确认。
 
 ## 每周怎么用（90 秒）
 
