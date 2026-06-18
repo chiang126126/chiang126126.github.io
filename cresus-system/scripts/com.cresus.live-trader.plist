@@ -6,10 +6,9 @@
     <string>com.cresus.live-trader</string>
 
     <!-- Phase 3 live_trader.py: 镜像 paper 决策到 Binance Futures.
-         当前: testnet + --live + OBS mode = 真单到 testnet (testnet 钱, 不烧真钱).
-         切主网真钱前 3 步: 1) 改 LIVE_OBSERVATION_MODE=False
-                          2) 加 --mainnet 这行
-                          3) touch ~/.allow-live -->
+         Phase 6.A (2026-06-03) — Mainnet Pilot Mode: env vars 切到主网真钱.
+         设计安全: 默认 testnet (此 plist 通过 EnvironmentVariables 覆盖到 mainnet).
+         切回 testnet 时 plist 改 EnvironmentVariables 任一 key (或注释整 block) 即可. -->
     <key>ProgramArguments</key>
     <array>
         <string>/Users/hong/cresus-bot/.venv/bin/python3</string>
@@ -17,6 +16,19 @@
         <string>--once</string>
         <string>--live</string>
     </array>
+
+    <!-- Phase 6.A (2026-06-03) Mainnet 关键: 通过 EnvironmentVariables 设置切换主网.
+         若想切回 testnet, 把这一整 block 注释掉即可 (live_trader.py 默认 testnet).
+         读取细节见 live_trader.py:863 `os.environ.get('CRESUS_MODE', 'testnet')`. -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>CRESUS_MODE</key>
+        <string>mainnet_pilot</string>
+        <key>CRESUS_PILOT_CAPITAL</key>
+        <string>600</string>
+        <key>BINANCE_KEYS_PATH</key>
+        <string>/Users/hong/cresus-bot/binance_keys_mainnet.json</string>
+    </dict>
 
     <!-- Phase 6.O (2026-06-18): StartInterval 5→2s + ThrottleInterval 10→2s
          合并把实际 tick cadence 从 ~10s 减到 ~2s.
@@ -47,7 +59,7 @@
     <key>ThrottleInterval</key>
     <integer>2</integer>
 
-    <!-- 凭证从 ~/.cresus-bot/binance_keys.json 自动读取 (load_credentials helper).
+    <!-- 凭证从 BINANCE_KEYS_PATH (上面 EnvironmentVariables) 指定的 json 读取.
          不在 plist 里硬编码 key (即使 plist 是私有的, 也避免事故). -->
 
     <key>WorkingDirectory</key>
