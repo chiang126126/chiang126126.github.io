@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-19T13:30:36.938882+00:00",
+  "generated_at": "2026-06-19T13:32:40.373576+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 759,
@@ -36,12 +36,12 @@
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "SWARMSUSDT",
-      "BLESSUSDT"
+      "BLESSUSDT",
+      "SWARMSUSDT"
     ],
     "exchange_symbols": [
-      "SWARMSUSDT",
-      "BLESSUSDT"
+      "BLESSUSDT",
+      "SWARMSUSDT"
     ]
   },
   "open_trades": [
@@ -60,8 +60,8 @@
       "risk_usdt": 0.7366,
       "risk_pct": 0.737,
       "mirror_latency_sec": 48.4,
-      "sl_price": 0.006571110000000001,
-      "sl_paper_current": 0.00656021,
+      "sl_price": 0.0066089,
+      "sl_paper_current": 0.006598,
       "disaster_stop_price": null,
       "disaster_stop_at": null,
       "maker_shadow_data": {
@@ -81,7 +81,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 6,
       "wick_filter_mode": "always",
-      "sl_breach_count": 0,
+      "sl_breach_count": 5,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.005,
       "regime_gate_enabled": true,
@@ -101,7 +101,7 @@
       "top_trader_position_ratio": 2.0745,
       "top_trader_account_ratio": 1.8377,
       "global_account_ratio": 1.8727,
-      "phase_a_mfe_pct": 0.349,
+      "phase_a_mfe_pct": 0.606,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.04,
@@ -114,14 +114,17 @@
       "btc_pct_vs_ma25_at_open": -0.209,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 0.006621,
-      "current_price": 0.006616,
-      "unrealized_pnl_usdt": 0.1074,
-      "unrealized_pnl_pct": 0.107,
-      "last_price_check_at": "2026-06-19T13:30:35.307305+00:00",
+      "phase_a_mfe_price": 0.006638,
+      "current_price": 0.006607,
+      "unrealized_pnl_usdt": -0.0287,
+      "unrealized_pnl_pct": -0.029,
+      "last_price_check_at": "2026-06-19T13:32:38.761349+00:00",
       "phase_a_mae_price": 0.00659,
       "phase_a_mae_pct": -0.286,
-      "phase_a_mae_at": "2026-06-19T13:24:24.057556+00:00"
+      "phase_a_mae_at": "2026-06-19T13:24:24.057556+00:00",
+      "last_sl_sync_at": "2026-06-19T13:31:05.264588+00:00",
+      "last_sl_sync_paper_sl": 0.006598,
+      "sl_sync_count": 1
     },
     {
       "paper_id": "SWARMSUSDT|LONG|2026-06-19T13:24:04.741288+00:00",
@@ -179,7 +182,7 @@
       "top_trader_position_ratio": 1.3031,
       "top_trader_account_ratio": 2.7064,
       "global_account_ratio": 2.6805,
-      "phase_a_mfe_pct": 0.023,
+      "phase_a_mfe_pct": 0.428,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.04,
@@ -192,11 +195,11 @@
       "btc_pct_vs_ma25_at_open": -0.18,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 0.008649,
-      "current_price": 0.008675,
-      "unrealized_pnl_usdt": 0.347,
-      "unrealized_pnl_pct": 0.347,
-      "last_price_check_at": "2026-06-19T13:30:35.307305+00:00",
+      "phase_a_mfe_price": 0.008684,
+      "current_price": 0.008627,
+      "unrealized_pnl_usdt": -0.2082,
+      "unrealized_pnl_pct": -0.208,
+      "last_price_check_at": "2026-06-19T13:32:38.761349+00:00",
       "phase_a_mae_price": 0.008612,
       "phase_a_mae_pct": -0.382,
       "phase_a_mae_at": "2026-06-19T13:28:24.985703+00:00"
@@ -61166,8 +61169,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-19T13:17:56.356858+00:00",
-      "reason": "paper trade too old (759s > 600s)",
-      "last_checked_at": "2026-06-19T13:30:35.307305+00:00"
+      "reason": "paper trade too old (882s > 600s)",
+      "last_checked_at": "2026-06-19T13:32:38.761349+00:00"
     },
     {
       "paper_id": "USUSDT|SHORT|2026-06-19T13:28:30.552492+00:00",
@@ -61176,18 +61179,18 @@
       "conviction_score": 5,
       "signal_at": "2026-06-19T13:28:48.429426+00:00",
       "reason": "funding adverse (0.06% ≥ 0.05%) (Phase 4.M: paper 历史人均 -$0.85, 不利 mirror)",
-      "last_checked_at": "2026-06-19T13:30:35.307305+00:00"
+      "last_checked_at": "2026-06-19T13:32:38.761349+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 62775.3,
-    "btc_ma25_1h": 62824.16,
-    "pct_vs_ma25": -0.078,
-    "change_24h_pct": -1.84,
+    "btc_price": 62750.2,
+    "btc_ma25_1h": 62823.15,
+    "pct_vs_ma25": -0.116,
+    "change_24h_pct": -1.88,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-19T13:30:36.321290+00:00"
+    "computed_at": "2026-06-19T13:32:39.757066+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
