@@ -253,24 +253,28 @@ async function loadBot() {
   $("botOpenBody").innerHTML = (st.positions || []).map(p => {
     const lp = livePrice((p.symbol || "").replace("USDT", "")); let u = null;
     if (lp != null) u = (lp - p.entry) * p.qty - (p.fee_in || 0) - lp * p.qty * FEE;
-    return `<tr><td><b>${p.symbol}</b> <span class="chip risk-on">LONG</span></td>
-      <td>${fmt(p.entry, 2)}</td><td>${lp != null ? fmt(lp, 2) : "—"}</td>
-      <td>${fmt(p.stop, 2)}</td><td>${fmt(p.target, 2)}</td>
-      <td class="${cls(u)}">${u == null ? "—" : (u >= 0 ? "+" : "") + fmt(u, 2) + "U"}</td></tr>`;
+    return `<tr><td data-label="标的"><b>${p.symbol}</b> <span class="chip risk-on">LONG</span></td>
+      <td data-label="入场">${fmt(p.entry, 2)}</td><td data-label="现价">${lp != null ? fmt(lp, 2) : "—"}</td>
+      <td data-label="止损">${fmt(p.stop, 2)}</td><td data-label="止盈">${fmt(p.target, 2)}</td>
+      <td data-label="浮动盈亏" class="${cls(u)}">${u == null ? "—" : (u >= 0 ? "+" : "") + fmt(u, 2) + "U"}</td></tr>`;
   }).join("") || '<tr><td colspan="6" class="badge">当前无持仓</td></tr>';
 
+  const decTs = log.ts ? Math.floor(Date.parse(log.ts) / 1000) : null;
+  const decTime = decTs ? new Date(log.ts).toLocaleString("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }) : "";
   $("botDecisions").innerHTML = (log.items || []).map(it =>
-    `<div class="ev" style="padding:8px 0"><div class="t"><b>${it.symbol || ""}</b>
+    `<div class="ev" style="padding:8px 0"><div class="t" style="flex-wrap:wrap;align-items:baseline">
+      <b>${it.symbol || ""}</b>
       <span class="chip ${it.bias === "LONG" ? "risk-on" : "neutral"}">${it.bias || it.action || "—"}</span>
+      ${decTime ? `<span class="badge" style="color:var(--muted)">🕐 ${decTime} · ${ago(decTs)}</span>` : ""}
       <span class="badge">${it.source ? it.source + " · " : ""}${it.confidence != null ? "conf " + it.confidence + " · " : ""}${it.reason || it.rationale || ""}</span></div></div>`).join("") || '<span class="badge">暂无决策</span>';
 
   $("botTradesBody").innerHTML = tr.slice().reverse().slice(0, 20).map(t => `<tr>
-    <td><b>${t.symbol}</b></td><td>${fmt(t.entry, 2)} → ${fmt(t.exit, 2)}</td>
-    <td>${t.exit_reason || ""}</td>
-    <td class="${cls(t.pnl)}">${(t.pnl >= 0 ? "+" : "") + fmt(t.pnl, 2)}U</td>
-    <td class="${cls(t.r)}">${(t.r >= 0 ? "+" : "") + fmt(t.r, 2)}R</td>
-    <td><span class="chip ${t.outcome === "WIN" ? "risk-on" : t.outcome === "LOSS" ? "risk-off" : "neutral"}">${t.outcome}</span></td>
-    <td class="badge">${(t.closed_at || "").slice(5, 16).replace("T", " ")}</td></tr>`).join("") || '<tr><td colspan="7" class="badge">暂无已平仓</td></tr>';
+    <td data-label="标的"><b>${t.symbol}</b></td><td data-label="入场→出场">${fmt(t.entry, 2)} → ${fmt(t.exit, 2)}</td>
+    <td data-label="出场原因">${t.exit_reason || ""}</td>
+    <td data-label="盈亏" class="${cls(t.pnl)}">${(t.pnl >= 0 ? "+" : "") + fmt(t.pnl, 2)}U</td>
+    <td data-label="R" class="${cls(t.r)}">${(t.r >= 0 ? "+" : "") + fmt(t.r, 2)}R</td>
+    <td data-label="结果"><span class="chip ${t.outcome === "WIN" ? "risk-on" : t.outcome === "LOSS" ? "risk-off" : "neutral"}">${t.outcome}</span></td>
+    <td data-label="时间" class="badge">${(t.closed_at || "").slice(5, 16).replace("T", " ")}</td></tr>`).join("") || '<tr><td colspan="7" class="badge">暂无已平仓</td></tr>';
 }
 
 //==================== 加密新闻（CryptoCompare 直连 + 可选 RSS）====================
@@ -318,19 +322,26 @@ async function fetchRssNews() {
 }
 let _newsItems = [], _newsLang = "en";
 const _trCache = {};
+function newsCard(n) {
+  const title = (_newsLang === "zh" && _trCache[n.title]) ? _trCache[n.title] : n.title;
+  const meta = `${n.source || ''}${n.cats ? ' · ' + n.cats : ''}${n.ts ? ' · ' + ago(n.ts) : ''}`;
+  return `<a class="news-card" href="${n.url}" target="_blank" rel="noopener">
+    ${n.img ? `<img src="${n.img}" loading="lazy" alt="">` : ""}
+    <div class="nc-body"><b>${title}</b><div class="badge">${meta}</div></div></a>`;
+}
 function renderNews() {
   const box = $("cryptoNews"); if (!box) return;
   if (!_newsItems.length) { box.innerHTML = '<span class="badge">暂无新闻</span>'; return; }
-  const rows = _newsItems.map(n => {
-    const title = (_newsLang === "zh" && _trCache[n.title]) ? _trCache[n.title] : n.title;
-    return `<a class="news" href="${n.url}" target="_blank" rel="noopener">
-      ${n.img ? `<img src="${n.img}" loading="lazy" alt="">` : ""}
-      <div class="news-t"><b>${title}</b>
-        <div class="badge">${n.source || ''}${n.cats ? ' · ' + n.cats : ''} · ${n.ts ? ago(n.ts) : ''}</div></div></a>`;
-  }).join("");
-  const dur = Math.max(24, _newsItems.length * 3.4);   // 条数越多滚得越慢，速度恒定
-  // 列表复制两份以实现无缝循环滚动
-  box.innerHTML = `<div class="news-scroll"><div class="news-track" style="animation-duration:${dur}s">${rows}${rows}</div></div>`;
+  // 交替分到两列 → 两列高度天然错落，形成瀑布流；各列复制两份实现无缝滚动
+  const colA = [], colB = [];
+  _newsItems.forEach((n, i) => (i % 2 ? colB : colA).push(newsCard(n)));
+  const a = colA.join(""), b = colB.join("");
+  const durA = Math.max(26, colA.length * 4.4);          // 条数越多滚得越慢，速度恒定
+  const durB = Math.max(26, colB.length * 4.4) * 1.15;   // 两列略不同步，更像瀑布流
+  box.innerHTML = `<div class="news-masonry">
+    <div class="news-col"><div class="news-track" style="animation-duration:${durA}s">${a}${a}</div></div>
+    <div class="news-col"><div class="news-track" style="animation-duration:${durB}s">${b}${b}</div></div>
+  </div>`;
 }
 // 免费翻译(MyMemory，CORS 友好)，按标题缓存，避免重复翻译
 async function translateNews() {
@@ -387,9 +398,13 @@ async function loadUsStocks() {
       try { const q = await jget(wurl(`type=finnhub&path=quote&qs=symbol=${sym}`));
         return { sym, price: q.c, chg: q.dp }; } catch (e) { return { sym, price: null, chg: null }; }
     }));
-    $("usBox").innerHTML = out.map(s => `<div class="card">
-      <div class="k">${s.sym}</div><div class="v">${s.price == null ? "—" : "$" + fmt(s.price, 2)}</div>
-      <div class="badge ${cls(s.chg)}">${pct(s.chg)}</div></div>`).join("");
+    $("usBox").innerHTML = out.map(s => {
+      const col = s.chg == null ? "" : (s.chg >= 0 ? "var(--green)" : "var(--red)");
+      return `<div class="card">
+        <div class="k">${s.sym}</div>
+        <div class="v" style="color:${col || 'var(--text)'}">${s.price == null ? "—" : "$" + fmt(s.price, 2)}</div>
+        <div style="font-size:11px;margin-top:2px;color:${col || 'var(--muted)'}">${pct(s.chg)}</div></div>`;
+    }).join("");
   } catch (e) { $("usBox").innerHTML = `<div class="err">美股报价获取失败，检查 Worker 与 FINNHUB_KEY。</div>`; }
 }
 function workerHint() {

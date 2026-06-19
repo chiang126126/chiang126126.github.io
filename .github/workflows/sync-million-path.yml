@@ -22,8 +22,8 @@ jobs:
           if [ -z "$TOKEN" ]; then echo "::error::缺少 SYNC_TOKEN"; exit 1; fi
           git clone --depth=1 "https://x-access-token:${TOKEN}@github.com/chiang126126/million-path.git" dest
 
-          # 这些是「实时数据/用户配置」，已存在则保留，不被源覆盖
-          PRESERVE="data/ledger.json data/events.json config.js \
+          # 这些是「实时数据」，已存在则保留，不被源覆盖（config.js 改为由源仓库统一管理）
+          PRESERVE="data/ledger.json data/events.json \
                     data/bot_state.json data/bot_trades.json data/bot_log.json"
 
           # 1) 同步代码（--delete 清理已删文件），但排除受保护文件与 reviews/

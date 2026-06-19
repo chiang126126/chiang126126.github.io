@@ -21,9 +21,9 @@ window.MP_CONFIG = {
   // —— MSTR / Strategy（微策略）BTC 持仓，手动维护 ——
   // 没有干净的免费 CORS API 提供实时持仓，这里手填、定期更新即可。
   // 看板用它 × 实时 BTC 价 估算 BTC 净值，再用 Finnhub 市值算 mNAV(溢价/折价)。
-  MSTR_BTC_HOLDINGS: 0,            // 持有的 BTC 数量（0 = 未填，相关估算会提示你去填）
-  MSTR_HOLDINGS_ASOF: "请更新",     // 上述数字的日期，如 "2026-06"
-  MSTR_AVG_COST: 0,               // 平均买入成本(USD/BTC，可选，填 0 不显示)
+  MSTR_BTC_HOLDINGS: 846842,        // 持有的 BTC 数量（bitcointreasuries.net）
+  MSTR_HOLDINGS_ASOF: "2026-06-15", // 上述数字的日期
+  MSTR_AVG_COST: 75658,            // 平均买入成本(USD/BTC)，bitcointreasuries.net
 
   // 加密新闻额外接入的品牌 RSS（需配置 WORKER_URL）
   CRYPTO_RSS: [
