@@ -117,8 +117,8 @@ async function loadMarket() {
     const fund = fo ? `<span class="${cls(-Math.sign(fo.funding))}">资费 ${fo.funding >= 0 ? '+' : ''}${fo.funding.toFixed(4)}%</span>` : "";
     return `<div class="card coin">
       <div class="row"><div><div class="nm">${c.name}<span class="badge"> /USDT</span></div>
-        <div class="px">${money(c.price)}</div></div>
-        <div class="tag ${up ? 'risk-on' : 'risk-off'}">${pct(c.chg)}</div></div>
+        <div class="px" id="px-${c.name}">${money(c.price)}</div></div>
+        <div class="tag ${up ? 'risk-on' : 'risk-off'}" id="chg-${c.name}">${pct(c.chg)}</div></div>
       ${sparkSVG(closes.slice(-30), up)}
       <div class="meta"><span>高 ${money(c.high)}</span><span>低 ${money(c.low)}</span>
         <span>额 ${c.vol ? '$' + fmt(c.vol / 1e6, 0) + 'M' : '—'}</span></div>
@@ -458,6 +458,68 @@ function copyEvidence() {
   }
 }
 
+//==================== 实时价格（Binance WebSocket，逐秒推送）====================
+// @ticker 流约每 1 秒推一次，含最新价/24h涨跌/高低/量。WebSocket 不受 CORS 限制；
+// 若所在地区屏蔽 Binance，连接失败会自动回退到 60 秒轮询（不影响其它面板）。
+const _lastPx = {};
+function applyLivePrice(name, price, chg) {
+  if (STATE.market) { const e = STATE.market.find(x => x.name === name); if (e) { e.price = price; e.chg = chg; } }
+  const pxEl = $("px-" + name);
+  if (pxEl) {
+    const prev = _lastPx[name];
+    pxEl.textContent = money(price);
+    if (prev != null && price !== prev) {
+      pxEl.classList.remove("flash-up", "flash-down");
+      void pxEl.offsetWidth;                       // 重排以重启动画
+      pxEl.classList.add(price > prev ? "flash-up" : "flash-down");
+    }
+  }
+  _lastPx[name] = price;
+  const chgEl = $("chg-" + name);
+  if (chgEl) { chgEl.textContent = pct(chg); chgEl.className = "tag " + (chg >= 0 ? "risk-on" : "risk-off"); }
+}
+
+const LIVE = {
+  ws: null, on: false, backoff: 1000, timer: null,
+  streams: CORE.map(c => c.sym.toLowerCase() + "@ticker").join("/"),
+  start() { if (this.on) return; this.on = true; this._open(); setLiveUI(true); },
+  stop() { this.on = false; this._clear(); if (this.ws) { try { this.ws.close(); } catch (e) {} this.ws = null; } setLiveUI(false); },
+  _clear() { if (this.timer) { clearTimeout(this.timer); this.timer = null; } },
+  _open() {
+    if (!this.on || typeof WebSocket === "undefined") return;
+    try {
+      const ws = new WebSocket(`wss://stream.binance.com:9443/stream?streams=${this.streams}`);
+      this.ws = ws;
+      ws.onopen = () => { this.backoff = 1000; liveDot("on"); };
+      ws.onmessage = ev => {
+        try {
+          const d = JSON.parse(ev.data).data; if (!d || !d.s) return;
+          const core = CORE.find(c => c.sym === d.s); if (!core) return;
+          applyLivePrice(core.name, +d.c, +d.P);
+          const u = $("updated"); if (u) u.textContent = "实时 " + new Date().toLocaleTimeString("zh-CN");
+        } catch (e) {}
+      };
+      ws.onclose = () => { liveDot("off"); this._reconnect(); };
+      ws.onerror = () => { try { ws.close(); } catch (e) {} };
+    } catch (e) { this._reconnect(); }
+  },
+  _reconnect() { if (!this.on) return; this._clear(); this.backoff = Math.min(this.backoff * 2, 30000); this.timer = setTimeout(() => this._open(), this.backoff); }
+};
+function liveDot(state) {
+  const d = $("liveDot"); if (!d) return;
+  d.style.background = state === "on" ? "var(--green)" : "var(--muted)";
+  d.style.boxShadow = state === "on" ? "0 0 8px var(--green)" : "none";
+}
+function setLiveUI(on) {
+  const b = $("liveToggle"); if (b) b.textContent = on ? "🟢 实时" : "⚪ 省流";
+  liveDot(on ? "on" : "off");
+}
+function toggleLive() {
+  const next = !LIVE.on;
+  try { localStorage.setItem("mp_live", next ? "1" : "0"); } catch (e) {}
+  next ? LIVE.start() : LIVE.stop();
+}
+
 //==================== 启动 ====================
 async function refreshLive() {
   // 并行刷新所有信息面板，等全部结束后再（可选）自动重建 Evidence
@@ -475,8 +537,19 @@ function init() {
   $("refreshBtn") && $("refreshBtn").addEventListener("click", refreshLive);
   $("genEvBtn") && $("genEvBtn").addEventListener("click", showEvidence);
   $("copyEvBtn") && $("copyEvBtn").addEventListener("click", copyEvidence);
+  $("liveToggle") && $("liveToggle").addEventListener("click", toggleLive);
   loadLedger(); loadEvents(); refreshLive(); renderCalc();
   const ms = Math.max(15, (+CFG.REFRESH_SECONDS || 60)) * 1000;
   setInterval(refreshLive, ms);
+
+  // 实时价格：默认开启（除非用户上次选了省流）；标签页隐藏时自动断开省电，回来再连
+  let live = true;
+  try { live = localStorage.getItem("mp_live") !== "0"; } catch (e) {}
+  if (live) LIVE.start(); else setLiveUI(false);
+  document.addEventListener("visibilitychange", () => {
+    if (!LIVE.on && localStorage.getItem("mp_live") === "0") return;
+    if (document.hidden) { LIVE._clear(); if (LIVE.ws) { try { LIVE.ws.close(); } catch (e) {} } liveDot("off"); }
+    else if (LIVE.on) LIVE._open();
+  });
 }
 document.addEventListener("DOMContentLoaded", init);

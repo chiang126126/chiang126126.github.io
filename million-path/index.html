@@ -55,6 +55,9 @@
   .risk-off{background:rgba(234,57,67,.16);color:var(--red)}
   .coin .row{display:flex;justify-content:space-between;align-items:flex-start}
   .coin .nm{font-weight:800;font-size:16px} .coin .px{font-size:22px;font-weight:800;margin-top:2px}
+  .flash-up{animation:flashUp .55s ease}.flash-down{animation:flashDown .55s ease}
+  @keyframes flashUp{0%{color:#16c784;text-shadow:0 0 10px rgba(22,199,132,.7)}100%{color:inherit;text-shadow:none}}
+  @keyframes flashDown{0%{color:#ea3943;text-shadow:0 0 10px rgba(234,57,67,.7)}100%{color:inherit;text-shadow:none}}
   .coin .meta{font-size:11px;color:var(--muted);margin-top:8px;display:flex;justify-content:space-between;gap:8px}
   .spark{width:100%;height:46px;margin-top:8px}
   .tag{font-size:10px;padding:2px 7px;border-radius:6px;font-weight:700}
@@ -109,7 +112,7 @@
     <div class="brand"><div class="logo">M</div>
       <div><h1>Million Path · 百万之路</h1><div class="sub">MP500 交易驾驶舱 · 500U → 100万 · 风控优先</div></div>
     </div>
-    <div class="refresh"><span class="dot"></span><span id="updated">加载中…</span><button class="btn" id="refreshBtn">↻ 刷新</button></div>
+    <div class="refresh"><span class="dot" id="liveDot"></span><span id="updated">加载中…</span><button class="btn" id="liveToggle" title="实时(WebSocket逐秒) / 省流(60秒轮询，更省电)">🟢 实时</button><button class="btn" id="refreshBtn">↻ 刷新</button></div>
   </div>
 
   <nav class="nav">
