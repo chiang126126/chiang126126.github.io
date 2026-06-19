@@ -26,6 +26,12 @@ const ago = ts => { // 时间戳(秒) -> "x小时前"
   return Math.floor(s / 86400) + "天前";
 };
 const jget = async (url, opt) => { const r = await fetch(url, opt); if (!r.ok) throw new Error(r.status); return r.json(); };
+// 直连失败时自动改走 Worker（绕过 CORS/地区限制）。无 Worker 时仍抛原错误。
+const viaWorker = u => `${(CFG.WORKER_URL || "").replace(/\/$/, "")}/?type=get&url=${encodeURIComponent(u)}`;
+const jgetSmart = async (url, opt) => {
+  try { return await jget(url, opt); }
+  catch (e) { if (CFG.WORKER_URL && CFG.WORKER_URL.trim()) return jget(viaWorker(url), opt); throw e; }
+};
 
 //==================== 数据源主机 ====================
 const BN_SPOT = "https://data-api.binance.vision";   // 行情专用主机，比 api.binance.com 更稳/更易直连
@@ -74,8 +80,8 @@ async function fetchFundingOI(c) {
     return { funding: +pi.lastFundingRate * 100, nextFunding: +pi.nextFundingTime, oi: +oi.openInterest };
   } catch (e) { return null; }
 }
-async function fetchFNG() { const d = await jget("https://api.alternative.me/fng/?limit=1"); return d.data[0]; }
-async function fetchGlobal() { const d = await jget(`${CG}/global`); return d.data; }
+async function fetchFNG() { const d = await jgetSmart("https://api.alternative.me/fng/?limit=1"); return d.data[0]; }
+async function fetchGlobal() { const d = await jgetSmart(`${CG}/global`); return d.data; }
 
 //==================== 渲染：行情 + 趋势 + 合约 ====================
 function sparkSVG(vals, up) {
@@ -174,7 +180,7 @@ async function loadCryptoMacro() {
 //==================== 链上 TVL（DeFiLlama）====================
 async function loadDefi() {
   try {
-    const chains = await jget("https://api.llama.fi/v2/chains");
+    const chains = await jgetSmart("https://api.llama.fi/v2/chains");
     const total = chains.reduce((s, c) => s + (c.tvl || 0), 0);
     const top = chains.slice().sort((a, b) => b.tvl - a.tvl).slice(0, 6);
     $("defiTotal").innerHTML = big(total);
@@ -214,7 +220,7 @@ async function loadCryptoNews() {
   const box = $("cryptoNews");
   try {
     const key = CFG.CRYPTOCOMPARE_KEY ? `&api_key=${CFG.CRYPTOCOMPARE_KEY}` : "";
-    const d = await jget(`${CC}/data/v2/news/?lang=EN${key}`);
+    const d = await jgetSmart(`${CC}/data/v2/news/?lang=EN${key}`);
     let items = (d.Data || []).slice(0, 12).map(n => ({
       title: n.title, url: n.url, source: (n.source_info && n.source_info.name) || n.source, ts: n.published_on,
       img: n.imageurl, cats: (n.categories || "").split("|").slice(0, 2).join(" · ")

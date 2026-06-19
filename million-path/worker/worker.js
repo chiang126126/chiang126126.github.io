@@ -22,7 +22,16 @@ const ALLOWED_HOSTS = [
   "www.coindesk.com",
   "cointelegraph.com",
   "decrypt.co",
-  "www.theblock.co"
+  "www.theblock.co",
+  // 通用代理（CORS/地区兜底）允许的数据源
+  "api.coingecko.com",
+  "min-api.cryptocompare.com",
+  "api.llama.fi",
+  "coins.llama.fi",
+  "stablecoins.llama.fi",
+  "api.alternative.me",
+  "data-api.binance.vision",
+  "fapi.binance.com"
 ];
 
 function corsHeaders(origin) {
@@ -65,7 +74,8 @@ export default {
         if (!env.FINNHUB_KEY) throw new Error("FINNHUB_KEY 未配置");
         target = `https://finnhub.io/api/v1/${path}?${qs}&token=${env.FINNHUB_KEY}`;
 
-      } else if (type === "rss") {
+      } else if (type === "rss" || type === "get") {
+        // 通用透传：?type=get&url=<完整URL>（仅限白名单主机）
         // 例：?type=rss&url=https://cointelegraph.com/rss
         target = url.searchParams.get("url") || "";
 
