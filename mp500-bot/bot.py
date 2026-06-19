@@ -97,10 +97,17 @@ def main():
             continue
         if tn:
             try:
-                res = tn.market_sell_qty(pos["symbol"], _fmt_qty(pos["qty"]))
+                base = pos["symbol"].replace("USDT", "")
+                filt = exchange.symbol_filters(pos["symbol"])
+                sell_qty = exchange.round_step(min(pos["qty"], tn.free_balance(base)), filt["step"])
+                if sell_qty <= 0:
+                    raise Exception("可卖余额为 0")
+                res = tn.market_sell_qty(pos["symbol"], exchange.fmt_qty(sell_qty, filt["step"]))
                 exit_price = _avg_fill(res, exit_price)
             except Exception as e:
-                print(f"[warn] testnet 平仓失败，按价记账: {e}")
+                print(f"[warn] testnet 平仓失败，保留持仓下次重试: {e}")
+                still_open.append(pos)
+                continue
         gross = (exit_price - pos["entry"]) * pos["qty"]
         fee_out = exit_price * pos["qty"] * FEE
         pnl = gross - pos.get("fee_in", 0) - fee_out
@@ -139,7 +146,11 @@ def main():
                     entry = _avg_fill(res, entry)
                     plan["qty"] = float(res.get("executedQty", plan["qty"]))
                 except Exception as e:
-                    print(f"[warn] testnet 开仓失败，按价记账: {e}")
+                    print(f"[warn] testnet 开仓失败，跳过本次: {e}")
+                    item["action"] = "testnet-open-failed"
+                    item["reason"] = str(e)
+                    log["items"].append(item)
+                    continue
             pos = {"symbol": sym, "side": "LONG", "entry": entry,
                    "stop": plan["stop"], "target": plan["target"], "qty": plan["qty"],
                    "notional": plan["notional"], "risk_usdt": plan["risk_usdt"],

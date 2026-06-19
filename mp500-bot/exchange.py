@@ -1,6 +1,7 @@
 """行情与执行：公开行情 + 币安 Spot Testnet（模拟盘）签名下单。"""
 import hashlib
 import hmac
+import math
 import time
 from urllib.parse import urlencode
 
@@ -47,12 +48,49 @@ def fear_greed():
         return None, None
 
 
+_FILTERS = {}
+
+
+def symbol_filters(symbol):
+    """读取交易对的下单精度/最小量/最小名义（带缓存）。"""
+    if symbol in _FILTERS:
+        return _FILTERS[symbol]
+    r = requests.get(f"{TESTNET}/api/v3/exchangeInfo", params={"symbol": symbol}, timeout=TIMEOUT)
+    r.raise_for_status()
+    flt = r.json()["symbols"][0]["filters"]
+    step, min_qty, min_notional = None, 0.0, 0.0
+    for x in flt:
+        if x["filterType"] == "LOT_SIZE":
+            step = float(x["stepSize"]); min_qty = float(x["minQty"])
+        if x["filterType"] in ("MIN_NOTIONAL", "NOTIONAL"):
+            min_notional = float(x.get("minNotional") or x.get("notional") or 0)
+    _FILTERS[symbol] = {"step": step, "min_qty": min_qty, "min_notional": min_notional}
+    return _FILTERS[symbol]
+
+
+def round_step(qty, step):
+    if not step:
+        return qty
+    return math.floor(qty / step + 1e-9) * step
+
+
+def fmt_qty(qty, step):
+    d = max(0, int(round(-math.log10(step)))) if step and step < 1 else 0
+    return f"{qty:.{d}f}"
+
+
 class Testnet:
     """币安现货模拟盘客户端（仅在 MODE=testnet 时使用）。"""
 
     def __init__(self, key, secret):
         self.key = key
         self.secret = secret
+
+    def free_balance(self, asset):
+        for b in self.account().get("balances", []):
+            if b["asset"] == asset:
+                return float(b["free"])
+        return 0.0
 
     def _signed(self, method, path, params):
         params = dict(params)
