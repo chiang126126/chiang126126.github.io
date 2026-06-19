@@ -387,9 +387,13 @@ async function loadUsStocks() {
       try { const q = await jget(wurl(`type=finnhub&path=quote&qs=symbol=${sym}`));
         return { sym, price: q.c, chg: q.dp }; } catch (e) { return { sym, price: null, chg: null }; }
     }));
-    $("usBox").innerHTML = out.map(s => `<div class="card">
-      <div class="k">${s.sym}</div><div class="v">${s.price == null ? "—" : "$" + fmt(s.price, 2)}</div>
-      <div class="badge ${cls(s.chg)}">${pct(s.chg)}</div></div>`).join("");
+    $("usBox").innerHTML = out.map(s => {
+      const col = s.chg == null ? "" : (s.chg >= 0 ? "var(--green)" : "var(--red)");
+      return `<div class="card">
+        <div class="k">${s.sym}</div>
+        <div class="v" style="color:${col || 'var(--text)'}">${s.price == null ? "—" : "$" + fmt(s.price, 2)}</div>
+        <div style="font-size:11px;margin-top:2px;color:${col || 'var(--muted)'}">${pct(s.chg)}</div></div>`;
+    }).join("");
   } catch (e) { $("usBox").innerHTML = `<div class="err">美股报价获取失败，检查 Worker 与 FINNHUB_KEY。</div>`; }
 }
 function workerHint() {
