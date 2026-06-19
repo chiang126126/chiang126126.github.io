@@ -44,6 +44,45 @@ mkdir -p data && MODE=dry python bot.py
 - `indicators.py` EMA/RSI/ATR/SMA
 - 输出:`data/bot_state.json`(权益/持仓)、`data/bot_trades.json`(已平仓)、`data/bot_log.json`(每次决策)
 
+## 本地运行(连币安 testnet 真下单,绕开 GitHub 地区封锁)
+
+GitHub 美国服务器被币安封(451),但**你自己电脑能连币安**,所以在本地跑就能真下单。
+
+**一次性准备:**
+```bash
+# 1) 只取 mp500-bot 代码（不下载 4.6GB 历史）
+git clone --depth=1 --filter=blob:none --sparse https://github.com/chiang126126/chiang126126.github.io.git mp500
+cd mp500 && git sparse-checkout set mp500-bot && cd mp500-bot
+
+# 2) clone 独立仓库(给看板看的小仓库)
+git clone https://github.com/chiang126126/million-path.git ~/mp-data
+
+# 3) 依赖
+pip3 install -r requirements.txt
+
+# 4) 配置
+cp .env.example .env
+#   编辑 .env：MODE=testnet
+#             LLM_API_KEY=你的DeepSeek key
+#             BINANCE_TESTNET_KEY / BINANCE_TESTNET_SECRET
+#             DATA_REPO=/Users/你的用户名/mp-data
+```
+
+**手动跑一次验证:**
+```bash
+bash run_local.sh
+```
+应打印 `[testnet] 已连接，USDT 可用余额 ...`，FLAT 则观望、LONG 则真下单,然后推数据、看板更新。
+
+**每小时自动(macOS / Linux,crontab):**
+```bash
+crontab -e
+# 加一行（把路径换成你的真实路径）：
+7 * * * * /bin/bash /Users/你的用户名/mp500/mp500-bot/run_local.sh >> ~/mp500-bot.log 2>&1
+```
+> ⚠️ 笔记本要**保持开机且不休眠**才会按时跑(cron 不会唤醒睡眠的电脑)。要真 24/7 就用一台常开的小主机/VPS。
+> 时间需准(签名校验):若报 timestamp 错误,先校准系统时钟(NTP)。
+
 ## 边界(诚实)
 - 每小时决策一次,**没有秒级插针防护**(那需常驻进程/VPS,属 S2 后期)。止损用 K 线高低价检测,保证不漏。
 - Actions 定时**可能延迟数分钟或偶尔跳过**,对小时级策略无碍。
