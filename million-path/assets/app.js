@@ -280,14 +280,14 @@ async function loadCryptoNews() {
     }));
     if (!items.length) throw new Error("empty");
     STATE.news = items.slice(0, 6).map(n => n.title);
-    box.innerHTML = renderNews(items); stampNews(); return;
+    _newsItems = items; renderNews(); stampNews(); if (_newsLang === "zh") translateNews(); return;
   } catch (e) { /* 进入 RSS 回退 */ }
   // 2) 回退：品牌 RSS（CoinDesk / Cointelegraph / Decrypt，经 Worker）
   try {
     const items = await fetchRssNews();
     if (!items.length) throw new Error("empty");
     STATE.news = items.slice(0, 6).map(n => n.title);
-    box.innerHTML = renderNews(items); stampNews(); return;
+    _newsItems = items; renderNews(); stampNews(); if (_newsLang === "zh") translateNews(); return;
   } catch (e) {
     box.innerHTML = `<div class="err">加密新闻暂不可用。CryptoCompare 受限、且 RSS 回退需要已部署的 Worker（见 worker/README.md）。</div>`;
   }
@@ -309,12 +309,40 @@ async function fetchRssNews() {
   }
   return all.filter(x => x.title).sort((a, b) => (b.ts || 0) - (a.ts || 0)).slice(0, 12);
 }
-function renderNews(items) {
-  if (!items.length) return '<span class="badge">暂无新闻</span>';
-  return items.map(n => `<a class="news" href="${n.url}" target="_blank" rel="noopener">
-    ${n.img ? `<img src="${n.img}" loading="lazy" alt="">` : ""}
-    <div class="news-t"><b>${n.title}</b>
-      <div class="badge">${n.source || ''}${n.cats ? ' · ' + n.cats : ''} · ${n.ts ? ago(n.ts) : ''}</div></div></a>`).join("");
+let _newsItems = [], _newsLang = "en";
+const _trCache = {};
+function renderNews() {
+  const box = $("cryptoNews"); if (!box) return;
+  if (!_newsItems.length) { box.innerHTML = '<span class="badge">暂无新闻</span>'; return; }
+  box.innerHTML = _newsItems.map(n => {
+    const title = (_newsLang === "zh" && _trCache[n.title]) ? _trCache[n.title] : n.title;
+    return `<a class="news" href="${n.url}" target="_blank" rel="noopener">
+      ${n.img ? `<img src="${n.img}" loading="lazy" alt="">` : ""}
+      <div class="news-t"><b>${title}</b>
+        <div class="badge">${n.source || ''}${n.cats ? ' · ' + n.cats : ''} · ${n.ts ? ago(n.ts) : ''}</div></div></a>`;
+  }).join("");
+}
+// 免费翻译(MyMemory，CORS 友好)，按标题缓存，避免重复翻译
+async function translateNews() {
+  const todo = _newsItems.map(n => n.title).filter(t => t && !_trCache[t]);
+  const btn = $("newsLangBtn");
+  if (todo.length && btn) btn.textContent = "翻译中…";
+  await Promise.all(todo.map(async t => {
+    try {
+      const r = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(t)}&langpair=en|zh-CN`);
+      const d = await r.json();
+      const zh = d && d.responseData && d.responseData.translatedText;
+      if (zh && !/MYMEMORY WARNING/i.test(zh)) _trCache[t] = zh;
+    } catch (e) {}
+  }));
+  if (btn) btn.textContent = _newsLang === "zh" ? "原文" : "译中文";
+  renderNews();
+}
+function toggleNewsLang() {
+  _newsLang = _newsLang === "en" ? "zh" : "en";
+  const btn = $("newsLangBtn");
+  if (_newsLang === "zh") { if (btn) btn.textContent = "原文"; translateNews(); }
+  else { if (btn) btn.textContent = "译中文"; renderNews(); }
 }
 
 //==================== Worker 板块：美联储宏观 / 美股自选 ====================
@@ -781,6 +809,7 @@ function init() {
   $("genEvBtn") && $("genEvBtn").addEventListener("click", showEvidence);
   $("copyEvBtn") && $("copyEvBtn").addEventListener("click", copyEvidence);
   $("liveToggle") && $("liveToggle").addEventListener("click", toggleLive);
+  $("newsLangBtn") && $("newsLangBtn").addEventListener("click", toggleNewsLang);
   // Paper 持仓器
   PAPER.load();
   $("pOpenBtn") && $("pOpenBtn").addEventListener("click", paperOpen);
