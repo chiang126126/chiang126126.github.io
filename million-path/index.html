@@ -118,7 +118,7 @@
   <nav class="nav">
     <a href="#sec-overview">概览</a><a href="#sec-market">行情</a><a href="#sec-trend">趋势</a>
     <a href="#sec-macro">加密宏观</a><a href="#sec-mstr">MSTR微策略</a><a href="#sec-sentiment">情绪·事件</a><a href="#sec-news">加密新闻</a>
-    <a href="#sec-us">美股·宏观</a><a href="#sec-ai">AI快照</a><a href="#sec-trades">交易复盘</a><a href="#sec-stats">统计·测算</a>
+    <a href="#sec-us">美股·宏观</a><a href="#sec-ai">AI快照</a><a href="#sec-paper">Paper仓</a><a href="#sec-trades">交易复盘</a><a href="#sec-stats">统计·测算</a>
   </nav>
 
   <!-- 顶部滚动行情条 (TradingView) -->
@@ -250,6 +250,42 @@
       <textarea id="evidenceOut" readonly
         style="width:100%;min-height:220px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.5"></textarea>
     </details>
+  </section>
+
+  <!-- Paper 持仓器 -->
+  <section id="sec-paper" class="panel">
+    <h2><span class="bar"></span>Paper 持仓器 · S0 模拟交易（实时算盈亏）</h2>
+    <div class="badge" style="margin-bottom:12px">本地模拟仓（存浏览器，不动真钱）。先确定止损再开仓，按 MP500 单笔风险反推仓位；浮动盈亏用实时价逐秒更新。<b>数据存在本浏览器,不跨设备同步。</b></div>
+
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;align-items:end">
+      <div><label>标的</label><select id="pSym"><option>BTC</option><option>ETH</option><option>SOL</option><option>BNB</option></select></div>
+      <div><label>方向</label><select id="pSide"><option>LONG</option><option>SHORT</option></select></div>
+      <div><label>入场价</label><input id="pEntry" type="number" step="any" placeholder="现价"></div>
+      <div style="display:flex;align-items:end"><button class="btn" id="pUseLiveBtn" style="width:100%">用现价</button></div>
+      <div><label>止损价 *</label><input id="pStop" type="number" step="any"></div>
+      <div><label>止盈价</label><input id="pTarget" type="number" step="any"></div>
+      <div><label>单笔风险 %</label><input id="pRisk" type="number" step="0.1" value="1"></div>
+      <div style="display:flex;align-items:end"><button class="btn" id="pOpenBtn" style="width:100%;border-color:var(--gold)">开 Paper 仓</button></div>
+    </div>
+    <div id="paperMsg" class="badge" style="margin-top:8px;min-height:16px"></div>
+
+    <div class="grid g-auto" id="paperStats" style="margin:14px 0"></div>
+
+    <div class="k" style="font-size:11px;color:var(--muted);margin-bottom:6px">当前持仓（浮动盈亏实时更新）</div>
+    <div class="tablewrap"><table>
+      <thead><tr><th>标的/方向</th><th>入场</th><th>现价</th><th>止损</th><th>止盈</th><th>名义</th><th>浮动盈亏</th><th>R</th><th></th></tr></thead>
+      <tbody id="paperOpenBody"></tbody></table></div>
+
+    <div class="k" style="font-size:11px;color:var(--muted);margin:14px 0 6px">已平仓记录（最近 30 笔）</div>
+    <div class="tablewrap"><table>
+      <thead><tr><th>标的/方向</th><th>入场→出场</th><th>盈亏</th><th>R</th><th>结果</th><th>时间</th></tr></thead>
+      <tbody id="paperClosedBody"></tbody></table></div>
+
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+      <button class="btn" id="pExportBtn">📋 导出本期统计（填 ledger）</button>
+      <button class="btn" id="pResetBtn" style="border-color:var(--red)">清空 Paper 账户</button>
+    </div>
+    <input id="paperExport" readonly style="width:100%;margin-top:8px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px;font-family:ui-monospace,Menlo,monospace;font-size:12px">
   </section>
 
   <!-- 交易复盘 -->
