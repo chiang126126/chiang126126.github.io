@@ -259,9 +259,13 @@ async function loadBot() {
       <td data-label="浮动盈亏" class="${cls(u)}">${u == null ? "—" : (u >= 0 ? "+" : "") + fmt(u, 2) + "U"}</td></tr>`;
   }).join("") || '<tr><td colspan="6" class="badge">当前无持仓</td></tr>';
 
+  const decTs = log.ts ? Math.floor(Date.parse(log.ts) / 1000) : null;
+  const decTime = decTs ? new Date(log.ts).toLocaleString("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }) : "";
   $("botDecisions").innerHTML = (log.items || []).map(it =>
-    `<div class="ev" style="padding:8px 0"><div class="t"><b>${it.symbol || ""}</b>
+    `<div class="ev" style="padding:8px 0"><div class="t" style="flex-wrap:wrap;align-items:baseline">
+      <b>${it.symbol || ""}</b>
       <span class="chip ${it.bias === "LONG" ? "risk-on" : "neutral"}">${it.bias || it.action || "—"}</span>
+      ${decTime ? `<span class="badge" style="color:var(--muted)">🕐 ${decTime} · ${ago(decTs)}</span>` : ""}
       <span class="badge">${it.source ? it.source + " · " : ""}${it.confidence != null ? "conf " + it.confidence + " · " : ""}${it.reason || it.rationale || ""}</span></div></div>`).join("") || '<span class="badge">暂无决策</span>';
 
   $("botTradesBody").innerHTML = tr.slice().reverse().slice(0, 20).map(t => `<tr>
