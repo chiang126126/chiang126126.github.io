@@ -1,0 +1,32 @@
+name: Sync million-path → standalone repo
+
+# 每当 million-path/ 有改动被推送，自动把它同步到独立仓库 chiang126126/million-path，
+# 由 GitHub 服务器完成，你的电脑无需 clone/下载任何东西。
+on:
+  push:
+    branches: [claude/trusting-pasteur-el5wv5, main]
+    paths: ["million-path/**"]
+  workflow_dispatch: {}   # 也可在 Actions 页面手动触发
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Push million-path/ to chiang126126/million-path:main
+        env:
+          TOKEN: ${{ secrets.SYNC_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::error::缺少 SYNC_TOKEN secret。请在仓库 Settings → Secrets → Actions 添加。"
+            exit 1
+          fi
+          cd million-path
+          git init -q -b main
+          git config user.name "million-path-sync"
+          git config user.email "mangzi141800@gmail.com"
+          git add -A
+          git commit -q -m "Sync million-path from ${GITHUB_SHA::7}"
+          git push -f "https://x-access-token:${TOKEN}@github.com/chiang126126/million-path.git" main:main
+          echo "✅ 已同步到 chiang126126/million-path"
