@@ -45,6 +45,7 @@ jobs:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           BINANCE_TESTNET_KEY: ${{ secrets.BINANCE_TESTNET_KEY }}
           BINANCE_TESTNET_SECRET: ${{ secrets.BINANCE_TESTNET_SECRET }}
+          MARKETAUX_KEY: ${{ secrets.MARKETAUX_KEY }}
         run: python mp500-bot/bot.py
 
       - name: Commit bot data

@@ -22,6 +22,7 @@ def cfg():
         "LLM_MODEL": os.getenv("LLM_MODEL", "deepseek-chat"),
         "TN_KEY": os.getenv("BINANCE_TESTNET_KEY", ""),
         "TN_SECRET": os.getenv("BINANCE_TESTNET_SECRET", ""),
+        "MARKETAUX_KEY": os.getenv("MARKETAUX_KEY", ""),
         "DATA_DIR": os.getenv("DATA_DIR", "./data"),
     }
 
@@ -137,12 +138,20 @@ def main():
     state["positions"] = still_open
     open_syms = {p["symbol"] for p in state["positions"]}
 
-    # 2) 寻找新入场
+    # 2) 整合新闻信息面（每轮抓一次，喂给 LLM 做小时级判断）
+    news_text = ""
+    try:
+        news_text = strategy.fetch_news(c)
+        log["news_lines"] = len([x for x in news_text.split("\n") if x.startswith("-")])
+    except Exception as e:
+        print(f"[warn] 新闻抓取失败: {e}")
+
+    # 3) 寻找新入场
     for sym in CORE:
         if sym in open_syms or sym in closed_this_run:   # 同周期刚平仓则冷却，不立即回补
             continue
         try:
-            decision, evidence, ind = strategy.analyze(sym, c)
+            decision, evidence, ind = strategy.analyze(sym, c, news_text)
         except Exception as e:
             print(f"[warn] {sym} 分析失败: {e}")
             continue
