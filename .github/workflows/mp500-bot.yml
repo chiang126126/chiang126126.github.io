@@ -1,0 +1,57 @@
+name: MP500 paper bot (hourly)
+
+# 每小时跑一次：取数据 → LLM/规则决策 → 风控否决 → 执行(sim/testnet) → 把结果写进
+# 独立仓库 chiang126126/million-path 的 data/，看板自动读取展示。
+on:
+  schedule:
+    - cron: "7 * * * *"     # 每小时 :07（避开整点高峰，定时可能延迟数分钟，正常）
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "运行模式 dry/sim/testnet"
+        default: "sim"
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  trade:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: pip install -r mp500-bot/requirements.txt
+
+      - name: Clone data repo (standalone)
+        env:
+          TOKEN: ${{ secrets.SYNC_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then echo "::error::缺少 SYNC_TOKEN"; exit 1; fi
+          git clone --depth=1 "https://x-access-token:${TOKEN}@github.com/chiang126126/million-path.git" standalone
+
+      - name: Run bot
+        env:
+          DATA_DIR: ${{ github.workspace }}/standalone/data
+          MODE: ${{ github.event.inputs.mode || 'sim' }}
+          LLM_PROVIDER: ${{ vars.LLM_PROVIDER || 'deepseek' }}
+          LLM_MODEL: ${{ vars.LLM_MODEL || 'deepseek-chat' }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          BINANCE_TESTNET_KEY: ${{ secrets.BINANCE_TESTNET_KEY }}
+          BINANCE_TESTNET_SECRET: ${{ secrets.BINANCE_TESTNET_SECRET }}
+        run: python mp500-bot/bot.py
+
+      - name: Commit bot data
+        env:
+          TOKEN: ${{ secrets.SYNC_TOKEN }}
+        run: |
+          cd standalone
+          git config user.name "mp500-bot"
+          git config user.email "mangzi141800@gmail.com"
+          git add -A data/
+          git commit -q -m "bot run $(date -u +%FT%TZ)" || { echo "no changes"; exit 0; }
+          git push origin HEAD:main
