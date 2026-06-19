@@ -318,19 +318,26 @@ async function fetchRssNews() {
 }
 let _newsItems = [], _newsLang = "en";
 const _trCache = {};
+function newsCard(n) {
+  const title = (_newsLang === "zh" && _trCache[n.title]) ? _trCache[n.title] : n.title;
+  const meta = `${n.source || ''}${n.cats ? ' · ' + n.cats : ''}${n.ts ? ' · ' + ago(n.ts) : ''}`;
+  return `<a class="news-card" href="${n.url}" target="_blank" rel="noopener">
+    ${n.img ? `<img src="${n.img}" loading="lazy" alt="">` : ""}
+    <div class="nc-body"><b>${title}</b><div class="badge">${meta}</div></div></a>`;
+}
 function renderNews() {
   const box = $("cryptoNews"); if (!box) return;
   if (!_newsItems.length) { box.innerHTML = '<span class="badge">暂无新闻</span>'; return; }
-  const rows = _newsItems.map(n => {
-    const title = (_newsLang === "zh" && _trCache[n.title]) ? _trCache[n.title] : n.title;
-    return `<a class="news" href="${n.url}" target="_blank" rel="noopener">
-      ${n.img ? `<img src="${n.img}" loading="lazy" alt="">` : ""}
-      <div class="news-t"><b>${title}</b>
-        <div class="badge">${n.source || ''}${n.cats ? ' · ' + n.cats : ''} · ${n.ts ? ago(n.ts) : ''}</div></div></a>`;
-  }).join("");
-  const dur = Math.max(24, _newsItems.length * 3.4);   // 条数越多滚得越慢，速度恒定
-  // 列表复制两份以实现无缝循环滚动
-  box.innerHTML = `<div class="news-scroll"><div class="news-track" style="animation-duration:${dur}s">${rows}${rows}</div></div>`;
+  // 交替分到两列 → 两列高度天然错落，形成瀑布流；各列复制两份实现无缝滚动
+  const colA = [], colB = [];
+  _newsItems.forEach((n, i) => (i % 2 ? colB : colA).push(newsCard(n)));
+  const a = colA.join(""), b = colB.join("");
+  const durA = Math.max(26, colA.length * 4.4);          // 条数越多滚得越慢，速度恒定
+  const durB = Math.max(26, colB.length * 4.4) * 1.15;   // 两列略不同步，更像瀑布流
+  box.innerHTML = `<div class="news-masonry">
+    <div class="news-col"><div class="news-track" style="animation-duration:${durA}s">${a}${a}</div></div>
+    <div class="news-col"><div class="news-track" style="animation-duration:${durB}s">${b}${b}</div></div>
+  </div>`;
 }
 // 免费翻译(MyMemory，CORS 友好)，按标题缓存，避免重复翻译
 async function translateNews() {

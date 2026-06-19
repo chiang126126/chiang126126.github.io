@@ -129,10 +129,19 @@
   #sec-env.mood-neutral{border-color:#33476e}
   #sec-env.mood-greed{border-color:#1f6a44;box-shadow:0 0 0 1px rgba(22,199,132,.24),0 8px 30px rgba(22,199,132,.11)}
   #sec-env.mood-exgreed{border-color:#16c784;box-shadow:0 0 0 1px rgba(22,199,132,.38),0 8px 34px rgba(22,199,132,.17)}
-  /* 新闻滚动 */
-  .news-scroll{height:300px;overflow:hidden;position:relative;-webkit-mask-image:linear-gradient(180deg,transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(180deg,transparent,#000 7%,#000 93%,transparent)}
+  /* 加密新闻：双列瀑布流 + 自动滚动 */
+  .news-masonry{display:flex;gap:14px}
+  .news-col{flex:1;min-width:0;height:360px;overflow:hidden;position:relative;-webkit-mask-image:linear-gradient(180deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(180deg,transparent,#000 6%,#000 94%,transparent)}
   .news-track{display:flex;flex-direction:column;animation:newsroll linear infinite;will-change:transform}
-  .news-scroll:hover .news-track{animation-play-state:paused}
+  .news-masonry:hover .news-track{animation-play-state:paused}
+  .news-card{display:block;margin-bottom:12px;background:var(--chip);border:1px solid var(--border);border-radius:12px;overflow:hidden;text-decoration:none;color:var(--text);transition:border-color .2s,transform .2s}
+  .news-card:hover{border-color:var(--gold2);transform:translateY(-1px)}
+  .news-card img{width:100%;height:104px;object-fit:cover;display:block;background:#1a1f2e}
+  .news-card .nc-body{padding:9px 11px}
+  .news-card .nc-body b{font-size:13px;font-weight:600;line-height:1.42;display:block}
+  .news-card:hover b{color:var(--gold2)}
+  .news-card .badge{margin-top:6px}
+  @media(max-width:560px){.news-masonry{gap:10px}.news-col{height:320px}.news-card img{height:88px}}
   @keyframes newsroll{from{transform:translateY(0)}to{transform:translateY(-50%)}}
 </style>
 </head>
@@ -360,7 +369,7 @@
     ⚠️ 本看板为纪律与复盘工具，行情数据仅供参考、可能延迟或因网络/地区受限；<b>不构成投资建议</b>，加密交易可能损失全部本金。任何收益目标必须服从风控。
   </div>
 
-  <script src="./config.js?v=18"></script>
-  <script src="./assets/app.js?v=18"></script>
+  <script src="./config.js?v=19"></script>
+  <script src="./assets/app.js?v=19"></script>
 </body>
 </html>
