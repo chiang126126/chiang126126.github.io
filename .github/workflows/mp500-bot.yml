@@ -3,8 +3,10 @@ name: MP500 paper bot (hourly)
 # 每小时跑一次：取数据 → LLM/规则决策 → 风控否决 → 执行(sim/testnet) → 把结果写进
 # 独立仓库 chiang126126/million-path 的 data/，看板自动读取展示。
 on:
-  schedule:
-    - cron: "7 * * * *"     # 每小时 :07（避开整点高峰，定时可能延迟数分钟，正常）
+  # 云端定时已关闭：改用本地 run_local.sh 跑 testnet，避免与本地推数据冲突。
+  # 如需恢复云端 sim，取消下面两行注释即可。
+  # schedule:
+  #   - cron: "7 * * * *"
   workflow_dispatch:
     inputs:
       mode:
