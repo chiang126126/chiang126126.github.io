@@ -1,6 +1,7 @@
 /* Million Path 看板逻辑 —— 每个面板独立容错，单个数据源失败不影响其它。 */
 "use strict";
 const CFG = window.MP_CONFIG || {};
+const STATE = {};  // 收集各面板最新数据，供「AI 策略快照」生成 Evidence Document
 
 //==================== 工具 ====================
 const $ = id => document.getElementById(id);
@@ -146,6 +147,9 @@ async function loadMarket() {
   const hr = $("heroRegime"); hr.className = "chip " + brg.key;
   hr.textContent = `BTC ${brg.label}${brg.dev != null ? '（' + pct(brg.dev) + '）' : ''}`;
   $("heroAdvice").textContent = ADVICE[brg.key];
+  // 供 Evidence 快照使用
+  STATE.btcRegime = brg;
+  STATE.market = tick.rows.map((c, i) => ({ name: c.name, price: c.price, chg: c.chg, funding: foArr[i] ? foArr[i].funding : null }));
   $("updated").textContent = "更新于 " + new Date().toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" });
 }
 
@@ -155,6 +159,7 @@ async function loadCryptoMacro() {
     const g = await fetchGlobal();
     const mc = g.total_market_cap.usd, chg = g.market_cap_change_percentage_24h_usd;
     const btcD = g.market_cap_percentage.btc, ethD = g.market_cap_percentage.eth;
+    STATE.macro = { mc, chg, btcD, ethD };
     const cards = [
       ["加密总市值", big(mc), `<span class="${cls(chg)}">${pct(chg)}</span>`],
       ["BTC 占比", btcD.toFixed(1) + "%", "主导率"],
@@ -187,6 +192,7 @@ async function loadSentiment() {
     $("fngVal").style.color = v < 25 ? "#ea3943" : v < 45 ? "#f0b90b" : v < 55 ? "#cbd5e1" : v < 75 ? "#84cc16" : "#16c784";
     $("fngMark").style.left = v + "%";
     const map = { "Extreme Fear": "极度恐惧", "Fear": "恐惧", "Neutral": "中性", "Greed": "贪婪", "Extreme Greed": "极度贪婪" };
+    STATE.fng = { v, label: map[f.value_classification] || f.value_classification };
     $("fngLabel").textContent = (map[f.value_classification] || f.value_classification) + " · 越低越恐慌（潜在机会），越高越贪婪（注意风险）";
   } catch (e) { $("fngVal").textContent = "—"; $("fngLabel").innerHTML = '<span class="err">情绪指数暂不可用</span>'; }
 }
@@ -213,6 +219,7 @@ async function loadCryptoNews() {
       title: n.title, url: n.url, source: (n.source_info && n.source_info.name) || n.source, ts: n.published_on,
       img: n.imageurl, cats: (n.categories || "").split("|").slice(0, 2).join(" · ")
     }));
+    STATE.news = items.slice(0, 6).map(n => n.title);
     box.innerHTML = renderNews(items);
   } catch (e) { box.innerHTML = `<div class="err">加密新闻暂不可用（CryptoCompare）。上线后请在浏览器 DevTools 确认其 CORS。</div>`; }
 }
@@ -242,6 +249,7 @@ async function loadFred() {
         const o = (d.observations || [])[0]; return { ...s, val: o ? o.value : null, date: o ? o.date : "" }; }
       catch (e) { return { ...s, val: null }; }
     }));
+    STATE.fred = out.filter(s => s.val != null).map(s => `${s.label} ${s.val}${s.suf}`);
     $("fredBox").innerHTML = out.map(s =>
       `<div class="card"><div class="k">${s.label}</div><div class="v">${s.val == null ? "—" : s.val + s.suf}</div>
        <div class="badge">${s.date || ''}</div></div>`).join("");
@@ -286,6 +294,7 @@ async function loadMstr() {
     const btc = btcT ? +btcT.price : null;
     const navBtc = (holdings && btc) ? holdings * btc : null;     // BTC 持仓净值
     const mnav = (mcap && navBtc) ? mcap / navBtc : null;          // >1 溢价，<1 折价
+    STATE.mstr = { price, chg, mnav };
     const cards = [
       ["MSTR 现价", price == null ? "—" : "$" + fmt(price, 2), `<span class="${cls(chg)}">${pct(chg)} (当日)</span>`],
       ["公司市值", mcap ? big(mcap) : "—", "Finnhub"],
@@ -326,6 +335,7 @@ function renderLedger(d) {
     peak = Math.max(peak, x.equity_end); maxDD = Math.max(maxDD, (peak - x.equity_end) / peak * 100); });
   const last = w[w.length - 1] || { equity_end: m.initial_capital, stage: "S0" };
   const cum = ((last.equity_end / m.initial_capital) - 1) * 100;
+  STATE.portfolio = { equity: last.equity_end, stage: last.stage, weeks: w.length };
   const viol = w.reduce((s, x) => s + (x.violations || 0), 0);
   const rets = w.filter(x => x._ret != null).map(x => x._ret);
   const avg = rets.length ? rets.reduce((a, b) => a + b, 0) / rets.length : null;
@@ -384,11 +394,75 @@ function renderCalc() {
   }).join("");
 }
 
+//==================== AI 策略快照（Evidence Document 生成器）====================
+// 把当前看板数据汇成结构化文本，供你粘进任意 LLM，让它回一个决策元组。
+// 零 API 成本、无后端；人 + 风控引擎始终最终拍板。
+function buildEvidence() {
+  const t = new Date().toLocaleString("zh-CN");
+  const p = STATE.portfolio || {};
+  const mkt = (STATE.market || []).map(c =>
+    `  - ${c.name}: ${money(c.price)} (${pct(c.chg)} 24h)${c.funding != null ? `, 资金费率 ${c.funding.toFixed(4)}%` : ""}`).join("\n") || "  - 暂无";
+  const reg = STATE.btcRegime ? `${STATE.btcRegime.label}${STATE.btcRegime.dev != null ? "（偏离30日线 " + pct(STATE.btcRegime.dev) + "）" : ""}` : "未知";
+  const macro = STATE.macro ? `总市值 ${big(STATE.macro.mc)}（24h ${pct(STATE.macro.chg)}）, BTC占比 ${STATE.macro.btcD.toFixed(1)}%, ETH占比 ${STATE.macro.ethD.toFixed(1)}%` : "暂无";
+  const fng = STATE.fng ? `${STATE.fng.v}（${STATE.fng.label}）` : "暂无";
+  const mstr = STATE.mstr ? `现价 $${fmt(STATE.mstr.price, 2)}（${pct(STATE.mstr.chg)}）${STATE.mstr.mnav ? ", mNAV " + STATE.mstr.mnav.toFixed(2) + "x" : ""}` : "暂无（需 Worker）";
+  const fred = (STATE.fred && STATE.fred.length) ? STATE.fred.join(" | ") : "暂无（需 Worker）";
+  const news = (STATE.news && STATE.news.length) ? STATE.news.map((h, i) => `  ${i + 1}. ${h}`).join("\n") : "  暂无";
+
+  return `# MP500 Evidence Document（${t}）
+
+## 组合
+- 阶段 ${p.stage || "S0"} | 权益 ${p.equity != null ? fmt(p.equity, 0) + "U" : "—"} | 已运行 ${p.weeks || 0} 周
+
+## 市场结构（核心池）
+${mkt}
+- BTC 行情状态（30日线法）: ${reg}
+
+## 加密宏观
+- ${macro}
+- 恐惧贪婪指数: ${fng}
+
+## MSTR / 微策略（BTC 杠杆代理）
+- ${mstr}
+
+## 美股 / 宏观（FRED）
+- ${fred}
+
+## 近期加密新闻头条
+${news}
+
+---
+请你扮演 MP500 的战略分析师，基于以上 Evidence，按如下 JSON 给出决策元组（只做参谋，不替我下单）：
+{
+  "bias": "LONG | FLAT",            // S2 前不做 SHORT
+  "confidence": 0.0,                // 0~1
+  "expected_move_bps": 0,           // 预期幅度（基点）
+  "rationale": "识别到的形态/催化剂/叙事，及为什么",
+  "risk_flags": ["需要警惕的风险，如资金费率过热/流动性/宏观事件"],
+  "abstain_ok": true                // 行情不明确时，FLAT/空仓是允许且常常正确的
+}
+要求：风控优先；不确定就给 FLAT。`;
+}
+function showEvidence() {
+  const box = $("evidenceOut");
+  if (box) box.value = buildEvidence();
+}
+function copyEvidence() {
+  const box = $("evidenceOut");
+  if (!box || !box.value) showEvidence();
+  if (box && box.value) {
+    navigator.clipboard && navigator.clipboard.writeText(box.value);
+    const b = $("copyEvBtn"); if (b) { const o = b.textContent; b.textContent = "已复制 ✓"; setTimeout(() => b.textContent = o, 1500); }
+  }
+}
+
 //==================== 启动 ====================
 function refreshLive() { loadMarket(); loadSentiment(); loadCryptoMacro(); loadDefi(); loadCryptoNews(); loadFred(); loadUsStocks(); loadMstr(); }
 function init() {
   ["cStart", "cRate", "cFx", "cRmb", "cUsd"].forEach(id => $(id) && $(id).addEventListener("input", renderCalc));
   $("refreshBtn") && $("refreshBtn").addEventListener("click", refreshLive);
+  $("genEvBtn") && $("genEvBtn").addEventListener("click", showEvidence);
+  $("copyEvBtn") && $("copyEvBtn").addEventListener("click", copyEvidence);
   loadLedger(); loadEvents(); refreshLive(); renderCalc();
   setInterval(refreshLive, 60000);
 }

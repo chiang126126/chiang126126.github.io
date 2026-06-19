@@ -24,6 +24,8 @@ million-path/
 │   └── README.md                  # Worker 部署指南
 ├── docs/
 │   ├── MP500-v1.1.md              # 主策略文档（周节奏 + 收益预期表 + S1合约仅paper）
+│   ├── MP500-AI-architecture.md   # AI策略层×确定性风控层 双层架构（借鉴 WebCryptoAgent）
+│   ├── trade_journal_TEMPLATE.md  # 单笔交易日志（决策元组 + 结构化反思/经验回放）
 │   └── weekly_review_TEMPLATE.md  # 周复盘模板（被脚本自动填充）
 ├── scripts/
 │   └── new_week.py                # 每周自动生成复盘脚手架（自动填数）
@@ -41,6 +43,7 @@ million-path/
 | 趋势判断 | 核心三币 价格 vs 30 日均线 → risk-on/neutral/risk-off | Binance K线 |
 | 加密宏观 & 链上 | 总市值、BTC/ETH 占比、成交额、**DeFi TVL** | CoinGecko + DeFiLlama |
 | **MSTR 微策略** | MSTR vs BTC 走势、现价、市值、BTC 持仓净值、**mNAV 溢价/折价** | TradingView + Finnhub（经 Worker）|
+| **AI 策略快照** | 一键把全看板数据汇成 Evidence Document，粘进 LLM 出「决策元组」 | 看板数据汇总（零 API 成本）|
 | 市场情绪 & 事件 | 恐惧贪婪指数 + 大事件/解锁日历 | alternative.me + events.json |
 | 加密新闻 | 实时加密新闻流 | CryptoCompare（直连，CORS 友好）|
 | **美股 & 宏观** | 财经日历(FOMC/CPI/非农)、指数总览、VIX、美元、美债；美联储利率/CPI；美股自选报价 | TradingView widget + FRED + Finnhub（经 Worker）|
