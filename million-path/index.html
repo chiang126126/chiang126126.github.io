@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0a0e17" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<title>Million Path · 百万之路 · 交易驾驶舱</title>
+<title>To Millions · 百万之路 · 交易驾驶舱</title>
 <style>
   :root{
     --bg:#0a0e17; --bg2:#0e1422; --panel:#121a2b; --panel2:#16203455;
@@ -110,7 +110,7 @@
 
   <div class="topbar">
     <div class="brand"><div class="logo">M</div>
-      <div><h1>Million Path · 百万之路</h1><div class="sub">MP500 交易驾驶舱 · 500U → 100万 · 风控优先</div></div>
+      <div><h1>To Millions · 百万之路</h1><div class="sub">MP500 交易驾驶舱 · 500U → 100万 · 风控优先</div></div>
     </div>
     <div class="refresh"><span class="dot" id="liveDot"></span><span id="updated">加载中…</span><button class="btn" id="liveToggle" title="实时(WebSocket逐秒) / 省流(60秒轮询，更省电)">🟢 实时</button><button class="btn" id="refreshBtn">↻ 刷新</button></div>
   </div>
@@ -236,16 +236,20 @@
     </div></div>
   </section>
 
-  <!-- AI 策略快照 / Evidence Document -->
+  <!-- AI 策略快照 / 决策元组 -->
   <section id="sec-ai" class="panel">
-    <h2><span class="bar"></span>AI 策略快照 · Evidence Document<span class="badge" id="evTime" style="margin-left:auto;font-weight:400">随刷新自动生成</span></h2>
-    <div class="badge" style="margin-bottom:10px">随看板每次刷新<b>自动重建</b>（你框选/复制时会自动跳过）。复制后粘进任意 LLM（如 Claude），让它按 MP500 格式回一个「决策元组」。借鉴 WebCryptoAgent 双层架构：LLM 只做参谋，<b>风控引擎与你始终最终拍板</b>。详见 <code>docs/MP500-AI-architecture.md</code>。</div>
-    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-      <button class="btn" id="genEvBtn">📋 立即重新生成</button>
-      <button class="btn" id="copyEvBtn">复制</button>
-    </div>
-    <textarea id="evidenceOut" readonly placeholder="点「生成当前 Evidence」后，这里会出现可复制的结构化快照…"
-      style="width:100%;min-height:260px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.5"></textarea>
+    <h2><span class="bar"></span>AI 策略快照 · 决策元组<span class="badge" id="decTime" style="margin-left:auto;font-weight:400">随刷新自动更新</span></h2>
+    <div class="badge" style="margin-bottom:12px">由确定性规则从实时数据推断的<b>参考决策</b>，随看板自动更新。借鉴 WebCryptoAgent 双层架构：这只是「战略层参谋」，<b>风控引擎与你始终最终拍板</b>。详见 <code>docs/MP500-AI-architecture.md</code>。</div>
+    <div id="decisionBox"><div class="badge">计算中…</div></div>
+    <details style="margin-top:14px">
+      <summary style="cursor:pointer;color:var(--muted);font-size:13px">展开给 LLM 的 Evidence 文本（复制粘进 Claude 可获得更深入判断）<span class="badge" id="evTime"></span></summary>
+      <div style="display:flex;gap:8px;margin:10px 0;flex-wrap:wrap">
+        <button class="btn" id="genEvBtn">📋 重新生成</button>
+        <button class="btn" id="copyEvBtn">复制</button>
+      </div>
+      <textarea id="evidenceOut" readonly
+        style="width:100%;min-height:220px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.5"></textarea>
+    </details>
   </section>
 
   <!-- 交易复盘 -->
@@ -280,7 +284,7 @@
     ⚠️ 本看板为纪律与复盘工具，行情数据仅供参考、可能延迟或因网络/地区受限；<b>不构成投资建议</b>，加密交易可能损失全部本金。任何收益目标必须服从风控。
   </div>
 
-  <script src="./config.js"></script>
-  <script src="./assets/app.js"></script>
+  <script src="./config.js?v=10"></script>
+  <script src="./assets/app.js?v=10"></script>
 </body>
 </html>

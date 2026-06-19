@@ -493,6 +493,54 @@ function copyEvidence() {
   }
 }
 
+//==================== 规则推断的决策元组（直接可读，非 JSON）====================
+// 用确定性规则从实时数据给出参考决策。这是「战略层 lite」，非投资建议；
+// 想要更深入判断，可复制下方 Evidence 文本喂给 LLM。
+function computeDecision() {
+  const reg = STATE.btcRegime, fng = STATE.fng, mkt = STATE.market || [];
+  let bias = "FLAT", conf = 0.3; const reasons = [], flags = [];
+  if (reg) {
+    if (reg.key === "risk-on") { bias = "LONG"; conf = 0.55; reasons.push(`BTC ${reg.label}${reg.dev != null ? "（+" + reg.dev.toFixed(1) + "%）" : ""}，趋势偏多`); }
+    else if (reg.key === "risk-off") { bias = "FLAT"; reasons.push(`BTC ${reg.label}，防守为主、优先持币观望`); }
+    else { bias = "FLAT"; reasons.push("BTC 贴近30日线、方向不明，少动"); }
+    if (reg.dev != null) conf += Math.min(0.2, Math.abs(reg.dev) / 50);
+  }
+  const btc = mkt.find(c => c.name === "BTC");
+  if (btc && btc.funding != null && Math.abs(btc.funding) > 0.05) {
+    flags.push(`资金费率偏高（${btc.funding >= 0 ? "+" : ""}${btc.funding.toFixed(4)}%/8h），${btc.funding > 0 ? "多头" : "空头"}拥挤`);
+    if (bias === "LONG") conf -= 0.1;
+  }
+  if (fng) {
+    reasons.push(`市场情绪：${fng.label}（${fng.v}）`);
+    if (fng.v >= 75) { flags.push(`极度贪婪（${fng.v}），警惕追高`); if (bias === "LONG") conf -= 0.1; }
+    else if (fng.v <= 25) { flags.push(`极度恐惧（${fng.v}），或有超跌机会但需右侧确认`); }
+  }
+  conf = Math.max(0.1, Math.min(0.9, conf));
+  const move = bias === "LONG" ? "顺势做多，目标盈亏比 ≥ 1.5" : "观望 / 空仓（FLAT 也是决策）";
+  const advice = reg ? ADVICE[reg.key] : ADVICE.neutral;
+  return { bias, conf, move, reasons, flags, advice };
+}
+function renderDecision() {
+  const box = $("decisionBox"); if (!box) return;
+  const d = computeDecision();
+  const biasCls = d.bias === "LONG" ? "risk-on" : "neutral";
+  const bar = Math.round(d.conf * 100);
+  box.innerHTML = `
+    <div class="grid g-auto" style="margin-bottom:10px">
+      <div class="card"><div class="k">方向 bias</div><div class="v"><span class="chip ${biasCls}" style="font-size:15px">${d.bias}</span></div></div>
+      <div class="card"><div class="k">置信度 confidence</div><div class="v">${d.conf.toFixed(2)}</div>
+        <div style="height:6px;border-radius:4px;background:#0d1426;margin-top:6px;overflow:hidden"><div style="height:100%;width:${bar}%;background:linear-gradient(90deg,var(--gold),var(--gold2))"></div></div></div>
+      <div class="card" style="grid-column:span 2;min-width:200px"><div class="k">操作 expected move</div><div class="v" style="font-size:14px">${d.move}</div></div>
+    </div>
+    <div class="card" style="margin-bottom:8px"><div class="k">理由 rationale</div>
+      <div style="font-size:13px;margin-top:4px">${d.reasons.map(r => "· " + r).join("<br>") || "—"}</div></div>
+    <div class="card" style="margin-bottom:8px;border-color:${d.flags.length ? 'var(--red)' : 'var(--border)'}"><div class="k">风险提示 risk flags</div>
+      <div style="font-size:13px;margin-top:4px;color:${d.flags.length ? 'var(--red)' : 'var(--muted)'}">${d.flags.map(r => "⚠ " + r).join("<br>") || "暂无明显风险信号"}</div></div>
+    <div class="badge">MP500 仓位建议：${d.advice}</div>
+    <div class="badge" style="display:block;margin-top:6px">⚠ 以上为<b>规则推断的参考</b>，非投资建议；最终由你与风控引擎决定。想要更深入判断，展开下方 Evidence 复制给 LLM。</div>`;
+  const t = $("decTime"); if (t) t.textContent = "更新于 " + new Date().toLocaleTimeString("zh-CN");
+}
+
 //==================== 实时价格（Binance WebSocket，逐秒推送）====================
 // @ticker 流约每 1 秒推一次，含最新价/24h涨跌/高低/量。WebSocket 不受 CORS 限制；
 // 若所在地区屏蔽 Binance，连接失败会自动回退到 60 秒轮询（不影响其它面板）。
@@ -562,7 +610,8 @@ async function refreshLive() {
     loadMarket(), loadSentiment(), loadCryptoMacro(), loadDefi(),
     loadCryptoNews(), loadFred(), loadUsStocks(), loadMstr()
   ]);
-  // AI 策略快照自动重生成：用户正在框选/编辑该文本框时跳过，避免打断复制
+  renderDecision();   // 规则推断的决策元组（直接可读）
+  // 给 LLM 的 Evidence 文本自动重生成：用户正在框选/编辑该文本框时跳过，避免打断复制
   if (CFG.AUTO_EVIDENCE !== false && document.activeElement !== $("evidenceOut")) {
     showEvidence();
   }
