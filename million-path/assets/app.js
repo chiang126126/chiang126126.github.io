@@ -201,6 +201,12 @@ async function loadSentiment() {
     const map = { "Extreme Fear": "极度恐惧", "Fear": "恐惧", "Neutral": "中性", "Greed": "贪婪", "Extreme Greed": "极度贪婪" };
     STATE.fng = { v, label: map[f.value_classification] || f.value_classification };
     $("fngLabel").textContent = (map[f.value_classification] || f.value_classification) + " · 越低越恐慌（潜在机会），越高越贪婪（注意风险）";
+    // 市场环境随情绪变色（一眼感受氛围）
+    const moods = [[25, "mood-exfear", "极度恐惧", "#ea3943"], [45, "mood-fear", "恐惧", "#f0a020"],
+      [55, "mood-neutral", "中性", "#cbd5e1"], [75, "mood-greed", "贪婪", "#84cc16"], [999, "mood-exgreed", "极度贪婪", "#16c784"]];
+    const mood = moods.find(x => v < x[0]);
+    const env = $("sec-env"); if (env) env.className = "panel " + mood[1];
+    const em = $("envMood"); if (em) { em.textContent = "情绪 " + mood[2] + "（" + v + "）"; em.style.color = mood[3]; }
   } catch (e) { $("fngVal").textContent = "—"; $("fngLabel").innerHTML = '<span class="err">情绪指数暂不可用</span>'; }
 }
 async function loadEvents() {
