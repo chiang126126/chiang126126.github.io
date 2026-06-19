@@ -281,7 +281,7 @@ async function loadCryptoNews() {
   try {
     const key = CFG.CRYPTOCOMPARE_KEY ? `&api_key=${CFG.CRYPTOCOMPARE_KEY}` : "";
     const d = await jgetSmart(`${CC}/data/v2/news/?lang=EN${key}`);
-    const items = (d.Data || []).slice(0, 12).map(n => ({
+    const items = (d.Data || []).slice(0, 18).map(n => ({
       title: n.title, url: n.url, source: (n.source_info && n.source_info.name) || n.source, ts: n.published_on,
       img: n.imageurl, cats: (n.categories || "").split("|").slice(0, 2).join(" · ")
     }));
@@ -321,13 +321,16 @@ const _trCache = {};
 function renderNews() {
   const box = $("cryptoNews"); if (!box) return;
   if (!_newsItems.length) { box.innerHTML = '<span class="badge">暂无新闻</span>'; return; }
-  box.innerHTML = _newsItems.map(n => {
+  const rows = _newsItems.map(n => {
     const title = (_newsLang === "zh" && _trCache[n.title]) ? _trCache[n.title] : n.title;
     return `<a class="news" href="${n.url}" target="_blank" rel="noopener">
       ${n.img ? `<img src="${n.img}" loading="lazy" alt="">` : ""}
       <div class="news-t"><b>${title}</b>
         <div class="badge">${n.source || ''}${n.cats ? ' · ' + n.cats : ''} · ${n.ts ? ago(n.ts) : ''}</div></div></a>`;
   }).join("");
+  const dur = Math.max(24, _newsItems.length * 3.4);   // 条数越多滚得越慢，速度恒定
+  // 列表复制两份以实现无缝循环滚动
+  box.innerHTML = `<div class="news-scroll"><div class="news-track" style="animation-duration:${dur}s">${rows}${rows}</div></div>`;
 }
 // 免费翻译(MyMemory，CORS 友好)，按标题缓存，避免重复翻译
 async function translateNews() {

@@ -129,6 +129,11 @@
   #sec-env.mood-neutral{border-color:#33476e}
   #sec-env.mood-greed{border-color:#1f6a44;box-shadow:0 0 0 1px rgba(22,199,132,.24),0 8px 30px rgba(22,199,132,.11)}
   #sec-env.mood-exgreed{border-color:#16c784;box-shadow:0 0 0 1px rgba(22,199,132,.38),0 8px 34px rgba(22,199,132,.17)}
+  /* 新闻滚动 */
+  .news-scroll{height:300px;overflow:hidden;position:relative;-webkit-mask-image:linear-gradient(180deg,transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(180deg,transparent,#000 7%,#000 93%,transparent)}
+  .news-track{display:flex;flex-direction:column;animation:newsroll linear infinite;will-change:transform}
+  .news-scroll:hover .news-track{animation-play-state:paused}
+  @keyframes newsroll{from{transform:translateY(0)}to{transform:translateY(-50%)}}
 </style>
 </head>
 <body>
@@ -266,7 +271,8 @@
   <!-- ⑥ 加密新闻 -->
   <section id="sec-news" class="panel">
     <h2><span class="bar"></span>加密新闻 · 实时<button class="btn" id="newsLangBtn" style="margin-left:auto;padding:4px 10px;font-size:12px">译中文</button><span class="badge" id="newsTime" style="font-weight:400">…</span></h2>
-    <div class="news-cols" id="cryptoNews"><div class="badge">加载新闻中…</div></div>
+    <div id="cryptoNews"><div class="badge">加载新闻中…</div></div>
+    <div class="badge" style="margin-top:6px">悬停暂停滚动 · 点标题打开原文</div>
   </section>
 
   <!-- 美股 & 宏观 -->
@@ -354,7 +360,7 @@
     ⚠️ 本看板为纪律与复盘工具，行情数据仅供参考、可能延迟或因网络/地区受限；<b>不构成投资建议</b>，加密交易可能损失全部本金。任何收益目标必须服从风控。
   </div>
 
-  <script src="./config.js?v=15"></script>
-  <script src="./assets/app.js?v=15"></script>
+  <script src="./config.js?v=16"></script>
+  <script src="./assets/app.js?v=16"></script>
 </body>
 </html>
