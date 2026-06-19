@@ -136,14 +136,14 @@
   <nav class="nav">
     <a href="#sec-overview">概览</a><a href="#sec-bot">🤖机器人</a><a href="#sec-ai">AI决策</a>
     <a href="#sec-market">行情</a><a href="#sec-env">市场环境</a><a href="#sec-news">加密新闻</a>
-    <a href="#sec-us">美股·宏观</a><a href="#sec-mstr">MSTR</a><a href="#sec-trades">复盘</a><a href="#sec-stats">测算</a>
+    <a href="#sec-us">美股·宏观</a><a href="#sec-trades">复盘</a><a href="#sec-stats">测算</a>
   </nav>
 
   <!-- 右侧悬浮电梯层（桌面） + 回顶 -->
   <nav class="elev" id="elev">
     <a href="#sec-overview">概览</a><a href="#sec-bot">机器人</a><a href="#sec-ai">AI决策</a>
     <a href="#sec-market">行情</a><a href="#sec-env">环境</a><a href="#sec-news">新闻</a>
-    <a href="#sec-us">美股</a><a href="#sec-mstr">MSTR</a><a href="#sec-trades">复盘</a><a href="#sec-stats">测算</a>
+    <a href="#sec-us">美股</a><a href="#sec-trades">复盘</a><a href="#sec-stats">测算</a>
   </nav>
   <button class="totop" id="toTop" title="回到顶部">↑</button>
 
@@ -233,11 +233,16 @@
     <h2><span class="bar"></span>市场环境 · 宏观 / 链上 / 情绪 / 事件</h2>
     <div class="grid g-auto" id="macroCards" style="margin-bottom:14px"><div class="badge">加载中…</div></div>
     <div class="two-col" style="margin-bottom:14px">
-      <div class="card gauge-wrap"><div class="k">恐惧贪婪指数 (Fear & Greed)</div>
-        <div class="gauge-val" id="fngVal">—</div><div class="gbar"></div>
-        <div class="gmark"><span id="fngMark" style="left:50%"></span></div>
-        <div class="badge" id="fngLabel" style="margin-top:8px">—</div></div>
-      <div id="defiBox"><div class="k" style="font-size:11px;color:var(--muted);margin-bottom:6px">DeFi 总锁仓量 (TVL) · DeFiLlama</div>
+      <div>
+        <div class="subhead">MSTR · 微策略（BTC 杠杆代理）</div>
+        <div class="grid g-auto" id="mstrBox" style="margin-bottom:12px"><div class="badge">…</div></div>
+        <div class="subhead">恐惧贪婪指数 (Fear &amp; Greed)</div>
+        <div class="card gauge-wrap" style="padding-top:14px">
+          <div class="gauge-val" id="fngVal">—</div><div class="gbar"></div>
+          <div class="gmark"><span id="fngMark" style="left:50%"></span></div>
+          <div class="badge" id="fngLabel" style="margin-top:8px">—</div></div>
+      </div>
+      <div id="defiBox"><div class="subhead">DeFi 总锁仓量（TVL · DeFiLlama）</div>
         <div class="card"><div class="k">全链 DeFi TVL</div><div class="v" id="defiTotal">—</div></div>
         <div id="defiChains" style="margin-top:8px"></div></div>
     </div>
@@ -268,16 +273,9 @@
     <div class="tv-wrap"><div class="tradingview-widget-container">
       <div class="tradingview-widget-container__widget"></div>
       <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
-      {"colorTheme":"dark","dateRange":"1D","showChart":true,"locale":"zh_CN","width":"100%","height":420,"isTransparent":true,"showSymbolLogo":true,"tabs":[{"title":"指数","symbols":[{"s":"FOREXCOM:SPXUSD","d":"标普500"},{"s":"FOREXCOM:NSXUSD","d":"纳指100"},{"s":"FOREXCOM:DJI","d":"道琼斯"},{"s":"TVC:VIX","d":"VIX恐慌"},{"s":"TVC:DXY","d":"美元指数"},{"s":"TVC:US10Y","d":"美债10Y"}]},{"title":"加密","symbols":[{"s":"BINANCE:BTCUSDT","d":"BTC"},{"s":"BINANCE:ETHUSDT","d":"ETH"},{"s":"BINANCE:SOLUSDT","d":"SOL"},{"s":"CRYPTOCAP:TOTAL","d":"加密总市值"}]}]}
+      {"colorTheme":"dark","dateRange":"1D","showChart":true,"locale":"zh_CN","width":"100%","height":320,"isTransparent":true,"showSymbolLogo":true,"tabs":[{"title":"指数","symbols":[{"s":"FOREXCOM:SPXUSD","d":"标普500"},{"s":"FOREXCOM:NSXUSD","d":"纳指100"},{"s":"FOREXCOM:DJI","d":"道琼斯"},{"s":"TVC:VIX","d":"VIX恐慌"},{"s":"TVC:DXY","d":"美元指数"},{"s":"TVC:US10Y","d":"美债10Y"}]},{"title":"加密","symbols":[{"s":"BINANCE:BTCUSDT","d":"BTC"},{"s":"BINANCE:ETHUSDT","d":"ETH"},{"s":"BINANCE:SOLUSDT","d":"SOL"},{"s":"CRYPTOCAP:TOTAL","d":"加密总市值"}]}]}
       </script>
     </div></div>
-  </section>
-
-  <!-- MSTR（参考，紧凑） -->
-  <section id="sec-mstr" class="panel">
-    <h2><span class="bar"></span>MSTR · 微策略 · BTC 杠杆代理</h2>
-    <div class="grid g-auto" id="mstrBox"><div class="badge">…</div></div>
-    <div class="badge" style="margin-top:8px">MSTR 持有巨量 BTC，常作「BTC 杠杆代理」；mNAV 溢价收缩是风险偏好降温的旁证。顶部行情条已含 MSTR 实时价。</div>
   </section>
 
   <!-- Paper 持仓器（折叠，手动实验） -->
@@ -348,7 +346,7 @@
     ⚠️ 本看板为纪律与复盘工具，行情数据仅供参考、可能延迟或因网络/地区受限；<b>不构成投资建议</b>，加密交易可能损失全部本金。任何收益目标必须服从风控。
   </div>
 
-  <script src="./config.js?v=13"></script>
-  <script src="./assets/app.js?v=13"></script>
+  <script src="./config.js?v=14"></script>
+  <script src="./assets/app.js?v=14"></script>
 </body>
 </html>
