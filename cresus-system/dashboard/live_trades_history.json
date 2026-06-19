@@ -1,46 +1,44 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-19T10:05:11.354687+00:00",
+  "generated_at": "2026-06-19T10:07:17.336961+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 753,
-    "open": 2,
-    "closed": 751,
+    "open": 1,
+    "closed": 752,
     "wins": 241,
-    "losses": 501,
-    "win_rate": 0.325,
-    "total_pnl_usdt": -75.3166,
-    "net_pnl_usdt": -169.9855,
-    "avg_pnl_usdt": -0.1003,
+    "losses": 502,
+    "win_rate": 0.324,
+    "total_pnl_usdt": -75.8566,
+    "net_pnl_usdt": -170.6057,
+    "avg_pnl_usdt": -0.1009,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 94.7489,
-    "fees_realized_usdt": 94.6689,
-    "fees_open_usdt": 0.08,
+    "fees_paid_usdt": 94.7891,
+    "fees_realized_usdt": 94.7491,
+    "fees_open_usdt": 0.04,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 200.04,
-    "free_capital_usdt": 229.9,
+    "deployed_usdt": 100.08,
+    "free_capital_usdt": 329.28,
     "max_concurrent_slots": 3,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 0.5355,
-    "deployed_usdt": 200.04
+    "daily_pnl": -0.0045,
+    "deployed_usdt": 100.08
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "DEXEUSDT",
       "KERNELUSDT"
     ],
     "exchange_symbols": [
-      "DEXEUSDT",
       "KERNELUSDT"
     ]
   },
@@ -115,17 +113,19 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.691,
       "phase_a_mfe_price": 0.05,
-      "current_price": 0.05,
-      "unrealized_pnl_usdt": 1.2257,
-      "unrealized_pnl_pct": 1.225,
-      "last_price_check_at": "2026-06-19T10:05:09.810952+00:00",
+      "current_price": 0.05017,
+      "unrealized_pnl_usdt": 0.8896,
+      "unrealized_pnl_pct": 0.889,
+      "last_price_check_at": "2026-06-19T10:07:15.693412+00:00",
       "phase_a_mae_price": 0.05107,
       "phase_a_mae_pct": -0.889,
       "phase_a_mae_at": "2026-06-19T09:50:11.523401+00:00",
       "last_sl_sync_at": "2026-06-19T09:55:20.734051+00:00",
       "last_sl_sync_paper_sl": 0.050655714000000004,
       "sl_sync_count": 1
-    },
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "DEXEUSDT|SHORT|2026-06-19T10:01:16.646576+00:00",
       "trade_id": "L1781863276_DEXEUSD_S",
@@ -185,7 +185,7 @@
       "phase_a_mfe_pct": 0.0,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.04,
+      "fees_paid_usdt": 0.0802,
       "fees_are_actual": false,
       "opened_at": "2026-06-19T10:01:55.414113+00:00",
       "is_dry_run": false,
@@ -196,16 +196,38 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.366,
       "phase_a_mfe_price": 16.63,
-      "current_price": 16.73,
-      "unrealized_pnl_usdt": -0.42,
-      "unrealized_pnl_pct": -0.42,
-      "last_price_check_at": "2026-06-19T10:05:09.810952+00:00",
+      "current_price": 16.75,
+      "unrealized_pnl_usdt": -0.54,
+      "unrealized_pnl_pct": -0.54,
+      "last_price_check_at": "2026-06-19T10:06:03.299599+00:00",
       "phase_a_mae_price": 16.75,
       "phase_a_mae_pct": -0.54,
-      "phase_a_mae_at": "2026-06-19T10:04:39.182537+00:00"
-    }
-  ],
-  "recent_closed": [
+      "phase_a_mae_at": "2026-06-19T10:04:39.182537+00:00",
+      "btc_regime_at_close": "down",
+      "btc_sub_regime_at_close": "down_stable",
+      "btc_price_at_close": 62371.4,
+      "btc_pct_vs_ma25_at_close": -0.975,
+      "closed_at": "2026-06-19T10:06:11.232865+00:00",
+      "close_reason": "paper:hit_sl",
+      "avg_exit_price": 16.75,
+      "realized_pnl_usdt": -0.54,
+      "close_order_id": 1596927240,
+      "close_qty": 6.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_method": "limit_ioc_full",
+      "actual_close_slip_bps": 2.99,
+      "limit_qty_closed": 6.0,
+      "market_qty_closed": 0.0,
+      "mid_at_close_attempt": 16.744999999999997,
+      "last_sl_sync_at": null,
+      "last_sl_sync_paper_sl": null,
+      "sl_sync_count": null,
+      "close_expected_price": 16.75,
+      "close_slippage_bps": 0.0,
+      "entry_fees_usdt": 0.04,
+      "close_fees_usdt": 0.0402
+    },
     {
       "paper_id": "CHIPUSDT|SHORT|2026-06-19T04:19:56.658800+00:00",
       "trade_id": "L1781842796_CHIPUSD_S",
@@ -60559,8 +60581,8 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-19T09:03:12.330193+00:00",
-      "reason": "paper trade too old (3717s > 600s)",
-      "last_checked_at": "2026-06-19T10:05:09.810952+00:00"
+      "reason": "paper trade too old (3843s > 600s)",
+      "last_checked_at": "2026-06-19T10:07:15.693412+00:00"
     },
     {
       "paper_id": "WLDUSDT|SHORT|2026-06-19T09:19:36.768826+00:00",
@@ -60568,8 +60590,8 @@
       "direction": "SHORT",
       "conviction_score": 6,
       "signal_at": "2026-06-19T09:20:38.653630+00:00",
-      "reason": "paper trade too old (2671s > 600s)",
-      "last_checked_at": "2026-06-19T10:05:09.810952+00:00"
+      "reason": "paper trade too old (2797s > 600s)",
+      "last_checked_at": "2026-06-19T10:07:15.693412+00:00"
     },
     {
       "paper_id": "AIOUSDT|SHORT|2026-06-19T09:24:41.623216+00:00",
@@ -60577,8 +60599,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-06-19T09:24:55.827578+00:00",
-      "reason": "paper trade too old (2414s > 600s)",
-      "last_checked_at": "2026-06-19T10:05:09.810952+00:00"
+      "reason": "paper trade too old (2540s > 600s)",
+      "last_checked_at": "2026-06-19T10:07:15.693412+00:00"
     },
     {
       "paper_id": "SYNUSDT|LONG|2026-06-19T09:49:57.185031+00:00",
@@ -60586,8 +60608,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-19T09:51:03.781034+00:00",
-      "reason": "paper trade too old (846s > 600s)",
-      "last_checked_at": "2026-06-19T10:05:09.810952+00:00"
+      "reason": "paper trade too old (972s > 600s)",
+      "last_checked_at": "2026-06-19T10:07:15.693412+00:00"
     },
     {
       "paper_id": "USUSDT|SHORT|2026-06-19T09:57:22.455252+00:00",
@@ -60596,27 +60618,18 @@
       "conviction_score": 6,
       "signal_at": "2026-06-19T09:57:34.016352+00:00",
       "reason": "phase_6f_b1: conviction=6 整桶 block (EXP1 v2 仅放 D 微币 LONG chop, entry=$0.01478 不满足)",
-      "last_checked_at": "2026-06-19T10:05:09.810952+00:00"
-    },
-    {
-      "paper_id": "BICOUSDT|LONG|2026-06-19T10:01:40.060656+00:00",
-      "symbol": "BICOUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-06-19T10:01:47.354029+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.33% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-06-19T10:05:09.810952+00:00"
+      "last_checked_at": "2026-06-19T10:07:15.693412+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 62388.9,
-    "btc_ma25_1h": 62985.92,
-    "pct_vs_ma25": -0.948,
-    "change_24h_pct": -2.593,
+    "btc_price": 62385.1,
+    "btc_ma25_1h": 62985.76,
+    "pct_vs_ma25": -0.954,
+    "change_24h_pct": -2.599,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.325,
-    "computed_at": "2026-06-19T10:05:10.737840+00:00"
+    "change_3h_pct": -0.331,
+    "computed_at": "2026-06-19T10:07:16.986368+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
