@@ -1,48 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-19T11:43:54.035327+00:00",
+  "generated_at": "2026-06-19T11:45:56.157731+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 757,
-    "open": 1,
-    "closed": 756,
+    "open": 0,
+    "closed": 757,
     "wins": 243,
-    "losses": 504,
+    "losses": 505,
     "win_rate": 0.325,
-    "total_pnl_usdt": -75.7002,
-    "net_pnl_usdt": -170.7693,
-    "avg_pnl_usdt": -0.1001,
+    "total_pnl_usdt": -76.7491,
+    "net_pnl_usdt": -171.8986,
+    "avg_pnl_usdt": -0.1014,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 95.1091,
-    "fees_realized_usdt": 95.0691,
-    "fees_open_usdt": 0.04,
+    "fees_paid_usdt": 95.1495,
+    "fees_realized_usdt": 95.1495,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 99.95,
-    "free_capital_usdt": 329.24,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 428.1,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 0.1519,
-    "deployed_usdt": 99.95
+    "daily_pnl": -0.897,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "DEXEUSDT"
-    ],
-    "exchange_symbols": [
-      "DEXEUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "DEXEUSDT|SHORT|2026-06-19T11:40:15.219822+00:00",
       "trade_id": "L1781869215_DEXEUSD_S",
@@ -79,7 +76,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 6,
       "wick_filter_mode": "always",
-      "sl_breach_count": 5,
+      "sl_breach_count": 6,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.005,
       "regime_gate_enabled": true,
@@ -102,7 +99,7 @@
       "phase_a_mfe_pct": 0.369,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.04,
+      "fees_paid_usdt": 0.0804,
       "fees_are_actual": false,
       "opened_at": "2026-06-19T11:40:58.264117+00:00",
       "is_dry_run": false,
@@ -113,16 +110,37 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": 0.048,
       "phase_a_mfe_price": 16.22,
-      "current_price": 16.35,
-      "unrealized_pnl_usdt": -0.9255,
-      "unrealized_pnl_pct": -0.926,
-      "last_price_check_at": "2026-06-19T11:43:52.820043+00:00",
-      "phase_a_mae_price": 16.35,
-      "phase_a_mae_pct": -0.926,
-      "phase_a_mae_at": "2026-06-19T11:43:41.936354+00:00"
-    }
-  ],
-  "recent_closed": [
+      "current_price": 16.37,
+      "unrealized_pnl_usdt": -1.0489,
+      "unrealized_pnl_pct": -1.049,
+      "last_price_check_at": "2026-06-19T11:43:56.426436+00:00",
+      "phase_a_mae_price": 16.37,
+      "phase_a_mae_pct": -1.049,
+      "phase_a_mae_at": "2026-06-19T11:43:56.426436+00:00",
+      "btc_regime_at_close": "chop",
+      "btc_price_at_close": 62631.4,
+      "btc_pct_vs_ma25_at_close": -0.481,
+      "closed_at": "2026-06-19T11:44:00.194117+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 16.37,
+      "realized_pnl_usdt": -1.0489,
+      "close_order_id": 1597099312,
+      "close_qty": 6.17,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_method": "limit_ioc_full",
+      "actual_close_slip_bps": 3.06,
+      "limit_qty_closed": 6.17,
+      "market_qty_closed": 0.0,
+      "mid_at_close_attempt": 16.365000000000002,
+      "last_sl_sync_at": null,
+      "last_sl_sync_paper_sl": null,
+      "sl_sync_count": null,
+      "close_expected_price": 16.33178571,
+      "close_slippage_bps": 23.4,
+      "entry_fees_usdt": 0.04,
+      "close_fees_usdt": 0.0404
+    },
     {
       "paper_id": "EDENUSDT|LONG|2026-06-19T11:29:13.697831+00:00",
       "trade_id": "L1781868553_EDENUSD_L",
@@ -60985,28 +61003,19 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-06-19T11:19:09.555229+00:00",
-      "reason": "paper trade too old (1483s > 600s)",
-      "last_checked_at": "2026-06-19T11:43:52.820043+00:00"
-    },
-    {
-      "paper_id": "HUSDT|LONG|2026-06-19T11:18:18.652727+00:00",
-      "symbol": "HUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-06-19T11:19:09.555229+00:00",
-      "reason": "paper trade too old (1483s > 600s)",
-      "last_checked_at": "2026-06-19T11:43:52.820043+00:00"
+      "reason": "paper trade too old (1605s > 600s)",
+      "last_checked_at": "2026-06-19T11:45:54.386431+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 62631.4,
-    "btc_ma25_1h": 62933.86,
-    "pct_vs_ma25": -0.481,
-    "change_24h_pct": -2.047,
+    "btc_price": 62633.3,
+    "btc_ma25_1h": 62933.94,
+    "pct_vs_ma25": -0.478,
+    "change_24h_pct": -2.044,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-19T11:43:53.729945+00:00"
+    "computed_at": "2026-06-19T11:45:56.118145+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
