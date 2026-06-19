@@ -240,7 +240,8 @@ async function loadBot() {
     ["持仓中", (st.positions || []).length],
   ].map(([k, v]) => `<div class="card"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
 
-  $("botMode").textContent = `更新于 ${(st.updated_at || "").slice(5, 16).replace("T", " ")} · 日盈亏 ${pct(log.day_pnl_pct)} · 回撤 ${fmt(log.total_dd_pct, 1)}%`;
+  const tnInfo = log.testnet_usdt != null ? ` · Testnet USDT ${fmt(log.testnet_usdt, 0)}` : (log.testnet_error ? ` · Testnet:${log.testnet_error}` : "");
+  $("botMode").textContent = `更新于 ${(st.updated_at || "").slice(5, 16).replace("T", " ")} · 日盈亏 ${pct(log.day_pnl_pct)} · 回撤 ${fmt(log.total_dd_pct, 1)}%${tnInfo}`;
 
   $("botOpenBody").innerHTML = (st.positions || []).map(p => {
     const lp = livePrice((p.symbol || "").replace("USDT", "")); let u = null;

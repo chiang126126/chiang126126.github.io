@@ -9,7 +9,7 @@ on:
     inputs:
       mode:
         description: "运行模式 dry/sim/testnet"
-        default: "sim"
+        default: "testnet"
         required: false
 
 permissions:
@@ -37,7 +37,7 @@ jobs:
       - name: Run bot
         env:
           DATA_DIR: ${{ github.workspace }}/standalone/data
-          MODE: ${{ github.event.inputs.mode || 'sim' }}
+          MODE: ${{ github.event.inputs.mode || 'testnet' }}
           LLM_PROVIDER: ${{ vars.LLM_PROVIDER || 'deepseek' }}
           LLM_MODEL: ${{ vars.LLM_MODEL || 'deepseek-chat' }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
