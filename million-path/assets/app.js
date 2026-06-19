@@ -201,9 +201,16 @@ async function loadSentiment() {
     const map = { "Extreme Fear": "极度恐惧", "Fear": "恐惧", "Neutral": "中性", "Greed": "贪婪", "Extreme Greed": "极度贪婪" };
     STATE.fng = { v, label: map[f.value_classification] || f.value_classification };
     $("fngLabel").textContent = (map[f.value_classification] || f.value_classification) + " · 越低越恐慌（潜在机会），越高越贪婪（注意风险）";
+    // 市场环境随情绪变色（一眼感受氛围）
+    const moods = [[25, "mood-exfear", "极度恐惧", "#ea3943"], [45, "mood-fear", "恐惧", "#f0a020"],
+      [55, "mood-neutral", "中性", "#cbd5e1"], [75, "mood-greed", "贪婪", "#84cc16"], [999, "mood-exgreed", "极度贪婪", "#16c784"]];
+    const mood = moods.find(x => v < x[0]);
+    const env = $("sec-env"); if (env) env.className = "panel " + mood[1];
+    const em = $("envMood"); if (em) { em.textContent = "情绪 " + mood[2] + "（" + v + "）"; em.style.color = mood[3]; }
   } catch (e) { $("fngVal").textContent = "—"; $("fngLabel").innerHTML = '<span class="err">情绪指数暂不可用</span>'; }
 }
 async function loadEvents() {
+  if (!$("eventsList")) return;   // 「我的提醒」已移除时跳过
   let data; try { data = await jget("./data/events.json", { cache: "no-store" }); }
   catch (e) { $("eventsList").innerHTML = '<span class="badge">未找到 data/events.json</span>'; return; }
   const today = todayISO();
@@ -280,14 +287,14 @@ async function loadCryptoNews() {
     }));
     if (!items.length) throw new Error("empty");
     STATE.news = items.slice(0, 6).map(n => n.title);
-    box.innerHTML = renderNews(items); stampNews(); return;
+    _newsItems = items; renderNews(); stampNews(); if (_newsLang === "zh") translateNews(); return;
   } catch (e) { /* 进入 RSS 回退 */ }
   // 2) 回退：品牌 RSS（CoinDesk / Cointelegraph / Decrypt，经 Worker）
   try {
     const items = await fetchRssNews();
     if (!items.length) throw new Error("empty");
     STATE.news = items.slice(0, 6).map(n => n.title);
-    box.innerHTML = renderNews(items); stampNews(); return;
+    _newsItems = items; renderNews(); stampNews(); if (_newsLang === "zh") translateNews(); return;
   } catch (e) {
     box.innerHTML = `<div class="err">加密新闻暂不可用。CryptoCompare 受限、且 RSS 回退需要已部署的 Worker（见 worker/README.md）。</div>`;
   }
@@ -309,12 +316,40 @@ async function fetchRssNews() {
   }
   return all.filter(x => x.title).sort((a, b) => (b.ts || 0) - (a.ts || 0)).slice(0, 12);
 }
-function renderNews(items) {
-  if (!items.length) return '<span class="badge">暂无新闻</span>';
-  return items.map(n => `<a class="news" href="${n.url}" target="_blank" rel="noopener">
-    ${n.img ? `<img src="${n.img}" loading="lazy" alt="">` : ""}
-    <div class="news-t"><b>${n.title}</b>
-      <div class="badge">${n.source || ''}${n.cats ? ' · ' + n.cats : ''} · ${n.ts ? ago(n.ts) : ''}</div></div></a>`).join("");
+let _newsItems = [], _newsLang = "en";
+const _trCache = {};
+function renderNews() {
+  const box = $("cryptoNews"); if (!box) return;
+  if (!_newsItems.length) { box.innerHTML = '<span class="badge">暂无新闻</span>'; return; }
+  box.innerHTML = _newsItems.map(n => {
+    const title = (_newsLang === "zh" && _trCache[n.title]) ? _trCache[n.title] : n.title;
+    return `<a class="news" href="${n.url}" target="_blank" rel="noopener">
+      ${n.img ? `<img src="${n.img}" loading="lazy" alt="">` : ""}
+      <div class="news-t"><b>${title}</b>
+        <div class="badge">${n.source || ''}${n.cats ? ' · ' + n.cats : ''} · ${n.ts ? ago(n.ts) : ''}</div></div></a>`;
+  }).join("");
+}
+// 免费翻译(MyMemory，CORS 友好)，按标题缓存，避免重复翻译
+async function translateNews() {
+  const todo = _newsItems.map(n => n.title).filter(t => t && !_trCache[t]);
+  const btn = $("newsLangBtn");
+  if (todo.length && btn) btn.textContent = "翻译中…";
+  await Promise.all(todo.map(async t => {
+    try {
+      const r = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(t)}&langpair=en|zh-CN`);
+      const d = await r.json();
+      const zh = d && d.responseData && d.responseData.translatedText;
+      if (zh && !/MYMEMORY WARNING/i.test(zh)) _trCache[t] = zh;
+    } catch (e) {}
+  }));
+  if (btn) btn.textContent = _newsLang === "zh" ? "原文" : "译中文";
+  renderNews();
+}
+function toggleNewsLang() {
+  _newsLang = _newsLang === "en" ? "zh" : "en";
+  const btn = $("newsLangBtn");
+  if (_newsLang === "zh") { if (btn) btn.textContent = "原文"; translateNews(); }
+  else { if (btn) btn.textContent = "译中文"; renderNews(); }
 }
 
 //==================== Worker 板块：美联储宏观 / 美股自选 ====================
@@ -762,6 +797,26 @@ function paperExport() {
 let _paperT = 0;
 function paperTick() { const now = Date.now(); if (now - _paperT < 900) return; _paperT = now; if ($("paperOpenBody") && PAPER.data.positions.length) renderPaper(); }
 
+//==================== 电梯层导航（高亮当前 + 回顶）====================
+function setupNav() {
+  if (typeof document.querySelectorAll !== "function") return;
+  const links = Array.from(document.querySelectorAll(".nav a, .elev a"));
+  const map = {};
+  links.forEach(a => { const id = (a.getAttribute("href") || "").slice(1); if (id) (map[id] = map[id] || []).push(a); });
+  const ids = Object.keys(map);
+  if (typeof IntersectionObserver === "function") {
+    const obs = new IntersectionObserver(es => {
+      es.forEach(e => { if (e.isIntersecting) ids.forEach(id => map[id].forEach(a => a.classList.toggle("active", id === e.target.id))); });
+    }, { rootMargin: "-45% 0px -50% 0px" });
+    ids.forEach(id => { const el = document.getElementById(id); if (el) obs.observe(el); });
+  }
+  const tt = $("toTop");
+  if (tt) {
+    window.addEventListener("scroll", () => { tt.style.display = window.scrollY > 500 ? "grid" : "none"; });
+    tt.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+  }
+}
+
 //==================== 启动 ====================
 async function refreshLive() {
   // 并行刷新所有信息面板，等全部结束后再（可选）自动重建 Evidence
@@ -781,6 +836,7 @@ function init() {
   $("genEvBtn") && $("genEvBtn").addEventListener("click", showEvidence);
   $("copyEvBtn") && $("copyEvBtn").addEventListener("click", copyEvidence);
   $("liveToggle") && $("liveToggle").addEventListener("click", toggleLive);
+  $("newsLangBtn") && $("newsLangBtn").addEventListener("click", toggleNewsLang);
   // Paper 持仓器
   PAPER.load();
   $("pOpenBtn") && $("pOpenBtn").addEventListener("click", paperOpen);
@@ -792,6 +848,7 @@ function init() {
     const b = e.target.closest && e.target.closest("[data-close]"); if (b) paperClose(+b.getAttribute("data-close"));
   });
   renderPaper();
+  setupNav();
   loadLedger(); loadEvents(); refreshLive(); renderCalc();
   const ms = Math.max(15, (+CFG.REFRESH_SECONDS || 60)) * 1000;
   setInterval(refreshLive, ms);

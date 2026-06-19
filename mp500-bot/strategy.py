@@ -7,26 +7,68 @@ import exchange
 import indicators
 
 SYSTEM_PROMPT = (
-    "你是 MP500 加密交易系统的战略分析师。基于给定的 Evidence（指标/资金费率/情绪），"
-    "对该标的给出一个保守的短线决策。规则：只允许做多或观望（不做空）；"
-    "行情不明确时必须 FLAT（空仓也是决策）；必须给出止损；风控优先于收益。\n"
+    "你是 MP500 加密交易系统的战略分析师。综合给定的 Evidence（技术指标 + 资金费率 + 情绪 + "
+    "近期新闻/叙事/宏观/地缘），对该标的给出一个保守的短线决策。\n"
+    "重视信息面：关键人物发言、AI 基建/芯片叙事、监管、地缘冲突/战争、美联储与宏观数据，"
+    "都可能在小时级别快速重定价；但叙事行情来去快，需与技术面/风控共同确认，不可只凭新闻追高。\n"
+    "规则：只允许做多或观望（不做空）；行情不明确时必须 FLAT（空仓也是决策）；必须给出止损；风控优先于收益。\n"
     "只返回严格 JSON，字段：\n"
     '{"bias":"LONG|FLAT","confidence":0.0-1.0,"stop_pct":正数(止损距入场的百分比,如2.0表示2%),'
-    '"target_pct":正数(止盈距入场的百分比),"rationale":"简述形态/理由","risk_flags":["风险点"]}'
+    '"target_pct":正数(止盈距入场的百分比),"rationale":"简述形态+新闻/叙事依据","risk_flags":["风险点"]}'
 )
 
 
-def build_evidence(symbol, ind, funding, fng):
+def fetch_crypto_news(n=8):
+    """CryptoCompare 加密新闻头条（无需 key）。"""
+    try:
+        r = requests.get("https://min-api.cryptocompare.com/data/v2/news/?lang=EN", timeout=15)
+        r.raise_for_status()
+        data = r.json().get("Data", [])[:n]
+        return [f"- [{(it.get('source_info') or {}).get('name', '')}] {it.get('title', '')}" for it in data]
+    except Exception:
+        return []
+
+
+def fetch_marketaux_news(key, n=6):
+    """Marketaux 宏观/AI/地缘新闻（需免费 key，覆盖 NVDA/MRVL 等 AI 基建、美联储、地缘）。"""
+    try:
+        r = requests.get("https://api.marketaux.com/v1/news/all", params={
+            "api_token": key, "language": "en", "filter_entities": "true", "limit": n,
+            "search": "bitcoin OR crypto OR ethereum OR AI OR semiconductor OR Nvidia OR Fed OR rate OR war OR geopolitical",
+        }, timeout=15)
+        r.raise_for_status()
+        data = r.json().get("data", [])[:n]
+        return [f"- {it.get('title', '')}" for it in data]
+    except Exception:
+        return []
+
+
+def fetch_news(cfg):
+    """整合新闻信息面，供 LLM 小时级判断。"""
+    blocks = []
+    cn = fetch_crypto_news(8)
+    if cn:
+        blocks.append("加密新闻头条:\n" + "\n".join(cn))
+    if cfg.get("MARKETAUX_KEY"):
+        mn = fetch_marketaux_news(cfg["MARKETAUX_KEY"], 6)
+        if mn:
+            blocks.append("宏观 / AI 基建 / 地缘 新闻:\n" + "\n".join(mn))
+    return "\n\n".join(blocks) if blocks else "（暂无新闻）"
+
+
+def build_evidence(symbol, ind, funding, fng, news_text=""):
     fng_v, fng_c = fng
+    n2 = lambda x, d=2: ("n/a" if x is None else f"{x:.{d}f}")
     return (
         f"标的: {symbol}\n"
-        f"现价: {ind['price']:.2f}\n"
-        f"30小时均线偏离: {ind['dev_pct']:.2f}%  (站上为偏多)\n"
-        f"EMA21: {ind['ema21']:.2f}  EMA50: {ind['ema50']:.2f}\n"
-        f"RSI14: {ind['rsi14']:.1f}\n"
-        f"ATR(1h): {ind['atr_pct']:.2f}% (波动率)\n"
+        f"现价: {n2(ind['price'])}\n"
+        f"30小时均线偏离: {n2(ind['dev_pct'])}%  (站上为偏多)\n"
+        f"EMA21: {n2(ind['ema21'])}  EMA50: {n2(ind['ema50'])}\n"
+        f"RSI14: {n2(ind['rsi14'], 1)}\n"
+        f"ATR(1h): {n2(ind['atr_pct'])}% (波动率)\n"
         f"资金费率: {('%.4f%%/8h' % funding) if funding is not None else 'n/a'}\n"
         f"恐惧贪婪: {fng_v if fng_v is not None else 'n/a'} ({fng_c or 'n/a'})\n"
+        f"\n## 近期新闻 / 叙事 / 宏观 / 地缘\n{news_text or '（暂无新闻）'}\n"
     )
 
 
@@ -68,13 +110,13 @@ def rule_decide(ind, funding, fng):
             "target_pct": round(stop_pct * 1.8, 2), "rationale": "规则引擎兜底", "risk_flags": flags}
 
 
-def analyze(symbol, cfg):
-    """返回 (decision, evidence, indicators)。"""
+def analyze(symbol, cfg, news_text=""):
+    """返回 (decision, evidence, indicators)。news_text 由 bot 每轮抓一次后传入。"""
     kl = exchange.klines(symbol, "1h", 200)
     ind = indicators.summarize(kl)
     funding = exchange.funding_rate(symbol)
     fng = exchange.fear_greed()
-    evidence = build_evidence(symbol, ind, funding, fng)
+    evidence = build_evidence(symbol, ind, funding, fng, news_text)
 
     decision = None
     if cfg.get("LLM_API_KEY"):
