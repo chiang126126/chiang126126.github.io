@@ -46,11 +46,11 @@ def fetch_marketaux_news(key, n=6):
 def fetch_news(cfg):
     """整合新闻信息面，供 LLM 小时级判断。"""
     blocks = []
-    cn = fetch_crypto_news(8)
+    cn = fetch_crypto_news(15)
     if cn:
         blocks.append("加密新闻头条:\n" + "\n".join(cn))
     if cfg.get("MARKETAUX_KEY"):
-        mn = fetch_marketaux_news(cfg["MARKETAUX_KEY"], 6)
+        mn = fetch_marketaux_news(cfg["MARKETAUX_KEY"], 8)
         if mn:
             blocks.append("宏观 / AI 基建 / 地缘 新闻:\n" + "\n".join(mn))
     return "\n\n".join(blocks) if blocks else "（暂无新闻）"
