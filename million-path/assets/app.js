@@ -216,6 +216,55 @@ async function loadEvents() {
   }).join("") || '<span class="badge">暂无事件，去 data/events.json 添加</span>';
 }
 
+//==================== 自动机器人（读取 bot 写入的数据）====================
+async function loadBot() {
+  if (!$("botStats")) return;
+  let st;
+  try { st = await jget("./data/bot_state.json", { cache: "no-store" }); }
+  catch (e) { $("botStats").innerHTML = '<div class="badge">机器人尚未运行（配置 LLM_API_KEY + 启用 Actions 后每小时自动决策）。</div>'; return; }
+  let log = { items: [] }, tr = [];
+  try { log = await jget("./data/bot_log.json", { cache: "no-store" }); } catch (e) {}
+  try { tr = await jget("./data/bot_trades.json", { cache: "no-store" }); } catch (e) {}
+
+  const eq0 = st.equity0 || 500, cum = (st.equity / eq0 - 1) * 100;
+  const wins = tr.filter(t => t.pnl > 0), wr = tr.length ? wins.length / tr.length * 100 : null;
+  const sw = wins.reduce((s, t) => s + t.pnl, 0), sl = Math.abs(tr.filter(t => t.pnl < 0).reduce((s, t) => s + t.pnl, 0));
+  const pf = sl > 0 ? sw / sl : (sw > 0 ? Infinity : null);
+  $("botStats").innerHTML = [
+    ["模式", `<span class="chip neutral">${st.mode || "—"}</span>`],
+    ["机器人权益", fmt(st.equity, 1) + " U"],
+    ["累计收益", `<span class="${cls(cum)}">${pct(cum)}</span>`],
+    ["已平笔数", tr.length],
+    ["胜率", wr == null ? "—" : fmt(wr, 0) + "%"],
+    ["盈亏比", pf == null ? "—" : (pf === Infinity ? "∞" : fmt(pf, 2))],
+    ["持仓中", (st.positions || []).length],
+  ].map(([k, v]) => `<div class="card"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
+
+  $("botMode").textContent = `更新于 ${(st.updated_at || "").slice(5, 16).replace("T", " ")} · 日盈亏 ${pct(log.day_pnl_pct)} · 回撤 ${fmt(log.total_dd_pct, 1)}%`;
+
+  $("botOpenBody").innerHTML = (st.positions || []).map(p => {
+    const lp = livePrice((p.symbol || "").replace("USDT", "")); let u = null;
+    if (lp != null) u = (lp - p.entry) * p.qty - (p.fee_in || 0) - lp * p.qty * FEE;
+    return `<tr><td><b>${p.symbol}</b> <span class="chip risk-on">LONG</span></td>
+      <td>${fmt(p.entry, 2)}</td><td>${lp != null ? fmt(lp, 2) : "—"}</td>
+      <td>${fmt(p.stop, 2)}</td><td>${fmt(p.target, 2)}</td>
+      <td class="${cls(u)}">${u == null ? "—" : (u >= 0 ? "+" : "") + fmt(u, 2) + "U"}</td></tr>`;
+  }).join("") || '<tr><td colspan="6" class="badge">当前无持仓</td></tr>';
+
+  $("botDecisions").innerHTML = (log.items || []).map(it =>
+    `<div class="ev" style="padding:8px 0"><div class="t"><b>${it.symbol || ""}</b>
+      <span class="chip ${it.bias === "LONG" ? "risk-on" : "neutral"}">${it.bias || it.action || "—"}</span>
+      <span class="badge">${it.source ? it.source + " · " : ""}${it.confidence != null ? "conf " + it.confidence + " · " : ""}${it.reason || it.rationale || ""}</span></div></div>`).join("") || '<span class="badge">暂无决策</span>';
+
+  $("botTradesBody").innerHTML = tr.slice().reverse().slice(0, 20).map(t => `<tr>
+    <td><b>${t.symbol}</b></td><td>${fmt(t.entry, 2)} → ${fmt(t.exit, 2)}</td>
+    <td>${t.exit_reason || ""}</td>
+    <td class="${cls(t.pnl)}">${(t.pnl >= 0 ? "+" : "") + fmt(t.pnl, 2)}U</td>
+    <td class="${cls(t.r)}">${(t.r >= 0 ? "+" : "") + fmt(t.r, 2)}R</td>
+    <td><span class="chip ${t.outcome === "WIN" ? "risk-on" : t.outcome === "LOSS" ? "risk-off" : "neutral"}">${t.outcome}</span></td>
+    <td class="badge">${(t.closed_at || "").slice(5, 16).replace("T", " ")}</td></tr>`).join("") || '<tr><td colspan="7" class="badge">暂无已平仓</td></tr>';
+}
+
 //==================== 加密新闻（CryptoCompare 直连 + 可选 RSS）====================
 function stampNews() { const nt = $("newsTime"); if (nt) nt.textContent = "更新于 " + new Date().toLocaleTimeString("zh-CN"); }
 async function loadCryptoNews() {
@@ -717,7 +766,7 @@ async function refreshLive() {
   // 并行刷新所有信息面板，等全部结束后再（可选）自动重建 Evidence
   await Promise.allSettled([
     loadMarket(), loadSentiment(), loadCryptoMacro(), loadDefi(),
-    loadCryptoNews(), loadFred(), loadUsStocks(), loadMstr()
+    loadCryptoNews(), loadFred(), loadUsStocks(), loadMstr(), loadBot()
   ]);
   renderDecision();   // 规则推断的决策元组（直接可读）
   // 给 LLM 的 Evidence 文本自动重生成：用户正在框选/编辑该文本框时跳过，避免打断复制

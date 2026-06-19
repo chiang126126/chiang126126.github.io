@@ -1,12 +1,13 @@
 name: Sync million-path → standalone repo
 
-# 每当 million-path/ 有改动被推送，自动把它同步到独立仓库 chiang126126/million-path，
-# 由 GitHub 服务器完成，你的电脑无需 clone/下载任何东西。
+# 把 million-path/ 同步到独立仓库 chiang126126/million-path（看板源）。
+# 关键：只同步【代码】，保留独立仓库里的【实时数据】（ledger/events/bot_*/reviews/config），
+# 避免覆盖用户与机器人累积的数据。
 on:
   push:
     branches: [claude/trusting-pasteur-el5wv5, main]
     paths: ["million-path/**"]
-  workflow_dispatch: {}   # 也可在 Actions 页面手动触发
+  workflow_dispatch: {}
 
 jobs:
   sync:
@@ -14,19 +15,33 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Push million-path/ to chiang126126/million-path:main
+      - name: Sync code, preserve live data
         env:
           TOKEN: ${{ secrets.SYNC_TOKEN }}
         run: |
-          if [ -z "$TOKEN" ]; then
-            echo "::error::缺少 SYNC_TOKEN secret。请在仓库 Settings → Secrets → Actions 添加。"
-            exit 1
-          fi
-          cd million-path
-          git init -q -b main
+          if [ -z "$TOKEN" ]; then echo "::error::缺少 SYNC_TOKEN"; exit 1; fi
+          git clone --depth=1 "https://x-access-token:${TOKEN}@github.com/chiang126126/million-path.git" dest
+
+          # 这些是「实时数据/用户配置」，已存在则保留，不被源覆盖
+          PRESERVE="data/ledger.json data/events.json config.js \
+                    data/bot_state.json data/bot_trades.json data/bot_log.json"
+
+          # 1) 同步代码（--delete 清理已删文件），但排除受保护文件与 reviews/
+          rsync -a --delete \
+            --exclude '.git' --exclude 'reviews/' \
+            $(for f in $PRESERVE; do echo --exclude "$f"; done) \
+            million-path/ dest/
+
+          # 2) 仅当目标缺失时，用源里的版本做初始种子
+          for f in $PRESERVE; do
+            if [ ! -f "dest/$f" ]; then mkdir -p "dest/$(dirname "$f")"; cp "million-path/$f" "dest/$f"; fi
+          done
+          mkdir -p dest/reviews/trades
+
+          cd dest
           git config user.name "million-path-sync"
           git config user.email "mangzi141800@gmail.com"
           git add -A
-          git commit -q -m "Sync million-path from ${GITHUB_SHA::7}"
-          git push -f "https://x-access-token:${TOKEN}@github.com/chiang126126/million-path.git" main:main
-          echo "✅ 已同步到 chiang126126/million-path"
+          git commit -q -m "Sync code from ${GITHUB_SHA::7} (data preserved)" || { echo "no changes"; exit 0; }
+          git push origin HEAD:main
+          echo "✅ 已同步代码（实时数据保留）"
