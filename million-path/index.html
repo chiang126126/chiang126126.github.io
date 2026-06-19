@@ -109,6 +109,19 @@
   details.panel>summary::after{content:"展开 ▸";margin-left:auto;font-size:11px;color:var(--muted);font-weight:400}
   details.panel[open]>summary::after{content:"收起 ▾"}
   details.panel[open]>summary{margin-bottom:12px}
+  /* premium + 电梯层 + 响应式 */
+  .card{transition:border-color .15s}
+  .card:hover{border-color:#33476e}
+  .subhead{font-size:11px;color:var(--muted);margin:2px 0 8px;display:flex;align-items:center;gap:7px;letter-spacing:.2px;font-weight:500}
+  .subhead::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px var(--gold);flex:0 0 auto}
+  .nav a.active{color:var(--gold2);border-color:var(--gold);background:rgba(240,185,11,.08)}
+  .elev{position:fixed;right:12px;top:50%;transform:translateY(-50%);z-index:20;display:flex;flex-direction:column;gap:3px}
+  .elev a{font-size:11px;color:var(--muted);text-decoration:none;padding:3px 10px;border-radius:7px;border:1px solid transparent;transition:.15s}
+  .elev a:hover{color:var(--text);background:rgba(18,26,43,.6)}
+  .elev a.active{color:var(--gold2);border-color:var(--gold);background:rgba(18,26,43,.9)}
+  .totop{position:fixed;right:16px;bottom:16px;z-index:20;width:40px;height:40px;border-radius:50%;display:none;place-items:center;cursor:pointer;color:#1a1200;font-size:18px;border:none;background:linear-gradient(135deg,var(--gold2),var(--gold));box-shadow:0 4px 14px rgba(240,185,11,.45)}
+  @media(max-width:1140px){.elev{display:none}}
+  @media(max-width:520px){body{padding:12px;padding-bottom:50px}.equity{font-size:28px}.hero-grid{gap:12px}.panel{padding:12px}.nav{margin-left:-2px;margin-right:-2px}.totop{right:12px;bottom:12px}}
 </style>
 </head>
 <body>
@@ -125,6 +138,14 @@
     <a href="#sec-market">行情</a><a href="#sec-env">市场环境</a><a href="#sec-news">加密新闻</a>
     <a href="#sec-us">美股·宏观</a><a href="#sec-mstr">MSTR</a><a href="#sec-trades">复盘</a><a href="#sec-stats">测算</a>
   </nav>
+
+  <!-- 右侧悬浮电梯层（桌面） + 回顶 -->
+  <nav class="elev" id="elev">
+    <a href="#sec-overview">概览</a><a href="#sec-bot">机器人</a><a href="#sec-ai">AI决策</a>
+    <a href="#sec-market">行情</a><a href="#sec-env">环境</a><a href="#sec-news">新闻</a>
+    <a href="#sec-us">美股</a><a href="#sec-mstr">MSTR</a><a href="#sec-trades">复盘</a><a href="#sec-stats">测算</a>
+  </nav>
+  <button class="totop" id="toTop" title="回到顶部">↑</button>
 
   <!-- 顶部滚动行情条 (TradingView) -->
   <div class="tv-wrap" style="margin:10px 0">
@@ -220,21 +241,13 @@
         <div class="card"><div class="k">全链 DeFi TVL</div><div class="v" id="defiTotal">—</div></div>
         <div id="defiChains" style="margin-top:8px"></div></div>
     </div>
-    <div class="two-col">
-      <div>
-        <div class="k" style="font-size:11px;color:var(--muted);margin-bottom:6px">经济日历（FOMC / CPI / 非农 · TradingView 实时）</div>
-        <div class="tv-wrap"><div class="tradingview-widget-container">
-          <div class="tradingview-widget-container__widget"></div>
-          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
-          {"colorTheme":"dark","isTransparent":true,"width":"100%","height":380,"locale":"zh_CN","importanceFilter":"0,1","countryFilter":"us"}
-          </script>
-        </div></div>
-      </div>
-      <div>
-        <div class="k" style="font-size:11px;color:var(--muted);margin-bottom:6px">我的提醒（解锁 / 上币 · 手动维护 data/events.json）</div>
-        <div id="eventsList"><div class="badge">加载事件中…</div></div>
-      </div>
-    </div>
+    <div class="subhead">经济日历 · FOMC / CPI / 非农（TradingView 实时）</div>
+    <div class="tv-wrap"><div class="tradingview-widget-container">
+      <div class="tradingview-widget-container__widget"></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
+      {"colorTheme":"dark","isTransparent":true,"width":"100%","height":340,"locale":"zh_CN","importanceFilter":"0,1","countryFilter":"us"}
+      </script>
+    </div></div>
   </section>
 
   <!-- ⑥ 加密新闻 -->
@@ -247,18 +260,11 @@
   <section id="sec-us" class="panel">
     <h2><span class="bar"></span>美股 & 宏观</h2>
 
-    <div class="two-col" style="margin-bottom:6px">
-      <div>
-        <div class="k" style="font-size:11px;color:var(--muted);margin-bottom:6px">美联储宏观（利率 / 美债 / CPI · FRED，需 Worker）</div>
-        <div class="grid g-auto" id="fredBox"><div class="badge">…</div></div>
-      </div>
-      <div>
-        <div class="k" style="font-size:11px;color:var(--muted);margin-bottom:6px">美股自选（实时报价 · Finnhub，需 Worker）</div>
-        <div class="grid g-auto" id="usBox"><div class="badge">…</div></div>
-      </div>
-    </div>
-
-    <div class="k" style="font-size:11px;color:var(--muted);margin:16px 0 6px">主要指数总览（标普 / 纳指 / 道指 / VIX / 美元 / 美债 · TradingView）</div>
+    <div class="subhead">美联储宏观 · 利率 / 美债 / CPI（FRED，需 Worker）</div>
+    <div class="grid g-auto" id="fredBox" style="margin-bottom:12px"><div class="badge">…</div></div>
+    <div class="subhead">美股自选 · 实时报价（Finnhub，需 Worker）</div>
+    <div class="grid g-auto" id="usBox" style="margin-bottom:12px"><div class="badge">…</div></div>
+    <div class="subhead">主要指数总览 · 标普 / 纳指 / 道指 / VIX / 美元 / 美债（TradingView）</div>
     <div class="tv-wrap"><div class="tradingview-widget-container">
       <div class="tradingview-widget-container__widget"></div>
       <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
@@ -342,7 +348,7 @@
     ⚠️ 本看板为纪律与复盘工具，行情数据仅供参考、可能延迟或因网络/地区受限；<b>不构成投资建议</b>，加密交易可能损失全部本金。任何收益目标必须服从风控。
   </div>
 
-  <script src="./config.js?v=12"></script>
-  <script src="./assets/app.js?v=12"></script>
+  <script src="./config.js?v=13"></script>
+  <script src="./assets/app.js?v=13"></script>
 </body>
 </html>

@@ -204,6 +204,7 @@ async function loadSentiment() {
   } catch (e) { $("fngVal").textContent = "—"; $("fngLabel").innerHTML = '<span class="err">情绪指数暂不可用</span>'; }
 }
 async function loadEvents() {
+  if (!$("eventsList")) return;   // 「我的提醒」已移除时跳过
   let data; try { data = await jget("./data/events.json", { cache: "no-store" }); }
   catch (e) { $("eventsList").innerHTML = '<span class="badge">未找到 data/events.json</span>'; return; }
   const today = todayISO();
@@ -790,6 +791,26 @@ function paperExport() {
 let _paperT = 0;
 function paperTick() { const now = Date.now(); if (now - _paperT < 900) return; _paperT = now; if ($("paperOpenBody") && PAPER.data.positions.length) renderPaper(); }
 
+//==================== 电梯层导航（高亮当前 + 回顶）====================
+function setupNav() {
+  if (typeof document.querySelectorAll !== "function") return;
+  const links = Array.from(document.querySelectorAll(".nav a, .elev a"));
+  const map = {};
+  links.forEach(a => { const id = (a.getAttribute("href") || "").slice(1); if (id) (map[id] = map[id] || []).push(a); });
+  const ids = Object.keys(map);
+  if (typeof IntersectionObserver === "function") {
+    const obs = new IntersectionObserver(es => {
+      es.forEach(e => { if (e.isIntersecting) ids.forEach(id => map[id].forEach(a => a.classList.toggle("active", id === e.target.id))); });
+    }, { rootMargin: "-45% 0px -50% 0px" });
+    ids.forEach(id => { const el = document.getElementById(id); if (el) obs.observe(el); });
+  }
+  const tt = $("toTop");
+  if (tt) {
+    window.addEventListener("scroll", () => { tt.style.display = window.scrollY > 500 ? "grid" : "none"; });
+    tt.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+  }
+}
+
 //==================== 启动 ====================
 async function refreshLive() {
   // 并行刷新所有信息面板，等全部结束后再（可选）自动重建 Evidence
@@ -821,6 +842,7 @@ function init() {
     const b = e.target.closest && e.target.closest("[data-close]"); if (b) paperClose(+b.getAttribute("data-close"));
   });
   renderPaper();
+  setupNav();
   loadLedger(); loadEvents(); refreshLive(); renderCalc();
   const ms = Math.max(15, (+CFG.REFRESH_SECONDS || 60)) * 1000;
   setInterval(refreshLive, ms);
