@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-19T14:26:07.029343+00:00",
+  "generated_at": "2026-06-19T14:28:10.459658+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 762,
@@ -115,10 +115,10 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.09441,
-      "current_price": 0.09419,
-      "unrealized_pnl_usdt": 0.5335,
-      "unrealized_pnl_pct": 0.534,
-      "last_price_check_at": "2026-06-19T14:26:05.187114+00:00",
+      "current_price": 0.09357,
+      "unrealized_pnl_usdt": -0.128,
+      "unrealized_pnl_pct": -0.128,
+      "last_price_check_at": "2026-06-19T14:28:08.937369+00:00",
       "phase_a_mae_price": 0.09338,
       "phase_a_mae_pct": -0.331,
       "phase_a_mae_at": "2026-06-19T14:25:00.729846+00:00"
@@ -138,8 +138,8 @@
       "risk_usdt": 0.5211,
       "risk_pct": 0.523,
       "mirror_latency_sec": 7.5,
-      "sl_price": 3.3315714279999997,
-      "sl_paper_current": 3.317571428,
+      "sl_price": 3.335,
+      "sl_paper_current": 3.321,
       "disaster_stop_price": null,
       "disaster_stop_at": null,
       "maker_shadow_data": {
@@ -168,7 +168,7 @@
       "min_conviction_threshold": null,
       "tp1_price": 3.34671429,
       "tp2_price": 3.37242857,
-      "phase": "A",
+      "phase": "B",
       "entry_order_id": 19405061995,
       "entry_client_id": "cresus_L1781879091_ORDIUSD_L_E",
       "sl_order_id": null,
@@ -179,8 +179,8 @@
       "top_trader_position_ratio": 2.2759,
       "top_trader_account_ratio": 0.9527,
       "global_account_ratio": 0.6981,
-      "phase_a_mfe_pct": 0.422,
-      "phase_b_mfe_pct": null,
+      "phase_a_mfe_pct": 1.325,
+      "phase_b_mfe_pct": 1.325,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.0399,
       "fees_are_actual": false,
@@ -192,11 +192,15 @@
       "btc_pct_vs_ma25_at_open": 0.494,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 3.335,
-      "current_price": 3.344,
-      "unrealized_pnl_usdt": 0.2691,
-      "unrealized_pnl_pct": 0.27,
-      "last_price_check_at": "2026-06-19T14:26:05.187114+00:00"
+      "phase_a_mfe_price": 3.365,
+      "current_price": 3.364,
+      "unrealized_pnl_usdt": 0.8671,
+      "unrealized_pnl_pct": 0.87,
+      "last_price_check_at": "2026-06-19T14:28:08.937369+00:00",
+      "last_sl_sync_at": "2026-06-19T14:27:37.179582+00:00",
+      "last_sl_sync_paper_sl": 3.321,
+      "sl_sync_count": 1,
+      "phase_b_mfe_price": 3.365
     }
   ],
   "recent_closed": [
@@ -61466,8 +61470,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-19T14:03:25.967937+00:00",
-      "reason": "paper trade too old (1359s > 600s)",
-      "last_checked_at": "2026-06-19T14:26:05.187114+00:00"
+      "reason": "paper trade too old (1483s > 600s)",
+      "last_checked_at": "2026-06-19T14:28:08.937369+00:00"
     },
     {
       "paper_id": "EVAAUSDT|LONG|2026-06-19T14:09:27.836430+00:00",
@@ -61475,19 +61479,28 @@
       "direction": "LONG",
       "conviction_score": 8,
       "signal_at": "2026-06-19T14:10:08.645938+00:00",
-      "reason": "paper trade too old (957s > 600s)",
-      "last_checked_at": "2026-06-19T14:26:05.187114+00:00"
+      "reason": "paper trade too old (1080s > 600s)",
+      "last_checked_at": "2026-06-19T14:28:08.937369+00:00"
+    },
+    {
+      "paper_id": "JTOUSDT|LONG|2026-06-19T14:26:37.943593+00:00",
+      "symbol": "JTOUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-19T14:27:31.833767+00:00",
+      "reason": "phase_6m: Tier C 小币 (entry=$0.7520) 整体 block — 13 天 195 笔 -$96 (drag $1.30/笔, 全 tier 最高)",
+      "last_checked_at": "2026-06-19T14:28:08.937369+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 63165.6,
-    "btc_ma25_1h": 62808.64,
-    "pct_vs_ma25": 0.568,
-    "change_24h_pct": -0.97,
+    "btc_price": 63226.9,
+    "btc_ma25_1h": 62811.1,
+    "pct_vs_ma25": 0.662,
+    "change_24h_pct": -0.874,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-19T14:26:06.442909+00:00"
+    "computed_at": "2026-06-19T14:28:09.864224+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
