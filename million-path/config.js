@@ -30,5 +30,11 @@ window.MP_CONFIG = {
     { name: "CoinDesk", url: "https://www.coindesk.com/arc/outboundfeeds/rss/" },
     { name: "Cointelegraph", url: "https://cointelegraph.com/rss" },
     { name: "Decrypt", url: "https://decrypt.co/feed" }
-  ]
+  ],
+
+  // 自动刷新间隔（秒）。所有信息面板每隔这么久自动更新一次。
+  // 别设太小以免触发免费 API 限流：建议 30~60。
+  REFRESH_SECONDS: 60,
+  // AI 策略快照是否随刷新自动重新生成（你正在框选/复制时会自动跳过，不打断）
+  AUTO_EVIDENCE: true
 };

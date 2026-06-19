@@ -198,7 +198,7 @@
 
   <!-- 加密新闻 -->
   <section id="sec-news" class="panel">
-    <h2><span class="bar"></span>加密新闻 · 实时（CryptoCompare）</h2>
+    <h2><span class="bar"></span>加密新闻 · 实时（CryptoCompare）<span class="badge" id="newsTime" style="margin-left:auto;font-weight:400">自动更新中…</span></h2>
     <div class="news-cols" id="cryptoNews"><div class="badge">加载新闻中…</div></div>
   </section>
 
@@ -235,10 +235,10 @@
 
   <!-- AI 策略快照 / Evidence Document -->
   <section id="sec-ai" class="panel">
-    <h2><span class="bar"></span>AI 策略快照 · Evidence Document</h2>
-    <div class="badge" style="margin-bottom:10px">把当前看板数据汇成结构化证据，复制后粘进任意 LLM（如 Claude），让它按 MP500 格式回一个「决策元组」。借鉴 WebCryptoAgent 双层架构：LLM 只做参谋，<b>风控引擎与你始终最终拍板</b>。详见 <code>docs/MP500-AI-architecture.md</code>。</div>
+    <h2><span class="bar"></span>AI 策略快照 · Evidence Document<span class="badge" id="evTime" style="margin-left:auto;font-weight:400">随刷新自动生成</span></h2>
+    <div class="badge" style="margin-bottom:10px">随看板每次刷新<b>自动重建</b>（你框选/复制时会自动跳过）。复制后粘进任意 LLM（如 Claude），让它按 MP500 格式回一个「决策元组」。借鉴 WebCryptoAgent 双层架构：LLM 只做参谋，<b>风控引擎与你始终最终拍板</b>。详见 <code>docs/MP500-AI-architecture.md</code>。</div>
     <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-      <button class="btn" id="genEvBtn">📋 生成当前 Evidence</button>
+      <button class="btn" id="genEvBtn">📋 立即重新生成</button>
       <button class="btn" id="copyEvBtn">复制</button>
     </div>
     <textarea id="evidenceOut" readonly placeholder="点「生成当前 Evidence」后，这里会出现可复制的结构化快照…"

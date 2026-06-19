@@ -221,6 +221,7 @@ async function loadCryptoNews() {
     }));
     STATE.news = items.slice(0, 6).map(n => n.title);
     box.innerHTML = renderNews(items);
+    const nt = $("newsTime"); if (nt) nt.textContent = "更新于 " + new Date().toLocaleTimeString("zh-CN");
   } catch (e) { box.innerHTML = `<div class="err">加密新闻暂不可用（CryptoCompare）。上线后请在浏览器 DevTools 确认其 CORS。</div>`; }
 }
 function renderNews(items) {
@@ -446,6 +447,7 @@ ${news}
 function showEvidence() {
   const box = $("evidenceOut");
   if (box) box.value = buildEvidence();
+  const t = $("evTime"); if (t) t.textContent = "生成于 " + new Date().toLocaleTimeString("zh-CN");
 }
 function copyEvidence() {
   const box = $("evidenceOut");
@@ -457,13 +459,24 @@ function copyEvidence() {
 }
 
 //==================== 启动 ====================
-function refreshLive() { loadMarket(); loadSentiment(); loadCryptoMacro(); loadDefi(); loadCryptoNews(); loadFred(); loadUsStocks(); loadMstr(); }
+async function refreshLive() {
+  // 并行刷新所有信息面板，等全部结束后再（可选）自动重建 Evidence
+  await Promise.allSettled([
+    loadMarket(), loadSentiment(), loadCryptoMacro(), loadDefi(),
+    loadCryptoNews(), loadFred(), loadUsStocks(), loadMstr()
+  ]);
+  // AI 策略快照自动重生成：用户正在框选/编辑该文本框时跳过，避免打断复制
+  if (CFG.AUTO_EVIDENCE !== false && document.activeElement !== $("evidenceOut")) {
+    showEvidence();
+  }
+}
 function init() {
   ["cStart", "cRate", "cFx", "cRmb", "cUsd"].forEach(id => $(id) && $(id).addEventListener("input", renderCalc));
   $("refreshBtn") && $("refreshBtn").addEventListener("click", refreshLive);
   $("genEvBtn") && $("genEvBtn").addEventListener("click", showEvidence);
   $("copyEvBtn") && $("copyEvBtn").addEventListener("click", copyEvidence);
   loadLedger(); loadEvents(); refreshLive(); renderCalc();
-  setInterval(refreshLive, 60000);
+  const ms = Math.max(15, (+CFG.REFRESH_SECONDS || 60)) * 1000;
+  setInterval(refreshLive, ms);
 }
 document.addEventListener("DOMContentLoaded", init);
