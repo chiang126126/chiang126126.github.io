@@ -25,6 +25,7 @@ const ALLOWED_HOSTS = [
   "www.theblock.co",
   // 通用代理（CORS/地区兜底）允许的数据源
   "api.coingecko.com",
+  "api.coinpaprika.com",
   "min-api.cryptocompare.com",
   "api.llama.fi",
   "coins.llama.fi",

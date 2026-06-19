@@ -81,7 +81,8 @@ async function fetchFundingOI(c) {
   } catch (e) { return null; }
 }
 async function fetchFNG() { const d = await jgetSmart("https://api.alternative.me/fng/?limit=1"); return d.data[0]; }
-async function fetchGlobal() { const d = await jgetSmart(`${CG}/global`); return d.data; }
+// 加密宏观改用 CoinPaprika（免费、无 key、限额更宽，避开 CoinGecko 429）
+async function fetchGlobal() { return await jgetSmart("https://api.coinpaprika.com/v1/global"); }
 
 //==================== 渲染：行情 + 趋势 + 合约 ====================
 function sparkSVG(vals, up) {
@@ -162,15 +163,15 @@ async function loadMarket() {
 //==================== 加密宏观（CoinGecko global）====================
 async function loadCryptoMacro() {
   try {
-    const g = await fetchGlobal();
-    const mc = g.total_market_cap.usd, chg = g.market_cap_change_percentage_24h_usd;
-    const btcD = g.market_cap_percentage.btc, ethD = g.market_cap_percentage.eth;
-    STATE.macro = { mc, chg, btcD, ethD };
+    const g = await fetchGlobal();  // CoinPaprika /v1/global
+    const mc = g.market_cap_usd, chg = g.market_cap_change_24h, btcD = g.bitcoin_dominance_percentage,
+      vol = g.volume_24h_usd, n = g.cryptocurrencies_number;
+    STATE.macro = { mc, chg, btcD };
     const cards = [
       ["加密总市值", big(mc), `<span class="${cls(chg)}">${pct(chg)}</span>`],
-      ["BTC 占比", btcD.toFixed(1) + "%", "主导率"],
-      ["ETH 占比", ethD.toFixed(1) + "%", ""],
-      ["24h 成交额", big(g.total_volume.usd), "全市场"],
+      ["BTC 占比", btcD != null ? btcD.toFixed(1) + "%" : "—", "主导率"],
+      ["24h 成交额", big(vol), "全市场"],
+      ["活跃币种", n != null ? fmt(n, 0) : "—", "CoinPaprika"],
     ];
     $("macroCards").innerHTML = cards.map(([k, v, sub]) =>
       `<div class="card"><div class="k">${k}</div><div class="v">${v}</div><div class="badge">${sub}</div></div>`).join("");
@@ -216,19 +217,47 @@ async function loadEvents() {
 }
 
 //==================== 加密新闻（CryptoCompare 直连 + 可选 RSS）====================
+function stampNews() { const nt = $("newsTime"); if (nt) nt.textContent = "更新于 " + new Date().toLocaleTimeString("zh-CN"); }
 async function loadCryptoNews() {
   const box = $("cryptoNews");
+  // 1) 优先 CryptoCompare（直连 → 失败自动走 Worker）
   try {
     const key = CFG.CRYPTOCOMPARE_KEY ? `&api_key=${CFG.CRYPTOCOMPARE_KEY}` : "";
     const d = await jgetSmart(`${CC}/data/v2/news/?lang=EN${key}`);
-    let items = (d.Data || []).slice(0, 12).map(n => ({
+    const items = (d.Data || []).slice(0, 12).map(n => ({
       title: n.title, url: n.url, source: (n.source_info && n.source_info.name) || n.source, ts: n.published_on,
       img: n.imageurl, cats: (n.categories || "").split("|").slice(0, 2).join(" · ")
     }));
+    if (!items.length) throw new Error("empty");
     STATE.news = items.slice(0, 6).map(n => n.title);
-    box.innerHTML = renderNews(items);
-    const nt = $("newsTime"); if (nt) nt.textContent = "更新于 " + new Date().toLocaleTimeString("zh-CN");
-  } catch (e) { box.innerHTML = `<div class="err">加密新闻暂不可用（CryptoCompare）。上线后请在浏览器 DevTools 确认其 CORS。</div>`; }
+    box.innerHTML = renderNews(items); stampNews(); return;
+  } catch (e) { /* 进入 RSS 回退 */ }
+  // 2) 回退：品牌 RSS（CoinDesk / Cointelegraph / Decrypt，经 Worker）
+  try {
+    const items = await fetchRssNews();
+    if (!items.length) throw new Error("empty");
+    STATE.news = items.slice(0, 6).map(n => n.title);
+    box.innerHTML = renderNews(items); stampNews(); return;
+  } catch (e) {
+    box.innerHTML = `<div class="err">加密新闻暂不可用。CryptoCompare 受限、且 RSS 回退需要已部署的 Worker（见 worker/README.md）。</div>`;
+  }
+}
+async function fetchRssNews() {
+  if (!hasWorker() || typeof DOMParser === "undefined") return [];
+  const feeds = (CFG.CRYPTO_RSS || []).slice(0, 2);
+  const all = [];
+  for (const f of feeds) {
+    try {
+      const xml = await (await fetch(wurl(`type=rss&url=${encodeURIComponent(f.url)}`))).text();
+      const doc = new DOMParser().parseFromString(xml, "application/xml");
+      Array.from(doc.querySelectorAll("item")).slice(0, 8).forEach(it => {
+        const g = s => { const el = it.querySelector(s); return el ? el.textContent : ""; };
+        all.push({ title: g("title"), url: g("link") || "#", source: f.name,
+          ts: Math.floor(Date.parse(g("pubDate")) / 1000) || null, img: null, cats: "" });
+      });
+    } catch (e) {}
+  }
+  return all.filter(x => x.title).sort((a, b) => (b.ts || 0) - (a.ts || 0)).slice(0, 12);
 }
 function renderNews(items) {
   if (!items.length) return '<span class="badge">暂无新闻</span>';
@@ -410,7 +439,7 @@ function buildEvidence() {
   const mkt = (STATE.market || []).map(c =>
     `  - ${c.name}: ${money(c.price)} (${pct(c.chg)} 24h)${c.funding != null ? `, 资金费率 ${c.funding.toFixed(4)}%` : ""}`).join("\n") || "  - 暂无";
   const reg = STATE.btcRegime ? `${STATE.btcRegime.label}${STATE.btcRegime.dev != null ? "（偏离30日线 " + pct(STATE.btcRegime.dev) + "）" : ""}` : "未知";
-  const macro = STATE.macro ? `总市值 ${big(STATE.macro.mc)}（24h ${pct(STATE.macro.chg)}）, BTC占比 ${STATE.macro.btcD.toFixed(1)}%, ETH占比 ${STATE.macro.ethD.toFixed(1)}%` : "暂无";
+  const macro = STATE.macro ? `总市值 ${big(STATE.macro.mc)}（24h ${pct(STATE.macro.chg)}）, BTC占比 ${STATE.macro.btcD != null ? STATE.macro.btcD.toFixed(1) + "%" : "—"}` : "暂无";
   const fng = STATE.fng ? `${STATE.fng.v}（${STATE.fng.label}）` : "暂无";
   const mstr = STATE.mstr ? `现价 $${fmt(STATE.mstr.price, 2)}（${pct(STATE.mstr.chg)}）${STATE.mstr.mnav ? ", mNAV " + STATE.mstr.mnav.toFixed(2) + "x" : ""}` : "暂无（需 Worker）";
   const fred = (STATE.fred && STATE.fred.length) ? STATE.fred.join(" | ") : "暂无（需 Worker）";
