@@ -81,6 +81,20 @@ def main():
     log = {"ts": now_iso(), "mode": c["MODE"], "equity": round(state["equity"], 2),
            "day_pnl_pct": round(day_pnl, 2), "total_dd_pct": round(total_dd, 2), "items": []}
 
+    # testnet 连接自检：确认 key 可用 + 打印模拟盘 USDT 余额
+    if c["MODE"] == "testnet":
+        if tn:
+            try:
+                usdt = tn.free_balance("USDT")
+                log["testnet_usdt"] = round(usdt, 2)
+                print(f"[testnet] 已连接，USDT 可用余额 {usdt:.2f}")
+            except Exception as e:
+                log["testnet_error"] = str(e)
+                print(f"[warn] testnet 连接失败（检查 key/时间）: {e}")
+        else:
+            log["testnet_error"] = "未配置 BINANCE_TESTNET_KEY/SECRET"
+            print("[warn] MODE=testnet 但未配置 testnet key，本次不会真下单")
+
     # 1) 管理现有持仓（止损/止盈）
     still_open = []
     closed_this_run = set()
