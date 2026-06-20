@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-20T03:15:23.259222+00:00",
+  "generated_at": "2026-06-20T03:17:23.213552+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 773,
@@ -79,7 +79,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 6,
       "wick_filter_mode": "always",
-      "sl_breach_count": 0,
+      "sl_breach_count": 5,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.005,
       "regime_gate_enabled": true,
@@ -113,13 +113,13 @@
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
       "phase_a_mfe_price": 0.09939,
-      "current_price": 0.09935,
-      "unrealized_pnl_usdt": 0.5932,
-      "unrealized_pnl_pct": 0.594,
-      "last_price_check_at": "2026-06-20T03:15:22.010166+00:00",
-      "phase_a_mae_price": 0.09858,
-      "phase_a_mae_pct": -0.186,
-      "phase_a_mae_at": "2026-06-20T03:09:00.624723+00:00",
+      "current_price": 0.09852,
+      "unrealized_pnl_usdt": -0.246,
+      "unrealized_pnl_pct": -0.246,
+      "last_price_check_at": "2026-06-20T03:17:21.802006+00:00",
+      "phase_a_mae_price": 0.09839,
+      "phase_a_mae_pct": -0.378,
+      "phase_a_mae_at": "2026-06-20T03:16:32.771167+00:00",
       "last_sl_sync_at": "2026-06-20T03:10:20.631369+00:00",
       "last_sl_sync_paper_sl": 0.0985455,
       "sl_sync_count": 1
@@ -62516,16 +62516,26 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "EVAAUSDT|LONG|2026-06-20T03:16:09.904119+00:00",
+      "symbol": "EVAAUSDT",
+      "direction": "LONG",
+      "conviction_score": 6,
+      "signal_at": "2026-06-20T03:16:49.782050+00:00",
+      "reason": "phase_6m: Tier C 小币 (entry=$0.7854) 整体 block — 13 天 195 笔 -$96 (drag $1.30/笔, 全 tier 最高)",
+      "last_checked_at": "2026-06-20T03:17:21.802006+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 63324.7,
-    "btc_ma25_1h": 62985.72,
-    "pct_vs_ma25": 0.538,
-    "change_24h_pct": 0.924,
+    "btc_price": 63349.1,
+    "btc_ma25_1h": 62986.7,
+    "pct_vs_ma25": 0.575,
+    "change_24h_pct": 0.963,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-20T03:15:22.944766+00:00"
+    "computed_at": "2026-06-20T03:17:22.873390+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
