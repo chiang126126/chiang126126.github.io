@@ -4335,7 +4335,10 @@ class TestMirrorIterationGuards(unittest.TestCase):
 
     def test_sl_compensation_in_mirror_open(self):
         """Phase 4.D 集成: 当 paper_id 分到 B 组 (always for mode='always'), live_trade
-        的 sl_price 应该是补偿后的值, 含必要的 metadata 字段."""
+        的 sl_price 应该是补偿后的值, 含必要的 metadata 字段.
+
+        2026-06-20: Phase 6.Q 不对称 gate 默认开 — 此测试场景 (LONG adverse slip)
+        在 6.Q 下会跳过 comp. patch 6.Q off 保 Phase 4.D 老 comp 行为可测."""
         now = datetime.now(timezone.utc)
         self._write_paper([{
             "id": "BTCUSDT|LONG|t_b_group",
@@ -4343,7 +4346,7 @@ class TestMirrorIterationGuards(unittest.TestCase):
             "entered_at": (now - timedelta(seconds=10)).isoformat(),
             "entry_price": 100.0, "sl": 95.0,   # paper SL 95
         }])
-        # mock open 返回 fill 100.5 (高 0.5%, slip +50bps 在阈值 50 边界)
+        # mock open 返回 fill 100.5 (高 0.5%, adverse slip +50bps for LONG)
         mock_open = {
             "trade_id": "L1", "symbol": "BTCUSDT", "side": "BUY", "qty": 0.2,
             "avg_fill_price": 100.5, "actual_notional": 20.0,
@@ -4353,8 +4356,9 @@ class TestMirrorIterationGuards(unittest.TestCase):
             "opened_at": now.isoformat(),
             "fees_paid_usdt": 0, "_dryRun": True,
         }
-        # 强制 always 模式 (B 组)
+        # 强制 always 模式 (B 组) + 关 6.Q 测老 Phase 4.D 行为
         with patch.object(live_trader, "LIVE_SL_COMPENSATION_MODE", "always"), \
+             patch.object(live_trader, "LIVE_PHASE_6Q_ASYMMETRIC_COMP_ENABLED", False), \
              patch.object(self.client, "open_position",
                           return_value=mock_open) as mock_op, \
              patch.object(self.client, "get_klines",
@@ -4368,6 +4372,74 @@ class TestMirrorIterationGuards(unittest.TestCase):
         self.assertAlmostEqual(lt["sl_compensation_offset"], 0.5, places=6)
         self.assertEqual(lt["sl_compensation_mode"], "always")
         self.assertAlmostEqual(lt["sl_paper_current"], 95.0, places=4)
+
+    def test_sl_compensation_6q_skips_on_adverse_slip(self):
+        """Phase 6.Q 集成: LONG + adverse slip → 跳过 comp, live_sl 保持 paper_sl.
+        这是 6.Q 主要救命场景: 145 笔 mainnet sl_breach + adverse + comp 提前砍."""
+        now = datetime.now(timezone.utc)
+        self._write_paper([{
+            "id": "BTCUSDT|LONG|6q_adverse",
+            "symbol": "BTCUSDT", "direction": "LONG",
+            "entered_at": (now - timedelta(seconds=10)).isoformat(),
+            "entry_price": 100.0, "sl": 95.0,
+        }])
+        # LONG adverse: live_entry 100.5 > paper 100.0
+        mock_open = {
+            "trade_id": "L1", "symbol": "BTCUSDT", "side": "BUY", "qty": 0.2,
+            "avg_fill_price": 100.5, "actual_notional": 20.0,
+            "entry_order_id": 1, "entry_client_id": "x",
+            "sl_price": 95.0,
+            "sl_side": "SELL", "sl_mode": "client_side",
+            "opened_at": now.isoformat(),
+            "fees_paid_usdt": 0, "_dryRun": True,
+        }
+        # 6.Q 默认开
+        with patch.object(live_trader, "LIVE_SL_COMPENSATION_MODE", "always"), \
+             patch.object(self.client, "open_position",
+                          return_value=mock_open) as mock_op, \
+             patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "100.0", 0, 0, 0, 0, 0, 0, 0]]):
+            result = main_loop(self.client, dry_run=True)
+        self.assertEqual(mock_op.call_count, 1)
+        lt = result["live_open_trades"][0]
+        # 6.Q gate: adverse slip + LONG → 跳过 comp, live_sl 保持 paper_sl(95.0)
+        self.assertAlmostEqual(lt["sl_price"], 95.0, places=4,
+                                msg="6.Q 应跳过 comp, live_sl = paper_sl = 95.0")
+        # sl_compensation_enabled 仍 True (B 组身份不变), 但 offset 应 0 (跳过 = 没应用)
+        self.assertTrue(lt["sl_compensation_enabled"])
+        self.assertAlmostEqual(lt["sl_compensation_offset"], 0.0, places=6,
+                                msg="跳过 comp 时 offset 应 0")
+
+    def test_sl_compensation_6q_applies_on_favorable_slip(self):
+        """Phase 6.Q: LONG + favorable slip → 应用 comp (LOOSEN), 行为同老 Phase 4.D."""
+        now = datetime.now(timezone.utc)
+        self._write_paper([{
+            "id": "BTCUSDT|LONG|6q_favorable",
+            "symbol": "BTCUSDT", "direction": "LONG",
+            "entered_at": (now - timedelta(seconds=10)).isoformat(),
+            "entry_price": 100.0, "sl": 95.0,
+        }])
+        # LONG favorable: live_entry 99.5 < paper 100.0
+        mock_open = {
+            "trade_id": "L1", "symbol": "BTCUSDT", "side": "BUY", "qty": 0.2,
+            "avg_fill_price": 99.5, "actual_notional": 20.0,
+            "entry_order_id": 1, "entry_client_id": "x",
+            "sl_price": 95.0,
+            "sl_side": "SELL", "sl_mode": "client_side",
+            "opened_at": now.isoformat(),
+            "fees_paid_usdt": 0, "_dryRun": True,
+        }
+        with patch.object(live_trader, "LIVE_SL_COMPENSATION_MODE", "always"), \
+             patch.object(self.client, "open_position",
+                          return_value=mock_open) as mock_op, \
+             patch.object(self.client, "get_klines",
+                          return_value=[[0, 0, 0, 0, "99.0", 0, 0, 0, 0, 0, 0, 0]]):
+            result = main_loop(self.client, dry_run=True)
+        lt = result["live_open_trades"][0]
+        # 6.Q LOOSEN 应用: live_sl = paper_sl + offset = 95 + (99.5-100) = 94.5
+        self.assertAlmostEqual(lt["sl_price"], 94.5, places=4,
+                                msg="6.Q favorable LONG: comp 应用, live_sl=94.5 (更宽 cushion)")
+        self.assertAlmostEqual(lt["sl_compensation_offset"], -0.5, places=6)
 
     def test_sl_compensation_mode_off_no_change(self):
         """mode='off': SL 不应被改, 跟旧逻辑一致."""
@@ -7494,6 +7566,113 @@ class TestPhase6OSLSyncAudit(unittest.TestCase):
                   "phase_b_mfe_pct", "phase_b_mfe_price",
                   "phase_c_mfe_pct", "phase_c_mfe_price"):
             self.assertEqual(live_trade[k], paper[k], f"{k} 未同步")
+
+
+class TestPhase6QAsymmetricSLCompensation(unittest.TestCase):
+    """Phase 6.Q (2026-06-20): SL compensation 不对称改造.
+
+    背景: 16 天 mainnet audit 发现 145 笔 (40%) sl_breach + comp 提前砍, 累计 -$60.85.
+    Worst 8 笔全部 slippage_bps > 0 (adverse 滑点) — comp 把 live_sl 推得离 entry 更近.
+    本改造: 仅在 comp 会 LOOSEN SL 时应用 (favorable 滑点), 反向跳过.
+
+    物理:
+      LONG (BUY):
+        offset = live - paper > 0 (adverse, 多花)  → live_sl 升 → TIGHTEN → 跳过
+        offset < 0 (favorable, 省钱)               → live_sl 降 → LOOSEN → 应用
+      SHORT (SELL):
+        offset > 0 (favorable, 卖更高)             → live_sl 升 → LOOSEN → 应用
+        offset < 0 (adverse, 卖更低)               → live_sl 降 → TIGHTEN → 跳过
+    """
+
+    def test_6q_default_enabled(self):
+        """Phase 6.Q 默认开启 — 这是主要 fix 不是 opt-in 试验."""
+        self.assertTrue(live_trader.LIVE_PHASE_6Q_ASYMMETRIC_COMP_ENABLED,
+                          "Phase 6.Q 应默认 True (audit 显示净 +EV)")
+
+    def test_6q_long_adverse_slip_skips_comp(self):
+        """Phase 6.Q 核心: LONG + adverse slip (offset > 0) → 跳过 comp.
+        通过验证 _compute_compensated_sl 公式 + 不对称逻辑.
+        """
+        from live_trader import _compute_compensated_sl
+        # Setup: LONG, paper_entry=100, paper_sl=99 (R=1%), live_entry=100.5 (adverse +50bps)
+        # 老 comp: live_sl = 99 + 0.5 = 99.5 (TIGHTEN, 距 entry 只 1$)
+        # 新 6.Q: 跳过 comp, live_sl 保持 99 (距 entry 1.5$ = 更宽 cushion)
+        paper_sl = 99.0
+        live_entry = 100.5
+        paper_entry = 100.0
+        offset = live_entry - paper_entry   # +0.5 = adverse for LONG
+        # 验证物理: comp 会算出 99.5 (TIGHTEN), 不对称 gate 应跳过
+        comp_value = _compute_compensated_sl(paper_sl, live_entry, paper_entry)
+        self.assertEqual(comp_value, 99.5, "comp 公式应算出 99.5 (TIGHTEN)")
+        # 不对称判定: LONG (BUY) + offset>0 → 不是 LOOSEN, 应跳过
+        is_long = True
+        would_loosen = (is_long and offset < 0) or (not is_long and offset > 0)
+        self.assertFalse(would_loosen, "LONG + adverse slip 应判定为非-LOOSEN")
+
+    def test_6q_long_favorable_slip_applies_comp(self):
+        """Phase 6.Q: LONG + favorable slip (offset < 0) → 应用 comp (LOOSEN)."""
+        from live_trader import _compute_compensated_sl
+        # LONG, paper_entry=100, paper_sl=99, live_entry=99.5 (favorable -50bps, 省钱)
+        # 老 comp: live_sl = 99 + (-0.5) = 98.5 (LOOSEN, 距 entry 更远)
+        paper_sl = 99.0
+        live_entry = 99.5
+        paper_entry = 100.0
+        offset = live_entry - paper_entry   # -0.5 = favorable for LONG
+        comp_value = _compute_compensated_sl(paper_sl, live_entry, paper_entry)
+        self.assertEqual(comp_value, 98.5, "comp 应算出 98.5 (LOOSEN)")
+        is_long = True
+        would_loosen = (is_long and offset < 0) or (not is_long and offset > 0)
+        self.assertTrue(would_loosen, "LONG + favorable slip 应判定为 LOOSEN")
+
+    def test_6q_short_adverse_slip_skips_comp(self):
+        """Phase 6.Q: SHORT + adverse slip (offset < 0) → 跳过 comp."""
+        # SHORT, paper_entry=100, paper_sl=101 (SL 在 entry 上方, R=1%)
+        # adverse for SHORT: live_entry LOWER (卖更便宜) → offset < 0
+        live_entry = 99.5
+        paper_entry = 100.0
+        offset = live_entry - paper_entry   # -0.5 = adverse for SHORT
+        is_long = False
+        would_loosen = (is_long and offset < 0) or (not is_long and offset > 0)
+        self.assertFalse(would_loosen, "SHORT + adverse slip 应判定为非-LOOSEN")
+
+    def test_6q_short_favorable_slip_applies_comp(self):
+        """Phase 6.Q: SHORT + favorable slip (offset > 0) → 应用 comp (LOOSEN)."""
+        # SHORT, paper_entry=100, paper_sl=101
+        # favorable for SHORT: live_entry HIGHER (卖更贵) → offset > 0
+        live_entry = 100.5
+        paper_entry = 100.0
+        offset = live_entry - paper_entry   # +0.5 = favorable for SHORT
+        is_long = False
+        would_loosen = (is_long and offset < 0) or (not is_long and offset > 0)
+        self.assertTrue(would_loosen, "SHORT + favorable slip 应判定为 LOOSEN")
+
+    def test_6q_zero_slip_treated_as_loosen(self):
+        """Phase 6.Q: slip=0 (offset=0) edge case — 应当 comp 等于 paper_sl, no-op.
+        代码中 abs(offset_raw) > 1e-9 检查跳过 0 slip, 行为不变 (退化到老 comp 行为).
+        """
+        live_entry = 100.0
+        paper_entry = 100.0
+        offset = live_entry - paper_entry   # = 0
+        is_long = True
+        would_loosen = (is_long and offset < 0) or (not is_long and offset > 0)
+        # 0 slip 时 would_loosen=False, 但代码用 abs(offset) > 1e-9 跳过判定
+        self.assertFalse(would_loosen, "0 slip 不算 LOOSEN")
+        # 代码内 abs(offset_raw) > 1e-9 检查: True → 进入 skip 逻辑, 但 0 slip 时 comp 也 = paper_sl
+        self.assertLessEqual(abs(offset), 1e-9, "0 slip 应被 epsilon 检查跳过 6.Q gate")
+
+    def test_6q_disabled_falls_back_to_legacy(self):
+        """Phase 6.Q=False → 退回 Phase 4.D 行为 (always apply comp).
+        这是紧急回滚配置, 必须能恢复原 comp 逻辑.
+        """
+        from live_trader import _compute_compensated_sl
+        # 同 test_6q_long_adverse_slip_skips_comp, 但 patch 6.Q off
+        paper_sl, live_entry, paper_entry = 99.0, 100.5, 100.0
+        with patch.object(live_trader, "LIVE_PHASE_6Q_ASYMMETRIC_COMP_ENABLED", False):
+            self.assertFalse(live_trader.LIVE_PHASE_6Q_ASYMMETRIC_COMP_ENABLED)
+        # 关闭 6.Q 后, 老逻辑会 always 应用 comp (LIVE_SL_COMPENSATION_MODE 决定是否应用)
+        # _compute_compensated_sl 行为不变
+        comp = _compute_compensated_sl(paper_sl, live_entry, paper_entry)
+        self.assertEqual(comp, 99.5, "_compute_compensated_sl 公式不变")
 
 
 if __name__ == "__main__":

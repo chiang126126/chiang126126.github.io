@@ -628,6 +628,31 @@ LIVE_PHASE_6H1_BLOCK_DOWN_REBOUND_SHORT = True   # 紧急回滚改 False
 LIVE_SL_COMPENSATION_MODE = "always"  # "off" | "ab" (legacy) | "abc" | "abcd" | "always"
 
 # ============================================================================
+# Phase 6.Q (2026-06-20) — SL Compensation 不对称改造 (审计驱动)
+# ============================================================================
+# 数据驱动 (mainnet 16 天 776 笔 sl_breach_client + comp 反事实分析):
+#   - 145 笔 (40%) "若不 comp 不会触发": comp 提前砍, 累计 -$60.85
+#   - 220 笔 (60%) "若不 comp 也会触发": comp 小帮助 (减小 R% 损失)
+#   - 净: comp 整体 ≈ neutral 或 -$5 微负
+#
+# 关键观察 — Worst 8 笔被 comp 提前砍, 全部 (8/8) slippage_bps > 0 (adverse 滑点).
+# 物理: comp 公式 live_sl = paper_sl + (live_entry - paper_entry):
+#   LONG adverse (positive slip): offset>0, live_sl 上移 = TIGHTEN (距 entry 更近)
+#   SHORT adverse (positive slip): offset<0, live_sl 下移 = TIGHTEN
+#   LONG/SHORT favorable: comp loosens SL = 给更多 cushion = neutral/+EV
+#
+# 决策: 不对称应用 — comp 只在 LOOSEN SL 时启用 (favorable 滑点), 不在 TIGHTEN
+# 时启用 (adverse 滑点). 消除 145 笔提前砍 (-$60.85), 保留 220 笔小帮助.
+# 月化预期: +$112.
+#
+# 实现: 在 _try_mirror_open 调 _compute_compensated_sl 前加 gate, 检查
+# (live_entry - paper_entry) 跟 direction 一致 → 应用; 反向 → 跳过 (用 paper_sl).
+#
+# 紧急回滚: LIVE_PHASE_6Q_ASYMMETRIC_COMP_ENABLED = False
+# (退化到 Phase 4.D 原行为, comp 永远应用).
+LIVE_PHASE_6Q_ASYMMETRIC_COMP_ENABLED = True
+
+# ============================================================================
 # Phase 6.G G3 (2026-06-12) — Close-side LIMIT-IOC + market fallback
 # ============================================================================
 # 数据驱动 (170h pilot, 419 笔 close):
@@ -3105,15 +3130,40 @@ def _try_mirror_open(
         final_sl = float(result.get("sl_price", sl_price))   # 默认 = paper_sl
         sl_paper_at_open = float(sl_price)                    # 记录原始 paper_sl
         if sl_comp_enabled and actual_fill > 0 and paper_entry > 0:
-            compensated = _compute_compensated_sl(sl_price, actual_fill, paper_entry)
-            if compensated is not None and compensated > 0:
-                sl_comp_offset = round(actual_fill - paper_entry, 8)
-                final_sl = compensated
+            # Phase 6.Q (2026-06-20) 不对称 gate: comp 只在 LOOSEN SL 时应用.
+            # offset = live_entry - paper_entry. SL 公式: live_sl = paper_sl + offset.
+            #   LONG (side=BUY):  offset>0 → live_sl 升 → 距 entry 更近 = TIGHTEN, skip
+            #                     offset<0 → live_sl 降 → 距 entry 更远 = LOOSEN, apply
+            #   SHORT (side=SELL): offset>0 → live_sl 升 → 距 entry 更远 = LOOSEN, apply
+            #                      offset<0 → live_sl 降 → 距 entry 更近 = TIGHTEN, skip
+            # 数据: 145 笔 sl_breach + adverse slip + comp 累计 -$60.85, 此 gate 救之.
+            offset_raw = actual_fill - paper_entry
+            is_long = (side.upper() == "BUY")
+            would_loosen = (is_long and offset_raw < 0) or (not is_long and offset_raw > 0)
+            skip_comp_asymmetric = (
+                LIVE_PHASE_6Q_ASYMMETRIC_COMP_ENABLED
+                and not would_loosen
+                and abs(offset_raw) > 1e-9   # offset == 0 (slip 0bps) 跳过判定, 行为不变
+            )
+            if skip_comp_asymmetric:
+                # comp 会 TIGHTEN, 跳过. 用 paper_sl 当 live_sl. 记录决策原因.
                 log.info(
-                    f"[sl-comp] {sym} {side} paper_sl={sl_price:.6f} "
-                    f"→ live_sl={final_sl:.6f} (offset {sl_comp_offset:+.6f}, "
-                    f"slip {slippage_bps:+.1f}bps)"
+                    f"[sl-comp-skip-6q] {sym} {side} adverse slip {slippage_bps:+.1f}bps, "
+                    f"comp 会 TIGHTEN SL (offset {offset_raw:+.6f}) → 跳过 comp, "
+                    f"live_sl = paper_sl = {sl_price:.6f}"
                 )
+                # sl_comp_offset 保持 0.0, final_sl 保持 paper_sl (默认值)
+            else:
+                compensated = _compute_compensated_sl(sl_price, actual_fill, paper_entry)
+                if compensated is not None and compensated > 0:
+                    sl_comp_offset = round(offset_raw, 8)
+                    final_sl = compensated
+                    direction_note = "LOOSEN" if would_loosen else "neutral(slip=0)"
+                    log.info(
+                        f"[sl-comp] {sym} {side} paper_sl={sl_price:.6f} "
+                        f"→ live_sl={final_sl:.6f} (offset {sl_comp_offset:+.6f}, "
+                        f"slip {slippage_bps:+.1f}bps, 6.Q: {direction_note})"
+                    )
         if wick_filter_enabled:
             log.info(
                 f"[wick-filter] {sym} {side} 启用 wick 过滤 "
