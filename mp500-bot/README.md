@@ -9,9 +9,11 @@
 |---|---|---|
 | `dry` | 只决策、只记录,**不开任何仓** | LLM key(可选) |
 | `sim`(默认) | 用**真实价格模拟撮合**开/平仓,算 PnL | LLM key(可选) |
-| `testnet` | 在**币安现货模拟盘**真下单 | LLM key + 币安 Testnet key |
+| `testnet` | 在**币安 USDT 合约模拟盘**真下单（1x，可多可空）| LLM key + 币安合约 Testnet key |
 
 **建议路径**:先 `dry` 看几次决策合不合理 → `sim` 跑 1–2 周看期望 → 再上 `testnet`。
+
+> 现阶段用 **USDT 本位合约 1 倍杠杆**：可做多(LONG)/做空(SHORT)，震荡行情双向取样、不浪费时间；1x 不放大风险，单笔风险仍由止损距离 ≤1% 控制。后续要上更高杠杆，只需改 `.env` 的 `LEVERAGE`（但请先在 paper 充分验证）。
 
 ## 信息面（喂给 LLM 做小时级判断）
 每轮决策前，机器人会抓**新闻信息面**并并入 Evidence 一起喂给 LLM（借鉴 WebCryptoAgent 的 web informatics）：
@@ -28,7 +30,7 @@
 在大仓库 `chiang126126.github.io` → Settings → Secrets and variables → Actions:
 - `SYNC_TOKEN` — 已有(同步用,Contents:write on million-path)。
 - `LLM_API_KEY` — DeepSeek key(https://platform.deepseek.com)或 OpenAI key。**留空则用规则,不报错。**
-- (可选,testnet 才需)`BINANCE_TESTNET_KEY` / `BINANCE_TESTNET_SECRET` — 从 https://testnet.binance.vision 用 GitHub 登录后 Generate HMAC Key。
+- (可选,testnet 才需)`BINANCE_TESTNET_KEY` / `BINANCE_TESTNET_SECRET` — ⚠️ 现为合约模式，须从 **https://testnet.binancefuture.com** 用 GitHub 登录后生成（与现货 testnet.binance.vision 的 key 不通用）。
 - (可选)Variables 里设 `LLM_PROVIDER`(deepseek/openai)、`LLM_MODEL`。
 
 默认 `MODE=sim`。想换模式:Actions → MP500 paper bot → **Run workflow** → 选 mode。
@@ -78,7 +80,7 @@ cp .env.example .env
 ```bash
 bash run_local.sh
 ```
-应打印 `[testnet] 已连接，USDT 可用余额 ...`，FLAT 则观望、LONG 则真下单,然后推数据、看板更新。
+应打印 `[testnet] 已连接，USDT 可用余额 ...`，FLAT 则观望、LONG/SHORT 则真下单(合约 1x),然后推数据、看板更新。
 
 **每小时自动(macOS / Linux,crontab):**
 ```bash

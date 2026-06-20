@@ -251,9 +251,10 @@ async function loadBot() {
   $("botMode").textContent = `更新于 ${(st.updated_at || "").slice(5, 16).replace("T", " ")} · 日盈亏 ${pct(log.day_pnl_pct)} · 回撤 ${fmt(log.total_dd_pct, 1)}%${tnInfo}`;
 
   $("botOpenBody").innerHTML = (st.positions || []).map(p => {
+    const side = p.side || "LONG", long = side === "LONG";
     const lp = livePrice((p.symbol || "").replace("USDT", "")); let u = null;
-    if (lp != null) u = (lp - p.entry) * p.qty - (p.fee_in || 0) - lp * p.qty * FEE;
-    return `<tr><td data-label="标的"><b>${p.symbol}</b> <span class="chip risk-on">LONG</span></td>
+    if (lp != null) u = (long ? (lp - p.entry) : (p.entry - lp)) * p.qty - (p.fee_in || 0) - lp * p.qty * FEE;
+    return `<tr><td data-label="标的"><b>${p.symbol}</b> <span class="chip ${long ? "risk-on" : "risk-off"}">${side}</span></td>
       <td data-label="入场">${fmt(p.entry, 2)}</td><td data-label="现价">${lp != null ? fmt(lp, 2) : "—"}</td>
       <td data-label="止损">${fmt(p.stop, 2)}</td><td data-label="止盈">${fmt(p.target, 2)}</td>
       <td data-label="浮动盈亏" class="${cls(u)}">${u == null ? "—" : (u >= 0 ? "+" : "") + fmt(u, 2) + "U"}</td></tr>`;
@@ -264,12 +265,12 @@ async function loadBot() {
   $("botDecisions").innerHTML = (log.items || []).map(it =>
     `<div class="ev" style="padding:8px 0"><div class="t" style="flex-wrap:wrap;align-items:baseline">
       <b>${it.symbol || ""}</b>
-      <span class="chip ${it.bias === "LONG" ? "risk-on" : "neutral"}">${it.bias || it.action || "—"}</span>
+      <span class="chip ${it.bias === "LONG" ? "risk-on" : it.bias === "SHORT" ? "risk-off" : "neutral"}">${it.bias || it.action || "—"}</span>
       ${decTime ? `<span class="badge" style="color:var(--muted)">🕐 ${decTime} · ${ago(decTs)}</span>` : ""}
       <span class="badge">${it.source ? it.source + " · " : ""}${it.confidence != null ? "conf " + it.confidence + " · " : ""}${it.reason || it.rationale || ""}</span></div></div>`).join("") || '<span class="badge">暂无决策</span>';
 
   $("botTradesBody").innerHTML = tr.slice().reverse().slice(0, 20).map(t => `<tr>
-    <td data-label="标的"><b>${t.symbol}</b></td><td data-label="入场→出场">${fmt(t.entry, 2)} → ${fmt(t.exit, 2)}</td>
+    <td data-label="标的"><b>${t.symbol}</b> <span class="chip ${(t.side || "LONG") === "LONG" ? "risk-on" : "risk-off"}" style="font-size:10px;padding:1px 7px">${t.side || "LONG"}</span></td><td data-label="入场→出场">${fmt(t.entry, 2)} → ${fmt(t.exit, 2)}</td>
     <td data-label="出场原因">${t.exit_reason || ""}</td>
     <td data-label="盈亏" class="${cls(t.pnl)}">${(t.pnl >= 0 ? "+" : "") + fmt(t.pnl, 2)}U</td>
     <td data-label="R" class="${cls(t.r)}">${(t.r >= 0 ? "+" : "") + fmt(t.r, 2)}R</td>
@@ -604,7 +605,7 @@ function computeDecision() {
   let bias = "FLAT", conf = 0.3; const reasons = [], flags = [];
   if (reg) {
     if (reg.key === "risk-on") { bias = "LONG"; conf = 0.55; reasons.push(`BTC ${reg.label}${reg.dev != null ? "（+" + reg.dev.toFixed(1) + "%）" : ""}，趋势偏多`); }
-    else if (reg.key === "risk-off") { bias = "FLAT"; reasons.push(`BTC ${reg.label}，防守为主、优先持币观望`); }
+    else if (reg.key === "risk-off") { bias = "SHORT"; conf = 0.55; reasons.push(`BTC ${reg.label}${reg.dev != null ? "（" + reg.dev.toFixed(1) + "%）" : ""}，趋势偏空（1x 合约可顺势做空）`); }
     else { bias = "FLAT"; reasons.push("BTC 贴近30日线、方向不明，少动"); }
     if (reg.dev != null) conf += Math.min(0.2, Math.abs(reg.dev) / 50);
   }
@@ -618,15 +619,18 @@ function computeDecision() {
     if (fng.v >= 75) { flags.push(`极度贪婪（${fng.v}），警惕追高`); if (bias === "LONG") conf -= 0.1; }
     else if (fng.v <= 25) { flags.push(`极度恐惧（${fng.v}），或有超跌机会但需右侧确认`); }
   }
+  if (bias === "SHORT" && btc && btc.funding != null && Math.abs(btc.funding) > 0.05 && btc.funding < 0) conf -= 0.1;
   conf = Math.max(0.1, Math.min(0.9, conf));
-  const move = bias === "LONG" ? "顺势做多，目标盈亏比 ≥ 1.5" : "观望 / 空仓（FLAT 也是决策）";
+  const move = bias === "LONG" ? "顺势做多，目标盈亏比 ≥ 1.5"
+    : bias === "SHORT" ? "顺势做空（1x 合约），目标盈亏比 ≥ 1.5"
+    : "观望 / 空仓（FLAT 也是决策）";
   const advice = reg ? ADVICE[reg.key] : ADVICE.neutral;
   return { bias, conf, move, reasons, flags, advice };
 }
 function renderDecision() {
   const box = $("decisionBox"); if (!box) return;
   const d = computeDecision();
-  const biasCls = d.bias === "LONG" ? "risk-on" : "neutral";
+  const biasCls = d.bias === "LONG" ? "risk-on" : d.bias === "SHORT" ? "risk-off" : "neutral";
   const bar = Math.round(d.conf * 100);
   box.innerHTML = `
     <div class="grid g-auto" style="margin-bottom:10px">

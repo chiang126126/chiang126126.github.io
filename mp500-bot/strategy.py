@@ -10,10 +10,12 @@ SYSTEM_PROMPT = (
     "你是 MP500 加密交易系统的战略分析师。综合给定的 Evidence（技术指标 + 资金费率 + 情绪 + "
     "近期新闻/叙事/宏观/地缘），对该标的给出一个保守的短线决策。\n"
     "重视信息面：关键人物发言、AI 基建/芯片叙事、监管、地缘冲突/战争、美联储与宏观数据，"
-    "都可能在小时级别快速重定价；但叙事行情来去快，需与技术面/风控共同确认，不可只凭新闻追高。\n"
-    "规则：只允许做多或观望（不做空）；行情不明确时必须 FLAT（空仓也是决策）；必须给出止损；风控优先于收益。\n"
+    "都可能在小时级别快速重定价；但叙事行情来去快，需与技术面/风控共同确认，不可只凭新闻追高/追空。\n"
+    "现阶段使用【1 倍杠杆 USDT 合约】，可做多(LONG)、做空(SHORT)或观望(FLAT)。\n"
+    "规则：顺势进场——做多需价在均线上方且动能向上；做空需价在均线下方且动能向下，严禁逆势；"
+    "行情不明确/震荡中枢时必须 FLAT（空仓也是决策）；必须给出止损；风控优先于收益。\n"
     "只返回严格 JSON，字段：\n"
-    '{"bias":"LONG|FLAT","confidence":0.0-1.0,"stop_pct":正数(止损距入场的百分比,如2.0表示2%),'
+    '{"bias":"LONG|SHORT|FLAT","confidence":0.0-1.0,"stop_pct":正数(止损距入场的百分比,如2.0表示2%),'
     '"target_pct":正数(止盈距入场的百分比),"rationale":"简述形态+新闻/叙事依据","risk_flags":["风险点"]}'
 )
 
@@ -93,10 +95,13 @@ def llm_decide(provider, api_key, model, evidence):
 
 def rule_decide(ind, funding, fng):
     """确定性兜底：LLM 不可用或失败时使用。与看板 computeDecision 同源逻辑。"""
-    dev = ind["dev_pct"]
+    dev = ind["dev_pct"]; rsi = ind["rsi14"]
     bias, conf, flags = "FLAT", 0.3, []
-    if dev is not None and dev >= 1 and ind["rsi14"] and ind["rsi14"] < 72:
-        bias, conf = "LONG", min(0.7, 0.5 + abs(dev) / 50)
+    if dev is not None and rsi is not None:
+        if dev >= 1 and rsi < 72:            # 站上均线 + 未超买 → 顺势做多
+            bias, conf = "LONG", min(0.7, 0.5 + abs(dev) / 50)
+        elif dev <= -1 and rsi > 28:         # 跌破均线 + 未超卖 → 顺势做空
+            bias, conf = "SHORT", min(0.7, 0.5 + abs(dev) / 50)
     fng_v = fng[0]
     if fng_v is not None and fng_v >= 78:
         flags.append("极度贪婪，警惕追高")

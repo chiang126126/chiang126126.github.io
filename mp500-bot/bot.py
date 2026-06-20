@@ -1,5 +1,6 @@
 """MP500 paper 机器人 —— 每次运行执行一个决策+执行周期。
-MODE: dry(只决策不下单) | sim(用真实价格模拟撮合) | testnet(币安现货模拟盘真下单)
+MODE: dry(只决策不下单) | sim(用真实价格模拟撮合) | testnet(币安合约模拟盘真下单)
+当前阶段：USDT 本位合约 1 倍杠杆，可做多/做空（在震荡行情双向都能取样）。
 数据读写在 $DATA_DIR（默认 ./data），由外层 workflow 负责提交。
 """
 import json
@@ -22,6 +23,7 @@ def cfg():
         "LLM_MODEL": os.getenv("LLM_MODEL", "deepseek-chat"),
         "TN_KEY": os.getenv("BINANCE_TESTNET_KEY", ""),
         "TN_SECRET": os.getenv("BINANCE_TESTNET_SECRET", ""),
+        "LEVERAGE": int(os.getenv("LEVERAGE", "1")),
         "MARKETAUX_KEY": os.getenv("MARKETAUX_KEY", ""),
         "DATA_DIR": os.getenv("DATA_DIR", "./data"),
     }
@@ -52,14 +54,22 @@ def fresh_state():
 
 
 def manage_exit(pos, kl):
-    """检查开仓后是否触及止损/止盈。返回 (exit_price, reason) 或 (None, None)。"""
+    """检查开仓后是否触及止损/止盈。返回 (exit_price, reason) 或 (None, None)。
+    LONG：跌破止损/涨到止盈；SHORT：涨破止损/跌到止盈。同根K线优先判止损（保守）。"""
+    long = pos.get("side", "LONG") == "LONG"
     for k in kl:
         if k["t"] < pos["opened_kline_t"]:
             continue
-        if k["l"] <= pos["stop"]:           # 止损优先（保守）
-            return pos["stop"], "STOP"
-        if k["h"] >= pos["target"]:
-            return pos["target"], "TARGET"
+        if long:
+            if k["l"] <= pos["stop"]:
+                return pos["stop"], "STOP"
+            if k["h"] >= pos["target"]:
+                return pos["target"], "TARGET"
+        else:
+            if k["h"] >= pos["stop"]:
+                return pos["stop"], "STOP"
+            if k["l"] <= pos["target"]:
+                return pos["target"], "TARGET"
     return None, None
 
 
@@ -69,7 +79,7 @@ def main():
     state = load_json(os.path.join(ddir, "bot_state.json"), fresh_state())
     trades = load_json(os.path.join(ddir, "bot_trades.json"), [])
     state["mode"] = c["MODE"]
-    tn = exchange.Testnet(c["TN_KEY"], c["TN_SECRET"]) if c["MODE"] == "testnet" and c["TN_KEY"] else None
+    tn = exchange.Futures(c["TN_KEY"], c["TN_SECRET"]) if c["MODE"] == "testnet" and c["TN_KEY"] else None
 
     today = now_iso()[:10]
     if state.get("day") != today:
@@ -112,18 +122,19 @@ def main():
             continue
         if tn:
             try:
-                base = pos["symbol"].replace("USDT", "")
-                filt = exchange.symbol_filters(pos["symbol"])
-                sell_qty = exchange.round_step(min(pos["qty"], tn.free_balance(base)), filt["step"])
-                if sell_qty <= 0:
-                    raise Exception("可卖余额为 0")
-                res = tn.market_sell_qty(pos["symbol"], exchange.fmt_qty(sell_qty, filt["step"]))
+                filt = exchange.futures_filters(pos["symbol"])
+                close_qty = exchange.round_step(pos["qty"], filt["step"])
+                if close_qty <= 0:
+                    raise Exception("可平数量为 0")
+                res = tn.market_close(pos["symbol"], pos.get("side", "LONG"),
+                                      exchange.fmt_qty(close_qty, filt["step"]))
                 exit_price = _avg_fill(res, exit_price)
             except Exception as e:
                 print(f"[warn] testnet 平仓失败，保留持仓下次重试: {e}")
                 still_open.append(pos)
                 continue
-        gross = (exit_price - pos["entry"]) * pos["qty"]
+        long = pos.get("side", "LONG") == "LONG"
+        gross = (exit_price - pos["entry"]) * pos["qty"] if long else (pos["entry"] - exit_price) * pos["qty"]
         fee_out = exit_price * pos["qty"] * FEE
         pnl = gross - pos.get("fee_in", 0) - fee_out
         state["equity"] += pnl
@@ -163,26 +174,32 @@ def main():
         if ok and c["MODE"] != "dry":
             kl_t = exchange.klines(sym, "1h", 1)[-1]["t"]
             entry = plan["entry"]
+            side = plan["side"]
             if tn:
                 try:
-                    res = tn.market_buy_quote(sym, plan["notional"])
+                    tn.set_leverage(sym, c["LEVERAGE"])
+                    filt = exchange.futures_filters(sym)
+                    qty = exchange.round_step(plan["qty"], filt["step"])
+                    if qty < filt["min_qty"] or qty * entry < filt["min_notional"]:
+                        raise Exception(f"低于交易所最小下单量/名义({filt['min_qty']}/{filt['min_notional']})")
+                    res = tn.market_open(sym, side, exchange.fmt_qty(qty, filt["step"]))
                     entry = _avg_fill(res, entry)
-                    plan["qty"] = float(res.get("executedQty", plan["qty"]))
+                    plan["qty"] = float(res.get("executedQty", qty)) or qty
                 except Exception as e:
                     print(f"[warn] testnet 开仓失败，跳过本次: {e}")
                     item["action"] = "testnet-open-failed"
                     item["reason"] = str(e)
                     log["items"].append(item)
                     continue
-            pos = {"symbol": sym, "side": "LONG", "entry": entry,
+            pos = {"symbol": sym, "side": side, "entry": entry,
                    "stop": plan["stop"], "target": plan["target"], "qty": plan["qty"],
                    "notional": plan["notional"], "risk_usdt": plan["risk_usdt"],
                    "fee_in": plan["notional"] * FEE, "confidence": plan["confidence"],
                    "opened_at": now_iso(), "opened_kline_t": kl_t}
             state["positions"].append(pos)
-            item["action"] = "OPEN LONG"
+            item["action"] = f"OPEN {side}"
             item["price"] = round(entry, 2)
-            print(f"[open] {sym} LONG @ {entry:.2f} stop={plan['stop']} target={plan['target']}")
+            print(f"[open] {sym} {side} @ {entry:.2f} stop={plan['stop']} target={plan['target']}")
         else:
             item["action"] = "skip" if not ok else "dry"
         log["items"].append(item)
@@ -202,6 +219,9 @@ def _fmt_qty(q):
 
 def _avg_fill(res, fallback):
     try:
+        # 合约 RESULT 响应直接带 avgPrice
+        if res.get("avgPrice") and float(res["avgPrice"]) > 0:
+            return float(res["avgPrice"])
         fills = res.get("fills") or []
         if fills:
             tot = sum(float(f["price"]) * float(f["qty"]) for f in fills)
