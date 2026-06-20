@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-20T09:13:08.193687+00:00",
+  "generated_at": "2026-06-20T09:15:14.509883+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 776,
@@ -28,7 +28,7 @@
   "risk_status": {
     "block_new_opens": true,
     "reasons": [
-      "emergency stop flag exists: 'AUTO 2026-06-20T09:13:04.123029+00:00: cumulative DD 30.02% (balance $419.90 < threshold $420.00)'",
+      "emergency stop flag exists: 'AUTO 2026-06-20T09:15:10.042972+00:00: cumulative DD 30.02% (balance $419.90 < threshold $420.00)'",
       "cumulative DD 30.02% (balance $419.90 < threshold $420.00)"
     ],
     "daily_pnl": -2.404,
@@ -62756,16 +62756,26 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "SANDUSDT|LONG|2026-06-20T09:12:45.863739+00:00",
+      "symbol": "SANDUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-20T09:13:28.101949+00:00",
+      "reason": "risk_gate: emergency stop flag exists: 'AUTO 2026-06-20T09:15:10.042972+00:00: cumulative DD 30.02% (balance $419.90 < threshold $420.00)', cumulative DD 30.02% (balance $419.90 < threshold $420.00)",
+      "last_checked_at": "2026-06-20T09:15:13.148411+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 63487.5,
-    "btc_ma25_1h": 63210.58,
-    "pct_vs_ma25": 0.438,
-    "change_24h_pct": 1.819,
+    "btc_price": 63488.3,
+    "btc_ma25_1h": 63210.62,
+    "pct_vs_ma25": 0.439,
+    "change_24h_pct": 1.821,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-20T09:13:08.141184+00:00"
+    "computed_at": "2026-06-20T09:15:14.451804+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
