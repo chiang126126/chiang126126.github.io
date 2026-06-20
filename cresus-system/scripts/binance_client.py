@@ -349,6 +349,10 @@ class BinanceClient:
         # 时钟漂移 (本地 + offset ≈ 服务器). 单位 ms.
         self._time_offset_ms: int = 0
         self._last_time_sync_monotonic: float = 0.0
+        # Phase 6.R (2026-06-20): BNB/USDT 价缓存 — BNB 抵扣 fees 换算用.
+        # 缓存 BNB_PRICE_CACHE_SEC 秒, 避免每笔 close 都打一次 ticker API.
+        self._bnb_usdt_price_cache: Optional[float] = None
+        self._bnb_usdt_price_cached_at: float = 0.0
 
     # --- 安全: 永不打 secret ---
 
@@ -755,13 +759,44 @@ class BinanceClient:
             return []
         return result
 
+    # Phase 6.R (2026-06-20) BNB price cache TTL (秒).
+    # BNB 价波动 ~0.5%/min, 30s 内换算误差 < 0.25% — 完全够 fee 准确性.
+    _BNB_PRICE_CACHE_TTL_SEC = 30
+
+    def _get_bnb_usdt_price(self) -> Optional[float]:
+        """获取 BNB/USDT 当前 mid 价, 用于 BNB-discount fees 换算 USDT.
+
+        Phase 6.R (2026-06-20): 用户 Binance 账户开了 BNB 抵扣 fees (10% 折扣),
+        所有 commissionAsset=BNB 之前都被回退估算. 加 BNB→USDT 换算解决.
+
+        缓存 _BNB_PRICE_CACHE_TTL_SEC 秒, 避免每笔 close 单独打 ticker API.
+        失败返 None, 调用方应 fallback 到估算 (跟以前一样, 不破坏 close 流程).
+        """
+        now = time.time()
+        if (self._bnb_usdt_price_cache is not None
+                and now - self._bnb_usdt_price_cached_at < self._BNB_PRICE_CACHE_TTL_SEC):
+            return self._bnb_usdt_price_cache
+        try:
+            bt = self.get_book_ticker("BNBUSDT")
+            bid = float(bt.get("bidPrice") or 0)
+            ask = float(bt.get("askPrice") or 0)
+            if bid > 0 and ask > 0:
+                mid = (bid + ask) / 2.0
+                self._bnb_usdt_price_cache = mid
+                self._bnb_usdt_price_cached_at = now
+                return mid
+        except (BinanceError, ValueError, KeyError, TypeError) as e:
+            log.warning(f"[bnb-price] fetch BNBUSDT failed: {type(e).__name__}: {e}")
+        return None
+
     def _actual_commission_usdt(
         self, symbol: str, order_id: int,
     ) -> Optional[float]:
         """汇总指定订单的真实 commission (USDT). 返回 None 表示取不到 (调用方应 fallback).
 
-        BNB-discount (commissionAsset=BNB) 情况: 本版本暂不换算, 返回 None
-        让调用方 fallback 到估算. 实盘启用 BNB 折扣前再扩展.
+        Phase 6.R (2026-06-20): 加 BNB→USDT 换算. 之前 commissionAsset=BNB 整单
+        回退估算. 现在用 mid BNB/USDT 价 × BNB 数量得到 USDT 等值.
+        BNB 价 fetch 失败时仍回退估算 (保守).
 
         Phase 6.P (2026-06-18): 加 0.25s + 0.5s = max 0.75s 总 backoff retry
         防 Binance userTrades 返 empty fills (订单刚 settle, API 索引延迟).
@@ -806,11 +841,28 @@ class BinanceClient:
                 continue
             if asset == "USDT":
                 total += comm
+            elif asset == "BNB":
+                # Phase 6.R (2026-06-20): BNB-discount 换算到 USDT.
+                # 用户开 BNB 抵扣 (10% fees 折扣), commissionAsset=BNB.
+                # 用 mid BNB/USDT 价 × BNB 数量 = USDT 等值.
+                bnb_price = self._get_bnb_usdt_price()
+                if bnb_price is None or bnb_price <= 0:
+                    log.warning(
+                        f"[fee] {symbol} order_id={order_id}: BNB price "
+                        f"unavailable, fallback to estimate"
+                    )
+                    return None
+                usdt_equiv = comm * bnb_price
+                total += usdt_equiv
+                log.debug(
+                    f"[fee] {symbol} order_id={order_id}: BNB {comm:.6f} × "
+                    f"${bnb_price:.2f} = ${usdt_equiv:.4f} USDT 等值"
+                )
             else:
-                # 非 USDT 计费 (e.g. BNB-discount). 本版本不换算 → 整单回退估算.
+                # 其它 commissionAsset (BUSD/USDC/exotic token), 不支持换算 → fallback
                 log.warning(
                     f"[fee] {symbol} order_id={order_id}: "
-                    f"commissionAsset={asset} (非 USDT), 暂不支持换算, 回退估算"
+                    f"commissionAsset={asset} 未支持的资产, 回退估算"
                 )
                 return None
         return round(total, 6)

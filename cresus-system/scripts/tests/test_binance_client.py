@@ -1158,11 +1158,14 @@ class TestActualCommission(unittest.TestCase):
             self.client.get_user_trades("BTCUSDT", limit=1001)
 
     def test_bnb_commission_returns_none_for_fallback(self):
-        """BNB-discount 模式暂不支持换算 → 返 None 让上层回退估算."""
+        """Phase 6.R 之前: BNB-discount 暂不支持换算 → None.
+        2026-06-20: 改造 BNB 现在会换算到 USDT, 但若 BNB 价 fetch 失败 → 仍 None.
+        此测试现在验证: BNB 价不可达时 fallback."""
         fills = [{"commission": "0.0001", "commissionAsset": "BNB"}]
-        with patch.object(self.client, "get_user_trades", return_value=fills):
+        with patch.object(self.client, "get_user_trades", return_value=fills), \
+             patch.object(self.client, "_get_bnb_usdt_price", return_value=None):
             fee = self.client._actual_commission_usdt("BTCUSDT", 1)
-        self.assertIsNone(fee)
+        self.assertIsNone(fee, "BNB 价 unavailable 应 fallback")
 
     def test_empty_fills_returns_none(self):
         """Phase 6.P: 3 次 retry 全空 → None (上层回退估算).
@@ -1195,15 +1198,81 @@ class TestActualCommission(unittest.TestCase):
             fee = self.client._actual_commission_usdt("BTCUSDT", 1)
         self.assertIsNone(fee)
 
+    def test_phase_6r_bnb_converted_to_usdt(self):
+        """Phase 6.R (2026-06-20): BNB commission 换算到 USDT 不再 fallback.
+        用 BNB 数量 × BNB 价 = USDT 等值."""
+        fills = [{"commission": "0.0001", "commissionAsset": "BNB"}]
+        # BNB 价 $600 → 0.0001 × 600 = $0.06
+        with patch.object(self.client, "get_user_trades", return_value=fills), \
+             patch.object(self.client, "_get_bnb_usdt_price", return_value=600.0):
+            fee = self.client._actual_commission_usdt("BTCUSDT", 1)
+        self.assertAlmostEqual(fee, 0.06, places=6,
+                                msg="0.0001 BNB × $600 应换 $0.06")
+
+    def test_phase_6r_mixed_usdt_and_bnb_now_sums(self):
+        """Phase 6.R: USDT + BNB 混合不再 fallback, 两者相加."""
+        fills = [
+            {"commission": "0.004", "commissionAsset": "USDT"},
+            {"commission": "0.0001", "commissionAsset": "BNB"},  # × $600 = $0.06
+        ]
+        with patch.object(self.client, "get_user_trades", return_value=fills), \
+             patch.object(self.client, "_get_bnb_usdt_price", return_value=600.0):
+            fee = self.client._actual_commission_usdt("BTCUSDT", 1)
+        self.assertAlmostEqual(fee, 0.064, places=6,
+                                msg="0.004 USDT + (0.0001 BNB × $600) = $0.064")
+
+    def test_phase_6r_bnb_price_cache_hit(self):
+        """Phase 6.R 缓存: 同 client 短时间内多次调 _get_bnb_usdt_price 应只调 1 次 API."""
+        bt = {"bidPrice": "595.0", "askPrice": "605.0"}
+        with patch.object(self.client, "get_book_ticker",
+                          return_value=bt) as mock_bt:
+            p1 = self.client._get_bnb_usdt_price()
+            p2 = self.client._get_bnb_usdt_price()
+            p3 = self.client._get_bnb_usdt_price()
+        self.assertEqual(mock_bt.call_count, 1,
+                          "缓存生效: 3 次调用应只命中 API 1 次")
+        # mid = (595 + 605) / 2 = 600
+        self.assertAlmostEqual(p1, 600.0, places=4)
+        self.assertEqual(p1, p2)
+        self.assertEqual(p2, p3)
+
+    def test_phase_6r_bnb_price_cache_expires(self):
+        """Phase 6.R 缓存过期: TTL 之后应重新 fetch."""
+        import time as time_module
+        bt = {"bidPrice": "595.0", "askPrice": "605.0"}
+        with patch.object(self.client, "get_book_ticker",
+                          return_value=bt) as mock_bt:
+            self.client._get_bnb_usdt_price()
+            # 模拟过期: 把缓存时间往前推 60s (> 30s TTL)
+            self.client._bnb_usdt_price_cached_at -= 60
+            self.client._get_bnb_usdt_price()
+        self.assertEqual(mock_bt.call_count, 2,
+                          "缓存过期后应重新 fetch")
+
+    def test_phase_6r_bnb_price_api_failure(self):
+        """Phase 6.R: book_ticker 失败时 BNB 价 fetch 返 None, 不抛."""
+        with patch.object(self.client, "get_book_ticker",
+                          side_effect=BinanceError("api down")):
+            p = self.client._get_bnb_usdt_price()
+        self.assertIsNone(p)
+
+    def test_phase_6r_unknown_asset_still_falls_back(self):
+        """Phase 6.R: USDT + BNB 之外的 asset (e.g. BUSD, exotic) 仍 fallback."""
+        fills = [{"commission": "0.5", "commissionAsset": "BUSD"}]
+        with patch.object(self.client, "get_user_trades", return_value=fills):
+            fee = self.client._actual_commission_usdt("BTCUSDT", 1)
+        self.assertIsNone(fee, "BUSD 未支持的资产应 fallback")
+
     def test_mixed_usdt_and_bnb_falls_back(self):
-        """任何一 fill 是非 USDT → 整单回退 (避免半精确)."""
+        """Phase 6.R 前的老测试 — 现在改成: BNB 价 unavailable 时 USDT+BNB 仍 fallback."""
         fills = [
             {"commission": "0.004", "commissionAsset": "USDT"},
             {"commission": "0.001", "commissionAsset": "BNB"},
         ]
-        with patch.object(self.client, "get_user_trades", return_value=fills):
+        with patch.object(self.client, "get_user_trades", return_value=fills), \
+             patch.object(self.client, "_get_bnb_usdt_price", return_value=None):
             fee = self.client._actual_commission_usdt("BTCUSDT", 1)
-        self.assertIsNone(fee)
+        self.assertIsNone(fee, "BNB 价 unavailable 时整单 fallback (保守)")
 
     def test_malformed_commission_value_skipped(self):
         """坏值 fill 跳过 (不应让整次 close 崩)."""
