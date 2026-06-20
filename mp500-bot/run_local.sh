@@ -2,7 +2,14 @@
 # 本地运行 MP500 机器人（从你自己的网络连币安 testnet，绕开 GitHub 的地区封锁）。
 # 用法：bash run_local.sh   （或加进 crontab 每小时跑）
 set -e
+
+# cron 的 PATH 极简（只有 /usr/bin:/bin），会找不到 Homebrew 装的 python3/git，
+# 导致"手动跑正常、cron 跑失败"。这里补上常见路径，确保两种方式一致。
+export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+
 cd "$(dirname "$0")"                       # 进入 mp500-bot 目录
+echo "──────── $(date '+%F %T %Z') 开始运行 ────────"
+echo "python3: $(command -v python3 || echo '未找到!')  git: $(command -v git || echo '未找到!')"
 
 # 读 .env（MODE / LLM_API_KEY / BINANCE_TESTNET_* / DATA_REPO）
 set -a; [ -f .env ] && . ./.env; set +a
