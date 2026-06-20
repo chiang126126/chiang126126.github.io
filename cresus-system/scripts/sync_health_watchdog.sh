@@ -75,14 +75,20 @@ RECENT_SECS=600  # 10 分钟内的错误才算"近期"
 check_recent_aborting() {
     local f="$1"
     [ -f "$f" ] || return 0   # 文件不存在不算错
-    # 看最后 20 行有没 Aborting / pull --rebase 失败
-    local has_abort=$(tail -20 "$f" 2>/dev/null | grep -cE 'Aborting|pull --rebase 失败|untracked working tree files would be overwritten' || echo 0)
-    if [ "$has_abort" -gt 0 ]; then
+    # 看最后 20 行有没 Aborting / pull --rebase 失败.
+    # 2026-06-20 fix: 用 grep | wc -l 替代 grep -c | ... || echo 0 — 后者在
+    # grep 无匹配时 exit 1, || echo 0 会附加另一个 0 让 has_abort="0\n0",
+    # 后续 [-gt] 比较抛 "integer expression expected".
+    local has_abort
+    has_abort=$(tail -20 "$f" 2>/dev/null | grep -cE 'Aborting|pull --rebase 失败|untracked working tree files would be overwritten' 2>/dev/null || true)
+    has_abort=${has_abort:-0}
+    if [ "$has_abort" -gt 0 ] 2>/dev/null; then
         # 看 file mtime 是不是近期 (= 这个错误是新的, 不是历史尾巴)
-        local f_mtime=$(stat -f %m "$f" 2>/dev/null || stat -c %Y "$f" 2>/dev/null || echo 0)
-        if [ "$f_mtime" -gt 0 ]; then
+        local f_mtime
+        f_mtime=$(stat -f %m "$f" 2>/dev/null || stat -c %Y "$f" 2>/dev/null || echo 0)
+        if [ "$f_mtime" -gt 0 ] 2>/dev/null; then
             local f_age=$(( NOW - f_mtime ))
-            if [ "$f_age" -lt "$RECENT_SECS" ]; then
+            if [ "$f_age" -lt "$RECENT_SECS" ] 2>/dev/null; then
                 return 1   # 近期有 Aborting
             fi
         fi
