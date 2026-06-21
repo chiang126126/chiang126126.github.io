@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-21T23:09:25.933187+00:00",
+  "generated_at": "2026-06-21T23:11:29.610577+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 776,
@@ -28,7 +28,7 @@
   "risk_status": {
     "block_new_opens": true,
     "reasons": [
-      "emergency stop flag exists: 'AUTO 2026-06-21T23:09:21.436743+00:00: cumulative DD 30.02% (balance $419.90 < threshold $420.00)'",
+      "emergency stop flag exists: 'AUTO 2026-06-21T23:11:25.513142+00:00: cumulative DD 30.02% (balance $419.90 < threshold $420.00)'",
       "cumulative DD 30.02% (balance $419.90 < threshold $420.00)"
     ],
     "daily_pnl": 0.0,
@@ -62756,16 +62756,26 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "TAIKOUSDT|LONG|2026-06-21T23:10:56.282607+00:00",
+      "symbol": "TAIKOUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-21T23:11:04.637566+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.22% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-21T23:11:28.616004+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 63704.7,
-    "btc_ma25_1h": 64129.51,
-    "pct_vs_ma25": -0.662,
-    "change_24h_pct": -0.88,
+    "btc_price": 63683.2,
+    "btc_ma25_1h": 64128.65,
+    "pct_vs_ma25": -0.695,
+    "change_24h_pct": -0.913,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.188,
-    "computed_at": "2026-06-21T23:09:25.878048+00:00"
+    "change_3h_pct": -0.222,
+    "computed_at": "2026-06-21T23:11:29.550885+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
