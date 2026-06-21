@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-21T03:23:26.658423+00:00",
+  "generated_at": "2026-06-21T03:25:34.014887+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
@@ -6251,6 +6251,18 @@
         }
       }
     },
+    "AKEUSDT|sustained|SHORT": {
+      "symbol": "AKEUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.1
+        }
+      }
+    },
     "HUMAUSDT|burst|LONG": {
       "symbol": "HUMAUSDT",
       "alert_type": "burst",
@@ -6636,9 +6648,9 @@
           "avg_outcome_pct": 0.02
         },
         "60m": {
-          "n": 65,
-          "win_rate": 0.338,
-          "avg_outcome_pct": -0.02
+          "n": 66,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -0.03
         },
         "240m": {
           "n": 63,
