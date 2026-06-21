@@ -1,33 +1,33 @@
 {
-  "generated_at": "2026-06-21T10:05:57.399808+00:00",
+  "generated_at": "2026-06-21T10:08:03.638334+00:00",
   "stats": {
     "total_trades": 5944,
-    "open": 4,
-    "closed": 5940,
-    "wins": 1864,
+    "open": 3,
+    "closed": 5941,
+    "wins": 1865,
     "losses": 3274,
     "scratches": 802,
     "win_rate": 0.363,
     "avg_pnl_pct": 0.212,
     "best_trade": 51.11,
     "worst_trade": -9.1,
-    "total_usdt_pnl": 2515.65,
+    "total_usdt_pnl": 2522.65,
     "verdict": "⚖️ 中性 (μ +0.21% / 胜率 36%) — 继续观察",
     "verdict_class": "neutral",
     "hypothetical_notional_usdt": 200.0,
     "by_outcome": {
       "hit_b_trail": 1002,
       "hit_sl": 3770,
-      "hit_trail": 1122,
+      "hit_trail": 1123,
       "timeout": 22,
       "hit_be_sl": 24
     },
     "oi_subset": {
       "oi_match": {
-        "n": 3732,
-        "wins": 1149,
+        "n": 3733,
+        "wins": 1150,
         "win_rate": 0.308,
-        "avg_pct": 0.201
+        "avg_pct": 0.202
       },
       "oi_mismatch": {
         "n": 2208,
@@ -62,10 +62,10 @@
       "tp2": 0.01562571,
       "initial_r": 0.00023857000000000045,
       "entered_at": "2026-06-21T09:55:03.717308+00:00",
-      "current_price": 0.01482,
-      "unrealized_pnl_pct": -0.604,
+      "current_price": 0.01505,
+      "unrealized_pnl_pct": 0.939,
       "notional_usdt": 200.0,
-      "unrealized_usdt_pnl": -1.21,
+      "unrealized_usdt_pnl": 1.88,
       "funding_rate_pct": -0.0018,
       "oi_delta_5m_pct": -0.168,
       "oi_matches_direction": false,
@@ -81,8 +81,10 @@
       "phase": "A",
       "tp1_hit_at": null,
       "tp2_hit_at": null,
-      "high_water_mark": 0.01491,
-      "trailing_sl": null
+      "high_water_mark": 0.01505,
+      "trailing_sl": null,
+      "phase_a_mfe_price": 0.01505,
+      "phase_a_mfe_pct": 0.939
     },
     {
       "id": "shadow|KAVAUSDT|LONG|2026-06-21T09:56:49.709069+00:00",
@@ -102,10 +104,10 @@
       "tp2": 0.04824857,
       "initial_r": 5.2860000000001794e-05,
       "entered_at": "2026-06-21T09:57:11.384312+00:00",
-      "current_price": 0.04809,
-      "unrealized_pnl_pct": 0.0,
+      "current_price": 0.04804,
+      "unrealized_pnl_pct": -0.104,
       "notional_usdt": 200.0,
-      "unrealized_usdt_pnl": 0.0,
+      "unrealized_usdt_pnl": -0.21,
       "funding_rate_pct": -0.0038,
       "oi_delta_5m_pct": 0.037,
       "oi_matches_direction": true,
@@ -142,10 +144,10 @@
       "tp2": 0.01816,
       "initial_r": 0.0001799999999999996,
       "entered_at": "2026-06-21T09:59:29.866730+00:00",
-      "current_price": 0.01745,
-      "unrealized_pnl_pct": -0.965,
+      "current_price": 0.01751,
+      "unrealized_pnl_pct": -0.624,
       "notional_usdt": 200.0,
-      "unrealized_usdt_pnl": -1.93,
+      "unrealized_usdt_pnl": -1.25,
       "funding_rate_pct": -0.0006,
       "oi_delta_5m_pct": 0.371,
       "oi_matches_direction": true,
@@ -163,7 +165,9 @@
       "tp2_hit_at": null,
       "high_water_mark": 0.01762,
       "trailing_sl": null
-    },
+    }
+  ],
+  "recent_closed": [
     {
       "id": "shadow|IDOLUSDT|LONG|2026-06-21T09:58:47.061783+00:00",
       "shadow": true,
@@ -182,10 +186,10 @@
       "tp2": 0.02413214,
       "initial_r": 0.00019071000000000018,
       "entered_at": "2026-06-21T09:59:29.866730+00:00",
-      "current_price": 0.02467,
-      "unrealized_pnl_pct": 4.711,
+      "current_price": 0.02432,
+      "unrealized_pnl_pct": 3.226,
       "notional_usdt": 100.0,
-      "unrealized_usdt_pnl": 4.71,
+      "unrealized_usdt_pnl": 3.23,
       "funding_rate_pct": 0.005,
       "oi_delta_5m_pct": 0.02,
       "oi_matches_direction": true,
@@ -213,10 +217,17 @@
       "tp1_partial_closed": true,
       "tp1_locked_pnl_usdt": 1.45,
       "phase_c_mfe_price": 0.02467,
-      "phase_c_mfe_pct": 4.711
-    }
-  ],
-  "recent_closed": [
+      "phase_c_mfe_pct": 4.711,
+      "closed_at": "2026-06-21T10:08:02.744717+00:00",
+      "close_price": 0.024403564,
+      "close_reason": "hit_trail",
+      "gross_pnl_pct": 3.58,
+      "fee_pct": 0.08,
+      "fee_usdt": 0.08,
+      "realized_pnl_pct": 3.5,
+      "realized_usdt_pnl": 4.95,
+      "hold_time_min": 8.5
+    },
     {
       "id": "shadow|ORDIUSDT|LONG|2026-06-21T10:03:10.596298+00:00",
       "shadow": true,
