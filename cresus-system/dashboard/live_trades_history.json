@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-21T18:09:13.745249+00:00",
+  "generated_at": "2026-06-21T18:11:18.058247+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 776,
@@ -28,7 +28,7 @@
   "risk_status": {
     "block_new_opens": true,
     "reasons": [
-      "emergency stop flag exists: 'AUTO 2026-06-21T18:09:09.616190+00:00: cumulative DD 30.02% (balance $419.90 < threshold $420.00)'",
+      "emergency stop flag exists: 'AUTO 2026-06-21T18:11:13.772619+00:00: cumulative DD 30.02% (balance $419.90 < threshold $420.00)'",
       "cumulative DD 30.02% (balance $419.90 < threshold $420.00)"
     ],
     "daily_pnl": 0.0,
@@ -62756,16 +62756,26 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "BICOUSDT|SHORT|2026-06-21T18:09:06.659174+00:00",
+      "symbol": "BICOUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-06-21T18:10:21.789459+00:00",
+      "reason": "risk_gate: emergency stop flag exists: 'AUTO 2026-06-21T18:11:13.772619+00:00: cumulative DD 30.02% (balance $419.90 < threshold $420.00)', cumulative DD 30.02% (balance $419.90 < threshold $420.00)",
+      "last_checked_at": "2026-06-21T18:11:16.865870+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 64003.7,
-    "btc_ma25_1h": 64144.6,
-    "pct_vs_ma25": -0.22,
-    "change_24h_pct": 0.356,
+    "btc_price": 63963.3,
+    "btc_ma25_1h": 64142.99,
+    "pct_vs_ma25": -0.28,
+    "change_24h_pct": 0.293,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-21T18:09:13.689794+00:00"
+    "computed_at": "2026-06-21T18:11:17.998140+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
