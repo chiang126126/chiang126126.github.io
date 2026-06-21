@@ -28,7 +28,16 @@ def vet(symbol, decision, equity, ind, open_count, day_pnl_pct, total_dd_pct):
     if conf < MIN_CONFIDENCE:
         return False, f"置信度 {conf:.2f} < {MIN_CONFIDENCE}", None
 
-    # 右交易：顺势进场。做多需站上均线，做空需跌破均线，都不逆势/不接飞刀。
+    # 高周期闸门：不逆日线大趋势（±1% 中性带内多空皆放行，避免均线上下甩鞭）。
+    regime = ind.get("regime", "neutral")
+    dd = ind.get("daily_dev_pct")
+    dds = f"{dd:+.1f}%" if dd is not None else "n/a"
+    if regime == "risk-off" and bias == "LONG":
+        return False, f"日线趋势向下({dds})，禁止逆势做多", None
+    if regime == "risk-on" and bias == "SHORT":
+        return False, f"日线趋势向上({dds})，禁止逆势做空", None
+
+    # 右交易：小时级顺势进场。做多需站上均线，做空需跌破均线，都不逆势/不接飞刀。
     dev = ind.get("dev_pct")
     if dev is None:
         return False, "均线数据缺失，观望", None

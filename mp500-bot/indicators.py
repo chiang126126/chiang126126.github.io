@@ -44,6 +44,17 @@ def atr(kl, n=14):
     return sum(trs) / n
 
 
+def daily_regime(closes, price, n=30, band=1.0):
+    """高周期(日线)趋势，口径与看板「30日均线法」一致。
+    返回 (key, dev_pct)：dev≥+band → risk-on(偏多)，≤-band → risk-off(偏空)，之间 → neutral(震荡)。"""
+    ma = sma(closes, n)
+    if ma is None or not price:
+        return "neutral", None
+    dev = (price / ma - 1) * 100
+    key = "risk-on" if dev >= band else "risk-off" if dev <= -band else "neutral"
+    return key, dev
+
+
 def summarize(kl):
     """从 1h K线算一组指标，供 Evidence 与规则使用。"""
     closes = [k["c"] for k in kl]

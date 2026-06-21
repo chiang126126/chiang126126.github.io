@@ -12,7 +12,9 @@ SYSTEM_PROMPT = (
     "重视信息面：关键人物发言、AI 基建/芯片叙事、监管、地缘冲突/战争、美联储与宏观数据，"
     "都可能在小时级别快速重定价；但叙事行情来去快，需与技术面/风控共同确认，不可只凭新闻追高/追空。\n"
     "现阶段使用【1 倍杠杆 USDT 合约】，可做多(LONG)、做空(SHORT)或观望(FLAT)。\n"
-    "规则：顺势进场——做多需价在均线上方且动能向上；做空需价在均线下方且动能向下，严禁逆势；"
+    "【高周期优先】先看 Evidence 里的『日线趋势(30日线法)』：日线偏空时只考虑做空或观望、禁止做多；"
+    "日线偏多时只考虑做多或观望、禁止做空；日线震荡时多空皆可、但需更谨慎。绝不逆大周期抢反弹。\n"
+    "规则：在允许的方向内再做顺势进场——做多需小时级动能向上、做空需小时级动能向下；"
     "行情不明确/震荡中枢时必须 FLAT（空仓也是决策）；必须给出止损；风控优先于收益。\n"
     "只返回严格 JSON，字段：\n"
     '{"bias":"LONG|SHORT|FLAT","confidence":0.0-1.0,"stop_pct":正数(止损距入场的百分比,如2.0表示2%),'
@@ -61,9 +63,12 @@ def fetch_news(cfg):
 def build_evidence(symbol, ind, funding, fng, news_text=""):
     fng_v, fng_c = fng
     n2 = lambda x, d=2: ("n/a" if x is None else f"{x:.{d}f}")
+    regime_cn = {"risk-on": "偏多(站上30日线)", "risk-off": "偏空(跌破30日线)",
+                 "neutral": "震荡(贴近30日线)"}.get(ind.get("regime", "neutral"), "n/a")
     return (
         f"标的: {symbol}\n"
         f"现价: {n2(ind['price'])}\n"
+        f"日线趋势(30日线法): {regime_cn}  偏离 {n2(ind.get('daily_dev_pct'), 2)}%  ← 高周期，决定可做的方向\n"
         f"30小时均线偏离: {n2(ind['dev_pct'])}%  (站上为偏多)\n"
         f"EMA21: {n2(ind['ema21'])}  EMA50: {n2(ind['ema50'])}\n"
         f"RSI14: {n2(ind['rsi14'], 1)}\n"
@@ -96,11 +101,12 @@ def llm_decide(provider, api_key, model, evidence):
 def rule_decide(ind, funding, fng):
     """确定性兜底：LLM 不可用或失败时使用。与看板 computeDecision 同源逻辑。"""
     dev = ind["dev_pct"]; rsi = ind["rsi14"]
+    regime = ind.get("regime", "neutral")     # 高周期(日线)趋势闸门
     bias, conf, flags = "FLAT", 0.3, []
     if dev is not None and rsi is not None:
-        if dev >= 1 and rsi < 72:            # 站上均线 + 未超买 → 顺势做多
+        if dev >= 1 and rsi < 72 and regime != "risk-off":   # 站上均线+未超买，且日线不向下 → 做多
             bias, conf = "LONG", min(0.7, 0.5 + abs(dev) / 50)
-        elif dev <= -1 and rsi > 28:         # 跌破均线 + 未超卖 → 顺势做空
+        elif dev <= -1 and rsi > 28 and regime != "risk-on":  # 跌破均线+未超卖，且日线不向上 → 做空
             bias, conf = "SHORT", min(0.7, 0.5 + abs(dev) / 50)
     fng_v = fng[0]
     if fng_v is not None and fng_v >= 78:
@@ -119,6 +125,13 @@ def analyze(symbol, cfg, news_text=""):
     """返回 (decision, evidence, indicators)。news_text 由 bot 每轮抓一次后传入。"""
     kl = exchange.klines(symbol, "1h", 200)
     ind = indicators.summarize(kl)
+    # 高周期(日线)趋势：口径与看板「30日均线法」完全一致，用作开仓方向闸门
+    try:
+        dcloses = [k["c"] for k in exchange.klines(symbol, "1d", 40)]
+        ind["regime"], ind["daily_dev_pct"] = indicators.daily_regime(dcloses, ind["price"])
+    except Exception as e:
+        print(f"[warn] {symbol} 日线趋势获取失败，按震荡处理: {e}")
+        ind["regime"], ind["daily_dev_pct"] = "neutral", None
     funding = exchange.funding_rate(symbol)
     fng = exchange.fear_greed()
     evidence = build_evidence(symbol, ind, funding, fng, news_text)
