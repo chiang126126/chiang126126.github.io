@@ -653,6 +653,28 @@ LIVE_SL_COMPENSATION_MODE = "always"  # "off" | "ab" (legacy) | "abc" | "abcd" |
 LIVE_PHASE_6Q_ASYMMETRIC_COMP_ENABLED = True
 
 # ============================================================================
+# Phase 6.T (2026-06-22) — MA30 趋势 gate (不接飞刀, 只做右侧交易)
+# ============================================================================
+# 用户要求 (2026-06-22 B-staged 恢复时加): 开仓 symbol 的价格必须站在 30 日 SMA
+# 之上 (LONG) 或之下 (SHORT). 不接飞刀, 只做右侧.
+#
+# 设计:
+#   - LONG: entry_price > MA30 才放行
+#   - SHORT: entry_price < MA30 才放行
+#   - MA30 = 30 根 daily kline close 简单均值
+#   - MA30 fetch 失败 → fail-safe pass (不因数据问题阻塞 trade)
+#   - cache TTL = 300s (= MA30 daily 不会快速变化, 减 5min API 压力)
+#
+# 哲学: paper 策略 entry 是基于 short-term velocity scanner, 不考虑长期趋势.
+# Mainnet 16 天数据显示 paper 在 chop/down 也大量出 LONG (然后被扫). MA30 gate
+# 加一个 macro 趋势 filter, 强制 trade 跟周期方向一致, 提高 EV.
+#
+# 紧急回滚: LIVE_PHASE_6T_MA30_GATE_ENABLED = False
+LIVE_PHASE_6T_MA30_GATE_ENABLED = True
+LIVE_PHASE_6T_MA30_CACHE_TTL_SEC = 300       # 5 min, MA30 daily 变化慢
+LIVE_PHASE_6T_MA30_LIMIT_DAYS = 30            # SMA 周期
+
+# ============================================================================
 # Phase 6.G G3 (2026-06-12) — Close-side LIMIT-IOC + market fallback
 # ============================================================================
 # 数据驱动 (170h pilot, 419 笔 close):
@@ -1304,6 +1326,7 @@ def is_eligible_for_mirror(
     btc_regime: Optional[str] = None,
     btc_sub_regime: Optional[str] = None,
     btc_change_3h_pct: Optional[float] = None,
+    client: Optional[BinanceClient] = None,
 ) -> tuple:
     """检查 paper trade 是否应在 live mirror.
 
@@ -1317,6 +1340,8 @@ def is_eligible_for_mirror(
                     'down_rebound'). 仅用于丰富拒绝原因的日志/missed_signal 记录,
                     **不影响 gate 决策** (gate 仍然 down+LONG 一律拒).
         btc_change_3h_pct: 可选, BTC 过去 3 小时收盘价变化百分比. 同上, 仅 log.
+        client: 可选, Binance client. Phase 6.T MA30 gate 需用此 fetch klines.
+                未传时跳过 MA30 gate (向后兼容 + 单元测试便利).
 
     Returns (eligible: bool, reason: str).
     """
@@ -1560,6 +1585,30 @@ def is_eligible_for_mirror(
     #   - 8% 阈值是永不触发的死条件, 提供虚假安全感
     # 真正的反向过滤保护在 scanner 上游. 若未来 paper_trade 加入 change_4h_pct
     # 字段, 可以用 4h 趋势 (更稳健) 重新实现此 gate.
+    #
+    # Phase 6.T (2026-06-22): MA30 趋势 gate — 不接飞刀, 只做右侧.
+    # 必须最后检查 (= 经过所有其他 gate 后才决定要不要 fetch MA30 API, 节流).
+    # LONG 要求 entry_price > MA30; SHORT 要求 entry_price < MA30.
+    # client=None 跳过 (向后兼容老调用 / 单元测试便利).
+    if LIVE_PHASE_6T_MA30_GATE_ENABLED and client is not None:
+        try:
+            entry_price_for_6t = float(paper_trade.get("entry_price") or 0)
+        except (ValueError, TypeError):
+            entry_price_for_6t = 0.0
+        if entry_price_for_6t > 0:
+            ma30 = _get_ma30_for_symbol(client, sym)
+            if ma30 is not None and ma30 > 0:
+                if direction == "LONG" and entry_price_for_6t < ma30:
+                    return False, (
+                        f"phase_6t: LONG entry ${entry_price_for_6t:.6f} < "
+                        f"MA30 ${ma30:.6f} — 不接飞刀 (右侧才做)"
+                    )
+                if direction == "SHORT" and entry_price_for_6t > ma30:
+                    return False, (
+                        f"phase_6t: SHORT entry ${entry_price_for_6t:.6f} > "
+                        f"MA30 ${ma30:.6f} — 不接飞刀 (右侧才做)"
+                    )
+            # ma30 is None: fail-safe pass (不阻塞 trade), 已在 helper 内 log warning
     return True, "ok"
 
 
@@ -2316,6 +2365,59 @@ def _compute_compensated_sl(
     if psl <= 0 or le <= 0 or pe <= 0:
         return None
     return psl + (le - pe)
+
+
+# Phase 6.T (2026-06-22): MA30 cache. 模块级 dict, 5min TTL.
+# Key: symbol, Value: (ma30_value, cached_at_unix_ts).
+_MA30_CACHE: dict = {}
+
+
+def _get_ma30_for_symbol(
+    client: BinanceClient, symbol: str,
+) -> Optional[float]:
+    """获取 symbol 的 30 日 SMA (close 价均值).
+
+    Phase 6.T (2026-06-22): 不接飞刀, 只做右侧交易. paper 信号在右侧 gate 前
+    必须通过 MA30 趋势确认 (LONG: 价>MA30; SHORT: 价<MA30).
+
+    缓存 5min (LIVE_PHASE_6T_MA30_CACHE_TTL_SEC) 减少 API 压力 —
+    MA30 daily 变化极慢, 5min cache 误差极小.
+
+    Returns: MA30 (float) 或 None (API 失败, 调用方应 fail-safe pass).
+    """
+    now = time.time()
+    cached = _MA30_CACHE.get(symbol)
+    if cached is not None:
+        ma30, cached_at = cached
+        if now - cached_at < LIVE_PHASE_6T_MA30_CACHE_TTL_SEC:
+            return ma30
+    try:
+        klines = client.get_klines(
+            symbol, interval="1d", limit=LIVE_PHASE_6T_MA30_LIMIT_DAYS,
+        )
+    except (BinanceError, ValueError) as e:
+        log.warning(
+            f"[ma30] {symbol}: get_klines failed ({type(e).__name__}: {e}), "
+            f"fail-safe pass (不阻塞 trade)"
+        )
+        return None
+    if not klines or len(klines) < LIVE_PHASE_6T_MA30_LIMIT_DAYS:
+        log.warning(
+            f"[ma30] {symbol}: insufficient klines "
+            f"({len(klines) if klines else 0}/{LIVE_PHASE_6T_MA30_LIMIT_DAYS}), "
+            f"fail-safe pass"
+        )
+        return None
+    try:
+        closes = [float(k[4]) for k in klines]
+        ma30 = sum(closes) / len(closes)
+        if ma30 <= 0:
+            return None
+        _MA30_CACHE[symbol] = (ma30, now)
+        return ma30
+    except (ValueError, IndexError, TypeError) as e:
+        log.warning(f"[ma30] {symbol}: parse klines failed: {e}")
+        return None
 
 
 def _compute_btc_regime(client: BinanceClient) -> Optional[dict]:
@@ -3401,6 +3503,7 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
             btc_regime=current_regime,
             btc_sub_regime=current_sub_regime,
             btc_change_3h_pct=current_change_3h,
+            client=client,   # Phase 6.T MA30 gate 需要 client fetch klines
         )
         if eligible:
             mirror_candidates.append(pt)
@@ -3501,11 +3604,13 @@ def main_loop(client: BinanceClient, *, dry_run: bool = True) -> dict:
 
             # Re-check eligibility 用最新 live state (含本轮已 mirror 的)
             # Phase 4.F/J/K: 传 btc_regime + sub_regime + 3h 动量
+            # Phase 6.T: 传 client 启用 MA30 gate
             eligible, reason = is_eligible_for_mirror(
                 pt, live, now,
                 btc_regime=current_regime,
                 btc_sub_regime=current_sub_regime,
                 btc_change_3h_pct=current_change_3h,
+                client=client,
             )
             if not eligible:
                 log.debug(f"[skip-during-iter] {pt['symbol']}: {reason}")

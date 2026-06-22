@@ -7675,5 +7675,190 @@ class TestPhase6QAsymmetricSLCompensation(unittest.TestCase):
         self.assertEqual(comp, 99.5, "_compute_compensated_sl 公式不变")
 
 
+class TestPhase6TMA30TrendGate(unittest.TestCase):
+    """Phase 6.T (2026-06-22): MA30 趋势 gate — 不接飞刀, 只做右侧.
+
+    LONG: entry_price > MA30 才放行
+    SHORT: entry_price < MA30 才放行
+    API 失败 → fail-safe pass (不阻塞 trade)
+    cache TTL 5min
+    """
+
+    def setUp(self):
+        from datetime import datetime, timezone
+        self.now = datetime.now(timezone.utc)
+        from live_trader import _MA30_CACHE
+        _MA30_CACHE.clear()   # 每个测试干净的 cache
+
+    def _base_paper_trade(self, **kw):
+        """构造一笔通过其它所有 gate 的 paper trade. entry_price=$50, direction=LONG."""
+        t = {
+            "id": f"TESTUSDT|{kw.get('direction','LONG')}|p6t|2026-06-22T13:00:00+00:00",
+            "symbol": "TESTUSDT",
+            "direction": kw.get('direction', 'LONG'),
+            "entry_price": kw.get('entry_price', 50.0),
+            "conviction_score": 5,
+            "entered_at": self.now.isoformat(),
+            "sl": 49.0, "tp1": 52.0, "tp2": 54.0,
+            "atr_pct": 0.5, "notional_usdt": 100.0,
+            "phase": "A", "tier": "diamond",
+        }
+        t.update(kw)
+        return t
+
+    def _base_live_state(self):
+        return {
+            "live_open_trades": [], "live_closed_trades": [],
+            "mirrored_paper_ids": [], "missed_signals": [],
+        }
+
+    def _mock_client_with_ma30(self, ma30_value):
+        """构造 mock client, get_klines 返 30 根 close=ma30_value 的 daily kline."""
+        client = MagicMock()
+        # kline format: [open_time, open, high, low, close, ...]
+        klines = [[0, 0, 0, 0, str(ma30_value), 0, 0, 0, 0, 0, 0, 0] for _ in range(30)]
+        client.get_klines.return_value = klines
+        return client
+
+    def test_6t_default_enabled(self):
+        """6.T 默认开 — 这是用户授权的策略改进."""
+        self.assertTrue(live_trader.LIVE_PHASE_6T_MA30_GATE_ENABLED)
+
+    def test_6t_long_above_ma30_passes(self):
+        """LONG entry > MA30 → 应通过 (右侧交易)."""
+        from live_trader import is_eligible_for_mirror
+        t = self._base_paper_trade(direction="LONG", entry_price=55.0)
+        client = self._mock_client_with_ma30(50.0)   # MA30 = 50, entry = 55 > 50
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now,
+                btc_regime="up", client=client,
+            )
+        self.assertTrue(ok, f"LONG above MA30 应通过, reason={reason}")
+
+    def test_6t_long_below_ma30_blocked(self):
+        """LONG entry < MA30 → 应 block (= 飞刀)."""
+        from live_trader import is_eligible_for_mirror
+        t = self._base_paper_trade(direction="LONG", entry_price=45.0)
+        client = self._mock_client_with_ma30(50.0)   # MA30 = 50, entry = 45 < 50
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now,
+                btc_regime="up", client=client,
+            )
+        self.assertFalse(ok, "LONG below MA30 应 block")
+        self.assertIn("phase_6t", reason)
+        self.assertIn("不接飞刀", reason)
+
+    def test_6t_short_below_ma30_passes(self):
+        """SHORT entry < MA30 → 应通过 (右侧 SHORT)."""
+        from live_trader import is_eligible_for_mirror
+        t = self._base_paper_trade(direction="SHORT", entry_price=45.0)
+        t["sl"] = 46.0
+        client = self._mock_client_with_ma30(50.0)
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now,
+                btc_regime="down", client=client,
+            )
+        # 注: regime gate down+SHORT 通过, 但 down+LONG 拒. 这里测 6.T 通过
+        # 实际是否到 6.T 取决于其它 gate 先通过. 用 OBS mode + regime=down 应通过
+        self.assertTrue(ok, f"SHORT below MA30 应通过, reason={reason}")
+
+    def test_6t_short_above_ma30_blocked(self):
+        """SHORT entry > MA30 → 应 block (= 飞刀)."""
+        from live_trader import is_eligible_for_mirror
+        t = self._base_paper_trade(direction="SHORT", entry_price=55.0)
+        t["sl"] = 56.0
+        client = self._mock_client_with_ma30(50.0)
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now,
+                btc_regime="down", client=client,
+            )
+        self.assertFalse(ok, "SHORT above MA30 应 block")
+        self.assertIn("phase_6t", reason)
+        self.assertIn("不接飞刀", reason)
+
+    def test_6t_api_failure_fails_open(self):
+        """6.T API 失败 → fail-safe pass (不阻塞 trade)."""
+        from live_trader import is_eligible_for_mirror
+        from binance_client import BinanceError
+        t = self._base_paper_trade(direction="LONG", entry_price=45.0)
+        client = MagicMock()
+        client.get_klines.side_effect = BinanceError("rate limit")
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now,
+                btc_regime="up", client=client,
+            )
+        self.assertTrue(ok, "API 失败应 fail-safe pass")
+
+    def test_6t_no_client_skips_gate(self):
+        """6.T 无 client (向后兼容老调用) → 跳过 MA30 gate."""
+        from live_trader import is_eligible_for_mirror
+        t = self._base_paper_trade(direction="LONG", entry_price=45.0)
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now,
+                btc_regime="up",  # 没传 client
+            )
+        # 没 client 不能 fetch MA30, 跳过 gate, 应通过 (假设其他 gate 都过)
+        self.assertTrue(ok, f"No client 应跳过 6.T, reason={reason}")
+
+    def test_6t_cache_hit_reduces_api_calls(self):
+        """6.T cache: 同 symbol 5min 内多次调用应只 fetch 1 次."""
+        from live_trader import _get_ma30_for_symbol, _MA30_CACHE
+        _MA30_CACHE.clear()
+        client = self._mock_client_with_ma30(50.0)
+        # 第 1 次 fetch
+        ma30_1 = _get_ma30_for_symbol(client, "TESTUSDT")
+        # 第 2 次 应命中 cache
+        ma30_2 = _get_ma30_for_symbol(client, "TESTUSDT")
+        # 第 3 次 应命中 cache
+        ma30_3 = _get_ma30_for_symbol(client, "TESTUSDT")
+        self.assertEqual(client.get_klines.call_count, 1, "5min 内应只 fetch 1 次")
+        self.assertEqual(ma30_1, 50.0)
+        self.assertEqual(ma30_2, 50.0)
+        self.assertEqual(ma30_3, 50.0)
+
+    def test_6t_cache_expires(self):
+        """6.T cache: TTL 过后应重新 fetch."""
+        from live_trader import _get_ma30_for_symbol, _MA30_CACHE
+        import time
+        _MA30_CACHE.clear()
+        client = self._mock_client_with_ma30(50.0)
+        _get_ma30_for_symbol(client, "TESTUSDT")
+        # 模拟过期: 把 cache 时间往前推 400s (> 300 TTL)
+        if "TESTUSDT" in _MA30_CACHE:
+            ma30, t = _MA30_CACHE["TESTUSDT"]
+            _MA30_CACHE["TESTUSDT"] = (ma30, t - 400)
+        _get_ma30_for_symbol(client, "TESTUSDT")
+        self.assertEqual(client.get_klines.call_count, 2, "TTL 过后应重新 fetch")
+
+    def test_6t_disabled_skips_gate(self):
+        """6.T disabled (config off) → 跳过 gate."""
+        from live_trader import is_eligible_for_mirror
+        t = self._base_paper_trade(direction="LONG", entry_price=45.0)
+        client = self._mock_client_with_ma30(50.0)   # LONG below MA30 — 正常应 block
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True), \
+             patch.object(live_trader, "LIVE_PHASE_6T_MA30_GATE_ENABLED", False):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now,
+                btc_regime="up", client=client,
+            )
+        self.assertTrue(ok, "6.T 关闭后应通过, reason=" + reason)
+
+    def test_6t_insufficient_klines_fails_open(self):
+        """6.T klines 不够 30 根 (新上市 symbol) → fail-safe pass."""
+        from live_trader import _get_ma30_for_symbol, _MA30_CACHE
+        _MA30_CACHE.clear()
+        client = MagicMock()
+        # 只 10 根 klines (< 30 阈值)
+        client.get_klines.return_value = [[0,0,0,0,"50",0,0,0,0,0,0,0]] * 10
+        ma30 = _get_ma30_for_symbol(client, "TESTUSDT")
+        self.assertIsNone(ma30, "klines 不够应返 None (调用方 fail-safe pass)")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
