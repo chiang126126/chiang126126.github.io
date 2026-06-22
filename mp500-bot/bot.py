@@ -117,6 +117,7 @@ def main():
             still_open.append(pos)
             continue
         exit_price, reason = manage_exit(pos, kl)
+        _update_mfe(pos, kl)                       # 跟踪开仓以来的最佳有利价（MFE）
         if exit_price is None:
             still_open.append(pos)
             continue
@@ -136,12 +137,20 @@ def main():
         long = pos.get("side", "LONG") == "LONG"
         gross = (exit_price - pos["entry"]) * pos["qty"] if long else (pos["entry"] - exit_price) * pos["qty"]
         fee_out = exit_price * pos["qty"] * FEE
+        fee_total = pos.get("fee_in", 0) + fee_out
         pnl = gross - pos.get("fee_in", 0) - fee_out
+        closed = now_iso()
+        mfe_price = pos.get("mfe_price", pos["entry"])
+        mfe_pct = max(0.0, (mfe_price / pos["entry"] - 1) * 100 if long else (pos["entry"] / mfe_price - 1) * 100)
+        hold_h = _hold_hours(pos.get("opened_at"), closed)
+        analysis = _trade_analysis(pos, reason, pnl, mfe_pct)
         state["equity"] += pnl
         trades.append({**pos, "exit": exit_price, "exit_reason": reason, "pnl": round(pnl, 4),
                        "r": round(pnl / pos["risk_usdt"], 2) if pos.get("risk_usdt") else 0,
                        "outcome": "WIN" if pnl > 0 else "LOSS" if pnl < 0 else "BE",
-                       "closed_at": now_iso()})
+                       "fee_total": round(fee_total, 4), "mfe_pct": round(mfe_pct, 2),
+                       "hold_hours": round(hold_h, 1), "analysis": analysis,
+                       "closed_at": closed})
         closed_this_run.add(pos["symbol"])
         log["items"].append({"symbol": pos["symbol"], "action": f"CLOSE {reason}",
                              "price": round(exit_price, 2), "pnl": round(pnl, 2)})
@@ -215,6 +224,43 @@ def main():
 
 def _fmt_qty(q):
     return f"{q:.5f}".rstrip("0").rstrip(".")
+
+
+def _update_mfe(pos, kl):
+    """更新开仓以来的最佳有利价（MFE）：做多取最高 high，做空取最低 low。逐轮累积。"""
+    long = pos.get("side", "LONG") == "LONG"
+    best = pos.get("mfe_price", pos["entry"])
+    for k in kl:
+        if k["t"] < pos["opened_kline_t"]:
+            continue
+        best = max(best, k["h"]) if long else min(best, k["l"])
+    pos["mfe_price"] = best
+
+
+def _hold_hours(opened_at, closed_at):
+    try:
+        fmt = "%Y-%m-%dT%H:%M:%SZ"
+        o = datetime.strptime(opened_at, fmt)
+        c = datetime.strptime(closed_at, fmt)
+        return max(0.0, (c - o).total_seconds() / 3600)
+    except Exception:
+        return 0.0
+
+
+def _trade_analysis(pos, reason, pnl, mfe_pct):
+    """生成一句话盈亏归因，便于复盘。"""
+    side = "做多" if pos.get("side", "LONG") == "LONG" else "做空"
+    entry = pos["entry"]
+    target_pct = abs(pos["target"] - entry) / entry * 100 if entry else 0
+    if reason == "TARGET":
+        return f"{side}·顺利止盈（最佳浮盈 {mfe_pct:.1f}%，达标）"
+    if reason == "STOP":
+        if pnl >= 0:
+            return f"{side}·保本/微利离场"
+        if mfe_pct >= max(1.0, 0.5 * target_pct):
+            return f"{side}·曾浮盈 {mfe_pct:.1f}% 未止盈即回落触损（可考虑移动止盈/保本）"
+        return f"{side}·入场后即走反，触发止损（方向判断偏差）"
+    return f"{side}·{reason}"
 
 
 def _avg_fill(res, fallback):

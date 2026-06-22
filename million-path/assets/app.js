@@ -107,7 +107,7 @@ function regimeOf(price, sma) {
 const ADVICE = {
   "risk-on": "仓位上限 60–80%｜目标 +3%~+5%｜顺势做多，趋势单拿盈亏比",
   "neutral": "仓位上限 0–30%｜目标 0%~+2%｜少打，只做高分信号",
-  "risk-off": "仓位上限 0–20%｜目标 0%（保本第一）｜多拿 USDT，可小仓做空(S2后)"
+  "risk-off": "仓位上限 0–20%｜目标 0%（保本第一）｜偏空：只顺势做空、禁止抢多（S0 paper 已启用）"
 };
 
 async function loadMarket() {
@@ -224,6 +224,7 @@ async function loadEvents() {
 }
 
 //==================== 自动机器人（读取 bot 写入的数据）====================
+let _botState = null;   // 机器人最新状态，供顶部权益与逐秒浮动盈亏复用
 async function loadBot() {
   if (!$("botStats")) return;
   let st;
@@ -250,15 +251,9 @@ async function loadBot() {
   const tnInfo = log.testnet_usdt != null ? ` · Testnet USDT ${fmt(log.testnet_usdt, 0)}` : (log.testnet_error ? ` · Testnet:${log.testnet_error}` : "");
   $("botMode").textContent = `更新于 ${(st.updated_at || "").slice(5, 16).replace("T", " ")} · 日盈亏 ${pct(log.day_pnl_pct)} · 回撤 ${fmt(log.total_dd_pct, 1)}%${tnInfo}`;
 
-  $("botOpenBody").innerHTML = (st.positions || []).map(p => {
-    const side = p.side || "LONG", long = side === "LONG";
-    const lp = livePrice((p.symbol || "").replace("USDT", "")); let u = null;
-    if (lp != null) u = (long ? (lp - p.entry) : (p.entry - lp)) * p.qty - (p.fee_in || 0) - lp * p.qty * FEE;
-    return `<tr><td data-label="标的"><b>${p.symbol}</b> <span class="chip ${long ? "risk-on" : "risk-off"}">${side}</span></td>
-      <td data-label="入场">${fmt(p.entry, 2)}</td><td data-label="现价">${lp != null ? fmt(lp, 2) : "—"}</td>
-      <td data-label="止损">${fmt(p.stop, 2)}</td><td data-label="止盈">${fmt(p.target, 2)}</td>
-      <td data-label="浮动盈亏" class="${cls(u)}">${u == null ? "—" : (u >= 0 ? "+" : "") + fmt(u, 2) + "U"}</td></tr>`;
-  }).join("") || '<tr><td colspan="6" class="badge">当前无持仓</td></tr>';
+  _botState = st;
+  renderBotPositions();
+  updateHeroFromBot();
 
   const decTs = log.ts ? Math.floor(Date.parse(log.ts) / 1000) : null;
   const decTime = decTs ? new Date(log.ts).toLocaleString("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }) : "";
@@ -269,13 +264,56 @@ async function loadBot() {
       ${decTime ? `<span class="badge" style="color:var(--muted)">🕐 ${decTime} · ${ago(decTs)}</span>` : ""}
       <span class="badge">${it.source ? it.source + " · " : ""}${it.confidence != null ? "conf " + it.confidence + " · " : ""}${it.reason || it.rationale || ""}</span></div></div>`).join("") || '<span class="badge">暂无决策</span>';
 
-  $("botTradesBody").innerHTML = tr.slice().reverse().slice(0, 20).map(t => `<tr>
-    <td data-label="标的"><b>${t.symbol}</b> <span class="chip ${(t.side || "LONG") === "LONG" ? "risk-on" : "risk-off"}" style="font-size:10px;padding:1px 7px">${t.side || "LONG"}</span></td><td data-label="入场→出场">${fmt(t.entry, 2)} → ${fmt(t.exit, 2)}</td>
-    <td data-label="出场原因">${t.exit_reason || ""}</td>
+  $("botTradesBody").innerHTML = tr.slice().reverse().slice(0, 20).map(t => {
+    const side = t.side || "LONG";
+    return `<tr>
+    <td data-label="标的/方向"><b>${t.symbol}</b> <span class="chip ${side === "LONG" ? "risk-on" : "risk-off"}" style="font-size:10px;padding:1px 7px">${side}</span></td>
+    <td data-label="入场→出场">${fmt(t.entry, 2)} → ${fmt(t.exit, 2)}</td>
     <td data-label="盈亏" class="${cls(t.pnl)}">${(t.pnl >= 0 ? "+" : "") + fmt(t.pnl, 2)}U</td>
     <td data-label="R" class="${cls(t.r)}">${(t.r >= 0 ? "+" : "") + fmt(t.r, 2)}R</td>
+    <td data-label="最佳浮盈" class="pos">${t.mfe_pct != null ? "+" + fmt(t.mfe_pct, 1) + "%" : "—"}</td>
+    <td data-label="持仓">${fmtHold(t.hold_hours, t.opened_at, t.closed_at)}</td>
+    <td data-label="手续费">${t.fee_total != null ? fmt(t.fee_total, 3) + "U" : "—"}</td>
     <td data-label="结果"><span class="chip ${t.outcome === "WIN" ? "risk-on" : t.outcome === "LOSS" ? "risk-off" : "neutral"}">${t.outcome}</span></td>
-    <td data-label="时间" class="badge">${(t.closed_at || "").slice(5, 16).replace("T", " ")}</td></tr>`).join("") || '<tr><td colspan="7" class="badge">暂无已平仓</td></tr>';
+    <td data-label="盈亏原因" style="text-align:left;white-space:normal;max-width:240px">${t.analysis || t.exit_reason || ""}</td>
+    <td data-label="时间" class="badge">${(t.closed_at || "").slice(5, 16).replace("T", " ")}</td></tr>`;
+  }).join("") || '<tr><td colspan="10" class="badge">暂无已平仓</td></tr>';
+}
+function fmtHold(h, openedAt, closedAt) {
+  let hrs = h;
+  if (hrs == null && openedAt && closedAt) { const d = (Date.parse(closedAt) - Date.parse(openedAt)) / 3.6e6; if (!isNaN(d)) hrs = d; }
+  if (hrs == null) return "—";
+  if (hrs < 1) return Math.round(hrs * 60) + "分";
+  if (hrs < 24) return fmt(hrs, 1) + "时";
+  const dd = Math.floor(hrs / 24), hh = Math.round(hrs % 24);
+  return dd + "天" + (hh ? hh + "时" : "");
+}
+// 机器人持仓的浮动盈亏（逐秒刷新，复用最新 _botState + 实时价）
+function renderBotPositions() {
+  const body = $("botOpenBody"); if (!body || !_botState) return;
+  body.innerHTML = (_botState.positions || []).map(p => {
+    const side = p.side || "LONG", long = side === "LONG";
+    const lp = livePrice((p.symbol || "").replace("USDT", "")); let u = null;
+    if (lp != null) u = (long ? (lp - p.entry) : (p.entry - lp)) * p.qty - (p.fee_in || 0) - lp * p.qty * FEE;
+    return `<tr><td data-label="标的"><b>${p.symbol}</b> <span class="chip ${long ? "risk-on" : "risk-off"}">${side}</span></td>
+      <td data-label="入场">${fmt(p.entry, 2)}</td><td data-label="现价">${lp != null ? fmt(lp, 2) : "—"}</td>
+      <td data-label="止损">${fmt(p.stop, 2)}</td><td data-label="止盈">${fmt(p.target, 2)}</td>
+      <td data-label="浮动盈亏" class="${cls(u)}">${u == null ? "—" : (u >= 0 ? "+" : "") + fmt(u, 2) + "U"}</td></tr>`;
+  }).join("") || '<tr><td colspan="6" class="badge">当前无持仓</td></tr>';
+}
+// 顶部「组合权益」按机器人实时盯市（已实现权益 + 未平仓浮动盈亏）更新
+function updateHeroFromBot() {
+  if (!_botState) return;
+  const eq0 = _botState.equity0 || 500;
+  let eq = _botState.equity;
+  (_botState.positions || []).forEach(p => {
+    const long = (p.side || "LONG") === "LONG";
+    const lp = livePrice((p.symbol || "").replace("USDT", ""));
+    if (lp != null) eq += (long ? (lp - p.entry) : (p.entry - lp)) * p.qty - (p.fee_in || 0) - lp * p.qty * FEE;
+  });
+  const cum = (eq / eq0 - 1) * 100;
+  const he = $("heroEquity"); if (he) he.innerHTML = fmt(eq, 1) + ' <small>USDT</small>';
+  const hc = $("heroCum"); if (hc) hc.innerHTML = `<span class="${cls(cum)}">${pct(cum)}</span>`;
 }
 
 //==================== 加密新闻（CryptoCompare 直连 + 可选 RSS）====================
@@ -482,8 +520,10 @@ function renderLedger(d) {
   const wr = w.filter(x => x.win_rate_pct != null); const avgWr = wr.length ? wr.reduce((a, b) => a + b.win_rate_pct, 0) / wr.length : null;
   const pf = w.filter(x => x.profit_factor != null); const avgPf = pf.length ? pf.reduce((a, b) => a + b.profit_factor, 0) / pf.length : null;
 
-  $("heroEquity").innerHTML = fmt(last.equity_end, 0) + ' <small>USDT</small>';
-  $("heroCum").innerHTML = `<span class="${cls(cum)}">${pct(cum)}</span>`;
+  if (!_botState) {   // 机器人数据到位后，顶部权益由 updateHeroFromBot() 实时盯市，ledger 不再覆盖
+    $("heroEquity").innerHTML = fmt(last.equity_end, 0) + ' <small>USDT</small>';
+    $("heroCum").innerHTML = `<span class="${cls(cum)}">${pct(cum)}</span>`;
+  }
   $("heroStage").textContent = last.stage;
   $("heroWeeks").textContent = w.length + " 周";
   $("heroViol").innerHTML = `<span class="${viol > 0 ? 'warn' : 'pos'}">${viol}</span>`;
@@ -668,6 +708,7 @@ function applyLivePrice(name, price, chg) {
   const chgEl = $("chg-" + name);
   if (chgEl) { chgEl.textContent = pct(chg); chgEl.className = "tag " + (chg >= 0 ? "risk-on" : "risk-off"); }
   paperTick();   // 持仓中则实时刷新浮动盈亏
+  if (_botState) { renderBotPositions(); updateHeroFromBot(); }   // 机器人持仓 + 顶部权益逐秒盯市
 }
 
 const LIVE = {
