@@ -268,6 +268,7 @@ async function loadBot() {
     const side = t.side || "LONG";
     return `<tr>
     <td data-label="标的/方向"><b>${t.symbol}</b> <span class="chip ${side === "LONG" ? "risk-on" : "risk-off"}" style="font-size:10px;padding:1px 7px">${side}</span></td>
+    <td data-label="仓位">${fmtQty(t.qty, t.symbol)}</td>
     <td data-label="入场→出场">${fmt(t.entry, 2)} → ${fmt(t.exit, 2)}</td>
     <td data-label="盈亏" class="${cls(t.pnl)}">${(t.pnl >= 0 ? "+" : "") + fmt(t.pnl, 2)}U</td>
     <td data-label="R" class="${cls(t.r)}">${(t.r >= 0 ? "+" : "") + fmt(t.r, 2)}R</td>
@@ -277,7 +278,7 @@ async function loadBot() {
     <td data-label="结果"><span class="chip ${t.outcome === "WIN" ? "risk-on" : t.outcome === "LOSS" ? "risk-off" : "neutral"}">${t.outcome}</span></td>
     <td data-label="盈亏原因" style="text-align:left;white-space:normal;max-width:240px">${t.analysis || t.exit_reason || ""}</td>
     <td data-label="时间" class="badge">${(t.closed_at || "").slice(5, 16).replace("T", " ")}</td></tr>`;
-  }).join("") || '<tr><td colspan="10" class="badge">暂无已平仓</td></tr>';
+  }).join("") || '<tr><td colspan="11" class="badge">暂无已平仓</td></tr>';
 }
 function fmtHold(h, openedAt, closedAt) {
   let hrs = h;
@@ -300,13 +301,20 @@ function renderBotPositions() {
     const upct = (u != null && notional) ? u / notional * 100 : null;
     const openT = p.opened_at ? new Date(p.opened_at).toLocaleString("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }) : "—";
     return `<tr><td data-label="标的/方向"><b>${p.symbol}</b> <span class="chip ${long ? "risk-on" : "risk-off"}">${side}</span></td>
+      <td data-label="仓位">${fmtQty(p.qty, p.symbol)}</td>
       <td data-label="入场">${fmt(p.entry, 2)}</td><td data-label="现价">${lp != null ? fmt(lp, 2) : "—"}</td>
       <td data-label="止损">${fmt(p.stop, 2)}</td><td data-label="止盈">${fmt(p.target, 2)}</td>
       <td data-label="浮动盈亏" class="${cls(u)}">${u == null ? "—" : (u >= 0 ? "+" : "") + fmt(u, 2) + "U"}</td>
       <td data-label="浮盈%" class="${cls(upct)}">${upct == null ? "—" : (upct >= 0 ? "+" : "") + fmt(upct, 2) + "%"}</td>
       <td data-label="入场时间" class="badge">${openT}</td>
       <td data-label="持仓">${fmtHold(null, p.opened_at, nowISO)}</td></tr>`;
-  }).join("") || '<tr><td colspan="9" class="badge">当前无持仓</td></tr>';
+  }).join("") || '<tr><td colspan="10" class="badge">当前无持仓</td></tr>';
+}
+// 持币数量格式化：4 位有效数字 + 币种，如 0.003912 BTC
+function fmtQty(q, symbol) {
+  if (q == null) return "—";
+  const base = (symbol || "").replace("USDT", "");
+  return (+q).toLocaleString("en-US", { maximumSignificantDigits: 4 }) + (base ? " " + base : "");
 }
 // 顶部「组合权益」按机器人实时盯市（已实现权益 + 未平仓浮动盈亏）更新
 function updateHeroFromBot() {
