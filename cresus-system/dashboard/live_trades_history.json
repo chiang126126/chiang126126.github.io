@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-22T17:29:17.978582+00:00",
+  "generated_at": "2026-06-22T17:31:24.120491+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 777,
-    "open": 0,
+    "total_trades": 778,
+    "open": 1,
     "closed": 777,
     "wins": 246,
     "losses": 522,
@@ -15,30 +15,113 @@
     "avg_pnl_usdt": -0.1055,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 96.7235,
+    "fees_paid_usdt": 96.7735,
     "fees_realized_usdt": 96.7235,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.05,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 421.32,
+    "deployed_usdt": 100.0,
+    "free_capital_usdt": 321.27,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -0.2673,
-    "deployed_usdt": 0
+    "deployed_usdt": 100.0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "WUSDT"
+    ],
+    "exchange_symbols": [
+      "WUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "WUSDT|LONG|2026-06-22T17:29:40.202964+00:00",
+      "trade_id": "L1782149380_WUSDT_L",
+      "symbol": "WUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.01201,
+      "avg_fill_price": 0.01197,
+      "slippage_bps": -33.31,
+      "qty": 8354.2,
+      "notional_usdt": 99.999774,
+      "leverage": 1,
+      "risk_usdt": 0.3729,
+      "risk_pct": 0.373,
+      "mirror_latency_sec": 6.3,
+      "sl_price": 0.01188536,
+      "sl_paper_current": 0.01192536,
+      "disaster_stop_price": null,
+      "disaster_stop_at": null,
+      "maker_shadow_data": {
+        "maker_price_would_have_been": 0.01196,
+        "current_bid": 0.01196,
+        "current_ask": 0.01197,
+        "spread_bps": 8.357709987463094,
+        "market_fill_price": 0.01197,
+        "paper_signal_age_sec": 4.650665,
+        "maker_vs_market_bps": 8.361204013377586
+      },
+      "_phase_6f_b1_partial_unblock": false,
+      "_phase_6f_b2_partial_unblock": false,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -4e-05,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "C",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.01213696,
+      "tp2_price": 0.01226393,
+      "phase": "A",
+      "entry_order_id": 4875831241,
+      "entry_client_id": "cresus_L1782149380_WUSDT_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 0.47,
+      "top_trader_position_ratio": 1.0664,
+      "top_trader_account_ratio": 1.986,
+      "global_account_ratio": 1.7793,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.05,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-22T17:30:33.188927+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 64456.4,
+      "btc_change_24h_at_open": 0.533,
+      "btc_pct_vs_ma25_at_open": 0.292,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.01201,
+      "current_price": 0.0119,
+      "unrealized_pnl_usdt": -0.5848,
+      "unrealized_pnl_pct": -0.585,
+      "last_price_check_at": "2026-06-22T17:31:22.742691+00:00",
+      "phase_a_mae_price": 0.0119,
+      "phase_a_mae_pct": -0.585,
+      "phase_a_mae_at": "2026-06-22T17:31:14.779138+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "BLESSUSDT|LONG|2026-06-22T16:37:49.972600+00:00",
@@ -62861,8 +62944,8 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-22T16:55:51.069673+00:00",
-      "reason": "paper trade too old (2006s > 600s)",
-      "last_checked_at": "2026-06-22T17:29:16.796410+00:00"
+      "reason": "paper trade too old (2132s > 600s)",
+      "last_checked_at": "2026-06-22T17:31:22.742691+00:00"
     },
     {
       "paper_id": "REUSDT|LONG|2026-06-22T17:09:57.107122+00:00",
@@ -62870,19 +62953,19 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-22T17:11:00.060850+00:00",
-      "reason": "paper trade too old (1097s > 600s)",
-      "last_checked_at": "2026-06-22T17:29:16.796410+00:00"
+      "reason": "paper trade too old (1223s > 600s)",
+      "last_checked_at": "2026-06-22T17:31:22.742691+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 64519.9,
-    "btc_ma25_1h": 64271.44,
-    "pct_vs_ma25": 0.387,
-    "change_24h_pct": 0.632,
+    "btc_price": 64413.0,
+    "btc_ma25_1h": 64267.16,
+    "pct_vs_ma25": 0.227,
+    "change_24h_pct": 0.465,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-22T17:29:17.926189+00:00"
+    "computed_at": "2026-06-22T17:31:23.781476+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
