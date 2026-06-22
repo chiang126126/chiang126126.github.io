@@ -2406,7 +2406,10 @@ class TestPhase6AMainnetPilotConfig(unittest.TestCase):
         self.assertEqual(cfg['notional'], {'5': 100, '6': 130, '7': 200, '8': 100, '9': 100, '10': 100})
         self.assertEqual(cfg['max_concurrent'], 3)   # 2026-06-04: 2→3 (避免错过高 conviction 信号)
         self.assertEqual(cfg['max_deploy'], 450.0)
-        self.assertEqual(cfg['daily_dd'], 60.0)  # 10% of $600
+        # Phase 6.U (2026-06-22): B-staged P1 override daily DD 10% × $600 = $60 → $10
+        # (kill switch 触发后恢复期, 1 笔大输立即再暂停一天)
+        self.assertEqual(cfg['daily_dd'], 10.0,
+                          "Phase 6.U B-staged P1: daily DD 严控 $10")
         self.assertEqual(cfg['regime_mult'], {})  # Phase 5.S 清空
 
     def _run_pilot_tier_subprocess(self, capital_str):
@@ -7858,6 +7861,37 @@ class TestPhase6TMA30TrendGate(unittest.TestCase):
         client.get_klines.return_value = [[0,0,0,0,"50",0,0,0,0,0,0,0]] * 10
         ma30 = _get_ma30_for_symbol(client, "TESTUSDT")
         self.assertIsNone(ma30, "klines 不够应返 None (调用方 fail-safe pass)")
+
+
+class TestPhase6UBStagedP1DailyDD(unittest.TestCase):
+    """Phase 6.U (2026-06-22): B-staged Phase 1 严控 daily DD.
+
+    用户 2026-06-22 kill switch 触发后, 选 B-staged 恢复. P1 期间 daily DD
+    $60 → $10 严控. 通过 24h 观察后 (daily PnL ≥ -$5), 改 False 退回 10%.
+    """
+
+    def test_6u_default_enabled(self):
+        """6.U 默认开 (= 配 B-staged 启用)."""
+        self.assertTrue(live_trader.LIVE_PHASE_6U_BSTAGED_P1_ENABLED)
+
+    def test_6u_dd_value_is_10(self):
+        """6.U 默认 daily DD = $10 (1 笔小亏的容差)."""
+        self.assertEqual(live_trader.LIVE_PHASE_6U_BSTAGED_P1_DAILY_DD_USDT, 10.0)
+
+    def test_6u_subprocess_pilot_600_daily_dd_overridden(self):
+        """6.U 启用后, mainnet_pilot $600 daily DD 应 = $10, 不是默认 10% = $60."""
+        import subprocess, json as json_mod
+        env = dict(os.environ)
+        env['CRESUS_MODE'] = 'mainnet_pilot'
+        env['CRESUS_PILOT_CAPITAL'] = '600'
+        result = subprocess.run(
+            [sys.executable, '-c',
+             "import live_trader, json; print(json.dumps({'dd': live_trader.LIVE_DAILY_DD_LIMIT_USDT}))"],
+            env=env, capture_output=True, text=True, timeout=30,
+        )
+        self.assertEqual(result.returncode, 0, f"subprocess fail: {result.stderr}")
+        cfg = json_mod.loads(result.stdout.strip().split('\n')[-1])
+        self.assertEqual(cfg['dd'], 10.0, "6.U override 应让 daily DD = $10")
 
 
 if __name__ == "__main__":

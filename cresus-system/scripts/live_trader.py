@@ -675,6 +675,20 @@ LIVE_PHASE_6T_MA30_CACHE_TTL_SEC = 300       # 5 min, MA30 daily 变化慢
 LIVE_PHASE_6T_MA30_LIMIT_DAYS = 30            # SMA 周期
 
 # ============================================================================
+# Phase 6.U (2026-06-22) — B-staged Phase 1 严控 daily DD (恢复 from kill switch)
+# ============================================================================
+# 用户 2026-06-22 kill switch 触发 ($419.90 < $420) 后, 选 B-staged 恢复:
+#   - 转 $5 USDT 进币安子账户给 buffer ($4.90)
+#   - max_concurrent 保持 3 (用户指定, 配合 6.T MA30 严选)
+#   - daily DD limit $60 → $10 (1 笔大输立即暂停一天)
+#   - 6.T MA30 gate ON
+#
+# 启用此 flag 时, 计算后的 LIVE_DAILY_DD_LIMIT_USDT 被 override 为 $10.
+# 通过 P1 观察 (24h 内 daily PnL ≥ -$5) 后, 改 False 退回 10% × PILOT_CAPITAL.
+LIVE_PHASE_6U_BSTAGED_P1_ENABLED = True
+LIVE_PHASE_6U_BSTAGED_P1_DAILY_DD_USDT = 10.0   # 1 笔小亏 + 部分 noise 的容差
+
+# ============================================================================
 # Phase 6.G G3 (2026-06-12) — Close-side LIMIT-IOC + market fallback
 # ============================================================================
 # 数据驱动 (170h pilot, 419 笔 close):
@@ -967,6 +981,12 @@ if CRESUS_MODE == 'mainnet_pilot':
 
     # 10% 日熔断 — 例 $600 → -$60 触发暂停
     LIVE_DAILY_DD_LIMIT_USDT = round(PILOT_CAPITAL * 0.10, 2)
+
+    # Phase 6.U (2026-06-22) B-staged P1 override:
+    # 用户 kill switch 触发恢复期, 严控 daily DD 到 $10.
+    # 通过 24h 观察 (daily PnL ≥ -$5) 后改 False 退回 10% × PILOT_CAPITAL.
+    if LIVE_PHASE_6U_BSTAGED_P1_ENABLED:
+        LIVE_DAILY_DD_LIMIT_USDT = LIVE_PHASE_6U_BSTAGED_P1_DAILY_DD_USDT
 
     # Phase 5.S multipliers 一律清空 — mainnet 数据足够后再 audit 重启用
     LIVE_REGIME_SIZE_MULTIPLIER = {}
