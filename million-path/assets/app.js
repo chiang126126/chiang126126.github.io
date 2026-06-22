@@ -329,6 +329,7 @@ function updateHeroFromBot() {
   const cum = (eq / eq0 - 1) * 100;
   const he = $("heroEquity"); if (he) he.innerHTML = fmt(eq, 1) + ' <small>USDT</small>';
   const hc = $("heroCum"); if (hc) hc.innerHTML = `<span class="${cls(cum)}">${pct(cum)}</span>`;
+  const hs = $("heroStart"); if (hs) hs.textContent = fmt(eq0, 0);
 }
 
 //==================== 加密新闻（CryptoCompare 直连 + 可选 RSS）====================
