@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-23T08:21:36.384267+00:00",
+  "generated_at": "2026-06-23T08:23:43.268538+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 783,
-    "open": 1,
+    "total_trades": 784,
+    "open": 2,
     "closed": 782,
     "wins": 250,
     "losses": 523,
@@ -15,30 +15,32 @@
     "avg_pnl_usdt": -0.0991,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 97.212,
+    "fees_paid_usdt": 97.262,
     "fees_realized_usdt": 97.162,
-    "fees_open_usdt": 0.05,
+    "fees_open_usdt": 0.1,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 99.97,
-    "free_capital_usdt": 325.32,
+    "deployed_usdt": 199.98,
+    "free_capital_usdt": 225.26,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -0.5502,
-    "deployed_usdt": 99.97
+    "deployed_usdt": 199.98
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
+      "OPNUSDT",
       "INJUSDT"
     ],
     "exchange_symbols": [
+      "OPNUSDT",
       "INJUSDT"
     ]
   },
@@ -116,13 +118,91 @@
       "last_sl_sync_paper_sl": 4.5928357140000005,
       "sl_sync_count": 1,
       "phase_a_mfe_price": 4.572,
-      "current_price": 4.576,
-      "unrealized_pnl_usdt": -0.2409,
-      "unrealized_pnl_pct": -0.241,
-      "last_price_check_at": "2026-06-23T08:21:33.201580+00:00",
-      "phase_a_mae_price": 4.576,
-      "phase_a_mae_pct": -0.241,
-      "phase_a_mae_at": "2026-06-23T08:21:33.201580+00:00"
+      "current_price": 4.554,
+      "unrealized_pnl_usdt": 0.2409,
+      "unrealized_pnl_pct": 0.241,
+      "last_price_check_at": "2026-06-23T08:23:40.824999+00:00",
+      "phase_a_mae_price": 4.579,
+      "phase_a_mae_pct": -0.307,
+      "phase_a_mae_at": "2026-06-23T08:21:51.931270+00:00"
+    },
+    {
+      "paper_id": "OPNUSDT|SHORT|2026-06-23T08:20:35.790325+00:00",
+      "trade_id": "L1782202835_OPNUSDT_S",
+      "symbol": "OPNUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.07119,
+      "avg_fill_price": 0.0718466,
+      "slippage_bps": -92.23,
+      "qty": 1392.0,
+      "notional_usdt": 100.0104,
+      "leverage": 1,
+      "risk_usdt": 0.0167,
+      "risk_pct": 0.017,
+      "mirror_latency_sec": 53.0,
+      "sl_price": 0.07251516999999999,
+      "sl_paper_current": 0.07185857,
+      "disaster_stop_price": null,
+      "disaster_stop_at": null,
+      "maker_shadow_data": {
+        "maker_price_would_have_been": 0.07183,
+        "current_bid": 0.07181,
+        "current_ask": 0.07183,
+        "spread_bps": 2.784739626845743,
+        "market_fill_price": 0.07181,
+        "paper_signal_age_sec": 51.86626,
+        "maker_vs_market_bps": 2.784351942086332
+      },
+      "_phase_6f_b1_partial_unblock": false,
+      "_phase_6f_b2_partial_unblock": false,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.0006566,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "A",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.07018714,
+      "tp2_price": 0.06918429,
+      "phase": "A",
+      "entry_order_id": 519771376,
+      "entry_client_id": "cresus_L1782202835_OPNUSDT_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "burst",
+      "atr_pct": 0.626,
+      "top_trader_position_ratio": 2.498,
+      "top_trader_account_ratio": 1.1088,
+      "global_account_ratio": 0.7292,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.050005,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-23T08:22:19.456417+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 62499.2,
+      "btc_change_24h_at_open": -2.549,
+      "btc_pct_vs_ma25_at_open": -2.573,
+      "btc_sub_regime_at_open": "down_acute",
+      "btc_change_3h_at_open": -1.377,
+      "phase_a_mfe_price": 0.07119,
+      "current_price": 0.0714,
+      "unrealized_pnl_usdt": 0.6217,
+      "unrealized_pnl_pct": 0.622,
+      "last_price_check_at": "2026-06-23T08:23:40.824999+00:00",
+      "phase_a_mae_price": 0.07186,
+      "phase_a_mae_pct": -0.019,
+      "phase_a_mae_at": "2026-06-23T08:22:23.168041+00:00"
     }
   ],
   "recent_closed": [
@@ -63459,8 +63539,8 @@
       "direction": "SHORT",
       "conviction_score": 6,
       "signal_at": "2026-06-23T08:04:17.623861+00:00",
-      "reason": "paper trade too old (1036s > 600s)",
-      "last_checked_at": "2026-06-23T08:21:33.201580+00:00"
+      "reason": "paper trade too old (1163s > 600s)",
+      "last_checked_at": "2026-06-23T08:23:40.824999+00:00"
     },
     {
       "paper_id": "BICOUSDT|SHORT|2026-06-23T08:14:10.122753+00:00",
@@ -63469,7 +63549,7 @@
       "conviction_score": 9,
       "signal_at": "2026-06-23T08:15:21.418740+00:00",
       "reason": "phase_6f_b2: conviction=9 整桶 block (EXP1 仅放 D/B Tier LONG chop, 实际 TierD entry=$0.02991)",
-      "last_checked_at": "2026-06-23T08:21:33.201580+00:00"
+      "last_checked_at": "2026-06-23T08:23:40.824999+00:00"
     },
     {
       "paper_id": "GRASSUSDT|SHORT|2026-06-23T08:17:45.489183+00:00",
@@ -63478,7 +63558,7 @@
       "conviction_score": 5,
       "signal_at": "2026-06-23T08:18:03.322087+00:00",
       "reason": "phase_6m: Tier C 小币 (entry=$0.4080) 整体 block — 13 天 195 笔 -$96 (drag $1.30/笔, 全 tier 最高)",
-      "last_checked_at": "2026-06-23T08:21:33.201580+00:00"
+      "last_checked_at": "2026-06-23T08:23:40.824999+00:00"
     },
     {
       "paper_id": "RAVEUSDT|SHORT|2026-06-23T08:17:51.861727+00:00",
@@ -63487,7 +63567,7 @@
       "conviction_score": 5,
       "signal_at": "2026-06-23T08:18:03.322087+00:00",
       "reason": "phase_6m: Tier C 小币 (entry=$0.2507) 整体 block — 13 天 195 笔 -$96 (drag $1.30/笔, 全 tier 最高)",
-      "last_checked_at": "2026-06-23T08:21:33.201580+00:00"
+      "last_checked_at": "2026-06-23T08:23:40.824999+00:00"
     },
     {
       "paper_id": "RESOLVUSDT|SHORT|2026-06-23T08:19:25.208256+00:00",
@@ -63495,8 +63575,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-06-23T08:21:26.490189+00:00",
-      "reason": "phase_6t: SHORT entry $0.023900 > MA30 $0.019596 — 不接飞刀 (右侧才做)",
-      "last_checked_at": "2026-06-23T08:21:33.201580+00:00"
+      "reason": "phase_6t: SHORT entry $0.023900 > MA30 $0.019584 — 不接飞刀 (右侧才做)",
+      "last_checked_at": "2026-06-23T08:23:40.824999+00:00"
     },
     {
       "paper_id": "SIRENUSDT|SHORT|2026-06-23T08:19:44.147527+00:00",
@@ -63505,7 +63585,7 @@
       "conviction_score": 5,
       "signal_at": "2026-06-23T08:21:26.490189+00:00",
       "reason": "funding adverse (0.0798% ≥ 0.05%) (Phase 4.M: paper 历史人均 -$0.85, 不利 mirror)",
-      "last_checked_at": "2026-06-23T08:21:33.201580+00:00"
+      "last_checked_at": "2026-06-23T08:23:40.824999+00:00"
     },
     {
       "paper_id": "ETHFIUSDT|SHORT|2026-06-23T08:20:29.072558+00:00",
@@ -63514,27 +63594,18 @@
       "conviction_score": 6,
       "signal_at": "2026-06-23T08:21:26.490189+00:00",
       "reason": "phase_6m: Tier C 小币 (entry=$0.3227) 整体 block — 13 天 195 笔 -$96 (drag $1.30/笔, 全 tier 最高)",
-      "last_checked_at": "2026-06-23T08:21:33.201580+00:00"
-    },
-    {
-      "paper_id": "OPNUSDT|SHORT|2026-06-23T08:20:35.790325+00:00",
-      "symbol": "OPNUSDT",
-      "direction": "SHORT",
-      "conviction_score": 5,
-      "signal_at": "2026-06-23T08:21:26.490189+00:00",
-      "reason": "open_failed (retry next tick)",
-      "last_checked_at": "2026-06-23T08:21:33.201580+00:00"
+      "last_checked_at": "2026-06-23T08:23:40.824999+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 62450.0,
-    "btc_ma25_1h": 64147.91,
-    "pct_vs_ma25": -2.647,
-    "change_24h_pct": -2.625,
+    "btc_price": 62375.8,
+    "btc_ma25_1h": 64144.94,
+    "pct_vs_ma25": -2.758,
+    "change_24h_pct": -2.741,
     "sub_regime": "down_acute",
-    "change_3h_pct": -1.455,
-    "computed_at": "2026-06-23T08:21:34.385081+00:00"
+    "change_3h_pct": -1.572,
+    "computed_at": "2026-06-23T08:23:42.359179+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
