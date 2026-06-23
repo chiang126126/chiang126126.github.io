@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-23T08:42:16.384145+00:00",
+  "generated_at": "2026-06-23T08:44:19.837932+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 784,
-    "open": 0,
+    "total_trades": 785,
+    "open": 1,
     "closed": 784,
     "wins": 251,
     "losses": 524,
@@ -15,30 +15,116 @@
     "avg_pnl_usdt": -0.0979,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 97.3616,
+    "fees_paid_usdt": 97.4014,
     "fees_realized_usdt": 97.3616,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.0397,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 425.9,
+    "deployed_usdt": 99.35,
+    "free_capital_usdt": 326.51,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": 0.2098,
-    "deployed_usdt": 0
+    "deployed_usdt": 99.35
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "COHRUSDT"
+    ],
+    "exchange_symbols": [
+      "COHRUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "COHRUSDT|SHORT|2026-06-23T08:43:15.684585+00:00",
+      "trade_id": "L1782204195_COHRUSD_S",
+      "symbol": "COHRUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 397.44,
+      "avg_fill_price": 397.4,
+      "slippage_bps": 1.01,
+      "qty": 0.25,
+      "notional_usdt": 99.35,
+      "leverage": 1,
+      "risk_usdt": 0.6022,
+      "risk_pct": 0.606,
+      "mirror_latency_sec": 6.3,
+      "sl_price": 399.80892857,
+      "sl_paper_current": 399.80892857,
+      "disaster_stop_price": null,
+      "disaster_stop_at": null,
+      "maker_shadow_data": {
+        "maker_price_would_have_been": 397.65,
+        "current_bid": 397.4,
+        "current_ask": 397.65,
+        "spread_bps": 6.288912647003334,
+        "market_fill_price": 397.4,
+        "paper_signal_age_sec": 4.173368,
+        "maker_vs_market_bps": 6.286935747516662
+      },
+      "_phase_6f_b1_partial_unblock": false,
+      "_phase_6f_b2_partial_unblock": false,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.0,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "D",
+      "min_conviction_threshold": null,
+      "tp1_price": 393.88660714,
+      "tp2_price": 390.33321429,
+      "phase": "A",
+      "entry_order_id": 60286219,
+      "entry_client_id": "cresus_L1782204195_COHRUSD_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "burst",
+      "atr_pct": 0.397,
+      "top_trader_position_ratio": 1.029,
+      "top_trader_account_ratio": 2.5575,
+      "global_account_ratio": 2.2062,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.03974,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-23T08:43:40.820976+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 62377.3,
+      "btc_change_24h_at_open": -2.739,
+      "btc_pct_vs_ma25_at_open": -2.756,
+      "btc_sub_regime_at_open": "down_acute",
+      "btc_change_3h_at_open": -1.57,
+      "last_sl_sync_at": "2026-06-23T08:43:42.031637+00:00",
+      "last_sl_sync_paper_sl": 399.80892857,
+      "sl_sync_count": 1,
+      "phase_a_mfe_price": 397.44,
+      "current_price": 398.57,
+      "unrealized_pnl_usdt": -0.2925,
+      "unrealized_pnl_pct": -0.294,
+      "last_price_check_at": "2026-06-23T08:44:18.563447+00:00",
+      "phase_a_mae_price": 398.72,
+      "phase_a_mae_pct": -0.332,
+      "phase_a_mae_at": "2026-06-23T08:43:55.890843+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "OPNUSDT|SHORT|2026-06-23T08:20:35.790325+00:00",
@@ -63581,8 +63667,8 @@
       "direction": "SHORT",
       "conviction_score": 9,
       "signal_at": "2026-06-23T08:15:21.418740+00:00",
-      "reason": "paper trade too old (1614s > 600s)",
-      "last_checked_at": "2026-06-23T08:42:15.245727+00:00"
+      "reason": "paper trade too old (1737s > 600s)",
+      "last_checked_at": "2026-06-23T08:44:18.563447+00:00"
     },
     {
       "paper_id": "RAVEUSDT|SHORT|2026-06-23T08:17:51.861727+00:00",
@@ -63590,8 +63676,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-06-23T08:18:03.322087+00:00",
-      "reason": "paper trade too old (1452s > 600s)",
-      "last_checked_at": "2026-06-23T08:42:15.245727+00:00"
+      "reason": "paper trade too old (1575s > 600s)",
+      "last_checked_at": "2026-06-23T08:44:18.563447+00:00"
     },
     {
       "paper_id": "RESOLVUSDT|SHORT|2026-06-23T08:19:25.208256+00:00",
@@ -63599,8 +63685,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-06-23T08:21:26.490189+00:00",
-      "reason": "paper trade too old (1249s > 600s)",
-      "last_checked_at": "2026-06-23T08:42:15.245727+00:00"
+      "reason": "paper trade too old (1372s > 600s)",
+      "last_checked_at": "2026-06-23T08:44:18.563447+00:00"
     },
     {
       "paper_id": "SIRENUSDT|SHORT|2026-06-23T08:19:44.147527+00:00",
@@ -63608,8 +63694,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-06-23T08:21:26.490189+00:00",
-      "reason": "paper trade too old (1249s > 600s)",
-      "last_checked_at": "2026-06-23T08:42:15.245727+00:00"
+      "reason": "paper trade too old (1372s > 600s)",
+      "last_checked_at": "2026-06-23T08:44:18.563447+00:00"
     },
     {
       "paper_id": "ETHFIUSDT|SHORT|2026-06-23T08:20:29.072558+00:00",
@@ -63617,8 +63703,8 @@
       "direction": "SHORT",
       "conviction_score": 6,
       "signal_at": "2026-06-23T08:21:26.490189+00:00",
-      "reason": "paper trade too old (1249s > 600s)",
-      "last_checked_at": "2026-06-23T08:42:15.245727+00:00"
+      "reason": "paper trade too old (1372s > 600s)",
+      "last_checked_at": "2026-06-23T08:44:18.563447+00:00"
     },
     {
       "paper_id": "BILLUSDT|SHORT|2026-06-23T08:23:19.463826+00:00",
@@ -63626,8 +63712,8 @@
       "direction": "SHORT",
       "conviction_score": 6,
       "signal_at": "2026-06-23T08:23:51.664054+00:00",
-      "reason": "paper trade too old (1104s > 600s)",
-      "last_checked_at": "2026-06-23T08:42:15.245727+00:00"
+      "reason": "paper trade too old (1227s > 600s)",
+      "last_checked_at": "2026-06-23T08:44:18.563447+00:00"
     },
     {
       "paper_id": "1000PEPEUSDT|SHORT|2026-06-23T08:25:07.423596+00:00",
@@ -63635,8 +63721,8 @@
       "direction": "SHORT",
       "conviction_score": 6,
       "signal_at": "2026-06-23T08:27:47.033170+00:00",
-      "reason": "paper trade too old (868s > 600s)",
-      "last_checked_at": "2026-06-23T08:42:15.245727+00:00"
+      "reason": "paper trade too old (992s > 600s)",
+      "last_checked_at": "2026-06-23T08:44:18.563447+00:00"
     },
     {
       "paper_id": "TRUMPUSDT|SHORT|2026-06-23T08:25:17.733614+00:00",
@@ -63644,19 +63730,19 @@
       "direction": "SHORT",
       "conviction_score": 6,
       "signal_at": "2026-06-23T08:27:47.033170+00:00",
-      "reason": "paper trade too old (868s > 600s)",
-      "last_checked_at": "2026-06-23T08:42:15.245727+00:00"
+      "reason": "paper trade too old (992s > 600s)",
+      "last_checked_at": "2026-06-23T08:44:18.563447+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 62395.3,
-    "btc_ma25_1h": 64145.72,
-    "pct_vs_ma25": -2.729,
-    "change_24h_pct": -2.711,
+    "btc_price": 62390.3,
+    "btc_ma25_1h": 64145.52,
+    "pct_vs_ma25": -2.736,
+    "change_24h_pct": -2.719,
     "sub_regime": "down_acute",
-    "change_3h_pct": -1.541,
-    "computed_at": "2026-06-23T08:42:16.333028+00:00"
+    "change_3h_pct": -1.549,
+    "computed_at": "2026-06-23T08:44:19.508670+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
