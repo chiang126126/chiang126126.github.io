@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-23T08:17:33.890642+00:00",
+  "generated_at": "2026-06-23T08:19:34.386802+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 782,
-    "open": 0,
+    "total_trades": 783,
+    "open": 1,
     "closed": 782,
     "wins": 250,
     "losses": 523,
@@ -15,30 +15,116 @@
     "avg_pnl_usdt": -0.0991,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 97.162,
+    "fees_paid_usdt": 97.212,
     "fees_realized_usdt": 97.162,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.05,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 425.34,
+    "deployed_usdt": 99.97,
+    "free_capital_usdt": 325.32,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -0.5502,
-    "deployed_usdt": 0
+    "deployed_usdt": 99.97
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "INJUSDT"
+    ],
+    "exchange_symbols": [
+      "INJUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "INJUSDT|SHORT|2026-06-23T08:16:56.564342+00:00",
+      "trade_id": "L1782202616_INJUSDT_S",
+      "symbol": "INJUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 4.589,
+      "avg_fill_price": 4.565,
+      "slippage_bps": 52.3,
+      "qty": 21.9,
+      "notional_usdt": 99.9735,
+      "leverage": 1,
+      "risk_usdt": 0.6096,
+      "risk_pct": 0.61,
+      "mirror_latency_sec": 5.9,
+      "sl_price": 4.5928357140000005,
+      "sl_paper_current": 4.5928357140000005,
+      "disaster_stop_price": null,
+      "disaster_stop_at": null,
+      "maker_shadow_data": {
+        "maker_price_would_have_been": 4.566,
+        "current_bid": 4.565,
+        "current_ask": 4.566,
+        "spread_bps": 2.1903405979617694,
+        "market_fill_price": 4.565,
+        "paper_signal_age_sec": 4.694086,
+        "maker_vs_market_bps": 2.1901007446330394
+      },
+      "_phase_6f_b1_partial_unblock": false,
+      "_phase_6f_b2_partial_unblock": false,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": -0.0194,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "D",
+      "min_conviction_threshold": null,
+      "tp1_price": 4.56023214,
+      "tp2_price": 4.53146429,
+      "phase": "A",
+      "entry_order_id": 13177166727,
+      "entry_client_id": "cresus_L1782202616_INJUSDT_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "burst",
+      "atr_pct": 0.279,
+      "top_trader_position_ratio": 1.4071,
+      "top_trader_account_ratio": 0.6731,
+      "global_account_ratio": 0.5545,
+      "phase_a_mfe_pct": 0.349,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.049987,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-23T08:18:09.184082+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 62521.0,
+      "btc_change_24h_at_open": -2.515,
+      "btc_pct_vs_ma25_at_open": -2.541,
+      "btc_sub_regime_at_open": "down_acute",
+      "btc_change_3h_at_open": -1.343,
+      "last_sl_sync_at": "2026-06-23T08:18:09.992994+00:00",
+      "last_sl_sync_paper_sl": 4.5928357140000005,
+      "sl_sync_count": 1,
+      "phase_a_mfe_price": 4.573,
+      "current_price": 4.556,
+      "unrealized_pnl_usdt": 0.1971,
+      "unrealized_pnl_pct": 0.197,
+      "last_price_check_at": "2026-06-23T08:19:32.954367+00:00",
+      "phase_a_mae_price": 4.57,
+      "phase_a_mae_pct": -0.11,
+      "phase_a_mae_at": "2026-06-23T08:18:36.390967+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "IDUSDT|LONG|2026-06-23T01:55:41.636692+00:00",
@@ -63368,31 +63454,13 @@
   ],
   "missed_signals": [
     {
-      "paper_id": "XANUSDT|LONG|2026-06-23T08:03:48.413849+00:00",
-      "symbol": "XANUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-06-23T08:04:17.623861+00:00",
-      "reason": "paper trade too old (795s > 600s)",
-      "last_checked_at": "2026-06-23T08:17:32.739508+00:00"
-    },
-    {
       "paper_id": "OPENUSDT|SHORT|2026-06-23T08:04:12.131070+00:00",
       "symbol": "OPENUSDT",
       "direction": "SHORT",
       "conviction_score": 6,
       "signal_at": "2026-06-23T08:04:17.623861+00:00",
-      "reason": "paper trade too old (795s > 600s)",
-      "last_checked_at": "2026-06-23T08:17:32.739508+00:00"
-    },
-    {
-      "paper_id": "ARXUSDT|LONG|2026-06-23T08:12:20.514820+00:00",
-      "symbol": "ARXUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-06-23T08:12:59.056705+00:00",
-      "reason": "phase_6m: Tier C 小币 (entry=$0.4093) 整体 block — 13 天 195 笔 -$96 (drag $1.30/笔, 全 tier 最高)",
-      "last_checked_at": "2026-06-23T08:17:32.739508+00:00"
+      "reason": "paper trade too old (915s > 600s)",
+      "last_checked_at": "2026-06-23T08:19:32.954367+00:00"
     },
     {
       "paper_id": "BICOUSDT|SHORT|2026-06-23T08:14:10.122753+00:00",
@@ -63401,18 +63469,45 @@
       "conviction_score": 9,
       "signal_at": "2026-06-23T08:15:21.418740+00:00",
       "reason": "phase_6f_b2: conviction=9 整桶 block (EXP1 仅放 D/B Tier LONG chop, 实际 TierD entry=$0.02991)",
-      "last_checked_at": "2026-06-23T08:17:32.739508+00:00"
+      "last_checked_at": "2026-06-23T08:19:32.954367+00:00"
+    },
+    {
+      "paper_id": "FARTCOINUSDT|SHORT|2026-06-23T08:17:04.632063+00:00",
+      "symbol": "FARTCOINUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-06-23T08:18:03.322087+00:00",
+      "reason": "phase_6m: Tier C 小币 (entry=$0.1207) 整体 block — 13 天 195 笔 -$96 (drag $1.30/笔, 全 tier 最高)",
+      "last_checked_at": "2026-06-23T08:19:32.954367+00:00"
+    },
+    {
+      "paper_id": "GRASSUSDT|SHORT|2026-06-23T08:17:45.489183+00:00",
+      "symbol": "GRASSUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-06-23T08:18:03.322087+00:00",
+      "reason": "phase_6m: Tier C 小币 (entry=$0.4080) 整体 block — 13 天 195 笔 -$96 (drag $1.30/笔, 全 tier 最高)",
+      "last_checked_at": "2026-06-23T08:19:32.954367+00:00"
+    },
+    {
+      "paper_id": "RAVEUSDT|SHORT|2026-06-23T08:17:51.861727+00:00",
+      "symbol": "RAVEUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-06-23T08:18:03.322087+00:00",
+      "reason": "phase_6m: Tier C 小币 (entry=$0.2507) 整体 block — 13 天 195 笔 -$96 (drag $1.30/笔, 全 tier 最高)",
+      "last_checked_at": "2026-06-23T08:19:32.954367+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 62515.3,
-    "btc_ma25_1h": 64150.52,
-    "pct_vs_ma25": -2.549,
-    "change_24h_pct": -2.524,
+    "btc_price": 62412.8,
+    "btc_ma25_1h": 64146.42,
+    "pct_vs_ma25": -2.703,
+    "change_24h_pct": -2.683,
     "sub_regime": "down_acute",
-    "change_3h_pct": -1.352,
-    "computed_at": "2026-06-23T08:17:33.830704+00:00"
+    "change_3h_pct": -1.514,
+    "computed_at": "2026-06-23T08:19:34.048471+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
