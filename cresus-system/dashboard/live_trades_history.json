@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-23T17:51:38.309582+00:00",
+  "generated_at": "2026-06-23T17:53:40.251087+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 791,
@@ -64298,8 +64298,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-23T16:54:52.141075+00:00",
-      "reason": "paper trade too old (3405s > 600s)",
-      "last_checked_at": "2026-06-23T17:51:37.270693+00:00"
+      "reason": "paper trade too old (3527s > 600s)",
+      "last_checked_at": "2026-06-23T17:53:39.260310+00:00"
     },
     {
       "paper_id": "HUSDT|SHORT|2026-06-23T17:37:42.789296+00:00",
@@ -64307,19 +64307,37 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-06-23T17:38:35.541663+00:00",
-      "reason": "paper trade too old (782s > 600s)",
-      "last_checked_at": "2026-06-23T17:51:37.270693+00:00"
+      "reason": "paper trade too old (904s > 600s)",
+      "last_checked_at": "2026-06-23T17:53:39.260310+00:00"
+    },
+    {
+      "paper_id": "CBRSUSDT|LONG|2026-06-23T17:50:57.595325+00:00",
+      "symbol": "CBRSUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-23T17:51:58.278411+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.09% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-23T17:53:39.260310+00:00"
+    },
+    {
+      "paper_id": "LYNUSDT|SHORT|2026-06-23T17:51:46.264416+00:00",
+      "symbol": "LYNUSDT",
+      "direction": "SHORT",
+      "conviction_score": 6,
+      "signal_at": "2026-06-23T17:51:58.278411+00:00",
+      "reason": "phase_6f_b1: conviction=6 整桶 block (EXP1 v2 仅放 D 微币 LONG chop, entry=$0.03622 不满足)",
+      "last_checked_at": "2026-06-23T17:53:39.260310+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 62464.8,
-    "btc_ma25_1h": 63328.16,
-    "pct_vs_ma25": -1.363,
-    "change_24h_pct": -3.276,
+    "btc_price": 62403.8,
+    "btc_ma25_1h": 63325.72,
+    "pct_vs_ma25": -1.456,
+    "change_24h_pct": -3.371,
     "sub_regime": "down_stable",
-    "change_3h_pct": 0.003,
-    "computed_at": "2026-06-23T17:51:38.257625+00:00"
+    "change_3h_pct": -0.094,
+    "computed_at": "2026-06-23T17:53:40.190115+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
