@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-24T13:05:56.786992+00:00",
+  "generated_at": "2026-06-24T13:10:02.310757+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 799,
@@ -65106,16 +65106,26 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "AVGOUSDT|LONG|2026-06-24T13:05:48.926596+00:00",
+      "symbol": "AVGOUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-24T13:06:15.360010+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.38% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-24T13:10:01.288968+00:00"
+    }
+  ],
   "btc_regime_now": {
-    "regime": "chop",
-    "btc_price": 62383.9,
-    "btc_ma25_1h": 62596.58,
-    "pct_vs_ma25": -0.34,
-    "change_24h_pct": -0.1,
-    "sub_regime": null,
-    "change_3h_pct": null,
-    "computed_at": "2026-06-24T13:05:56.732508+00:00"
+    "regime": "down",
+    "btc_price": 62182.6,
+    "btc_ma25_1h": 62588.53,
+    "pct_vs_ma25": -0.649,
+    "change_24h_pct": -0.423,
+    "sub_regime": "down_stable",
+    "change_3h_pct": -0.375,
+    "computed_at": "2026-06-24T13:10:02.249041+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
