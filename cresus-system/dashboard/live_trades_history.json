@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-24T19:46:41.197672+00:00",
+  "generated_at": "2026-06-24T19:48:47.513082+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 808,
-    "open": 0,
+    "total_trades": 809,
+    "open": 1,
     "closed": 808,
     "wins": 260,
     "losses": 539,
@@ -15,30 +15,113 @@
     "avg_pnl_usdt": -0.0989,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 99.6978,
+    "fees_paid_usdt": 99.7478,
     "fees_realized_usdt": 99.6978,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.05,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 420.41,
+    "deployed_usdt": 100.02,
+    "free_capital_usdt": 320.34,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -2.4451,
-    "deployed_usdt": 0
+    "deployed_usdt": 100.02
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "MITOUSDT"
+    ],
+    "exchange_symbols": [
+      "MITOUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "MITOUSDT|SHORT|2026-06-24T19:46:54.956939+00:00",
+      "trade_id": "L1782330414_MITOUSD_S",
+      "symbol": "MITOUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.02349,
+      "avg_fill_price": 0.0235279,
+      "slippage_bps": -16.13,
+      "qty": 4251.0,
+      "notional_usdt": 100.01699,
+      "leverage": 1,
+      "risk_usdt": 0.8713,
+      "risk_pct": 0.871,
+      "mirror_latency_sec": 15.0,
+      "sl_price": 0.023770760000000002,
+      "sl_paper_current": 0.02373286,
+      "disaster_stop_price": null,
+      "disaster_stop_at": null,
+      "maker_shadow_data": {
+        "maker_price_would_have_been": 0.02353,
+        "current_bid": 0.02352,
+        "current_ask": 0.02353,
+        "spread_bps": 4.25079702444191,
+        "market_fill_price": 0.02352,
+        "paper_signal_age_sec": 13.505638,
+        "maker_vs_market_bps": 4.2498937526560105
+      },
+      "_phase_6f_b1_partial_unblock": false,
+      "_phase_6f_b2_partial_unblock": false,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 3.79e-05,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "A",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.02312571,
+      "tp2_price": 0.02276143,
+      "phase": "A",
+      "entry_order_id": 1036780859,
+      "entry_client_id": "cresus_L1782330414_MITOUSD_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "burst",
+      "atr_pct": 0.517,
+      "top_trader_position_ratio": 2.7863,
+      "top_trader_account_ratio": 1.6546,
+      "global_account_ratio": 1.1589,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.050008,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-24T19:47:22.097905+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 59770.9,
+      "btc_change_24h_at_open": -4.161,
+      "btc_pct_vs_ma25_at_open": -3.549,
+      "btc_sub_regime_at_open": "down_stable",
+      "btc_change_3h_at_open": -0.062,
+      "phase_a_mfe_price": 0.02349,
+      "current_price": 0.02353,
+      "unrealized_pnl_usdt": -0.0089,
+      "unrealized_pnl_pct": -0.009,
+      "last_price_check_at": "2026-06-24T19:48:46.220052+00:00",
+      "phase_a_mae_price": 0.02354,
+      "phase_a_mae_pct": -0.051,
+      "phase_a_mae_at": "2026-06-24T19:47:30.927936+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "RECALLUSDT|SHORT|2026-06-24T15:46:21.740765+00:00",
@@ -66039,8 +66122,8 @@
       "direction": "SHORT",
       "conviction_score": 6,
       "signal_at": "2026-06-24T15:49:18.646928+00:00",
-      "reason": "paper trade too old (14241s > 600s)",
-      "last_checked_at": "2026-06-24T19:46:39.863248+00:00"
+      "reason": "paper trade too old (14368s > 600s)",
+      "last_checked_at": "2026-06-24T19:48:46.220052+00:00"
     },
     {
       "paper_id": "PARTIUSDT|SHORT|2026-06-24T17:24:42.491630+00:00",
@@ -66048,8 +66131,8 @@
       "direction": "SHORT",
       "conviction_score": 6,
       "signal_at": "2026-06-24T17:25:25.694341+00:00",
-      "reason": "paper trade too old (8474s > 600s)",
-      "last_checked_at": "2026-06-24T19:46:39.863248+00:00"
+      "reason": "paper trade too old (8601s > 600s)",
+      "last_checked_at": "2026-06-24T19:48:46.220052+00:00"
     },
     {
       "paper_id": "BLESSUSDT|SHORT|2026-06-24T19:33:11.138562+00:00",
@@ -66057,19 +66140,19 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-06-24T19:34:04.798462+00:00",
-      "reason": "paper trade too old (755s > 600s)",
-      "last_checked_at": "2026-06-24T19:46:39.863248+00:00"
+      "reason": "paper trade too old (881s > 600s)",
+      "last_checked_at": "2026-06-24T19:48:46.220052+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 59767.1,
-    "btc_ma25_1h": 61970.17,
-    "pct_vs_ma25": -3.555,
-    "change_24h_pct": -4.167,
+    "btc_price": 59748.7,
+    "btc_ma25_1h": 61969.43,
+    "pct_vs_ma25": -3.584,
+    "change_24h_pct": -4.196,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.069,
-    "computed_at": "2026-06-24T19:46:41.140848+00:00"
+    "change_3h_pct": -0.099,
+    "computed_at": "2026-06-24T19:48:47.169244+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
