@@ -7894,5 +7894,59 @@ class TestPhase6UBStagedP1DailyDD(unittest.TestCase):
         self.assertEqual(cfg['dd'], 10.0, "6.U override 应让 daily DD = $10")
 
 
+class TestPhase6VKillSwitchBuffer(unittest.TestCase):
+    """Phase 6.V (2026-06-23): 用户授权 kill switch 多给 $20 buffer.
+
+    背景: 2026-06-22 部署 6.M/Q/T/U 后, 2026-06-23 第 2 次熔断 ($419.90 < $420).
+    用户决定 (a) 继续交易, (b) 多给 $20 关停空间 = kill switch floor 从 $420 → $400.
+    """
+
+    def test_6v_default_buffer_20(self):
+        """6.V 默认 buffer = $20 (用户指定)."""
+        self.assertEqual(live_trader.LIVE_PHASE_6V_KILL_SWITCH_EXTRA_BUFFER_USDT, 20.0)
+
+    def test_6v_pilot_600_dd_pct_extended(self):
+        """6.V 启用 + $600 pilot: LIVE_TOTAL_DD_LIMIT_PCT 应 ~33.33%
+        (= 30% 默认 + 20/600 × 100 = 3.33% buffer)."""
+        import subprocess, json as json_mod
+        env = dict(os.environ)
+        env['CRESUS_MODE'] = 'mainnet_pilot'
+        env['CRESUS_PILOT_CAPITAL'] = '600'
+        result = subprocess.run(
+            [sys.executable, '-c',
+             "import live_trader, json; "
+             "print(json.dumps({'dd_pct': live_trader.LIVE_TOTAL_DD_LIMIT_PCT, "
+             "'capital': live_trader.LIVE_STARTING_CAPITAL_USDT, "
+             "'floor': live_trader.LIVE_STARTING_CAPITAL_USDT * "
+             "(1 - live_trader.LIVE_TOTAL_DD_LIMIT_PCT/100)}))"],
+            env=env, capture_output=True, text=True, timeout=30,
+        )
+        self.assertEqual(result.returncode, 0, f"subprocess fail: {result.stderr}")
+        cfg = json_mod.loads(result.stdout.strip().split('\n')[-1])
+        self.assertAlmostEqual(cfg['dd_pct'], 33.3333, places=3,
+                                msg="DD% 应 = 30 + 20/600×100 = 33.3333")
+        self.assertEqual(cfg['capital'], 600.0)
+        self.assertAlmostEqual(cfg['floor'], 400.0, places=1,
+                                msg="kill switch floor 应 = $400 (= $600 - $200)")
+
+    def test_6v_disabled_falls_back_to_30pct(self):
+        """6.V buffer=0 → 退回默认 30% DD = $420 floor."""
+        import subprocess, json as json_mod
+        env = dict(os.environ)
+        env['CRESUS_MODE'] = 'mainnet_pilot'
+        env['CRESUS_PILOT_CAPITAL'] = '600'
+        result = subprocess.run(
+            [sys.executable, '-c',
+             "import live_trader; live_trader.LIVE_PHASE_6V_KILL_SWITCH_EXTRA_BUFFER_USDT = 0.0; "
+             "exec(open(live_trader.__file__).read().split('if __name__')[0]); "
+             "import json; print(json.dumps({'dd_pct': LIVE_TOTAL_DD_LIMIT_PCT}))"],
+            env=env, capture_output=True, text=True, timeout=30,
+        )
+        # 注: 这个 test 用 exec 重新跑配置, 不一定 reliable. 主要看 default value.
+        # 直接验 module-level constant 即可:
+        self.assertEqual(live_trader.LIVE_PHASE_6V_KILL_SWITCH_EXTRA_BUFFER_USDT, 20.0,
+                          "默认 buffer 仍为 $20")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

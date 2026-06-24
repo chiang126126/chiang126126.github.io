@@ -689,6 +689,24 @@ LIVE_PHASE_6U_BSTAGED_P1_ENABLED = True
 LIVE_PHASE_6U_BSTAGED_P1_DAILY_DD_USDT = 10.0   # 1 笔小亏 + 部分 noise 的容差
 
 # ============================================================================
+# Phase 6.V (2026-06-23) — Kill switch buffer 扩展 (用户授权多给 $20 关停空间)
+# ============================================================================
+# 用户 2026-06-23 第 2 次 kill switch 触发后, 决定继续交易 + 给 $20 额外 buffer.
+# 即 kill switch 阈值从 $420 → $400 (= $600 - $180 - $20 = $400).
+#
+# ⚠️ 工程角度的警告 (已告知用户):
+#   - 这是连续 3 天第 2 次熔断, 根因 (execution drag) 尚未被 Phase 6.Q/T/U 完全验证修复
+#   - 多给 buffer = 撤掉真正在工作的安全网, 等同于"再亏 $20 才停"
+#   - 用户接受这个 trade-off (资金是他的, 决策权在他)
+#
+# 实现: 在 mainnet_pilot 配置块, LIVE_TOTAL_DD_LIMIT_PCT 加额外 USD buffer 换算后的 %.
+#   原: 30% × $600 = $180 loss = floor $420
+#   新: 30% + ($20 / $600 × 100) = 33.33% = $200 loss = floor $400
+#
+# 紧急回滚: LIVE_PHASE_6V_KILL_SWITCH_EXTRA_BUFFER_USDT = 0.0 (退回原 30%).
+LIVE_PHASE_6V_KILL_SWITCH_EXTRA_BUFFER_USDT = 20.0
+
+# ============================================================================
 # Phase 6.G G3 (2026-06-12) — Close-side LIMIT-IOC + market fallback
 # ============================================================================
 # 数据驱动 (170h pilot, 419 笔 close):
@@ -995,6 +1013,12 @@ if CRESUS_MODE == 'mainnet_pilot':
     # 默认 $2000 / 5% (testnet 时代) 在 mainnet $600 启动瞬间触发 (因 $600 < $1900).
     LIVE_STARTING_CAPITAL_USDT = PILOT_CAPITAL
     LIVE_TOTAL_DD_LIMIT_PCT = 30.0      # 30% pilot 累计 DD — 例 $600 → 跌破 $420 停
+
+    # Phase 6.V (2026-06-23): 用户授权多给 kill switch buffer.
+    # extra_pct = $20 / $600 × 100 = 3.33%. 总 DD = 30% + 3.33% = 33.33% → floor $400.
+    if LIVE_PHASE_6V_KILL_SWITCH_EXTRA_BUFFER_USDT > 0 and PILOT_CAPITAL > 0:
+        extra_pct = LIVE_PHASE_6V_KILL_SWITCH_EXTRA_BUFFER_USDT / PILOT_CAPITAL * 100.0
+        LIVE_TOTAL_DD_LIMIT_PCT = round(LIVE_TOTAL_DD_LIMIT_PCT + extra_pct, 4)
 
     # Phase 6.A-fix: LIVE_NOTIONAL_USDT 仅用于 log 显示 (功能上由 LIVE_NOTIONAL_BY_SCORE
     # 接管). 设为 max(by_score.values()) 使 log "config: notional=$X" 反映真实最大笔.
