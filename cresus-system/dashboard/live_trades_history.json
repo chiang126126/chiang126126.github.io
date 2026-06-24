@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-24T13:12:06.221389+00:00",
+  "generated_at": "2026-06-24T13:14:11.817917+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 801,
@@ -40,8 +40,8 @@
       "1000LUNCUSDT"
     ],
     "exchange_symbols": [
-      "1000LUNCUSDT",
-      "ROBOUSDT"
+      "ROBOUSDT",
+      "1000LUNCUSDT"
     ]
   },
   "open_trades": [
@@ -60,8 +60,8 @@
       "risk_usdt": 0.6396,
       "risk_pct": 0.64,
       "mirror_latency_sec": 4.6,
-      "sl_price": 0.06137,
-      "sl_paper_current": 0.06137,
+      "sl_price": 0.06125533960000001,
+      "sl_paper_current": 0.06125533960000001,
       "disaster_stop_price": null,
       "disaster_stop_at": null,
       "maker_shadow_data": {
@@ -116,13 +116,16 @@
       "btc_change_3h_at_open": -0.517,
       "phase_a_mfe_price": 0.06097,
       "phase_b_mfe_price": 0.06097,
-      "current_price": 0.06104,
-      "unrealized_pnl_usdt": -0.0984,
-      "unrealized_pnl_pct": -0.098,
-      "last_price_check_at": "2026-06-24T13:12:04.420222+00:00",
-      "phase_b_mae_price": 0.06109,
-      "phase_b_mae_pct": -0.18,
-      "phase_b_mae_at": "2026-06-24T13:12:00.284125+00:00"
+      "current_price": 0.06112,
+      "unrealized_pnl_usdt": -0.2296,
+      "unrealized_pnl_pct": -0.23,
+      "last_price_check_at": "2026-06-24T13:14:09.834428+00:00",
+      "phase_b_mae_price": 0.06124,
+      "phase_b_mae_pct": -0.426,
+      "phase_b_mae_at": "2026-06-24T13:13:32.921831+00:00",
+      "last_sl_sync_at": "2026-06-24T13:13:24.843261+00:00",
+      "last_sl_sync_paper_sl": 0.06125533960000001,
+      "sl_sync_count": 1
     },
     {
       "paper_id": "ROBOUSDT|SHORT|2026-06-24T13:10:45.702906+00:00",
@@ -197,10 +200,13 @@
       "last_sl_sync_paper_sl": 0.01848286,
       "sl_sync_count": 1,
       "phase_a_mfe_price": 0.01842,
-      "current_price": 0.0184,
-      "unrealized_pnl_usdt": -0.0,
-      "unrealized_pnl_pct": -0.0,
-      "last_price_check_at": "2026-06-24T13:12:04.420222+00:00"
+      "current_price": 0.01843,
+      "unrealized_pnl_usdt": -0.163,
+      "unrealized_pnl_pct": -0.163,
+      "last_price_check_at": "2026-06-24T13:14:09.834428+00:00",
+      "phase_a_mae_price": 0.01845,
+      "phase_a_mae_pct": -0.272,
+      "phase_a_mae_at": "2026-06-24T13:12:37.448318+00:00"
     }
   ],
   "recent_closed": [
@@ -65277,19 +65283,28 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-24T13:06:15.360010+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.55% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-06-24T13:12:04.420222+00:00"
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.68% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-24T13:14:09.834428+00:00"
+    },
+    {
+      "paper_id": "UNIUSDT|SHORT|2026-06-24T13:12:28.171156+00:00",
+      "symbol": "UNIUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-06-24T13:13:19.513364+00:00",
+      "reason": "phase_6t: SHORT entry $2.871000 > MA30 $2.837933 — 不接飞刀 (右侧才做)",
+      "last_checked_at": "2026-06-24T13:14:09.834428+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 62071.5,
-    "btc_ma25_1h": 62584.09,
-    "pct_vs_ma25": -0.819,
-    "change_24h_pct": -0.601,
+    "btc_price": 61992.5,
+    "btc_ma25_1h": 62580.93,
+    "pct_vs_ma25": -0.94,
+    "change_24h_pct": -0.727,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.553,
-    "computed_at": "2026-06-24T13:12:05.612912+00:00"
+    "change_3h_pct": -0.68,
+    "computed_at": "2026-06-24T13:14:10.933096+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
