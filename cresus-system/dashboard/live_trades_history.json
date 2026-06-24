@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-24T15:07:46.813573+00:00",
+  "generated_at": "2026-06-24T15:09:50.740194+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 803,
-    "open": 0,
+    "total_trades": 804,
+    "open": 1,
     "closed": 803,
     "wins": 257,
     "losses": 537,
@@ -15,30 +15,116 @@
     "avg_pnl_usdt": -0.1012,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 99.1985,
+    "fees_paid_usdt": 99.2485,
     "fees_realized_usdt": 99.1985,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.05,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 419.53,
+    "deployed_usdt": 99.98,
+    "free_capital_usdt": 319.5,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -3.8237,
-    "deployed_usdt": 0
+    "deployed_usdt": 99.98
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "BICOUSDT"
+    ],
+    "exchange_symbols": [
+      "BICOUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "BICOUSDT|SHORT|2026-06-24T15:08:01.123933+00:00",
+      "trade_id": "L1782313681_BICOUSD_S",
+      "symbol": "BICOUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 0.02374,
+      "avg_fill_price": 0.02363,
+      "slippage_bps": 46.34,
+      "qty": 4231.0,
+      "notional_usdt": 99.97853,
+      "leverage": 1,
+      "risk_usdt": 1.2043,
+      "risk_pct": 1.205,
+      "mirror_latency_sec": 11.5,
+      "sl_price": 0.02391464,
+      "sl_paper_current": 0.02391464,
+      "disaster_stop_price": null,
+      "disaster_stop_at": null,
+      "maker_shadow_data": {
+        "maker_price_would_have_been": 0.02364,
+        "current_bid": 0.02363,
+        "current_ask": 0.02364,
+        "spread_bps": 4.23101332769181,
+        "market_fill_price": 0.02363,
+        "paper_signal_age_sec": 10.573333,
+        "maker_vs_market_bps": 4.230118443316241
+      },
+      "_phase_6f_b1_partial_unblock": false,
+      "_phase_6f_b2_partial_unblock": false,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": -0.0085,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "D",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.02347804,
+      "tp2_price": 0.02321607,
+      "phase": "A",
+      "entry_order_id": 2320551600,
+      "entry_client_id": "cresus_L1782313681_BICOUSD_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "burst",
+      "atr_pct": 0.49,
+      "top_trader_position_ratio": 1.4063,
+      "top_trader_account_ratio": 1.3068,
+      "global_account_ratio": 1.1295,
+      "phase_a_mfe_pct": 0.168,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.049989,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-24T15:09:03.399644+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 60836.9,
+      "btc_change_24h_at_open": -2.592,
+      "btc_pct_vs_ma25_at_open": -2.558,
+      "btc_sub_regime_at_open": "down_acute",
+      "btc_change_3h_at_open": -2.8,
+      "last_sl_sync_at": "2026-06-24T15:09:05.641221+00:00",
+      "last_sl_sync_paper_sl": 0.02391464,
+      "sl_sync_count": 1,
+      "phase_a_mfe_price": 0.0237,
+      "current_price": 0.02375,
+      "unrealized_pnl_usdt": -0.5077,
+      "unrealized_pnl_pct": -0.508,
+      "last_price_check_at": "2026-06-24T15:09:49.313118+00:00",
+      "phase_a_mae_price": 0.02375,
+      "phase_a_mae_pct": -0.508,
+      "phase_a_mae_at": "2026-06-24T15:09:49.313118+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "MYXUSDT|SHORT|2026-06-24T13:15:23.323239+00:00",
@@ -65526,8 +65612,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-06-24T14:34:03.806685+00:00",
-      "reason": "paper trade too old (2022s > 600s)",
-      "last_checked_at": "2026-06-24T15:07:45.453980+00:00"
+      "reason": "paper trade too old (2146s > 600s)",
+      "last_checked_at": "2026-06-24T15:09:49.313118+00:00"
     },
     {
       "paper_id": "GLWUSDT|LONG|2026-06-24T14:40:19.942208+00:00",
@@ -65535,8 +65621,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-24T14:40:35.219131+00:00",
-      "reason": "paper trade too old (1630s > 600s)",
-      "last_checked_at": "2026-06-24T15:07:45.453980+00:00"
+      "reason": "paper trade too old (1754s > 600s)",
+      "last_checked_at": "2026-06-24T15:09:49.313118+00:00"
     },
     {
       "paper_id": "BEUSDT|LONG|2026-06-24T14:40:32.705489+00:00",
@@ -65544,19 +65630,28 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-24T14:40:35.219131+00:00",
-      "reason": "paper trade too old (1630s > 600s)",
-      "last_checked_at": "2026-06-24T15:07:45.453980+00:00"
+      "reason": "paper trade too old (1754s > 600s)",
+      "last_checked_at": "2026-06-24T15:09:49.313118+00:00"
+    },
+    {
+      "paper_id": "MORPHOUSDT|LONG|2026-06-24T15:08:36.129930+00:00",
+      "symbol": "MORPHOUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-24T15:08:51.889403+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_acute 3h=-2.74% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-24T15:09:49.313118+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 60898.7,
-    "btc_ma25_1h": 62436.54,
-    "pct_vs_ma25": -2.463,
-    "change_24h_pct": -2.493,
+    "btc_price": 60872.7,
+    "btc_ma25_1h": 62435.5,
+    "pct_vs_ma25": -2.503,
+    "change_24h_pct": -2.535,
     "sub_regime": "down_acute",
-    "change_3h_pct": -2.701,
-    "computed_at": "2026-06-24T15:07:46.758121+00:00"
+    "change_3h_pct": -2.743,
+    "computed_at": "2026-06-24T15:09:50.399812+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
