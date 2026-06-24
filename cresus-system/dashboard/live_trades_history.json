@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-24T07:31:32.969757+00:00",
+  "generated_at": "2026-06-24T07:33:35.443620+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 794,
-    "open": 0,
+    "total_trades": 795,
+    "open": 1,
     "closed": 794,
     "wins": 254,
     "losses": 531,
@@ -15,30 +15,113 @@
     "avg_pnl_usdt": -0.0993,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 98.2979,
+    "fees_paid_usdt": 98.3479,
     "fees_realized_usdt": 98.2979,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.05,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 422.87,
+    "deployed_usdt": 100.0,
+    "free_capital_usdt": 322.82,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -1.3826,
-    "deployed_usdt": 0
+    "deployed_usdt": 100.0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "GUSDT"
+    ],
+    "exchange_symbols": [
+      "GUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "GUSDT|LONG|2026-06-24T07:31:47.395938+00:00",
+      "trade_id": "L1782286307_GUSDT_L",
+      "symbol": "GUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.003454,
+      "avg_fill_price": 0.003435,
+      "slippage_bps": -55.01,
+      "qty": 29112.0,
+      "notional_usdt": 99.99972,
+      "leverage": 1,
+      "risk_usdt": 2.2833,
+      "risk_pct": 2.283,
+      "mirror_latency_sec": 6.6,
+      "sl_price": 0.00333757,
+      "sl_paper_current": 0.00335657,
+      "disaster_stop_price": null,
+      "disaster_stop_at": null,
+      "maker_shadow_data": {
+        "maker_price_would_have_been": 0.003431,
+        "current_bid": 0.003431,
+        "current_ask": 0.003435,
+        "spread_bps": 11.65161666181211,
+        "market_fill_price": 0.003435,
+        "paper_signal_age_sec": 5.478981,
+        "maker_vs_market_bps": 11.658408627222666
+      },
+      "_phase_6f_b1_partial_unblock": false,
+      "_phase_6f_b2_partial_unblock": false,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": -1.9e-05,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": -0.0456,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "B",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.00360014,
+      "tp2_price": 0.00374629,
+      "phase": "A",
+      "entry_order_id": 1000485015,
+      "entry_client_id": "cresus_L1782286307_GUSDT_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "sustained",
+      "atr_pct": 1.41,
+      "top_trader_position_ratio": 1.2841,
+      "top_trader_account_ratio": 1.1556,
+      "global_account_ratio": 1.2095,
+      "phase_a_mfe_pct": 0.0,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.05,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-24T07:32:48.663439+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "chop",
+      "btc_price_at_open": 62657.8,
+      "btc_change_24h_at_open": -0.305,
+      "btc_pct_vs_ma25_at_open": 0.17,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "phase_a_mfe_price": 0.003454,
+      "current_price": 0.003421,
+      "unrealized_pnl_usdt": -0.4076,
+      "unrealized_pnl_pct": -0.408,
+      "last_price_check_at": "2026-06-24T07:33:34.037117+00:00",
+      "phase_a_mae_price": 0.003408,
+      "phase_a_mae_pct": -0.786,
+      "phase_a_mae_at": "2026-06-24T07:33:30.152765+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "VICUSDT|LONG|2026-06-24T06:22:45.875963+00:00",
@@ -64597,31 +64680,13 @@
   ],
   "missed_signals": [
     {
-      "paper_id": "SLXUSDT|LONG|2026-06-24T05:43:03.663042+00:00",
-      "symbol": "SLXUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-06-24T05:43:48.279005+00:00",
-      "reason": "paper trade too old (6463s > 600s)",
-      "last_checked_at": "2026-06-24T07:31:31.778677+00:00"
-    },
-    {
       "paper_id": "SPXUSDT|LONG|2026-06-24T06:25:10.850323+00:00",
       "symbol": "SPXUSDT",
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-24T06:25:27.187287+00:00",
-      "reason": "paper trade too old (3965s > 600s)",
-      "last_checked_at": "2026-06-24T07:31:31.778677+00:00"
-    },
-    {
-      "paper_id": "ALICEUSDT|LONG|2026-06-24T06:42:38.650137+00:00",
-      "symbol": "ALICEUSDT",
-      "direction": "LONG",
-      "conviction_score": 7,
-      "signal_at": "2026-06-24T06:43:11.997080+00:00",
-      "reason": "paper trade too old (2900s > 600s)",
-      "last_checked_at": "2026-06-24T07:31:31.778677+00:00"
+      "reason": "paper trade too old (4087s > 600s)",
+      "last_checked_at": "2026-06-24T07:33:34.037117+00:00"
     },
     {
       "paper_id": "EVAAUSDT|LONG|2026-06-24T06:47:18.625545+00:00",
@@ -64629,8 +64694,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-24T06:47:43.609003+00:00",
-      "reason": "paper trade too old (2628s > 600s)",
-      "last_checked_at": "2026-06-24T07:31:31.778677+00:00"
+      "reason": "paper trade too old (2750s > 600s)",
+      "last_checked_at": "2026-06-24T07:33:34.037117+00:00"
     },
     {
       "paper_id": "SAHARAUSDT|LONG|2026-06-24T07:19:05.049128+00:00",
@@ -64638,19 +64703,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-24T07:19:42.438725+00:00",
-      "reason": "paper trade too old (709s > 600s)",
-      "last_checked_at": "2026-06-24T07:31:31.778677+00:00"
+      "reason": "paper trade too old (832s > 600s)",
+      "last_checked_at": "2026-06-24T07:33:34.037117+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 62680.4,
-    "btc_ma25_1h": 62552.54,
-    "pct_vs_ma25": 0.204,
-    "change_24h_pct": -0.269,
+    "btc_price": 62684.8,
+    "btc_ma25_1h": 62552.72,
+    "pct_vs_ma25": 0.211,
+    "change_24h_pct": -0.262,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-24T07:31:32.927440+00:00"
+    "computed_at": "2026-06-24T07:33:35.132429+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
