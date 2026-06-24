@@ -1,48 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-24T09:33:23.601267+00:00",
+  "generated_at": "2026-06-24T09:35:28.879754+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 798,
-    "open": 1,
-    "closed": 797,
-    "wins": 255,
+    "open": 0,
+    "closed": 798,
+    "wins": 256,
     "losses": 533,
     "win_rate": 0.324,
-    "total_pnl_usdt": -80.7483,
-    "net_pnl_usdt": -179.3452,
-    "avg_pnl_usdt": -0.1013,
+    "total_pnl_usdt": -78.4843,
+    "net_pnl_usdt": -177.1823,
+    "avg_pnl_usdt": -0.0984,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 98.6469,
-    "fees_realized_usdt": 98.5969,
-    "fees_open_usdt": 0.05,
+    "fees_paid_usdt": 98.698,
+    "fees_realized_usdt": 98.698,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 99.97,
-    "free_capital_usdt": 320.64,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 422.82,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": -3.3019,
-    "deployed_usdt": 99.97
+    "daily_pnl": -1.0379,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "BASUSDT"
-    ],
-    "exchange_symbols": [
-      "BASUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "BASUSDT|LONG|2026-06-24T08:53:25.122559+00:00",
       "trade_id": "L1782291205_BASUSDT_L",
@@ -79,7 +76,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 6,
       "wick_filter_mode": "always",
-      "sl_breach_count": 0,
+      "sl_breach_count": 6,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.0348,
       "regime_gate_enabled": true,
@@ -102,7 +99,7 @@
       "phase_a_mfe_pct": 1.612,
       "phase_b_mfe_pct": 3.87,
       "phase_c_mfe_pct": 4.118,
-      "fees_paid_usdt": 0.049985,
+      "fees_paid_usdt": 0.101102,
       "fees_are_actual": true,
       "opened_at": "2026-06-24T08:53:50.713895+00:00",
       "is_dry_run": false,
@@ -116,18 +113,36 @@
       "last_sl_sync_paper_sl": 0.0365766025,
       "sl_sync_count": 9,
       "phase_a_mfe_price": 0.036052,
-      "current_price": 0.036905,
-      "unrealized_pnl_usdt": 3.4381,
-      "unrealized_pnl_pct": 3.439,
-      "last_price_check_at": "2026-06-24T09:33:22.326170+00:00",
+      "current_price": 0.036384,
+      "unrealized_pnl_usdt": 1.9782,
+      "unrealized_pnl_pct": 1.979,
+      "last_price_check_at": "2026-06-24T09:35:16.237427+00:00",
       "phase_a_mae_price": 0.035414,
       "phase_a_mae_pct": -0.74,
       "phase_a_mae_at": "2026-06-24T08:55:39.963134+00:00",
       "phase_b_mfe_price": 0.036853,
-      "phase_c_mfe_price": 0.036941
-    }
-  ],
-  "recent_closed": [
+      "phase_c_mfe_price": 0.036941,
+      "btc_regime_at_close": "chop",
+      "btc_price_at_close": 62653.1,
+      "btc_pct_vs_ma25_at_close": 0.15,
+      "closed_at": "2026-06-24T09:35:20.851473+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.036486,
+      "realized_pnl_usdt": 2.264,
+      "close_order_id": 1676117371,
+      "close_qty": 2802.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_method": "limit_ioc_full",
+      "actual_close_slip_bps": 3.43,
+      "limit_qty_closed": 2802.0,
+      "market_qty_closed": 0.0,
+      "mid_at_close_attempt": 0.036473500000000006,
+      "close_expected_price": 0.0365766025,
+      "close_slippage_bps": 24.77,
+      "entry_fees_usdt": 0.049985,
+      "close_fees_usdt": 0.051117
+    },
     {
       "paper_id": "TNSRUSDT|LONG|2026-06-24T09:14:54.746798+00:00",
       "trade_id": "L1782292494_TNSRUSD_L",
@@ -64995,8 +65010,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-24T06:25:27.187287+00:00",
-      "reason": "paper trade too old (11275s > 600s)",
-      "last_checked_at": "2026-06-24T09:33:22.326170+00:00"
+      "reason": "paper trade too old (11400s > 600s)",
+      "last_checked_at": "2026-06-24T09:35:27.154387+00:00"
     },
     {
       "paper_id": "SAHARAUSDT|LONG|2026-06-24T08:50:39.385970+00:00",
@@ -65004,8 +65019,8 @@
       "direction": "LONG",
       "conviction_score": 7,
       "signal_at": "2026-06-24T08:51:22.409299+00:00",
-      "reason": "paper trade too old (2520s > 600s)",
-      "last_checked_at": "2026-06-24T09:33:22.326170+00:00"
+      "reason": "paper trade too old (2645s > 600s)",
+      "last_checked_at": "2026-06-24T09:35:27.154387+00:00"
     },
     {
       "paper_id": "MAGMAUSDT|LONG|2026-06-24T09:28:12.446280+00:00",
@@ -65014,18 +65029,18 @@
       "conviction_score": 5,
       "signal_at": "2026-06-24T09:28:15.407018+00:00",
       "reason": "phase_6m: Tier C 小币 (entry=$0.4191) 整体 block — 13 天 195 笔 -$96 (drag $1.30/笔, 全 tier 最高)",
-      "last_checked_at": "2026-06-24T09:33:22.326170+00:00"
+      "last_checked_at": "2026-06-24T09:35:27.154387+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 62662.3,
-    "btc_ma25_1h": 62559.83,
-    "pct_vs_ma25": 0.164,
-    "change_24h_pct": 0.501,
+    "btc_price": 62653.2,
+    "btc_ma25_1h": 62559.47,
+    "pct_vs_ma25": 0.15,
+    "change_24h_pct": 0.486,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-24T09:33:23.264023+00:00"
+    "computed_at": "2026-06-24T09:35:28.821941+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
