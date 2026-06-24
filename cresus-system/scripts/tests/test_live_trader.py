@@ -3868,6 +3868,10 @@ class TestMirrorIterationGuards(unittest.TestCase):
         # Phase 4.H: 关闭 conv filter (这个 test class 不测它)
         self._conv_patcher = patch.object(live_trader, "LIVE_MIN_CONVICTION_SCORE", None)
         self._conv_patcher.start()
+        # Phase 6.T-strict (2026-06-24): 关闭 MA30 gate (这个 test class mock 只返 1 kline
+        # 会触发 insufficient_klines block, 不是测 6.T 行为). 单独 TestPhase6TMA30TrendGate 测.
+        self._ma30_patcher = patch.object(live_trader, "LIVE_PHASE_6T_MA30_GATE_ENABLED", False)
+        self._ma30_patcher.start()
 
         # Mock fill 默认对齐多数测试的 paper entry_price=100.0.
         # entry_price=1.0 的特殊测试 (test_same_symbol_blocks_within_iteration) 用
@@ -3883,6 +3887,7 @@ class TestMirrorIterationGuards(unittest.TestCase):
 
     def tearDown(self):
         self._conv_patcher.stop()
+        self._ma30_patcher.stop()
         live_trader.LIVE_STATE = self._orig_live_state
         live_trader.PAPER_HISTORY = self._orig_paper_history
         import shutil
@@ -7821,9 +7826,10 @@ class TestPhase6TMA30TrendGate(unittest.TestCase):
         # 第 3 次 应命中 cache
         ma30_3 = _get_ma30_for_symbol(client, "TESTUSDT")
         self.assertEqual(client.get_klines.call_count, 1, "5min 内应只 fetch 1 次")
-        self.assertEqual(ma30_1, 50.0)
-        self.assertEqual(ma30_2, 50.0)
-        self.assertEqual(ma30_3, 50.0)
+        # Phase 6.T-strict (2026-06-24): _get_ma30 现在返 (ma30, error) tuple
+        self.assertEqual(ma30_1, (50.0, None))
+        self.assertEqual(ma30_2, (50.0, None))
+        self.assertEqual(ma30_3, (50.0, None))
 
     def test_6t_cache_expires(self):
         """6.T cache: TTL 过后应重新 fetch."""
@@ -7852,15 +7858,61 @@ class TestPhase6TMA30TrendGate(unittest.TestCase):
             )
         self.assertTrue(ok, "6.T 关闭后应通过, reason=" + reason)
 
-    def test_6t_insufficient_klines_fails_open(self):
-        """6.T klines 不够 30 根 (新上市 symbol) → fail-safe pass."""
+    def test_6t_insufficient_klines_returns_strict_error(self):
+        """Phase 6.T-strict (2026-06-24): klines 不够 30 根 (新币) → block (不再 fail-safe pass).
+        新币没 30 天历史 = 无右侧锚, 应拒做."""
         from live_trader import _get_ma30_for_symbol, _MA30_CACHE
         _MA30_CACHE.clear()
         client = MagicMock()
         # 只 10 根 klines (< 30 阈值)
         client.get_klines.return_value = [[0,0,0,0,"50",0,0,0,0,0,0,0]] * 10
-        ma30 = _get_ma30_for_symbol(client, "TESTUSDT")
-        self.assertIsNone(ma30, "klines 不够应返 None (调用方 fail-safe pass)")
+        ma30, error = _get_ma30_for_symbol(client, "TESTUSDT")
+        self.assertIsNone(ma30, "klines 不够应返 ma30=None")
+        self.assertEqual(error, "insufficient_klines",
+                          "应返 error='insufficient_klines' 让调用方 block")
+
+    def test_6t_strict_blocks_new_symbol_in_gate(self):
+        """6.T-strict: is_eligible_for_mirror 收到 insufficient_klines 应 block 信号."""
+        from live_trader import is_eligible_for_mirror
+        t = self._base_paper_trade(direction="LONG", entry_price=50.0)
+        client = MagicMock()
+        # 模拟新币: 只 10 根 klines
+        client.get_klines.return_value = [[0,0,0,0,"50",0,0,0,0,0,0,0]] * 10
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now,
+                btc_regime="up", client=client,
+            )
+        self.assertFalse(ok, "新币 insufficient klines 应 block")
+        self.assertIn("phase_6t_strict", reason)
+        self.assertIn("insufficient kline history", reason)
+
+    def test_6t_strict_api_failure_still_passes(self):
+        """6.T-strict: API 失败 (transient) 仍 fail-safe pass, 不破坏 trade 流程."""
+        from live_trader import is_eligible_for_mirror
+        from binance_client import BinanceError
+        from live_trader import _MA30_CACHE
+        _MA30_CACHE.clear()
+        t = self._base_paper_trade(direction="LONG", entry_price=55.0)
+        client = MagicMock()
+        client.get_klines.side_effect = BinanceError("rate limit")
+        with patch.object(live_trader, "LIVE_OBSERVATION_MODE", True):
+            ok, reason = is_eligible_for_mirror(
+                t, self._base_live_state(), self.now,
+                btc_regime="up", client=client,
+            )
+        self.assertTrue(ok, "API 失败应 fail-safe pass, reason=" + reason)
+
+    def test_6t_get_ma30_returns_api_failed_tuple(self):
+        """6.T-strict: API 失败时 _get_ma30 返 (None, 'api_failed')."""
+        from live_trader import _get_ma30_for_symbol, _MA30_CACHE
+        from binance_client import BinanceError
+        _MA30_CACHE.clear()
+        client = MagicMock()
+        client.get_klines.side_effect = BinanceError("rate limit")
+        ma30, error = _get_ma30_for_symbol(client, "TESTUSDT")
+        self.assertIsNone(ma30)
+        self.assertEqual(error, "api_failed")
 
 
 class TestPhase6UBStagedP1DailyDD(unittest.TestCase):

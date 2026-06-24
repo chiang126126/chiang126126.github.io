@@ -1634,13 +1634,19 @@ def is_eligible_for_mirror(
     # 必须最后检查 (= 经过所有其他 gate 后才决定要不要 fetch MA30 API, 节流).
     # LONG 要求 entry_price > MA30; SHORT 要求 entry_price < MA30.
     # client=None 跳过 (向后兼容老调用 / 单元测试便利).
+    #
+    # Phase 6.T-strict (2026-06-24): 区分 fail 原因:
+    #   - insufficient_klines (新币 < 30 天): block (无右侧锚)
+    #   - api_failed / parse_failed (transient): fail-safe pass
+    # 触发: 2026-06-24 audit 发现 82 笔 insufficient klines 都被 fail-safe 放行,
+    # = 新币没保护. 用户原意"不接飞刀"应包含"不做新币" (无历史数据).
     if LIVE_PHASE_6T_MA30_GATE_ENABLED and client is not None:
         try:
             entry_price_for_6t = float(paper_trade.get("entry_price") or 0)
         except (ValueError, TypeError):
             entry_price_for_6t = 0.0
         if entry_price_for_6t > 0:
-            ma30 = _get_ma30_for_symbol(client, sym)
+            ma30, ma30_error = _get_ma30_for_symbol(client, sym)
             if ma30 is not None and ma30 > 0:
                 if direction == "LONG" and entry_price_for_6t < ma30:
                     return False, (
@@ -1652,7 +1658,13 @@ def is_eligible_for_mirror(
                         f"phase_6t: SHORT entry ${entry_price_for_6t:.6f} > "
                         f"MA30 ${ma30:.6f} — 不接飞刀 (右侧才做)"
                     )
-            # ma30 is None: fail-safe pass (不阻塞 trade), 已在 helper 内 log warning
+            elif ma30_error == "insufficient_klines":
+                # 6.T-strict: 新币结构性拒做 (无 30 天历史 = 无右侧锚)
+                return False, (
+                    f"phase_6t_strict: {sym} insufficient kline history "
+                    f"(<30d), 无右侧锚 — 拒做新币 (不接飞刀)"
+                )
+            # ma30 None + api_failed/parse_failed: fail-safe pass
     return True, "ok"
 
 
@@ -2418,23 +2430,28 @@ _MA30_CACHE: dict = {}
 
 def _get_ma30_for_symbol(
     client: BinanceClient, symbol: str,
-) -> Optional[float]:
+) -> tuple:
     """获取 symbol 的 30 日 SMA (close 价均值).
 
-    Phase 6.T (2026-06-22): 不接飞刀, 只做右侧交易. paper 信号在右侧 gate 前
-    必须通过 MA30 趋势确认 (LONG: 价>MA30; SHORT: 价<MA30).
+    Phase 6.T (2026-06-22): 不接飞刀, 只做右侧交易.
+    Phase 6.T-strict (2026-06-24): 区分 fail 原因 —
+      - 'insufficient_klines' (新币 < 30 天历史): **block** (无右侧锚, 拒做新币)
+      - 'api_failed' / 'parse_failed' (transient): fail-safe pass
 
-    缓存 5min (LIVE_PHASE_6T_MA30_CACHE_TTL_SEC) 减少 API 压力 —
-    MA30 daily 变化极慢, 5min cache 误差极小.
+    Returns: (ma30, error_reason)
+      - (float, None): 成功
+      - (None, 'insufficient_klines'): 数据不够, 调用方应 block (新币结构性风险)
+      - (None, 'api_failed'): API 失败 (transient), 调用方应 fail-safe pass
+      - (None, 'parse_failed'): 数据解析失败 (code bug), 调用方应 fail-safe pass
 
-    Returns: MA30 (float) 或 None (API 失败, 调用方应 fail-safe pass).
+    缓存 5min 减少 API 压力 — MA30 daily 变化极慢, 5min cache 误差极小.
     """
     now = time.time()
     cached = _MA30_CACHE.get(symbol)
     if cached is not None:
         ma30, cached_at = cached
         if now - cached_at < LIVE_PHASE_6T_MA30_CACHE_TTL_SEC:
-            return ma30
+            return (ma30, None)
     try:
         klines = client.get_klines(
             symbol, interval="1d", limit=LIVE_PHASE_6T_MA30_LIMIT_DAYS,
@@ -2442,26 +2459,27 @@ def _get_ma30_for_symbol(
     except (BinanceError, ValueError) as e:
         log.warning(
             f"[ma30] {symbol}: get_klines failed ({type(e).__name__}: {e}), "
-            f"fail-safe pass (不阻塞 trade)"
+            f"fail-safe pass (transient API 错, 不阻塞 trade)"
         )
-        return None
+        return (None, "api_failed")
     if not klines or len(klines) < LIVE_PHASE_6T_MA30_LIMIT_DAYS:
+        n_actual = len(klines) if klines else 0
         log.warning(
             f"[ma30] {symbol}: insufficient klines "
-            f"({len(klines) if klines else 0}/{LIVE_PHASE_6T_MA30_LIMIT_DAYS}), "
-            f"fail-safe pass"
+            f"({n_actual}/{LIVE_PHASE_6T_MA30_LIMIT_DAYS}), "
+            f"6.T-strict 拒做 (新币 < 30 天历史, 无右侧锚可参考)"
         )
-        return None
+        return (None, "insufficient_klines")
     try:
         closes = [float(k[4]) for k in klines]
         ma30 = sum(closes) / len(closes)
         if ma30 <= 0:
-            return None
+            return (None, "parse_failed")
         _MA30_CACHE[symbol] = (ma30, now)
-        return ma30
+        return (ma30, None)
     except (ValueError, IndexError, TypeError) as e:
         log.warning(f"[ma30] {symbol}: parse klines failed: {e}")
-        return None
+        return (None, "parse_failed")
 
 
 def _compute_btc_regime(client: BinanceClient) -> Optional[dict]:
