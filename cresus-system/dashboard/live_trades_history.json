@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-24T08:50:03.409586+00:00",
+  "generated_at": "2026-06-24T08:52:09.434042+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 796,
@@ -58,8 +58,8 @@
       "risk_usdt": 1.0209,
       "risk_pct": 1.021,
       "mirror_latency_sec": 8.7,
-      "sl_price": 0.03957179,
-      "sl_paper_current": 0.03957179,
+      "sl_price": 0.03992,
+      "sl_paper_current": 0.03992,
       "disaster_stop_price": null,
       "disaster_stop_at": null,
       "maker_shadow_data": {
@@ -99,7 +99,7 @@
       "top_trader_position_ratio": 1.1135,
       "top_trader_account_ratio": 1.3063,
       "global_account_ratio": 1.4056,
-      "phase_a_mfe_pct": 0.05,
+      "phase_a_mfe_pct": 0.902,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.049995,
@@ -112,14 +112,17 @@
       "btc_pct_vs_ma25_at_open": 0.304,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "last_sl_sync_at": "2026-06-24T08:49:25.780267+00:00",
-      "last_sl_sync_paper_sl": 0.03957179,
-      "sl_sync_count": 1,
-      "phase_a_mfe_price": 0.03994,
-      "current_price": 0.04002,
-      "unrealized_pnl_usdt": 0.1,
-      "unrealized_pnl_pct": 0.1,
-      "last_price_check_at": "2026-06-24T08:50:01.827316+00:00"
+      "last_sl_sync_at": "2026-06-24T08:51:26.274819+00:00",
+      "last_sl_sync_paper_sl": 0.03992,
+      "sl_sync_count": 2,
+      "phase_a_mfe_price": 0.04028,
+      "current_price": 0.04098,
+      "unrealized_pnl_usdt": 2.501,
+      "unrealized_pnl_pct": 2.501,
+      "last_price_check_at": "2026-06-24T08:52:07.728099+00:00",
+      "phase_a_mae_price": 0.03991,
+      "phase_a_mae_pct": -0.175,
+      "phase_a_mae_at": "2026-06-24T08:50:48.811714+00:00"
     }
   ],
   "recent_closed": [
@@ -64786,8 +64789,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-24T06:25:27.187287+00:00",
-      "reason": "paper trade too old (8675s > 600s)",
-      "last_checked_at": "2026-06-24T08:50:01.827316+00:00"
+      "reason": "paper trade too old (8801s > 600s)",
+      "last_checked_at": "2026-06-24T08:52:07.728099+00:00"
     },
     {
       "paper_id": "GRASSUSDT|LONG|2026-06-24T08:07:56.057977+00:00",
@@ -64795,19 +64798,28 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-24T08:08:20.382261+00:00",
-      "reason": "paper trade too old (2501s > 600s)",
-      "last_checked_at": "2026-06-24T08:50:01.827316+00:00"
+      "reason": "paper trade too old (2627s > 600s)",
+      "last_checked_at": "2026-06-24T08:52:07.728099+00:00"
+    },
+    {
+      "paper_id": "SAHARAUSDT|LONG|2026-06-24T08:50:39.385970+00:00",
+      "symbol": "SAHARAUSDT",
+      "direction": "LONG",
+      "conviction_score": 7,
+      "signal_at": "2026-06-24T08:51:22.409299+00:00",
+      "reason": "phase_6t: LONG entry $0.013740 < MA30 $0.023336 — 不接飞刀 (右侧才做)",
+      "last_checked_at": "2026-06-24T08:52:07.728099+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 62722.2,
-    "btc_ma25_1h": 62545.46,
-    "pct_vs_ma25": 0.283,
-    "change_24h_pct": 0.591,
+    "btc_price": 62750.0,
+    "btc_ma25_1h": 62546.57,
+    "pct_vs_ma25": 0.325,
+    "change_24h_pct": 0.636,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-24T08:50:03.088006+00:00"
+    "computed_at": "2026-06-24T08:52:08.829291+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
