@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-24T20:03:16.244094+00:00",
+  "generated_at": "2026-06-24T20:05:17.264998+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 810,
@@ -116,10 +116,10 @@
       "last_sl_sync_paper_sl": 183.4,
       "sl_sync_count": 2,
       "phase_a_mfe_price": 181.89,
-      "current_price": 182.52,
-      "unrealized_pnl_usdt": 0.181,
-      "unrealized_pnl_pct": 0.183,
-      "last_price_check_at": "2026-06-24T20:03:14.424435+00:00",
+      "current_price": 182.45,
+      "unrealized_pnl_usdt": 0.2188,
+      "unrealized_pnl_pct": 0.222,
+      "last_price_check_at": "2026-06-24T20:05:15.407037+00:00",
       "phase_a_mae_price": 183.6,
       "phase_a_mae_pct": -0.407,
       "phase_a_mae_at": "2026-06-24T19:53:04.610597+00:00"
@@ -66227,8 +66227,8 @@
       "direction": "SHORT",
       "conviction_score": 6,
       "signal_at": "2026-06-24T17:25:25.694341+00:00",
-      "reason": "paper trade too old (9469s > 600s)",
-      "last_checked_at": "2026-06-24T20:03:14.424435+00:00"
+      "reason": "paper trade too old (9590s > 600s)",
+      "last_checked_at": "2026-06-24T20:05:15.407037+00:00"
     },
     {
       "paper_id": "BASUSDT|SHORT|2026-06-24T19:52:44.281401+00:00",
@@ -66236,19 +66236,37 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-06-24T19:53:45.368398+00:00",
-      "reason": "phase_6h1: down+SHORT in down_rebound 陷阱反弹 sub=down_rebound 3h=+1.36% (数据驱动: n=11 WR 18% -$11.63)",
-      "last_checked_at": "2026-06-24T20:03:14.424435+00:00"
+      "reason": "paper trade too old (690s > 600s)",
+      "last_checked_at": "2026-06-24T20:05:15.407037+00:00"
+    },
+    {
+      "paper_id": "DRAMUSDT|LONG|2026-06-24T20:01:55.774127+00:00",
+      "symbol": "DRAMUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-24T20:04:16.897320+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_rebound 3h=+1.46% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-24T20:05:15.407037+00:00"
+    },
+    {
+      "paper_id": "AEROUSDT|LONG|2026-06-24T20:03:13.495836+00:00",
+      "symbol": "AEROUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-24T20:04:16.897320+00:00",
+      "reason": "phase_6m: Tier C 小币 (entry=$0.4913) 整体 block — 13 天 195 笔 -$96 (drag $1.30/笔, 全 tier 最高)",
+      "last_checked_at": "2026-06-24T20:05:15.407037+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 60170.4,
-    "btc_ma25_1h": 61888.62,
-    "pct_vs_ma25": -2.776,
-    "change_24h_pct": -3.635,
+    "btc_price": 60227.5,
+    "btc_ma25_1h": 61890.91,
+    "pct_vs_ma25": -2.688,
+    "change_24h_pct": -3.543,
     "sub_regime": "down_rebound",
-    "change_3h_pct": 1.359,
-    "computed_at": "2026-06-24T20:03:15.900271+00:00"
+    "change_3h_pct": 1.455,
+    "computed_at": "2026-06-24T20:05:16.924182+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
