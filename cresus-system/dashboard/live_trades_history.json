@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-25T09:22:57.110572+00:00",
+  "generated_at": "2026-06-25T09:25:00.543109+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 812,
@@ -88,7 +88,7 @@
       "min_conviction_threshold": null,
       "tp1_price": 0.0083497,
       "tp2_price": 0.00844339,
-      "phase": "A",
+      "phase": "B",
       "entry_order_id": 1573082751,
       "entry_client_id": "cresus_L1782378496_BLESSUS_L_E",
       "sl_order_id": null,
@@ -99,8 +99,8 @@
       "top_trader_position_ratio": 2.1534,
       "top_trader_account_ratio": 1.8977,
       "global_account_ratio": 1.8777,
-      "phase_a_mfe_pct": 1.126,
-      "phase_b_mfe_pct": null,
+      "phase_a_mfe_pct": 2.265,
+      "phase_b_mfe_pct": 2.265,
       "phase_c_mfe_pct": null,
       "fees_paid_usdt": 0.049999,
       "fees_are_actual": true,
@@ -112,17 +112,18 @@
       "btc_pct_vs_ma25_at_open": 0.897,
       "btc_sub_regime_at_open": null,
       "btc_change_3h_at_open": null,
-      "phase_a_mfe_price": 0.008349,
-      "current_price": 0.008444,
-      "unrealized_pnl_usdt": 2.5877,
-      "unrealized_pnl_pct": 2.588,
-      "last_price_check_at": "2026-06-25T09:22:55.664131+00:00",
+      "phase_a_mfe_price": 0.008443,
+      "current_price": 0.00851,
+      "unrealized_pnl_usdt": 3.3896,
+      "unrealized_pnl_pct": 3.39,
+      "last_price_check_at": "2026-06-25T09:24:59.252369+00:00",
       "phase_a_mae_price": 0.008167,
       "phase_a_mae_pct": -0.778,
       "phase_a_mae_at": "2026-06-25T09:13:23.015904+00:00",
       "last_sl_sync_at": "2026-06-25T09:21:48.781491+00:00",
       "last_sl_sync_paper_sl": 0.008256,
-      "sl_sync_count": 1
+      "sl_sync_count": 1,
+      "phase_b_mfe_price": 0.008443
     }
   ],
   "recent_closed": [
@@ -66431,19 +66432,37 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-25T09:08:54.584210+00:00",
-      "reason": "paper trade too old (841s > 600s)",
-      "last_checked_at": "2026-06-25T09:22:55.664131+00:00"
+      "reason": "paper trade too old (965s > 600s)",
+      "last_checked_at": "2026-06-25T09:24:59.252369+00:00"
+    },
+    {
+      "paper_id": "BTWUSDT|LONG|2026-06-25T09:23:04.061639+00:00",
+      "symbol": "BTWUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-25T09:23:56.024872+00:00",
+      "reason": "phase_6m: Tier C 小币 (entry=$0.1003) 整体 block — 13 天 195 笔 -$96 (drag $1.30/笔, 全 tier 最高)",
+      "last_checked_at": "2026-06-25T09:24:59.252369+00:00"
+    },
+    {
+      "paper_id": "HYPERUSDT|LONG|2026-06-25T09:23:48.019951+00:00",
+      "symbol": "HYPERUSDT",
+      "direction": "LONG",
+      "conviction_score": 6,
+      "signal_at": "2026-06-25T09:23:56.024872+00:00",
+      "reason": "phase_6f_b1: conviction=6 整桶 block (EXP1 v2 仅放 D 微币 LONG chop, entry=$0.08180 不满足)",
+      "last_checked_at": "2026-06-25T09:24:59.252369+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 61585.0,
-    "btc_ma25_1h": 61151.92,
-    "pct_vs_ma25": 0.708,
-    "change_24h_pct": -1.7,
+    "btc_price": 61638.2,
+    "btc_ma25_1h": 61154.05,
+    "pct_vs_ma25": 0.792,
+    "change_24h_pct": -1.615,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-25T09:22:56.770992+00:00"
+    "computed_at": "2026-06-25T09:25:00.191527+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
