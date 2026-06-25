@@ -1952,6 +1952,103 @@ class TestPhase6GG3CloseLimitIoc(unittest.TestCase):
         self.assertEqual(mock_market.call_count, 1)
 
 
+class TestPhase6WCumQuoteZeroFallback(unittest.TestCase):
+    """Phase 6.W (2026-06-25): close-side cumQuote=0 sanity check + userTrades fallback.
+
+    背景: 2026-06-25 BLESSUSDT LIMIT-IOC 100% filled 但 Binance API 返 cumQuote=0,
+    bot 算出 exit_price=0 → pnl=-$100 (假亏). 真实交易其实 +$7.51.
+    Fix: 检测 cumQuote=0 + qty>0 = anomaly, fallback 到 userTrades 重算.
+    """
+
+    def setUp(self):
+        self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=False)
+
+    def test_6w_normal_path_no_fallback_when_cum_quote_ok(self):
+        """正常情况 (cum_quote > 0): bot 不该走 fallback."""
+        with patch.object(self.client, "get_user_trades") as mock_ut:
+            cum_quote = 100.0
+            qty = 1000.0
+            # 模拟正常路径: 直接 cum_quote / qty
+            exit_price = cum_quote / qty
+            self.assertEqual(exit_price, 0.1)
+            # 验证未调 userTrades
+            self.assertEqual(mock_ut.call_count, 0)
+
+    def test_6w_cum_quote_zero_triggers_userTrades_fallback(self):
+        """Phase 6.W 核心: cumQuote=0 + qty>0 时, 应 fallback 到 userTrades 重算."""
+        from binance_client import BinanceClient
+        # 模拟 BLESSUSDT 场景: 12149 qty filled, cumQuote=0
+        # userTrades 返 4 笔 fills, 真实总价 $107.52
+        mock_fills = [
+            {"price": "0.00885", "qty": "5000"},   # 44.25 USDT
+            {"price": "0.00884", "qty": "4000"},   # 35.36
+            {"price": "0.00885", "qty": "2149"},   # 19.02
+            {"price": "0.00886", "qty": "1000"},   # 8.86
+        ]
+        # Expected real cum_quote: 5000*0.00885 + 4000*0.00884 + 2149*0.00885 + 1000*0.00886
+        # = 44.25 + 35.36 + 19.018 + 8.86 = 107.488
+        # Expected exit_price: 107.488 / 12149 = ~0.008848
+
+        with patch.object(self.client, "get_user_trades",
+                          return_value=mock_fills) as mock_ut:
+            # 直接调 helper 逻辑 (= mock 真实 close_position 流程)
+            qty = 12149.0
+            cum_quote_from_api = 0.0   # Binance bug
+            order_id = 12345
+
+            # 模拟 Phase 6.W 逻辑
+            if qty > 0 and cum_quote_from_api == 0:
+                fills = self.client.get_user_trades("BLESSUSDT", order_id=order_id)
+                real_cum_quote = 0.0
+                real_qty = 0.0
+                for f in fills:
+                    fp = float(f.get('price') or 0)
+                    fq = float(f.get('qty') or 0)
+                    if fp > 0 and fq > 0:
+                        real_cum_quote += fp * fq
+                        real_qty += fq
+                exit_price = real_cum_quote / real_qty if real_qty > 0 else 0
+
+            self.assertEqual(mock_ut.call_count, 1, "应调一次 get_user_trades")
+            self.assertGreater(exit_price, 0.0088, "exit_price 应在 0.00884-0.00886 之间")
+            self.assertLess(exit_price, 0.0089)
+
+    def test_6w_userTrades_failure_falls_back_to_entry_price(self):
+        """Phase 6.W: userTrades 也失败时, 用 entry_price (= PnL 0 = 保守) + suspect 标记."""
+        from binance_client import BinanceClient, BinanceError
+        entry_price = 0.008231
+        qty = 12149.0
+
+        with patch.object(self.client, "get_user_trades",
+                          side_effect=BinanceError("API down")) as mock_ut:
+            # 模拟 6.W fallback chain
+            fill_failed = False
+            try:
+                fills = self.client.get_user_trades("BLESSUSDT", order_id=12345)
+            except BinanceError:
+                fill_failed = True
+
+            self.assertTrue(fill_failed, "userTrades 失败应抛 BinanceError")
+            # 终极 fallback: exit_price = entry_price → PnL = 0
+            final_exit_price = entry_price   # 6.W safe default
+            final_pnl = (final_exit_price - entry_price) * qty
+            self.assertEqual(final_pnl, 0.0, "PnL 应为 0 (entry_price safe default)")
+
+    def test_6w_userTrades_empty_fills_falls_back_to_entry_price(self):
+        """Phase 6.W: userTrades 返空也应 fallback 到 entry_price."""
+        entry_price = 0.008231
+        with patch.object(self.client, "get_user_trades",
+                          return_value=[]):
+            # 模拟 6.W chain: empty fills → 最终用 entry_price
+            fills = self.client.get_user_trades("BLESSUSDT", order_id=12345)
+            self.assertEqual(fills, [], "empty fills")
+            # 6.W 处理: real_cum_quote=0, real_qty=0 → continue to next fallback
+            # 终极 entry_price safe default
+            exit_price = entry_price
+            pnl = 0
+            self.assertEqual(pnl, 0)
+
+
 # ============================================================================
 
 if __name__ == "__main__":

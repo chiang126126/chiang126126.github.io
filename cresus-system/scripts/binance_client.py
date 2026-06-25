@@ -1736,6 +1736,65 @@ class BinanceClient:
         close_order_id_int = last_order_id
         # 重写 qty 为实际成交总量 (chunking 后)
         qty = total_qty_closed
+
+        # Phase 6.W (2026-06-25): cumQuote=0 sanity check + userTrades fallback.
+        # Binance API 偶尔在 LIMIT-IOC 多笔 partial fill 时返 cumQuote=0 (虽然 fills 实际发生).
+        # 2026-06-25 BLESSUSDT 事故: qty=12149 filled 100%, cumQuote=0 → exit_price=0
+        # → pnl=-$100 (= -100% notional 假亏). 真实交易 +$7.51 win.
+        # Fix: exit_price=0 + qty>0 = 必为 API anomaly, 走 userTrades 拿真实 fills 重算.
+        exit_price_source_6w = "cum_quote"   # 默认: bot 用 cum_quote / qty 算的
+        if total_qty_closed > 0 and (exit_price == 0 or total_cum_quote == 0):
+            log.warning(
+                f"[6.W] close_position {symbol}: cumQuote={total_cum_quote} "
+                f"despite executedQty={total_qty_closed} = Binance API anomaly. "
+                f"Fallback to userTrades 重算 exit_price."
+            )
+            if last_order_id > 0:
+                try:
+                    fills = self.get_user_trades(symbol, order_id=last_order_id)
+                    if fills:
+                        real_cum_quote = 0.0
+                        real_qty = 0.0
+                        for f in fills:
+                            try:
+                                fp = float(f.get('price') or 0)
+                                fq = float(f.get('qty') or 0)
+                                if fp > 0 and fq > 0:
+                                    real_cum_quote += fp * fq
+                                    real_qty += fq
+                            except (ValueError, TypeError):
+                                continue
+                        if real_qty > 0 and real_cum_quote > 0:
+                            exit_price = real_cum_quote / real_qty
+                            close_cum_quote = real_cum_quote
+                            exit_price_source_6w = "userTrades_fallback"
+                            log.info(
+                                f"[6.W] {symbol}: userTrades fallback success — "
+                                f"exit_price={exit_price:.8f} (从 {len(fills)} 笔 fills 重算)"
+                            )
+                except (BinanceError, ValueError) as e:
+                    log.error(
+                        f"[6.W] {symbol}: userTrades fallback failed: {e}. "
+                        f"将 fallback 到 avgPrice"
+                    )
+            # 仍 0 → 最后 fallback avgPrice
+            if exit_price == 0:
+                avg_p = float(close_resp.get("avgPrice") or 0)
+                if avg_p > 0:
+                    exit_price = avg_p
+                    exit_price_source_6w = "avgPrice_fallback"
+                    log.warning(
+                        f"[6.W] {symbol}: 仍 0, 用 avgPrice={avg_p} (less reliable)"
+                    )
+                else:
+                    # 终极 fallback: 用 entry_price → PnL = 0 (保守, 不算亏不算赚)
+                    exit_price = entry_price
+                    exit_price_source_6w = "entry_price_safe_default"
+                    log.error(
+                        f"[6.W] {symbol}: 完全无法定 exit_price, 用 entry_price={entry_price} "
+                        f"= 假设 PnL 0 (保守). 标记 realized_pnl_suspect=True"
+                    )
+
         # PnL: LONG = (exit - entry) * qty; SHORT = (entry - exit) * qty
         if side == "BUY":
             pnl = (exit_price - entry_price) * qty
@@ -1747,6 +1806,9 @@ class BinanceClient:
         # > 5× notional 必是某个输入错位 (entry / exit / qty 任一异常). 不擦写值,
         # 但加 realized_pnl_suspect=True 标记 + log error, 供 dashboard / 复盘核对.
         realized_pnl_suspect = False
+        # Phase 6.W: 若 exit_price 是 6.W 兜底来的, 标记 suspect
+        if exit_price_source_6w in ("entry_price_safe_default", "avgPrice_fallback"):
+            realized_pnl_suspect = True
         notional_at_exit = qty * exit_price if exit_price > 0 else 0.0
         if notional_at_exit > 0 and abs(pnl) > 5.0 * notional_at_exit:
             log.error(
