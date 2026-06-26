@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-26T08:04:45.943215+00:00",
+  "generated_at": "2026-06-26T08:06:58.099596+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 813,
-    "open": 0,
+    "total_trades": 814,
+    "open": 1,
     "closed": 813,
     "wins": 261,
     "losses": 543,
@@ -15,30 +15,113 @@
     "avg_pnl_usdt": -0.0922,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 100.1819,
+    "fees_paid_usdt": 100.2318,
     "fees_realized_usdt": 100.1819,
-    "fees_open_usdt": 0,
+    "fees_open_usdt": 0.0499,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0,
-    "free_capital_usdt": 424.84,
+    "deployed_usdt": 0.0,
+    "free_capital_usdt": 424.79,
     "max_concurrent_slots": 3,
-    "slots_used": 0
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
     "daily_pnl": -0.0498,
-    "deployed_usdt": 0
+    "deployed_usdt": 0.0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [],
-    "exchange_symbols": []
+    "live_symbols": [
+      "BLESSUSDT"
+    ],
+    "exchange_symbols": [
+      "BLESSUSDT"
+    ]
   },
-  "open_trades": [],
+  "open_trades": [
+    {
+      "paper_id": "BLESSUSDT|LONG|2026-06-26T08:05:12.601641+00:00",
+      "trade_id": "L1782461112_BLESSUS_L",
+      "symbol": "BLESSUSDT",
+      "side": "BUY",
+      "direction": "LONG",
+      "entry_price_paper": 0.008013,
+      "avg_fill_price": 0.0,
+      "slippage_bps": 0.0,
+      "qty": 12482.0,
+      "notional_usdt": 0.0,
+      "leverage": 1,
+      "risk_usdt": 0.0,
+      "risk_pct": 0.0,
+      "mirror_latency_sec": 4.7,
+      "sl_price": 0.00794207,
+      "sl_paper_current": 0.00794207,
+      "disaster_stop_price": null,
+      "disaster_stop_at": null,
+      "maker_shadow_data": {
+        "maker_price_would_have_been": 0.008008,
+        "current_bid": 0.008008,
+        "current_ask": 0.008011,
+        "spread_bps": 3.7455521568153642,
+        "market_fill_price": 0.008011,
+        "paper_signal_age_sec": 3.16611,
+        "maker_vs_market_bps": 3.746253746255327
+      },
+      "_phase_6f_b1_partial_unblock": false,
+      "_phase_6f_b2_partial_unblock": false,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": 0.005,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "C",
+      "min_conviction_threshold": null,
+      "tp1_price": 0.00811939,
+      "tp2_price": 0.00822579,
+      "phase": "A",
+      "entry_order_id": 1578994998,
+      "entry_client_id": "cresus_L1782461112_BLESSUS_L_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "burst",
+      "atr_pct": 0.59,
+      "top_trader_position_ratio": 2.2971,
+      "top_trader_account_ratio": 1.9412,
+      "global_account_ratio": 1.858,
+      "phase_a_mfe_pct": 0.212,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.049921,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-26T08:05:47.957763+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "up",
+      "btc_price_at_open": 60338.8,
+      "btc_change_24h_at_open": -2.185,
+      "btc_pct_vs_ma25_at_open": 0.576,
+      "btc_sub_regime_at_open": null,
+      "btc_change_3h_at_open": null,
+      "last_sl_sync_at": "2026-06-26T08:05:48.013298+00:00",
+      "last_sl_sync_paper_sl": 0.00794207,
+      "sl_sync_count": 1,
+      "phase_a_mfe_price": 0.00803,
+      "current_price": 0.008036,
+      "unrealized_pnl_usdt": 0.0,
+      "unrealized_pnl_pct": 0.0,
+      "last_price_check_at": "2026-06-26T08:06:56.237091+00:00"
+    }
+  ],
   "recent_closed": [
     {
       "paper_id": "MANTAUSDT|LONG|2026-06-26T04:24:01.204867+00:00",
@@ -66547,19 +66630,28 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-26T06:11:02.869927+00:00",
-      "reason": "paper trade too old (6822s > 600s)",
-      "last_checked_at": "2026-06-26T08:04:44.765992+00:00"
+      "reason": "paper trade too old (6953s > 600s)",
+      "last_checked_at": "2026-06-26T08:06:56.237091+00:00"
+    },
+    {
+      "paper_id": "JTOUSDT|LONG|2026-06-26T08:04:56.303113+00:00",
+      "symbol": "JTOUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-26T08:05:43.296284+00:00",
+      "reason": "phase_6m: Tier C 小币 (entry=$0.7754) 整体 block — 13 天 195 笔 -$96 (drag $1.30/笔, 全 tier 最高)",
+      "last_checked_at": "2026-06-26T08:06:56.237091+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "up",
-    "btc_price": 60351.9,
-    "btc_ma25_1h": 59993.63,
-    "pct_vs_ma25": 0.597,
-    "change_24h_pct": -2.163,
+    "btc_price": 60316.4,
+    "btc_ma25_1h": 59992.21,
+    "pct_vs_ma25": 0.54,
+    "change_24h_pct": -2.221,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-26T08:04:45.887720+00:00"
+    "computed_at": "2026-06-26T08:06:57.756663+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
