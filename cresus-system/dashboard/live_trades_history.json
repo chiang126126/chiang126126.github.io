@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-26T13:32:25.948076+00:00",
+  "generated_at": "2026-06-26T13:34:40.320611+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
-    "total_trades": 821,
-    "open": 1,
+    "total_trades": 822,
+    "open": 2,
     "closed": 820,
     "wins": 264,
     "losses": 547,
@@ -15,15 +15,15 @@
     "avg_pnl_usdt": -0.0941,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 100.9299,
+    "fees_paid_usdt": 100.9684,
     "fees_realized_usdt": 100.8799,
-    "fees_open_usdt": 0.05,
+    "fees_open_usdt": 0.0885,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
     "deployed_usdt": 0.0,
-    "free_capital_usdt": 421.88,
+    "free_capital_usdt": 421.85,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 2
   },
   "risk_status": {
     "block_new_opens": false,
@@ -36,10 +36,12 @@
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "NFPUSDT"
+      "NFPUSDT",
+      "LITEUSDT"
     ],
     "exchange_symbols": [
-      "NFPUSDT"
+      "NFPUSDT",
+      "LITEUSDT"
     ]
   },
   "open_trades": [
@@ -113,10 +115,88 @@
       "btc_sub_regime_at_open": "down_stable",
       "btc_change_3h_at_open": -0.84,
       "phase_a_mfe_price": 0.005359,
-      "current_price": 0.005448,
+      "current_price": 0.005422,
       "unrealized_pnl_usdt": 0.0,
       "unrealized_pnl_pct": 0.0,
-      "last_price_check_at": "2026-06-26T13:32:24.292283+00:00"
+      "last_price_check_at": "2026-06-26T13:34:38.387789+00:00"
+    },
+    {
+      "paper_id": "LITEUSDT|SHORT|2026-06-26T13:32:12.881215+00:00",
+      "trade_id": "L1782480732_LITEUSD_S",
+      "symbol": "LITEUSDT",
+      "side": "SELL",
+      "direction": "SHORT",
+      "entry_price_paper": 801.66,
+      "avg_fill_price": 0.0,
+      "slippage_bps": 0.0,
+      "qty": 0.12,
+      "notional_usdt": 0.0,
+      "leverage": 1,
+      "risk_usdt": 0.0,
+      "risk_pct": 0.0,
+      "mirror_latency_sec": 8.6,
+      "sl_price": 805.05071429,
+      "sl_paper_current": 805.05071429,
+      "disaster_stop_price": null,
+      "disaster_stop_at": null,
+      "maker_shadow_data": {
+        "maker_price_would_have_been": 800.92,
+        "current_bid": 800.47,
+        "current_ask": 800.92,
+        "spread_bps": 5.620117522901127,
+        "market_fill_price": 800.47,
+        "paper_signal_age_sec": 6.537967,
+        "maker_vs_market_bps": 5.618538680516553
+      },
+      "_phase_6f_b1_partial_unblock": false,
+      "_phase_6f_b2_partial_unblock": false,
+      "sl_compensation_enabled": true,
+      "sl_compensation_offset": 0.0,
+      "sl_compensation_mode": "always",
+      "wick_filter_enabled": true,
+      "wick_filter_min_breaches": 6,
+      "wick_filter_mode": "always",
+      "sl_breach_count": 0,
+      "funding_signal": "neutral",
+      "funding_rate_pct_at_open": -0.007,
+      "regime_gate_enabled": true,
+      "regime_gate_mode": "always",
+      "ab_group": "A",
+      "min_conviction_threshold": null,
+      "tp1_price": 796.57392857,
+      "tp2_price": 791.48785714,
+      "phase": "A",
+      "entry_order_id": 186513090,
+      "entry_client_id": "cresus_L1782480732_LITEUSD_S_E",
+      "sl_order_id": null,
+      "sl_mode": "client_side",
+      "conviction_score": 5,
+      "alert_type": "burst",
+      "atr_pct": 0.423,
+      "top_trader_position_ratio": 4.8305,
+      "top_trader_account_ratio": 3.3975,
+      "global_account_ratio": 2.7286,
+      "phase_a_mfe_pct": 0.012,
+      "phase_b_mfe_pct": null,
+      "phase_c_mfe_pct": null,
+      "fees_paid_usdt": 0.038466,
+      "fees_are_actual": true,
+      "opened_at": "2026-06-26T13:33:14.211524+00:00",
+      "is_dry_run": false,
+      "btc_regime_at_open": "down",
+      "btc_price_at_open": 59014.0,
+      "btc_change_24h_at_open": 1.314,
+      "btc_pct_vs_ma25_at_open": -0.928,
+      "btc_sub_regime_at_open": "down_stable",
+      "btc_change_3h_at_open": -0.466,
+      "last_sl_sync_at": "2026-06-26T13:33:14.539322+00:00",
+      "last_sl_sync_paper_sl": 805.05071429,
+      "sl_sync_count": 1,
+      "phase_a_mfe_price": 801.56,
+      "current_price": 796.98,
+      "unrealized_pnl_usdt": 0.0,
+      "unrealized_pnl_pct": 0.0,
+      "last_price_check_at": "2026-06-26T13:34:38.387789+00:00"
     }
   ],
   "recent_closed": [
@@ -67311,33 +67391,24 @@
   ],
   "missed_signals": [
     {
-      "paper_id": "ARXUSDT|SHORT|2026-06-26T12:41:24.095454+00:00",
-      "symbol": "ARXUSDT",
-      "direction": "SHORT",
-      "conviction_score": 6,
-      "signal_at": "2026-06-26T12:42:42.972349+00:00",
-      "reason": "paper trade too old (2981s > 600s)",
-      "last_checked_at": "2026-06-26T13:32:24.292283+00:00"
-    },
-    {
       "paper_id": "RESOLVUSDT|SHORT|2026-06-26T13:10:28.061989+00:00",
       "symbol": "RESOLVUSDT",
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-06-26T13:11:04.845360+00:00",
-      "reason": "paper trade too old (1279s > 600s)",
-      "last_checked_at": "2026-06-26T13:32:24.292283+00:00"
+      "reason": "paper trade too old (1414s > 600s)",
+      "last_checked_at": "2026-06-26T13:34:38.387789+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 59058.1,
-    "btc_ma25_1h": 59568.3,
-    "pct_vs_ma25": -0.856,
-    "change_24h_pct": 1.39,
+    "btc_price": 58974.1,
+    "btc_ma25_1h": 59564.94,
+    "pct_vs_ma25": -0.992,
+    "change_24h_pct": 1.246,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.391,
-    "computed_at": "2026-06-26T13:32:25.595832+00:00"
+    "change_3h_pct": -0.533,
+    "computed_at": "2026-06-26T13:34:39.669124+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
