@@ -1,6 +1,6 @@
 # Cresus — 待修 / 待做清单
 
-最后更新: 2026-06-25
+最后更新: 2026-06-26
 
 ## 优先级说明
 
@@ -12,25 +12,6 @@
 ---
 
 ## 🔴 P0 — 当前未做但必须
-
-### GitHub 认证迁移到 SSH (PAT 反复掉, 永久解)
-**触发**: 2026-06-23 + 2026-06-25 两次 GitHub HTTPS PAT 认证失败导致 sync 死.
-keychain 里的 PAT 反复丢失 / 失效, launchd 非交互上下文无法重新 prompt
-("could not read Username / Device not configured"), 每次都要人工交互 push 才恢复.
-
-**根因**: HTTPS+PAT 在 launchd context 依赖 osxkeychain, keychain 条目一旦失效
-(过期/撤销/iCloud sync 清除) 就需人工干预. PAT 有有效期, 注定反复.
-
-**永久解 (SSH 不过期, 不依赖 keychain prompt)**:
-- `ssh-keygen -t ed25519 -C "cresus-bot"` 生成 key
-- 公钥加到 https://github.com/settings/keys
-- `git -C ~/chiang126126.github.io remote set-url origin git@github.com:chiang126126/chiang126126.github.io.git`
-- 验证: `git push` 不再问密码
-- SSH key 在 ~/.ssh, launchd 始终可访问, 无 prompt 问题
-
-**预期**: 彻底消除 PAT 反复掉的 sync 事故.
-**估时**: 15 分钟.
-**目标日期**: 2026-06-26 (下次有空立即做, 优先级最高)
 
 ### BLESSUSDT 假账记录修正 (cosmetic, 不影响真钱)
 **触发**: 2026-06-25 BLESSUSDT close Binance API 返 cumQuote=0, bot 记录
@@ -49,27 +30,6 @@ $428.13 没受伤.
    trade_id=L1782378496_BLESSUS_L, 改 realized_pnl_usdt -99.9984 → +7.46
 3. `launchctl bootstrap` 重启
 **目标日期**: 下次维护窗口 (不紧急)
-
-### 6.S v3 — Watchdog 检测扩展
-**触发**: 2026-06-23 incident — GitHub PAT 过期导致 sync 死 4h, watchdog v2 grep 模式不含 `push.*失败` 关键字, **告警漏报**.
-
-**实现**:
-- 文件: `cresus-system/scripts/sync_health_watchdog.sh`
-- 在 `check_recent_aborting()` 的 grep 模式加:
-  - `push.*失败` (= fast-sync push 3 次均失败)
-  - `denied` / `Permission denied` (GitHub 403)
-  - `Invalid username or token` (PAT 过期)
-  - `Authentication failed` (auth 失败通用)
-- 加新检查 `check_git_remote_ping()`:
-  - 跑 `git -C $REPO ls-remote origin HEAD 2>&1`
-  - 失败 → alarm "git remote 不通, 可能是 PAT 过期 / 网络断"
-  - 每 30 分钟跑一次 (避免 rate limit)
-
-**预期**: PAT 过期事故从 4h+ 浮出 → 10-30min 浮出.
-
-**估时**: 30 分钟 + 单元测试.
-
-**目标日期**: 2026-06-29 周日
 
 ---
 
@@ -183,6 +143,8 @@ $428.13 没受伤.
 | 6.V | 2026-06-24 | kill switch buffer +$20 (floor $420→$400) |
 | 6.T-strict | 2026-06-24 | 新币 insufficient klines 改 block (不再 fail-safe pass) |
 | 6.W | 2026-06-25 | close-side cumQuote=0 sanity check + userTrades fallback |
+| SSH 迁移 | 2026-06-26 | GitHub 认证 HTTPS+PAT → SSH ed25519 (无 passphrase). PAT 第 4 次失效后永久解, launchd 不再依赖 keychain prompt |
+| 6.S v3 | 2026-06-26 | watchdog 加认证失败关键字 + 检查 5 (unpushed 堆积 >20 告警). 修 v2 盲点: 本地 commit 新鲜但 push 全死时漏报 |
 
 ---
 
