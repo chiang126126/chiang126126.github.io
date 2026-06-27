@@ -8000,5 +8000,127 @@ class TestPhase6VKillSwitchBuffer(unittest.TestCase):
                           "默认 buffer 仍为 $20")
 
 
+class TestPhase6XRealizedPnlPctPopulation(unittest.TestCase):
+    """Phase 6.X (2026-06-27): live 平仓时补写 realized_pnl_pct.
+
+    背景: 历史 828 条已平仓全部缺 realized_pnl_pct 字段 (paper 写了 live 漏了),
+    导致 live 板已平仓卡片显示 "—" (无百分比). Fix: 在 _try_mirror_close
+    合并 close 信息时计算 (exit-entry)/entry*100*sign 写入 closed dict.
+    entry=0 (Phase 6.X 前的 16 条脏数据) 时保留 None 让看板兜底.
+    """
+
+    def setUp(self):
+        self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+
+    def _do_close(self, live_trade, mock_close):
+        with patch.object(self.client, "close_position",
+                          return_value=mock_close):
+            return _try_mirror_close(
+                self.client, live_trade,
+                reason="sl_breach_client", dry_run=True,
+            )
+
+    def test_6x_long_winner_pct_populated(self):
+        """LONG 盈利: entry=100 → exit=110 → pct=+10.0."""
+        live_trade = {
+            "trade_id": "L1_X", "symbol": "BTCUSDT", "side": "BUY",
+            "paper_id": "BTCUSDT|LONG|...", "sl_price": 95.0, "phase": "A",
+            "avg_fill_price": 100.0,
+        }
+        mock_close = {
+            "closed_at": "2026-06-27T10:00:00+00:00",
+            "avg_exit_price": 110.0,
+            "realized_pnl_usdt": 10.0,
+            "close_order_id": 1, "qty_closed": 1.0,
+        }
+        r = self._do_close(live_trade, mock_close)
+        self.assertIsNotNone(r)
+        self.assertIsNotNone(r.get("realized_pnl_pct"), "LONG winner 应算出 pct")
+        self.assertAlmostEqual(r["realized_pnl_pct"], 10.0, places=4)
+
+    def test_6x_long_loser_pct_populated(self):
+        """LONG 亏损: entry=100 → exit=95 → pct=-5.0."""
+        live_trade = {
+            "trade_id": "L1_X", "symbol": "BTCUSDT", "side": "BUY",
+            "paper_id": "BTCUSDT|LONG|...", "sl_price": 90.0, "phase": "A",
+            "avg_fill_price": 100.0,
+        }
+        mock_close = {
+            "closed_at": "2026-06-27T10:00:00+00:00",
+            "avg_exit_price": 95.0,
+            "realized_pnl_usdt": -5.0,
+            "close_order_id": 1, "qty_closed": 1.0,
+        }
+        r = self._do_close(live_trade, mock_close)
+        self.assertAlmostEqual(r["realized_pnl_pct"], -5.0, places=4)
+
+    def test_6x_short_winner_pct_populated(self):
+        """SHORT 盈利: entry=100 → exit=90 → pct=+10.0 (反号)."""
+        live_trade = {
+            "trade_id": "L1_X", "symbol": "ETHUSDT", "side": "SELL",
+            "paper_id": "ETHUSDT|SHORT|...", "sl_price": 110.0, "phase": "A",
+            "avg_fill_price": 100.0,
+        }
+        mock_close = {
+            "closed_at": "2026-06-27T10:00:00+00:00",
+            "avg_exit_price": 90.0,
+            "realized_pnl_usdt": 10.0,
+            "close_order_id": 1, "qty_closed": 1.0,
+        }
+        r = self._do_close(live_trade, mock_close)
+        self.assertAlmostEqual(r["realized_pnl_pct"], 10.0, places=4,
+                                msg="SHORT entry>exit 应正 pct (sign=-1 翻号)")
+
+    def test_6x_short_loser_pct_populated(self):
+        """SHORT 亏损: entry=100 → exit=105 → pct=-5.0."""
+        live_trade = {
+            "trade_id": "L1_X", "symbol": "ETHUSDT", "side": "SELL",
+            "paper_id": "ETHUSDT|SHORT|...", "sl_price": 115.0, "phase": "A",
+            "avg_fill_price": 100.0,
+        }
+        mock_close = {
+            "closed_at": "2026-06-27T10:00:00+00:00",
+            "avg_exit_price": 105.0,
+            "realized_pnl_usdt": -5.0,
+            "close_order_id": 1, "qty_closed": 1.0,
+        }
+        r = self._do_close(live_trade, mock_close)
+        self.assertAlmostEqual(r["realized_pnl_pct"], -5.0, places=4)
+
+    def test_6x_entry_zero_returns_none_for_dashboard_fallback(self):
+        """6.X 前脏数据 entry=0: pct=None, 让看板兜底用 pnl/(qty*exit) 反推显示."""
+        live_trade = {
+            "trade_id": "L_HMSTR", "symbol": "HMSTRUSDT", "side": "BUY",
+            "paper_id": "HMSTRUSDT|LONG|...", "sl_price": 0.0001, "phase": "A",
+            "avg_fill_price": 0.0,   # 旧脏数据
+        }
+        mock_close = {
+            "closed_at": "2026-06-27T10:00:00+00:00",
+            "avg_exit_price": 0.0001854,
+            "realized_pnl_usdt": -0.64,
+            "close_order_id": 1, "qty_closed": 535905.0,
+        }
+        r = self._do_close(live_trade, mock_close)
+        self.assertIsNone(r["realized_pnl_pct"],
+                          "entry=0 保留 None 让看板兜底反推显示")
+
+    def test_6x_exit_zero_returns_none(self):
+        """exit=0 (异常) 也应保留 None 不算错的 pct."""
+        live_trade = {
+            "trade_id": "L1_X", "symbol": "BTCUSDT", "side": "BUY",
+            "paper_id": "BTCUSDT|LONG|...", "sl_price": 95.0, "phase": "A",
+            "avg_fill_price": 100.0,
+        }
+        mock_close = {
+            "closed_at": "2026-06-27T10:00:00+00:00",
+            "avg_exit_price": 0.0,
+            "realized_pnl_usdt": 0.0,
+            "close_order_id": 1, "qty_closed": 1.0,
+        }
+        r = self._do_close(live_trade, mock_close)
+        self.assertIsNone(r["realized_pnl_pct"],
+                          "exit=0 异常路径也保留 None")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -5409,9 +5409,21 @@ function renderLivePanel(data) {
       const entry = Number(t.avg_fill_price || 0);
       const exit  = Number(t.avg_exit_price || t.close_price || t.exit_price || 0);
       let pnlPct = null;
-      if (entry > 0 && exit > 0) {
+      // Phase 6.X (2026-06-27): 优先用 backend 写入的 realized_pnl_pct (新平仓自带);
+      // 回退到 entry/exit 现算 (老数据 entry>0 仍能显示);
+      // 兜底 entry=0 脏数据 (历史 16 条 HMSTRUSDT/WUSDT/NFPUSDT 等)
+      //   用 pnl/(qty*exit)*100 近似 — 1x 杠杆下 entry≈exit, 偏差 ≤ 0.几%,
+      //   够看板显示一个有意义的%替代空白 "—".
+      if (t.realized_pnl_pct != null) {
+        pnlPct = Number(t.realized_pnl_pct);
+      } else if (entry > 0 && exit > 0) {
         const sign = side === 'BUY' ? 1 : -1;
         pnlPct = (exit - entry) / entry * 100 * sign;
+      } else {
+        const qty = Number(t.qty || 0);
+        if (qty > 0 && exit > 0 && Number.isFinite(pnlUsdt)) {
+          pnlPct = pnlUsdt / (qty * exit) * 100;
+        }
       }
       const pnlCls = pnlUsdt > 0 ? 'up' : (pnlUsdt < 0 ? 'down' : '');
       const winLossCls = pnlUsdt > 0.01 ? 'win' : (pnlUsdt < -0.01 ? 'loss' : '');

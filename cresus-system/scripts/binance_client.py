@@ -1094,6 +1094,8 @@ class BinanceClient:
                 "side": side,
                 "qty": qty,
                 "avg_fill_price": last_close,   # mock (实盘时是真实 fill)
+                "avg_fill_price_source": "dry_run_mock",   # Phase 6.X
+                "avg_fill_price_suspect": False,           # Phase 6.X
                 "requested_notional": notional_usdt,
                 "actual_notional": actual_notional,
                 "entry_order_id": -1,
@@ -1180,16 +1182,89 @@ class BinanceClient:
         executed_qty = float(entry_resp.get("executedQty") or 0)
         cum_quote = float(entry_resp.get("cumQuote") or 0)
         entry_order_id_int = int(entry_resp.get("orderId") or 0)
+
+        if executed_qty <= 0:
+            raise BinanceError(f"Entry executed_qty={executed_qty}, abnormal")
+
+        # Phase 6.X (2026-06-27): avgPrice=0 / cumQuote=0 sanity check + userTrades fallback.
+        # 开仓侧补 6.W (平仓侧) 同款防御. Binance API 偶尔在 LIMIT-IOC 多笔 partial fill
+        # 时返 avgPrice=0 或 cumQuote=0 (虽然 fills 实际发生). 历史 16 条 entry=0 +
+        # notional=0 假账记录 (HMSTRUSDT/WUSDT/NFPUSDT/IDUSDT/USELESSUSDT/HYPERUSDT/
+        # LITEUSDT/SPCXUSDT/RIVERUSDT) 即此族 bug. 1191 已 raise executed_qty<=0, 到此
+        # executed_qty 必 >0, 可安全做分母.
+        avg_fill_price_source = "binance_resp"
+        avg_fill_price_suspect = False
+        if avg_fill_price == 0 or cum_quote == 0:
+            log.warning(
+                f"[6.X] open_position {symbol} {side}: avgPrice={avg_fill_price} "
+                f"cumQuote={cum_quote} despite executedQty={executed_qty} = Binance API "
+                f"anomaly. 启动 fallback chain (cum/qty → userTrades → limit_price)."
+            )
+            # Fallback 1: cumQuote>0 + avgPrice=0 → cum/qty 数学等价重算, 无精度损失
+            if avg_fill_price == 0 and cum_quote > 0:
+                avg_fill_price = cum_quote / executed_qty
+                avg_fill_price_source = "cum_quote_div_qty"
+                log.info(
+                    f"[6.X] {symbol}: cum/qty fallback OK — avg_fill_price="
+                    f"{avg_fill_price:.8f} (cumQuote={cum_quote} / qty={executed_qty})"
+                )
+            # Fallback 2: cumQuote=0 → 调 userTrades 拿真实 fills 重算 (同 6.W 平仓侧)
+            elif cum_quote == 0 and entry_order_id_int > 0:
+                try:
+                    fills = self.get_user_trades(symbol, order_id=entry_order_id_int)
+                    if fills:
+                        real_cum_quote = 0.0
+                        real_qty = 0.0
+                        for f in fills:
+                            try:
+                                fp = float(f.get('price') or 0)
+                                fq = float(f.get('qty') or 0)
+                                if fp > 0 and fq > 0:
+                                    real_cum_quote += fp * fq
+                                    real_qty += fq
+                            except (ValueError, TypeError):
+                                continue
+                        if real_qty > 0 and real_cum_quote > 0:
+                            avg_fill_price = real_cum_quote / real_qty
+                            cum_quote = real_cum_quote
+                            avg_fill_price_source = "userTrades_fallback"
+                            log.info(
+                                f"[6.X] {symbol}: userTrades fallback OK — "
+                                f"avg_fill_price={avg_fill_price:.8f} "
+                                f"cumQuote={cum_quote:.4f} (从 {len(fills)} 笔 fills 重算)"
+                            )
+                except (BinanceError, ValueError) as e:
+                    log.error(f"[6.X] {symbol}: userTrades fallback 失败: {e}")
+            # Fallback 3: 仍 0 → limit_price 兜底 (IOC 模式必传; 精度损失 ≤ 几个 tick)
+            if avg_fill_price == 0 and limit_price and limit_price > 0:
+                avg_fill_price = float(limit_price)
+                if cum_quote == 0:
+                    cum_quote = avg_fill_price * executed_qty
+                avg_fill_price_source = "limit_price_fallback"
+                avg_fill_price_suspect = True
+                log.warning(
+                    f"[6.X] {symbol}: 用 limit_price={avg_fill_price} 兜底 "
+                    f"(less accurate, 标记 suspect)."
+                )
+            # 全部 fallback 失败: 保留 0 + suspect=True. 仓位已开成功 (executed_qty>0),
+            # 必须返回让上层挂 SL 保命; entry record 不可靠由 caller / dashboard 识别.
+            if avg_fill_price == 0:
+                avg_fill_price_source = "unresolved"
+                avg_fill_price_suspect = True
+                log.error(
+                    f"[6.X] {symbol}: 所有 fallback 失败, avg_fill_price 仍=0. "
+                    f"position 已开 ({executed_qty} units), 仍返回让上层挂 SL 保命. "
+                    f"entry record 不可靠, suspect=True."
+                )
+
         # 实际 commission — 调 /fapi/v1/userTrades. 失败回退到估算 (0.04% taker).
+        # cum_quote 经 6.X 修正后 fee_estimate 才准.
         fee_estimate = round(cum_quote * 0.0004, 4)
         actual_fee = None
         if entry_order_id_int > 0:
             actual_fee = self._actual_commission_usdt(symbol, entry_order_id_int)
         entry_fee = actual_fee if actual_fee is not None else fee_estimate
         fee_is_actual = actual_fee is not None
-
-        if executed_qty <= 0:
-            raise BinanceError(f"Entry executed_qty={executed_qty}, abnormal")
 
         # 10. 下 STOP_MARKET SL (除非 use_exchange_sl=False)
         if not use_exchange_sl:
@@ -1204,6 +1279,8 @@ class BinanceClient:
                 "side": side,
                 "qty": executed_qty,
                 "avg_fill_price": avg_fill_price,
+                "avg_fill_price_source": avg_fill_price_source,   # Phase 6.X
+                "avg_fill_price_suspect": avg_fill_price_suspect, # Phase 6.X
                 "requested_notional": notional_usdt,
                 "actual_notional": cum_quote,
                 "entry_order_id": int(entry_resp.get("orderId") or 0),
@@ -1272,6 +1349,8 @@ class BinanceClient:
             "side": side,
             "qty": executed_qty,
             "avg_fill_price": avg_fill_price,
+            "avg_fill_price_source": avg_fill_price_source,   # Phase 6.X
+            "avg_fill_price_suspect": avg_fill_price_suspect, # Phase 6.X
             "requested_notional": notional_usdt,
             "actual_notional": cum_quote,
             "entry_order_id": int(entry_resp.get("orderId") or 0),
