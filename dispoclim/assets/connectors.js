@@ -92,17 +92,22 @@
     },
   ];
 
-  // Ingestion : remplace les données démo par un flux réel.
-  // En production, on chargera /api/inventory.json (généré côté serveur).
-  async function loadInventory() {
-    try {
-      const res = await fetch("api/inventory.json", { cache: "no-store" });
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data.records) && data.records.length) return data.records;
+  // Ingestion : remplace les données démo par l'API backend réelle.
+  // Définir window.DISPOCLIM_API_BASE = "https://api.dispoclim.fr" pour activer.
+  // Voir backend/ (Express + Postgres) — endpoint GET /api/inventory.
+  async function loadInventory(params) {
+    const base = window.DISPOCLIM_API_BASE;
+    if (base) {
+      try {
+        const qs = new URLSearchParams(params || {}).toString();
+        const res = await fetch(`${base}/api/inventory${qs ? "?" + qs : ""}`, { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.records)) return data.records;
+        }
+      } catch (_) {
+        /* API injoignable : on retombe sur la démo ci-dessous */
       }
-    } catch (_) {
-      /* pas de flux réel disponible : on retombe sur la démo */
     }
     return window.DISPOCLIM ? window.DISPOCLIM.INVENTORY : [];
   }
