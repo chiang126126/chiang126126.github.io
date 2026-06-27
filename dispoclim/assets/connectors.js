@@ -75,19 +75,19 @@
     },
     {
       retailer: "manomano",
-      method: "affiliate-api",
-      status: "planned",
-      auth: "API marchand / affiliation",
-      notes: "Marketplace : suivre vendeur + délai d'expédition.",
+      method: "awin-feed",
+      status: "ready",
+      auth: "Flux produits Awin (merchant ID 17547)",
+      notes: "Première source réelle : prix + dispo en ligne via flux affilié Awin (cf. backend/CONNECTORS.md).",
       respectRobots: true,
     },
     {
       retailer: "amazon-fr",
-      method: "pa-api",
-      status: "planned",
-      auth: "Amazon Product Advertising API (associé)",
+      method: "creators-api",
+      status: "research",
+      auth: "Amazon Creators API (associé éligible)",
       notes:
-        "Utiliser l'API officielle (PA-API) + liens affiliés ; ne pas scraper Amazon.",
+        "PA-API 5.0 retirée le 15/05/2026 → migrer vers la Creators API ; accès conditionné aux ventes. Ne pas scraper Amazon.",
       respectRobots: true,
     },
   ];

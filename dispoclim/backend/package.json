@@ -12,6 +12,7 @@
     "collector:start": "node dist/collector/run.js",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test:awin": "tsx scripts/test-awin.ts",
     "db:init": "tsx scripts/init-db.ts"
   },
   "dependencies": {
