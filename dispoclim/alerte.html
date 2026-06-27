@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Créer une alerte de stock — DispoClim | Midea PortaSplit & COMFEE'</title>
+  <meta name="description" content="Activez votre Pass de surveillance DispoClim (1,99 €, sans reconduction) et recevez un e-mail ou un SMS dès qu'un climatiseur mobile Midea PortaSplit ou COMFEE' revient en stock près de chez vous." />
+  <link rel="canonical" href="https://chiang126126.github.io/dispoclim/alerte.html" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>❄️</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="logo" href="/dispoclim/"><span class="mark">❄️</span><span>DispoClim<br><span class="fr">RADAR STOCK · FRANCE</span></span></a>
+      <nav class="nav-links" id="nav-links">
+        <a href="/dispoclim/#radar">Le radar</a>
+        <a href="/dispoclim/#tarifs">Tarifs</a>
+        <a href="/dispoclim/#faq">FAQ</a>
+      </nav>
+    </div>
+  </header>
+
+  <section id="alerte" style="min-height:calc(100vh - 64px)">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="kicker" style="color:#8fd6e0">Pass de surveillance · 1,99 €</span>
+        <h2 style="color:#fff">Créez votre alerte de réapprovisionnement</h2>
+        <p style="color:#b8c6dc">Choisissez vos produits et magasins. Dès que le stock revient, vous êtes prévenu — souvent avant la page publique.</p>
+      </div>
+
+      <form class="alert-card" onsubmit="event.preventDefault(); document.getElementById('confirm').style.display='block'; window.scrollTo({top:document.getElementById('confirm').offsetTop-80,behavior:'smooth'});">
+        <div class="filters" style="grid-template-columns:repeat(2,1fr)">
+          <div class="field"><label>Adresse e-mail *</label><input type="email" required placeholder="vous@exemple.fr" /></div>
+          <div class="field"><label>Téléphone (alertes SMS, optionnel)</label><input type="tel" placeholder="+33 6 12 34 56 78" /></div>
+          <div class="field"><label>Produit(s) à surveiller *</label>
+            <select required>
+              <option value="">— Choisir —</option>
+              <option>Midea PortaSplit 12000 BTU</option>
+              <option>COMFEE' 9000 BTU</option>
+              <option>Midea PortaSplit Cool</option>
+              <option>Support universel PortaSplit</option>
+              <option>Tous les climatiseurs mobiles</option>
+            </select>
+          </div>
+          <div class="field"><label>Code postal *</label><input type="text" inputmode="numeric" maxlength="5" required placeholder="74580" /></div>
+          <div class="field"><label>Rayon de surveillance</label>
+            <select><option>10 km</option><option>25 km</option><option selected>50 km</option><option>100 km</option><option>200 km</option><option>Toute la France</option></select>
+          </div>
+          <div class="field"><label>Durée du Pass</label>
+            <select><option>30 jours — 1,99 €</option><option>60 jours — 1,99 €</option><option>90 jours — 1,99 €</option></select>
+          </div>
+        </div>
+
+        <label class="consent" style="margin-top:18px">
+          <input type="checkbox" required />
+          <span>J'accepte de recevoir des e-mails et/ou SMS d'alerte de stock de DispoClim. Consentement libre, retirable à tout moment via le lien de désinscription présent dans chaque message (<a href="confidentialite.html#consentement" style="color:#8fd6e0">en savoir plus</a>).</span>
+        </label>
+        <label class="consent">
+          <input type="checkbox" required />
+          <span>Je demande l'exécution immédiate du service numérique et reconnais perdre mon droit de rétractation une fois la surveillance pleinement exécutée (<a href="cgv.html#retractation" style="color:#8fd6e0">art. L221-28 du Code de la consommation</a>). J'accepte les <a href="cgv.html" style="color:#8fd6e0">CGV</a>.</span>
+        </label>
+
+        <div style="margin-top:22px;display:flex;gap:14px;flex-wrap:wrap;align-items:center">
+          <button class="btn btn-primary" type="submit">Payer 1,99 € et activer →</button>
+          <span style="color:#7d8db0;font-size:.85rem">Paiement unique · sans reconduction · résiliation en 1 clic</span>
+        </div>
+
+        <div id="confirm" style="display:none;margin-top:22px;padding:18px;border-radius:12px;background:rgba(46,230,166,.1);border:1px solid rgba(46,230,166,.3);color:#bff7e2">
+          <strong>✓ Démonstration</strong> — Dans la version en service, vous seriez redirigé vers le paiement sécurisé, puis votre surveillance serait activée et confirmée par e-mail. Le back-end de paiement et d'envoi reste à brancher.
+        </div>
+      </form>
+
+      <p style="text-align:center;margin-top:24px"><a href="/dispoclim/#tarifs" style="color:#8fd6e0">← Comparer Gratuit et Pass</a></p>
+    </div>
+  </section>
+
+  <script src="assets/data.js"></script>
+</body>
+</html>
