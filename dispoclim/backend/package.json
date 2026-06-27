@@ -12,7 +12,7 @@
     "collector:start": "node dist/collector/run.js",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "db:init": "node --experimental-strip-types scripts/init-db.ts"
+    "db:init": "tsx scripts/init-db.ts"
   },
   "dependencies": {
     "express": "^4.19.2",
