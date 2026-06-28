@@ -1964,6 +1964,7 @@ def _auto_heal_live_only_mismatches(
         target["closed_at"] = now.isoformat()
         target["close_reason"] = "already_closed_externally_auto"
         target["realized_pnl_usdt"] = 0.0
+        target["realized_pnl_pct"] = 0.0    # Phase 6.X: auto-heal 外部已关 → pct=0
         target["close_qty"] = 0.0
         target["avg_exit_price"] = 0.0
         target["_auto_heal_streak_ticks"] = streak[sym]
@@ -2725,6 +2726,7 @@ def _try_mirror_close(
             closed["closed_at"] = datetime.now(timezone.utc).isoformat()
             closed["close_reason"] = "already_closed_externally"
             closed["realized_pnl_usdt"] = 0.0   # 无法精确知道, 外部 close 时 PnL 在 binance 手动结算
+            closed["realized_pnl_pct"] = 0.0    # Phase 6.X: 外部已关 → 无敞口 → pct=0
             closed["close_qty"] = 0.0
             closed["avg_exit_price"] = 0.0
             # Phase 6.G G3-fix (2026-06-15): early-return 也要把 G3 跟踪字段填 None,
@@ -2753,6 +2755,17 @@ def _try_mirror_close(
     exit_price = float(result.get("avg_exit_price") or 0)
     closed["avg_exit_price"] = exit_price
     closed["realized_pnl_usdt"] = float(result.get("realized_pnl_usdt") or 0)
+    # Phase 6.X (2026-06-27): 补写 realized_pnl_pct 供看板显示百分比.
+    # 历史 828 条全部缺这个字段 → live 板已平仓卡片显示 "—". 此处算出来一并写入.
+    # entry=0 (Phase 6.X 前的 16 条脏数据) 时保留 None, 由看板兜底用 pnl/(qty*exit) 反推.
+    entry_for_pct = float(closed.get("avg_fill_price") or 0)
+    if entry_for_pct > 0 and exit_price > 0:
+        sign_pct = 1 if closed.get("side") == "BUY" else -1
+        closed["realized_pnl_pct"] = round(
+            (exit_price - entry_for_pct) / entry_for_pct * 100 * sign_pct, 4
+        )
+    else:
+        closed["realized_pnl_pct"] = None
     closed["close_order_id"] = result.get("close_order_id")
     closed["close_qty"] = float(result.get("qty_closed") or 0)
     # Phase 5.T: 传 sanity flags 到 trade record, 供 dashboard 显示警告

@@ -2051,6 +2051,187 @@ class TestPhase6WCumQuoteZeroFallback(unittest.TestCase):
 
 # ============================================================================
 
+
+class TestPhase6XOpenPositionFallback(unittest.TestCase):
+    """Phase 6.X (2026-06-27): open-side avgPrice=0 / cumQuote=0 fallback (补 6.W 对称).
+
+    背景: 2026-06-27 实盘看板发现 16 条历史平仓记录 entry=0 + notional=0
+    (HMSTRUSDT/WUSDT/NFPUSDT/IDUSDT/USELESSUSDT/HYPERUSDT/LITEUSDT/SPCXUSDT/RIVERUSDT/...).
+    根因: Binance LIMIT-IOC 多笔 partial fill 时偶尔返 avgPrice=0 / cumQuote=0,
+    open_position 直接信 API 写入. 6.W 只修了平仓侧, 开仓侧漏了同款防御.
+    Fix: 检测 anomaly, fallback chain (cum/qty → userTrades → limit_price).
+    """
+
+    FAKE_FILTERS = {
+        "step_size": 0.1, "min_qty": 0.1, "max_qty": 1000000.0,
+        "market_max_qty": 100000.0, "min_notional": 5.0,
+        "tick_size": 0.00001, "quantity_precision": 1, "price_precision": 5,
+        "status": "TRADING",
+    }
+
+    def setUp(self):
+        self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=False)
+
+    def _common_patches(self, entry_resp, fills=None, fills_exc=None,
+                        last_close="0.0002"):
+        """统一 mock — 返回 (entry_resp 用作 place_market_order 返回值).
+
+        last_close: get_klines mock 的最后收盘价 (string). LONG sl 必须 < 此价,
+                    SHORT sl 必须 > 此价 (open_position 内部 sanity check).
+        fills: 若提供, mock get_user_trades 返这个 list
+        fills_exc: 若提供, mock get_user_trades 抛这个异常
+        """
+        patches = [
+            patch.object(self.client, "get_symbol_filters",
+                         return_value=self.FAKE_FILTERS),
+            patch.object(self.client, "get_klines",
+                         return_value=[[0, 0, 0, 0, last_close,
+                                        0, 0, 0, 0, 0, 0, 0]]),
+            patch.object(self.client, "place_market_order",
+                         return_value=entry_resp),
+            patch.object(self.client, "place_stop_market_order",
+                         return_value={"orderId": 2}),
+            patch.object(self.client, "_actual_commission_usdt",
+                         return_value=None),
+        ]
+        if fills_exc is not None:
+            patches.append(patch.object(self.client, "get_user_trades",
+                                        side_effect=fills_exc))
+        elif fills is not None:
+            patches.append(patch.object(self.client, "get_user_trades",
+                                        return_value=fills))
+        return patches
+
+    def test_6x_normal_path_no_fallback_when_avgPrice_ok(self):
+        """Regression: avgPrice>0 + cumQuote>0 时不该触发 fallback, 行为不变."""
+        entry_resp = {
+            "orderId": 1, "executedQty": "10000.0",
+            "cumQuote": "440.0", "avgPrice": "0.044",
+            "status": "FILLED",
+        }
+        from contextlib import ExitStack
+        with ExitStack() as stack:
+            for p in self._common_patches(entry_resp, last_close="0.045"):
+                stack.enter_context(p)
+            result = self.client.open_position(
+                symbol="DYMUSDT", side="BUY",
+                notional_usdt=440.0, sl_price=0.04,
+                trade_id="test_6x_normal", use_exchange_sl=False,
+            )
+        self.assertAlmostEqual(float(result["avg_fill_price"]), 0.044, places=6)
+        self.assertEqual(result.get("avg_fill_price_source"), "binance_resp")
+        self.assertFalse(result.get("avg_fill_price_suspect"))
+        self.assertAlmostEqual(float(result["actual_notional"]), 440.0, places=4)
+
+    def test_6x_avgPrice_zero_cumQuote_positive_uses_cum_div_qty(self):
+        """Phase 6.X Fallback 1: avgPrice=0 但 cumQuote>0 → 用 cumQuote/executedQty 重建."""
+        entry_resp = {
+            "orderId": 1, "executedQty": "535905.0",
+            "cumQuote": "99.34", "avgPrice": "0",   # API anomaly: avgPrice 报 0
+            "status": "FILLED",
+        }
+        from contextlib import ExitStack
+        with ExitStack() as stack:
+            for p in self._common_patches(entry_resp):
+                stack.enter_context(p)
+            result = self.client.open_position(
+                symbol="HMSTRUSDT", side="BUY",
+                notional_usdt=100.0, sl_price=0.0001,
+                trade_id="test_6x_cum", use_exchange_sl=False,
+            )
+        expected_avg = 99.34 / 535905.0
+        self.assertAlmostEqual(float(result["avg_fill_price"]), expected_avg, places=10)
+        self.assertEqual(result.get("avg_fill_price_source"), "cum_quote_div_qty")
+        self.assertFalse(result.get("avg_fill_price_suspect"),
+                         "cum/qty 数学等价重算不应标记 suspect")
+        self.assertAlmostEqual(float(result["actual_notional"]), 99.34, places=4)
+
+    def test_6x_cumQuote_zero_triggers_userTrades_fallback(self):
+        """Phase 6.X Fallback 2: avgPrice=0 + cumQuote=0 → userTrades 真实 fills 重算.
+
+        模拟历史 16 条假账记录场景 (HMSTRUSDT/USELESSUSDT 类小币 LIMIT-IOC).
+        """
+        entry_resp = {
+            "orderId": 12345, "executedQty": "535905.0",
+            "cumQuote": "0", "avgPrice": "0",   # API double anomaly
+            "status": "FILLED",
+        }
+        mock_fills = [
+            {"price": "0.0001854", "qty": "300000"},
+            {"price": "0.0001853", "qty": "235905"},
+        ]
+        from contextlib import ExitStack
+        with ExitStack() as stack:
+            for p in self._common_patches(entry_resp, fills=mock_fills):
+                stack.enter_context(p)
+            result = self.client.open_position(
+                symbol="HMSTRUSDT", side="BUY",
+                notional_usdt=100.0, sl_price=0.0001,
+                trade_id="test_6x_ut", use_exchange_sl=False,
+            )
+        real_cum = 0.0001854 * 300000 + 0.0001853 * 235905
+        real_qty = 300000 + 235905
+        expected_avg = real_cum / real_qty
+        self.assertAlmostEqual(float(result["avg_fill_price"]), expected_avg, places=10)
+        self.assertEqual(result.get("avg_fill_price_source"), "userTrades_fallback")
+        self.assertFalse(result.get("avg_fill_price_suspect"),
+                         "userTrades fallback 是真实 fills, 准确, 不该 suspect")
+        self.assertAlmostEqual(float(result["actual_notional"]), real_cum, places=4)
+
+    def test_6x_userTrades_fail_market_path_unresolved(self):
+        """Phase 6.X: MARKET 路径 (无 limit_price) userTrades 失败 → unresolved + suspect.
+
+        MARKET 路径不传 limit_price, fallback chain 走完全部分支后到 unresolved.
+        仓位仍开成功 (executed_qty>0), 必须返回让上层挂 SL 保命.
+        """
+        from binance_client import BinanceError
+
+        entry_resp = {
+            "orderId": 12345, "executedQty": "1000.0",
+            "cumQuote": "0", "avgPrice": "0",
+            "status": "FILLED",
+        }
+        from contextlib import ExitStack
+        with ExitStack() as stack:
+            for p in self._common_patches(entry_resp,
+                                          fills_exc=BinanceError("API down")):
+                stack.enter_context(p)
+            result = self.client.open_position(
+                symbol="HMSTRUSDT", side="BUY",
+                notional_usdt=10.0, sl_price=0.0001,
+                trade_id="test_6x_market_unresolved", use_exchange_sl=False,
+            )
+        self.assertEqual(float(result["avg_fill_price"]), 0.0,
+                         "MARKET 无 limit_price + userTrades 失败 → avg 保持 0")
+        self.assertEqual(result.get("avg_fill_price_source"), "unresolved")
+        self.assertTrue(result.get("avg_fill_price_suspect"),
+                        "全 fallback 失败必须标记 suspect")
+        self.assertEqual(float(result["qty"]), 1000.0,
+                         "仓位仍返回 — 上层据此挂 SL 保命")
+
+    def test_6x_userTrades_empty_falls_back_to_unresolved(self):
+        """Phase 6.X: userTrades 返空 fills (非异常) 也应走到 unresolved + suspect."""
+        entry_resp = {
+            "orderId": 12345, "executedQty": "1000.0",
+            "cumQuote": "0", "avgPrice": "0",
+            "status": "FILLED",
+        }
+        from contextlib import ExitStack
+        with ExitStack() as stack:
+            for p in self._common_patches(entry_resp, fills=[]):
+                stack.enter_context(p)
+            result = self.client.open_position(
+                symbol="HMSTRUSDT", side="BUY",
+                notional_usdt=10.0, sl_price=0.0001,
+                trade_id="test_6x_empty", use_exchange_sl=False,
+            )
+        self.assertEqual(float(result["avg_fill_price"]), 0.0)
+        self.assertEqual(result.get("avg_fill_price_source"), "unresolved")
+        self.assertTrue(result.get("avg_fill_price_suspect"))
+
+
+# ============================================================================
+
 if __name__ == "__main__":
     # 直接运行: python3 test_binance_client.py
     unittest.main(verbosity=2)
