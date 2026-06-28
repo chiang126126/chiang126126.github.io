@@ -5397,6 +5397,27 @@ function renderLivePanel(data) {
     }
   }
 
+  // ===== Phase 6.Z 前向实验: SL floor A/B 臂监控 (手动 kill 用) =====
+  // A=对照(现状 SL) / B=SL距离下限=1×ATR. B-A 明显落后即关 LIVE_EXP_SL_FLOOR_ENABLED.
+  {
+    const armNet = ts => ts.reduce((s, t) => s + (Number(t.realized_pnl_usdt || 0) - Number(t.fees_paid_usdt || 0)), 0);
+    const armWinPct = ts => ts.length ? Math.round(ts.filter(t => (Number(t.realized_pnl_usdt || 0) - Number(t.fees_paid_usdt || 0)) > 0).length / ts.length * 100) : 0;
+    const armA = closed.filter(t => t.exp_sl_floor_arm === 'A');
+    const armB = closed.filter(t => t.exp_sl_floor_arm === 'B');
+    if (armA.length + armB.length > 0) {
+      const neta = armNet(armA), netb = armNet(armB), diff = netb - neta;
+      const diffCol = diff > 0 ? '#00e676' : (diff < 0 ? '#ff5252' : 'var(--text-dim)');
+      body += `<div style="background:rgba(124,77,255,0.08);border:1px solid rgba(124,77,255,0.3);border-radius:8px;padding:8px 12px;margin:8px 0;font-size:12px">
+        <span style="font-weight:600;color:#b388ff">🧪 SL floor 实验 (6.Z)</span>
+        <span style="margin-left:8px">A对照 ${armA.length}笔 净<b>$${neta.toFixed(2)}</b> (胜${armWinPct(armA)}%)</span>
+        <span style="margin-left:8px">·</span>
+        <span style="margin-left:8px">B下限 ${armB.length}笔 净<b>$${netb.toFixed(2)}</b> (胜${armWinPct(armB)}%)</span>
+        <span style="margin-left:8px;color:${diffCol};font-weight:600">· B−A $${diff.toFixed(2)}</span>
+        <span style="margin-left:8px;font-size:10px;color:var(--text-dim)">(B 明显落后即关实验)</span>
+      </div>`;
+    }
+  }
+
   // ===== 最近 10 条已平仓 (可折叠) =====
   if (closed.length > 0) {
     const closedShow = closed.slice(0, 10);

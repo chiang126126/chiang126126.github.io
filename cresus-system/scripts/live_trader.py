@@ -891,6 +891,23 @@ LIVE_PHASE_6Y_ATR_FLOOR_ENABLED = True
 LIVE_PHASE_6Y_MIN_ATR_PCT = 1.0        # paper atr_pct < 此值 → block mirror
 
 # ============================================================================
+# Phase 6.Z (2026-06-28) — 前向实验: SL 距离下限 (测"保本后 SL 太紧"假说)
+# ============================================================================
+# 审计结论 (835 笔): 98% 的 live-vs-paper gap 是出场行为差; 排除入场滑点/手续费/
+#   wick窗口/采样/补偿后, 唯一未排除主嫌 = "paper 保本后 SL 太紧 (~0.30%),
+#   live 忠实镜像 → 正常噪音 (~0.3%) 打掉, 而 paper 稀疏采样没看见 → trail 到利润".
+# 历史无 tick 路径不可回测, 故前向 A/B 实验:
+#   A 臂 (对照): 现状 — live_sl = paper_sl (+comp), 含保本后的紧 SL
+#   B 臂 (treatment): SL 距离下限 = K×ATR — 保本后不让 SL 收得比 K×ATR 更紧.
+#                     只放宽 (远离 entry), 永不收紧. 看是救回赢家还是放大真亏.
+# 随机分臂: _ab_group(paper_id, 2) → A/B (空 id → A 对照, 安全).
+# ⚠️ 真钱实验: B 臂 SL 更宽 = 单笔真亏可能更大. 手动 kill (看板 A/B 面板监控,
+#    若 B 臂明显落后即改 LIVE_EXP_SL_FLOOR_ENABLED=False 回全对照).
+# 注: K=1.0 < 灾难单 2.5×ATR, 不冲突; 只在 ATR>0 生效 (6.Y 已挡 ATR<1%).
+LIVE_EXP_SL_FLOOR_ENABLED = True
+LIVE_EXP_SL_FLOOR_ATR_MULT = 1.0       # B 臂 SL 距离下限 = 此值 × ATR%
+
+# ============================================================================
 # Phase 6.N (2026-06-16) — Maker mode 开仓 (LIMIT post-only) feature flag
 # ============================================================================
 # 设计: 默认 market taker (fees 0.05%/单 ≈ 0.10%/round-trip = 0.13%/笔).
@@ -2647,6 +2664,22 @@ def _sync_live_with_paper(live_trade: dict, paper_open_trade: dict) -> bool:
             # Phase 4.D: 若此 trade 是 SL 补偿组, 应用 offset 计算 live SL
             offset = float(live_trade.get("sl_compensation_offset") or 0)
             new_live_sl = new_paper_sl + offset    # offset=0 时退化为旧行为
+            # Phase 6.Z 前向实验: B 臂 SL 距离下限 = K×ATR (保本后不让 SL 收太紧).
+            # 只放宽 (远离 entry), 永不收紧; A 臂/禁用时不动 = 对照.
+            # ⚠️ 关键: 仅在 SL 仍在亏损侧 (LONG ≤entry / SHORT ≥entry) 且比下限更紧时放宽.
+            #    若 paper 已 trail 越过 entry 锁定利润 (SL 到盈利侧), 绝不动 — 否则会把
+            #    锁定的利润拉回亏损位吐掉 (B 臂永远锁不住利润, 实验作废且烧钱).
+            if (LIVE_EXP_SL_FLOOR_ENABLED
+                    and live_trade.get("exp_sl_floor_arm") == "B"):
+                entry_z = float(live_trade.get("avg_fill_price") or 0)
+                atr_z = float(live_trade.get("atr_pct") or 0)
+                side_z = (live_trade.get("side") or "").upper()
+                if entry_z > 0 and atr_z > 0:
+                    min_dist_z = entry_z * (LIVE_EXP_SL_FLOOR_ATR_MULT * atr_z / 100.0)
+                    if side_z == "BUY" and entry_z - min_dist_z < new_live_sl <= entry_z:
+                        new_live_sl = entry_z - min_dist_z   # 亏损侧太紧 → 放宽到下限
+                    elif side_z == "SELL" and entry_z <= new_live_sl < entry_z + min_dist_z:
+                        new_live_sl = entry_z + min_dist_z   # 亏损侧太紧 → 放宽到下限
             if abs(new_live_sl - float(live_trade.get("sl_price", 0))) > 1e-9:
                 old = live_trade.get("sl_price")
                 live_trade["sl_price"] = new_live_sl
@@ -3324,6 +3357,7 @@ def _try_mirror_open(
         wick_filter_enabled = _ab_use_wick_filter(paper_id, LIVE_SL_WICK_FILTER_MODE)
         regime_gate_enabled = _ab_use_regime_gate(paper_id, LIVE_REGIME_GATE_MODE)
         ab_group = _ab_group(paper_id)   # 'A' / 'B' / 'C' / 'D' — 记录用
+        exp_sl_floor_arm = _ab_group(paper_id, n_groups=2)   # Phase 6.Z: A=对照 / B=SL下限
         # Phase 4.M: funding signal 类型 (友好/不利/中性). 友好时 wick filter 用 +1 breaches.
         funding_signal = _funding_signal(paper_trade)
         wick_min_breaches = (LIVE_FUNDING_FAVORABLE_WICK_BREACHES
@@ -3421,6 +3455,7 @@ def _try_mirror_open(
             "regime_gate_enabled": regime_gate_enabled,    # D 组标记
             "regime_gate_mode": LIVE_REGIME_GATE_MODE,     # 部署时模式 (溯源用)
             "ab_group": ab_group,                          # 'A' / 'B' / 'C' / 'D' 显式记录
+            "exp_sl_floor_arm": exp_sl_floor_arm,          # Phase 6.Z 实验臂 (A=对照/B=SL下限)
             # Phase 4.H: Conviction filter 溯源 (部署时阈值, None=未启用)
             "min_conviction_threshold": LIVE_MIN_CONVICTION_SCORE,
 

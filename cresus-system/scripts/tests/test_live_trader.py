@@ -8184,5 +8184,81 @@ class TestPhase6YAtrFloor(unittest.TestCase):
         self.assertTrue(ok, f"6.Y 关闭时低 ATR 应通过, got: {reason}")
 
 
+class TestPhase6ZSlFloor(unittest.TestCase):
+    """Phase 6.Z (2026-06-28) 前向实验: B 臂 SL 距离下限 = K×ATR.
+
+    只放宽 (远离 entry), 永不收紧; A 臂/禁用/缺数据 = 不动 (对照).
+    entry=100, atr_pct=2% → min_dist = 100×1.0×2/100 = 2.0
+      LONG floor = 98.0, SHORT floor = 102.0
+    """
+
+    def _lt(self, **kw):
+        t = {
+            "symbol": "TESTUSDT", "side": "BUY", "avg_fill_price": 100.0,
+            "atr_pct": 2.0, "exp_sl_floor_arm": "B", "sl_price": 0.0,
+            "sl_compensation_offset": 0.0, "phase": "A",
+        }
+        t.update(kw)
+        return t
+
+    def test_6z_b_long_tight_sl_floored(self):
+        lt = self._lt()   # paper 紧 SL 99.7 (距离 0.3%) → 放宽到 floor 98.0
+        live_trader._sync_live_with_paper(lt, {"sl": 99.7, "phase": "B"})
+        self.assertAlmostEqual(lt["sl_price"], 98.0, places=6)
+
+    def test_6z_b_long_wide_sl_unchanged(self):
+        lt = self._lt()   # paper 宽 SL 95.0 (< floor 98.0) → 不动
+        live_trader._sync_live_with_paper(lt, {"sl": 95.0, "phase": "A"})
+        self.assertAlmostEqual(lt["sl_price"], 95.0, places=6)
+
+    def test_6z_b_short_tight_sl_floored(self):
+        lt = self._lt(side="SELL")   # SHORT 紧 SL 100.3 → 放宽到 floor 102.0
+        live_trader._sync_live_with_paper(lt, {"sl": 100.3, "phase": "B"})
+        self.assertAlmostEqual(lt["sl_price"], 102.0, places=6)
+
+    def test_6z_b_short_wide_sl_unchanged(self):
+        lt = self._lt(side="SELL")   # SHORT 宽 SL 105.0 (> floor 102.0) → 不动
+        live_trader._sync_live_with_paper(lt, {"sl": 105.0, "phase": "A"})
+        self.assertAlmostEqual(lt["sl_price"], 105.0, places=6)
+
+    def test_6z_a_arm_no_floor(self):
+        lt = self._lt(exp_sl_floor_arm="A")   # 对照臂 → 不动
+        live_trader._sync_live_with_paper(lt, {"sl": 99.7, "phase": "B"})
+        self.assertAlmostEqual(lt["sl_price"], 99.7, places=6)
+
+    def test_6z_disabled_no_floor(self):
+        lt = self._lt()
+        with patch.object(live_trader, "LIVE_EXP_SL_FLOOR_ENABLED", False):
+            live_trader._sync_live_with_paper(lt, {"sl": 99.7, "phase": "B"})
+        self.assertAlmostEqual(lt["sl_price"], 99.7, places=6)
+
+    def test_6z_missing_atr_no_floor(self):
+        lt = self._lt(atr_pct=0)   # 缺 ATR → fail-safe 不动
+        live_trader._sync_live_with_paper(lt, {"sl": 99.7, "phase": "B"})
+        self.assertAlmostEqual(lt["sl_price"], 99.7, places=6)
+
+    def test_6z_floor_never_tightens(self):
+        lt = self._lt()   # paper SL 恰在 floor (98.0) → 不动 (边界, 不收紧)
+        live_trader._sync_live_with_paper(lt, {"sl": 98.0, "phase": "B"})
+        self.assertAlmostEqual(lt["sl_price"], 98.0, places=6)
+        # 验证 floor 永远在 entry 正确一侧 (LONG 下方)
+        self.assertLess(lt["sl_price"], lt["avg_fill_price"])
+
+    def test_6z_b_long_profit_lock_unchanged(self):
+        # ⚠️ 防回归: paper trail SL 到 103 (entry 100 上方, 锁 3% 利润) →
+        # B 臂绝不能拉回到 98 (否则吐掉利润). 应保持 103.
+        lt = self._lt()
+        live_trader._sync_live_with_paper(lt, {"sl": 103.0, "phase": "C"})
+        self.assertAlmostEqual(lt["sl_price"], 103.0, places=6)
+        self.assertGreater(lt["sl_price"], lt["avg_fill_price"])   # 仍在盈利侧
+
+    def test_6z_b_short_profit_lock_unchanged(self):
+        # SHORT paper trail SL 到 97 (entry 100 下方, 锁 3% 利润) → 不动, 保持 97.
+        lt = self._lt(side="SELL")
+        live_trader._sync_live_with_paper(lt, {"sl": 97.0, "phase": "C"})
+        self.assertAlmostEqual(lt["sl_price"], 97.0, places=6)
+        self.assertLess(lt["sl_price"], lt["avg_fill_price"])      # 仍在盈利侧
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
