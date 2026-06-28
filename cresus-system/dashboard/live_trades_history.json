@@ -1,34 +1,34 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-28T08:53:08.079715+00:00",
+  "generated_at": "2026-06-28T08:55:14.996162+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 831,
-    "open": 2,
-    "closed": 829,
+    "open": 1,
+    "closed": 830,
     "wins": 265,
-    "losses": 555,
+    "losses": 556,
     "win_rate": 0.323,
-    "total_pnl_usdt": -83.6211,
-    "net_pnl_usdt": -185.3155,
-    "avg_pnl_usdt": -0.1009,
+    "total_pnl_usdt": -84.4418,
+    "net_pnl_usdt": -186.2357,
+    "avg_pnl_usdt": -0.1017,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 101.7943,
-    "fees_realized_usdt": 101.6944,
-    "fees_open_usdt": 0.1,
+    "fees_paid_usdt": 101.8439,
+    "fees_realized_usdt": 101.7939,
+    "fees_open_usdt": 0.05,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
     "deployed_usdt": 0.0,
-    "free_capital_usdt": 414.58,
+    "free_capital_usdt": 413.71,
     "max_concurrent_slots": 3,
-    "slots_used": 2
+    "slots_used": 1
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 0.0,
+    "daily_pnl": -0.8207,
     "deployed_usdt": 0.0
   },
   "reconciliation": {
@@ -36,12 +36,10 @@
     "mismatches": [],
     "api_failed": false,
     "live_symbols": [
-      "BASEDUSDT",
-      "ZEREBROUSDT"
+      "BASEDUSDT"
     ],
     "exchange_symbols": [
-      "BASEDUSDT",
-      "ZEREBROUSDT"
+      "BASEDUSDT"
     ]
   },
   "open_trades": [
@@ -118,11 +116,13 @@
       "last_sl_sync_paper_sl": 0.08070286,
       "sl_sync_count": 1,
       "phase_a_mfe_price": 0.0831,
-      "current_price": 0.08234,
+      "current_price": 0.08228,
       "unrealized_pnl_usdt": 0.0,
       "unrealized_pnl_pct": 0.0,
-      "last_price_check_at": "2026-06-28T08:53:06.183481+00:00"
-    },
+      "last_price_check_at": "2026-06-28T08:55:13.707368+00:00"
+    }
+  ],
+  "recent_closed": [
     {
       "paper_id": "ZEREBROUSDT|LONG|2026-06-28T08:44:30.003180+00:00",
       "trade_id": "L1782636270_ZEREBRO_L",
@@ -159,7 +159,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 6,
       "wick_filter_mode": "always",
-      "sl_breach_count": 0,
+      "sl_breach_count": 6,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.0387,
       "regime_gate_enabled": true,
@@ -182,7 +182,7 @@
       "phase_a_mfe_pct": 0.759,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.049982,
+      "fees_paid_usdt": 0.099553,
       "fees_are_actual": true,
       "opened_at": "2026-06-28T08:45:14.938480+00:00",
       "is_dry_run": false,
@@ -196,13 +196,31 @@
       "last_sl_sync_paper_sl": 0.041801085999999994,
       "sl_sync_count": 2,
       "phase_a_mfe_price": 0.042194,
-      "current_price": 0.042037,
+      "current_price": 0.041738,
       "unrealized_pnl_usdt": 0.0,
       "unrealized_pnl_pct": 0.0,
-      "last_price_check_at": "2026-06-28T08:53:06.183481+00:00"
-    }
-  ],
-  "recent_closed": [
+      "last_price_check_at": "2026-06-28T08:54:46.580585+00:00",
+      "btc_regime_at_close": "chop",
+      "btc_price_at_close": 60365.8,
+      "btc_pct_vs_ma25_at_close": 0.095,
+      "closed_at": "2026-06-28T08:54:51.073071+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.04167402816309374,
+      "realized_pnl_usdt": -0.8207,
+      "close_order_id": 2911481946,
+      "close_qty": 2379.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "binance_api",
+      "close_method": "limit_ioc_full",
+      "actual_close_slip_bps": 7.55,
+      "limit_qty_closed": 2379.0,
+      "market_qty_closed": 0.0,
+      "mid_at_close_attempt": 0.0417055,
+      "close_expected_price": 0.041801085999999994,
+      "close_slippage_bps": 30.4,
+      "entry_fees_usdt": 0.049982,
+      "close_fees_usdt": 0.049571
+    },
     {
       "paper_id": "BASUSDT|LONG|2026-06-27T17:34:57.808065+00:00",
       "trade_id": "L1782581697_BASUSDT_L",
@@ -68285,19 +68303,19 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-28T08:35:57.864294+00:00",
-      "reason": "paper trade too old (1028s > 600s)",
-      "last_checked_at": "2026-06-28T08:53:06.183481+00:00"
+      "reason": "paper trade too old (1156s > 600s)",
+      "last_checked_at": "2026-06-28T08:55:13.707368+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 60370.1,
-    "btc_ma25_1h": 60308.74,
-    "pct_vs_ma25": 0.102,
-    "change_24h_pct": -0.091,
+    "btc_price": 60374.3,
+    "btc_ma25_1h": 60308.9,
+    "pct_vs_ma25": 0.108,
+    "change_24h_pct": -0.084,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-28T08:53:07.466924+00:00"
+    "computed_at": "2026-06-28T08:55:14.657517+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
