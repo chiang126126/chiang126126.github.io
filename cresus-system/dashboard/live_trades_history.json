@@ -1,29 +1,29 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-28T12:07:43.411213+00:00",
+  "generated_at": "2026-06-28T12:09:51.689183+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 835,
-    "open": 1,
-    "closed": 834,
+    "open": 0,
+    "closed": 835,
     "wins": 265,
-    "losses": 560,
+    "losses": 561,
     "win_rate": 0.321,
-    "total_pnl_usdt": -90.2697,
-    "net_pnl_usdt": -192.4605,
-    "avg_pnl_usdt": -0.1082,
+    "total_pnl_usdt": -90.9835,
+    "net_pnl_usdt": -193.2739,
+    "avg_pnl_usdt": -0.109,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 102.2408,
-    "fees_realized_usdt": 102.1908,
-    "fees_open_usdt": 0.05,
+    "fees_paid_usdt": 102.2904,
+    "fees_realized_usdt": 102.2904,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 0.0,
-    "free_capital_usdt": 407.49,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 406.73,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
@@ -42,7 +42,8 @@
       "MANTAUSDT"
     ]
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "MANTAUSDT|LONG|2026-06-28T12:03:03.107318+00:00",
       "trade_id": "L1782648183_MANTAUS_L",
@@ -79,7 +80,7 @@
       "wick_filter_enabled": true,
       "wick_filter_min_breaches": 6,
       "wick_filter_mode": "always",
-      "sl_breach_count": 0,
+      "sl_breach_count": 6,
       "funding_signal": "neutral",
       "funding_rate_pct_at_open": 0.005,
       "regime_gate_enabled": true,
@@ -102,7 +103,7 @@
       "phase_a_mfe_pct": 0.0,
       "phase_b_mfe_pct": null,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.049977,
+      "fees_paid_usdt": 0.099597,
       "fees_are_actual": true,
       "opened_at": "2026-06-28T12:03:44.333806+00:00",
       "is_dry_run": false,
@@ -116,13 +117,32 @@
       "last_sl_sync_paper_sl": 0.0939525,
       "sl_sync_count": 1,
       "phase_a_mfe_price": 0.09459,
-      "current_price": 0.09423,
+      "current_price": 0.0937,
       "unrealized_pnl_usdt": 0.0,
       "unrealized_pnl_pct": 0.0,
-      "last_price_check_at": "2026-06-28T12:07:41.984721+00:00"
-    }
-  ],
-  "recent_closed": [
+      "last_price_check_at": "2026-06-28T12:09:47.478687+00:00",
+      "btc_regime_at_close": "chop",
+      "btc_price_at_close": 60319.3,
+      "btc_pct_vs_ma25_at_close": 0.055,
+      "closed_at": "2026-06-28T12:09:51.633747+00:00",
+      "close_reason": "sl_breach_client",
+      "avg_exit_price": 0.09367623182933736,
+      "realized_pnl_usdt": -0.7138,
+      "realized_pnl_pct": null,
+      "close_order_id": 3882120898,
+      "close_qty": 1059.4,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "binance_api",
+      "close_method": "limit_ioc_full",
+      "actual_close_slip_bps": 3.07,
+      "limit_qty_closed": 1059.4,
+      "market_qty_closed": 0.0,
+      "mid_at_close_attempt": 0.093705,
+      "close_expected_price": 0.0939525,
+      "close_slippage_bps": 29.41,
+      "entry_fees_usdt": 0.049977,
+      "close_fees_usdt": 0.04962
+    },
     {
       "paper_id": "MANTAUSDT|LONG|2026-06-28T10:20:39.687974+00:00",
       "trade_id": "L1782642039_MANTAUS_L",
@@ -68695,19 +68715,19 @@
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-06-28T11:50:26.911701+00:00",
-      "reason": "paper trade too old (1035s > 600s)",
-      "last_checked_at": "2026-06-28T12:07:41.984721+00:00"
+      "reason": "paper trade too old (1161s > 600s)",
+      "last_checked_at": "2026-06-28T12:09:47.478687+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 60342.0,
-    "btc_ma25_1h": 60287.01,
-    "pct_vs_ma25": 0.091,
-    "change_24h_pct": -0.086,
+    "btc_price": 60319.3,
+    "btc_ma25_1h": 60286.1,
+    "pct_vs_ma25": 0.055,
+    "change_24h_pct": -0.124,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-06-28T12:07:43.073197+00:00"
+    "computed_at": "2026-06-28T12:09:48.743701+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
