@@ -879,6 +879,18 @@ LIVE_PHASE_6F_B2_PARTIAL_VALID_TIERS = frozenset({"D", "B"})  # 仅 D 微币 + B
 LIVE_PHASE_6M_TIER_C_FULL_BLOCK_ENABLED = True
 
 # ============================================================================
+# Phase 6.Y (2026-06-28) — ATR 波动率下限闸门 (止血)
+# ============================================================================
+# 数据驱动 (835 笔实盘 bootstrap audit, 2026-06-28):
+#   ATR<1% 的币 (717 笔 = 86% 交易) 净 -$232, bootstrap CI[-317, -145] 整段 < 0
+#   = 统计稳健亏损. ATR≥1% (116 笔) inconclusive (CI 跨 0, 证不了盈亏).
+#   根因: ATR<1% = 几乎不动的币, trail 吃不到利润, 却照付 SL 损失 + 手续费.
+#   ⚠️ 24 天 BTC 下跌样本, regime-specific — 牛市/高波动期未必成立, 需复审.
+# 紧急回滚: LIVE_PHASE_6Y_ATR_FLOOR_ENABLED = False
+LIVE_PHASE_6Y_ATR_FLOOR_ENABLED = True
+LIVE_PHASE_6Y_MIN_ATR_PCT = 1.0        # paper atr_pct < 此值 → block mirror
+
+# ============================================================================
 # Phase 6.N (2026-06-16) — Maker mode 开仓 (LIMIT post-only) feature flag
 # ============================================================================
 # 设计: 默认 market taker (fees 0.05%/单 ≈ 0.10%/round-trip = 0.13%/笔).
@@ -1473,6 +1485,20 @@ def is_eligible_for_mirror(
             return False, (
                 f"phase_6m: Tier C 小币 (entry=${entry_price_for_6m:.4f}) "
                 f"整体 block — 13 天 195 笔 -$96 (drag $1.30/笔, 全 tier 最高)"
+            )
+    # Phase 6.Y (2026-06-28): ATR 波动率下限闸门 — atr_pct < 阈值 → block.
+    # 数据: ATR<1% 稳健亏 -$232 (835 笔 bootstrap CI[-317,-145] 整段<0).
+    # 缺 atr_pct 时 fail-safe 放行 (不过度拦截 — atr_pct 由 paper 计算, 缺失罕见).
+    if LIVE_PHASE_6Y_ATR_FLOOR_ENABLED:
+        raw_atr_6y = paper_trade.get("atr_pct")
+        try:
+            atr_val_6y = float(raw_atr_6y) if raw_atr_6y is not None else None
+        except (ValueError, TypeError):
+            atr_val_6y = None
+        if atr_val_6y is not None and atr_val_6y < LIVE_PHASE_6Y_MIN_ATR_PCT:
+            return False, (
+                f"phase_6y: ATR {atr_val_6y:.2f}% < {LIVE_PHASE_6Y_MIN_ATR_PCT}% 下限 "
+                f"(ATR<1% 稳健亏 -$232, bootstrap CI 整段<0)"
             )
     # 6.F. Phase 6.F BLACKLIST — 数据驱动 (105h 280 笔统计):
     #   B1: conv=6 (n=57 -$80, paper 也仅 +$22 → 信号差 + 执行差).
