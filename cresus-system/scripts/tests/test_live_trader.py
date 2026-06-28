@@ -6042,7 +6042,7 @@ class TestPhase6FBlacklist(unittest.TestCase):
             "conviction_score": 5,     # conv5 default (避免 B1 触发)
             "entered_at": now,
             "sl": 4.5, "tp1": 6.0, "tp2": 7.0,
-            "atr_pct": 0.5, "notional_usdt": 150.0,
+            "atr_pct": 1.5, "notional_usdt": 150.0,   # ≥1.0 以通过 Phase 6.Y ATR 闸门
             "phase": "A", "tier": "diamond",
         }
         t.update(overrides)
@@ -7708,7 +7708,7 @@ class TestPhase6TMA30TrendGate(unittest.TestCase):
             "conviction_score": 5,
             "entered_at": self.now.isoformat(),
             "sl": 49.0, "tp1": 52.0, "tp2": 54.0,
-            "atr_pct": 0.5, "notional_usdt": 100.0,
+            "atr_pct": 1.5, "notional_usdt": 100.0,   # ≥1.0 以通过 Phase 6.Y ATR 闸门
             "phase": "A", "tier": "diamond",
         }
         t.update(kw)
@@ -8120,6 +8120,68 @@ class TestPhase6XRealizedPnlPctPopulation(unittest.TestCase):
         r = self._do_close(live_trade, mock_close)
         self.assertIsNone(r["realized_pnl_pct"],
                           "exit=0 异常路径也保留 None")
+
+
+class TestPhase6YAtrFloor(unittest.TestCase):
+    """Phase 6.Y (2026-06-28): ATR 波动率下限闸门. paper atr_pct < 1.0% → block.
+
+    数据: 835 笔 bootstrap audit, ATR<1% 稳健亏 -$232 (CI[-317,-145] 整段<0).
+    缺/异常 atr_pct → fail-safe 放行 (不过度拦截).
+    """
+
+    def setUp(self):
+        self.now = datetime.now(timezone.utc)
+        # 隔离: 关 6.F (conv=6 会被它拦), 单测 6.Y gate
+        self._6f = patch.object(live_trader, "LIVE_PHASE_6F_BLACKLIST_ENABLED", False)
+        self._6f.start(); self.addCleanup(self._6f.stop)
+        self.base = {
+            "id": "ETHUSDT|LONG|2026-06-28T10:00:00+00:00",
+            "symbol": "ETHUSDT",
+            "direction": "LONG",
+            "entered_at": (self.now - timedelta(seconds=30)).isoformat(),
+            "entry_price": 3000.0,   # 远离 Tier C ($0.1-$1)
+            "sl": 2970.0,
+            "conviction_score": 7,   # 避开 6.F conv=6 block
+        }
+        self.live = _empty_live_state()
+
+    def test_6y_low_atr_blocked(self):
+        t = dict(self.base); t["atr_pct"] = 0.5
+        ok, reason = is_eligible_for_mirror(t, self.live, self.now)
+        self.assertFalse(ok)
+        self.assertIn("phase_6y", reason)
+
+    def test_6y_high_atr_passes(self):
+        t = dict(self.base); t["atr_pct"] = 2.0
+        ok, reason = is_eligible_for_mirror(t, self.live, self.now)
+        self.assertTrue(ok, f"ATR 2% 应通过, got: {reason}")
+
+    def test_6y_boundary_exactly_1pct_passes(self):
+        t = dict(self.base); t["atr_pct"] = 1.0   # 不 < 1.0 → 通过
+        ok, reason = is_eligible_for_mirror(t, self.live, self.now)
+        self.assertTrue(ok, f"ATR=1.0% 边界应通过 (< 才拦), got: {reason}")
+
+    def test_6y_just_below_1pct_blocked(self):
+        t = dict(self.base); t["atr_pct"] = 0.99
+        ok, reason = is_eligible_for_mirror(t, self.live, self.now)
+        self.assertFalse(ok)
+        self.assertIn("phase_6y", reason)
+
+    def test_6y_missing_atr_failsafe_pass(self):
+        t = dict(self.base)   # 无 atr_pct
+        ok, reason = is_eligible_for_mirror(t, self.live, self.now)
+        self.assertTrue(ok, f"缺 atr_pct 应 fail-safe 放行, got: {reason}")
+
+    def test_6y_invalid_atr_failsafe_pass(self):
+        t = dict(self.base); t["atr_pct"] = "bad"
+        ok, reason = is_eligible_for_mirror(t, self.live, self.now)
+        self.assertTrue(ok, f"atr_pct 非数应 fail-safe 放行, got: {reason}")
+
+    def test_6y_disabled_low_atr_passes(self):
+        t = dict(self.base); t["atr_pct"] = 0.3
+        with patch.object(live_trader, "LIVE_PHASE_6Y_ATR_FLOOR_ENABLED", False):
+            ok, reason = is_eligible_for_mirror(t, self.live, self.now)
+        self.assertTrue(ok, f"6.Y 关闭时低 ATR 应通过, got: {reason}")
 
 
 if __name__ == "__main__":
