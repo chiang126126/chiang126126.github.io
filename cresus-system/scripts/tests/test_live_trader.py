@@ -62,6 +62,23 @@ FAKE_KEY    = "FAKE_API_KEY_DO_NOT_USE_" + "x" * 40
 FAKE_SECRET = "FAKE_API_SECRET_DO_NOT_USE_" + "y" * 37
 
 
+def _disable_net_reads(testcase, client):
+    """让测试用的真实 BinanceClient 市场数据读取 (book_ticker/klines) 默认失败,
+    复刻云端"无网络"行为 → 测试不依赖运行机器是否联网 (修 #15 真机 41 失败).
+
+    根因: _get_entry_reference_price 先调 get_book_ticker (真机有网络 → 返真价),
+    而各测试只 mock 了 get_klines fallback → book_ticker 真值让 get_klines mock 失效,
+    滑点用真价算出巨大值 → 滑点 gate 误拒 / 断言失败. 云端无网络时 book_ticker 也失败
+    → 落 get_klines, 故云端 pass. 此 helper 强制两个读取失败 = 复刻云端.
+    per-test 的 `with patch.object(client, "get_klines", ...)` 仍在 with 块内覆盖.
+    """
+    for _m in ("get_book_ticker", "get_klines"):
+        _p = patch.object(client, _m,
+                          side_effect=BinanceError("test: net disabled (match cloud)"))
+        _p.start()
+        testcase.addCleanup(_p.stop)
+
+
 # ============================================================================
 # Trade ID generation (Phase 3.1: 符合 binance_client 约束)
 # ============================================================================
@@ -467,6 +484,7 @@ class TestTryMirrorOpen(unittest.TestCase):
 
     def setUp(self):
         self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+        _disable_net_reads(self, self.client)
         self.paper_trade = {
             "id": "BTCUSDT|LONG|2026-05-15T10:00:00+00:00",
             "symbol": "BTCUSDT",
@@ -705,6 +723,7 @@ class TestMainLoopMirroring(unittest.TestCase):
         self._conv_patcher.start()
 
         self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+        _disable_net_reads(self, self.client)
         # Mock fill response
         self.mock_result = {
             "trade_id": "L1_BTCUSDT_L",
@@ -960,6 +979,7 @@ class TestGetCurrentPrice(unittest.TestCase):
 
     def setUp(self):
         self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+        _disable_net_reads(self, self.client)
 
     def test_normal(self):
         with patch.object(self.client, "get_klines",
@@ -988,6 +1008,7 @@ class TestComputePreEntrySlippage(unittest.TestCase):
 
     def setUp(self):
         self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+        _disable_net_reads(self, self.client)
 
     def _kline(self, price):
         return [[0, 0, 0, 0, str(price), 0, 0, 0, 0, 0, 0, 0]]
@@ -1266,6 +1287,7 @@ class TestComputeBtcRegime(unittest.TestCase):
 
     def setUp(self):
         self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+        _disable_net_reads(self, self.client)
 
     def _kline_set(self, closes):
         """造 25 根 1h kline, 给定 close 价 list."""
@@ -2916,6 +2938,7 @@ class TestTryMirrorClose(unittest.TestCase):
 
     def setUp(self):
         self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+        _disable_net_reads(self, self.client)
         self.live_trade = {
             "trade_id": "L1_BTC_L",
             "symbol": "BTCUSDT",
@@ -3146,6 +3169,7 @@ class TestMainLoopPhase32b(unittest.TestCase):
         live_trader.LIVE_STATE = Path(self.tmpdir) / "live.json"
         live_trader.PAPER_HISTORY = Path(self.tmpdir) / "paper.json"
         self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+        _disable_net_reads(self, self.client)
 
     def tearDown(self):
         live_trader.LIVE_STATE = self._orig_live_state
@@ -3522,6 +3546,7 @@ class TestMainLoopWithRiskGates(unittest.TestCase):
         self._conv_patcher = patch.object(live_trader, "LIVE_MIN_CONVICTION_SCORE", None)
         self._conv_patcher.start()
         self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+        _disable_net_reads(self, self.client)
 
     def tearDown(self):
         self._conv_patcher.stop()
@@ -3655,6 +3680,7 @@ class TestCumulativeDD(unittest.TestCase):
         self._orig_stop = live_trader.EMERGENCY_STOP_PATH
         live_trader.EMERGENCY_STOP_PATH = Path(self.tmpdir) / ".emergency-stop"
         self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+        _disable_net_reads(self, self.client)
 
     def tearDown(self):
         live_trader.EMERGENCY_STOP_PATH = self._orig_stop
@@ -3724,6 +3750,7 @@ class TestPositionReconciliation(unittest.TestCase):
 
     def setUp(self):
         self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+        _disable_net_reads(self, self.client)
 
     def test_all_match_ok(self):
         """Live 和 exchange 同样的 symbols → ok."""
@@ -3800,6 +3827,7 @@ class TestRiskGatesWithClient(unittest.TestCase):
         live_trader.EMERGENCY_STOP_PATH = Path(self.tmpdir) / ".emergency"
         live_trader.PAUSE_FLAG_PATH = Path(self.tmpdir) / ".pause"
         self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+        _disable_net_reads(self, self.client)
         self.now = datetime.now(timezone.utc)
 
     def tearDown(self):
@@ -3865,6 +3893,7 @@ class TestMirrorIterationGuards(unittest.TestCase):
         live_trader.LIVE_STATE = Path(self.tmpdir) / "live.json"
         live_trader.PAPER_HISTORY = Path(self.tmpdir) / "paper.json"
         self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+        _disable_net_reads(self, self.client)
         # Phase 4.H: 关闭 conv filter (这个 test class 不测它)
         self._conv_patcher = patch.object(live_trader, "LIVE_MIN_CONVICTION_SCORE", None)
         self._conv_patcher.start()
@@ -8011,6 +8040,7 @@ class TestPhase6XRealizedPnlPctPopulation(unittest.TestCase):
 
     def setUp(self):
         self.client = BinanceClient(FAKE_KEY, FAKE_SECRET, dry_run=True)
+        _disable_net_reads(self, self.client)
 
     def _do_close(self, live_trade, mock_close):
         with patch.object(self.client, "close_position",
