@@ -2817,7 +2817,13 @@ def _try_mirror_close(
     # Phase 6.X (2026-06-27): 补写 realized_pnl_pct 供看板显示百分比.
     # 历史 828 条全部缺这个字段 → live 板已平仓卡片显示 "—". 此处算出来一并写入.
     # entry=0 (Phase 6.X 前的 16 条脏数据) 时保留 None, 由看板兜底用 pnl/(qty*exit) 反推.
-    entry_for_pct = float(closed.get("avg_fill_price") or 0)
+    # Phase 6.X-fix (2026-06-29): avg_fill_price 可能是非数字 (Phase 5.T 脏数据场景),
+    # `or 0` 挡不住 truthy 字符串 → float() 抛 ValueError 让平仓崩. 包 try/except 兜底:
+    # 非数字 → 当 0 → realized_pnl_pct=None (跟 Phase 5.T "不崩传 None" 设计一致).
+    try:
+        entry_for_pct = float(closed.get("avg_fill_price") or 0)
+    except (ValueError, TypeError):
+        entry_for_pct = 0.0
     if entry_for_pct > 0 and exit_price > 0:
         sign_pct = 1 if closed.get("side") == "BUY" else -1
         closed["realized_pnl_pct"] = round(
