@@ -5397,25 +5397,39 @@ function renderLivePanel(data) {
     }
   }
 
-  // ===== Phase 6.Z 前向实验: SL floor A/B 臂监控 (手动 kill 用) =====
+  // ===== Phase 6.Z 前向实验卡片: SL floor A/B (always 显示) =====
   // A=对照(现状 SL) / B=SL距离下限=1×ATR. B-A 明显落后即关 LIVE_EXP_SL_FLOOR_ENABLED.
   {
     const armNet = ts => ts.reduce((s, t) => s + (Number(t.realized_pnl_usdt || 0) - Number(t.fees_paid_usdt || 0)), 0);
     const armWinPct = ts => ts.length ? Math.round(ts.filter(t => (Number(t.realized_pnl_usdt || 0) - Number(t.fees_paid_usdt || 0)) > 0).length / ts.length * 100) : 0;
     const armA = closed.filter(t => t.exp_sl_floor_arm === 'A');
     const armB = closed.filter(t => t.exp_sl_floor_arm === 'B');
-    if (armA.length + armB.length > 0) {
-      const neta = armNet(armA), netb = armNet(armB), diff = netb - neta;
-      const diffCol = diff > 0 ? '#00e676' : (diff < 0 ? '#ff5252' : 'var(--text-dim)');
-      body += `<div style="background:rgba(124,77,255,0.08);border:1px solid rgba(124,77,255,0.3);border-radius:8px;padding:8px 12px;margin:8px 0;font-size:12px">
-        <span style="font-weight:600;color:#b388ff">🧪 SL floor 实验 (6.Z)</span>
-        <span style="margin-left:8px">A对照 ${armA.length}笔 净<b>$${neta.toFixed(2)}</b> (胜${armWinPct(armA)}%)</span>
-        <span style="margin-left:8px">·</span>
-        <span style="margin-left:8px">B下限 ${armB.length}笔 净<b>$${netb.toFixed(2)}</b> (胜${armWinPct(armB)}%)</span>
-        <span style="margin-left:8px;color:${diffCol};font-weight:600">· B−A $${diff.toFixed(2)}</span>
-        <span style="margin-left:8px;font-size:10px;color:var(--text-dim)">(B 明显落后即关实验)</span>
-      </div>`;
+    const neta = armNet(armA), netb = armNet(armB), diff = netb - neta;
+    const col = v => v > 0 ? '#00e676' : (v < 0 ? '#ff5252' : 'var(--text-dim)');
+    const TARGET = 40;
+    let bottom;
+    if (armA.length + armB.length === 0) {
+      bottom = '<span style="color:var(--text-dim)">⏳ 等待数据 — 新单平仓后自动填充</span>';
+    } else {
+      const need = Math.max(0, TARGET - Math.min(armA.length, armB.length));
+      const verdict = diff > 0 ? 'B 下限领先' : (diff < 0 ? 'B 落后, 可考虑关实验' : '持平');
+      bottom = `<span style="color:${col(diff)};font-weight:700">B − A = $${diff.toFixed(2)}</span>`
+             + `<span style="margin-left:8px;color:${col(diff)}">${verdict}</span>`
+             + `<span style="margin-left:10px;font-size:11px;color:var(--text-dim)">每臂目标 ${TARGET} 笔` + (need > 0 ? ` (还差 ${need} 笔可判读)` : ` ✓ 已够判读`) + `</span>`;
     }
+    const colCard = (label, net, cnt, win) => `<div style="flex:1;background:rgba(255,255,255,0.04);border-radius:8px;padding:10px 12px;text-align:center">
+        <div style="font-size:11px;color:var(--text-dim)">${label}</div>
+        <div style="font-size:20px;font-weight:700;color:${col(net)};margin:2px 0">$${net.toFixed(2)}</div>
+        <div style="font-size:11px;color:var(--text-dim)">${cnt} 笔 · 胜 ${win}%</div>
+      </div>`;
+    body += `<div style="background:rgba(124,77,255,0.08);border:1px solid rgba(124,77,255,0.35);border-radius:10px;padding:12px 14px;margin:10px 0">
+      <div style="font-weight:700;color:#b388ff;margin-bottom:8px">🧪 SL floor 前向实验 (6.Z) <span style="font-size:11px;color:var(--text-dim);font-weight:normal">— 测"保本后 SL 太紧"</span></div>
+      <div style="display:flex;gap:10px">
+        ${colCard('A 对照 (现状 SL)', neta, armA.length, armWinPct(armA))}
+        ${colCard('B 下限 (SL ≥ 1×ATR)', netb, armB.length, armWinPct(armB))}
+      </div>
+      <div style="margin-top:9px;font-size:12px">${bottom}</div>
+    </div>`;
   }
 
   // ===== 最近 10 条已平仓 (可折叠) =====
