@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-06-30T18:01:05.104169+00:00",
+  "generated_at": "2026-06-30T18:03:12.806938+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 837,
@@ -68916,19 +68916,37 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-06-30T17:41:22.146599+00:00",
-      "reason": "paper trade too old (1182s > 600s)",
-      "last_checked_at": "2026-06-30T18:01:04.093673+00:00"
+      "reason": "paper trade too old (1309s > 600s)",
+      "last_checked_at": "2026-06-30T18:03:11.644671+00:00"
+    },
+    {
+      "paper_id": "CAPUSDT|LONG|2026-06-30T18:01:54.389359+00:00",
+      "symbol": "CAPUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-06-30T18:02:48.278409+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=+0.08% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-06-30T18:03:11.644671+00:00"
+    },
+    {
+      "paper_id": "MYXUSDT|SHORT|2026-06-30T18:02:32.124718+00:00",
+      "symbol": "MYXUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-06-30T18:02:48.278409+00:00",
+      "reason": "phase_6y: ATR 0.50% < 1.0% 下限 (ATR<1% 稳健亏 -$232, bootstrap CI 整段<0)",
+      "last_checked_at": "2026-06-30T18:03:11.644671+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 58442.5,
-    "btc_ma25_1h": 59427.2,
-    "pct_vs_ma25": -1.657,
-    "change_24h_pct": -3.041,
+    "btc_price": 58402.3,
+    "btc_ma25_1h": 59425.59,
+    "pct_vs_ma25": -1.722,
+    "change_24h_pct": -3.108,
     "sub_regime": "down_stable",
-    "change_3h_pct": 0.148,
-    "computed_at": "2026-06-30T18:01:05.047100+00:00"
+    "change_3h_pct": 0.079,
+    "computed_at": "2026-06-30T18:03:12.746096+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
