@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-01T00:33:45.892567+00:00",
+  "generated_at": "2026-07-01T00:35:54.214731+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
@@ -16921,6 +16921,18 @@
         }
       }
     },
+    "GLMUSDT|burst|LONG": {
+      "symbol": "GLMUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -0.74
+        }
+      }
+    },
     "SOLUSDT|sustained|SHORT": {
       "symbol": "SOLUSDT",
       "alert_type": "sustained",
@@ -19902,9 +19914,9 @@
           "avg_outcome_pct": 0.6
         },
         "60m": {
-          "n": 36,
-          "win_rate": 0.278,
-          "avg_outcome_pct": -0.75
+          "n": 37,
+          "win_rate": 0.27,
+          "avg_outcome_pct": -0.73
         },
         "240m": {
           "n": 36,
