@@ -1,48 +1,45 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-07-01T02:52:15.000367+00:00",
+  "generated_at": "2026-07-01T02:54:24.042072+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 838,
-    "open": 1,
-    "closed": 837,
-    "wins": 266,
+    "open": 0,
+    "closed": 838,
+    "wins": 267,
     "losses": 562,
-    "win_rate": 0.321,
-    "total_pnl_usdt": -93.7055,
-    "net_pnl_usdt": -196.134,
-    "avg_pnl_usdt": -0.112,
+    "win_rate": 0.322,
+    "total_pnl_usdt": -91.4342,
+    "net_pnl_usdt": -193.9638,
+    "avg_pnl_usdt": -0.1091,
     "best_trade_usdt": 65.723,
     "worst_trade_usdt": -15.1399,
-    "fees_paid_usdt": 102.4785,
-    "fees_realized_usdt": 102.4285,
-    "fees_open_usdt": 0.05,
+    "fees_paid_usdt": 102.5296,
+    "fees_realized_usdt": 102.5296,
+    "fees_open_usdt": 0,
     "fees_are_actual": false,
     "starting_capital_usdt": 600.0,
-    "deployed_usdt": 99.96,
-    "free_capital_usdt": 303.85,
+    "deployed_usdt": 0,
+    "free_capital_usdt": 406.04,
     "max_concurrent_slots": 3,
-    "slots_used": 1
+    "slots_used": 0
   },
   "risk_status": {
     "block_new_opens": false,
     "reasons": [],
-    "daily_pnl": 0.0,
-    "deployed_usdt": 99.96
+    "daily_pnl": 2.2713,
+    "deployed_usdt": 0
   },
   "reconciliation": {
     "ok": true,
     "mismatches": [],
     "api_failed": false,
-    "live_symbols": [
-      "XNYUSDT"
-    ],
-    "exchange_symbols": [
-      "XNYUSDT"
-    ]
+    "live_symbols": [],
+    "exchange_symbols": []
   },
-  "open_trades": [
+  "open_trades": [],
+  "recent_closed": [
     {
       "paper_id": "XNYUSDT|LONG|2026-07-01T02:41:03.622658+00:00",
       "trade_id": "L1782873663_XNYUSDT_L",
@@ -103,7 +100,7 @@
       "phase_a_mfe_pct": 4.888,
       "phase_b_mfe_pct": 4.888,
       "phase_c_mfe_pct": null,
-      "fees_paid_usdt": 0.049981,
+      "fees_paid_usdt": 0.101098,
       "fees_are_actual": true,
       "opened_at": "2026-07-01T02:41:46.452861+00:00",
       "is_dry_run": false,
@@ -124,10 +121,29 @@
       "last_sl_sync_at": "2026-07-01T02:48:07.024919+00:00",
       "last_sl_sync_paper_sl": 0.006383,
       "sl_sync_count": 1,
-      "phase_b_mfe_price": 0.006695
-    }
-  ],
-  "recent_closed": [
+      "phase_b_mfe_price": 0.006695,
+      "btc_regime_at_close": "chop",
+      "btc_price_at_close": 59018.8,
+      "btc_pct_vs_ma25_at_close": 0.112,
+      "closed_at": "2026-07-01T02:52:23.588001+00:00",
+      "close_reason": "paper:hit_b_trail",
+      "avg_exit_price": 0.00648405384664172,
+      "realized_pnl_usdt": 2.2713,
+      "realized_pnl_pct": 2.2721,
+      "close_order_id": 1150731278,
+      "close_qty": 15767.0,
+      "realized_pnl_suspect": false,
+      "entry_price_source": "expected",
+      "close_method": "limit_ioc_full",
+      "actual_close_slip_bps": 1.63,
+      "limit_qty_closed": 15767.0,
+      "market_qty_closed": 0.0,
+      "mid_at_close_attempt": 0.006482999999999999,
+      "close_expected_price": 0.00648,
+      "close_slippage_bps": -6.26,
+      "entry_fees_usdt": 0.049981,
+      "close_fees_usdt": 0.051117
+    },
     {
       "paper_id": "1000XECUSDT|LONG|2026-06-28T13:33:12.587925+00:00",
       "trade_id": "L1782653592_1000XEC_L",
@@ -69005,18 +69021,18 @@
       "conviction_score": 5,
       "signal_at": "2026-07-01T02:45:54.936385+00:00",
       "reason": "phase_6m: Tier C 小币 (entry=$0.1851) 整体 block — 13 天 195 笔 -$96 (drag $1.30/笔, 全 tier 最高)",
-      "last_checked_at": "2026-07-01T02:52:13.399576+00:00"
+      "last_checked_at": "2026-07-01T02:54:22.883238+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 59018.8,
-    "btc_ma25_1h": 58952.58,
-    "pct_vs_ma25": 0.112,
-    "change_24h_pct": -1.505,
+    "btc_price": 59039.9,
+    "btc_ma25_1h": 58953.42,
+    "pct_vs_ma25": 0.147,
+    "change_24h_pct": -1.469,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-07-01T02:52:14.663324+00:00"
+    "computed_at": "2026-07-01T02:54:23.997529+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
