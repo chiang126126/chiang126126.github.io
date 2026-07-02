@@ -110,7 +110,7 @@
       <div class="hero">
         <div class="hero-grid">
           <div>
-            <div class="eyebrow"><span class="live"><span class="dot"></span>LIVE</span> · AI 辅助商品挖掘与交易决策</div>
+            <div class="eyebrow"><span class="live" id="livePill"><span class="dot"></span><span class="lt">LIVE</span></span> · AI 辅助商品挖掘与交易决策</div>
             <h1>把<span class="g">天气 · 市场 · 供应链</span>放进同一张决策表</h1>
             <p>系统不预测天气，而是把气候概率、市场情绪、消费者行为、电商库存与中国供应链能力放在一起，输出「备货 / 预售 / 轻测 / 观察 / 放弃」的可执行判断。第一阶段聚焦欧洲高温降温商机。</p>
             <div class="hero-stats">
@@ -353,7 +353,7 @@
     app.innerHTML = `
     <section class="view">
       <div class="section-head"><div><div class="eyebrow">信号台</div><h2>气候 · 市场情绪信号</h2><p>汇总天气、预测市场、搜索热度与新闻——判断市场是否正在提前交易高温预期。手动录入为主，后续接入天气 API、Polymarket、Google Trends 与爬虫。</p></div>
-      <button class="btn" id="editCities">编辑城市气候</button></div>
+      <div style="display:flex;gap:8px"><button class="btn" id="refreshLive">↻ 同步实时信号</button><button class="btn" id="editCities">编辑城市气候</button></div></div>
 
       <div class="sig-board" style="margin-bottom:20px">
         ${state.cities.map(c => {
@@ -395,6 +395,7 @@
         <span>信号为人工录入 / 示例值，用于辅助判断，不构成保证。真实决策请以最新天气预报、平台库存与本地实盘反馈为准；不鼓励盲目囤货。</span></div>
     </section>`;
     $('#editCities').onclick = () => openCityEditor();
+    const rl = $('#refreshLive'); if (rl) rl.onclick = () => refreshLive(true);
   }
 
   // ============================================================
@@ -613,11 +614,41 @@
   let toastT;
   function toast(msg) { const t = $('#toast'); $('#toastMsg').textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 1800); }
 
+  // ============================================================
+  //  LIVE SIGNALS — 实时信号水合
+  // ============================================================
+  let liveBusy = false;
+  async function refreshLive(manual) {
+    if (!window.LiveSignals || liveBusy) return;
+    const names = LiveSignals.providerNames();
+    if (!names.length) { if (manual) toast('暂无已启用的实时数据源'); return; }
+    liveBusy = true;
+    updateLivePill('refresh', '同步中…');
+    let any = false;
+    await LiveSignals.hydrate(state, (name, patch) => { any = true; });
+    liveBusy = false;
+    if (any) { Store.save(state); render(); }
+    const meta = LiveSignals.status();
+    const okCount = Object.values(meta).filter(m => m && m.ok).length;
+    updateLivePill(okCount ? 'ok' : 'idle', okCount ? `实时 · ${okCount} 源已更新` : '实时数据未接通（种子）');
+    if (manual) toast(okCount ? `已同步 ${okCount} 路实时信号` : '实时源暂不可达，已保留种子数据');
+  }
+  function updateLivePill(kind, text) {
+    const el = $('#livePill'); if (!el) return;
+    const color = kind === 'ok' ? 'var(--buy)' : kind === 'refresh' ? 'var(--test)' : 'var(--muted)';
+    el.querySelector('.dot').style.background = color;
+    el.querySelector('.dot').style.boxShadow = '0 0 10px ' + color;
+    el.querySelector('.lt').textContent = text;
+  }
+
   // expose for inline onclick
   window.__go = go;
+  window.__refreshLive = () => refreshLive(true);
 
   // ---------- init ----------
   $('#nav').onclick = e => { const b = e.target.closest('button[data-view]'); if (b) go(b.dataset.view); };
   $('#addBtn').onclick = () => openForm(null);
   render();
+  // 载入后自动尝试水合实时信号（失败静默降级）
+  if (window.LiveSignals && LiveSignals.providerNames().length) setTimeout(() => refreshLive(false), 300);
 })();
