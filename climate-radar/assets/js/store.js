@@ -5,17 +5,18 @@
 (function (global) {
   'use strict';
 
-  const KEY = 'climate_radar_v1';
+  const KEY = 'climate_radar_v2'; // v2: 城市增加 14 天热浪信号（heatwave/feelsLike）
 
   // ---------- 城市气候快照（种子；可在"信号"页手动更新）----------
+  // heatwave: { sustained, days(连续高温天数), startsIn(第几天起,0基), peak, tropicalNights, horizon(预报窗口天), thresholdC }
   const CITIES = [
-    { name: 'Paris', zh: '巴黎', maxTemp: 38, nightTemp: 22, alert: 'orange', heatDays: 5, acPenetration: 'low' },
-    { name: 'Lyon', zh: '里昂', maxTemp: 39, nightTemp: 23, alert: 'orange', heatDays: 5, acPenetration: 'low' },
-    { name: 'Marseille', zh: '马赛', maxTemp: 36, nightTemp: 24, alert: 'yellow', heatDays: 6, acPenetration: 'mid' },
-    { name: 'Annecy', zh: '安纳西', maxTemp: 34, nightTemp: 19, alert: 'yellow', heatDays: 4, acPenetration: 'low' },
-    { name: 'Genève', zh: '日内瓦', maxTemp: 35, nightTemp: 20, alert: 'yellow', heatDays: 4, acPenetration: 'low' },
-    { name: 'London', zh: '伦敦', maxTemp: 33, nightTemp: 19, alert: 'yellow', heatDays: 3, acPenetration: 'low' },
-    { name: 'Milano', zh: '米兰', maxTemp: 37, nightTemp: 23, alert: 'orange', heatDays: 5, acPenetration: 'mid' },
+    { name: 'Paris', zh: '巴黎', maxTemp: 38, nightTemp: 22, feelsLike: 40, alert: 'orange', heatDays: 5, acPenetration: 'low', heatwave: { sustained: true, days: 5, startsIn: 1, peak: 38, tropicalNights: 4, horizon: 14, thresholdC: 32 } },
+    { name: 'Lyon', zh: '里昂', maxTemp: 39, nightTemp: 23, feelsLike: 41, alert: 'red', heatDays: 6, acPenetration: 'low', heatwave: { sustained: true, days: 6, startsIn: 0, peak: 39, tropicalNights: 5, horizon: 14, thresholdC: 32 } },
+    { name: 'Marseille', zh: '马赛', maxTemp: 36, nightTemp: 24, feelsLike: 38, alert: 'orange', heatDays: 6, acPenetration: 'mid', heatwave: { sustained: true, days: 6, startsIn: 2, peak: 36, tropicalNights: 6, horizon: 14, thresholdC: 32 } },
+    { name: 'Annecy', zh: '安纳西', maxTemp: 34, nightTemp: 19, feelsLike: 35, alert: 'yellow', heatDays: 4, acPenetration: 'low', heatwave: { sustained: true, days: 3, startsIn: 3, peak: 34, tropicalNights: 1, horizon: 14, thresholdC: 32 } },
+    { name: 'Genève', zh: '日内瓦', maxTemp: 35, nightTemp: 20, feelsLike: 36, alert: 'orange', heatDays: 4, acPenetration: 'low', heatwave: { sustained: true, days: 4, startsIn: 2, peak: 35, tropicalNights: 2, horizon: 14, thresholdC: 32 } },
+    { name: 'London', zh: '伦敦', maxTemp: 33, nightTemp: 19, feelsLike: 34, alert: 'yellow', heatDays: 3, acPenetration: 'low', heatwave: { sustained: false, days: 2, startsIn: 4, peak: 33, tropicalNights: 0, horizon: 14, thresholdC: 32 } },
+    { name: 'Milano', zh: '米兰', maxTemp: 37, nightTemp: 23, feelsLike: 40, alert: 'orange', heatDays: 5, acPenetration: 'mid', heatwave: { sustained: true, days: 5, startsIn: 1, peak: 37, tropicalNights: 4, horizon: 14, thresholdC: 32 } },
   ];
 
   // ---------- 市场情绪信号（种子）----------

@@ -73,7 +73,7 @@ climate-radar/
 
 | 信号 | 方式 | 实现 | 说明 |
 |------|------|------|------|
-| **天气** | 浏览器直连 | `live-weather.js` | [Open-Meteo](https://open-meteo.com)，免 key、支持 CORS。拉 7 城 7 天最高/最低温，推导峰值/热带夜/高温天数/预警，写回城市并**传导到商品气候字段，真实驱动机会分** |
+| **天气** | 浏览器直连 | `live-weather.js` | [Open-Meteo](https://open-meteo.com)（聚合 ECMWF/GFS/ICON/AROME 专业模型），免 key、支持 CORS。拉 7 城**未来 14 天**最高/最低/体感温，推导峰值、热带夜、体感、**热浪信号（未来 7–14 天是否连续 ≥3 天 ≥32℃、从第几天起）** 与预警等级，写回城市并**传导到商品气候/热浪字段，真实驱动机会分**。热浪按 canicule 规则由专业预报推导（非官方 Vigilance，可后续经管道叠加） |
 | **Polymarket** | 浏览器直连 | `live-polymarket.js` | 公共 Gamma API，筛选高温/气候市场→隐含概率映射巴黎/伦敦。无匹配市场时诚实降级 |
 | **Google Trends** | 数据管道 | `live-trends.js` + `scripts/fetch_trends.py` + `.github/workflows/climate-radar-trends.yml` | 无浏览器可调 API，故用 GitHub Action（pytrends，每 6h）抓取 FR 热度、提交 `data/trends.json`，前端只读 |
 | **电商库存** | 数据管道 | `live-retail.js` + `scripts/fetch_retail.py` + `.github/workflows/climate-radar-retail.yml` | 反爬+CORS 无法直连，故用 Action（每 12h，best-effort）刷新 `data/retail.json`；**以手工维护为主**，按关键字+品类映射到商品 `retailStockout/retailTight` |

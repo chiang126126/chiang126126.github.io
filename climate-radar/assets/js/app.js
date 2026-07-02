@@ -121,15 +121,16 @@
             </div>
           </div>
           <div class="panel glass">
-            <div class="eyebrow" style="margin-bottom:12px">城市气候信号 · 未来 7 天峰值</div>
+            <div class="eyebrow" style="margin-bottom:12px">城市气候信号 · 未来 14 天专业预报峰值</div>
             <div class="thermo">
               ${state.cities.map(c => {
                 const w = Math.max(6, Math.min(100, (c.maxTemp - 24) / (42 - 24) * 100));
                 const ac = { none: '#3b82f6', yellow: '#f5b544', orange: '#ff6b4a', red: '#f4517a' }[c.alert];
-                return `<div class="city-row"><span class="name">${c.zh}</span><span class="bar"><i style="width:${w}%"></i></span><span class="temp">${c.maxTemp}℃</span><span class="alert" title="${c.alert}" style="background:${ac};box-shadow:0 0 8px ${ac}"></span></div>`;
+                const hw = c.heatwave && c.heatwave.sustained ? `<span title="持续高温 ${c.heatwave.days} 天" style="font-size:11px">🔥</span>` : '';
+                return `<div class="city-row"><span class="name">${c.zh}</span><span class="bar"><i style="width:${w}%"></i></span>${hw}<span class="temp">${c.maxTemp}℃</span><span class="alert" title="${c.alert}" style="background:${ac};box-shadow:0 0 8px ${ac}"></span></div>`;
               }).join('')}
             </div>
-            <div class="data-note">🌙 圆点 = 官方高温预警等级 · 数据可在「信号台」更新</div>
+            <div class="data-note">🔥 = 未来 7–14 天持续高温信号 · 🌙 圆点 = 预警等级 · 「信号台」可同步/编辑</div>
           </div>
         </div>
       </div>
@@ -352,19 +353,26 @@
     const m = state.market;
     app.innerHTML = `
     <section class="view">
-      <div class="section-head"><div><div class="eyebrow">信号台</div><h2>气候 · 市场情绪信号</h2><p>汇总天气、预测市场、搜索热度与新闻——判断市场是否正在提前交易高温预期。手动录入为主，后续接入天气 API、Polymarket、Google Trends 与爬虫。</p></div>
+      <div class="section-head"><div><div class="eyebrow">信号台</div><h2>气候 · 市场情绪信号</h2><p>天气为 Open-Meteo 未来 14 天专业预报（ECMWF/GFS 等模型），含热浪信号——判断未来 7–14 天是否可能出现持续高温；叠加预测市场、搜索热度与缺货新闻，判断市场是否正在提前交易高温预期。</p></div>
       <div style="display:flex;gap:8px"><button class="btn" id="refreshLive">↻ 同步实时信号</button><button class="btn" id="editCities">编辑城市气候</button></div></div>
 
       <div class="sig-board" style="margin-bottom:20px">
         ${state.cities.map(c => {
           const s = Scoring.climateScore({ maxTemp: c.maxTemp, heatDays: c.heatDays, nightTemp: c.nightTemp, alert: c.alert, acPenetration: c.acPenetration });
-          const ac = { none: 'none', yellow: '🟡 黄色', orange: '🟠 橙色', red: '🔴 红色' }[c.alert];
+          const ac = { none: '—', yellow: '🟡 黄色', orange: '🟠 橙色', red: '🔴 红色' }[c.alert];
+          const hw = c.heatwave || {};
+          const hwOn = !!hw.sustained;
+          const hwColor = hwOn ? (hw.days >= 5 ? '#ff6b4a' : '#ffb347') : '#8aa0c4';
+          const hwText = hwOn
+            ? `⚠ 是 · 连续 ${hw.days} 天${hw.startsIn > 0 ? `（第 ${hw.startsIn + 1} 天起）` : '（本周内）'}`
+            : '暂无持续信号';
           return `<div class="sig-card">
             <div class="sh"><b>${c.zh} · ${c.name}</b><span class="tag">气候分 ${Math.round(s)}</span></div>
-            <div class="metric"><span class="m-lbl">日间峰值</span><span class="m-val" style="color:${c.maxTemp >= 38 ? '#ff6b4a' : c.maxTemp >= 35 ? '#ffb347' : '#22d3ee'}">${c.maxTemp}℃</span></div>
+            <div class="metric"><span class="m-lbl">日间峰值</span><span class="m-val" style="color:${c.maxTemp >= 38 ? '#ff6b4a' : c.maxTemp >= 35 ? '#ffb347' : '#22d3ee'}">${c.maxTemp}℃${c.feelsLike ? ` <span style="color:var(--muted);font-size:11px">体感 ${c.feelsLike}°</span>` : ''}</span></div>
             <div class="metric"><span class="m-lbl">夜间低温</span><span class="m-val" style="color:${c.nightTemp >= 20 ? '#ff6b4a' : '#8aa0c4'}">${c.nightTemp}℃ ${c.nightTemp >= 20 ? '热带夜' : ''}</span></div>
-            <div class="metric"><span class="m-lbl">高温持续</span><span class="m-val">${c.heatDays} 天</span></div>
-            <div class="metric"><span class="m-lbl">官方预警</span><span class="m-val">${ac}</span></div>
+            <div class="metric" style="border-bottom:1px solid ${hwOn ? 'rgba(255,107,74,.25)' : 'var(--border)'}"><span class="m-lbl" style="white-space:nowrap">7–14天持续高温</span><span class="m-val" style="color:${hwColor};text-align:right">${hwText}</span></div>
+            <div class="metric"><span class="m-lbl">连续高温 · 热带夜</span><span class="m-val">${c.heatDays} 天 · ${hw.tropicalNights != null ? hw.tropicalNights : (c.nightTemp >= 20 ? '≥1' : 0)} 夜</span></div>
+            <div class="metric"><span class="m-lbl">热浪预警等级</span><span class="m-val">${ac}</span></div>
             <div class="metric"><span class="m-lbl">空调渗透率</span><span class="m-val">${{ low: '低', mid: '中', high: '高' }[c.acPenetration]}</span></div>
           </div>`;
         }).join('')}
@@ -392,7 +400,7 @@
         <div class="data-note">更新时间 ${esc(m.updated)}</div>
       </div>
       <div class="disclaimer"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3l-8-14a2 2 0 0 0-3.4 0z"/></svg>
-        <span>信号为人工录入 / 示例值，用于辅助判断，不构成保证。真实决策请以最新天气预报、平台库存与本地实盘反馈为准；不鼓励盲目囤货。</span></div>
+        <span>天气为 Open-Meteo 专业模型 14 天预报；「热浪预警」由该预报按 canicule 规则（连续 ≥3 天 ≥32℃）推导，非官方 Vigilance/MeteoSwiss 通报——后者可后续经数据管道叠加。其余信号含人工录入 / 示例值，仅辅助判断、不构成保证；真实决策请以最新预报、平台库存与本地实盘为准，不鼓励盲目囤货。</span></div>
     </section>`;
     $('#editCities').onclick = () => openCityEditor();
     const rl = $('#refreshLive'); if (rl) rl.onclick = () => refreshLive(true);

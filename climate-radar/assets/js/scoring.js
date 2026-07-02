@@ -165,7 +165,12 @@
   function drivers(p, sig, rk, margin, hasLocal) {
     const d = [];
     // 正向
-    if (sig.C >= 70) d.push({ t: 'pos', k: '气候', v: `${p.city || '目标城市'} 未来将出现持续高温（${num(p.heatDays)}天 · 峰值 ${num(p.maxTemp)}℃），降温需求从舒适消费转为应急刚需` });
+    // 热浪信号（来自 14 天专业预报，或由已录入的高温字段回退推导）
+    const hw = p.heatwave || (num(p.heatDays) >= 3 && num(p.maxTemp) >= 32
+      ? { sustained: true, days: num(p.heatDays), startsIn: 0, thresholdC: 32, tropicalNights: num(p.nightTemp) >= 20 ? 1 : 0 }
+      : null);
+    if (hw && hw.sustained) d.push({ t: 'pos', k: '热浪', v: `专业预报显示未来 7–14 天持续高温：连续 ${hw.days} 天 ≥${hw.thresholdC || 32}℃${hw.startsIn > 0 ? `（第 ${hw.startsIn + 1} 天起）` : '（本周内）'}${hw.tropicalNights ? ` · ${hw.tropicalNights} 个热带夜` : ''}，降温需求集中爆发、窗口明确` });
+    else if (sig.C >= 70) d.push({ t: 'pos', k: '气候', v: `${p.city || '目标城市'} 未来将出现持续高温（${num(p.heatDays)}天 · 峰值 ${num(p.maxTemp)}℃），降温需求从舒适消费转为应急刚需` });
     if (num(p.nightTemp) >= 20) d.push({ t: 'pos', k: '夜温', v: `夜间温度 ${num(p.nightTemp)}℃ 降不下来（热带夜），睡眠场景强烈驱动空调 / 风扇购买` });
     if (margin >= 0.5) d.push({ t: 'pos', k: '价差', v: `毛利率约 ${Math.round(margin * 100)}%（欧洲售价 €${num(p.euPrice)} vs 中国采购 €${num(p.chinaCost)}），现货可接受适度溢价` });
     if (num(p.weightKg) <= 1.5 && p.demoEasy) d.push({ t: 'pos', k: '产品', v: `轻（${num(p.weightKg)}kg）、小、容易演示，符合"消费者一眼看懂"的启动逻辑${p.handCarry ? '，可人肉带货' : ''}` });
