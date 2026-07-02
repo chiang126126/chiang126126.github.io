@@ -190,6 +190,16 @@
     if (!hasLocal) d.push({ t: 'info', k: '待验证', v: '尚无本地实盘反馈——建议先挂 1 件现货，用真实询盘率验证再决定备货量' });
     if (num(p.acPenetration) === 'low' || p.acPenetration === 'low') d.push({ t: 'info', k: '区域', v: '目标区域空调渗透率低、老建筑多，移动 / 免安装产品打中真实居住环境' });
 
+    // 本地实盘 · 定性反馈
+    if (num(p.acceptPrice) > 0 && num(p.euPrice) > 0) {
+      const ap = num(p.acceptPrice), eu = num(p.euPrice);
+      if (ap < eu * 0.9) d.push({ t: 'neg', k: '定价', v: `买家可接受价 €${ap} 低于售价 €${eu}，价格敏感——考虑组合提价 / 适度让价 / 强调现货即时交付的溢价理由` });
+      else if (ap >= eu) d.push({ t: 'pos', k: '定价', v: `买家可接受价 €${ap} ≥ 售价 €${eu}，存在提价 / 溢价空间` });
+    }
+    if (p.noBuyReason && String(p.noBuyReason).trim()) d.push({ t: 'info', k: '未成交', v: `买家未成交原因："${String(p.noBuyReason).trim()}"——据此调整卖点 / 价格 / 组合` });
+    if (p.topQuestion && String(p.topQuestion).trim()) d.push({ t: 'info', k: '高频问', v: `买家最常问："${String(p.topQuestion).trim()}"——前置写进商品描述与话术，减少来回` });
+    if (p.concerns && String(p.concerns).trim()) d.push({ t: 'info', k: '关心点', v: `买家关心：${String(p.concerns).trim()}——针对性准备演示 / 说明 / 售后承诺` });
+
     return d;
   }
 
