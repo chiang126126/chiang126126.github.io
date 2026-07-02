@@ -17,7 +17,7 @@
 | **C 气候** | 0.28 | 峰值温度、高温持续天数、夜间热带夜、官方预警、区域空调渗透率 |
 | **M 市场情绪** | 0.24 | Polymarket 极端高温概率、Google Trends 搜索热度、缺货新闻、平台库存 |
 | **P 商品与渠道** | 0.30 | 毛利率（欧洲售价 vs 中国采购）、轻/小/易运、易演示、补货速度 |
-| **L 本地实盘** | 0.18 | 浏览量、询盘率、成交率、当天取货需求、B 端需求（无数据时权重顺延） |
+| **L 本地实盘** | 0.18 | 浏览量、询盘率、成交率、当天取货、B 端需求 + 定性字段（最常问 / 未成交原因 / 可接受价 / 关心项）（无数据时权重顺延） |
 
 **风险**（合规 CE/WEEE/EPR/GPSR、退货/差评）在加权后扣分。
 
@@ -77,6 +77,7 @@ climate-radar/
 | **Polymarket** | 浏览器直连 | `live-polymarket.js` | 公共 Gamma API，筛选高温/气候市场→隐含概率映射巴黎/伦敦。无匹配市场时诚实降级 |
 | **Google Trends** | 数据管道 | `live-trends.js` + `scripts/fetch_trends.py` + `.github/workflows/climate-radar-trends.yml` | 无浏览器可调 API，故用 GitHub Action（pytrends，每 6h）抓取 FR 热度、提交 `data/trends.json`，前端只读 |
 | **电商库存** | 数据管道 | `live-retail.js` + `scripts/fetch_retail.py` + `.github/workflows/climate-radar-retail.yml` | 反爬+CORS 无法直连，故用 Action（每 12h，best-effort）刷新 `data/retail.json`；**以手工维护为主**，按关键字+品类映射到商品 `retailStockout/retailTight` |
+| **社媒 & 新闻** | 数据管道 | `live-buzz.js` + `scripts/fetch_buzz.py` + `.github/workflows/climate-radar-buzz.yml` | Reddit 公共 JSON + Google News RSS（法国本地新闻 + 缺货/抢购/办公过热/求购），每 8h 抓取并按主题归类→`data/buzz.json`；「社媒 & 新闻雷达」面板 + 周报呈现。X/Instagram 无 keyless 接口，默认关闭、预留自备 key |
 
 **契约（`live.js`）**：`LiveSignals.register(name, async (state) => ({ ok, updated, source, note }))`——provider 只改自己的信号槽，成功 `ok:true`，失败 `ok:false` 且不改动 state。每个 provider 都暴露纯解析函数（`_parse` / `_apply` / `_deriveFromDaily`）便于离线单测。
 
