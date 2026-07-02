@@ -74,6 +74,60 @@
   }
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
+  // ---------- 社媒 & 新闻舆情面板 ----------
+  const BUZZ_THEME = {
+    heat: { label: '高温', color: '#ff6a45' },
+    shortage: { label: '缺货', color: '#ff5b86' },
+    ac_rush: { label: '抢购', color: '#ffbe4d' },
+    office_heat: { label: '办公过热', color: '#9d74ff' },
+    buying_need: { label: '求购', color: '#38e0ff' },
+  };
+  const BUZZ_SRC = { reddit: 'Reddit', googlenews: 'Google News', x: 'X', instagram: 'Instagram' };
+  function buzzPanelHTML(buzz) {
+    if (!buzz) return '';
+    const themes = buzz.themes || {};
+    const items = buzz.items || [];
+    const sources = buzz.sources || {};
+    const max = Math.max(1, ...Object.keys(BUZZ_THEME).map(k => themes[k] || 0));
+    const bars = Object.keys(BUZZ_THEME).map(k => {
+      const c = BUZZ_THEME[k], v = themes[k] || 0;
+      return `<div class="row"><span class="lbl" style="width:64px">${c.label}</span><span class="track"><i style="width:${Math.round(v / max * 100)}%;background:${c.color}"></i></span><span class="val">${v}</span></div>`;
+    }).join('');
+    const chips = Object.keys(BUZZ_SRC).map(k => {
+      const st = sources[k] || 'disabled';
+      const on = st === 'ok';
+      const col = on ? 'var(--buy)' : (st === 'disabled' ? 'var(--dim)' : 'var(--test)');
+      const txt = on ? '✓' : (st === 'disabled' ? '需API' : st);
+      return `<span class="chip" style="color:${col};border-color:${col}44">${BUZZ_SRC[k]} ${txt}</span>`;
+    }).join('');
+    const rows = items.slice(0, 6).map(it => {
+      const c = BUZZ_THEME[it.theme] || { label: it.theme, color: 'var(--muted)' };
+      const origin = it.origin || (it.source === 'reddit' ? 'Reddit' : it.source || '');
+      return `<a class="buzz-item" href="${esc(it.url || '#')}" target="_blank" rel="noopener">
+        <span class="bt" style="color:${c.color};border-color:${c.color}55">${c.label}</span>
+        <span class="btitle">${esc(it.title)}</span>
+        <span class="bsrc">${esc(origin)}${it.ts ? ' · ' + esc(it.ts) : ''}</span>
+      </a>`;
+    }).join('');
+    return `<div class="panel" style="margin-top:16px">
+      <div class="section-head" style="margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:10px"><span class="badge-ai" style="color:var(--cyan2)">◎ 舆情</span><b style="font-size:15px">社媒 & 新闻雷达</b></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">${chips}</div>
+      </div>
+      <div class="decision-grid" style="gap:16px">
+        <div>
+          <div class="eyebrow" style="margin-bottom:10px">话题热度 · 提及量</div>
+          <div class="sig-mini">${bars}</div>
+          <div class="data-note">Reddit 公共 JSON + Google News RSS 定时抓取；X/Instagram 无 keyless 接口，需自备 key</div>
+        </div>
+        <div>
+          <div class="eyebrow" style="margin-bottom:10px">最新舆情 · ${buzz.total || items.length} 条</div>
+          <div class="buzz-list">${rows || '<div class="data-note">暂无舆情条目</div>'}</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
   // ============================================================
   //  ROUTER
   // ============================================================
@@ -399,6 +453,7 @@
         <p style="margin:0;font-size:13.5px;color:var(--text)">${esc(m.news)}</p>
         <div class="data-note">更新时间 ${esc(m.updated)}</div>
       </div>
+      ${buzzPanelHTML(m.buzz)}
       <div class="disclaimer"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3l-8-14a2 2 0 0 0-3.4 0z"/></svg>
         <span>天气为 Open-Meteo 专业模型 14 天预报；「热浪预警」由该预报按 canicule 规则（连续 ≥3 天 ≥32℃）推导，非官方 Vigilance/MeteoSwiss 通报——后者可后续经数据管道叠加。其余信号含人工录入 / 示例值，仅辅助判断、不构成保证；真实决策请以最新预报、平台库存与本地实盘为准，不鼓励盲目囤货。</span></div>
     </section>`;
@@ -449,6 +504,7 @@
         <h4><span class="bar"></span>本周判断</h4>
         <p>${esc(rep.summary)}</p>
         ${rep.climate ? `<h4><span class="bar"></span>市场信号</h4><p class="muted">${esc(rep.climate)}</p>` : ''}
+        ${rep.buzz ? `<h4><span class="bar"></span>社媒 & 新闻舆情</h4><p class="muted">${esc(rep.buzz)}</p>` : ''}
         <h4><span class="bar"></span>建议备货（BUY）</h4>
         <ul class="rlist">${rep.buy.length ? rep.buy.map(line).join('') : '<li class="muted" style="justify-content:center">本周暂无 BUY 级机会</li>'}</ul>
         <h4><span class="bar"></span>建议预售 / 测试（PRESELL）</h4>

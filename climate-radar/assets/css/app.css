@@ -407,6 +407,14 @@ main{padding:26px 0 90px}
 .sig-card .metric .m-val{font-family:var(--mono);font-weight:700}
 .trend-up{color:var(--buy)} .trend-down{color:var(--skip)} .trend-flat{color:var(--muted)}
 
+/* 社媒 & 新闻雷达 */
+.buzz-list{display:flex;flex-direction:column;gap:8px}
+.buzz-item{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;gap:2px 10px;padding:9px 11px;background:rgba(6,10,20,.45);border:1px solid var(--border);border-radius:10px;text-decoration:none;transition:.15s}
+.buzz-item:hover{border-color:var(--border2);background:rgba(12,20,36,.6);text-decoration:none}
+.buzz-item .bt{grid-row:1/3;align-self:center;font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:8px;border:1px solid;white-space:nowrap;height:fit-content}
+.buzz-item .btitle{font-size:12.5px;color:var(--text);line-height:1.35}
+.buzz-item .bsrc{font-size:10.5px;color:var(--dim)}
+
 /* ============================ EMPTY / MISC ============================ */
 .empty{text-align:center;padding:60px 20px;color:var(--muted)}
 .empty .e-ico{font-size:44px;margin-bottom:12px;opacity:.7}

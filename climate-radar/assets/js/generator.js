@@ -158,6 +158,7 @@
       date: dateStr,
       summary: `本周共评估 ${products.length} 款商品，平均机会分 ${avg}/100。气候信号集中在 ${hotCity}——高温 + 低空调渗透率 + 缺货新闻叠加，降温需求正从"舒适消费"转为"应急刚需"。市场情绪已提前交易高温预期（搜索热度与预测市场概率上升），领先于缺货新闻，是切入窗口。`,
       climate: market && market.news ? market.news : '',
+      buzz: buzzSummary(market),
       buy, presell, watch, avg, hotCity,
       actions: [
         buy.length ? `优先备货：${buy.slice(0, 3).map(x => x.p.name).join('、')}——小批量 30–50 件，本地现货 + 即时交付。` : '本周暂无 BUY 级机会，保持观察。',
@@ -177,6 +178,7 @@
       rep.summary,
       '',
       rep.climate ? '## 市场信号\n' + rep.climate + '\n' : '',
+      rep.buzz ? '## 社媒 & 新闻舆情\n' + rep.buzz + '\n' : '',
       '## 建议备货（BUY）',
       rep.buy.length ? rep.buy.map(line).join('\n') : '  （无）',
       '',
@@ -188,6 +190,20 @@
       '',
       '— 本报告由气候商机雷达自动生成，所有建议均围绕「低成本验证 · 小批量补货 · 快速复盘」。',
     ].filter(Boolean).join('\n');
+  }
+
+  // 社媒 & 新闻舆情摘要
+  function buzzSummary(market) {
+    const b = market && market.buzz;
+    if (!b || !b.themes) return '';
+    const t = b.themes;
+    const parts = [];
+    if (t.shortage) parts.push(`缺货 ${t.shortage}`);
+    if (t.ac_rush) parts.push(`抢购 ${t.ac_rush}`);
+    if (t.buying_need) parts.push(`求购 ${t.buying_need}`);
+    if (t.office_heat) parts.push(`办公过热 ${t.office_heat}`);
+    if (t.heat) parts.push(`高温 ${t.heat}`);
+    return `社媒 & 新闻舆情（Reddit + Google News，${b.total || (b.items || []).length} 条）：${parts.join(' · ')} 提及。消费者正从"关注天气"转向"寻找商品/求购"，本地新闻已报道渠道缺货。`;
   }
 
   // ---------- helpers ----------

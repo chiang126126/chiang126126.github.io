@@ -1,0 +1,77 @@
+{
+  "items": [
+    {
+      "publisher": "Le Parisien",
+      "snippet": "Les ventes de climatiseurs mobiles explosent, plusieurs modèles en rupture chez Darty et Boulanger.",
+      "source": "googlenews",
+      "theme": "shortage",
+      "title": "Canicule : les climatiseurs mobiles en rupture dans plusieurs enseignes",
+      "ts": "2026-07-01",
+      "url": "https://news.google.com/"
+    },
+    {
+      "publisher": "BFM",
+      "snippet": "Carrefour indique avoir écoulé des dizaines de milliers de ventilateurs en une journée.",
+      "source": "googlenews",
+      "theme": "ac_rush",
+      "title": "Vague de chaleur : ruée sur les ventilateurs, Carrefour en écoule 30 000 en un jour",
+      "ts": "2026-06-30",
+      "url": "https://news.google.com/"
+    },
+    {
+      "lang": "fr",
+      "snippet": "Impossible de trouver un climatiseur mobile en stock à Paris, tout est épuisé…",
+      "source": "reddit",
+      "sub": "r/paris",
+      "theme": "shortage",
+      "title": "Où trouver un climatiseur mobile dispo à Paris ? Tout est en rupture",
+      "ts": "2026-07-01",
+      "url": "https://www.reddit.com/"
+    },
+    {
+      "lang": "fr",
+      "snippet": "Le bureau est une fournaise, pas de clim, on suffoque en open space.",
+      "source": "reddit",
+      "sub": "r/france",
+      "theme": "office_heat",
+      "title": "Canicule au bureau : vous faites comment sans clim ?",
+      "ts": "2026-06-30",
+      "url": "https://www.reddit.com/"
+    },
+    {
+      "lang": "fr",
+      "snippet": "Je cherche un ventilateur de cou ou un mini clim de bureau, des recommandations ?",
+      "source": "reddit",
+      "sub": "r/AskFrance",
+      "theme": "buying_need",
+      "title": "Recommandation ventilateur portable / mini clim bureau ?",
+      "ts": "2026-06-29",
+      "url": "https://www.reddit.com/"
+    },
+    {
+      "lang": "en",
+      "snippet": "Heatwave hitting hard, no AC anywhere, offices are unbearable.",
+      "source": "reddit",
+      "sub": "r/london",
+      "theme": "office_heat",
+      "title": "Heatwave + no AC at work = misery. How are you coping?",
+      "ts": "2026-06-30",
+      "url": "https://www.reddit.com/"
+    }
+  ],
+  "note": "社媒 & 新闻舆情快照。Reddit 公共 JSON + Google News RSS 由 GitHub Action 定时抓取；X / Instagram 无 keyless 接口，默认关闭（需自备 API key）。可手动编辑本文件。theme: heat=高温, shortage=缺货, ac_rush=抢购, office_heat=办公过热, buying_need=求购。",
+  "sources": {
+    "googlenews": "ok",
+    "instagram": "disabled",
+    "reddit": "ok",
+    "x": "disabled"
+  },
+  "themes": {
+    "ac_rush": 5,
+    "buying_need": 4,
+    "heat": 12,
+    "office_heat": 3,
+    "shortage": 7
+  },
+  "updated": "2026-07-02"
+}
