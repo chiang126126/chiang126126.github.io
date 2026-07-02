@@ -26,9 +26,9 @@
       <svg width="${size}" height="${size}">
         <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="#12203a" stroke-width="${stroke}"/>
         <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="${col}" stroke-width="${stroke}"
-          stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}"/>
+          stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}" style="filter:drop-shadow(0 0 5px ${col}aa)"/>
       </svg>
-      <div class="num" style="color:${col}">${score}<small>/100</small></div>
+      <div class="num" style="color:${col};text-shadow:0 0 16px ${col}66">${score}<small>/100</small></div>
     </div>`;
   }
   function radarChart(sig, size = 200) {
@@ -60,7 +60,7 @@
     let dots = axes.map((ax, i) => { const [x, y] = pt(i, (sig[ax.k] ?? 0) / 100); return `<circle cx="${x}" cy="${y}" r="3" fill="${ax.color}"/>`; }).join('');
     return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
       ${grid}${spokes}
-      <polygon points="${poly}" fill="rgba(34,211,238,.14)" stroke="#22d3ee" stroke-width="2"/>
+      <polygon points="${poly}" fill="rgba(56,224,255,.16)" stroke="#5cf0ff" stroke-width="2" style="filter:drop-shadow(0 0 6px rgba(56,224,255,.55))"/>
       ${dots}${labels}
     </svg>`;
   }
