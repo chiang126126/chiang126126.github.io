@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#060910" />
+  <title>Climate Opportunity Radar · 气候商机雷达</title>
+  <meta name="description" content="AI 辅助商品挖掘与交易决策系统：把天气概率、市场情绪、消费者行为、电商库存与中国供应链放在同一张决策表，输出 BUY / PRESELL / TEST / WATCH / SKIP 的可执行商业建议。" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>🛰️</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/app.css" />
+</head>
+<body>
+
+  <!-- ===================== TOPBAR ===================== -->
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="brand">
+        <span class="mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#04121a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+            <path d="M12 12l7-4" stroke-width="1.6"/>
+          </svg>
+        </span>
+        <div class="txt">
+          <b>气候商机雷达</b>
+          <span>Climate&nbsp;Radar</span>
+        </div>
+      </div>
+      <nav class="nav" id="nav">
+        <button data-view="radar" class="active">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/></svg>雷达</button>
+        <button data-view="products">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 4v16"/></svg>商品库</button>
+        <button data-view="signals">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>信号台</button>
+        <button data-view="bundles">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8l-9-5-9 5 9 5 9-5zM3 8v8l9 5 9-5V8"/></svg>组合包</button>
+        <button data-view="report">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg>周报</button>
+      </nav>
+      <div class="nav-cta">
+        <button class="btn primary" id="addBtn">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>录入商品
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap" id="app"><!-- views injected --></main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div>Climate Opportunity Radar · 气候商机雷达 — 内部选品决策系统 · 数据仅存于本地浏览器</div>
+      <div><a href="/">← chiang126126.github.io</a></div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg><span id="toastMsg"></span></div>
+
+  <script src="assets/js/scoring.js"></script>
+  <script src="assets/js/store.js"></script>
+  <script src="assets/js/generator.js"></script>
+  <!-- 实时信号层（混合架构）：先加载注册中心，再加载各 provider -->
+  <script src="assets/js/live.js"></script>
+  <script src="assets/js/live-weather.js"></script>
+  <script src="assets/js/live-polymarket.js"></script>
+  <script src="assets/js/live-trends.js"></script>
+  <script src="assets/js/live-retail.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

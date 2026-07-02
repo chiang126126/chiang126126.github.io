@@ -1,0 +1,50 @@
+name: climate-radar Google Trends refresh
+
+# Google Trends 没有官方浏览器可调 API（CORS 阻断），故用数据管道：
+# 定时在 GitHub 托管 runner 上用 pytrends 抓取法国搜索热度，
+# 写出 climate-radar/data/trends.json 并在有变化时提交回本仓库，前端只读快照。
+on:
+  schedule:
+    - cron: "17 */6 * * *"   # 每 6 小时（错峰的第 17 分钟），降低与其它任务/限流撞车
+  workflow_dispatch: {}
+
+permissions:
+  contents: write            # 用内置 GITHUB_TOKEN 提交回本仓库，无需额外 secret
+
+# 同一时刻只跑一个，避免并发提交打架
+concurrency:
+  group: climate-radar-trends
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # pytrends 受 Google 限流影响较大；安装失败不应让整条流水线标红
+      - name: Install pytrends
+        continue-on-error: true
+        run: pip install pytrends
+
+      # 脚本内部逐词兜底、绝不非零退出；再加 continue-on-error 双保险
+      - name: Fetch Google Trends
+        continue-on-error: true
+        run: python climate-radar/scripts/fetch_trends.py
+
+      - name: Commit snapshot if changed
+        run: |
+          git add climate-radar/data/trends.json
+          if git diff --staged --quiet; then
+            echo "无变化，跳过提交"
+          else
+            git config user.name "climate-radar-trends"
+            git config user.email "mangzi141800@gmail.com"
+            git commit -m "data(climate-radar): trends refresh"
+            git push
+            echo "✅ 已提交 trends 快照"
+          fi
