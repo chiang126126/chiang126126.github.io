@@ -63,8 +63,26 @@ climate-radar/
         └── app.js         # 视图 / 路由 / 交互
 ```
 
-> **接入真实数据 / LLM**：`generator.js` 的 `build*()` 函数与 `store.js` 的信号字段均为接入预留——
-> 后续可把模板输出替换为 Claude API 结果，把种子信号替换为天气 API / Polymarket / Google Trends / 电商爬虫，UI 无需改动。
+> **接入真实数据 / LLM**：`generator.js` 的 `build*()` 函数为接入 Claude API 预留——把模板输出替换为模型结果即可，UI 无需改动。
+
+---
+
+## 实时信号接入（混合架构）
+
+四路信号已按各自可行的方式真实接入，统一走 `live.js` 的 provider 契约，**全部优雅降级**（网络/数据不可用时保留种子数据，UI 不受影响）。信号台页顶「↻ 同步实时信号」可手动刷新，页面载入亦自动尝试。
+
+| 信号 | 方式 | 实现 | 说明 |
+|------|------|------|------|
+| **天气** | 浏览器直连 | `live-weather.js` | [Open-Meteo](https://open-meteo.com)，免 key、支持 CORS。拉 7 城 7 天最高/最低温，推导峰值/热带夜/高温天数/预警，写回城市并**传导到商品气候字段，真实驱动机会分** |
+| **Polymarket** | 浏览器直连 | `live-polymarket.js` | 公共 Gamma API，筛选高温/气候市场→隐含概率映射巴黎/伦敦。无匹配市场时诚实降级 |
+| **Google Trends** | 数据管道 | `live-trends.js` + `scripts/fetch_trends.py` + `.github/workflows/climate-radar-trends.yml` | 无浏览器可调 API，故用 GitHub Action（pytrends，每 6h）抓取 FR 热度、提交 `data/trends.json`，前端只读 |
+| **电商库存** | 数据管道 | `live-retail.js` + `scripts/fetch_retail.py` + `.github/workflows/climate-radar-retail.yml` | 反爬+CORS 无法直连，故用 Action（每 12h，best-effort）刷新 `data/retail.json`；**以手工维护为主**，按关键字+品类映射到商品 `retailStockout/retailTight` |
+
+**契约（`live.js`）**：`LiveSignals.register(name, async (state) => ({ ok, updated, source, note }))`——provider 只改自己的信号槽，成功 `ok:true`，失败 `ok:false` 且不改动 state。每个 provider 都暴露纯解析函数（`_parse` / `_apply` / `_deriveFromDaily`）便于离线单测。
+
+**数据管道**：两个 Action 用内置 `GITHUB_TOKEN` 提交回本仓库（无需额外 secret），采集脚本逐项兜底、抓不到就保留旧值、绝不非零退出。合并到 `main` 后按计划运行；首次运行前前端显示种子快照。`data/retail.json` 可直接手动编辑维护。
+
+> ⚠️ 说明：天气 / Polymarket 在**用户浏览器**中实时执行，Trends / 电商在 **GitHub runner** 上执行——均不依赖任何自有后端。`data/*.json` 不含任何密钥。
 
 ---
 
