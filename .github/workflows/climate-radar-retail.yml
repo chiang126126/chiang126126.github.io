@@ -1,0 +1,41 @@
+name: climate-radar retail snapshot
+
+# 低频（每 12h，off-minute）尽力刷新 climate-radar 的零售库存/价格快照。
+# 采集器 best-effort：抓不到就保留手工维护的值，绝不硬失败。
+# 只有 data/retail.json 真正变化时才提交。
+on:
+  schedule:
+    - cron: "41 */12 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: pip install requests
+
+      - name: Run collector (best-effort, never hard-fail)
+        continue-on-error: true
+        run: python3 climate-radar/scripts/fetch_retail.py
+
+      - name: Commit retail.json if changed
+        run: |
+          git config user.name "climate-radar-bot"
+          git config user.email "mangzi141800@gmail.com"
+          if git diff --quiet -- climate-radar/data/retail.json; then
+            echo "no changes"; exit 0
+          fi
+          git add climate-radar/data/retail.json
+          git commit -q -m "chore(climate-radar): refresh retail snapshot [skip ci]" || { echo "nothing to commit"; exit 0; }
+          git push origin HEAD || echo "push skipped"
