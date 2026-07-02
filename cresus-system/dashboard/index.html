@@ -5432,6 +5432,51 @@ function renderLivePanel(data) {
     </div>`;
   }
 
+  // ===== Phase 6.M-EXP1 监控卡片: Tier-C 肥尾豁免 (always 显示, 单臂) =====
+  // 测"高波动 Tier-C 小币 live 能否从全封锁基线 -$0.49/笔 转正". 硬顶: 40 笔 + 累计 -$30 kill.
+  {
+    const EXP_TARGET = 40, EXP_KILL = 30, EXP_BASELINE = -0.49;
+    const expNet = t => Number(t.realized_pnl_usdt || 0) - Number(t.fees_paid_usdt || 0);
+    const expClosed = closed.filter(t => t._phase_6m_exp_unblock === true);
+    const expOpen = open.filter(t => t._phase_6m_exp_unblock === true);
+    const cNet = expClosed.reduce((s, t) => s + expNet(t), 0);
+    const uNet = expOpen.reduce((s, t) => s + Number(t.unrealized_pnl_usdt || 0), 0);
+    const cumPnl = cNet + uNet;                     // = kill switch 口径 (含在飞浮盈亏)
+    const nTotal = expClosed.length + expOpen.length;
+    const winPct = expClosed.length ? Math.round(expClosed.filter(t => expNet(t) > 0).length / expClosed.length * 100) : 0;
+    const eCol = v => v > 0 ? '#00e676' : (v < 0 ? '#ff5252' : 'var(--text-dim)');
+    const baseAt = EXP_BASELINE * expClosed.length; // 若这些单走全封锁基线的预期净值
+    let eBottom;
+    if (nTotal === 0) {
+      eBottom = '<span style="color:var(--text-dim)">⏳ 等待数据 — 符合条件的 Tier-C 高波动单开仓后自动填充</span>';
+    } else {
+      const need = Math.max(0, EXP_TARGET - nTotal);
+      const beatBase = cNet > baseAt;
+      const verdict = cNet > 0
+        ? '✅ 已转正 (跑赢封锁)'
+        : (beatBase ? '🟡 仍负但优于封锁基线' : '🔴 劣于封锁基线, 观察 kill');
+      const killLeft = (EXP_KILL + cumPnl);         // 距 -$30 还剩多少
+      eBottom = `<span style="color:${eCol(cNet)};font-weight:700">实盘净 $${cNet.toFixed(2)}</span>`
+              + `<span style="margin-left:8px">${verdict}</span>`
+              + `<span style="margin-left:10px;font-size:11px;color:var(--text-dim)">封锁基线 $${baseAt.toFixed(2)} (${expClosed.length}×-$0.49)</span>`
+              + `<br><span style="font-size:11px;color:var(--text-dim)">进度 ${nTotal}/${EXP_TARGET} 笔` + (need > 0 ? ` (还差 ${need})` : ' ✓ 已满, 待 retro')
+              + ` · kill switch 累计 $${cumPnl.toFixed(2)} / -$${EXP_KILL} (距 kill 还有 $${killLeft.toFixed(2)})</span>`;
+    }
+    const eCard = (label, val, sub) => `<div style="flex:1;background:rgba(255,255,255,0.04);border-radius:8px;padding:10px 12px;text-align:center">
+        <div style="font-size:11px;color:var(--text-dim)">${label}</div>
+        <div style="font-size:20px;font-weight:700;color:${eCol(val)};margin:2px 0">$${val.toFixed(2)}</div>
+        <div style="font-size:11px;color:var(--text-dim)">${sub}</div>
+      </div>`;
+    body += `<div style="background:rgba(38,198,218,0.08);border:1px solid rgba(38,198,218,0.35);border-radius:10px;padding:12px 14px;margin:10px 0">
+      <div style="font-weight:700;color:#4dd0e1;margin-bottom:8px">🧬 Tier-C 肥尾豁免实验 (6.M-EXP1) <span style="font-size:11px;color:var(--text-dim);font-weight:normal">— 高波动小币 live 能否转正 (强制小仓+SL floor)</span></div>
+      <div style="display:flex;gap:10px">
+        ${eCard('已平仓实盘净', cNet, `${expClosed.length} 笔 · 胜 ${winPct}%`)}
+        ${eCard('在飞浮盈亏', uNet, `${expOpen.length} 笔持仓`)}
+      </div>
+      <div style="margin-top:9px;font-size:12px">${eBottom}</div>
+    </div>`;
+  }
+
   // ===== 最近 10 条已平仓 (可折叠) =====
   if (closed.length > 0) {
     const closedShow = closed.slice(0, 10);
