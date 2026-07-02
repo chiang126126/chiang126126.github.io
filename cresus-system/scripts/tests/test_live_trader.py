@@ -6059,6 +6059,14 @@ class TestPhase6FBlacklist(unittest.TestCase):
     被 block 的信号: paper / shadow 继续跑, live 不开仓.
     """
 
+    def setUp(self):
+        # Phase 6.M-EXP1 (2026-07-02) 隔离: 本类测 6.F/6.M block 机制本身, 不测肥尾豁免实验层.
+        # _base_paper_trade 默认 atr_pct=1.5 + conv=5, 会触发 6.M-EXP 豁免 → 关掉 EXP 层,
+        # 让 Tier-C 仍走全封锁, 保持本类对 block 机制的单元覆盖.
+        # 实验层 (Tier-C 高 ATR conv≥5 豁免) 的行为见 TestPhase6MExp1TierCFatTail.
+        self._6mexp = patch.object(live_trader, "LIVE_PHASE_6M_EXP_ENABLED", False)
+        self._6mexp.start(); self.addCleanup(self._6mexp.stop)
+
     def _base_paper_trade(self, **overrides):
         """构造一笔通过其它所有 gate 的 paper trade, 用 overrides 调字段做测试."""
         from datetime import datetime, timezone
@@ -8288,6 +8296,199 @@ class TestPhase6ZSlFloor(unittest.TestCase):
         live_trader._sync_live_with_paper(lt, {"sl": 97.0, "phase": "C"})
         self.assertAlmostEqual(lt["sl_price"], 97.0, places=6)
         self.assertLess(lt["sl_price"], lt["avg_fill_price"])      # 仍在盈利侧
+
+
+class TestPhase6MExp1TierCFatTail(unittest.TestCase):
+    """Phase 6.M-EXP1 (2026-07-02): Tier-C 肥尾豁免前向实验.
+
+    高波动 (ATR≥1%) + conv≥5 的 Tier-C ($0.1-$1) 信号, 用极小仓 + 强制 6.Z SL
+    floor 放行, 前向验证该子桶 live 能否从 -$0.49 基线转正. 硬顶: 40 笔上限 +
+    累计 -$30 kill switch. 下游 6.Y/6.F/regime 仍生效.
+    """
+
+    def setUp(self):
+        self.now = datetime.now(timezone.utc)
+        # observation mode 让 whitelist 跳过 (测 gate 本身)
+        self._obs = patch.object(live_trader, "LIVE_OBSERVATION_MODE", True)
+        self._obs.start(); self.addCleanup(self._obs.stop)
+        self.base = {
+            "id": "TESTUSDT|LONG|2026-07-02T10:00:00+00:00",
+            "symbol": "TESTUSDT",
+            "direction": "LONG",
+            "entered_at": (self.now - timedelta(seconds=30)).isoformat(),
+            "entry_price": 0.5,      # Tier C ($0.1-$1)
+            "atr_pct": 1.5,          # ≥1% → 符合豁免 + 过 6.Y
+            "conviction_score": 5,   # ≥5 且非 6/7 → 过 6.F
+            "sl": 0.485, "tp1": 0.52, "tp2": 0.54,
+        }
+        self.live = _empty_live_state()
+
+    def _state_flagged(self, n_closed=0, closed_pnl=0.0, n_open=0, open_pnl=0.0):
+        st = _empty_live_state()
+        for i in range(n_closed):
+            st["live_closed_trades"].append({
+                "_phase_6m_exp_unblock": True,
+                "realized_pnl_usdt": closed_pnl, "symbol": f"C{i}USDT",
+            })
+        for i in range(n_open):
+            st["live_open_trades"].append({
+                "_phase_6m_exp_unblock": True,
+                "unrealized_pnl_usdt": open_pnl, "symbol": f"O{i}USDT",
+            })
+        return st
+
+    # === 豁免触发 ===
+
+    def test_exempted_high_atr_conv5(self):
+        """Tier-C + ATR≥1% + conv≥5 → 豁免通过 + 打 flag (btc_regime=None 跳过下游 regime)."""
+        t = dict(self.base)
+        ok, reason = is_eligible_for_mirror(t, self.live, self.now)
+        self.assertTrue(ok, f"应豁免通过, got: {reason}")
+        self.assertTrue(t.get("_phase_6m_exp_unblock"), "应在 paper_trade 打 flag")
+
+    def test_boundary_atr1_conv5_exempted(self):
+        """边界: ATR 恰 1.0 + conv 恰 5 → 豁免 (≥ 判定)."""
+        t = dict(self.base); t["atr_pct"] = 1.0; t["conviction_score"] = 5
+        ok, reason = is_eligible_for_mirror(t, self.live, self.now)
+        self.assertTrue(ok, f"边界应豁免, got: {reason}")
+        self.assertTrue(t.get("_phase_6m_exp_unblock"))
+
+    # === 不满足条件 → 维持 6.M 全封锁 ===
+
+    def test_low_atr_still_blocked(self):
+        """Tier-C + ATR<1% → 不豁免, 维持 6.M block (且非 exp1 拒因)."""
+        t = dict(self.base); t["atr_pct"] = 0.5
+        ok, reason = is_eligible_for_mirror(t, self.live, self.now)
+        self.assertFalse(ok)
+        self.assertIn("phase_6m", reason)
+        self.assertNotIn("exp1", reason)
+        self.assertFalse(t.get("_phase_6m_exp_unblock"))
+
+    def test_low_conv_still_blocked(self):
+        """Tier-C + conv<5 → 不豁免, 维持 6.M block."""
+        t = dict(self.base); t["conviction_score"] = 4
+        ok, reason = is_eligible_for_mirror(t, self.live, self.now)
+        self.assertFalse(ok)
+        self.assertIn("phase_6m", reason)
+        self.assertNotIn("exp1", reason)
+
+    def test_exp_disabled_still_blocked(self):
+        """总开关 OFF → 高 ATR Tier-C 也维持 6.M 全封锁."""
+        t = dict(self.base)
+        with patch.object(live_trader, "LIVE_PHASE_6M_EXP_ENABLED", False):
+            ok, reason = is_eligible_for_mirror(t, self.live, self.now)
+        self.assertFalse(ok)
+        self.assertIn("phase_6m", reason)
+        self.assertNotIn("exp1", reason)
+
+    def test_non_tier_c_no_flag(self):
+        """非 Tier-C (entry=$5, Tier B) → 6.M 不适用, 不打豁免 flag (走正常通过)."""
+        t = dict(self.base); t["entry_price"] = 5.0
+        ok, reason = is_eligible_for_mirror(t, self.live, self.now)
+        self.assertTrue(ok, f"Tier B 应正常通过, got: {reason}")
+        self.assertFalse(t.get("_phase_6m_exp_unblock"), "非 Tier-C 不应打豁免 flag")
+
+    # === 硬风控: 笔数上限 + kill switch ===
+
+    def test_max_trades_reblocks(self):
+        """已跑满 40 笔 → re-block, 拒因含 exp1 + 40/40."""
+        t = dict(self.base)
+        st = self._state_flagged(n_closed=40, closed_pnl=-0.05)
+        ok, reason = is_eligible_for_mirror(t, st, self.now)
+        self.assertFalse(ok)
+        self.assertIn("phase_6m_exp1", reason)
+        self.assertIn("40/40", reason)
+
+    def test_kill_switch_at_max_loss(self):
+        """累计 ≤ -$30 → kill switch, re-block."""
+        t = dict(self.base)
+        st = self._state_flagged(n_closed=30, closed_pnl=-1.0)   # -$30
+        ok, reason = is_eligible_for_mirror(t, st, self.now)
+        self.assertFalse(ok)
+        self.assertIn("kill switch", reason)
+        self.assertIn("-$30", reason)
+
+    def test_kill_switch_includes_open_unrealized(self):
+        """kill switch 累计含在飞 open 的浮亏."""
+        t = dict(self.base)
+        # 1 笔 closed -$6 + 1 笔 open 浮亏 -$25 = -$31 → kill
+        st = self._state_flagged(n_closed=1, closed_pnl=-6.0, n_open=1, open_pnl=-25.0)
+        ok, reason = is_eligible_for_mirror(t, st, self.now)
+        self.assertFalse(ok)
+        self.assertIn("kill switch", reason)
+
+    def test_under_caps_still_exempts(self):
+        """未达上限/未触 kill (39 笔 各 +$0.1) → 仍豁免放行."""
+        t = dict(self.base)
+        st = self._state_flagged(n_closed=39, closed_pnl=0.1)
+        ok, reason = is_eligible_for_mirror(t, st, self.now)
+        self.assertTrue(ok, f"未达硬顶应豁免, got: {reason}")
+
+    # === notional + counter ===
+
+    def test_notional_forced_small(self):
+        """_phase_6m_exp_unblock=True → notional 强制 = EXP notional ($40)."""
+        from live_trader import _live_notional_for_paper
+        t = {"conviction_score": 5, "_phase_6m_exp_unblock": True}
+        self.assertEqual(_live_notional_for_paper(t),
+                         live_trader.LIVE_PHASE_6M_EXP_NOTIONAL_USDT)
+
+    def test_counter_counts_flag_only(self):
+        """_count_phase_6m_exp_unblock 只统计带 flag 的, open+closed 都算."""
+        from live_trader import _count_phase_6m_exp_unblock
+        self.assertEqual(_count_phase_6m_exp_unblock({}), (0, 0.0))
+        st = {
+            "live_open_trades": [
+                {"_phase_6m_exp_unblock": True, "unrealized_pnl_usdt": -2.0},
+                {"_phase_6m_exp_unblock": False, "unrealized_pnl_usdt": -99},
+            ],
+            "live_closed_trades": [
+                {"_phase_6m_exp_unblock": True, "realized_pnl_usdt": +3.0},
+                {"_phase_6m_exp_unblock": True, "realized_pnl_usdt": -1.0},
+                {"_phase_6m_exp_unblock": False, "realized_pnl_usdt": -99},
+            ],
+        }
+        n, pnl = _count_phase_6m_exp_unblock(st)
+        self.assertEqual(n, 3)
+        self.assertAlmostEqual(pnl, 0.0, places=6)   # -2 +3 -1 = 0
+
+    # === 强制 SL floor (不看 6.Z arm / 6.Z 开关) ===
+
+    def _lt(self, **kw):
+        t = {
+            "symbol": "TESTUSDT", "side": "BUY", "avg_fill_price": 100.0,
+            "atr_pct": 2.0, "exp_sl_floor_arm": "A", "sl_price": 0.0,
+            "sl_compensation_offset": 0.0, "phase": "A",
+            "_phase_6m_exp_unblock": True,
+        }
+        t.update(kw)
+        return t
+
+    def test_forces_floor_even_arm_a(self):
+        """6.M-EXP trade 即使分到 6.Z A 臂, 也强制 SL floor (entry100,atr2→floor98)."""
+        lt = self._lt(exp_sl_floor_arm="A")
+        live_trader._sync_live_with_paper(lt, {"sl": 99.7, "phase": "B"})
+        self.assertAlmostEqual(lt["sl_price"], 98.0, places=6)
+
+    def test_forces_floor_when_6z_globally_disabled(self):
+        """6.Z 总开关 OFF 时, 6.M-EXP trade 仍强制 floor (独立于 6.Z enable)."""
+        lt = self._lt(exp_sl_floor_arm="A")
+        with patch.object(live_trader, "LIVE_EXP_SL_FLOOR_ENABLED", False):
+            live_trader._sync_live_with_paper(lt, {"sl": 99.7, "phase": "B"})
+        self.assertAlmostEqual(lt["sl_price"], 98.0, places=6)
+
+    def test_forced_floor_profit_lock_unchanged(self):
+        """防回归: paper trail SL 到盈利侧 (103) → 强制 floor 也绝不拉回, 保持 103."""
+        lt = self._lt(exp_sl_floor_arm="A")
+        live_trader._sync_live_with_paper(lt, {"sl": 103.0, "phase": "C"})
+        self.assertAlmostEqual(lt["sl_price"], 103.0, places=6)
+        self.assertGreater(lt["sl_price"], lt["avg_fill_price"])
+
+    def test_non_exp_trade_arm_a_no_floor(self):
+        """对照: 非 6.M-EXP 且 A 臂 → 不 floor (确认 flag 才触发强制)."""
+        lt = self._lt(exp_sl_floor_arm="A", _phase_6m_exp_unblock=False)
+        live_trader._sync_live_with_paper(lt, {"sl": 99.7, "phase": "B"})
+        self.assertAlmostEqual(lt["sl_price"], 99.7, places=6)
 
 
 if __name__ == "__main__":

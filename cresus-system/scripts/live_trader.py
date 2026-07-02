@@ -113,6 +113,10 @@ def _live_notional_for_paper(paper_trade: dict) -> float:
         return LIVE_PHASE_6F_B1_PARTIAL_NOTIONAL_USDT
     if paper_trade.get("_phase_6f_b2_partial_unblock"):
         return LIVE_PHASE_6F_B2_PARTIAL_NOTIONAL_USDT
+    # Phase 6.M-EXP1 (2026-07-02): Tier-C 肥尾豁免 trade 强制小 notional ($40).
+    # 与 b1/b2 价格带互斥 (6m_exp = Tier C $0.1-1; b1/b2 = Tier D <$0.1), 顺序无碍.
+    if paper_trade.get("_phase_6m_exp_unblock"):
+        return LIVE_PHASE_6M_EXP_NOTIONAL_USDT
     try:
         s = int(paper_trade.get("conviction_score"))
     except (TypeError, ValueError):
@@ -165,6 +169,14 @@ def _count_phase_6f_b1_partial_unblock(live_state: dict) -> tuple:
 def _count_phase_6f_b2_partial_unblock(live_state: dict) -> tuple:
     """Phase 6.F-B2-EXP1 counter. 详见 _count_partial_unblock_trades."""
     return _count_partial_unblock_trades(live_state, "_phase_6f_b2_partial_unblock")
+
+
+def _count_phase_6m_exp_unblock(live_state: dict) -> tuple:
+    """Phase 6.M-EXP1 counter (Tier-C 肥尾豁免). 详见 _count_partial_unblock_trades.
+
+    用于 is_eligible_for_mirror: count ≥ MAX_TRADES 停放新, cum_pnl ≤ -MAX_LOSS kill.
+    """
+    return _count_partial_unblock_trades(live_state, "_phase_6m_exp_unblock")
 
 
 def _tier_from_entry_price(entry: float) -> Optional[str]:
@@ -908,6 +920,30 @@ LIVE_EXP_SL_FLOOR_ENABLED = True
 LIVE_EXP_SL_FLOOR_ATR_MULT = 1.0       # B 臂 SL 距离下限 = 此值 × ATR%
 
 # ============================================================================
+# Phase 6.M-EXP1 (2026-07-02) — Tier-C 肥尾豁免前向实验 (受控, 单臂, 有硬顶)
+# ============================================================================
+# 背景: 6.M 全封锁 Tier-C ($0.1-$1.0), 依据是该桶 live 均值 -$0.49/笔. 但复盘
+#   (74 笔 MAGMA/RIF/MEU/SLX) 显示该均值被"低波动 chop 小亏损"主导, 而 SLX
+#   +18.91%、RIF +4.07% 这类肥尾赢家集中在"高波动 (ATR≥1%)"子桶被一并误伤.
+# 假说 (可证伪): Tier-C 里 ATR≥1% + conv≥5 的高波动子桶, 配合强制 6.Z SL floor
+#   (防下影针 wick 扫掉肥尾), 在 live 上能从 -$0.49 转正. 若 40 笔后净仍<0 或
+#   触发 kill switch → 假说被证伪, 改 LIVE_PHASE_6M_EXP_ENABLED=False 回全封锁.
+# 硬风控 (真钱):
+#   - 强制小仓 $40 (远小于默认 conv=5 $200), 单笔真亏有限.
+#   - 累计 40 笔上限 (跑满自动停, 等 retro), 累计 PnL ≤ -$30 立即 kill.
+#   - 下游 6.Y (ATR<1% 挡, 但本实验要求 ATR≥1% 故自然通过) / 6.F (conv=6/7 挡) /
+#     regime gate (down+LONG 挡) 全部仍生效 → 实际入场以 conv=5 为主, 层层受控.
+# 方法学说明: 不做 live A/B — 被封锁臂在 live 无成交, 无 live 对照可比;
+#   单臂 (全部符合条件的都放行小仓) vs 已知 -$0.49 基线, 才是决策相关的检验.
+# 紧急回滚: LIVE_PHASE_6M_EXP_ENABLED = False (立即回到 6.M 全封锁, 不影响在飞单).
+LIVE_PHASE_6M_EXP_ENABLED = True          # master kill switch
+LIVE_PHASE_6M_EXP_MIN_ATR_PCT = 1.0       # 仅放行 atr_pct ≥ 此值 (与 6.Y 对齐)
+LIVE_PHASE_6M_EXP_MIN_CONV = 5            # 仅放行 conviction_score ≥ 此值
+LIVE_PHASE_6M_EXP_NOTIONAL_USDT = 40.0    # 强制小仓 (实验风控)
+LIVE_PHASE_6M_EXP_MAX_TRADES = 40         # 跑满 40 笔自动停, 等 retro
+LIVE_PHASE_6M_EXP_MAX_LOSS_USDT = 30.0    # 累计 PnL ≤ -此值 立即 kill 回全封锁
+
+# ============================================================================
 # Phase 6.N (2026-06-16) — Maker mode 开仓 (LIMIT post-only) feature flag
 # ============================================================================
 # 设计: 默认 market taker (fees 0.05%/单 ≈ 0.10%/round-trip = 0.13%/笔).
@@ -1499,10 +1535,51 @@ def is_eligible_for_mirror(
             entry_price_for_6m = 0.0
         if (entry_price_for_6m > 0
                 and LIVE_PHASE_6F_TIER_C_LOWER <= entry_price_for_6m < LIVE_PHASE_6F_TIER_C_UPPER):
-            return False, (
+            block_reason_6m = (
                 f"phase_6m: Tier C 小币 (entry=${entry_price_for_6m:.4f}) "
                 f"整体 block — 13 天 195 笔 -$96 (drag $1.30/笔, 全 tier 最高)"
             )
+            # Phase 6.M-EXP1 (2026-07-02): Tier-C 肥尾豁免前向实验.
+            # 高波动 (ATR≥阈值) + conv≥阈值 的 Tier-C 信号, 用极小仓 + 强制 6.Z SL
+            # floor 放行, 前向验证该子桶 live 能否转正. 硬顶: 笔数上限 + 累计亏 kill.
+            # 不满足条件 / 实验满 / kill 触发 / 总开关关 → 维持 6.M 全封锁.
+            # 通过时不 return — 打 flag 后继续走 6.Y/6.F/regime 下游 gate (层层受控).
+            exempted_6m = False
+            if LIVE_PHASE_6M_EXP_ENABLED:
+                raw_atr_6m = paper_trade.get("atr_pct")
+                try:
+                    atr_6m = float(raw_atr_6m) if raw_atr_6m is not None else None
+                except (ValueError, TypeError):
+                    atr_6m = None
+                raw_conv_6m = paper_trade.get("conviction_score")
+                try:
+                    conv_6m = int(raw_conv_6m) if raw_conv_6m is not None else None
+                except (ValueError, TypeError):
+                    conv_6m = None
+                if (atr_6m is not None and atr_6m >= LIVE_PHASE_6M_EXP_MIN_ATR_PCT
+                        and conv_6m is not None and conv_6m >= LIVE_PHASE_6M_EXP_MIN_CONV):
+                    exp_n_6m, exp_pnl_6m = _count_phase_6m_exp_unblock(live_state)
+                    if exp_n_6m >= LIVE_PHASE_6M_EXP_MAX_TRADES:
+                        return False, (
+                            f"phase_6m_exp1: Tier-C 肥尾实验已跑 "
+                            f"{exp_n_6m}/{LIVE_PHASE_6M_EXP_MAX_TRADES} 笔上限, 等待 retro"
+                        )
+                    if exp_pnl_6m <= -LIVE_PHASE_6M_EXP_MAX_LOSS_USDT:
+                        return False, (
+                            f"phase_6m_exp1: 累计 PnL ${exp_pnl_6m:.2f} 触发 kill switch "
+                            f"(-${LIVE_PHASE_6M_EXP_MAX_LOSS_USDT}), 重新全封锁"
+                        )
+                    paper_trade["_phase_6m_exp_unblock"] = True
+                    log.info(
+                        f"[phase_6m_exp1] {sym} Tier-C 肥尾豁免 "
+                        f"(entry=${entry_price_for_6m:.4f} atr={atr_6m:.2f}% conv={conv_6m}) "
+                        f"试验性 unblock (n={exp_n_6m + 1}/{LIVE_PHASE_6M_EXP_MAX_TRADES}, "
+                        f"cum_pnl ${exp_pnl_6m:.2f}, notional=${LIVE_PHASE_6M_EXP_NOTIONAL_USDT}, "
+                        f"强制 SL floor)"
+                    )
+                    exempted_6m = True
+            if not exempted_6m:
+                return False, block_reason_6m
     # Phase 6.Y (2026-06-28): ATR 波动率下限闸门 — atr_pct < 阈值 → block.
     # 数据: ATR<1% 稳健亏 -$232 (835 笔 bootstrap CI[-317,-145] 整段<0).
     # 缺 atr_pct 时 fail-safe 放行 (不过度拦截 — atr_pct 由 paper 计算, 缺失罕见).
@@ -2669,8 +2746,13 @@ def _sync_live_with_paper(live_trade: dict, paper_open_trade: dict) -> bool:
             # ⚠️ 关键: 仅在 SL 仍在亏损侧 (LONG ≤entry / SHORT ≥entry) 且比下限更紧时放宽.
             #    若 paper 已 trail 越过 entry 锁定利润 (SL 到盈利侧), 绝不动 — 否则会把
             #    锁定的利润拉回亏损位吐掉 (B 臂永远锁不住利润, 实验作废且烧钱).
-            if (LIVE_EXP_SL_FLOOR_ENABLED
-                    and live_trade.get("exp_sl_floor_arm") == "B"):
+            # Phase 6.M-EXP1 (2026-07-02): Tier-C 肥尾豁免 trade 强制 SL floor (不看 6.Z arm),
+            #   因为"防 wick 扫掉肥尾"是本实验的核心机制. flag 在开仓时落于 live_trade,
+            #   故 kill 总开关只停新开仓, 在飞的实验单保持开仓时的 SL 行为 (一致性).
+            _force_floor_6m = bool(live_trade.get("_phase_6m_exp_unblock"))
+            _arm_floor_6z = (LIVE_EXP_SL_FLOOR_ENABLED
+                             and live_trade.get("exp_sl_floor_arm") == "B")
+            if _force_floor_6m or _arm_floor_6z:
                 entry_z = float(live_trade.get("avg_fill_price") or 0)
                 atr_z = float(live_trade.get("atr_pct") or 0)
                 side_z = (live_trade.get("side") or "").upper()
@@ -3446,6 +3528,9 @@ def _try_mirror_open(
             "_phase_6f_b1_partial_unblock": bool(paper_trade.get("_phase_6f_b1_partial_unblock")),
             # Phase 6.F-B2-EXP1 (2026-06-14): 试验性 conv>=7 D 微币 LONG chop partial unblock 标记
             "_phase_6f_b2_partial_unblock": bool(paper_trade.get("_phase_6f_b2_partial_unblock")),
+            # Phase 6.M-EXP1 (2026-07-02): Tier-C 肥尾豁免标记. True → retro 单独统计 +
+            # _sync_live_with_paper 强制 SL floor. notional 已在 _live_notional_for_paper 减仓.
+            "_phase_6m_exp_unblock": bool(paper_trade.get("_phase_6m_exp_unblock")),
             "sl_compensation_enabled": sl_comp_enabled,    # B 组标记 (Phase 4.D)
             "sl_compensation_offset": sl_comp_offset,      # offset (B 组非 0; A/C 组 0)
             "sl_compensation_mode": LIVE_SL_COMPENSATION_MODE,  # 部署时模式 (溯源用)
