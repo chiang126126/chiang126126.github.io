@@ -3,16 +3,32 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#e9f3f8" />
+  <meta name="theme-color" content="#FBF8F3" />
   <title>Climate Opportunity Radar · 气候商机雷达</title>
   <meta name="description" content="AI 辅助商品挖掘与交易决策系统：把天气概率、市场情绪、消费者行为、电商库存与中国供应链放在同一张决策表，输出 BUY / PRESELL / TEST / WATCH / SKIP 的可执行商业建议。" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>🛰️</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,340;0,9..144,440;0,9..144,560;1,9..144,360&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/app.css" />
 </head>
 <body>
+
+  <!-- ===================== 等温线母题背景 ===================== -->
+  <div class="bg-atlas" aria-hidden="true">
+    <svg viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid slice">
+      <g fill="none" stroke-width="1.2">
+        <path d="M-40 120 C 260 40 500 200 760 120 S 1200 40 1460 120" stroke="#7FB8CE"/>
+        <path d="M-40 178 C 260 98 500 258 760 178 S 1200 98 1460 178" stroke="#9FD3BE"/>
+        <path d="M-40 246 C 300 156 560 326 820 246 S 1240 156 1460 246" stroke="#2E8C93"/>
+        <path d="M-40 336 C 300 246 560 426 820 336 S 1260 246 1460 336" stroke="#7FB8CE"/>
+        <path d="M-40 452 C 320 352 600 542 880 452 S 1280 352 1460 452" stroke="#EC6142"/>
+        <path d="M-40 566 C 320 476 600 656 880 566 S 1300 476 1460 566" stroke="#F2A65A"/>
+        <path d="M-40 686 C 340 596 620 766 900 686 S 1320 596 1460 686" stroke="#2E8C93"/>
+        <path d="M-40 792 C 340 706 620 872 900 792 S 1320 706 1460 792" stroke="#7FB8CE"/>
+      </g>
+    </svg>
+  </div>
 
   <!-- ===================== TOPBAR ===================== -->
   <header class="topbar">
