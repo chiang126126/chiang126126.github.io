@@ -18,13 +18,13 @@
   const allScored = () => state.products.map(scoreOf);
 
   // ---------- SVG helpers ----------
-  const TONE = { BUY: '#0eb488', PRESELL: '#1f9fd6', TEST: '#ef9f1c', WATCH: '#6b8ca3', SKIP: '#f0596f' };
+  const TONE = { BUY: '#2FD98A', PRESELL: '#38BDF8', TEST: '#F5A524', WATCH: '#65778F', SKIP: '#F65B6B' };
   function ring(score, size = 58, stroke = 5) {
     const r = (size - stroke) / 2, c = 2 * Math.PI * r, off = c * (1 - score / 100);
     const col = score >= 80 ? TONE.BUY : score >= 66 ? TONE.PRESELL : score >= 52 ? TONE.TEST : score >= 38 ? TONE.WATCH : TONE.SKIP;
     return `<div class="ring" style="width:${size}px;height:${size}px">
       <svg width="${size}" height="${size}">
-        <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="#dcebf1" stroke-width="${stroke}"/>
+        <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="#1A2432" stroke-width="${stroke}"/>
         <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="${col}" stroke-width="${stroke}"
           stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}"/>
       </svg>
@@ -33,10 +33,10 @@
   }
   function radarChart(sig, size = 200) {
     const axes = [
-      { k: 'C', label: '气候', color: '#ff7a59' },
-      { k: 'M', label: '市场', color: '#7c6cf0' },
-      { k: 'P', label: '商品', color: '#13b6ca' },
-      { k: 'L', label: '实盘', color: '#3f9be8' },
+      { k: 'C', label: '气候', color: '#FF7A47' },
+      { k: 'M', label: '市场', color: '#8B7CF6' },
+      { k: 'P', label: '商品', color: '#38BDF8' },
+      { k: 'L', label: '实盘', color: '#2FD98A' },
     ];
     const cx = size / 2, cy = size / 2, R = size / 2 - 30;
     const pt = (i, frac) => {
@@ -46,12 +46,12 @@
     let grid = '';
     [0.25, 0.5, 0.75, 1].forEach(f => {
       const p = axes.map((_, i) => pt(i, f).join(',')).join(' ');
-      grid += `<polygon points="${p}" fill="none" stroke="rgba(20,64,90,.14)" stroke-width="1"/>`;
+      grid += `<polygon points="${p}" fill="none" stroke="rgba(150,180,215,.10)" stroke-width="1"/>`;
     });
     let spokes = '', labels = '';
     axes.forEach((ax, i) => {
       const [x, y] = pt(i, 1);
-      spokes += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="rgba(20,64,90,.14)" stroke-width="1"/>`;
+      spokes += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="rgba(150,180,215,.10)" stroke-width="1"/>`;
       const [lx, ly] = pt(i, 1.22);
       const val = sig[ax.k] === null ? '—' : sig[ax.k];
       labels += `<text x="${lx}" y="${ly}" fill="${ax.color}" font-size="11" font-weight="700" text-anchor="middle" dominant-baseline="middle">${ax.label} ${val}</text>`;
@@ -60,7 +60,7 @@
     let dots = axes.map((ax, i) => { const [x, y] = pt(i, (sig[ax.k] ?? 0) / 100); return `<circle cx="${x}" cy="${y}" r="3" fill="${ax.color}"/>`; }).join('');
     return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
       ${grid}${spokes}
-      <polygon points="${poly}" fill="rgba(19,182,202,.16)" stroke="#13b6ca" stroke-width="2" style="filter:drop-shadow(0 4px 7px rgba(19,182,202,.28))"/>
+      <polygon points="${poly}" fill="rgba(56,189,248,.15)" stroke="#38BDF8" stroke-width="1.6" style="filter:drop-shadow(0 0 6px rgba(56,189,248,.5))"/>
       ${dots}${labels}
     </svg>`;
   }
@@ -96,11 +96,11 @@
 
   // ---------- 社媒 & 新闻舆情面板 ----------
   const BUZZ_THEME = {
-    heat: { label: '高温', color: '#ff7a59' },
-    shortage: { label: '缺货', color: '#f0596f' },
-    ac_rush: { label: '抢购', color: '#ef9f1c' },
-    office_heat: { label: '办公过热', color: '#7c6cf0' },
-    buying_need: { label: '求购', color: '#2aa8e0' },
+    heat: { label: '高温', color: '#FF7A47' },
+    shortage: { label: '缺货', color: '#F65B6B' },
+    ac_rush: { label: '抢购', color: '#F5A524' },
+    office_heat: { label: '办公过热', color: '#8B7CF6' },
+    buying_need: { label: '求购', color: '#38BDF8' },
   };
   const BUZZ_SRC = { reddit: 'Reddit', googlenews: 'Google News', x: 'X', instagram: 'Instagram' };
   function buzzPanelHTML(buzz) {
@@ -170,63 +170,126 @@
     const scored = allScored();
     const paired = state.products.map((p, i) => ({ p, r: scored[i] })).sort((a, b) => b.r.total - a.r.total);
     const buy = paired.filter(x => x.r.rec.code === 'BUY').length;
-    const presell = paired.filter(x => x.r.rec.code === 'PRESELL').length;
     const avg = Math.round(paired.reduce((s, x) => s + x.r.total, 0) / (paired.length || 1));
     const hotCity = state.cities.slice().sort((a, b) => b.maxTemp - a.maxTemp)[0];
+    const buzz = (state.market && state.market.buzz) || { themes: {}, total: 0 };
+    const shortage = (buzz.themes && buzz.themes.shortage) || 0;
+    const buzzTotal = buzz.total || (buzz.items ? buzz.items.length : 0);
+    const avgSig = k => Math.round(paired.reduce((s, x) => s + (x.r.signals[k] || 0), 0) / (paired.length || 1));
 
-    // filtered list
     let list = paired;
     if (filter.rec !== 'all') list = list.filter(x => x.r.rec.code === filter.rec);
     if (filter.q) { const q = filter.q.toLowerCase(); list = list.filter(x => (x.p.name + x.p.nameFr + x.p.city).toLowerCase().includes(q)); }
 
     app.innerHTML = `
-    <section class="view">
-      <div class="hero">
-        <div class="hero-grid">
-          <div>
-            <div class="eyebrow"><span class="live" id="livePill"><span class="dot"></span><span class="lt">LIVE</span></span> · AI 辅助商品挖掘与交易决策</div>
-            <h1>把<span class="g">天气 · 市场 · 供应链</span>放进同一张决策表</h1>
-            <p>系统不预测天气，而是把气候概率、市场情绪、消费者行为、电商库存与中国供应链能力放在一起，输出「备货 / 预售 / 轻测 / 观察 / 放弃」的可执行判断。第一阶段聚焦欧洲高温降温商机。</p>
-            <div class="hero-stats">
-              <div class="hstat"><div class="k">评估商品</div><div class="v cy">${state.products.length}</div></div>
-              <div class="hstat"><div class="k">建议备货</div><div class="v buy">${buy}</div></div>
-              <div class="hstat"><div class="k">平均机会分</div><div class="v">${avg}</div></div>
-              <div class="hstat"><div class="k">最热城市</div><div class="v hot" style="font-size:16px">${hotCity.zh} ${hotCity.maxTemp}℃</div></div>
+    <section class="view dash">
+      <div class="cmd-head">
+        <div>
+          <div class="eyebrow"><span class="live" id="livePill"><span class="dot"></span><span class="lt">LIVE</span></span> · Opportunity Command Deck</div>
+          <h1>气候商机 · 指挥大盘</h1>
+          <p>把天气 · 市场情绪 · 供应链 · 本地实盘汇入一张实时决策大盘，输出可执行的备货 / 预售 / 轻测 / 观察 / 放弃。</p>
+        </div>
+        <div class="cmd-meta">
+          <div class="clock" id="cmdClock">--:--:--</div>
+          <div class="cmd-date">欧洲高温季 · 第一阶段</div>
+          <button class="btn sm" id="refreshLive">↻ 同步实时信号</button>
+        </div>
+      </div>
+
+      <div class="kpi-row">
+        ${kpiTile('评估商品', state.products.length, 'SKU 在盘', 'accent')}
+        ${kpiTile('建议备货', buy, 'BUY 级机会', 'pos')}
+        ${kpiTile('平均机会分', avg, '满分 100', 'accent')}
+        ${kpiTile('最热城市', hotCity.maxTemp + '℃', hotCity.zh + ' · 14天峰值', 'heat')}
+        ${kpiTile('缺货信号', shortage, '社媒/新闻提及', 'warn')}
+        ${kpiTile('舆情热度', buzzTotal, '条 · 实时抓取', 'accent2')}
+      </div>
+
+      <div class="dash-grid">
+        <div class="module module-board">
+          <div class="module-head">
+            <div class="mh-title"><i class="tick"></i>机会排行大盘</div>
+            <div class="mh-tools">
+              <div class="seg" id="recFilter">${['all', 'BUY', 'PRESELL', 'TEST', 'WATCH', 'SKIP'].map(k => `<button data-rec="${k}" class="${filter.rec === k ? 'active' : ''}">${k === 'all' ? '全部' : k}</button>`).join('')}</div>
+              <div class="search"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><input id="searchInput" placeholder="搜索…" value="${esc(filter.q)}" /></div>
             </div>
           </div>
-          <div class="panel glass">
-            <div class="eyebrow" style="margin-bottom:12px">城市气候信号 · 未来 14 天专业预报峰值</div>
+          <div class="board">
+            <div class="board-head"><span>#</span><span>商品</span><span>城市</span><span>信号 C·M·P·L</span><span>机会分</span><span>建议</span><span>毛利</span></div>
+            <div id="boardRows">${list.length ? list.map((x, i) => boardRow(x.p, x.r, i)).join('') : '<div class="empty-row">没有匹配的商品 · 调整筛选或录入新商品</div>'}</div>
+          </div>
+        </div>
+
+        <div class="module-col">
+          <div class="module">
+            <div class="module-head"><div class="mh-title"><i class="tick heat"></i>城市气候 · 14天峰值</div></div>
             <div class="thermo">
               ${state.cities.map(c => {
-                const w = Math.max(6, Math.min(100, (c.maxTemp - 24) / (42 - 24) * 100));
-                const ac = { none: '#3f9be8', yellow: '#ef9f1c', orange: '#ff7a59', red: '#f0596f' }[c.alert];
-                const hw = c.heatwave && c.heatwave.sustained ? `<span title="持续高温 ${c.heatwave.days} 天" style="font-size:11px">🔥</span>` : '';
-                return `<div class="city-row"><span class="name">${c.zh}</span><span class="bar"><i style="width:${w}%"></i></span>${hw}<span class="temp">${c.maxTemp}℃</span><span class="alert" title="${c.alert}" style="background:${ac};box-shadow:0 0 8px ${ac}"></span></div>`;
+                const w = Math.max(4, Math.min(98, (c.maxTemp - 24) / (42 - 24) * 100));
+                const ac = { none: '#38BDF8', yellow: '#FFB13C', orange: '#FF7A47', red: '#F65B6B' }[c.alert];
+                const hw = c.heatwave && c.heatwave.sustained ? `<span title="持续高温 ${c.heatwave.days} 天" style="font-size:10px">🔥</span>` : '';
+                return `<div class="city-row"><span class="name">${c.zh}</span><span class="bar"><i style="left:${w}%"></i></span>${hw}<span class="temp">${c.maxTemp}℃</span><span class="alert" title="${c.alert}" style="background:${ac};box-shadow:0 0 7px ${ac}"></span></div>`;
               }).join('')}
             </div>
-            <div class="data-note">🔥 = 未来 7–14 天持续高温信号 · 🌙 圆点 = 预警等级 · 「信号台」可同步/编辑</div>
+            <div class="data-note" style="padding:0 15px 14px">🔥 持续高温 · 圆点 = 预警等级 · 「信号台」可编辑</div>
+          </div>
+          <div class="module">
+            <div class="module-head"><div class="mh-title"><i class="tick"></i>信号均值 · 全盘</div></div>
+            <div class="gauges">
+              ${gauge('气候', avgSig('C'), '#FF7A47')}
+              ${gauge('市场', avgSig('M'), '#8B7CF6')}
+              ${gauge('商品', avgSig('P'), '#38BDF8')}
+              ${gauge('实盘', avgSig('L'), '#2FD98A')}
+            </div>
           </div>
         </div>
-      </div>
-
-      <div class="toolbar">
-        <div class="seg" id="recFilter">
-          ${['all', 'BUY', 'PRESELL', 'TEST', 'WATCH', 'SKIP'].map(k => `<button data-rec="${k}" class="${filter.rec === k ? 'active' : ''}">${k === 'all' ? '全部' : k}</button>`).join('')}
-        </div>
-        <div class="search">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-          <input id="searchInput" placeholder="搜索商品 / 城市…" value="${esc(filter.q)}" />
-        </div>
-      </div>
-
-      <div class="grid-cards" id="cards">
-        ${list.length ? list.map(x => oppCard(x.p, x.r)).join('') : emptyCards()}
       </div>
     </section>`;
 
-    $('#recFilter').onclick = e => { const b = e.target.closest('[data-rec]'); if (b) { filter.rec = b.dataset.rec; renderRadar(); } };
-    const si = $('#searchInput'); si.oninput = () => { filter.q = si.value; const cards = $('#cards'); let l = paired; if (filter.rec !== 'all') l = l.filter(x => x.r.rec.code === filter.rec); if (filter.q) { const q = filter.q.toLowerCase(); l = l.filter(x => (x.p.name + x.p.nameFr + x.p.city).toLowerCase().includes(q)); } cards.innerHTML = l.length ? l.map(x => oppCard(x.p, x.r)).join('') : emptyCards(); bindCards(); };
-    bindCards();
+    const rf = $('#recFilter'); if (rf) rf.onclick = e => { const b = e.target.closest('[data-rec]'); if (b) { filter.rec = b.dataset.rec; renderRadar(); } };
+    const si = $('#searchInput'); if (si) si.oninput = () => {
+      filter.q = si.value; let l = paired;
+      if (filter.rec !== 'all') l = l.filter(x => x.r.rec.code === filter.rec);
+      if (filter.q) { const q = filter.q.toLowerCase(); l = l.filter(x => (x.p.name + x.p.nameFr + x.p.city).toLowerCase().includes(q)); }
+      const br = $('#boardRows'); br.innerHTML = l.length ? l.map((x, i) => boardRow(x.p, x.r, i)).join('') : '<div class="empty-row">没有匹配的商品</div>'; bindRows();
+    };
+    const rl = $('#refreshLive'); if (rl) rl.onclick = () => refreshLive(true);
+    bindRows();
+    startClock();
+  }
+
+  function kpiTile(k, v, sub, tone) {
+    return `<div class="kpi-tile t-${tone}"><div class="kt-k">${esc(k)}</div><div class="kt-v">${v}</div><div class="kt-s">${esc(sub)}</div></div>`;
+  }
+  function boardRow(p, r, i) {
+    const col = TONE[r.rec.code];
+    const bars = ['C', 'M', 'P', 'L'].map(k => { const v = r.signals[k]; const h = v === null ? 3 : Math.max(3, Math.round(v * 0.26)); return `<i class="sg-${k}" style="height:${h}px" title="${k}:${v === null ? '—' : v}"></i>`; }).join('');
+    return `<div class="brow" data-id="${p.id}">
+      <span class="rk">${String(i + 1).padStart(2, '0')}</span>
+      <span class="bp"><span class="be">${p.emoji}</span><b>${esc(p.name)}</b></span>
+      <span class="bc">${esc(p.city)}</span>
+      <span class="bsig">${bars}</span>
+      <span class="bscore"><span class="sc-bar"><i style="width:${r.total}%;background:${col}"></i></span><b style="color:${col}">${r.total}</b></span>
+      <span><span class="rec-badge rec-${r.rec.code}">${r.rec.code}</span></span>
+      <span class="bm">${r.margin}%</span>
+    </div>`;
+  }
+  function gauge(label, v, color) {
+    return `<div class="gauge"><span class="g-l">${label}</span><span class="g-t"><i style="width:${v}%;background:${color}"></i></span><span class="g-v">${v}</span></div>`;
+  }
+  function bindRows() {
+    $$('.brow').forEach(el => el.onclick = () => { selectedId = el.dataset.id; go('decision'); });
+  }
+  let _clockTimer = null;
+  function startClock() {
+    const el = $('#cmdClock'); if (!el) return;
+    const tick = () => {
+      const e2 = $('#cmdClock');
+      if (!e2) { if (_clockTimer) { clearInterval(_clockTimer); _clockTimer = null; } return; }
+      const d = new Date();
+      e2.textContent = [d.getHours(), d.getMinutes(), d.getSeconds()].map(n => String(n).padStart(2, '0')).join(':');
+    };
+    tick(); if (_clockTimer) clearInterval(_clockTimer); _clockTimer = setInterval(tick, 1000);
   }
 
   function oppCard(p, r) {
@@ -327,7 +390,7 @@
         <div>
           <div class="panel">
             <div class="dc-head">
-              <div class="emoji" style="width:60px;height:60px;font-size:30px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#eafaf9,#dcf0fb);border:1px solid rgba(255,255,255,.9)">${p.emoji}</div>
+              <div class="emoji" style="width:60px;height:60px;font-size:30px;border-radius:14px;display:grid;place-items:center;background:var(--bg-2);border:1px solid var(--line)">${p.emoji}</div>
               <div><h2>${esc(p.name)}</h2><div class="sub">${esc(p.nameFr || '')}</div><div class="sub">${esc(p.cat)} · 📍${esc(p.city)}</div></div>
             </div>
             <div class="score-big">
@@ -358,7 +421,7 @@
             <div class="eyebrow" style="margin-bottom:4px">信号雷达 · 四维分解</div>
             <div class="radar-wrap">${radarChart(r.signals, 210)}</div>
             <div class="radar-legend">
-              ${[['C', '气候信号', '#ff7a59'], ['M', '市场情绪', '#7c6cf0'], ['P', '商品渠道', '#13b6ca'], ['L', '本地实盘', '#3f9be8']].map(([k, n, c]) =>
+              ${[['C', '气候信号', '#FF7A47'], ['M', '市场情绪', '#8B7CF6'], ['P', '商品渠道', '#38BDF8'], ['L', '本地实盘', '#2FD98A']].map(([k, n, c]) =>
                 `<div class="li"><span class="sw" style="background:${c}"></span><span class="n">${n}</span><span class="v" style="color:${c}">${r.signals[k] === null ? '待录入' : r.signals[k]}</span></div>`).join('')}
             </div>
           </div>
@@ -437,14 +500,14 @@
           const ac = { none: '—', yellow: '🟡 黄色', orange: '🟠 橙色', red: '🔴 红色' }[c.alert];
           const hw = c.heatwave || {};
           const hwOn = !!hw.sustained;
-          const hwColor = hwOn ? (hw.days >= 5 ? '#ff7a59' : '#ef9f1c') : '#6b8ca3';
+          const hwColor = hwOn ? (hw.days >= 5 ? '#FF5A3C' : '#FFB13C') : '#65778F';
           const hwText = hwOn
             ? `⚠ 是 · 连续 ${hw.days} 天${hw.startsIn > 0 ? `（第 ${hw.startsIn + 1} 天起）` : '（本周内）'}`
             : '暂无持续信号';
           return `<div class="sig-card">
             <div class="sh"><b>${c.zh} · ${c.name}</b><span class="tag">气候分 ${Math.round(s)}</span></div>
-            <div class="metric"><span class="m-lbl">日间峰值</span><span class="m-val" style="color:${c.maxTemp >= 38 ? '#ff7a59' : c.maxTemp >= 35 ? '#ef9f1c' : '#13b6ca'}">${c.maxTemp}℃${c.feelsLike ? ` <span style="color:var(--muted);font-size:11px">体感 ${c.feelsLike}°</span>` : ''}</span></div>
-            <div class="metric"><span class="m-lbl">夜间低温</span><span class="m-val" style="color:${c.nightTemp >= 20 ? '#ff7a59' : '#6b8ca3'}">${c.nightTemp}℃ ${c.nightTemp >= 20 ? '热带夜' : ''}</span></div>
+            <div class="metric"><span class="m-lbl">日间峰值</span><span class="m-val" style="color:${c.maxTemp >= 38 ? '#FF5A3C' : c.maxTemp >= 35 ? '#FFB13C' : '#38BDF8'}">${c.maxTemp}℃${c.feelsLike ? ` <span style="color:var(--muted);font-size:11px">体感 ${c.feelsLike}°</span>` : ''}</span></div>
+            <div class="metric"><span class="m-lbl">夜间低温</span><span class="m-val" style="color:${c.nightTemp >= 20 ? '#FF7A47' : '#65778F'}">${c.nightTemp}℃ ${c.nightTemp >= 20 ? '热带夜' : ''}</span></div>
             <div class="metric" style="border-bottom:1px solid ${hwOn ? 'rgba(255,107,74,.25)' : 'var(--border)'}"><span class="m-lbl" style="white-space:nowrap">7–14天持续高温</span><span class="m-val" style="color:${hwColor};text-align:right">${hwText}</span></div>
             <div class="metric"><span class="m-lbl">连续高温 · 热带夜</span><span class="m-val">${c.heatDays} 天 · ${hw.tropicalNights != null ? hw.tropicalNights : (c.nightTemp >= 20 ? '≥1' : 0)} 夜</span></div>
             <div class="metric"><span class="m-lbl">热浪预警等级</span><span class="m-val">${ac}</span></div>
@@ -687,7 +750,7 @@
 
   // ---------- utils ----------
   function riskLabel(l) { return { low: '低', mid: '中', high: '高' }[l] || l; }
-  function riskColor(v) { return v >= 1 ? '#f0596f' : v >= 0.5 ? '#ef9f1c' : '#0eb488'; }
+  function riskColor(v) { return v >= 1 ? '#F65B6B' : v >= 0.5 ? '#F5A524' : '#2FD98A'; }
   function driverIcon(t) {
     if (t === 'pos') return '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>';
     if (t === 'neg') return '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3l-8-14a2 2 0 0 0-3.4 0z"/></svg>';
