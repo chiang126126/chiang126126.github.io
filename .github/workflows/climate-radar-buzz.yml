@@ -1,0 +1,48 @@
+name: climate-radar social & news buzz
+
+# 社媒 & 新闻舆情数据管道：定时在 GitHub runner 上抓取 Reddit 公共 JSON +
+# Google News RSS（法国本地新闻 + 缺货/抢购/办公过热/求购话题），归类写出
+# climate-radar/data/buzz.json，前端只读快照。X / Instagram 无 keyless 接口，
+# 默认关闭。采集器 best-effort、绝不非零退出，仅在有变化时提交。
+on:
+  schedule:
+    - cron: "33 */8 * * *"   # 每 8 小时（错峰第 33 分钟）
+  workflow_dispatch: {}
+
+permissions:
+  contents: write            # 内置 GITHUB_TOKEN 提交回本仓库，无需额外 secret
+
+concurrency:
+  group: climate-radar-buzz
+  cancel-in-progress: false
+
+jobs:
+  buzz:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        continue-on-error: true
+        run: pip install requests
+
+      - name: Fetch social & news buzz
+        continue-on-error: true
+        run: python climate-radar/scripts/fetch_buzz.py
+
+      - name: Commit snapshot if changed
+        run: |
+          git add climate-radar/data/buzz.json
+          if git diff --staged --quiet; then
+            echo "无变化，跳过提交"
+          else
+            git config user.name "climate-radar-buzz"
+            git config user.email "mangzi141800@gmail.com"
+            git commit -m "data(climate-radar): buzz refresh"
+            git push
+            echo "✅ 已提交 buzz 快照"
+          fi

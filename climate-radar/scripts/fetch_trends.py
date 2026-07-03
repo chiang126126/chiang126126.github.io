@@ -33,10 +33,14 @@ import datetime
 # 关键词顺序即前端展示顺序（法国降温家电市场）
 KEYWORDS = [
     "climatiseur mobile",
+    "climatiseur portable",
+    "clim mobile",
+    "clim",
     "ventilateur",
+    "ventilateur de cou",
+    "brumisateur",
     "canicule",
     "rafraîchir appartement",
-    "ventilateur de cou",
 ]
 
 GEO = "FR"

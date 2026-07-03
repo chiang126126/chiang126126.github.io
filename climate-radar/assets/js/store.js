@@ -5,7 +5,7 @@
 (function (global) {
   'use strict';
 
-  const KEY = 'climate_radar_v2'; // v2: 城市增加 14 天热浪信号（heatwave/feelsLike）
+  const KEY = 'climate_radar_v4'; // v4: 本地反馈增加 4 字段 + Trends 关键词补齐
 
   // ---------- 城市气候快照（种子；可在"信号"页手动更新）----------
   // heatwave: { sustained, days(连续高温天数), startsIn(第几天起,0基), peak, tropicalNights, horizon(预报窗口天), thresholdC }
@@ -24,13 +24,33 @@
     polymarket: { paris: 72, london: 54, rising: true, note: '巴黎"7月最高温≥38℃"合约概率一周内 58%→72%' },
     trends: [
       { kw: 'climatiseur mobile', idx: 96, rising: true },
+      { kw: 'climatiseur portable', idx: 84, rising: true },
+      { kw: 'clim mobile', idx: 88, rising: true },
+      { kw: 'clim', idx: 92, rising: true },
       { kw: 'ventilateur', idx: 88, rising: true },
+      { kw: 'ventilateur de cou', idx: 47, rising: true },
+      { kw: 'brumisateur', idx: 39, rising: true },
       { kw: 'canicule', idx: 100, rising: true },
       { kw: 'rafraîchir appartement', idx: 61, rising: true },
-      { kw: 'ventilateur de cou', idx: 47, rising: true },
     ],
     news: '家乐福单日售出约 3 万台风扇 / 空调；法国 5 月底一周售出约 68 万台风扇（同比 +1500%）；多款移动空调售罄。',
     updated: '2026-07-01',
+    // 社媒 & 新闻舆情种子（由 live-buzz.js 读取 data/buzz.json 覆盖）
+    buzz: {
+      updated: '2026-07-02',
+      sources: { reddit: 'ok', googlenews: 'ok', x: 'disabled', instagram: 'disabled' },
+      themes: { heat: 12, shortage: 7, ac_rush: 5, office_heat: 3, buying_need: 4 },
+      total: 6,
+      items: [
+        { source: 'googlenews', theme: 'shortage', title: 'Canicule : les climatiseurs mobiles en rupture dans plusieurs enseignes', origin: 'Le Parisien', url: 'https://news.google.com/', ts: '2026-07-01', lang: 'fr' },
+        { source: 'googlenews', theme: 'ac_rush', title: 'Ruée sur les ventilateurs : Carrefour en écoule 30 000 en un jour', origin: 'BFM', url: 'https://news.google.com/', ts: '2026-06-30', lang: 'fr' },
+        { source: 'reddit', theme: 'shortage', title: 'Où trouver un climatiseur mobile dispo à Paris ? Tout est en rupture', origin: 'r/paris', url: 'https://www.reddit.com/', ts: '2026-07-01', lang: 'fr' },
+        { source: 'reddit', theme: 'office_heat', title: 'Canicule au bureau : vous faites comment sans clim ?', origin: 'r/france', url: 'https://www.reddit.com/', ts: '2026-06-30', lang: 'fr' },
+        { source: 'reddit', theme: 'buying_need', title: 'Recommandation ventilateur portable / mini clim bureau ?', origin: 'r/AskFrance', url: 'https://www.reddit.com/', ts: '2026-06-29', lang: 'fr' },
+        { source: 'reddit', theme: 'office_heat', title: 'Heatwave + no AC at work = misery. How are you coping?', origin: 'r/london', url: 'https://www.reddit.com/', ts: '2026-06-30', lang: 'en' },
+      ],
+      note: '社媒 & 新闻舆情快照（Reddit + Google News）。',
+    },
   };
 
   // ---------- 种子商品 ----------
@@ -44,6 +64,7 @@
         euPrice: 329, chinaCost: 165, weightKg: 24, handCarry: false, demoEasy: true, restock: 'tight',
         complianceRisk: 'high', returnRisk: 'mid',
         views: 240, inquiries: 12, conversions: 3, fastPickup: true, b2bDemand: false,
+        topQuestion: '还有货吗？能今天自取吗？', noBuyReason: '嫌重 / 想等品牌方现货', acceptPrice: 299, concerns: '安装, 噪音, 退货',
         note: 'Leboncoin 一周十多个咨询；重、需合规，适合本地现货清货 + 配件组合。',
       }),
       mk({
@@ -176,6 +197,7 @@
       euPrice: 25, chinaCost: 6, weightKg: 0.5, handCarry: true, demoEasy: true, restock: 'yes',
       complianceRisk: 'low', returnRisk: 'low',
       views: 0, inquiries: 0, conversions: 0, fastPickup: false, b2bDemand: false,
+      topQuestion: '', noBuyReason: '', acceptPrice: 0, concerns: '',
       note: '', createdAt: '2026-07-02',
     };
   }

@@ -26,9 +26,9 @@
       <svg width="${size}" height="${size}">
         <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="#12203a" stroke-width="${stroke}"/>
         <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="${col}" stroke-width="${stroke}"
-          stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}"/>
+          stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}" style="filter:drop-shadow(0 0 5px ${col}aa)"/>
       </svg>
-      <div class="num" style="color:${col}">${score}<small>/100</small></div>
+      <div class="num" style="color:${col};text-shadow:0 0 16px ${col}66">${score}<small>/100</small></div>
     </div>`;
   }
   function radarChart(sig, size = 200) {
@@ -60,7 +60,7 @@
     let dots = axes.map((ax, i) => { const [x, y] = pt(i, (sig[ax.k] ?? 0) / 100); return `<circle cx="${x}" cy="${y}" r="3" fill="${ax.color}"/>`; }).join('');
     return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
       ${grid}${spokes}
-      <polygon points="${poly}" fill="rgba(34,211,238,.14)" stroke="#22d3ee" stroke-width="2"/>
+      <polygon points="${poly}" fill="rgba(56,224,255,.16)" stroke="#5cf0ff" stroke-width="2" style="filter:drop-shadow(0 0 6px rgba(56,224,255,.55))"/>
       ${dots}${labels}
     </svg>`;
   }
@@ -73,6 +73,80 @@
     }).join('') + `</div>`;
   }
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  // ---------- 买家反馈（本地实盘定性字段）----------
+  function buyerFeedbackHTML(p) {
+    const chips = (p.concerns || '').split(/[,，、]/).map(c => c.trim()).filter(Boolean);
+    const has = (p.topQuestion && p.topQuestion.trim()) || (p.noBuyReason && p.noBuyReason.trim()) || (+p.acceptPrice > 0) || chips.length;
+    if (!has) return '';
+    const priceCmp = (+p.acceptPrice > 0 && +p.euPrice > 0)
+      ? (+p.acceptPrice < +p.euPrice * 0.9 ? '<span style="color:var(--test)"> · 低于售价，价格敏感</span>'
+        : (+p.acceptPrice >= +p.euPrice ? '<span style="color:var(--buy)"> · ≥售价，有溢价空间</span>' : ''))
+      : '';
+    return `<div class="panel" style="margin-top:16px">
+      <div class="eyebrow" style="margin-bottom:12px">买家反馈 · 本地实盘</div>
+      <div class="fb-list">
+        ${p.topQuestion && p.topQuestion.trim() ? `<div class="fb"><span class="fk">最常问</span><span class="fv">${esc(p.topQuestion)}</span></div>` : ''}
+        ${p.noBuyReason && p.noBuyReason.trim() ? `<div class="fb"><span class="fk">未成交原因</span><span class="fv">${esc(p.noBuyReason)}</span></div>` : ''}
+        ${+p.acceptPrice > 0 ? `<div class="fb"><span class="fk">可接受价</span><span class="fv">€${esc(p.acceptPrice)}${+p.euPrice > 0 ? ` <span style="color:var(--muted)">/ 售价 €${esc(p.euPrice)}</span>` : ''}${priceCmp}</span></div>` : ''}
+        ${chips.length ? `<div class="fb"><span class="fk">关心项</span><span class="fv">${chips.map(c => `<span class="chip">${esc(c)}</span>`).join(' ')}</span></div>` : ''}
+      </div>
+    </div>`;
+  }
+
+  // ---------- 社媒 & 新闻舆情面板 ----------
+  const BUZZ_THEME = {
+    heat: { label: '高温', color: '#ff6a45' },
+    shortage: { label: '缺货', color: '#ff5b86' },
+    ac_rush: { label: '抢购', color: '#ffbe4d' },
+    office_heat: { label: '办公过热', color: '#9d74ff' },
+    buying_need: { label: '求购', color: '#38e0ff' },
+  };
+  const BUZZ_SRC = { reddit: 'Reddit', googlenews: 'Google News', x: 'X', instagram: 'Instagram' };
+  function buzzPanelHTML(buzz) {
+    if (!buzz) return '';
+    const themes = buzz.themes || {};
+    const items = buzz.items || [];
+    const sources = buzz.sources || {};
+    const max = Math.max(1, ...Object.keys(BUZZ_THEME).map(k => themes[k] || 0));
+    const bars = Object.keys(BUZZ_THEME).map(k => {
+      const c = BUZZ_THEME[k], v = themes[k] || 0;
+      return `<div class="row"><span class="lbl" style="width:64px">${c.label}</span><span class="track"><i style="width:${Math.round(v / max * 100)}%;background:${c.color}"></i></span><span class="val">${v}</span></div>`;
+    }).join('');
+    const chips = Object.keys(BUZZ_SRC).map(k => {
+      const st = sources[k] || 'disabled';
+      const on = st === 'ok';
+      const col = on ? 'var(--buy)' : (st === 'disabled' ? 'var(--dim)' : 'var(--test)');
+      const txt = on ? '✓' : (st === 'disabled' ? '需API' : st);
+      return `<span class="chip" style="color:${col};border-color:${col}44">${BUZZ_SRC[k]} ${txt}</span>`;
+    }).join('');
+    const rows = items.slice(0, 6).map(it => {
+      const c = BUZZ_THEME[it.theme] || { label: it.theme, color: 'var(--muted)' };
+      const origin = it.origin || (it.source === 'reddit' ? 'Reddit' : it.source || '');
+      return `<a class="buzz-item" href="${esc(it.url || '#')}" target="_blank" rel="noopener">
+        <span class="bt" style="color:${c.color};border-color:${c.color}55">${c.label}</span>
+        <span class="btitle">${esc(it.title)}</span>
+        <span class="bsrc">${esc(origin)}${it.ts ? ' · ' + esc(it.ts) : ''}</span>
+      </a>`;
+    }).join('');
+    return `<div class="panel" style="margin-top:16px">
+      <div class="section-head" style="margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:10px"><span class="badge-ai" style="color:var(--cyan2)">◎ 舆情</span><b style="font-size:15px">社媒 & 新闻雷达</b></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">${chips}</div>
+      </div>
+      <div class="decision-grid" style="gap:16px">
+        <div>
+          <div class="eyebrow" style="margin-bottom:10px">话题热度 · 提及量</div>
+          <div class="sig-mini">${bars}</div>
+          <div class="data-note">Reddit 公共 JSON + Google News RSS 定时抓取；X/Instagram 无 keyless 接口，需自备 key</div>
+        </div>
+        <div>
+          <div class="eyebrow" style="margin-bottom:10px">最新舆情 · ${buzz.total || items.length} 条</div>
+          <div class="buzz-list">${rows || '<div class="data-note">暂无舆情条目</div>'}</div>
+        </div>
+      </div>
+    </div>`;
+  }
 
   // ============================================================
   //  ROUTER
@@ -295,6 +369,7 @@
             <div style="font-size:12.5px;color:var(--muted)">${esc(relatedBundle.desc)}</div>
             <button class="btn sm" style="margin-top:12px" onclick="__go('bundles')">查看组合包 →</button>
           </div>` : ''}
+          ${buyerFeedbackHTML(p)}
         </div>
       </div>
 
@@ -399,6 +474,7 @@
         <p style="margin:0;font-size:13.5px;color:var(--text)">${esc(m.news)}</p>
         <div class="data-note">更新时间 ${esc(m.updated)}</div>
       </div>
+      ${buzzPanelHTML(m.buzz)}
       <div class="disclaimer"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3l-8-14a2 2 0 0 0-3.4 0z"/></svg>
         <span>天气为 Open-Meteo 专业模型 14 天预报；「热浪预警」由该预报按 canicule 规则（连续 ≥3 天 ≥32℃）推导，非官方 Vigilance/MeteoSwiss 通报——后者可后续经数据管道叠加。其余信号含人工录入 / 示例值，仅辅助判断、不构成保证；真实决策请以最新预报、平台库存与本地实盘为准，不鼓励盲目囤货。</span></div>
     </section>`;
@@ -449,6 +525,7 @@
         <h4><span class="bar"></span>本周判断</h4>
         <p>${esc(rep.summary)}</p>
         ${rep.climate ? `<h4><span class="bar"></span>市场信号</h4><p class="muted">${esc(rep.climate)}</p>` : ''}
+        ${rep.buzz ? `<h4><span class="bar"></span>社媒 & 新闻舆情</h4><p class="muted">${esc(rep.buzz)}</p>` : ''}
         <h4><span class="bar"></span>建议备货（BUY）</h4>
         <ul class="rlist">${rep.buy.length ? rep.buy.map(line).join('') : '<li class="muted" style="justify-content:center">本周暂无 BUY 级机会</li>'}</ul>
         <h4><span class="bar"></span>建议预售 / 测试（PRESELL）</h4>
@@ -519,7 +596,11 @@
             <div class="field"><label>咨询人数</label><input name="inquiries" type="number" value="${p.inquiries}" /></div>
             <div class="field"><label>成交数</label><input name="conversions" type="number" value="${p.conversions}" /></div>
             <div class="field"><label>要求当天/次日取货</label><select name="fastPickup">${sel(String(p.fastPickup), [['false', '否'], ['true', '是']])}</select></div>
-            <div class="field full"><label>B 端小批量需求</label><select name="b2bDemand">${sel(String(p.b2bDemand), [['false', '暂无'], ['true', '出现 B 端需求']])}</select></div>
+            <div class="field"><label>B 端小批量需求</label><select name="b2bDemand">${sel(String(p.b2bDemand), [['false', '暂无'], ['true', '出现 B 端需求']])}</select></div>
+            <div class="field"><label>买家可接受价 € <span class="hint">对比售价判断价格敏感度</span></label><input name="acceptPrice" type="number" step="0.1" value="${p.acceptPrice || 0}" /></div>
+            <div class="field full"><label>买家最常问的问题</label><input name="topQuestion" value="${esc(p.topQuestion || '')}" placeholder="还有货吗？能自取吗？安装难吗？噪音大吗？…" /></div>
+            <div class="field full"><label>未成交原因</label><input name="noBuyReason" value="${esc(p.noBuyReason || '')}" placeholder="价格偏高 / 想等品牌方现货 / 担心安装 / 担心退货…" /></div>
+            <div class="field full"><label>买家关心项 <span class="hint">逗号分隔</span></label><input name="concerns" value="${esc(p.concerns || '')}" placeholder="安装, 噪音, 能耗, 退货, 质保, 使用说明" /></div>
 
             <div class="field full"><label>备注</label><textarea name="note" placeholder="观察、假设、场景…">${esc(p.note)}</textarea></div>
           </div>
@@ -551,7 +632,7 @@
       ['polymarketRising', 'trendsRising', 'handCarry', 'demoEasy', 'fastPickup', 'b2bDemand'].forEach(k => o[k] = o[k] === 'true');
       o.retailStockout = fd.get('retailStockout') === 'out';
       o.retailTight = fd.get('retailStockout') === 'tight';
-      ['maxTemp', 'nightTemp', 'heatDays', 'polymarket', 'googleTrends', 'euPrice', 'chinaCost', 'weightKg', 'views', 'inquiries', 'conversions'].forEach(k => o[k] = parseFloat(o[k]) || 0);
+      ['maxTemp', 'nightTemp', 'heatDays', 'polymarket', 'googleTrends', 'euPrice', 'chinaCost', 'weightKg', 'views', 'inquiries', 'conversions', 'acceptPrice'].forEach(k => o[k] = parseFloat(o[k]) || 0);
       return { ...p, ...o };
     }
     function live() {
