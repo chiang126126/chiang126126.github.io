@@ -18,25 +18,25 @@
   const allScored = () => state.products.map(scoreOf);
 
   // ---------- SVG helpers ----------
-  const TONE = { BUY: '#16d99b', PRESELL: '#22d3ee', TEST: '#f5b544', WATCH: '#8aa0c4', SKIP: '#f4517a' };
+  const TONE = { BUY: '#0eb488', PRESELL: '#1f9fd6', TEST: '#ef9f1c', WATCH: '#6b8ca3', SKIP: '#f0596f' };
   function ring(score, size = 58, stroke = 5) {
     const r = (size - stroke) / 2, c = 2 * Math.PI * r, off = c * (1 - score / 100);
     const col = score >= 80 ? TONE.BUY : score >= 66 ? TONE.PRESELL : score >= 52 ? TONE.TEST : score >= 38 ? TONE.WATCH : TONE.SKIP;
     return `<div class="ring" style="width:${size}px;height:${size}px">
       <svg width="${size}" height="${size}">
-        <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="#12203a" stroke-width="${stroke}"/>
+        <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="#dcebf1" stroke-width="${stroke}"/>
         <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="${col}" stroke-width="${stroke}"
-          stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}" style="filter:drop-shadow(0 0 5px ${col}aa)"/>
+          stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}"/>
       </svg>
-      <div class="num" style="color:${col};text-shadow:0 0 16px ${col}66">${score}<small>/100</small></div>
+      <div class="num" style="color:${col}">${score}<small>/100</small></div>
     </div>`;
   }
   function radarChart(sig, size = 200) {
     const axes = [
-      { k: 'C', label: '气候', color: '#ff6b4a' },
-      { k: 'M', label: '市场', color: '#a78bfa' },
-      { k: 'P', label: '商品', color: '#22d3ee' },
-      { k: 'L', label: '实盘', color: '#3b82f6' },
+      { k: 'C', label: '气候', color: '#ff7a59' },
+      { k: 'M', label: '市场', color: '#7c6cf0' },
+      { k: 'P', label: '商品', color: '#13b6ca' },
+      { k: 'L', label: '实盘', color: '#3f9be8' },
     ];
     const cx = size / 2, cy = size / 2, R = size / 2 - 30;
     const pt = (i, frac) => {
@@ -46,12 +46,12 @@
     let grid = '';
     [0.25, 0.5, 0.75, 1].forEach(f => {
       const p = axes.map((_, i) => pt(i, f).join(',')).join(' ');
-      grid += `<polygon points="${p}" fill="none" stroke="#1c2c48" stroke-width="1"/>`;
+      grid += `<polygon points="${p}" fill="none" stroke="rgba(20,64,90,.14)" stroke-width="1"/>`;
     });
     let spokes = '', labels = '';
     axes.forEach((ax, i) => {
       const [x, y] = pt(i, 1);
-      spokes += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#1c2c48" stroke-width="1"/>`;
+      spokes += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="rgba(20,64,90,.14)" stroke-width="1"/>`;
       const [lx, ly] = pt(i, 1.22);
       const val = sig[ax.k] === null ? '—' : sig[ax.k];
       labels += `<text x="${lx}" y="${ly}" fill="${ax.color}" font-size="11" font-weight="700" text-anchor="middle" dominant-baseline="middle">${ax.label} ${val}</text>`;
@@ -60,7 +60,7 @@
     let dots = axes.map((ax, i) => { const [x, y] = pt(i, (sig[ax.k] ?? 0) / 100); return `<circle cx="${x}" cy="${y}" r="3" fill="${ax.color}"/>`; }).join('');
     return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
       ${grid}${spokes}
-      <polygon points="${poly}" fill="rgba(56,224,255,.16)" stroke="#5cf0ff" stroke-width="2" style="filter:drop-shadow(0 0 6px rgba(56,224,255,.55))"/>
+      <polygon points="${poly}" fill="rgba(19,182,202,.16)" stroke="#13b6ca" stroke-width="2" style="filter:drop-shadow(0 4px 7px rgba(19,182,202,.28))"/>
       ${dots}${labels}
     </svg>`;
   }
@@ -96,11 +96,11 @@
 
   // ---------- 社媒 & 新闻舆情面板 ----------
   const BUZZ_THEME = {
-    heat: { label: '高温', color: '#ff6a45' },
-    shortage: { label: '缺货', color: '#ff5b86' },
-    ac_rush: { label: '抢购', color: '#ffbe4d' },
-    office_heat: { label: '办公过热', color: '#9d74ff' },
-    buying_need: { label: '求购', color: '#38e0ff' },
+    heat: { label: '高温', color: '#ff7a59' },
+    shortage: { label: '缺货', color: '#f0596f' },
+    ac_rush: { label: '抢购', color: '#ef9f1c' },
+    office_heat: { label: '办公过热', color: '#7c6cf0' },
+    buying_need: { label: '求购', color: '#2aa8e0' },
   };
   const BUZZ_SRC = { reddit: 'Reddit', googlenews: 'Google News', x: 'X', instagram: 'Instagram' };
   function buzzPanelHTML(buzz) {
@@ -199,7 +199,7 @@
             <div class="thermo">
               ${state.cities.map(c => {
                 const w = Math.max(6, Math.min(100, (c.maxTemp - 24) / (42 - 24) * 100));
-                const ac = { none: '#3b82f6', yellow: '#f5b544', orange: '#ff6b4a', red: '#f4517a' }[c.alert];
+                const ac = { none: '#3f9be8', yellow: '#ef9f1c', orange: '#ff7a59', red: '#f0596f' }[c.alert];
                 const hw = c.heatwave && c.heatwave.sustained ? `<span title="持续高温 ${c.heatwave.days} 天" style="font-size:11px">🔥</span>` : '';
                 return `<div class="city-row"><span class="name">${c.zh}</span><span class="bar"><i style="width:${w}%"></i></span>${hw}<span class="temp">${c.maxTemp}℃</span><span class="alert" title="${c.alert}" style="background:${ac};box-shadow:0 0 8px ${ac}"></span></div>`;
               }).join('')}
@@ -327,7 +327,7 @@
         <div>
           <div class="panel">
             <div class="dc-head">
-              <div class="emoji" style="width:60px;height:60px;font-size:30px;border-radius:14px;display:grid;place-items:center;background:radial-gradient(circle at 30% 25%,#1a2942,#0d1626);border:1px solid var(--border)">${p.emoji}</div>
+              <div class="emoji" style="width:60px;height:60px;font-size:30px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#eafaf9,#dcf0fb);border:1px solid rgba(255,255,255,.9)">${p.emoji}</div>
               <div><h2>${esc(p.name)}</h2><div class="sub">${esc(p.nameFr || '')}</div><div class="sub">${esc(p.cat)} · 📍${esc(p.city)}</div></div>
             </div>
             <div class="score-big">
@@ -358,7 +358,7 @@
             <div class="eyebrow" style="margin-bottom:4px">信号雷达 · 四维分解</div>
             <div class="radar-wrap">${radarChart(r.signals, 210)}</div>
             <div class="radar-legend">
-              ${[['C', '气候信号', '#ff6b4a'], ['M', '市场情绪', '#a78bfa'], ['P', '商品渠道', '#22d3ee'], ['L', '本地实盘', '#3b82f6']].map(([k, n, c]) =>
+              ${[['C', '气候信号', '#ff7a59'], ['M', '市场情绪', '#7c6cf0'], ['P', '商品渠道', '#13b6ca'], ['L', '本地实盘', '#3f9be8']].map(([k, n, c]) =>
                 `<div class="li"><span class="sw" style="background:${c}"></span><span class="n">${n}</span><span class="v" style="color:${c}">${r.signals[k] === null ? '待录入' : r.signals[k]}</span></div>`).join('')}
             </div>
           </div>
@@ -437,14 +437,14 @@
           const ac = { none: '—', yellow: '🟡 黄色', orange: '🟠 橙色', red: '🔴 红色' }[c.alert];
           const hw = c.heatwave || {};
           const hwOn = !!hw.sustained;
-          const hwColor = hwOn ? (hw.days >= 5 ? '#ff6b4a' : '#ffb347') : '#8aa0c4';
+          const hwColor = hwOn ? (hw.days >= 5 ? '#ff7a59' : '#ef9f1c') : '#6b8ca3';
           const hwText = hwOn
             ? `⚠ 是 · 连续 ${hw.days} 天${hw.startsIn > 0 ? `（第 ${hw.startsIn + 1} 天起）` : '（本周内）'}`
             : '暂无持续信号';
           return `<div class="sig-card">
             <div class="sh"><b>${c.zh} · ${c.name}</b><span class="tag">气候分 ${Math.round(s)}</span></div>
-            <div class="metric"><span class="m-lbl">日间峰值</span><span class="m-val" style="color:${c.maxTemp >= 38 ? '#ff6b4a' : c.maxTemp >= 35 ? '#ffb347' : '#22d3ee'}">${c.maxTemp}℃${c.feelsLike ? ` <span style="color:var(--muted);font-size:11px">体感 ${c.feelsLike}°</span>` : ''}</span></div>
-            <div class="metric"><span class="m-lbl">夜间低温</span><span class="m-val" style="color:${c.nightTemp >= 20 ? '#ff6b4a' : '#8aa0c4'}">${c.nightTemp}℃ ${c.nightTemp >= 20 ? '热带夜' : ''}</span></div>
+            <div class="metric"><span class="m-lbl">日间峰值</span><span class="m-val" style="color:${c.maxTemp >= 38 ? '#ff7a59' : c.maxTemp >= 35 ? '#ef9f1c' : '#13b6ca'}">${c.maxTemp}℃${c.feelsLike ? ` <span style="color:var(--muted);font-size:11px">体感 ${c.feelsLike}°</span>` : ''}</span></div>
+            <div class="metric"><span class="m-lbl">夜间低温</span><span class="m-val" style="color:${c.nightTemp >= 20 ? '#ff7a59' : '#6b8ca3'}">${c.nightTemp}℃ ${c.nightTemp >= 20 ? '热带夜' : ''}</span></div>
             <div class="metric" style="border-bottom:1px solid ${hwOn ? 'rgba(255,107,74,.25)' : 'var(--border)'}"><span class="m-lbl" style="white-space:nowrap">7–14天持续高温</span><span class="m-val" style="color:${hwColor};text-align:right">${hwText}</span></div>
             <div class="metric"><span class="m-lbl">连续高温 · 热带夜</span><span class="m-val">${c.heatDays} 天 · ${hw.tropicalNights != null ? hw.tropicalNights : (c.nightTemp >= 20 ? '≥1' : 0)} 夜</span></div>
             <div class="metric"><span class="m-lbl">热浪预警等级</span><span class="m-val">${ac}</span></div>
@@ -687,7 +687,7 @@
 
   // ---------- utils ----------
   function riskLabel(l) { return { low: '低', mid: '中', high: '高' }[l] || l; }
-  function riskColor(v) { return v >= 1 ? '#f4517a' : v >= 0.5 ? '#f5b544' : '#16d99b'; }
+  function riskColor(v) { return v >= 1 ? '#f0596f' : v >= 0.5 ? '#ef9f1c' : '#0eb488'; }
   function driverIcon(t) {
     if (t === 'pos') return '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>';
     if (t === 'neg') return '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3l-8-14a2 2 0 0 0-3.4 0z"/></svg>';
