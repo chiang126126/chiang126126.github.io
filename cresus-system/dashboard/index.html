@@ -3162,6 +3162,53 @@
     </div>
   </div>
 
+  <!-- v2 多策略前向监控 (paper R&D · 独立于真金 pilot) -->
+  <div class="panel" id="v2-forward-panel">
+    <h2>🧪 v2 多策略前向 <span class="meta-inline" id="v2-updated">paper · 非真金 · 研发中</span></h2>
+    <div class="panel-body" id="v2-body"><div class="empty">加载 v2_forward.json…</div></div>
+  </div>
+  <script>
+  (function(){
+    function col(v){return v>=0?'var(--green)':'var(--red)';}
+    function card(title,accent,d,extra){
+      return '<div style="flex:1;min-width:180px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;border-top:2px solid '+accent+'">'
+        +'<div style="font-weight:700;color:'+accent+';font-size:13px">'+title+'</div>'
+        +'<div style="font-size:22px;font-weight:700;color:'+col(d.ret)+';margin:4px 0">$'+Math.round(d.equity).toLocaleString()+'</div>'
+        +'<div style="color:'+col(d.ret)+';font-size:13px">'+(d.ret>=0?'+':'')+d.ret.toFixed(2)+'%</div>'
+        +'<div style="color:var(--text-dim);font-size:11px;margin-top:6px">回撤 <b style="color:var(--yellow)">'+d.mdd.toFixed(1)+'%</b> · '+d.days+'天</div>'
+        +'<div style="color:var(--text-dim);font-size:11px">'+extra+'</div></div>';
+    }
+    function chart(series){
+      var all=[]; series.forEach(function(s){(s.pts||[]).forEach(function(p){all.push(p);});});
+      var w=820,h=240,pad=36;
+      if(all.length<2) return '<svg width="100%" height="'+h+'" viewBox="0 0 '+w+' '+h+'"><text x="'+(w/2)+'" y="'+(h/2)+'" fill="#8a96aa" text-anchor="middle" font-size="14">攒数据中… 前向刚启动, 每天一个点</text></svg>';
+      var xs=all.map(function(p){return p[0];}),ys=all.map(function(p){return p[1];});
+      var x0=Math.min.apply(0,xs),x1=Math.max.apply(0,xs),y0=Math.min.apply(0,ys),y1=Math.max.apply(0,ys);
+      if(x1===x0)x1=x0+1; var yp=(y1-y0)*0.1||1; y0-=yp; y1+=yp;
+      function X(d){return pad+(d-x0)/(x1-x0)*(w-2*pad);}
+      function Y(v){return h-pad-(v-y0)/(y1-y0)*(h-2*pad);}
+      var s='<svg width="100%" height="'+h+'" viewBox="0 0 '+w+' '+h+'" style="background:#0b0f17;border-radius:6px">';
+      var y100=Y(100); s+='<line x1="'+pad+'" y1="'+y100.toFixed(0)+'" x2="'+(w-pad)+'" y2="'+y100.toFixed(0)+'" stroke="#243047" stroke-dasharray="4"/>';
+      s+='<text x="4" y="'+(Y(y1)+9).toFixed(0)+'" fill="#8a96aa" font-size="10">'+y1.toFixed(0)+'</text>';
+      s+='<text x="4" y="'+Y(y0).toFixed(0)+'" fill="#8a96aa" font-size="10">'+y0.toFixed(0)+'</text>';
+      series.forEach(function(sr){ if(!sr.pts||sr.pts.length<2)return; s+='<polyline fill="none" stroke="'+sr.color+'" stroke-width="2" points="'+sr.pts.map(function(p){return X(p[0]).toFixed(1)+','+Y(p[1]).toFixed(1);}).join(' ')+'"/>';});
+      return s+'</svg>';
+    }
+    fetch('./v2_forward.json?_='+Date.now()).then(function(r){return r.json();}).then(function(d){
+      var body=document.getElementById('v2-body');
+      var upd=document.getElementById('v2-updated'); if(upd&&d.updated)upd.textContent='paper·非真金 · 更新 '+d.updated;
+      var cards='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">'
+        +card('组合(合成)','var(--yellow)',d.combined,'权重 carry'+Math.round(d.w_carry*100)+'%/趋势'+Math.round(d.w_trend*100)+'%')
+        +card('趋势 turtle','var(--blue)',d.trend,'持仓'+d.trend.positions+'/5 · 平'+d.trend.trades+(d.trend.winrate!=null?' 胜'+Math.round(d.trend.winrate*100)+'%':''))
+        +card('carry 中性','var(--green)',d.carry,'篮子 '+d.carry.basket+' 币')
+        +'</div>';
+      var legend='<div style="font-size:12px;color:var(--text-dim);margin:4px 0 6px">净值(起始100) <span style="color:#ffd600">■组合</span> <span style="color:#2196f3">■趋势</span> <span style="color:#00c853">■carry</span></div>';
+      var ch=chart([{color:'#ffd600',pts:d.combined.curve},{color:'#2196f3',pts:d.trend.curve},{color:'#00c853',pts:d.carry.curve}]);
+      body.innerHTML=cards+legend+ch;
+    }).catch(function(e){var b=document.getElementById('v2-body'); if(b)b.innerHTML='<div class="empty">v2_forward.json 未就绪(前向数据发布后显示)</div>';});
+  })();
+  </script>
+
   <!-- Phase 4: 💎 钻石信号自动模拟仓追踪 -->
   <div class="panel" id="paper-panel" style="display:none">
     <h2>💎 钻石信号模拟仓 <span class="meta-inline" id="paper-updated">—</span></h2>
