@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.cresus.v2-export</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/python3</string>
+        <string>/Users/hong/cresus-bot/v2_export.py</string>
+    </array>
+
+    <!-- 每 6 小时: 读两个前向 paper state, 生成 ~/cresus-bot/v2_forward.json.
+         之后由 velocity_fast_sync.sh (2min 周期) cp→dashboard + commit + push. -->
+    <key>StartInterval</key>
+    <integer>21600</integer>
+
+    <!-- 启动时立即跑一次 -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/hong/cresus-bot/logs/v2_export.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/hong/cresus-bot/logs/v2_export.log</string>
+</dict>
+</plist>

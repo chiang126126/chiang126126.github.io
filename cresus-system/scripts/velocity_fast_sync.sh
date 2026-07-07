@@ -1,9 +1,9 @@
 #!/bin/bash
-# velocity_fast_sync.sh — 高频同步 4 个 velocity 核心 JSON 文件
+# velocity_fast_sync.sh — 高频同步 6 个 velocity + v2 核心 JSON 文件
 #
 # 互补关系:
 #   - sync_signals.sh        10min 周期, 全量同步 (signals/pnl/regime + velocity)
-#   - 本脚本 (fast-sync)     2min 周期, 仅 4 个 velocity 核心文件
+#   - 本脚本 (fast-sync)     2min 周期, 仅 6 个核心文件
 #   - git_push_retry.sh      60s 周期, 兜底 retry 失败的 push
 #
 # 安全设计:
@@ -20,13 +20,14 @@ BOT="$HOME/cresus-bot"
 LOG="$BOT/logs/velocity_fast_sync.log"
 LOCK="$BOT/.velocity_fast_sync.lock"
 
-# 仅同步这 5 个 velocity 核心文件 (其他大文件交 sync_signals.sh 10min 周期)
+# 仅同步这 6 个核心文件 (velocity 5 + v2_forward; 其他大文件交 sync_signals.sh 10min 周期)
 FILES=(
     "volume_velocity_alerts.json"
     "velocity_winrate.json"
     "paper_trades_history.json"
     "paper_shadow_history.json"
     "live_trades_history.json"
+    "v2_forward.json"
 )
 
 # ====== 1. 自身并发锁 (orphan lock > 5min 强制清除) ======
@@ -77,7 +78,7 @@ for f in "${FILES[@]}"; do
     fi
 done
 
-# ====== 6. 精准 add (只 stage 这 4 个文件, 不污染其他) ======
+# ====== 6. 精准 add (只 stage 这几个文件, 不污染其他) ======
 for f in "${FILES[@]}"; do
     git add "cresus-system/dashboard/$f" 2>/dev/null || true
 done
