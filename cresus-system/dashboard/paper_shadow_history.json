@@ -1,39 +1,39 @@
 {
-  "generated_at": "2026-07-08T21:30:51.743030+00:00",
+  "generated_at": "2026-07-08T21:33:00.132340+00:00",
   "stats": {
     "total_trades": 11564,
-    "open": 3,
-    "closed": 11561,
-    "wins": 3507,
-    "losses": 6534,
+    "open": 1,
+    "closed": 11563,
+    "wins": 3508,
+    "losses": 6535,
     "scratches": 1520,
     "win_rate": 0.349,
-    "avg_pnl_pct": 0.22,
+    "avg_pnl_pct": 0.221,
     "best_trade": 51.11,
     "worst_trade": -9.1,
-    "total_usdt_pnl": 5094.17,
+    "total_usdt_pnl": 5105.65,
     "verdict": "❌ 负向 EV (μ +0.22% / 胜率 34%) — 保持 shadow 不开真仓",
     "verdict_class": "negative",
     "hypothetical_notional_usdt": 200.0,
     "by_outcome": {
-      "hit_b_trail": 1853,
-      "hit_sl": 7501,
+      "hit_b_trail": 1854,
+      "hit_sl": 7502,
       "hit_trail": 2080,
       "timeout": 75,
       "hit_be_sl": 52
     },
     "oi_subset": {
       "oi_match": {
-        "n": 7480,
+        "n": 7481,
         "wins": 2203,
-        "win_rate": 0.295,
+        "win_rate": 0.294,
         "avg_pct": 0.198
       },
       "oi_mismatch": {
-        "n": 4081,
-        "wins": 1304,
+        "n": 4082,
+        "wins": 1305,
         "win_rate": 0.32,
-        "avg_pct": 0.262
+        "avg_pct": 0.263
       },
       "no_oi_data": {
         "n": 0,
@@ -62,10 +62,10 @@
       "tp2": 149.64357143,
       "initial_r": 0.4278571400000146,
       "entered_at": "2026-07-08T20:01:42.468477+00:00",
-      "current_price": 149.46,
-      "unrealized_pnl_pct": 0.741,
+      "current_price": 149.48,
+      "unrealized_pnl_pct": 0.755,
       "notional_usdt": 100.0,
-      "unrealized_usdt_pnl": 0.74,
+      "unrealized_usdt_pnl": 0.75,
       "funding_rate_pct": 0.0285,
       "oi_delta_5m_pct": -1.127,
       "oi_matches_direction": false,
@@ -95,7 +95,9 @@
       "tp1_locked_pnl_usdt": 0.59,
       "phase_c_mfe_price": 149.72,
       "phase_c_mfe_pct": 0.917
-    },
+    }
+  ],
+  "recent_closed": [
     {
       "id": "shadow|POWERUSDT|SHORT|2026-07-08T20:45:15.815508+00:00",
       "shadow": true,
@@ -114,10 +116,10 @@
       "tp2": 0.08518143,
       "initial_r": 0.003802860000000005,
       "entered_at": "2026-07-08T20:46:08.854427+00:00",
-      "current_price": 0.08941,
-      "unrealized_pnl_pct": 7.433,
+      "current_price": 0.09226,
+      "unrealized_pnl_pct": 4.483,
       "notional_usdt": 200.0,
-      "unrealized_usdt_pnl": 14.87,
+      "unrealized_usdt_pnl": 8.97,
       "funding_rate_pct": 0.005,
       "oi_delta_5m_pct": 0.829,
       "oi_matches_direction": false,
@@ -142,7 +144,16 @@
       "_breakeven_shifted_at": "2026-07-08T20:48:18.210869+00:00",
       "phase_b_mfe_price": 0.0853,
       "phase_b_mfe_pct": 11.689,
-      "tp1_partial_closed": false
+      "tp1_partial_closed": false,
+      "closed_at": "2026-07-08T21:32:59.424657+00:00",
+      "close_price": 0.090338671,
+      "close_reason": "hit_b_trail",
+      "gross_pnl_pct": 6.472,
+      "fee_pct": 0.08,
+      "fee_usdt": 0.16,
+      "realized_pnl_pct": 6.392,
+      "realized_usdt_pnl": 12.78,
+      "hold_time_min": 46.8
     },
     {
       "id": "shadow|MYXUSDT|LONG|2026-07-08T21:28:26.976092+00:00",
@@ -162,10 +173,10 @@
       "tp2": 0.07058929,
       "initial_r": 0.00039643000000000317,
       "entered_at": "2026-07-08T21:28:46.021554+00:00",
-      "current_price": 0.0695,
-      "unrealized_pnl_pct": 0.144,
+      "current_price": 0.069,
+      "unrealized_pnl_pct": -0.576,
       "notional_usdt": 200.0,
-      "unrealized_usdt_pnl": 0.29,
+      "unrealized_usdt_pnl": -1.15,
       "funding_rate_pct": 0.005,
       "oi_delta_5m_pct": 0.057,
       "oi_matches_direction": true,
@@ -184,10 +195,17 @@
       "high_water_mark": 0.0695,
       "trailing_sl": null,
       "phase_a_mfe_price": 0.0695,
-      "phase_a_mfe_pct": 0.144
-    }
-  ],
-  "recent_closed": [
+      "phase_a_mfe_pct": 0.144,
+      "closed_at": "2026-07-08T21:32:59.424657+00:00",
+      "close_price": 0.06900357,
+      "close_reason": "hit_sl",
+      "gross_pnl_pct": -0.571,
+      "fee_pct": 0.08,
+      "fee_usdt": 0.16,
+      "realized_pnl_pct": -0.651,
+      "realized_usdt_pnl": -1.3,
+      "hold_time_min": 4.2
+    },
     {
       "id": "shadow|MONUSDT|SHORT|2026-07-08T21:13:30.137662+00:00",
       "shadow": true,
