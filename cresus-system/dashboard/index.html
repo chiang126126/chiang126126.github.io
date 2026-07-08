@@ -3271,6 +3271,38 @@
       return s+'</svg>';
     }
 
+    function contribWidget(d){
+      var tc=d.w_trend*d.trend.ret, cc=d.w_carry*d.carry.ret, tot=d.combined.ret;
+      var maxa=Math.max(Math.abs(tc),Math.abs(cc),0.001);
+      function row(lbl,color,pp){
+        var w=Math.min(48,Math.abs(pp)/maxa*48), pos=pp>=0;
+        var bar='<div style="position:relative;flex:1;height:14px;background:rgba(255,255,255,0.04);border-radius:3px">'
+          +'<div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--border)"></div>'
+          +'<div style="position:absolute;top:1px;bottom:1px;'+(pos?'left:50%':'right:50%')+';width:'+w+'%;background:'+color+';border-radius:2px;opacity:.85"></div></div>';
+        return '<div style="display:flex;align-items:center;gap:8px;margin:3px 0">'
+          +'<span style="width:82px;font-size:11px;color:var(--text-dim)">'+lbl+'</span>'+bar
+          +'<span style="width:64px;text-align:right;font-size:11.5px;font-variant-numeric:tabular-nums;color:'+(pos?'var(--green)':'var(--red)')+'">'+(pos?'+':'')+pp.toFixed(2)+' pp</span></div>';
+      }
+      return '<div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:12px">'
+        +'<div style="font-size:12px;color:var(--text-dim);margin-bottom:5px">组合收益归因 — 谁在驱动 (累计 pp, 起始至今)</div>'
+        +row('趋势 '+Math.round(d.w_trend*100)+'%','#2196f3',tc)
+        +row('carry '+Math.round(d.w_carry*100)+'%','#00c853',cc)
+        +'<div style="font-size:11px;color:var(--text-dim);margin-top:5px;text-align:right">合计 = 组合 <b style="color:'+(tot>=0?'var(--green)':'var(--red)')+'">'+(tot>=0?'+':'')+tot.toFixed(2)+'%</b></div></div>';
+    }
+    function spark(hist){
+      if(!hist||hist.length<2) return '<span style="color:var(--text-dim);font-size:10px">—</span>';
+      var vals=hist.map(function(p){return p[1];});
+      var w=76,h=20,mn=Math.min.apply(0,vals),mx=Math.max.apply(0,vals),rng=(mx-mn)||1;
+      function X(i){return i/(vals.length-1)*(w-2)+1;}
+      function Y(v){return h-2-((v-mn)/rng)*(h-4);}
+      var pts=vals.map(function(v,i){return X(i).toFixed(1)+','+Y(v).toFixed(1);}).join(' ');
+      var last=vals[vals.length-1], color=last>=0?'#00c853':'#ff1744';
+      var s='<svg width="'+w+'" height="'+h+'" style="vertical-align:middle">';
+      if(mn<0&&mx>0){var zy=Y(0);s+='<line x1="1" y1="'+zy.toFixed(1)+'" x2="'+(w-1)+'" y2="'+zy.toFixed(1)+'" stroke="#243047" stroke-dasharray="2"/>';}
+      s+='<polyline fill="none" stroke="'+color+'" stroke-width="1.4" points="'+pts+'"/>';
+      s+='<circle cx="'+X(vals.length-1).toFixed(1)+'" cy="'+Y(last).toFixed(1)+'" r="1.8" fill="'+color+'"/>';
+      return s+'</svg>';
+    }
     function renderOverview(){
       var d=D;
       var cards='<div class="v2-cards">'
@@ -3280,7 +3312,7 @@
         +'</div>';
       var legend='<div class="v2-legc">净值(起始100) <span style="color:#ffd600">■组合</span> <span style="color:#2196f3">■趋势</span> <span style="color:#00c853">■carry</span></div>';
       var ch=chart([{color:'#ffd600',pts:d.combined.curve},{color:'#2196f3',pts:d.trend.curve},{color:'#00c853',pts:d.carry.curve}]);
-      return cards+legend+ch;
+      return cards+contribWidget(d)+legend+ch;
     }
 
     function tile(k,v,cls){return '<div class="v2-tile"><div class="k">'+k+'</div><div class="v '+(cls||'')+'">'+v+'</div></div>';}
@@ -3327,8 +3359,8 @@
       if(c.held&&c.held.length){
         var hasf=c.held.some(function(x){return x.tfund_apr!=null;});
         if(hasf){
-          h+='<div class="v2-twrap"><table class="v2-t"><thead><tr><th>Symbol</th><th>年化funding</th><th>持有天数</th></tr></thead><tbody>';
-          c.held.forEach(function(x){ h+='<tr><td>'+(x.sym||'').replace('USDT','')+'</td><td class="'+((x.tfund_apr||0)>=0?'up':'down')+'">'+spct(x.tfund_apr!=null?x.tfund_apr*100:null)+'</td><td>'+(x.days_held!=null?x.days_held+'天':'—')+'</td></tr>'; });
+          h+='<div class="v2-twrap v2-scroll"><table class="v2-t"><thead><tr><th>Symbol</th><th>年化funding</th><th>持有天数</th><th style="text-align:right">funding 走势(14d)</th></tr></thead><tbody>';
+          c.held.forEach(function(x){ h+='<tr><td>'+(x.sym||'').replace('USDT','')+'</td><td class="'+((x.tfund_apr||0)>=0?'up':'down')+'">'+spct(x.tfund_apr!=null?x.tfund_apr*100:null)+'</td><td>'+(x.days_held!=null?x.days_held+'天':'—')+'</td><td style="text-align:right">'+spark(x.fund_hist)+'</td></tr>'; });
           h+='</tbody></table></div>';
         } else {
           h+='<div class="v2-chips">'+c.held.map(function(x){return '<span class="v2-hchip">'+(x.sym||'').replace('USDT','')+'</span>';}).join('')+'</div>';
