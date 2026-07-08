@@ -14,6 +14,11 @@ import strategy
 CORE = ["BTCUSDT", "ETHUSDT"]   # S0 只做 BTC/ETH
 FEE = risk.FEE
 
+# —— 出场管理（P1，依据 S0 首轮审计：19笔亏损中9笔曾浮盈≥1%后回吐）——
+BE_TRIGGER_PCT = 1.0     # 浮盈达 1.0% → 止损移到入场价(+手续费)，最差保本
+TRAIL_TRIGGER_PCT = 1.5  # 浮盈达 1.5% → 启动跟踪止盈
+TRAIL_LOCK = 0.5         # 跟踪止盈锁住最佳浮盈的 50%
+
 
 def cfg():
     return {
@@ -53,23 +58,59 @@ def fresh_state():
             "positions": [], "updated_at": now_iso()}
 
 
-def manage_exit(pos, kl):
-    """检查开仓后是否触及止损/止盈。返回 (exit_price, reason) 或 (None, None)。
-    LONG：跌破止损/涨到止盈；SHORT：涨破止损/跌到止盈。同根K线优先判止损（保守）。"""
+def _mfe_pct(pos):
+    """开仓以来最佳浮盈%（对做多=最高价、做空=最低价 相对入场的有利距离）。"""
+    e = pos["entry"]
+    m = pos.get("mfe_price", e)
+    return max(0.0, (m / e - 1) * 100 if pos.get("side", "LONG") == "LONG" else (e / m - 1) * 100)
+
+
+def _apply_stop_upgrade(pos):
+    """按当前 MFE 上移止损（只朝有利方向、永不放松）：≥1% 保本，≥1.5% 锁住 MFE 的一半。"""
     long = pos.get("side", "LONG") == "LONG"
+    e = pos["entry"]
+    mfe = _mfe_pct(pos)
+    new_stop, kind = None, None
+    if mfe >= TRAIL_TRIGGER_PCT:
+        lock = mfe * TRAIL_LOCK / 100
+        new_stop, kind = (e * (1 + lock) if long else e * (1 - lock)), "TRAIL"
+    elif mfe >= BE_TRIGGER_PCT:
+        new_stop, kind = (e * (1 + 2 * FEE) if long else e * (1 - 2 * FEE)), "BE"
+    if new_stop is None:
+        return
+    if (long and new_stop > pos["stop"]) or (not long and new_stop < pos["stop"]):
+        pos["stop"] = round(new_stop, 2)
+        pos["stop_kind"] = kind
+
+
+def manage_position(pos, kl):
+    """逐根K线按时间顺序推进持仓管理。返回 (exit_price, reason) 或 (None, None)。
+    每根K线：先用【进入该K线时】的止损/止盈检查出场（同根K线止损优先，保守），
+    再用该K线（仅已收盘的）更新 MFE 并上移止损——绝不用"未来"的高点触发"过去"的K线。
+    managed_t 游标：已消化的K线下轮跳过，防止止损上移后被旧K线重复触发。
+    出场那根K线不推进游标 → testnet 平仓失败时下轮会重试。"""
+    long = pos.get("side", "LONG") == "LONG"
+    last_t = kl[-1]["t"] if kl else None
+    _apply_stop_upgrade(pos)                 # 旧仓升级/跨轮持仓：先按已持久化的 MFE 对齐止损
     for k in kl:
-        if k["t"] < pos["opened_kline_t"]:
+        if k["t"] < pos["opened_kline_t"] or k["t"] <= pos.get("managed_t", 0):
             continue
+        stop_reason = {"BE": "STOP_BE", "TRAIL": "STOP_TRAIL"}.get(pos.get("stop_kind"), "STOP")
         if long:
             if k["l"] <= pos["stop"]:
-                return pos["stop"], "STOP"
+                return pos["stop"], stop_reason
             if k["h"] >= pos["target"]:
                 return pos["target"], "TARGET"
         else:
             if k["h"] >= pos["stop"]:
-                return pos["stop"], "STOP"
+                return pos["stop"], stop_reason
             if k["l"] <= pos["target"]:
                 return pos["target"], "TARGET"
+        if k["t"] != last_t:                 # 最后一根是未收盘K线：只查出场，不用于移动止损
+            best = pos.get("mfe_price", pos["entry"])
+            pos["mfe_price"] = max(best, k["h"]) if long else min(best, k["l"])
+            _apply_stop_upgrade(pos)
+            pos["managed_t"] = k["t"]
     return None, None
 
 
@@ -111,13 +152,12 @@ def main():
     closed_this_run = set()
     for pos in state["positions"]:
         try:
-            kl = exchange.klines(pos["symbol"], "1h", 6)
+            kl = exchange.klines(pos["symbol"], "1h", 48)   # 48根覆盖 cron 断档
         except Exception as e:
             print(f"[warn] {pos['symbol']} 取K线失败: {e}")
             still_open.append(pos)
             continue
-        exit_price, reason = manage_exit(pos, kl)
-        _update_mfe(pos, kl)                       # 跟踪开仓以来的最佳有利价（MFE）
+        exit_price, reason = manage_position(pos, kl)       # 含保本/跟踪止盈的逐K线管理
         if exit_price is None:
             still_open.append(pos)
             continue
@@ -175,8 +215,10 @@ def main():
         except Exception as e:
             print(f"[warn] {sym} 分析失败: {e}")
             continue
+        open_notional = sum(p.get("notional", 0) for p in state["positions"])
         ok, reason, plan = risk.vet(sym, decision, state["equity"], ind,
-                                    len(state["positions"]), day_pnl, total_dd)
+                                    len(state["positions"]), day_pnl, total_dd,
+                                    open_notional=open_notional)
         item = {"symbol": sym, "source": decision.get("_source"), "bias": decision.get("bias"),
                 "confidence": decision.get("confidence"), "vetted": ok, "reason": reason,
                 "rationale": decision.get("rationale", "")}
@@ -204,7 +246,8 @@ def main():
                    "stop": plan["stop"], "target": plan["target"], "qty": plan["qty"],
                    "notional": plan["notional"], "risk_usdt": plan["risk_usdt"],
                    "fee_in": plan["notional"] * FEE, "confidence": plan["confidence"],
-                   "opened_at": now_iso(), "opened_kline_t": kl_t}
+                   "opened_at": now_iso(), "opened_kline_t": kl_t,
+                   "stop_kind": "INIT", "snapshot": _snapshot(ind, decision)}
             state["positions"].append(pos)
             item["action"] = f"OPEN {side}"
             item["price"] = round(entry, 2)
@@ -226,15 +269,21 @@ def _fmt_qty(q):
     return f"{q:.5f}".rstrip("0").rstrip(".")
 
 
-def _update_mfe(pos, kl):
-    """更新开仓以来的最佳有利价（MFE）：做多取最高 high，做空取最低 low。逐轮累积。"""
-    long = pos.get("side", "LONG") == "LONG"
-    best = pos.get("mfe_price", pos["entry"])
-    for k in kl:
-        if k["t"] < pos["opened_kline_t"]:
-            continue
-        best = max(best, k["h"]) if long else min(best, k["l"])
-    pos["mfe_price"] = best
+def _snapshot(ind, decision):
+    """定格决策时刻的市场指标（随持仓存档、平仓时进 trades），下次复盘可按条件分组统计。"""
+    r2 = lambda x, d=2: (round(x, d) if isinstance(x, (int, float)) else None)
+    return {
+        "dev_pct": r2(ind.get("dev_pct")),            # 30小时均线偏离%
+        "rsi14": r2(ind.get("rsi14"), 1),             # RSI
+        "atr_pct": r2(ind.get("atr_pct")),            # 小时波动率%
+        "funding_pct": r2(ind.get("funding_pct"), 4), # 资金费率%/8h
+        "fng": ind.get("fng"),                        # 恐惧贪婪指数
+        "fng_label": ind.get("fng_label"),
+        "regime": ind.get("regime"),                  # 日线状态 risk-on/off/neutral
+        "daily_dev_pct": r2(ind.get("daily_dev_pct")),# 30日均线偏离%
+        "source": decision.get("_source"),            # llm / rule
+        "confidence": decision.get("confidence"),
+    }
 
 
 def _hold_hours(opened_at, closed_at):
@@ -250,15 +299,15 @@ def _hold_hours(opened_at, closed_at):
 def _trade_analysis(pos, reason, pnl, mfe_pct):
     """生成一句话盈亏归因，便于复盘。"""
     side = "做多" if pos.get("side", "LONG") == "LONG" else "做空"
-    entry = pos["entry"]
-    target_pct = abs(pos["target"] - entry) / entry * 100 if entry else 0
     if reason == "TARGET":
         return f"{side}·顺利止盈（最佳浮盈 {mfe_pct:.1f}%，达标）"
+    if reason == "STOP_TRAIL":
+        return f"{side}·跟踪止盈离场（最佳浮盈 {mfe_pct:.1f}%，锁定过半利润）"
+    if reason == "STOP_BE":
+        return f"{side}·曾浮盈 {mfe_pct:.1f}% 后回落，保本离场（免于 -1R）"
     if reason == "STOP":
         if pnl >= 0:
             return f"{side}·保本/微利离场"
-        if mfe_pct >= max(1.0, 0.5 * target_pct):
-            return f"{side}·曾浮盈 {mfe_pct:.1f}% 未止盈即回落触损（可考虑移动止盈/保本）"
         return f"{side}·入场后即走反，触发止损（方向判断偏差）"
     return f"{side}·{reason}"
 

@@ -134,6 +134,9 @@ def analyze(symbol, cfg, news_text=""):
         ind["regime"], ind["daily_dev_pct"] = "neutral", None
     funding = exchange.funding_rate(symbol)
     fng = exchange.fear_greed()
+    # 决策时刻快照素材：一并挂到 ind 上，供 bot 在开仓时定格存档（复盘用）
+    ind["funding_pct"] = funding
+    ind["fng"], ind["fng_label"] = fng
     evidence = build_evidence(symbol, ind, funding, fng, news_text)
 
     decision = None

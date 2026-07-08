@@ -266,6 +266,8 @@ async function loadBot() {
 
   $("botTradesBody").innerHTML = tr.slice().reverse().slice(0, 20).map(t => {
     const side = t.side || "LONG";
+    const sn = t.snapshot;
+    const snTip = sn ? `决策快照｜日线:${sn.regime || "?"} ${sn.daily_dev_pct != null ? sn.daily_dev_pct + "%" : ""} ｜时线偏离:${sn.dev_pct ?? "?"}% ｜RSI:${sn.rsi14 ?? "?"} ｜资费:${sn.funding_pct ?? "?"}%/8h ｜情绪:${sn.fng ?? "?"} ${sn.fng_label || ""} ｜${sn.source || "?"} conf ${sn.confidence ?? "?"}` : "";
     return `<tr>
     <td data-label="标的/方向"><b>${t.symbol}</b> <span class="chip ${side === "LONG" ? "risk-on" : "risk-off"}" style="font-size:10px;padding:1px 7px">${side}</span></td>
     <td data-label="仓位">${fmtQty(t.qty, t.symbol)}</td>
@@ -276,7 +278,7 @@ async function loadBot() {
     <td data-label="持仓">${fmtHold(t.hold_hours, t.opened_at, t.closed_at)}</td>
     <td data-label="手续费">${t.fee_total != null ? fmt(t.fee_total, 3) + "U" : "—"}</td>
     <td data-label="结果"><span class="chip ${t.outcome === "WIN" ? "risk-on" : t.outcome === "LOSS" ? "risk-off" : "neutral"}">${t.outcome}</span></td>
-    <td data-label="盈亏原因" style="text-align:left;white-space:normal;max-width:240px">${t.analysis || t.exit_reason || ""}</td>
+    <td data-label="盈亏原因" style="text-align:left;white-space:normal;max-width:240px" title="${snTip}">${t.analysis || t.exit_reason || ""}${sn ? ' <span class="badge" style="cursor:help">ⓘ</span>' : ""}</td>
     <td data-label="时间" class="badge">${(t.closed_at || "").slice(5, 16).replace("T", " ")}</td></tr>`;
   }).join("") || '<tr><td colspan="11" class="badge">暂无已平仓</td></tr>';
 }
@@ -769,7 +771,7 @@ function toggleLive() {
 }
 
 //==================== Paper 持仓器（localStorage，实时算 PnL）====================
-const FEE = 0.001;  // 模拟手续费 0.1%/边
+const FEE = 0.0005;  // 手续费 0.05%/边（币安 USDT 合约 taker，与 mp500-bot/risk.py 一致）
 function livePrice(name) {
   if (_lastPx[name] != null) return _lastPx[name];
   const e = (STATE.market || []).find(c => c.name === name); return e ? e.price : null;

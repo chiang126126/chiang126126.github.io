@@ -4,15 +4,18 @@
 
 MAX_RISK_PCT = 0.01          # 单笔风险 ≤ 1%（按止损距离计，与杠杆无关）
 MIN_CONFIDENCE = 0.55        # 置信度门槛
-FEE = 0.001                  # 0.1%/边
+FEE = 0.0005                 # 0.05%/边（币安 USDT 合约 taker；此前误用现货 0.1%）
 MIN_RR = 1.5                 # 最小盈亏比（目标/止损）
 MAX_OPEN = 2                 # 同时最多持仓数
+MAX_TOTAL_NOTIONAL = 0.95    # 全组合名义合计 ≤ 本金的 95%（1x 不超杠杆）
 DAILY_LOSS_STOP = 0.02       # 当日亏损达 2% 停手
 TOTAL_DD_KILL = 0.20         # 总回撤 20% kill switch
+RSI_OVERSOLD = 30            # RSI 低于此不追空（P2 入场闸门）
+RSI_OVERBOUGHT = 70          # RSI 高于此不追多
 
 
-def vet(symbol, decision, equity, ind, open_count, day_pnl_pct, total_dd_pct):
-    """返回 (ok: bool, reason: str, plan: dict|None)。"""
+def vet(symbol, decision, equity, ind, open_count, day_pnl_pct, total_dd_pct, open_notional=0.0):
+    """返回 (ok: bool, reason: str, plan: dict|None)。open_notional=当前已持仓的名义合计。"""
     # 熔断优先
     if total_dd_pct >= TOTAL_DD_KILL * 100:
         return False, f"总回撤 {total_dd_pct:.1f}% ≥ 20%，kill switch", None
@@ -46,6 +49,14 @@ def vet(symbol, decision, equity, ind, open_count, day_pnl_pct, total_dd_pct):
     if bias == "SHORT" and dev > 0:
         return False, "做空但价在均线上，不逆势", None
 
+    # RSI 极值闸门：行情已走出一段再追单，最易"入场即走反"（审计: 19笔亏损中7笔MFE<0.5%）
+    rsi = ind.get("rsi14")
+    if rsi is not None:
+        if bias == "SHORT" and rsi < RSI_OVERSOLD:
+            return False, f"RSI {rsi:.0f} 超卖区，不追空", None
+        if bias == "LONG" and rsi > RSI_OVERBOUGHT:
+            return False, f"RSI {rsi:.0f} 超买区，不追多", None
+
     stop_pct = float(decision.get("stop_pct", 0)) / 100
     target_pct = float(decision.get("target_pct", 0)) / 100
     if stop_pct <= 0:
@@ -61,7 +72,13 @@ def vet(symbol, decision, equity, ind, open_count, day_pnl_pct, total_dd_pct):
     entry = ind["price"]
     risk_usdt = equity * MAX_RISK_PCT
     notional = risk_usdt / stop_pct
-    notional = min(notional, equity * 0.95)     # 1x：名义不超过本金
+    # 1x 硬约束：全组合名义合计 ≤ 本金×95%（此前单仓各自封顶，两仓可达148%）
+    room = equity * MAX_TOTAL_NOTIONAL - open_notional
+    if room < equity * 0.10:
+        return False, f"组合名义余额不足(剩余 {max(room,0):.0f}U < 10%本金)", None
+    if notional > room:
+        notional = room
+        risk_usdt = notional * stop_pct        # 名义被压缩后，实际风险随之下降
     qty = notional / entry
     if bias == "LONG":
         stop = entry * (1 - stop_pct); target = entry * (1 + target_pct)
