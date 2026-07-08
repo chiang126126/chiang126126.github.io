@@ -3303,6 +3303,30 @@
       s+='<circle cx="'+X(vals.length-1).toFixed(1)+'" cy="'+Y(last).toFixed(1)+'" r="1.8" fill="'+color+'"/>';
       return s+'</svg>';
     }
+    function riskWidget(d){
+      var r=d.risk; if(!r) return '';
+      function dot(c){return '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+c+';margin-right:5px"></span>';}
+      function tile(label,html){return '<div class="v2-tile" style="min-width:150px;flex:1">'
+        +'<div class="k">'+label+'</div><div style="font-size:12.5px;margin-top:3px;line-height:1.5">'+html+'</div></div>';}
+      var bc=r.breaker==='正常'?'var(--green)':(r.breaker==='减半'?'var(--yellow)':'var(--red)');
+      var t1=tile('回撤断路器', dot(bc)+'<b style="color:'+bc+'">'+r.breaker+'</b> · 当前 '
+        +'<span style="color:'+(r.dd_pct>=r.dd_half?'var(--text)':'var(--red)')+'">'+r.dd_pct.toFixed(1)+'%</span>'
+        +'<span style="color:var(--text-dim)"> (减半'+r.dd_half+'%/停止'+r.dd_stop+'%)</span>');
+      var drift=Math.abs(r.eff_w_trend-d.w_trend)*100;
+      var t2=tile('权重(月度再平衡)', '趋势 '+(r.eff_w_trend*100).toFixed(1)+'% / carry '+(r.eff_w_carry*100).toFixed(1)+'%'
+        +'<span style="color:var(--text-dim)"> · 漂移 '+drift.toFixed(1)+'pp · 上次 '+(r.last_rebalance||'—')+'</span>');
+      var bok=r.basket>=r.basket_min;
+      var t3=tile('carry 分散度', dot(bok?'var(--green)':'var(--red)')+r.basket+' 币'
+        +'<span style="color:var(--text-dim)"> (最低 '+r.basket_min+')</span>'+(bok?'':' <b style="color:var(--red)">不足</b>'));
+      var g=r.gate; var gok=g.days>=g.target&&g.curve_pos&&g.breaches===0;
+      var t4=tile('真金门槛(预注册)', dot(gok?'var(--green)':'var(--text-dim)')+g.days+'/'+g.target+' 天 · 曲线'
+        +(g.curve_pos?'<span class="up">正</span>':'<span class="down">负</span>')+' · 违规 '
+        +(g.breaches===0?'<span class="up">0</span>':'<span class="down">'+g.breaches+'</span>')
+        +'<span style="color:var(--text-dim)"> → 达标才谈小额 canary</span>');
+      return '<div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:12px">'
+        +'<div style="font-size:12px;color:var(--text-dim);margin-bottom:7px">🛡️ 风控状态 (规则预注册于 V2_RISK_RULES.md)</div>'
+        +'<div style="display:flex;gap:8px;flex-wrap:wrap">'+t1+t2+t3+t4+'</div></div>';
+    }
     function renderOverview(){
       var d=D;
       var cards='<div class="v2-cards">'
@@ -3312,7 +3336,7 @@
         +'</div>';
       var legend='<div class="v2-legc">净值(起始100) <span style="color:#ffd600">■组合</span> <span style="color:#2196f3">■趋势</span> <span style="color:#00c853">■carry</span></div>';
       var ch=chart([{color:'#ffd600',pts:d.combined.curve},{color:'#2196f3',pts:d.trend.curve},{color:'#00c853',pts:d.carry.curve}]);
-      return cards+contribWidget(d)+legend+ch;
+      return cards+riskWidget(d)+contribWidget(d)+legend+ch;
     }
 
     function tile(k,v,cls){return '<div class="v2-tile"><div class="k">'+k+'</div><div class="v '+(cls||'')+'">'+v+'</div></div>';}
