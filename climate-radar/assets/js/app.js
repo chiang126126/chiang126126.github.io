@@ -64,6 +64,33 @@
       ${dots}${labels}
     </svg>`;
   }
+  // 迷你趋势线（sparkline）：series -> 折线 + 端点，末端小圆点
+  function sparkline(series, w = 96, h = 24, color = '#38BDF8') {
+    if (!Array.isArray(series) || series.length < 2) return '';
+    const min = Math.min.apply(null, series), max = Math.max.apply(null, series), span = (max - min) || 1;
+    const pts = series.map((v, i) => [2 + (i / (series.length - 1)) * (w - 6), h - 3 - ((v - min) / span) * (h - 8)]);
+    const d = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('');
+    const area = d + `L${pts[pts.length - 1][0].toFixed(1)} ${h - 1}L${pts[0][0].toFixed(1)} ${h - 1}Z`;
+    const last = pts[pts.length - 1];
+    return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">
+      <path d="${area}" fill="${color}" opacity=".1"/>
+      <path d="${d}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+      <circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="2" fill="${color}"/>
+    </svg>`;
+  }
+  // 环形仪表（自定义颜色，用于信号均值等）
+  function ringGauge(v, color, size = 62, stroke = 5) {
+    const r = (size - stroke) / 2, c = 2 * Math.PI * r, off = c * (1 - Math.max(0, Math.min(100, v)) / 100);
+    return `<div class="ring" style="width:${size}px;height:${size}px">
+      <svg width="${size}" height="${size}">
+        <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="#1A2432" stroke-width="${stroke}"/>
+        <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="${color}" stroke-width="${stroke}"
+          stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}" style="filter:drop-shadow(0 0 4px ${color}66)"/>
+      </svg>
+      <div class="num" style="color:${color};font-size:15px">${Math.round(v)}</div>
+    </div>`;
+  }
+
   function sigMini(sig) {
     const rows = [['C', '气候'], ['M', '市场'], ['P', '商品'], ['L', '实盘']];
     return `<div class="sig-mini">` + rows.map(([k, l]) => {
@@ -181,6 +208,29 @@
     if (filter.rec !== 'all') list = list.filter(x => x.r.rec.code === filter.rec);
     if (filter.q) { const q = filter.q.toLowerCase(); list = list.filter(x => (x.p.name + x.p.nameFr + x.p.city).toLowerCase().includes(q)); }
 
+    // ---- 滚动数据 ticker：城市温度 · 预测市场 · 搜索热度 · 舆情 · Top 机会 ----
+    const pm = (state.market && state.market.polymarket) || {};
+    const tk = [];
+    state.cities.forEach(c => tk.push(`<span class="tk">🌡 ${c.zh} <b class="${c.maxTemp >= 37 ? 'ht' : ''}">${c.maxTemp}℃</b>${c.heatwave && c.heatwave.sustained ? ` <span class="ht">🔥${c.heatwave.days}d</span>` : ''}</span>`));
+    if (pm.paris != null) tk.push(`<span class="tk">🎲 PARIS HEAT <b class="up">${pm.paris}%${pm.rising ? '↑' : ''}</b></span>`);
+    if (pm.london != null) tk.push(`<span class="tk">🎲 LONDON <b class="up">${pm.london}%${pm.rising ? '↑' : ''}</b></span>`);
+    (state.market.trends || []).slice(0, 5).forEach(t => tk.push(`<span class="tk">🔍 ${esc(t.kw)} <b class="${t.rising ? 'up' : ''}">${t.idx}${t.rising ? '↑' : ''}</b></span>`));
+    if (buzz.themes) tk.push(`<span class="tk">📰 缺货提及 <b class="dn">${buzz.themes.shortage || 0}</b></span>`, `<span class="tk">📰 抢购提及 <b class="ht">${buzz.themes.ac_rush || 0}</b></span>`);
+    paired.slice(0, 3).forEach(x => tk.push(`<span class="tk">⭐ ${esc(x.p.name)} <b style="color:${TONE[x.r.rec.code]}">${x.r.total} ${x.r.rec.code}</b></span>`));
+    const tkHTML = tk.join('');
+
+    // AI 建议流：Top 5 机会 + 理由摘句
+    const aiFeed = paired.slice(0, 5).map(x => {
+      const d = x.r.drivers.find(dd => dd.t === 'pos');
+      let txt = d ? `[${d.k}] ${d.v}` : x.r.rec.action;
+      if (txt.length > 76) txt = txt.slice(0, 75) + '…';
+      return `<div class="ai-item" data-id="${x.p.id}">
+        <span class="rec-badge rec-${x.r.rec.code}">${x.r.rec.code}</span>
+        <div class="ai-txt"><b>${esc(x.p.name)} · ${esc(x.p.city)}</b><p>${esc(txt)}</p></div>
+        <span class="ai-sc" style="color:${TONE[x.r.rec.code]}">${x.r.total}</span>
+      </div>`;
+    }).join('');
+
     app.innerHTML = `
     <section class="view dash">
       <div class="cmd-head">
@@ -195,6 +245,8 @@
           <button class="btn sm" id="refreshLive">↻ 同步实时信号</button>
         </div>
       </div>
+
+      <div class="ticker-wrap" aria-hidden="true"><div class="ticker">${tkHTML}${tkHTML}</div></div>
 
       <div class="kpi-row">
         ${kpiTile('评估商品', state.products.length, 'SKU 在盘', 'accent')}
@@ -222,25 +274,43 @@
 
         <div class="module-col">
           <div class="module">
-            <div class="module-head"><div class="mh-title"><i class="tick heat"></i>城市气候 · 14天峰值</div></div>
+            <div class="module-head"><div class="mh-title"><i class="tick heat"></i>城市气候 · 14天趋势</div></div>
             <div class="thermo">
               ${state.cities.map(c => {
-                const w = Math.max(4, Math.min(98, (c.maxTemp - 24) / (42 - 24) * 100));
                 const ac = { none: '#38BDF8', yellow: '#FFB13C', orange: '#FF7A47', red: '#F65B6B' }[c.alert];
+                const col = c.maxTemp >= 37 ? '#FF7A47' : c.maxTemp >= 34 ? '#FFB13C' : '#38BDF8';
                 const hw = c.heatwave && c.heatwave.sustained ? `<span title="持续高温 ${c.heatwave.days} 天" style="font-size:10px">🔥</span>` : '';
-                return `<div class="city-row"><span class="name">${c.zh}</span><span class="bar"><i style="left:${w}%"></i></span>${hw}<span class="temp">${c.maxTemp}℃</span><span class="alert" title="${c.alert}" style="background:${ac};box-shadow:0 0 7px ${ac}"></span></div>`;
+                return `<div class="city-row"><span class="name">${c.zh}</span><span class="spark-wrap">${sparkline(c.series, 100, 24, col)}</span>${hw}<span class="temp">${c.maxTemp}℃</span><span class="alert" title="${c.alert}" style="background:${ac};box-shadow:0 0 7px ${ac}"></span></div>`;
               }).join('')}
             </div>
-            <div class="data-note" style="padding:0 15px 14px">🔥 持续高温 · 圆点 = 预警等级 · 「信号台」可编辑</div>
+            <div class="data-note" style="padding:0 15px 14px">折线 = 未来 14 天每日峰值 · 🔥 持续高温 · 圆点 = 预警等级</div>
           </div>
           <div class="module">
             <div class="module-head"><div class="mh-title"><i class="tick"></i>信号均值 · 全盘</div></div>
-            <div class="gauges">
-              ${gauge('气候', avgSig('C'), '#FF7A47')}
-              ${gauge('市场', avgSig('M'), '#8B7CF6')}
-              ${gauge('商品', avgSig('P'), '#38BDF8')}
-              ${gauge('实盘', avgSig('L'), '#2FD98A')}
+            <div class="rings">
+              ${ringCell('气候', avgSig('C'), '#FF7A47')}
+              ${ringCell('市场', avgSig('M'), '#8B7CF6')}
+              ${ringCell('商品', avgSig('P'), '#38BDF8')}
+              ${ringCell('实盘', avgSig('L'), '#2FD98A')}
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-grid" style="margin-top:14px">
+        <div class="module">
+          <div class="module-head"><div class="mh-title"><i class="tick" style="background:#8B7CF6;box-shadow:0 0 8px rgba(139,124,246,.6)"></i>AI 建议流 · Top 5</div><span class="badge-ai">✦ AI</span></div>
+          <div class="ai-feed">${aiFeed}</div>
+        </div>
+        <div class="module">
+          <div class="module-head"><div class="mh-title"><i class="tick"></i>市场情绪 · 快照</div></div>
+          <div class="pmsnap">
+            <div class="pm-row"><span class="pm-l">🎲 巴黎极端高温概率</span><b class="trend-up">${pm.paris != null ? pm.paris + '%' : '—'} ${pm.rising ? '↑' : ''}</b></div>
+            <div class="pm-row"><span class="pm-l">🎲 伦敦极端高温概率</span><b class="trend-up">${pm.london != null ? pm.london + '%' : '—'} ${pm.rising ? '↑' : ''}</b></div>
+          </div>
+          <div class="pmsnap" style="border-top:1px solid var(--line)">
+            ${(state.market.trends || []).slice(0, 5).map(t => `<div class="gauge" style="margin-bottom:10px"><span class="g-l" style="width:118px;font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(t.kw)}">${esc(t.kw)}</span><span class="g-t"><i style="width:${t.idx}%;background:#8B7CF6"></i></span><span class="g-v" style="color:${t.rising ? 'var(--pos)' : 'var(--ink-1)'}">${t.idx}${t.rising ? '↑' : ''}</span></div>`).join('')}
+            <div class="data-note" style="margin-top:4px">Polymarket + Google Trends · 「信号台」看全量</div>
           </div>
         </div>
       </div>
@@ -277,8 +347,12 @@
   function gauge(label, v, color) {
     return `<div class="gauge"><span class="g-l">${label}</span><span class="g-t"><i style="width:${v}%;background:${color}"></i></span><span class="g-v">${v}</span></div>`;
   }
+  function ringCell(label, v, color) {
+    return `<div class="ringcell">${ringGauge(v, color)}<span class="rc-l">${label}</span></div>`;
+  }
   function bindRows() {
     $$('.brow').forEach(el => el.onclick = () => { selectedId = el.dataset.id; go('decision'); });
+    $$('.ai-item').forEach(el => el.onclick = () => { selectedId = el.dataset.id; go('decision'); });
   }
   let _clockTimer = null;
   function startClock() {
