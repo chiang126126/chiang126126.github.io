@@ -5,18 +5,19 @@
 (function (global) {
   'use strict';
 
-  const KEY = 'climate_radar_v4'; // v4: 本地反馈增加 4 字段 + Trends 关键词补齐
+  const KEY = 'climate_radar_v5'; // v5: 城市增加 14 天温度序列（sparkline 数据源）
 
   // ---------- 城市气候快照（种子；可在"信号"页手动更新）----------
   // heatwave: { sustained, days(连续高温天数), startsIn(第几天起,0基), peak, tropicalNights, horizon(预报窗口天), thresholdC }
+  // series: 未来 14 天每日最高温序列（种子为示意；实时天气接通后由真实预报覆盖，驱动 sparkline）
   const CITIES = [
-    { name: 'Paris', zh: '巴黎', maxTemp: 38, nightTemp: 22, feelsLike: 40, alert: 'orange', heatDays: 5, acPenetration: 'low', heatwave: { sustained: true, days: 5, startsIn: 1, peak: 38, tropicalNights: 4, horizon: 14, thresholdC: 32 } },
-    { name: 'Lyon', zh: '里昂', maxTemp: 39, nightTemp: 23, feelsLike: 41, alert: 'red', heatDays: 6, acPenetration: 'low', heatwave: { sustained: true, days: 6, startsIn: 0, peak: 39, tropicalNights: 5, horizon: 14, thresholdC: 32 } },
-    { name: 'Marseille', zh: '马赛', maxTemp: 36, nightTemp: 24, feelsLike: 38, alert: 'orange', heatDays: 6, acPenetration: 'mid', heatwave: { sustained: true, days: 6, startsIn: 2, peak: 36, tropicalNights: 6, horizon: 14, thresholdC: 32 } },
-    { name: 'Annecy', zh: '安纳西', maxTemp: 34, nightTemp: 19, feelsLike: 35, alert: 'yellow', heatDays: 4, acPenetration: 'low', heatwave: { sustained: true, days: 3, startsIn: 3, peak: 34, tropicalNights: 1, horizon: 14, thresholdC: 32 } },
-    { name: 'Genève', zh: '日内瓦', maxTemp: 35, nightTemp: 20, feelsLike: 36, alert: 'orange', heatDays: 4, acPenetration: 'low', heatwave: { sustained: true, days: 4, startsIn: 2, peak: 35, tropicalNights: 2, horizon: 14, thresholdC: 32 } },
-    { name: 'London', zh: '伦敦', maxTemp: 33, nightTemp: 19, feelsLike: 34, alert: 'yellow', heatDays: 3, acPenetration: 'low', heatwave: { sustained: false, days: 2, startsIn: 4, peak: 33, tropicalNights: 0, horizon: 14, thresholdC: 32 } },
-    { name: 'Milano', zh: '米兰', maxTemp: 37, nightTemp: 23, feelsLike: 40, alert: 'orange', heatDays: 5, acPenetration: 'mid', heatwave: { sustained: true, days: 5, startsIn: 1, peak: 37, tropicalNights: 4, horizon: 14, thresholdC: 32 } },
+    { name: 'Paris', zh: '巴黎', maxTemp: 38, nightTemp: 22, feelsLike: 40, alert: 'orange', heatDays: 5, acPenetration: 'low', series: [29, 31, 33, 35, 37, 38, 36, 34, 31, 30, 29, 31, 32, 30], heatwave: { sustained: true, days: 5, startsIn: 1, peak: 38, tropicalNights: 4, horizon: 14, thresholdC: 32 } },
+    { name: 'Lyon', zh: '里昂', maxTemp: 39, nightTemp: 23, feelsLike: 41, alert: 'red', heatDays: 6, acPenetration: 'low', series: [30, 32, 34, 36, 38, 39, 37, 35, 33, 31, 30, 31, 33, 32], heatwave: { sustained: true, days: 6, startsIn: 0, peak: 39, tropicalNights: 5, horizon: 14, thresholdC: 32 } },
+    { name: 'Marseille', zh: '马赛', maxTemp: 36, nightTemp: 24, feelsLike: 38, alert: 'orange', heatDays: 6, acPenetration: 'mid', series: [31, 32, 33, 34, 35, 36, 36, 35, 34, 33, 32, 31, 32, 33], heatwave: { sustained: true, days: 6, startsIn: 2, peak: 36, tropicalNights: 6, horizon: 14, thresholdC: 32 } },
+    { name: 'Annecy', zh: '安纳西', maxTemp: 34, nightTemp: 19, feelsLike: 35, alert: 'yellow', heatDays: 4, acPenetration: 'low', series: [27, 28, 30, 32, 33, 34, 33, 31, 29, 28, 27, 28, 29, 28], heatwave: { sustained: true, days: 3, startsIn: 3, peak: 34, tropicalNights: 1, horizon: 14, thresholdC: 32 } },
+    { name: 'Genève', zh: '日内瓦', maxTemp: 35, nightTemp: 20, feelsLike: 36, alert: 'orange', heatDays: 4, acPenetration: 'low', series: [28, 29, 31, 33, 34, 35, 33, 31, 29, 28, 27, 29, 30, 29], heatwave: { sustained: true, days: 4, startsIn: 2, peak: 35, tropicalNights: 2, horizon: 14, thresholdC: 32 } },
+    { name: 'London', zh: '伦敦', maxTemp: 33, nightTemp: 19, feelsLike: 34, alert: 'yellow', heatDays: 3, acPenetration: 'low', series: [26, 27, 29, 31, 33, 32, 30, 28, 27, 26, 25, 26, 27, 26], heatwave: { sustained: false, days: 2, startsIn: 4, peak: 33, tropicalNights: 0, horizon: 14, thresholdC: 32 } },
+    { name: 'Milano', zh: '米兰', maxTemp: 37, nightTemp: 23, feelsLike: 40, alert: 'orange', heatDays: 5, acPenetration: 'mid', series: [30, 31, 33, 35, 36, 37, 36, 34, 32, 31, 30, 31, 32, 31], heatwave: { sustained: true, days: 5, startsIn: 1, peak: 37, tropicalNights: 4, horizon: 14, thresholdC: 32 } },
   ];
 
   // ---------- 市场情绪信号（种子）----------

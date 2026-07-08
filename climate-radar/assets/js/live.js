@@ -80,6 +80,7 @@
     }
     return {
       maxTemp: maxT, nightTemp: worstNight, heatDays: hotRun, alert,
+      series: maxArr.map(function (v) { return Math.round(v); }), // 每日最高温序列（驱动 sparkline）
       heatwave: {
         sustained, days: hw.len, startsIn: hw.start, peak: hw.peak,
         tropicalNights, horizon: maxArr.length, thresholdC: hwT,
