@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-07-08T01:38:47.870535+00:00",
+  "generated_at": "2026-07-08T01:40:52.149289+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 842,
@@ -28,7 +28,7 @@
   "risk_status": {
     "block_new_opens": true,
     "reasons": [
-      "emergency stop flag exists: 'AUTO 2026-07-08T01:38:43.213683+00:00: cumulative DD 33.36% (balance $399.86 < threshold $400.00)'",
+      "emergency stop flag exists: 'AUTO 2026-07-08T01:40:48.023526+00:00: cumulative DD 33.36% (balance $399.86 < threshold $400.00)'",
       "cumulative DD 33.36% (balance $399.86 < threshold $400.00)"
     ],
     "daily_pnl": 0.0,
@@ -69348,33 +69348,78 @@
   ],
   "missed_signals": [
     {
-      "paper_id": "BASUSDT|LONG|2026-07-08T01:05:59.818803+00:00",
-      "symbol": "BASUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-07-08T01:06:07.446948+00:00",
-      "reason": "paper trade too old (1959s > 600s)",
-      "last_checked_at": "2026-07-08T01:38:46.311547+00:00"
-    },
-    {
       "paper_id": "GUAUSDT|LONG|2026-07-08T01:12:12.389858+00:00",
       "symbol": "GUAUSDT",
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-07-08T01:12:41.211773+00:00",
-      "reason": "paper trade too old (1565s > 600s)",
-      "last_checked_at": "2026-07-08T01:38:46.311547+00:00"
+      "reason": "paper trade too old (1690s > 600s)",
+      "last_checked_at": "2026-07-08T01:40:51.154292+00:00"
+    },
+    {
+      "paper_id": "PUMPUSDT|SHORT|2026-07-08T01:38:04.928858+00:00",
+      "symbol": "PUMPUSDT",
+      "direction": "SHORT",
+      "conviction_score": 6,
+      "signal_at": "2026-07-08T01:39:52.283020+00:00",
+      "reason": "phase_6y: ATR 0.52% < 1.0% 下限 (ATR<1% 稳健亏 -$232, bootstrap CI 整段<0)",
+      "last_checked_at": "2026-07-08T01:40:51.154292+00:00"
+    },
+    {
+      "paper_id": "XPLUSDT|SHORT|2026-07-08T01:38:17.655693+00:00",
+      "symbol": "XPLUSDT",
+      "direction": "SHORT",
+      "conviction_score": 6,
+      "signal_at": "2026-07-08T01:39:52.283020+00:00",
+      "reason": "phase_6y: ATR 0.29% < 1.0% 下限 (ATR<1% 稳健亏 -$232, bootstrap CI 整段<0)",
+      "last_checked_at": "2026-07-08T01:40:51.154292+00:00"
+    },
+    {
+      "paper_id": "GWEIUSDT|SHORT|2026-07-08T01:38:22.267294+00:00",
+      "symbol": "GWEIUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-07-08T01:39:52.283020+00:00",
+      "reason": "phase_6y: ATR 0.98% < 1.0% 下限 (ATR<1% 稳健亏 -$232, bootstrap CI 整段<0)",
+      "last_checked_at": "2026-07-08T01:40:51.154292+00:00"
+    },
+    {
+      "paper_id": "USTCUSDT|SHORT|2026-07-08T01:38:53.404242+00:00",
+      "symbol": "USTCUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-07-08T01:39:52.283020+00:00",
+      "reason": "phase_6y: ATR 0.30% < 1.0% 下限 (ATR<1% 稳健亏 -$232, bootstrap CI 整段<0)",
+      "last_checked_at": "2026-07-08T01:40:51.154292+00:00"
+    },
+    {
+      "paper_id": "TAIKOUSDT|SHORT|2026-07-08T01:39:09.001074+00:00",
+      "symbol": "TAIKOUSDT",
+      "direction": "SHORT",
+      "conviction_score": 6,
+      "signal_at": "2026-07-08T01:39:52.283020+00:00",
+      "reason": "phase_6y: ATR 0.44% < 1.0% 下限 (ATR<1% 稳健亏 -$232, bootstrap CI 整段<0)",
+      "last_checked_at": "2026-07-08T01:40:51.154292+00:00"
+    },
+    {
+      "paper_id": "AIGENSYNUSDT|SHORT|2026-07-08T01:39:13.051010+00:00",
+      "symbol": "AIGENSYNUSDT",
+      "direction": "SHORT",
+      "conviction_score": 6,
+      "signal_at": "2026-07-08T01:39:52.283020+00:00",
+      "reason": "phase_6y: ATR 0.42% < 1.0% 下限 (ATR<1% 稳健亏 -$232, bootstrap CI 整段<0)",
+      "last_checked_at": "2026-07-08T01:40:51.154292+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 62960.4,
-    "btc_ma25_1h": 63428.85,
-    "pct_vs_ma25": -0.739,
-    "change_24h_pct": -1.339,
+    "btc_price": 62983.3,
+    "btc_ma25_1h": 63429.77,
+    "pct_vs_ma25": -0.704,
+    "change_24h_pct": -1.303,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.873,
-    "computed_at": "2026-07-08T01:38:47.815022+00:00"
+    "change_3h_pct": -0.837,
+    "computed_at": "2026-07-08T01:40:52.086908+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
