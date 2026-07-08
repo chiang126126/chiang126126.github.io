@@ -28,10 +28,39 @@ def cfg():
         "LLM_MODEL": os.getenv("LLM_MODEL", "deepseek-chat"),
         "TN_KEY": os.getenv("BINANCE_TESTNET_KEY", ""),
         "TN_SECRET": os.getenv("BINANCE_TESTNET_SECRET", ""),
+        # —— 实盘（MODE=live 才生效；与 testnet key 完全隔离，不配则 live 拒绝运行）——
+        "LIVE_KEY": os.getenv("BINANCE_LIVE_KEY", ""),
+        "LIVE_SECRET": os.getenv("BINANCE_LIVE_SECRET", ""),
+        "LIVE_MAX_NOTIONAL": float(os.getenv("LIVE_MAX_NOTIONAL", "120")),  # 实盘单笔名义硬顶(U)
+        "LIVE_MAX_EQUITY": float(os.getenv("LIVE_MAX_EQUITY", "200")),      # 合约钱包余额超此值拒绝开新仓
         "LEVERAGE": int(os.getenv("LEVERAGE", "1")),
         "MARKETAUX_KEY": os.getenv("MARKETAUX_KEY", ""),
         "DATA_DIR": os.getenv("DATA_DIR", "./data"),
     }
+
+
+def make_client(c):
+    """按 MODE 构造交易客户端。返回 (client|None, fatal_err|None)。
+    live 的任何配置缺失都是致命错误——宁可不跑，绝不带病碰真钱。"""
+    if c["MODE"] == "live":
+        if not (c["LIVE_KEY"] and c["LIVE_SECRET"]):
+            return None, "MODE=live 但未配置 BINANCE_LIVE_KEY/SECRET，拒绝运行"
+        return exchange.Futures(c["LIVE_KEY"], c["LIVE_SECRET"], base=exchange.FUTURES_LIVE), None
+    if c["MODE"] == "testnet" and c["TN_KEY"]:
+        return exchange.Futures(c["TN_KEY"], c["TN_SECRET"], base=exchange.FUTURES_TESTNET), None
+    return None, None
+
+
+def _apply_live_cap(plan, cap):
+    """实盘单笔名义硬顶：超出则等比缩小 qty/notional/risk（風险随名义线性下降，方向与价位不变）。"""
+    if plan["notional"] <= cap:
+        return plan
+    k = cap / plan["notional"]
+    plan = dict(plan)
+    plan["notional"] = round(plan["notional"] * k, 2)
+    plan["qty"] = plan["qty"] * k
+    plan["risk_usdt"] = round(plan["risk_usdt"] * k, 2)
+    return plan
 
 
 def now_iso():
@@ -117,10 +146,40 @@ def manage_position(pos, kl):
 def main():
     c = cfg()
     ddir = c["DATA_DIR"]
-    state = load_json(os.path.join(ddir, "bot_state.json"), fresh_state())
-    trades = load_json(os.path.join(ddir, "bot_trades.json"), [])
+    # live 用独立数据文件（_live 后缀），与 testnet 历史完全隔离、互不污染
+    sfx = "_live" if c["MODE"] == "live" else ""
+    fpath = lambda name: os.path.join(ddir, f"{name}{sfx}.json")
+    state = load_json(fpath("bot_state"), fresh_state())
+    trades = load_json(fpath("bot_trades"), [])
     state["mode"] = c["MODE"]
-    tn = exchange.Futures(c["TN_KEY"], c["TN_SECRET"]) if c["MODE"] == "testnet" and c["TN_KEY"] else None
+    tn, fatal = make_client(c)
+    if fatal:
+        print(f"[fatal] {fatal}")
+        save_json(fpath("bot_log"), {"ts": now_iso(), "mode": c["MODE"], "fatal": fatal, "items": []})
+        return
+
+    entries_blocked = None   # 非 None = 本轮禁止开新仓的原因（已有持仓的出场管理照常）
+    if c["MODE"] == "live":
+        # 实盘前置自检：连接/持仓模式/余额护栏，任何一步失败都绝不交易
+        try:
+            if tn.position_mode_dual():
+                print("[fatal] 实盘账户为双向持仓(hedge)模式，请在币安合约设置改为【单向持仓】后再跑")
+                return
+            bal = tn.wallet_balance("USDT")
+        except Exception as e:
+            print(f"[fatal] 实盘连接自检失败，本轮不交易: {e}")
+            return
+        if not state.get("live_init"):
+            # 首次实盘运行：以真实钱包余额为起点建账
+            state.update({"live_init": True, "equity0": bal, "equity": bal,
+                          "day_start_equity": bal, "peak_equity": bal, "day": ""})
+            print(f"[live] 首次运行建账，起始权益 {bal:.2f}U")
+        state["equity"] = bal   # 实盘权益始终以真实余额为准（资金费率/滑点自然计入）
+        log_bal = round(bal, 2)
+        if bal > c["LIVE_MAX_EQUITY"]:
+            entries_blocked = f"合约钱包余额 {bal:.0f}U > 上限 {c['LIVE_MAX_EQUITY']:.0f}U，仅管理持仓、不开新仓（请把多余资金移出合约钱包）"
+            print(f"[guard] {entries_blocked}")
+        print(f"[live] 已连接主网，钱包余额 {bal:.2f}U")
 
     today = now_iso()[:10]
     if state.get("day") != today:
@@ -132,6 +191,11 @@ def main():
     open_syms = {p["symbol"] for p in state["positions"]}
     log = {"ts": now_iso(), "mode": c["MODE"], "equity": round(state["equity"], 2),
            "day_pnl_pct": round(day_pnl, 2), "total_dd_pct": round(total_dd, 2), "items": []}
+
+    if c["MODE"] == "live":
+        log["live_usdt"] = log_bal
+        if entries_blocked:
+            log["guard"] = entries_blocked
 
     # testnet 连接自检：确认 key 可用 + 打印模拟盘 USDT 余额
     if c["MODE"] == "testnet":
@@ -163,7 +227,7 @@ def main():
             continue
         if tn:
             try:
-                filt = exchange.futures_filters(pos["symbol"])
+                filt = exchange.futures_filters(pos["symbol"], tn.base)
                 close_qty = exchange.round_step(pos["qty"], filt["step"])
                 if close_qty <= 0:
                     raise Exception("可平数量为 0")
@@ -171,7 +235,7 @@ def main():
                                       exchange.fmt_qty(close_qty, filt["step"]))
                 exit_price = _avg_fill(res, exit_price)
             except Exception as e:
-                print(f"[warn] testnet 平仓失败，保留持仓下次重试: {e}")
+                print(f"[warn] {c['MODE']} 平仓失败，保留持仓下次重试: {e}")
                 still_open.append(pos)
                 continue
         long = pos.get("side", "LONG") == "LONG"
@@ -210,6 +274,9 @@ def main():
     for sym in CORE:
         if sym in open_syms or sym in closed_this_run:   # 同周期刚平仓则冷却，不立即回补
             continue
+        if entries_blocked:                              # live 余额护栏触发：只出不进
+            log["items"].append({"symbol": sym, "action": "skip", "reason": entries_blocked})
+            continue
         try:
             decision, evidence, ind = strategy.analyze(sym, c, news_text)
         except Exception as e:
@@ -219,6 +286,8 @@ def main():
         ok, reason, plan = risk.vet(sym, decision, state["equity"], ind,
                                     len(state["positions"]), day_pnl, total_dd,
                                     open_notional=open_notional)
+        if ok and c["MODE"] == "live":
+            plan = _apply_live_cap(plan, c["LIVE_MAX_NOTIONAL"])   # 实盘单笔名义硬顶
         item = {"symbol": sym, "source": decision.get("_source"), "bias": decision.get("bias"),
                 "confidence": decision.get("confidence"), "vetted": ok, "reason": reason,
                 "rationale": decision.get("rationale", "")}
@@ -229,7 +298,7 @@ def main():
             if tn:
                 try:
                     tn.set_leverage(sym, c["LEVERAGE"])
-                    filt = exchange.futures_filters(sym)
+                    filt = exchange.futures_filters(sym, tn.base)
                     qty = exchange.round_step(plan["qty"], filt["step"])
                     if qty < filt["min_qty"] or qty * entry < filt["min_notional"]:
                         raise Exception(f"低于交易所最小下单量/名义({filt['min_qty']}/{filt['min_notional']})")
@@ -237,8 +306,8 @@ def main():
                     entry = _avg_fill(res, entry)
                     plan["qty"] = float(res.get("executedQty", qty)) or qty
                 except Exception as e:
-                    print(f"[warn] testnet 开仓失败，跳过本次: {e}")
-                    item["action"] = "testnet-open-failed"
+                    print(f"[warn] {c['MODE']} 开仓失败，跳过本次: {e}")
+                    item["action"] = "open-failed"
                     item["reason"] = str(e)
                     log["items"].append(item)
                     continue
@@ -258,9 +327,9 @@ def main():
 
     state["peak_equity"] = max(state["peak_equity"], state["equity"])
     state["updated_at"] = now_iso()
-    save_json(os.path.join(ddir, "bot_state.json"), state)
-    save_json(os.path.join(ddir, "bot_trades.json"), trades[-500:])
-    save_json(os.path.join(ddir, "bot_log.json"), log)
+    save_json(fpath("bot_state"), state)
+    save_json(fpath("bot_trades"), trades[-500:])
+    save_json(fpath("bot_log"), log)
     print(f"[done] mode={c['MODE']} equity={state['equity']:.2f} "
           f"open={len(state['positions'])} trades={len(trades)}")
 

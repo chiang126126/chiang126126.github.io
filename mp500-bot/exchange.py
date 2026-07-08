@@ -10,6 +10,7 @@ import requests
 PUBLIC = "https://data-api.binance.vision"        # 公开行情（K线/价格），无需 key
 TESTNET = "https://testnet.binance.vision"        # 现货模拟盘（旧，保留）
 FUTURES_TESTNET = "https://testnet.binancefuture.com"  # USDT 本位合约模拟盘（当前使用）
+FUTURES_LIVE = "https://fapi.binance.com"         # USDT 本位合约【主网实盘】（MODE=live 才用）
 
 TIMEOUT = 20
 
@@ -119,14 +120,15 @@ class Testnet:
         return self._signed("GET", "/api/v3/account", {})
 
 
-_FFILTERS = {}
+_FFILTERS = {}   # 缓存按 (base, symbol) 区分：testnet 与主网的精度表互不串用
 
 
-def futures_filters(symbol):
-    """USDT 本位合约交易对的下单精度/最小量/最小名义（一次性拉全表后缓存）。"""
-    if not _FFILTERS:
-        r = requests.get(f"{FUTURES_TESTNET}/fapi/v1/exchangeInfo", timeout=TIMEOUT)
+def futures_filters(symbol, base=FUTURES_TESTNET):
+    """USDT 本位合约交易对的下单精度/最小量/最小名义（按 base 一次性拉全表后缓存）。"""
+    if base not in _FFILTERS:
+        r = requests.get(f"{base}/fapi/v1/exchangeInfo", timeout=TIMEOUT)
         r.raise_for_status()
+        table = {}
         for s in r.json()["symbols"]:
             step, min_qty, min_notional = 0.0, 0.0, 0.0
             for x in s["filters"]:
@@ -134,18 +136,21 @@ def futures_filters(symbol):
                     step = float(x["stepSize"]); min_qty = float(x["minQty"])
                 if x["filterType"] == "MIN_NOTIONAL":
                     min_notional = float(x.get("notional") or 0)
-            _FFILTERS[s["symbol"]] = {"step": step, "min_qty": min_qty, "min_notional": min_notional}
-    return _FFILTERS.get(symbol, {"step": 0.001, "min_qty": 0.0, "min_notional": 0.0})
+            table[s["symbol"]] = {"step": step, "min_qty": min_qty, "min_notional": min_notional}
+        _FFILTERS[base] = table
+    return _FFILTERS[base].get(symbol, {"step": 0.001, "min_qty": 0.0, "min_notional": 0.0})
 
 
 class Futures:
-    """币安 USDT 本位合约模拟盘客户端（testnet.binancefuture.com）。
-    现阶段固定 1 倍杠杆，可做多(LONG=BUY)/做空(SHORT=SELL)，平仓走 reduceOnly。
-    注意：合约模拟盘的 API key 与现货模拟盘【不同】，需在 testnet.binancefuture.com 单独申请。"""
+    """币安 USDT 本位合约客户端。base 决定环境：
+    - FUTURES_TESTNET（默认，模拟盘）：key 从 testnet.binancefuture.com 申请；
+    - FUTURES_LIVE（主网实盘，MODE=live 才用）：key 只勾『允许合约』、禁提现、设 IP 白名单。
+    现阶段固定 1 倍杠杆，可做多(LONG=BUY)/做空(SHORT=SELL)，平仓走 reduceOnly。"""
 
-    def __init__(self, key, secret):
+    def __init__(self, key, secret, base=FUTURES_TESTNET):
         self.key = key
         self.secret = secret
+        self.base = base
         self._lev_set = set()
 
     def _signed(self, method, path, params):
@@ -154,7 +159,7 @@ class Futures:
         params["recvWindow"] = 5000
         query = urlencode(params)
         sig = hmac.new(self.secret.encode(), query.encode(), hashlib.sha256).hexdigest()
-        url = f"{FUTURES_TESTNET}{path}?{query}&signature={sig}"
+        url = f"{self.base}{path}?{query}&signature={sig}"
         r = requests.request(method, url, headers={"X-MBX-APIKEY": self.key}, timeout=TIMEOUT)
         r.raise_for_status()
         return r.json()
@@ -164,6 +169,17 @@ class Futures:
             if b["asset"] == asset:
                 return float(b["availableBalance"])
         return 0.0
+
+    def wallet_balance(self, asset="USDT"):
+        """钱包余额（含被持仓占用的保证金，不含未实现盈亏）——live 用它做权益真值。"""
+        for b in self._signed("GET", "/fapi/v2/balance", {}):
+            if b["asset"] == asset:
+                return float(b["balance"])
+        return 0.0
+
+    def position_mode_dual(self):
+        """True=双向持仓(hedge)。本系统按单向持仓设计，live 检测到双向会拒绝交易。"""
+        return bool(self._signed("GET", "/fapi/v1/positionSide/dual", {}).get("dualSidePosition"))
 
     def set_leverage(self, symbol, lev=1):
         if symbol in self._lev_set:
