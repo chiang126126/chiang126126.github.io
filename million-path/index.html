@@ -141,6 +141,31 @@
   #sec-env.mood-neutral{border-color:#33476e}
   #sec-env.mood-greed{border-color:#1f6a44;box-shadow:0 0 0 1px rgba(22,199,132,.24),0 8px 30px rgba(22,199,132,.11)}
   #sec-env.mood-exgreed{border-color:#16c784;box-shadow:0 0 0 1px rgba(22,199,132,.38),0 8px 34px rgba(22,199,132,.17)}
+  /* 交易统计日历 */
+  .cal-head{display:flex;align-items:center;justify-content:center;gap:14px;margin:2px 0 6px}
+  .cal-head b{font-size:13px;min-width:110px;text-align:center}
+  .cal-nav{padding:2px 12px;font-size:15px;line-height:1.4}
+  .cal-dow{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px}
+  .cal-dow span{text-align:center;font-size:10px;color:var(--muted)}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+  .cal-cell{min-height:46px;border-radius:8px;background:var(--panel2);border:1px solid var(--border);
+    padding:3px 5px;font-size:10px;color:var(--muted);cursor:default;transition:.15s}
+  .cal-cell .d{display:block;font-size:10px}
+  .cal-cell .p{display:block;font-size:11px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+  .cal-cell .n{display:block;font-size:9px;opacity:.8}
+  .cal-cell.has{cursor:pointer}
+  .cal-cell.has:hover{border-color:var(--gold);transform:translateY(-1px)}
+  .cal-cell.p1{background:rgba(22,199,132,.10);border-color:rgba(22,199,132,.30)}
+  .cal-cell.p2{background:rgba(22,199,132,.22);border-color:rgba(22,199,132,.55)}
+  .cal-cell.p1 .p,.cal-cell.p2 .p{color:var(--green)}
+  .cal-cell.n1{background:rgba(234,57,67,.10);border-color:rgba(234,57,67,.30)}
+  .cal-cell.n2{background:rgba(234,57,67,.22);border-color:rgba(234,57,67,.55)}
+  .cal-cell.n1 .p,.cal-cell.n2 .p{color:var(--red)}
+  .cal-cell.today{outline:1.5px solid var(--gold);outline-offset:-1.5px}
+  .cal-cell.blank{background:transparent;border-color:transparent}
+  .cal-kpi .k{font-size:11px;color:var(--muted)}
+  .cal-kpi .v{font-size:16px;font-weight:800;margin-top:2px;font-variant-numeric:tabular-nums}
+  .cal-kpi .s{font-size:10px;color:var(--muted);margin-top:2px}
   /* 一日节奏 */
   .rhythm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
   .rh-card{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;opacity:.62;transition:.3s}
@@ -201,15 +226,15 @@
   </div>
 
   <nav class="nav">
-    <a href="#sec-overview">概览</a><a href="#sec-bot">🤖机器人</a><a href="#sec-ai">AI决策</a>
-    <a href="#sec-rhythm">📅节奏</a><a href="#sec-market">行情</a><a href="#sec-env">市场环境</a><a href="#sec-news">加密新闻</a>
+    <a href="#sec-overview">概览</a><a href="#sec-rhythm">📅节奏</a><a href="#sec-ai">AI决策</a>
+    <a href="#sec-bot">🤖机器人</a><a href="#sec-market">行情</a><a href="#sec-env">市场环境</a><a href="#sec-news">加密新闻</a>
     <a href="#sec-us">美股·宏观</a><a href="#sec-trades">复盘</a><a href="#sec-stats">测算</a>
   </nav>
 
   <!-- 右侧悬浮电梯层（桌面） + 回顶 -->
   <nav class="elev" id="elev">
-    <a href="#sec-overview">概览</a><a href="#sec-bot">机器人</a><a href="#sec-ai">AI决策</a>
-    <a href="#sec-rhythm">节奏</a><a href="#sec-market">行情</a><a href="#sec-env">环境</a><a href="#sec-news">新闻</a>
+    <a href="#sec-overview">概览</a><a href="#sec-rhythm">节奏</a><a href="#sec-ai">AI决策</a>
+    <a href="#sec-bot">机器人</a><a href="#sec-market">行情</a><a href="#sec-env">环境</a><a href="#sec-news">新闻</a>
     <a href="#sec-us">美股</a><a href="#sec-trades">复盘</a><a href="#sec-stats">测算</a>
   </nav>
   <button class="totop" id="toTop" title="回到顶部">↑</button>
@@ -240,45 +265,9 @@
     </div>
   </section>
 
-  <!-- ② 自动机器人 -->
-  <section id="sec-bot" class="panel">
-    <h2><span class="bar"></span>🤖 自动机器人 · LLM 决策 + 风控否决<span class="badge" id="botMode" style="margin-left:auto;font-weight:400"></span></h2>
-    <div class="badge" style="margin-bottom:12px">每小时自动:取数据 → DeepSeek 出决策(可多可空) → 确定性风控一票否决 → 执行(币安合约 testnet 1x/模拟撮合) → 写回数据。<b>非投资建议,用于 S0 验证。</b></div>
-    <div class="grid g-auto" id="botStats" style="margin-bottom:14px"><div class="badge">加载机器人数据…</div></div>
-
-    <div class="k" style="font-size:11px;color:var(--muted);margin-bottom:6px">机器人持仓（浮动盈亏实时）</div>
-    <div class="tablewrap"><table class="resp">
-      <thead><tr><th>标的/方向</th><th>仓位</th><th>入场</th><th>现价</th><th>止损</th><th>止盈</th><th>浮动盈亏</th><th>浮盈%</th><th>入场时间</th><th>持仓</th></tr></thead>
-      <tbody id="botOpenBody"></tbody></table></div>
-
-    <div class="k" style="font-size:11px;color:var(--muted);margin:14px 0 6px">最近一次决策</div>
-    <div id="botDecisions"></div>
-
-    <div class="k" style="font-size:11px;color:var(--muted);margin:14px 0 6px">机器人已平仓（最近 20 笔）</div>
-    <div class="tablewrap"><table class="resp">
-      <thead><tr><th>标的/方向</th><th>仓位</th><th>入场→出场</th><th>盈亏</th><th>R</th><th>最佳浮盈</th><th>持仓</th><th>手续费</th><th>结果</th><th>盈亏原因</th><th>时间</th></tr></thead>
-      <tbody id="botTradesBody"></tbody></table></div>
-  </section>
-
-  <!-- ③ AI 决策快照 -->
-  <section id="sec-ai" class="panel">
-    <h2><span class="bar"></span>AI 决策快照 · 决策元组<span class="badge" id="decTime" style="margin-left:auto;font-weight:400">随刷新自动更新</span></h2>
-    <div class="badge" style="margin-bottom:12px">由确定性规则从实时数据推断的<b>参考决策</b>，随看板自动更新。这只是「战略层参谋」，<b>风控引擎与你始终最终拍板</b>。</div>
-    <div id="decisionBox"><div class="badge">计算中…</div></div>
-    <details style="margin-top:14px">
-      <summary style="cursor:pointer;color:var(--muted);font-size:13px">展开给 LLM 的 Evidence 文本（复制粘进 Claude 可获得更深入判断）<span class="badge" id="evTime"></span></summary>
-      <div style="display:flex;gap:8px;margin:10px 0;flex-wrap:wrap">
-        <button class="btn" id="genEvBtn">📋 重新生成</button>
-        <button class="btn" id="copyEvBtn">复制</button>
-      </div>
-      <textarea id="evidenceOut" readonly
-        style="width:100%;min-height:220px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.5"></textarea>
-    </details>
-  </section>
-
   <!-- 一日节奏（一人投资体系 · 欧洲时区） -->
   <section id="sec-rhythm" class="panel">
-    <h2><span class="bar"></span>📅 一日节奏 · 一人投资体系<span class="badge" id="rhythmNow" style="margin-left:auto;font-weight:400"></span></h2>
+    <h2><span class="bar"></span>📅 一日节奏 · 一人投资体系<span class="chip neutral" style="font-size:10px">第1层·人·研判</span><span class="badge" id="rhythmNow" style="margin-left:auto;font-weight:400"></span></h2>
     <div class="badge" style="margin-bottom:10px">优势不是比别人早几秒拿到消息，而是：<b>欧洲白天完成研究 → 美股开盘前备好预案 → 开盘后只验证条件</b>。当前时段高亮。</div>
     <div class="rh-focus" id="rhFocus" style="display:none"></div>
     <div class="rhythm-grid" id="rhythmGrid">
@@ -325,6 +314,59 @@
       </div>
     </div>
   </section>
+
+  <!-- ③ AI 决策快照 -->
+  <section id="sec-ai" class="panel">
+    <h2><span class="bar"></span>AI 决策快照 · 决策元组<span class="chip neutral" style="font-size:10px">第2层·参谋·预演</span><span class="badge" id="decTime" style="margin-left:auto;font-weight:400">随刷新自动更新</span></h2>
+    <div class="badge" style="margin-bottom:12px">由确定性规则从实时数据推断的<b>参考决策</b>，随看板自动更新。这只是「战略层参谋」，<b>风控引擎与你始终最终拍板</b>。</div>
+    <div id="decisionBox"><div class="badge">计算中…</div></div>
+    <details style="margin-top:14px">
+      <summary style="cursor:pointer;color:var(--muted);font-size:13px">展开给 LLM 的 Evidence 文本（复制粘进 Claude 可获得更深入判断）<span class="badge" id="evTime"></span></summary>
+      <div style="display:flex;gap:8px;margin:10px 0;flex-wrap:wrap">
+        <button class="btn" id="genEvBtn">📋 重新生成</button>
+        <button class="btn" id="copyEvBtn">复制</button>
+      </div>
+      <textarea id="evidenceOut" readonly
+        style="width:100%;min-height:220px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.5"></textarea>
+    </details>
+  </section>
+
+  <!-- ② 自动机器人 -->
+  <section id="sec-bot" class="panel">
+    <h2><span class="bar"></span>🤖 自动机器人 · LLM 决策 + 风控否决<span class="chip neutral" style="font-size:10px">第3层·机器·执行</span><span class="badge" id="botMode" style="margin-left:auto;font-weight:400"></span></h2>
+    <div class="badge" style="margin-bottom:12px">每小时自动:取数据 → DeepSeek 出决策(可多可空) → 确定性风控一票否决 → 执行(币安合约 testnet 1x/模拟撮合) → 写回数据。<b>非投资建议,用于 S0 验证。</b></div>
+    <div class="grid g-auto" id="botStats" style="margin-bottom:14px"><div class="badge">加载机器人数据…</div></div>
+
+    <div class="k" style="font-size:11px;color:var(--muted);margin-bottom:6px">机器人持仓（浮动盈亏实时）</div>
+    <div class="tablewrap"><table class="resp">
+      <thead><tr><th>标的/方向</th><th>仓位</th><th>入场</th><th>现价</th><th>止损</th><th>止盈</th><th>浮动盈亏</th><th>浮盈%</th><th>入场时间</th><th>持仓</th></tr></thead>
+      <tbody id="botOpenBody"></tbody></table></div>
+
+    <div class="k" style="font-size:11px;color:var(--muted);margin:14px 0 6px">最近一次决策</div>
+    <div id="botDecisions"></div>
+
+    <div class="k" style="font-size:11px;color:var(--muted);margin:14px 0 6px">📆 交易统计 · 日/周/月</div>
+    <div class="cal-wrap">
+      <div class="grid" style="grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px" id="calKpis"></div>
+      <div class="cal-head">
+        <button class="btn cal-nav" id="calPrev">‹</button><b id="calTitle">—</b><button class="btn cal-nav" id="calNext">›</button>
+      </div>
+      <div class="cal-dow"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="badge" style="margin-top:6px">点日历格子＝按当日筛选下方明细；绿=当日净盈利，红=净亏损，色深=金额大</div>
+    </div>
+
+    <div class="k" style="font-size:11px;color:var(--muted);margin:14px 0 6px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      机器人已平仓 <span class="badge" id="tradesCount"></span>
+      <input id="tradeSearch" placeholder="🔍 搜标的/方向/结果/原因/日期…"
+        style="margin-left:auto;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 10px;font-size:12px;width:230px;max-width:60vw">
+    </div>
+    <div class="tablewrap"><table class="resp">
+      <thead><tr><th>标的/方向</th><th>仓位</th><th>入场→出场</th><th>盈亏</th><th>R</th><th>最佳浮盈</th><th>持仓</th><th>手续费</th><th>结果</th><th>盈亏原因</th><th>时间</th></tr></thead>
+      <tbody id="botTradesBody"></tbody></table></div>
+    <div style="text-align:center;margin-top:8px"><button class="btn" id="tradesMoreBtn" style="display:none"></button></div>
+  </section>
+
 
   <!-- 实时行情 -->
   <section id="sec-market" class="panel">
@@ -462,7 +504,7 @@
     ⚠️ 本看板为纪律与复盘工具，行情数据仅供参考、可能延迟或因网络/地区受限；<b>不构成投资建议</b>，加密交易可能损失全部本金。任何收益目标必须服从风控。
   </div>
 
-  <script src="./config.js?v=33"></script>
-  <script src="./assets/app.js?v=33"></script>
+  <script src="./config.js?v=34"></script>
+  <script src="./assets/app.js?v=34"></script>
 </body>
 </html>

@@ -277,11 +277,19 @@ async function loadBot() {
       ${card.length ? `<div class="badge" style="display:block;margin-top:3px">🎯 ${card.join(" ｜ ")}</div>` : ""}${flags}</div></div>`;
   }).join("") || '<span class="badge">暂无决策</span>');
 
-  $("botTradesBody").innerHTML = tr.slice().reverse().slice(0, 20).map(t => {
-    const side = t.side || "LONG";
-    const sn = t.snapshot;
-    const snTip = sn ? `决策快照｜日线:${sn.regime || "?"} ${sn.daily_dev_pct != null ? sn.daily_dev_pct + "%" : ""} ｜时线偏离:${sn.dev_pct ?? "?"}% ｜RSI:${sn.rsi14 ?? "?"} ｜资费:${sn.funding_pct ?? "?"}%/8h ｜情绪:${sn.fng ?? "?"} ${sn.fng_label || ""} ｜${sn.source || "?"} conf ${sn.confidence ?? "?"}` : "";
-    return `<tr>
+  _botTrades = tr;
+  renderBotTrades();
+  renderTradeCal();
+}
+
+//==================== 已平仓：搜索 + 折叠 + 日/周/月日历统计 ====================
+let _botTrades = [], _tradeQuery = "", _tradesExpanded = false, _calOffset = 0;
+const dayKeyLocal = ts => { try { const d = new Date(ts); return isNaN(d) ? "" : d.toLocaleDateString("sv"); } catch (e) { return ""; } };
+function tradeRow(t) {
+  const side = t.side || "LONG";
+  const sn = t.snapshot;
+  const snTip = sn ? `决策快照｜日线:${sn.regime || "?"} ${sn.daily_dev_pct != null ? sn.daily_dev_pct + "%" : ""} ｜时线偏离:${sn.dev_pct ?? "?"}% ｜RSI:${sn.rsi14 ?? "?"} ｜资费:${sn.funding_pct ?? "?"}%/8h ｜情绪:${sn.fng ?? "?"} ${sn.fng_label || ""} ｜${sn.source || "?"} conf ${sn.confidence ?? "?"}` : "";
+  return `<tr>
     <td data-label="标的/方向"><b>${t.symbol}</b> <span class="chip ${side === "LONG" ? "risk-on" : "risk-off"}" style="font-size:10px;padding:1px 7px">${side}</span></td>
     <td data-label="仓位">${fmtQty(t.qty, t.symbol)}</td>
     <td data-label="入场→出场">${fmt(t.entry, 2)} → ${fmt(t.exit, 2)}</td>
@@ -293,7 +301,70 @@ async function loadBot() {
     <td data-label="结果"><span class="chip ${t.outcome === "WIN" ? "risk-on" : t.outcome === "LOSS" ? "risk-off" : "neutral"}">${t.outcome}</span></td>
     <td data-label="盈亏原因" style="text-align:left;white-space:normal;max-width:240px" title="${snTip}">${t.analysis || t.exit_reason || ""}${sn ? ' <span class="badge" style="cursor:help">ⓘ</span>' : ""}</td>
     <td data-label="时间" class="badge">${(t.closed_at || "").slice(5, 16).replace("T", " ")}</td></tr>`;
-  }).join("") || '<tr><td colspan="11" class="badge">暂无已平仓</td></tr>';
+}
+function filterTrades(trades, q) {   // 关键词过滤（标的/方向/结果/出场原因/归因/日期），纯函数
+  if (!q) return trades;
+  const s = q.trim().toLowerCase();
+  return trades.filter(t => [t.symbol, t.side, t.outcome, t.exit_reason, t.analysis,
+    (t.closed_at || "").slice(0, 10), dayKeyLocal(t.closed_at)].join(" ").toLowerCase().includes(s));
+}
+function renderBotTrades() {
+  const body = $("botTradesBody"); if (!body) return;
+  const all = _botTrades.slice().reverse();
+  const hit = filterTrades(all, _tradeQuery);
+  const show = _tradesExpanded ? hit : hit.slice(0, 20);
+  body.innerHTML = show.map(tradeRow).join("") ||
+    `<tr><td colspan="11" class="badge">${_tradeQuery ? "无匹配交易，换个关键词试试" : "暂无已平仓"}</td></tr>`;
+  const cnt = $("tradesCount");
+  if (cnt) cnt.textContent = _tradeQuery
+    ? `筛选出 ${hit.length} / ${all.length} 笔`
+    : `共 ${all.length} 笔 · 显示${_tradesExpanded ? "全部" : "最近 " + Math.min(20, hit.length) + " 笔"}`;
+  const btn = $("tradesMoreBtn");
+  if (btn) {
+    if (hit.length > 20) { btn.style.display = ""; btn.textContent = _tradesExpanded ? "▲ 收起，只看最近 20 笔" : `▼ 展开全部 ${hit.length} 笔`; }
+    else btn.style.display = "none";
+  }
+}
+function tradeCalAgg(trades, now) {  // 日/周/月聚合（本地时区；周一为一周之始），纯函数
+  const byDay = {};
+  for (const t of trades) {
+    const k = dayKeyLocal(t.closed_at); if (!k) continue;
+    const v = byDay[k] = byDay[k] || { pnl: 0, n: 0, w: 0 };
+    v.pnl += (t.pnl || 0); v.n++; if ((t.pnl || 0) > 0) v.w++;
+  }
+  const today = new Date(now).toLocaleDateString("sv");
+  const d0 = new Date(now); d0.setHours(0, 0, 0, 0);
+  const monday = new Date(d0); monday.setDate(d0.getDate() - (d0.getDay() + 6) % 7);
+  const wk = []; for (let i = 0; i < 7; i++) { const d = new Date(monday); d.setDate(monday.getDate() + i); wk.push(d.toLocaleDateString("sv")); }
+  const agg = ks => ks.reduce((o, k) => { const v = byDay[k]; if (v) { o.pnl += v.pnl; o.n += v.n; o.w += v.w; } return o; }, { pnl: 0, n: 0, w: 0 });
+  return { byDay, today,
+    day: byDay[today] || { pnl: 0, n: 0, w: 0 },
+    week: agg(wk),
+    month: agg(Object.keys(byDay).filter(k => k.startsWith(today.slice(0, 7)))) };
+}
+function renderTradeCal() {
+  const grid = $("calGrid"); if (!grid) return;
+  const now = new Date();
+  const a = tradeCalAgg(_botTrades, now);
+  const kpi = (label, o) => `<div class="card cal-kpi"><div class="k">${label}</div>
+    <div class="v ${o.pnl > 0 ? "pos" : o.pnl < 0 ? "neg" : ""}">${(o.pnl >= 0 ? "+" : "") + fmt(o.pnl, 2)}U</div>
+    <div class="s">${o.n ? o.n + "笔 · 胜率" + Math.round(o.w / o.n * 100) + "%" : "无交易"}</div></div>`;
+  const kEl = $("calKpis"); if (kEl) kEl.innerHTML = kpi("今日", a.day) + kpi("本周", a.week) + kpi("本月", a.month);
+  const base = new Date(now.getFullYear(), now.getMonth() - _calOffset, 1);
+  const tEl = $("calTitle"); if (tEl) tEl.textContent = `${base.getFullYear()}年${base.getMonth() + 1}月`;
+  const daysIn = new Date(base.getFullYear(), base.getMonth() + 1, 0).getDate();
+  const lead = (base.getDay() + 6) % 7;
+  let html = "";
+  for (let i = 0; i < lead; i++) html += '<div class="cal-cell blank"></div>';
+  for (let d = 1; d <= daysIn; d++) {
+    const key = `${base.getFullYear()}-${String(base.getMonth() + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    const v = a.byDay[key];
+    const clsx = !v ? "" : v.pnl > 0 ? (v.pnl >= 5 ? "p2" : "p1") : v.pnl < 0 ? (v.pnl <= -5 ? "n2" : "n1") : "";
+    html += `<div class="cal-cell ${v ? "has " + clsx : ""}${key === a.today ? " today" : ""}"${v ? ` data-day="${key}"` : ""}>
+      <span class="d">${d}</span>${v ? `<span class="p">${(v.pnl >= 0 ? "+" : "") + fmt(v.pnl, 1)}</span><span class="n">${v.n}笔</span>` : ""}</div>`;
+  }
+  grid.innerHTML = html;
+  const nx = $("calNext"); if (nx) nx.disabled = _calOffset <= 0;
 }
 function fmtHold(h, openedAt, closedAt) {
   let hrs = h;
@@ -1207,6 +1278,15 @@ function init() {
   renderPaper();
   setupNav();
   updateRhythm(); setInterval(updateRhythm, 60000);
+  // 已平仓：搜索 / 折叠 / 日历
+  $("tradeSearch") && $("tradeSearch").addEventListener("input", e => { _tradeQuery = e.target.value; renderBotTrades(); });
+  $("tradesMoreBtn") && $("tradesMoreBtn").addEventListener("click", () => { _tradesExpanded = !_tradesExpanded; renderBotTrades(); });
+  $("calPrev") && $("calPrev").addEventListener("click", () => { _calOffset++; renderTradeCal(); });
+  $("calNext") && $("calNext").addEventListener("click", () => { _calOffset = Math.max(0, _calOffset - 1); renderTradeCal(); });
+  $("calGrid") && $("calGrid").addEventListener("click", e => {
+    const c = e.target.closest && e.target.closest("[data-day]");
+    if (c) { const day = c.getAttribute("data-day"); const inp = $("tradeSearch"); if (inp) inp.value = day; _tradeQuery = day; _tradesExpanded = true; renderBotTrades(); }
+  });
   loadLedger(); loadEvents(); refreshLive(); renderCalc();
   const ms = Math.max(15, (+CFG.REFRESH_SECONDS || 60)) * 1000;
   setInterval(refreshLive, ms);
