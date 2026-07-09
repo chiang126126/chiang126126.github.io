@@ -1172,7 +1172,7 @@ async function loadRhythmLive() {
     const xt = $("rhXmTime"); if (xt && _botLog.ts) xt.textContent = `快照 ${ago(Math.floor(Date.parse(_botLog.ts) / 1000))}`;
   }
   const plans = genPlans({ price, prevH: r.prevH, prevL: r.prevL, ma30h: r.ma30h, ma30d, funding });
-  if (plans) set("rhPlans", plans.map(p => `<div class="plan ${p.cls}"><b>${p.k}</b>：${p.v}</div>`).join(""));
+  if (plans) set("rhPlans", plans.map(p => `<div class="plan ${p.cls}"><b>${p.k}</b><span>${p.v}</span></div>`).join(""));
 
   // 今日焦点横幅：一眼看到 全球风偏｜BTC位置｜首要风险｜建议
   const focus = genFocus({ price, prevH: r.prevH, prevL: r.prevL, ma30d, funding,

@@ -168,14 +168,17 @@
   .cal-kpi .s{font-size:10px;color:var(--muted);margin-top:2px}
   /* 一日节奏 */
   .rhythm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
-  .rh-card{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;opacity:.62;transition:.3s}
+  .rh-card{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;opacity:.62;transition:.3s}
   .rh-card.active{opacity:1;border-color:var(--gold);box-shadow:0 0 0 1px rgba(240,185,11,.25),0 6px 22px rgba(240,185,11,.10)}
   .rh-card.active .rh-head b::after{content:" ◀ 现在";color:var(--gold2);font-size:11px}
   .rh-head{display:flex;justify-content:space-between;align-items:baseline}
-  .rh-sub{font-size:11px;color:var(--muted);margin:4px 0 6px}
-  .rh-card ul{margin:0;padding-left:2px;font-size:12px;line-height:1.7;list-style:none}
-  .rh-card li{color:var(--muted);margin-bottom:4px}
-  .rh-val{color:var(--text)}
+  .rh-sub{font-size:11px;color:var(--muted);margin:4px 0 0;padding-bottom:9px;border-bottom:1px solid var(--border)}
+  .rh-card ul{margin:0;padding:0;font-size:12px;list-style:none}
+  .rh-card li{padding:9px 0;border-bottom:1px solid rgba(31,44,68,.55)}
+  .rh-card li:last-child{border-bottom:none;padding-bottom:3px}
+  .rh-lab{display:block;font-size:11px;color:var(--muted);letter-spacing:.4px;margin-bottom:4px}
+  .rh-val{display:block;color:var(--text);line-height:1.8}
+  .rh-note{color:var(--muted);font-size:11px}
   /* 语义色：绿=机会/健康 红=风险/警报 金=中性/等待 白=关键数据 */
   .rh-val .w,.rh-focus .w{color:#fff;font-weight:700;font-variant-numeric:tabular-nums}
   .rh-val .g,.rh-focus .g{color:var(--green);font-weight:600}
@@ -185,9 +188,9 @@
   .sd-g{background:var(--green);box-shadow:0 0 6px rgba(22,199,132,.9)}
   .sd-r{background:var(--red);box-shadow:0 0 6px rgba(234,57,67,.9);animation:pulse 1.6s infinite}
   .sd-y{background:var(--gold);box-shadow:0 0 6px rgba(240,185,11,.9)}
-  .rh-plans{margin-top:8px;font-size:12px;line-height:1.65}
-  .rh-plans .plan{background:var(--chip);border:1px solid var(--border);border-radius:8px;padding:7px 9px;margin-top:6px}
-  .rh-plans .plan b:first-child{color:var(--gold2)}
+  .rh-plans{margin-top:10px;font-size:12px;line-height:1.75}
+  .rh-plans .plan{background:var(--chip);border:1px solid var(--border);border-radius:8px;padding:9px 11px;margin-top:8px}
+  .rh-plans .plan>b:first-child{display:block;color:var(--gold2);font-size:12px;margin-bottom:4px}
   .rh-plans .p-a{border-left:3px solid var(--red)}
   .rh-plans .p-b{border-left:3px solid var(--green)}
   .rh-plans .p-c{border-left:3px solid var(--gold)}
@@ -275,20 +278,20 @@
         <div class="rh-head"><b>① 欧洲上午</b><span class="badge">07:00–14:00</span></div>
         <div class="rh-sub">复盘隔夜/亚洲盘 · 形成初步假设 · 不急于交易</div>
         <ul>
-          <li>BTC 关键位：<span class="rh-val" id="rhLevels">计算中…</span></li>
-          <li>ETH/SOL 相对强弱：<span class="rh-val" id="rhRel">计算中…</span></li>
-          <li>夜间成交量：<span class="rh-val" id="rhVol">计算中…</span></li>
-          <li>资金费率 & OI：<span class="rh-val" id="rhFund">计算中…</span></li>
-          <li>关键事件：<span class="rh-val" id="rhEvents">扫描新闻中…</span></li>
+          <li><span class="rh-lab">BTC 关键位</span><span class="rh-val" id="rhLevels">计算中…</span></li>
+          <li><span class="rh-lab">ETH/SOL 相对强弱</span><span class="rh-val" id="rhRel">计算中…</span></li>
+          <li><span class="rh-lab">夜间成交量</span><span class="rh-val" id="rhVol">计算中…</span></li>
+          <li><span class="rh-lab">资金费率 & OI</span><span class="rh-val" id="rhFund">计算中…</span></li>
+          <li><span class="rh-lab">关键事件</span><span class="rh-val" id="rhEvents">扫描新闻中…</span></li>
         </ul>
       </div>
       <div class="rh-card" data-phase="1">
         <div class="rh-head"><b>② 美股盘前</b><span class="badge">14:00–15:30</span></div>
         <div class="rh-sub">建立当天三套情景，而不是一个预测<span class="badge" id="rhXmTime"></span></div>
         <ul>
-          <li>期指/美债/美元：<span class="rh-val" id="rhMacro">等机器人快照…</span></li>
-          <li>加密概念股：<span class="rh-val" id="rhStocks">等机器人快照…</span></li>
-          <li>今日数据/财报：<span class="rh-val"><a href="#sec-env">查经济日历</a>（重大数据前后 30 分钟避免开新仓）</span></li>
+          <li><span class="rh-lab">期指/美债/美元</span><span class="rh-val" id="rhMacro">等机器人快照…</span></li>
+          <li><span class="rh-lab">加密概念股</span><span class="rh-val" id="rhStocks">等机器人快照…</span></li>
+          <li><span class="rh-lab">今日数据/财报</span><span class="rh-val"><a href="#sec-env">查经济日历</a>（重大数据前后 30 分钟避免开新仓）</span></li>
         </ul>
         <div class="rh-plans" id="rhPlans">预案生成中…</div>
       </div>
@@ -296,20 +299,20 @@
         <div class="rh-head"><b>③ 美股盘中</b><span class="badge">15:30–22:00</span></div>
         <div class="rh-sub">只做确认 · 不追第一波（开盘噪音/止损/程序化资金多）</div>
         <ul>
-          <li>方向持续性：<span class="rh-val" id="rhTrendNow">计算中…</span></li>
-          <li>股币共振：<span class="rh-val" id="rhResonance">计算中…</span></li>
-          <li>真破位还是插针：<span class="rh-val" id="rhBreak">计算中…</span></li>
-          <li>OI 结构：<span class="rh-val" id="rhOi2">计算中…</span></li>
-          <li>资费拥挤度：<span class="rh-val" id="rhCrowd">计算中…</span></li>
+          <li><span class="rh-lab">方向持续性</span><span class="rh-val" id="rhTrendNow">计算中…</span></li>
+          <li><span class="rh-lab">股币共振</span><span class="rh-val" id="rhResonance">计算中…</span></li>
+          <li><span class="rh-lab">真破位还是插针</span><span class="rh-val" id="rhBreak">计算中…</span></li>
+          <li><span class="rh-lab">OI 结构</span><span class="rh-val" id="rhOi2">计算中…</span></li>
+          <li><span class="rh-lab">资费拥挤度</span><span class="rh-val" id="rhCrowd">计算中…</span></li>
         </ul>
       </div>
       <div class="rh-card" data-phase="3">
         <div class="rh-head"><b>④ 盘后/亚洲</b><span class="badge">22:00–07:00</span></div>
         <div class="rh-sub">加密独立行情时段 · 机器人值守</div>
         <ul>
-          <li>机器人状态：<span class="rh-val" id="rhBot">读取中…</span></li>
-          <li>持仓护航：<span class="rh-val" id="rhGuard">读取中…</span></li>
-          <li>次日欧洲上午复盘夜间异动</li>
+          <li><span class="rh-lab">机器人状态</span><span class="rh-val" id="rhBot">读取中…</span></li>
+          <li><span class="rh-lab">持仓护航</span><span class="rh-val" id="rhGuard">读取中…</span></li>
+          <li class="rh-note">☾ 次日欧洲上午复盘夜间异动</li>
         </ul>
       </div>
     </div>
@@ -504,7 +507,7 @@
     ⚠️ 本看板为纪律与复盘工具，行情数据仅供参考、可能延迟或因网络/地区受限；<b>不构成投资建议</b>，加密交易可能损失全部本金。任何收益目标必须服从风控。
   </div>
 
-  <script src="./config.js?v=34"></script>
-  <script src="./assets/app.js?v=34"></script>
+  <script src="./config.js?v=35"></script>
+  <script src="./assets/app.js?v=35"></script>
 </body>
 </html>
