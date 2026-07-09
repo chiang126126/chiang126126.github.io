@@ -27,7 +27,9 @@ jobs:
                     data/bot_state.json data/bot_trades.json data/bot_log.json"
 
           # 1) 同步代码（--delete 清理已删文件），但排除受保护文件与 reviews/
-          rsync -a --delete \
+          # --checksum 必须加：CI 里 checkout 与 clone 的 mtime 同秒，同字节数的改动
+          # （如缓存版本号 v48→v49）会被 rsync 快速校验误判为"未变化"而漏同步
+          rsync -a --delete --checksum \
             --exclude '.git' --exclude 'reviews/' \
             $(for f in $PRESERVE; do echo --exclude "$f"; done) \
             million-path/ dest/
