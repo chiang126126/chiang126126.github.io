@@ -81,7 +81,7 @@ def cross_market():
     """跨市场领先信息一揽子（每项独立失败降级为 None，绝不让 Evidence 构建崩溃）。"""
     q = yahoo_quote
     nq, nq_chg = q("NQ=F")          # 纳指期货
-    tnx, tnx_chg = q("^TNX")        # 美债10Y收益率指数(值≈收益率%×10)
+    tnx, tnx_chg = q("^TNX")        # 美债10Y收益率（雅虎直接返回收益率%，如 4.47；老约定是×10）
     dxy, dxy_chg = q("DX=F")        # 美元指数期货
     if dxy is None:
         dxy, dxy_chg = q("DX-Y.NYB")  # 备用: ICE 美元指数现货
@@ -89,7 +89,8 @@ def cross_market():
     nvda, nvda_chg = q("NVDA")
     coin, coin_chg = q("COIN")
     return {"nq": nq, "nq_chg": nq_chg,
-            "tnx": (round(tnx / 10, 2) if tnx else None), "tnx_chg": tnx_chg,
+            # 兼容两种口径：>20 视为 CBOE 指数(收益率×10)需除10；否则已是收益率本身
+            "tnx": (round(tnx / 10 if tnx > 20 else tnx, 2) if tnx else None), "tnx_chg": tnx_chg,
             "dxy": dxy, "dxy_chg": dxy_chg,
             "mstr_chg": mstr_chg, "nvda_chg": nvda_chg, "coin_chg": coin_chg,
             "btc_chg": ticker_24h("BTCUSDT"),
