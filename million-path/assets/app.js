@@ -907,7 +907,21 @@ function renderDecision() {
     .replace(/顺势做空/g, '<b style="color:var(--red)">顺势做空</b>')
     .replace(/顺势做多/g, '<b style="color:var(--green)">顺势做多</b>')
     .replace(/保持空仓|FLAT/g, m => `<b style="color:var(--gold2)">${m}</b>`);
+  // 结论先行：按方向着色的置顶横幅，一眼锁定 方向+置信度+结论+操作
+  const bcol = d.bias === "LONG" ? "var(--green)" : d.bias === "SHORT" ? "var(--red)" : "var(--gold2)";
+  const bbg = d.bias === "LONG" ? "rgba(22,199,132,.14)" : d.bias === "SHORT" ? "rgba(234,57,67,.14)" : "rgba(240,185,11,.13)";
+  const bword = d.bias === "LONG" ? "做多" : d.bias === "SHORT" ? "做空" : "观望 / 空仓";
   box.innerHTML = `
+    <div class="card" style="margin-bottom:10px;border:1px solid ${bcol};border-left:6px solid ${bcol};background:linear-gradient(135deg,${bbg},rgba(0,0,0,0) 65%)">
+      <div class="k" style="color:var(--gold2)">📋 综合投资决策 · 结论先行</div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:7px">
+        <span class="chip ${biasCls}" style="font-size:16px;font-weight:800;padding:4px 14px">${d.bias} · ${bword}</span>
+        <span style="font-size:12px;color:var(--muted)">置信度 <b style="color:#fff;font-variant-numeric:tabular-nums">${d.conf.toFixed(2)}</b></span>
+        ${d.symbol !== "—" ? `<span style="font-size:12px;color:var(--muted)">标的 <b style="color:#fff">${d.symbol}</b></span>` : ""}
+      </div>
+      <div style="font-size:13.5px;margin-top:9px;line-height:1.9">${hiSummary}</div>
+      <div style="font-size:12px;margin-top:9px;padding-top:8px;border-top:1px dashed var(--border);line-height:1.7">操作：<b style="color:${bcol}">${d.move}</b> ｜ MP500 仓位建议：${d.advice}</div>
+    </div>
     <div class="grid g-auto" style="margin-bottom:8px">
       <div class="card"><div class="k">市场状态</div><div class="v"><span class="chip ${stCls}" style="font-size:13px">${d.state}</span></div></div>
       <div class="card"><div class="k">方向 bias</div><div class="v"><span class="chip ${biasCls}" style="font-size:15px">${d.bias}</span></div></div>
@@ -931,16 +945,12 @@ function renderDecision() {
       ${layer("第二层 · 加密确认｜是否真传导到币圈？", d.l2, d.v2)}
       ${layer("第三层 · 执行条件｜值不值得下这笔单？", d.l3, d.v3)}
     </div>
-    <div class="card" style="margin-bottom:8px;border:1px solid var(--gold);background:linear-gradient(135deg,rgba(240,185,11,.10),transparent)">
-      <div class="k" style="color:var(--gold2)">📋 综合投资决策</div>
-      <div style="font-size:13px;margin-top:5px;line-height:1.85">${hiSummary}</div></div>
     <div class="dec-foot">
       <div class="card" style="margin:0;border-color:${d.flags.length ? 'var(--red)' : 'var(--border)'}"><div class="k">风险提示 risk flags</div>
         <div style="font-size:12px;margin-top:4px;line-height:1.7;color:${d.flags.length ? 'var(--red)' : 'var(--muted)'}">${d.flags.map(r => "⚠ " + r).join("<br>") || "暂无明显风险信号"}</div></div>
       <div class="card" style="margin:0;border-left:3px solid var(--red)"><div class="k">禁止交易条件（长期武装 · 实时值）</div>
         <div style="font-size:11.5px;margin-top:4px;line-height:1.7;color:var(--muted)">${d.bans.map(x => "🚫 " + x).join("<br>")}</div></div>
     </div>
-    <div class="badge">操作：${d.move} ｜ MP500 仓位建议：${d.advice}</div>
     <div class="badge" style="display:block;margin-top:6px">⚠ 本卡为<b>确定性规则的参谋预演</b>（与机器人闸门同源）；机器人的 DeepSeek 行动卡见「最近一次决策」。非投资建议。</div>`;
   const t = $("decTime"); if (t) t.textContent = "更新于 " + new Date().toLocaleTimeString("zh-CN");
 }
