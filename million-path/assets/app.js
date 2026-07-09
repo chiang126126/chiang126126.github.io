@@ -745,60 +745,134 @@ function copyEvidence() {
 // 用确定性规则从实时数据给出参考决策。这是「战略层 lite」，非投资建议；
 // 想要更深入判断，可复制下方 Evidence 文本喂给 LLM。
 function computeDecision() {
+  // 完整行动卡（确定性规则版）：三层分析 → 市场状态/方向/置信度/首选标的/入场区间/
+  // 失效位/目标位/最大持仓/禁止交易条件；要素答不全 → 强制 FLAT。与机器人闸门同源。
   const reg = STATE.btcRegime, fng = STATE.fng, mkt = STATE.market || [];
-  let bias = "FLAT", conf = 0.3; const reasons = [], flags = [];
-  if (reg) {
-    if (reg.key === "risk-on") { bias = "LONG"; conf = 0.55; reasons.push(`BTC ${reg.label}${reg.dev != null ? "（+" + reg.dev.toFixed(1) + "%）" : ""}，趋势偏多`); }
-    else if (reg.key === "risk-off") { bias = "SHORT"; conf = 0.55; reasons.push(`BTC ${reg.label}${reg.dev != null ? "（" + reg.dev.toFixed(1) + "%）" : ""}，趋势偏空（1x 合约可顺势做空）`); }
-    else { bias = "FLAT"; reasons.push("BTC 贴近30日线、方向不明，少动"); }
-    if (reg.dev != null) conf += Math.min(0.2, Math.abs(reg.dev) / 50);
-  }
   const btc = mkt.find(c => c.name === "BTC");
-  // 与机器人 risk.vet 同源的确定性否决（保证快照结论 ≠ 机器人行为 的矛盾不再出现）
-  const ma30h = _rhCache && _rhCache.ma30h, px = btc && btc.price;
-  if (bias !== "FLAT" && ma30h && px) {
-    if (bias === "LONG" && px < ma30h) { bias = "FLAT"; reasons.push(`小时级未确认（价 ${money(px)} 在30h线 ${money(ma30h)} 下方），机器人闸门会拦，观望`); }
-    if (bias === "SHORT" && px > ma30h) { bias = "FLAT"; reasons.push(`小时级未确认（价 ${money(px)} 在30h线 ${money(ma30h)} 上方），机器人闸门会拦，观望`); }
+  const r = _rhCache || {};
+  const xm = (_botLog && _botLog.xm) || {};
+  const usQ = s => (STATE.us && STATE.us[s] && STATE.us[s].chg != null) ? STATE.us[s].chg : null;
+  const px = btc ? btc.price : null, funding = btc ? btc.funding : null, ma30h = r.ma30h;
+  const l1 = [], l2 = [], l3 = [], flags = [], bans = [], incomplete = [];
+  const pcs = x => x == null ? "n/a" : (x >= 0 ? "+" : "") + x.toFixed(2) + "%";
+
+  // ── 第一层 · 领先信息（全球资金在加风险还是降风险？）
+  const g = (_botLog && _botLog.global_risk) || null;
+  if (g) l1.push(`全球风险偏好 <b>${g}</b>（纳指期货 ${pcs(xm.nq_chg)} · 美元 ${pcs(xm.dxy_chg)} · 10Y ${xm.tnx != null ? xm.tnx + "%" : "n/a"}）`);
+  else incomplete.push("全球风险判定");
+  const mstr = usQ("MSTR") ?? xm.mstr_chg, nvda = usQ("NVDA") ?? xm.nvda_chg;
+  if (mstr != null && btc && btc.chg != null) {
+    const gap = mstr - btc.chg;
+    l1.push(`MSTR ${pcs(mstr)} vs BTC ${pcs(btc.chg)} → ${gap <= -2 ? "超额弱势（降杠杆信号）" : gap >= 1.5 ? "率先转强（风偏恢复早期）" : "无显著背离"}`);
   }
-  if (btc && btc.funding != null) {
-    if (bias === "SHORT" && btc.funding <= -0.05) { bias = "FLAT"; flags.push(`资费 ${btc.funding.toFixed(4)}%/8h 空头极端拥挤——机器人闸门禁追空，观望`); }
-    else if (bias === "LONG" && btc.funding >= 0.10) { bias = "FLAT"; flags.push(`资费 +${btc.funding.toFixed(4)}%/8h 多头过热——机器人闸门禁追多，观望`); }
-    else if (Math.abs(btc.funding) > 0.05) {
-      flags.push(`资金费率偏高（${btc.funding >= 0 ? "+" : ""}${btc.funding.toFixed(4)}%/8h），${btc.funding > 0 ? "多头" : "空头"}拥挤`);
-      if (bias === "LONG") conf -= 0.1;
-    }
+  if (nvda != null) l1.push(`AI/半导体风向 NVDA ${pcs(nvda)}`);
+
+  // ── 第二层 · 加密市场确认 → 方向
+  let bias = "FLAT", conf = 0.3;
+  if (reg) {
+    if (reg.key === "risk-on") { bias = "LONG"; conf = 0.55; l2.push(`BTC ${reg.label}（${pcs(reg.dev)}），日线趋势偏多`); }
+    else if (reg.key === "risk-off") { bias = "SHORT"; conf = 0.55; l2.push(`BTC ${reg.label}（${pcs(reg.dev)}），日线趋势偏空`); }
+    else l2.push("BTC 贴近30日线、方向不明");
+    if (reg.dev != null) conf += Math.min(0.2, Math.abs(reg.dev) / 50);
+  } else incomplete.push("日线趋势");
+  if (bias !== "FLAT" && ma30h && px) {   // 小时级顺势确认（与 risk.vet 同源）
+    if (bias === "LONG" && px < ma30h) { bias = "FLAT"; l2.push(`小时级未确认（价在30h线 ${money(ma30h)} 下方）→ 机器人闸门会拦，FLAT`); }
+    if (bias === "SHORT" && px > ma30h) { bias = "FLAT"; l2.push(`小时级未确认（价在30h线 ${money(ma30h)} 上方）→ 机器人闸门会拦，FLAT`); }
+  } else if (!ma30h) incomplete.push("30h均线");
+  if (r.ethbtc != null || r.solbtc != null)
+    l2.push(`相对强弱 ETH/BTC ${pcs(r.ethbtc)} · SOL/BTC ${pcs(r.solbtc)} → ${(r.ethbtc >= 0.5 || r.solbtc >= 0.5) ? "资金下沉，risk-on确认项+1" : (r.ethbtc <= -0.5 ? "高β回避，防御" : "无偏向")}`);
+  if (r.oiChg != null && btc && btc.chg != null) {
+    l2.push(`OI 24h ${pcs(r.oiChg)} × 价 ${pcs(btc.chg)} → ${btc.chg < 0 && r.oiChg > 2 ? "新空进场" : btc.chg < 0 && r.oiChg < -2 ? "杠杆清算主导" : btc.chg > 0 && r.oiChg > 2 ? "新多进场" : "无明显杠杆结构"}`);
+    if (bias === "SHORT" && r.oiChg <= -8) { bias = "FLAT"; flags.push(`OI 24h ${pcs(r.oiChg)} 杠杆清理近尾声——禁追空（与机器人闸门同源）`); }
   }
+  if (r.volRatio != null) l2.push(`量能 ${r.volRatio.toFixed(1)}×常态${r.volRatio >= 1.8 ? "（异常放量，防事件驱动）" : ""}`);
+  if (funding != null) {
+    if (bias === "SHORT" && funding <= -0.05) { bias = "FLAT"; flags.push(`资费 ${funding.toFixed(4)}%/8h 空头极端拥挤——禁追空`); }
+    else if (bias === "LONG" && funding >= 0.10) { bias = "FLAT"; flags.push(`资费 +${funding.toFixed(4)}%/8h 多头过热——禁追多`); }
+    l2.push(`资金费率 ${funding >= 0 ? "+" : ""}${funding.toFixed(4)}%/8h${Math.abs(funding) >= 0.05 ? "（拥挤区）" : "（正常）"}`);
+  } else incomplete.push("资金费率");
   if (fng) {
-    reasons.push(`市场情绪：${fng.label}（${fng.v}）`);
-    if (fng.v >= 75) { flags.push(`极度贪婪（${fng.v}），警惕追高`); if (bias === "LONG") conf -= 0.1; }
-    else if (fng.v <= 25) { flags.push(`极度恐惧（${fng.v}），或有超跌机会但需右侧确认`); }
+    l2.push(`情绪 ${fng.label}（${fng.v}）`);
+    if (fng.v >= 75 && bias === "LONG") { conf -= 0.1; flags.push(`极度贪婪（${fng.v}），警惕追高`); }
+    if (fng.v <= 25 && bias === "SHORT") flags.push(`极度恐惧（${fng.v}），空头需防超跌反抽`);
   }
-  if (bias === "SHORT" && btc && btc.funding != null && Math.abs(btc.funding) > 0.05 && btc.funding < 0) conf -= 0.1;
+  // 第一层与第二层冲突 → 主动降置信度（用户规范：识别矛盾，不强行选方向）
+  if (g && reg && bias !== "FLAT" && ((g === "risk-on" && bias === "SHORT") || (g === "risk-off" && bias === "LONG"))) {
+    conf -= 0.15; flags.push(`第一层(${g})与第二层方向(${bias})冲突 → 降置信度`);
+  }
+
+  // ── 第三层 · 执行条件（入场区间/失效位/目标位/追单与成本检查）
+  let entry = null, invalid = null, target = null, symbol = "—";
+  if (bias !== "FLAT" && px && ma30h) {
+    const broke = bias === "SHORT" ? (r.prevL != null && px < r.prevL) : (r.prevH != null && px > r.prevH);
+    if (bias === "SHORT") {
+      entry = broke ? [r.prevL * 0.995, r.prevL * 1.002] : [px * 0.998, px * 1.004];
+      l3.push(broke ? `已破昨低 → 入场取破位回抽区` : `未破昨低 ${r.prevL != null ? money(r.prevL) : ""} → 顺小时级趋势，现价附近谨慎参与`);
+      invalid = `1h收盘站回30h线 ${money(ma30h)} 上方`;
+      target = (entry[0] + entry[1]) / 2 * (1 - 0.0225);
+      symbol = (r.ethbtc != null && r.ethbtc <= -0.5) ? "ETHUSDT（相对更弱）" : "BTCUSDT";
+    } else {
+      entry = broke ? [r.prevH * 0.998, r.prevH * 1.005] : [ma30h * 0.998, ma30h * 1.005];
+      l3.push(broke ? `已破昨高 → 入场取突破回踩区` : `回踩30h线不破再进（不追第一波）`);
+      invalid = `1h收盘跌回30h线 ${money(ma30h)} 下方`;
+      target = (entry[0] + entry[1]) / 2 * (1 + 0.0225);
+      symbol = (r.ethbtc != null && r.ethbtc >= 0.5) ? "ETHUSDT（相对更强）" : "BTCUSDT";
+    }
+    const dev30h = (px / ma30h - 1) * 100;
+    if (Math.abs(dev30h) > 2.5) { conf -= 0.1; flags.push(`价距30h线已 ${pcs(dev30h)}，涨跌过多，追单风险高`); }
+    l3.push(`目标≈1.5R（止损1.5% → 目标2.25%），覆盖来回成本0.1%+滑点后仍达标 ✓`);
+  }
+  // 禁止交易条件（长期武装，实时值标注）
+  bans.push(`资费 ≤−0.05% 禁空 / ≥+0.10% 禁多（当前 ${funding != null ? (funding >= 0 ? "+" : "") + funding.toFixed(4) + "%" : "n/a"}）`);
+  bans.push(`OI 24h ≤−8% 禁追空（当前 ${pcs(r.oiChg)}）`);
+  bans.push("重大宏观数据前后 30 分钟不开新仓（查经济日历）");
+  const earn = (typeof fmtEarnings === "function") ? fmtEarnings(window._earnCache, MEGA_EARN) : null;
+  if (earn) bans.push(`今日重点财报 ${earn}——财报前后波动放大，谨慎持仓过报`);
+  // 行动卡完整性：要素答不全 → 强制 FLAT（用户规范）
+  if (bias !== "FLAT" && (!entry || !invalid || !target)) {
+    bias = "FLAT"; flags.push("行动卡要素不全（入场/失效/目标缺失）→ 按纪律 FLAT");
+  }
+  if (incomplete.length) l3.push(`数据待补齐：${incomplete.join("、")}`);
   conf = Math.max(0.1, Math.min(0.9, conf));
-  const move = bias === "LONG" ? "顺势做多，目标盈亏比 ≥ 1.5"
-    : bias === "SHORT" ? "顺势做空（1x 合约），目标盈亏比 ≥ 1.5"
-    : "观望 / 空仓（FLAT 也是决策）";
+  const state = g || (reg ? (reg.key === "neutral" ? "mixed" : reg.key) : "unknown");
+  const move = bias === "LONG" ? "顺势做多（1x 合约），按入场区间执行" : bias === "SHORT" ? "顺势做空（1x 合约），按入场区间执行" : "观望 / 空仓（FLAT 也是决策）";
   const advice = reg ? ADVICE[reg.key] : ADVICE.neutral;
-  return { bias, conf, move, reasons, flags, advice };
+  return { state, bias, conf, symbol: bias === "FLAT" ? "—" : symbol, entry, invalid, target,
+           maxHold: bias === "FLAT" ? "—" : "≤48小时（超时无进展离场）",
+           move, l1, l2, l3, flags, bans, advice };
 }
 function renderDecision() {
   const box = $("decisionBox"); if (!box) return;
   const d = computeDecision();
   const biasCls = d.bias === "LONG" ? "risk-on" : d.bias === "SHORT" ? "risk-off" : "neutral";
+  const stCls = d.state === "risk-on" ? "risk-on" : d.state === "risk-off" ? "risk-off" : "neutral";
   const bar = Math.round(d.conf * 100);
+  const zone = d.entry ? `${money(d.entry[0])} – ${money(d.entry[1])}` : "—";
+  const layer = (t, arr) => `<div class="card" style="margin-bottom:8px"><div class="k">${t}</div>
+    <div style="font-size:13px;margin-top:4px;line-height:1.75">${arr.map(x => "· " + x).join("<br>") || "—"}</div></div>`;
   box.innerHTML = `
-    <div class="grid g-auto" style="margin-bottom:10px">
+    <div class="grid g-auto" style="margin-bottom:8px">
+      <div class="card"><div class="k">市场状态</div><div class="v"><span class="chip ${stCls}" style="font-size:13px">${d.state}</span></div></div>
       <div class="card"><div class="k">方向 bias</div><div class="v"><span class="chip ${biasCls}" style="font-size:15px">${d.bias}</span></div></div>
-      <div class="card"><div class="k">置信度 confidence</div><div class="v">${d.conf.toFixed(2)}</div>
+      <div class="card"><div class="k">置信度</div><div class="v">${d.conf.toFixed(2)}</div>
         <div style="height:6px;border-radius:4px;background:#0d1426;margin-top:6px;overflow:hidden"><div style="height:100%;width:${bar}%;background:linear-gradient(90deg,var(--gold),var(--gold2))"></div></div></div>
-      <div class="card" style="grid-column:span 2;min-width:200px"><div class="k">操作 expected move</div><div class="v" style="font-size:14px">${d.move}</div></div>
+      <div class="card"><div class="k">首选标的</div><div class="v" style="font-size:14px">${d.symbol}</div></div>
     </div>
-    <div class="card" style="margin-bottom:8px"><div class="k">理由 rationale</div>
-      <div style="font-size:13px;margin-top:4px">${d.reasons.map(r => "· " + r).join("<br>") || "—"}</div></div>
+    <div class="grid g-auto" style="margin-bottom:10px">
+      <div class="card"><div class="k">入场区间</div><div class="v" style="font-size:14px">${zone}</div></div>
+      <div class="card"><div class="k">判断失效位</div><div class="v" style="font-size:13px">${d.invalid || "—"}</div></div>
+      <div class="card"><div class="k">目标位（≥1.5R）</div><div class="v" style="font-size:14px">${d.target ? money(d.target) : "—"}</div></div>
+      <div class="card"><div class="k">最大持仓时间</div><div class="v" style="font-size:13px">${d.maxHold}</div></div>
+    </div>
+    ${layer("第一层 · 领先信息（风险偏好往哪走）", d.l1)}
+    ${layer("第二层 · 加密市场确认（是否真传导到币圈）", d.l2)}
+    ${layer("第三层 · 执行条件（值不值得下这笔单）", d.l3)}
     <div class="card" style="margin-bottom:8px;border-color:${d.flags.length ? 'var(--red)' : 'var(--border)'}"><div class="k">风险提示 risk flags</div>
       <div style="font-size:13px;margin-top:4px;color:${d.flags.length ? 'var(--red)' : 'var(--muted)'}">${d.flags.map(r => "⚠ " + r).join("<br>") || "暂无明显风险信号"}</div></div>
-    <div class="badge">MP500 仓位建议：${d.advice}</div>
-    <div class="badge" style="display:block;margin-top:6px">⚠ 以上为<b>规则推断的参考</b>，非投资建议；最终由你与风控引擎决定。想要更深入判断，展开下方 Evidence 复制给 LLM。</div>`;
+    <div class="card" style="margin-bottom:8px;border-left:3px solid var(--red)"><div class="k">禁止交易条件（长期武装 · 实时值）</div>
+      <div style="font-size:12px;margin-top:4px;line-height:1.75;color:var(--muted)">${d.bans.map(x => "🚫 " + x).join("<br>")}</div></div>
+    <div class="badge">操作：${d.move} ｜ MP500 仓位建议：${d.advice}</div>
+    <div class="badge" style="display:block;margin-top:6px">⚠ 本卡为<b>确定性规则的参谋预演</b>（与机器人闸门同源）；机器人的 DeepSeek 行动卡见「最近一次决策」。非投资建议。</div>`;
   const t = $("decTime"); if (t) t.textContent = "更新于 " + new Date().toLocaleTimeString("zh-CN");
 }
 
@@ -1302,8 +1376,8 @@ async function refreshLive() {
     loadMarket(), loadSentiment(), loadCryptoMacro(), loadDefi(),
     loadCryptoNews(), loadFred(), loadUsStocks(), loadMstr(), loadBot()
   ]);
-  renderDecision();   // 规则推断的决策元组（直接可读）
-  loadRhythmLive();   // 一日节奏·实时研报（依赖上面已刷新的行情/新闻/机器人数据）
+  await loadRhythmLive();   // 一日节奏·实时研报（先算，行动卡要用它的关键位/OI/相对强弱缓存）
+  renderDecision();         // AI 决策快照 = 完整行动卡（确定性规则版）
   // 给 LLM 的 Evidence 文本自动重生成：用户正在框选/编辑该文本框时跳过，避免打断复制
   if (CFG.AUTO_EVIDENCE !== false && document.activeElement !== $("evidenceOut")) {
     showEvidence();
