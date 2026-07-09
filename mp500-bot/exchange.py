@@ -50,6 +50,66 @@ def fear_greed():
         return None, None
 
 
+def ticker_24h(symbol):
+    """24h 涨跌%（现货）。失败返回 None。"""
+    try:
+        r = requests.get(f"{PUBLIC}/api/v3/ticker/24hr", params={"symbol": symbol}, timeout=TIMEOUT)
+        r.raise_for_status()
+        return float(r.json()["priceChangePercent"])
+    except Exception:
+        return None
+
+
+def yahoo_quote(symbol):
+    """Yahoo 行情：返回 (最新价, 相对昨收涨跌%)，失败 (None, None)。
+    用于纳指期货 NQ=F、美债10Y ^TNX、美元 DX=F、MSTR/NVDA/COIN 等跨市场领先信息。"""
+    try:
+        r = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}",
+                         params={"interval": "1d", "range": "2d"},
+                         headers={"User-Agent": "Mozilla/5.0"}, timeout=TIMEOUT)
+        r.raise_for_status()
+        meta = r.json()["chart"]["result"][0]["meta"]
+        last = float(meta["regularMarketPrice"])
+        prev = float(meta.get("chartPreviousClose") or meta.get("previousClose") or 0)
+        chg = (last / prev - 1) * 100 if prev else None
+        return last, (round(chg, 2) if chg is not None else None)
+    except Exception:
+        return None, None
+
+
+def cross_market():
+    """跨市场领先信息一揽子（每项独立失败降级为 None，绝不让 Evidence 构建崩溃）。"""
+    q = yahoo_quote
+    nq, nq_chg = q("NQ=F")          # 纳指期货
+    tnx, tnx_chg = q("^TNX")        # 美债10Y收益率指数(值≈收益率%×10)
+    dxy, dxy_chg = q("DX=F")        # 美元指数期货
+    mstr, mstr_chg = q("MSTR")
+    nvda, nvda_chg = q("NVDA")
+    coin, coin_chg = q("COIN")
+    return {"nq": nq, "nq_chg": nq_chg,
+            "tnx": (round(tnx / 10, 2) if tnx else None), "tnx_chg": tnx_chg,
+            "dxy": dxy, "dxy_chg": dxy_chg,
+            "mstr_chg": mstr_chg, "nvda_chg": nvda_chg, "coin_chg": coin_chg,
+            "btc_chg": ticker_24h("BTCUSDT"),
+            "ethbtc_chg": ticker_24h("ETHBTC"),      # ETH/BTC 相对强弱
+            "solbtc_chg": ticker_24h("SOLBTC")}      # SOL/BTC 相对强弱
+
+
+def oi_change_24h(symbol):
+    """合约持仓量(OI) 24小时变化%。判断下跌是新空进场(OI升)还是杠杆清算(OI降)。"""
+    try:
+        r = requests.get("https://fapi.binance.com/futures/data/openInterestHist",
+                         params={"symbol": symbol, "period": "1h", "limit": 25}, timeout=TIMEOUT)
+        r.raise_for_status()
+        d = r.json()
+        if len(d) < 2:
+            return None
+        first, last = float(d[0]["sumOpenInterest"]), float(d[-1]["sumOpenInterest"])
+        return round((last / first - 1) * 100, 2) if first else None
+    except Exception:
+        return None
+
+
 _FILTERS = {}
 
 

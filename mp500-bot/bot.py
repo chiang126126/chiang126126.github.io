@@ -18,6 +18,7 @@ FEE = risk.FEE
 BE_TRIGGER_PCT = 1.0     # 浮盈达 1.0% → 止损移到入场价(+手续费)，最差保本
 TRAIL_TRIGGER_PCT = 1.5  # 浮盈达 1.5% → 启动跟踪止盈
 TRAIL_LOCK = 0.5         # 跟踪止盈锁住最佳浮盈的 50%
+MAX_HOLD_CLAMP = (4, 72)  # LLM 行动卡的最大持仓时间被夹在 4~72 小时内
 
 
 def cfg():
@@ -110,6 +111,16 @@ def _apply_stop_upgrade(pos):
     if (long and new_stop > pos["stop"]) or (not long and new_stop < pos["stop"]):
         pos["stop"] = round(new_stop, 2)
         pos["stop_kind"] = kind
+
+
+def time_exit(pos, kl, now):
+    """行动卡的最大持仓时间：超时即按最新价离场（超时说明原判断未按预期兑现）。"""
+    mh = pos.get("max_hold_hours")
+    if not mh or not kl:
+        return None, None
+    if _hold_hours(pos.get("opened_at", now), now) >= float(mh):
+        return kl[-1]["c"], "TIME"
+    return None, None
 
 
 def manage_position(pos, kl):
@@ -223,6 +234,8 @@ def main():
             continue
         exit_price, reason = manage_position(pos, kl)       # 含保本/跟踪止盈的逐K线管理
         if exit_price is None:
+            exit_price, reason = time_exit(pos, kl, now_iso())   # 行动卡最大持仓时间
+        if exit_price is None:
             still_open.append(pos)
             continue
         if tn:
@@ -262,13 +275,16 @@ def main():
     state["positions"] = still_open
     open_syms = {p["symbol"] for p in state["positions"]}
 
-    # 2) 整合新闻信息面（每轮抓一次，喂给 LLM 做小时级判断）
+    # 2) 整合信息面（每轮抓一次，喂给 LLM 做小时级判断）
     news_text = ""
     try:
         news_text = strategy.fetch_news(c)
         log["news_lines"] = len([x for x in news_text.split("\n") if x.startswith("-")])
     except Exception as e:
         print(f"[warn] 新闻抓取失败: {e}")
+    xm = strategy.fetch_cross_market()          # 第一层·领先信息（纳指期指/美债/美元/MSTR…）
+    if xm.get("nq_chg") is not None or xm.get("mstr_chg") is not None:
+        log["global_risk"] = strategy.classify_global_risk(xm)[0]
 
     # 3) 寻找新入场
     for sym in CORE:
@@ -278,7 +294,7 @@ def main():
             log["items"].append({"symbol": sym, "action": "skip", "reason": entries_blocked})
             continue
         try:
-            decision, evidence, ind = strategy.analyze(sym, c, news_text)
+            decision, evidence, ind = strategy.analyze(sym, c, news_text, xm)
         except Exception as e:
             print(f"[warn] {sym} 分析失败: {e}")
             continue
@@ -288,9 +304,15 @@ def main():
                                     open_notional=open_notional)
         if ok and c["MODE"] == "live":
             plan = _apply_live_cap(plan, c["LIVE_MAX_NOTIONAL"])   # 实盘单笔名义硬顶
+        # 行动卡完整记录（看板"最近一次决策"渲染成行动卡）
         item = {"symbol": sym, "source": decision.get("_source"), "bias": decision.get("bias"),
                 "confidence": decision.get("confidence"), "vetted": ok, "reason": reason,
-                "rationale": decision.get("rationale", "")}
+                "rationale": decision.get("rationale", ""),
+                "market_state": decision.get("market_state"),
+                "entry_low": decision.get("entry_low"), "entry_high": decision.get("entry_high"),
+                "invalidation": decision.get("invalidation"),
+                "max_hold_hours": decision.get("max_hold_hours"),
+                "risk_flags": decision.get("risk_flags")}
         if ok and c["MODE"] != "dry":
             kl_t = exchange.klines(sym, "1h", 1)[-1]["t"]
             entry = plan["entry"]
@@ -317,6 +339,9 @@ def main():
                    "fee_in": plan["notional"] * FEE, "confidence": plan["confidence"],
                    "opened_at": now_iso(), "opened_kline_t": kl_t,
                    "stop_kind": "INIT", "snapshot": _snapshot(ind, decision)}
+            mh = decision.get("max_hold_hours")
+            if isinstance(mh, (int, float)) and mh > 0:
+                pos["max_hold_hours"] = min(MAX_HOLD_CLAMP[1], max(MAX_HOLD_CLAMP[0], float(mh)))
             state["positions"].append(pos)
             item["action"] = f"OPEN {side}"
             item["price"] = round(entry, 2)
@@ -352,6 +377,15 @@ def _snapshot(ind, decision):
         "daily_dev_pct": r2(ind.get("daily_dev_pct")),# 30日均线偏离%
         "source": decision.get("_source"),            # llm / rule
         "confidence": decision.get("confidence"),
+        # —— 第一层·领先信息（跨市场）——
+        "global_risk": ind.get("global_risk"),        # risk-on/off/mixed/unknown
+        "nq_chg": r2((ind.get("xm") or {}).get("nq_chg")),
+        "dxy_chg": r2((ind.get("xm") or {}).get("dxy_chg")),
+        "mstr_chg": r2((ind.get("xm") or {}).get("mstr_chg")),
+        "ethbtc_chg": r2((ind.get("xm") or {}).get("ethbtc_chg")),
+        "solbtc_chg": r2((ind.get("xm") or {}).get("solbtc_chg")),
+        "oi_chg_pct": r2(ind.get("oi_chg_pct")),
+        "market_state": decision.get("market_state"), # LLM 行动卡判定
     }
 
 
@@ -374,6 +408,9 @@ def _trade_analysis(pos, reason, pnl, mfe_pct):
         return f"{side}·跟踪止盈离场（最佳浮盈 {mfe_pct:.1f}%，锁定过半利润）"
     if reason == "STOP_BE":
         return f"{side}·曾浮盈 {mfe_pct:.1f}% 后回落，保本离场（免于 -1R）"
+    if reason == "TIME":
+        w = "小赚" if pnl > 0 else "小亏" if pnl < 0 else "平手"
+        return f"{side}·超过最大持仓时间离场({w})——原判断未按预期兑现，释放资金"
     if reason == "STOP":
         if pnl >= 0:
             return f"{side}·保本/微利离场"

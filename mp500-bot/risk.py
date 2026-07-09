@@ -12,6 +12,8 @@ DAILY_LOSS_STOP = 0.02       # 当日亏损达 2% 停手
 TOTAL_DD_KILL = 0.20         # 总回撤 20% kill switch
 RSI_OVERSOLD = 30            # RSI 低于此不追空（P2 入场闸门）
 RSI_OVERBOUGHT = 70          # RSI 高于此不追多
+FUNDING_CROWDED_SHORT = -0.05  # 资费(%/8h)低于此=空头已拥挤，禁追空
+FUNDING_OVERHEATED = 0.10      # 资费高于此=多头过热，禁追多
 
 
 def vet(symbol, decision, equity, ind, open_count, day_pnl_pct, total_dd_pct, open_notional=0.0):
@@ -56,6 +58,24 @@ def vet(symbol, decision, equity, ind, open_count, day_pnl_pct, total_dd_pct, op
             return False, f"RSI {rsi:.0f} 超卖区，不追空", None
         if bias == "LONG" and rsi > RSI_OVERBOUGHT:
             return False, f"RSI {rsi:.0f} 超买区，不追多", None
+
+    # 资金费率拥挤度闸门：空头已极端拥挤不追空（易被轧空）；多头过热不追多
+    fr = ind.get("funding_pct")
+    if fr is not None:
+        if bias == "SHORT" and fr <= FUNDING_CROWDED_SHORT:
+            return False, f"资费 {fr:.3f}%/8h 极端偏空，空头拥挤不追空", None
+        if bias == "LONG" and fr >= FUNDING_OVERHEATED:
+            return False, f"资费 {fr:.3f}%/8h 多头过热，不追多", None
+
+    # 入场区间闸门：LLM 行动卡给了入场区间，现价不在区间内 = 已错过好位置，不追单
+    lo, hi = decision.get("entry_low"), decision.get("entry_high")
+    price0 = ind["price"]
+    try:
+        lo, hi = (float(lo) if lo else None), (float(hi) if hi else None)
+    except (TypeError, ValueError):
+        lo = hi = None
+    if lo and hi and 0 < lo < hi and not (lo <= price0 <= hi):
+        return False, f"现价 {price0:.2f} 不在行动卡入场区间 [{lo:.2f},{hi:.2f}]，不追单", None
 
     stop_pct = float(decision.get("stop_pct", 0)) / 100
     target_pct = float(decision.get("target_pct", 0)) / 100

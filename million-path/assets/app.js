@@ -257,12 +257,23 @@ async function loadBot() {
 
   const decTs = log.ts ? Math.floor(Date.parse(log.ts) / 1000) : null;
   const decTime = decTs ? new Date(log.ts).toLocaleString("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }) : "";
-  $("botDecisions").innerHTML = (log.items || []).map(it =>
-    `<div class="ev" style="padding:8px 0"><div class="t" style="flex-wrap:wrap;align-items:baseline">
+  const gRisk = log.global_risk ? `<span class="chip ${log.global_risk === "risk-on" ? "risk-on" : log.global_risk === "risk-off" ? "risk-off" : "neutral"}" style="margin-right:6px">全球 ${log.global_risk}</span>` : "";
+  $("botDecisions").innerHTML = (gRisk ? `<div style="margin-bottom:6px">${gRisk}<span class="badge">第一层·领先信息判定（纳指期指/美元/MSTR/NVDA）</span></div>` : "") +
+    ((log.items || []).map(it => {
+    const ms = it.market_state ? `<span class="chip ${it.market_state === "risk-on" ? "risk-on" : it.market_state === "risk-off" ? "risk-off" : "neutral"}" style="font-size:10px">${it.market_state}</span>` : "";
+    // 行动卡明细（有则展示）
+    const card = [];
+    if (it.entry_low && it.entry_high) card.push(`入场区间 ${fmt(+it.entry_low, 2)}–${fmt(+it.entry_high, 2)}`);
+    if (it.max_hold_hours) card.push(`最长持仓 ${it.max_hold_hours}时`);
+    if (it.invalidation) card.push(`失效条件：${it.invalidation}`);
+    const flags = (it.risk_flags && it.risk_flags.length) ? `<div class="badge" style="display:block;margin-top:3px;color:var(--red)">⚠ ${it.risk_flags.join("；")}</div>` : "";
+    return `<div class="ev" style="padding:8px 0"><div class="t" style="flex-wrap:wrap;align-items:baseline">
       <b>${it.symbol || ""}</b>
-      <span class="chip ${it.bias === "LONG" ? "risk-on" : it.bias === "SHORT" ? "risk-off" : "neutral"}">${it.bias || it.action || "—"}</span>
+      <span class="chip ${it.bias === "LONG" ? "risk-on" : it.bias === "SHORT" ? "risk-off" : "neutral"}">${it.bias || it.action || "—"}</span>${ms}
       ${decTime ? `<span class="badge" style="color:var(--muted)">🕐 ${decTime} · ${ago(decTs)}</span>` : ""}
-      <span class="badge">${it.source ? it.source + " · " : ""}${it.confidence != null ? "conf " + it.confidence + " · " : ""}${it.reason || it.rationale || ""}</span></div></div>`).join("") || '<span class="badge">暂无决策</span>';
+      <span class="badge">${it.source ? it.source + " · " : ""}${it.confidence != null ? "conf " + it.confidence + " · " : ""}${it.reason || it.rationale || ""}</span>
+      ${card.length ? `<div class="badge" style="display:block;margin-top:3px">🎯 ${card.join(" ｜ ")}</div>` : ""}${flags}</div></div>`;
+  }).join("") || '<span class="badge">暂无决策</span>');
 
   $("botTradesBody").innerHTML = tr.slice().reverse().slice(0, 20).map(t => {
     const side = t.side || "LONG";
@@ -899,6 +910,25 @@ function setupNav() {
 }
 
 //==================== 启动 ====================
+//==================== 一日节奏（欧洲时区，高亮当前时段）====================
+function rhythmPhase(t) {   // t = 巴黎时间的"当日分钟数"
+  if (t >= 420 && t < 840) return 0;    // 07:00–14:00 欧洲上午
+  if (t >= 840 && t < 930) return 1;    // 14:00–15:30 美股盘前
+  if (t >= 930 && t < 1320) return 2;   // 15:30–22:00 美股盘中
+  return 3;                             // 22:00–07:00 盘后/亚洲
+}
+function updateRhythm() {
+  const grid = $("rhythmGrid"); if (!grid) return;
+  let h, m;
+  try {
+    const parts = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Paris", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(new Date());
+    h = +parts.find(p => p.type === "hour").value; m = +parts.find(p => p.type === "minute").value;
+  } catch (e) { const d = new Date(); h = d.getHours(); m = d.getMinutes(); }
+  const ph = rhythmPhase(h * 60 + m);
+  grid.querySelectorAll(".rh-card").forEach(c => c.classList.toggle("active", +c.dataset.phase === ph));
+  const now = $("rhythmNow"); if (now) now.textContent = `巴黎时间 ${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
 async function refreshLive() {
   // 并行刷新所有信息面板，等全部结束后再（可选）自动重建 Evidence
   await Promise.allSettled([
@@ -930,6 +960,7 @@ function init() {
   });
   renderPaper();
   setupNav();
+  updateRhythm(); setInterval(updateRhythm, 60000);
   loadLedger(); loadEvents(); refreshLive(); renderCalc();
   const ms = Math.max(15, (+CFG.REFRESH_SECONDS || 60)) * 1000;
   setInterval(refreshLive, ms);
