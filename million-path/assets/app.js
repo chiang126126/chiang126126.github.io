@@ -310,18 +310,19 @@ function filterTrades(trades, q) {   // 关键词过滤（标的/方向/结果/�
 }
 function renderBotTrades() {
   const body = $("botTradesBody"); if (!body) return;
+  const SHOW_N = 5;   // 默认只展示最近5笔，其余折叠
   const all = _botTrades.slice().reverse();
   const hit = filterTrades(all, _tradeQuery);
-  const show = _tradesExpanded ? hit : hit.slice(0, 20);
+  const show = _tradesExpanded ? hit : hit.slice(0, SHOW_N);
   body.innerHTML = show.map(tradeRow).join("") ||
     `<tr><td colspan="11" class="badge">${_tradeQuery ? "无匹配交易，换个关键词试试" : "暂无已平仓"}</td></tr>`;
   const cnt = $("tradesCount");
   if (cnt) cnt.textContent = _tradeQuery
     ? `筛选出 ${hit.length} / ${all.length} 笔`
-    : `共 ${all.length} 笔 · 显示${_tradesExpanded ? "全部" : "最近 " + Math.min(20, hit.length) + " 笔"}`;
+    : `共 ${all.length} 笔 · 显示${_tradesExpanded ? "全部" : "最近 " + Math.min(SHOW_N, hit.length) + " 笔"}`;
   const btn = $("tradesMoreBtn");
   if (btn) {
-    if (hit.length > 20) { btn.style.display = ""; btn.textContent = _tradesExpanded ? "▲ 收起，只看最近 20 笔" : `▼ 展开全部 ${hit.length} 笔`; }
+    if (hit.length > SHOW_N) { btn.style.display = ""; btn.textContent = _tradesExpanded ? `▲ 收起，只看最近 ${SHOW_N} 笔` : `▼ 展开全部 ${hit.length} 笔`; }
     else btn.style.display = "none";
   }
 }
