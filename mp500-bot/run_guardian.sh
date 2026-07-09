@@ -3,6 +3,7 @@
 # crontab: */3 * * * * /bin/bash /Users/hong/mp500/mp500-bot/run_guardian.sh >> $HOME/mp500-guardian.log 2>&1
 set -e
 export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+export PYTHONWARNINGS="ignore::Warning:urllib3"   # 静音 Mac 自带 Python 的 LibreSSL 无害警告
 cd "$(dirname "$0")"
 
 source ./lock.sh

@@ -6,6 +6,7 @@ set -e
 # cron 的 PATH 极简（只有 /usr/bin:/bin），会找不到 Homebrew 装的 python3/git，
 # 导致"手动跑正常、cron 跑失败"。这里补上常见路径，确保两种方式一致。
 export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+export PYTHONWARNINGS="ignore::Warning:urllib3"   # 静音 Mac 自带 Python 的 LibreSSL 无害警告
 
 cd "$(dirname "$0")"                       # 进入 mp500-bot 目录
 echo "──────── $(date '+%F %T %Z') 开始运行 ────────"
