@@ -775,20 +775,21 @@ function computeDecision() {
     else l2.push("BTC 贴近30日线、方向不明");
     if (reg.dev != null) conf += Math.min(0.2, Math.abs(reg.dev) / 50);
   } else incomplete.push("日线趋势");
+  let flatWhy = [];                        // 记录 FLAT 的确切原因，供层结论与综合建议引用
   if (bias !== "FLAT" && ma30h && px) {   // 小时级顺势确认（与 risk.vet 同源）
-    if (bias === "LONG" && px < ma30h) { bias = "FLAT"; l2.push(`小时级未确认（价在30h线 ${money(ma30h)} 下方）→ 机器人闸门会拦，FLAT`); }
-    if (bias === "SHORT" && px > ma30h) { bias = "FLAT"; l2.push(`小时级未确认（价在30h线 ${money(ma30h)} 上方）→ 机器人闸门会拦，FLAT`); }
+    if (bias === "LONG" && px < ma30h) { bias = "FLAT"; flatWhy.push("小时级未同向确认"); l2.push(`小时级未确认（价在30h线 ${money(ma30h)} 下方）→ 机器人闸门会拦，FLAT`); }
+    if (bias === "SHORT" && px > ma30h) { bias = "FLAT"; flatWhy.push("小时级未同向确认"); l2.push(`小时级未确认（价在30h线 ${money(ma30h)} 上方）→ 机器人闸门会拦，FLAT`); }
   } else if (!ma30h) incomplete.push("30h均线");
   if (r.ethbtc != null || r.solbtc != null)
     l2.push(`相对强弱 ETH/BTC ${pcs(r.ethbtc)} · SOL/BTC ${pcs(r.solbtc)} → ${(r.ethbtc >= 0.5 || r.solbtc >= 0.5) ? "资金下沉，risk-on确认项+1" : (r.ethbtc <= -0.5 ? "高β回避，防御" : "无偏向")}`);
   if (r.oiChg != null && btc && btc.chg != null) {
     l2.push(`OI 24h ${pcs(r.oiChg)} × 价 ${pcs(btc.chg)} → ${btc.chg < 0 && r.oiChg > 2 ? "新空进场" : btc.chg < 0 && r.oiChg < -2 ? "杠杆清算主导" : btc.chg > 0 && r.oiChg > 2 ? "新多进场" : "无明显杠杆结构"}`);
-    if (bias === "SHORT" && r.oiChg <= -8) { bias = "FLAT"; flags.push(`OI 24h ${pcs(r.oiChg)} 杠杆清理近尾声——禁追空（与机器人闸门同源）`); }
+    if (bias === "SHORT" && r.oiChg <= -8) { bias = "FLAT"; flatWhy.push("OI显示杠杆清理近尾声，下跌燃料已耗尽"); flags.push(`OI 24h ${pcs(r.oiChg)} 杠杆清理近尾声——禁追空（与机器人闸门同源）`); }
   }
   if (r.volRatio != null) l2.push(`量能 ${r.volRatio.toFixed(1)}×常态${r.volRatio >= 1.8 ? "（异常放量，防事件驱动）" : ""}`);
   if (funding != null) {
-    if (bias === "SHORT" && funding <= -0.05) { bias = "FLAT"; flags.push(`资费 ${funding.toFixed(4)}%/8h 空头极端拥挤——禁追空`); }
-    else if (bias === "LONG" && funding >= 0.10) { bias = "FLAT"; flags.push(`资费 +${funding.toFixed(4)}%/8h 多头过热——禁追多`); }
+    if (bias === "SHORT" && funding <= -0.05) { bias = "FLAT"; flatWhy.push("空头极端拥挤，此时追空易被轧空"); flags.push(`资费 ${funding.toFixed(4)}%/8h 空头极端拥挤——禁追空`); }
+    else if (bias === "LONG" && funding >= 0.10) { bias = "FLAT"; flatWhy.push("多头过热，此时追多是接最后一棒"); flags.push(`资费 +${funding.toFixed(4)}%/8h 多头过热——禁追多`); }
     l2.push(`资金费率 ${funding >= 0 ? "+" : ""}${funding.toFixed(4)}%/8h${Math.abs(funding) >= 0.05 ? "（拥挤区）" : "（正常）"}`);
   } else incomplete.push("资金费率");
   if (fng) {
@@ -830,16 +831,48 @@ function computeDecision() {
   if (earn) bans.push(`今日重点财报 ${earn}——财报前后波动放大，谨慎持仓过报`);
   // 行动卡完整性：要素答不全 → 强制 FLAT（用户规范）
   if (bias !== "FLAT" && (!entry || !invalid || !target)) {
-    bias = "FLAT"; flags.push("行动卡要素不全（入场/失效/目标缺失）→ 按纪律 FLAT");
+    bias = "FLAT"; flatWhy.push("行动卡要素不全（入场/失效/目标算不出）"); flags.push("行动卡要素不全（入场/失效/目标缺失）→ 按纪律 FLAT");
   }
   if (incomplete.length) l3.push(`数据待补齐：${incomplete.join("、")}`);
   conf = Math.max(0.1, Math.min(0.9, conf));
   const state = g || (reg ? (reg.key === "neutral" ? "mixed" : reg.key) : "unknown");
+
+  // ── 层级结论（数据→解读→对交易的含义）与综合建议
+  const causes = [];
+  if (xm.nq_chg != null && xm.nq_chg <= -0.5) causes.push("纳指期货走弱"); else if (xm.nq_chg >= 0.5) causes.push("纳指期货走强");
+  if (xm.dxy_chg != null && xm.dxy_chg >= 0.3) causes.push("美元走强(抽流动性)"); else if (xm.dxy_chg <= -0.3) causes.push("美元走弱(利风险资产)");
+  const gap = (mstr != null && btc && btc.chg != null) ? mstr - btc.chg : null;
+  if (gap != null && gap <= -2) causes.push("MSTR超额弱势(机构降杠杆)");
+  if (nvda != null && nvda <= -1.5) causes.push("AI/半导体回撤"); else if (nvda >= 1.5) causes.push("AI/半导体走强");
+  let v1;
+  if (g === "risk-off") v1 = { tone: "r", t: `领先信息偏空：${causes.join("、") || "跨市场信号走弱"}——全球资金在降风险，对加密构成压制。今日以防守/顺势空视角为主，反弹先视为做空观察区而非抄底机会。${gap != null && gap <= -2 && btc && Math.abs(btc.chg) < 1 ? "但注意：BTC自身尚稳，MSTR弱或为公司因素，勿机械看空。" : ""}` };
+  else if (g === "risk-on") v1 = { tone: "g", t: `领先信息偏多：${causes.join("、") || "跨市场信号回暖"}——全球资金在加风险，对加密是顺风。回调可视为顺势参与机会，但仍需第二层确认传导。` };
+  else if (g === "mixed") v1 = { tone: "y", t: `领先信息混杂：${causes.join("、") || "多空信号并存"}——机构方向未定。此时最容易被单一消息带偏，降低仓位预期，等待传导明朗。` };
+  else v1 = { tone: "y", t: "领先信息不足（等机器人跨市场快照）——缺全球风偏判定时，默认降低出手频率。" };
+
+  let v2;
+  if (!reg || reg.key === "neutral") v2 = { tone: "y", t: "传导判断：日线中性、币圈自身无方向——传统市场的波动尚未形成有效传导。方向交给区间突破决定，中枢位置开仓盈亏比不足。" };
+  else if (bias === "SHORT") v2 = { tone: "r", t: `传导已确认：日线偏空且小时级同向${r.oiChg != null && r.oiChg > 2 ? "，OI上升＝新空进场、下跌仍有燃料" : ""}${funding != null && Math.abs(funding) < 0.05 ? "，资费正常无拥挤" : ""} → 顺势做空成立，按第三层区间执行。` };
+  else if (bias === "LONG") v2 = { tone: "g", t: `传导已确认：日线偏多且小时级同向${r.oiChg != null && r.oiChg > 2 ? "，OI上升＝新多进场、趋势健康" : ""}${funding != null && funding < 0.05 ? "，资费未过热" : ""} → 顺势做多成立，按第三层区间执行。` };
+  else v2 = { tone: "y", t: `传导未确认：${flatWhy.join("；") || "日线方向与小时级结构不同频"}——方向可能在酝酿但结构不支持进场，此刻出手是把纪律让位给情绪。` };
+
+  let v3;
+  if (bias !== "FLAT" && entry) {
+    const dev30h2 = (px / ma30h - 1) * 100;
+    v3 = { tone: bias === "SHORT" ? "r" : "g",
+      t: `值得下注：位置${Math.abs(dev30h2) <= 2.5 ? "合理" : "偏远(谨慎)"}（距30h线 ${pcs(dev30h2)}）、目标2.25%足以覆盖0.1%成本+滑点、${earn ? "⚠今日有重点财报，留意波动窗口" : "无重大事件冲突"} → 按区间挂单执行，单笔风险≤1%，触失效位无条件认错离场。` };
+  } else {
+    v3 = { tone: "y", t: `今日不出手：${flatWhy.join("；") || (incomplete.length ? "数据不全(" + incomplete.join("、") + ")" : "开仓条件不齐")} → FLAT是主动决策不是错过。资金留给条件成立的那一笔，等待预案触发。` };
+  }
+  const summary = bias === "FLAT"
+    ? `${state === "risk-off" ? "全球降风险环境下，" : state === "risk-on" ? "全球风偏虽暖，但" : "信号混杂环境下，"}本时点不满足出手标准（${flatWhy[0] || "条件不齐"}）。保持空仓、盯住触发条件：${reg && reg.key !== "neutral" ? (reg.key === "risk-off" ? "反抽30h线衰竭或破昨低回抽，是下一个做空观察点" : "回踩30h线不破，是下一个做多观察点") : "等1h收盘突破昨高/昨低任一侧再按预案执行"}。机器人同规则值守，无需手动干预。`
+    : `三层同向（${state}＋日线${bias === "SHORT" ? "偏空" : "偏多"}＋小时级确认），${bias === "SHORT" ? "顺势做空" : "顺势做多"} ${symbol.split("（")[0]}；入场 ${money(entry[0])}–${money(entry[1])}，失效即认错（${invalid}），目标 ${money(target)}（≥1.5R），持仓不超48小时；单笔风险≤1%本金，若资费转极端或OI显示清算尾声则立即放弃计划。`;
+
   const move = bias === "LONG" ? "顺势做多（1x 合约），按入场区间执行" : bias === "SHORT" ? "顺势做空（1x 合约），按入场区间执行" : "观望 / 空仓（FLAT 也是决策）";
   const advice = reg ? ADVICE[reg.key] : ADVICE.neutral;
   return { state, bias, conf, symbol: bias === "FLAT" ? "—" : symbol, entry, invalid, target,
            maxHold: bias === "FLAT" ? "—" : "≤48小时（超时无进展离场）",
-           move, l1, l2, l3, flags, bans, advice };
+           move, l1, l2, l3, v1, v2, v3, summary, flags, bans, advice };
 }
 function renderDecision() {
   const box = $("decisionBox"); if (!box) return;
@@ -848,8 +881,11 @@ function renderDecision() {
   const stCls = d.state === "risk-on" ? "risk-on" : d.state === "risk-off" ? "risk-off" : "neutral";
   const bar = Math.round(d.conf * 100);
   const zone = d.entry ? `${money(d.entry[0])} – ${money(d.entry[1])}` : "—";
-  const layer = (t, arr) => `<div class="card" style="margin-bottom:8px"><div class="k">${t}</div>
-    <div style="font-size:13px;margin-top:4px;line-height:1.75">${arr.map(x => "· " + x).join("<br>") || "—"}</div></div>`;
+  const tcol = { r: "var(--red)", g: "var(--green)", y: "var(--gold2)" };
+  const tbg = { r: "rgba(234,57,67,.09)", g: "rgba(22,199,132,.09)", y: "rgba(240,185,11,.09)" };
+  const layer = (t, arr, v) => `<div class="card" style="margin-bottom:8px"><div class="k">${t}</div>
+    <div style="font-size:13px;margin-top:4px;line-height:1.75">${arr.map(x => "· " + x).join("<br>") || "—"}</div>
+    ${v ? `<div style="margin-top:7px;padding:7px 10px;border-radius:8px;background:${tbg[v.tone]};border-left:3px solid ${tcol[v.tone]};font-size:12.5px;line-height:1.7"><b style="color:${tcol[v.tone]}">📌 层结论</b>　${v.t}</div>` : ""}</div>`;
   box.innerHTML = `
     <div class="grid g-auto" style="margin-bottom:8px">
       <div class="card"><div class="k">市场状态</div><div class="v"><span class="chip ${stCls}" style="font-size:13px">${d.state}</span></div></div>
@@ -864,9 +900,12 @@ function renderDecision() {
       <div class="card"><div class="k">目标位（≥1.5R）</div><div class="v" style="font-size:14px">${d.target ? money(d.target) : "—"}</div></div>
       <div class="card"><div class="k">最大持仓时间</div><div class="v" style="font-size:13px">${d.maxHold}</div></div>
     </div>
-    ${layer("第一层 · 领先信息（风险偏好往哪走）", d.l1)}
-    ${layer("第二层 · 加密市场确认（是否真传导到币圈）", d.l2)}
-    ${layer("第三层 · 执行条件（值不值得下这笔单）", d.l3)}
+    ${layer("第一层 · 领先信息（全球资金在加风险还是降风险？）", d.l1, d.v1)}
+    ${layer("第二层 · 加密市场确认（传统市场的变化是否传导到币圈？）", d.l2, d.v2)}
+    ${layer("第三层 · 执行条件（这笔交易值不值得承担风险？）", d.l3, d.v3)}
+    <div class="card" style="margin-bottom:8px;border:1px solid var(--gold);background:linear-gradient(135deg,rgba(240,185,11,.10),transparent)">
+      <div class="k" style="color:var(--gold2)">📋 综合投资决策</div>
+      <div style="font-size:13px;margin-top:5px;line-height:1.8">${d.summary}</div></div>
     <div class="card" style="margin-bottom:8px;border-color:${d.flags.length ? 'var(--red)' : 'var(--border)'}"><div class="k">风险提示 risk flags</div>
       <div style="font-size:13px;margin-top:4px;color:${d.flags.length ? 'var(--red)' : 'var(--muted)'}">${d.flags.map(r => "⚠ " + r).join("<br>") || "暂无明显风险信号"}</div></div>
     <div class="card" style="margin-bottom:8px;border-left:3px solid var(--red)"><div class="k">禁止交易条件（长期武装 · 实时值）</div>
