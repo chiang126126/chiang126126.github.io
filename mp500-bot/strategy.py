@@ -74,7 +74,8 @@ SYSTEM_PROMPT = (
     "OI变化（下跌时OI升=新空进场，OI降=杠杆已清理、追空危险）、资金费率、情绪。\n"
     "【第三层·执行条件】方向对了也要回答：是否已涨跌过多不宜追？入场位在哪？什么价位证明判断错误？"
     "空间能否覆盖成本？答不全任何一项 → 必须 FLAT。\n"
-    "进场纪律：做空需等『跌破支撑→反抽无法收复→MSTR/科技股未恢复→ETH/SOL无相对走强→资费未极端偏空』；"
+    "进场纪律：支撑/阻力以 Evidence 给出的『昨高/昨低』为主要锚点（入场区间、失效位都应参考它们）。"
+    "做空需等『跌破支撑→反抽无法收复→MSTR/科技股未恢复→ETH/SOL无相对走强→资费未极端偏空』；"
     "做多更严格：『重新站回关键位→回踩不破→纳指风险偏好改善→MSTR不再弱于BTC→资费未过热』。"
     "禁止因纳指下跌/跌破均线就立即追空，禁止把下跌中的快速反弹当底部。\n"
     "信号冲突时（如美股弱但BTC稳且OI大降=去杠杆尾声；MSTR弱但BTC纳指稳=公司自身问题；"
@@ -146,6 +147,8 @@ def build_evidence(symbol, ind, funding, fng, news_text=""):
         f"MSTR三维解读: {mstr_divergence(xm)}\n"
         f"\n## 第二层·加密市场确认\n"
         f"现价: {n2(ind['price'])} ｜ BTC 24h: {pc(xm.get('btc_chg'))}\n"
+        f"关键位·昨高: {n2(ind.get('prev_h'))}  昨低: {n2(ind.get('prev_l'))}  ← 入场区间/失效位请锚定这些关键位\n"
+        f"近10小时量能: {n2(ind.get('vol_ratio'), 1)}×常态 (≥1.8×=异常放量，通常有事件驱动)\n"
         f"日线趋势(30日线法): {regime_cn}  偏离 {n2(ind.get('daily_dev_pct'), 2)}%  ← 高周期，决定可做的方向\n"
         f"30小时均线偏离: {n2(ind['dev_pct'])}%  (站上为偏多)\n"
         f"EMA21: {n2(ind['ema21'])}  EMA50: {n2(ind['ema50'])} ｜ RSI14: {n2(ind['rsi14'], 1)} ｜ "
@@ -218,8 +221,11 @@ def analyze(symbol, cfg, news_text="", xm=None):
     ind = indicators.summarize(kl)
     # 高周期(日线)趋势：口径与看板「30日均线法」完全一致，用作开仓方向闸门
     try:
-        dcloses = [k["c"] for k in exchange.klines(symbol, "1d", 40)]
+        dkl = exchange.klines(symbol, "1d", 40)
+        dcloses = [k["c"] for k in dkl]
         ind["regime"], ind["daily_dev_pct"] = indicators.daily_regime(dcloses, ind["price"])
+        if len(dkl) >= 2:   # 昨高/昨低：与看板一日节奏预案锚定同一关键位
+            ind["prev_h"], ind["prev_l"] = dkl[-2]["h"], dkl[-2]["l"]
     except Exception as e:
         print(f"[warn] {symbol} 日线趋势获取失败，按震荡处理: {e}")
         ind["regime"], ind["daily_dev_pct"] = "neutral", None

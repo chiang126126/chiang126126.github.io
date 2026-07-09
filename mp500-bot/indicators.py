@@ -55,12 +55,24 @@ def daily_regime(closes, price, n=30, band=1.0):
     return key, dev
 
 
+def vol_ratio_10h(kl):
+    """近10小时量能 / 常态(此前时段的10小时均量)。≥1.8 判异常放量。"""
+    vols = [k["v"] for k in kl]
+    if len(vols) < 40:
+        return None
+    last10 = sum(vols[-10:])
+    prior = vols[:-10]
+    base = sum(prior) / len(prior) * 10
+    return round(last10 / base, 2) if base else None
+
+
 def summarize(kl):
     """从 1h K线算一组指标，供 Evidence 与规则使用。"""
     closes = [k["c"] for k in kl]
     price = closes[-1]
     sma30 = sma(closes, 30)
     return {
+        "vol_ratio": vol_ratio_10h(kl),
         "price": price,
         "sma30": sma30,
         "dev_pct": (price / sma30 - 1) * 100 if sma30 else None,

@@ -681,9 +681,19 @@ function computeDecision() {
     if (reg.dev != null) conf += Math.min(0.2, Math.abs(reg.dev) / 50);
   }
   const btc = mkt.find(c => c.name === "BTC");
-  if (btc && btc.funding != null && Math.abs(btc.funding) > 0.05) {
-    flags.push(`资金费率偏高（${btc.funding >= 0 ? "+" : ""}${btc.funding.toFixed(4)}%/8h），${btc.funding > 0 ? "多头" : "空头"}拥挤`);
-    if (bias === "LONG") conf -= 0.1;
+  // 与机器人 risk.vet 同源的确定性否决（保证快照结论 ≠ 机器人行为 的矛盾不再出现）
+  const ma30h = _rhCache && _rhCache.ma30h, px = btc && btc.price;
+  if (bias !== "FLAT" && ma30h && px) {
+    if (bias === "LONG" && px < ma30h) { bias = "FLAT"; reasons.push(`小时级未确认（价 ${money(px)} 在30h线 ${money(ma30h)} 下方），机器人闸门会拦，观望`); }
+    if (bias === "SHORT" && px > ma30h) { bias = "FLAT"; reasons.push(`小时级未确认（价 ${money(px)} 在30h线 ${money(ma30h)} 上方），机器人闸门会拦，观望`); }
+  }
+  if (btc && btc.funding != null) {
+    if (bias === "SHORT" && btc.funding <= -0.05) { bias = "FLAT"; flags.push(`资费 ${btc.funding.toFixed(4)}%/8h 空头极端拥挤——机器人闸门禁追空，观望`); }
+    else if (bias === "LONG" && btc.funding >= 0.10) { bias = "FLAT"; flags.push(`资费 +${btc.funding.toFixed(4)}%/8h 多头过热——机器人闸门禁追多，观望`); }
+    else if (Math.abs(btc.funding) > 0.05) {
+      flags.push(`资金费率偏高（${btc.funding >= 0 ? "+" : ""}${btc.funding.toFixed(4)}%/8h），${btc.funding > 0 ? "多头" : "空头"}拥挤`);
+      if (bias === "LONG") conf -= 0.1;
+    }
   }
   if (fng) {
     reasons.push(`市场情绪：${fng.label}（${fng.v}）`);

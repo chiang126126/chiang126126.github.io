@@ -14,6 +14,7 @@ RSI_OVERSOLD = 30            # RSI 低于此不追空（P2 入场闸门）
 RSI_OVERBOUGHT = 70          # RSI 高于此不追多
 FUNDING_CROWDED_SHORT = -0.05  # 资费(%/8h)低于此=空头已拥挤，禁追空
 FUNDING_OVERHEATED = 0.10      # 资费高于此=多头过热，禁追多
+OI_CAPITULATION = -8           # OI 24h 降幅超此(%)=杠杆清理近尾声，下跌空间被透支，禁追空
 
 
 def vet(symbol, decision, equity, ind, open_count, day_pnl_pct, total_dd_pct, open_notional=0.0):
@@ -66,6 +67,11 @@ def vet(symbol, decision, equity, ind, open_count, day_pnl_pct, total_dd_pct, op
             return False, f"资费 {fr:.3f}%/8h 极端偏空，空头拥挤不追空", None
         if bias == "LONG" and fr >= FUNDING_OVERHEATED:
             return False, f"资费 {fr:.3f}%/8h 多头过热，不追多", None
+
+    # OI 清算闸门：持仓量24h大降=多头杠杆已被清洗，跌势燃料耗尽，此时追空最危险
+    oi = ind.get("oi_chg_pct")
+    if bias == "SHORT" and oi is not None and oi <= OI_CAPITULATION:
+        return False, f"OI 24h {oi:+.1f}% 杠杆清理近尾声，不追空", None
 
     # 入场区间闸门：LLM 行动卡给了入场区间，现价不在区间内 = 已错过好位置，不追单
     lo, hi = decision.get("entry_low"), decision.get("entry_high")
