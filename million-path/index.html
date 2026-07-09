@@ -148,13 +148,33 @@
   .rh-card.active .rh-head b::after{content:" ◀ 现在";color:var(--gold2);font-size:11px}
   .rh-head{display:flex;justify-content:space-between;align-items:baseline}
   .rh-sub{font-size:11px;color:var(--muted);margin:4px 0 6px}
-  .rh-card ul{margin:0;padding-left:16px;font-size:12px;line-height:1.7}
-  .rh-card li{color:var(--muted)}
+  .rh-card ul{margin:0;padding-left:2px;font-size:12px;line-height:1.7;list-style:none}
+  .rh-card li{color:var(--muted);margin-bottom:4px}
   .rh-val{color:var(--text)}
-  .rh-val b{color:var(--gold2)}
+  /* 语义色：绿=机会/健康 红=风险/警报 金=中性/等待 白=关键数据 */
+  .rh-val .w,.rh-focus .w{color:#fff;font-weight:700;font-variant-numeric:tabular-nums}
+  .rh-val .g,.rh-focus .g{color:var(--green);font-weight:600}
+  .rh-val .r,.rh-focus .r{color:var(--red);font-weight:600}
+  .rh-val .y,.rh-focus .y{color:var(--gold2);font-weight:600}
+  .sd{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:1px}
+  .sd-g{background:var(--green);box-shadow:0 0 6px rgba(22,199,132,.9)}
+  .sd-r{background:var(--red);box-shadow:0 0 6px rgba(234,57,67,.9);animation:pulse 1.6s infinite}
+  .sd-y{background:var(--gold);box-shadow:0 0 6px rgba(240,185,11,.9)}
   .rh-plans{margin-top:8px;font-size:12px;line-height:1.65}
   .rh-plans .plan{background:var(--chip);border:1px solid var(--border);border-radius:8px;padding:7px 9px;margin-top:6px}
   .rh-plans .plan b:first-child{color:var(--gold2)}
+  .rh-plans .p-a{border-left:3px solid var(--red)}
+  .rh-plans .p-b{border-left:3px solid var(--green)}
+  .rh-plans .p-c{border-left:3px solid var(--gold)}
+  .rh-plans .plan .w{color:#fff;font-weight:700}
+  .rh-plans .plan .r{color:var(--red);font-weight:600}
+  .rh-plans .plan .g{color:var(--green);font-weight:600}
+  /* 今日焦点横幅 */
+  .rh-focus{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 12px;padding:10px 13px;
+    background:linear-gradient(135deg,rgba(240,185,11,.10),rgba(22,199,132,.05) 60%,transparent),var(--chip);
+    border:1px solid #33476e;border-radius:10px;font-size:13px}
+  .rh-focus .fseg{display:inline-flex;align-items:center;gap:5px}
+  .rh-focus .fsep{color:var(--border)}
   /* 加密新闻：双列瀑布流 + 自动滚动 */
   .news-masonry{display:flex;gap:14px}
   .news-col{flex:1;min-width:0;height:360px;overflow:hidden;position:relative;-webkit-mask-image:linear-gradient(180deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(180deg,transparent,#000 6%,#000 94%,transparent)}
@@ -259,7 +279,8 @@
   <!-- 一日节奏（一人投资体系 · 欧洲时区） -->
   <section id="sec-rhythm" class="panel">
     <h2><span class="bar"></span>📅 一日节奏 · 一人投资体系<span class="badge" id="rhythmNow" style="margin-left:auto;font-weight:400"></span></h2>
-    <div class="badge" style="margin-bottom:12px">优势不是比别人早几秒拿到消息，而是：<b>欧洲白天完成研究 → 美股开盘前备好预案 → 开盘后只验证条件</b>。当前时段高亮。</div>
+    <div class="badge" style="margin-bottom:10px">优势不是比别人早几秒拿到消息，而是：<b>欧洲白天完成研究 → 美股开盘前备好预案 → 开盘后只验证条件</b>。当前时段高亮。</div>
+    <div class="rh-focus" id="rhFocus" style="display:none"></div>
     <div class="rhythm-grid" id="rhythmGrid">
       <div class="rh-card" data-phase="0">
         <div class="rh-head"><b>① 欧洲上午</b><span class="badge">07:00–14:00</span></div>
@@ -441,7 +462,7 @@
     ⚠️ 本看板为纪律与复盘工具，行情数据仅供参考、可能延迟或因网络/地区受限；<b>不构成投资建议</b>，加密交易可能损失全部本金。任何收益目标必须服从风控。
   </div>
 
-  <script src="./config.js?v=31"></script>
-  <script src="./assets/app.js?v=31"></script>
+  <script src="./config.js?v=32"></script>
+  <script src="./assets/app.js?v=32"></script>
 </body>
 </html>
