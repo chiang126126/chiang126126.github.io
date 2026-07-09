@@ -848,24 +848,24 @@ function computeDecision() {
   const headwind = negC.length ? `但存在逆风：${negC.join("、")}——` : "";
   const tailwind = posC.length ? `但有顺风支撑：${posC.join("、")}——` : "";
   let v1;
-  if (g === "risk-off") v1 = { tone: "r", t: `领先信息偏空：${negC.join("、") || "跨市场信号走弱"}——全球资金在降风险，对加密构成压制。${tailwind}${tailwind ? "信号非一边倒，" : ""}今日以防守/顺势空视角为主，反弹先视为做空观察区而非抄底机会。${gap != null && gap <= -2 && btc && Math.abs(btc.chg) < 1 ? "另注意：BTC自身尚稳，MSTR弱或为公司因素，勿机械看空。" : ""}` };
-  else if (g === "risk-on") v1 = { tone: "g", t: `领先信息偏多：${posC.join("、") || "跨市场信号回暖"}——全球资金在加风险，对加密是顺风。${headwind}${headwind ? "需警惕该分歧，" : ""}回调可视为顺势参与机会，但仍需第二层确认传导。` };
-  else if (g === "mixed") v1 = { tone: "y", t: `领先信息混杂：顺风(${posC.join("、") || "无"}) vs 逆风(${negC.join("、") || "无"})——机构方向未定。此时最容易被单一消息带偏，降低仓位预期，等待传导明朗。` };
-  else v1 = { tone: "y", t: "领先信息不足（等机器人跨市场快照）——缺全球风偏判定时，默认降低出手频率。" };
+  if (g === "risk-off") v1 = { tone: "r", s: "偏空 · 全球资金在降风险", t: `领先信息偏空：${negC.join("、") || "跨市场信号走弱"}——全球资金在降风险，对加密构成压制。${tailwind}${tailwind ? "信号非一边倒，" : ""}今日以防守/顺势空视角为主，反弹先视为做空观察区而非抄底机会。${gap != null && gap <= -2 && btc && Math.abs(btc.chg) < 1 ? "另注意：BTC自身尚稳，MSTR弱或为公司因素，勿机械看空。" : ""}` };
+  else if (g === "risk-on") v1 = { tone: "g", s: "偏多 · 全球资金在加风险", t: `领先信息偏多：${posC.join("、") || "跨市场信号回暖"}——全球资金在加风险，对加密是顺风。${headwind}${headwind ? "需警惕该分歧，" : ""}回调可视为顺势参与机会，但仍需第二层确认传导。` };
+  else if (g === "mixed") v1 = { tone: "y", s: "混杂 · 机构方向未定", t: `领先信息混杂：顺风(${posC.join("、") || "无"}) vs 逆风(${negC.join("、") || "无"})——机构方向未定。此时最容易被单一消息带偏，降低仓位预期，等待传导明朗。` };
+  else v1 = { tone: "y", s: "数据不足 · 降低出手频率", t: "领先信息不足（等机器人跨市场快照）——缺全球风偏判定时，默认降低出手频率。" };
 
   let v2;
-  if (!reg || reg.key === "neutral") v2 = { tone: "y", t: "传导判断：日线中性、币圈自身无方向——传统市场的波动尚未形成有效传导。方向交给区间突破决定，中枢位置开仓盈亏比不足。" };
-  else if (bias === "SHORT") v2 = { tone: "r", t: `传导已确认：日线偏空且小时级同向${r.oiChg != null && r.oiChg > 2 ? "，OI上升＝新空进场、下跌仍有燃料" : ""}${funding != null && Math.abs(funding) < 0.05 ? "，资费正常无拥挤" : ""} → 顺势做空成立，按第三层区间执行。` };
-  else if (bias === "LONG") v2 = { tone: "g", t: `传导已确认：日线偏多且小时级同向${r.oiChg != null && r.oiChg > 2 ? "，OI上升＝新多进场、趋势健康" : ""}${funding != null && funding < 0.05 ? "，资费未过热" : ""} → 顺势做多成立，按第三层区间执行。` };
-  else v2 = { tone: "y", t: `传导未确认：${flatWhy.join("；") || "日线方向与小时级结构不同频"}——方向可能在酝酿但结构不支持进场，此刻出手是把纪律让位给情绪。` };
+  if (!reg || reg.key === "neutral") v2 = { tone: "y", s: "传导未形成 · 币圈无方向", t: "传导判断：日线中性、币圈自身无方向——传统市场的波动尚未形成有效传导。方向交给区间突破决定，中枢位置开仓盈亏比不足。" };
+  else if (bias === "SHORT") v2 = { tone: "r", s: "传导成立 · 顺势做空", t: `传导已确认：日线偏空且小时级同向${r.oiChg != null && r.oiChg > 2 ? "，OI上升＝新空进场、下跌仍有燃料" : ""}${funding != null && Math.abs(funding) < 0.05 ? "，资费正常无拥挤" : ""} → 顺势做空成立，按第三层区间执行。` };
+  else if (bias === "LONG") v2 = { tone: "g", s: "传导成立 · 顺势做多", t: `传导已确认：日线偏多且小时级同向${r.oiChg != null && r.oiChg > 2 ? "，OI上升＝新多进场、趋势健康" : ""}${funding != null && funding < 0.05 ? "，资费未过热" : ""} → 顺势做多成立，按第三层区间执行。` };
+  else v2 = { tone: "y", s: "传导未确认 · 结构不支持", t: `传导未确认：${flatWhy.join("；") || "日线方向与小时级结构不同频"}——方向可能在酝酿但结构不支持进场，此刻出手是把纪律让位给情绪。` };
 
   let v3;
   if (bias !== "FLAT" && entry) {
     const dev30h2 = (px / ma30h - 1) * 100;
-    v3 = { tone: bias === "SHORT" ? "r" : "g",
+    v3 = { tone: bias === "SHORT" ? "r" : "g", s: "值得下注 · 按区间执行",
       t: `值得下注：位置${Math.abs(dev30h2) <= 2.5 ? "合理" : "偏远(谨慎)"}（距30h线 ${pcs(dev30h2)}）、目标2.25%足以覆盖0.1%成本+滑点、${earn ? "⚠今日有重点财报，留意波动窗口" : "无重大事件冲突"} → 按区间挂单执行，单笔风险≤1%，触失效位无条件认错离场。` };
   } else {
-    v3 = { tone: "y", t: `今日不出手：${flatWhy.join("；") || (incomplete.length ? "数据不全(" + incomplete.join("、") + ")" : "开仓条件不齐")} → FLAT是主动决策不是错过。资金留给条件成立的那一笔，等待预案触发。` };
+    v3 = { tone: "y", s: "条件不齐 · 等区间突破", t: `今日不出手：${flatWhy.join("；") || (incomplete.length ? "数据不全(" + incomplete.join("、") + ")" : "开仓条件不齐")} → FLAT是主动决策不是错过。资金留给条件成立的那一笔，等待预案触发。` };
     if (r.prevH != null && r.prevL != null) {
       l3.push(`上行触发：1h收盘站上昨高 ${money(r.prevH)} → 转多头观察，按预案B执行`);
       l3.push(`下行触发：1h收盘跌破昨低 ${money(r.prevL)} → 转空头观察，按预案A执行`);
@@ -881,9 +881,40 @@ function computeDecision() {
   const advice = reg ? ADVICE[reg.key] : ADVICE.neutral;
   const triggers = (bias === "FLAT" && r.prevH != null && r.prevL != null)
     ? { up: r.prevH, down: r.prevL, mid: ma30h } : null;
+
+  // ── 传导链节点的数据芯片（名称+数值+色调；负号用 U+2212 防断行）
+  const sgn = x => x == null ? null : (x >= 0 ? "+" : "−") + Math.abs(x).toFixed(2) + "%";
+  const sT = x => x == null ? "" : x >= 0 ? "g" : "r";
+  const c1 = [];
+  if (xm.nq_chg != null) c1.push({ k: "纳指期货", v: sgn(xm.nq_chg), t: sT(xm.nq_chg) });
+  if (xm.dxy_chg != null) c1.push({ k: "美元", v: sgn(xm.dxy_chg), t: sT(xm.dxy_chg) });
+  if (xm.tnx != null) c1.push({ k: "10Y", v: xm.tnx + "%", t: "" });
+  if (gap != null) c1.push({ k: "MSTR−BTC", v: gap <= -2 ? "超额弱势" : gap >= 1.5 ? "率先转强" : "无背离", t: gap <= -2 ? "r" : gap >= 1.5 ? "g" : "" });
+  if (nvda != null) c1.push({ k: "NVDA", v: sgn(nvda), t: sT(nvda) });
+  const c2 = [];
+  if (reg) c2.push({ k: "日线", v: reg.key === "neutral" ? "贴30日线" : (reg.key === "risk-on" ? "偏多 " : "偏空 ") + sgn(reg.dev), t: reg.key === "neutral" ? "y" : reg.key === "risk-on" ? "g" : "r" });
+  if (r.ethbtc != null) c2.push({ k: "ETH/BTC", v: sgn(r.ethbtc), t: sT(r.ethbtc) });
+  if (r.solbtc != null) c2.push({ k: "SOL/BTC", v: sgn(r.solbtc), t: sT(r.solbtc) });
+  if (r.oiChg != null) c2.push({ k: "OI 24h", v: sgn(r.oiChg), t: r.oiChg <= -8 ? "r" : sT(r.oiChg) });
+  if (r.volRatio != null) c2.push({ k: "量能", v: r.volRatio.toFixed(1) + "×", t: r.volRatio >= 1.8 ? "y" : "" });
+  if (funding != null) c2.push({ k: "资费", v: (funding >= 0 ? "+" : "−") + Math.abs(funding).toFixed(4) + "%", t: (funding <= -0.05 || funding >= 0.10) ? "r" : "g" });
+  if (fng) c2.push({ k: "情绪", v: fng.v + " " + fng.label, t: fng.v <= 25 ? "r" : fng.v >= 75 ? "y" : "" });
+  const c3 = [];
+  if (bias !== "FLAT" && entry) {
+    c3.push({ k: "入场", v: `${money(entry[0])}–${money(entry[1])}`, t: bias === "SHORT" ? "r" : "g" });
+    if (ma30h) c3.push({ k: "失效", v: `30h线 ${money(ma30h)}`, t: "y" });
+    if (target) c3.push({ k: "目标", v: `${money(target)} · 1.5R`, t: "" });
+    if (px && ma30h) c3.push({ k: "距30h线", v: sgn((px / ma30h - 1) * 100), t: "" });
+  } else if (triggers) {
+    c3.push({ k: "上破", v: `${money(triggers.up)}→预案B`, t: "g" });
+    c3.push({ k: "下破", v: `${money(triggers.down)}→预案A`, t: "r" });
+    if (triggers.mid) c3.push({ k: "30h中枢", v: money(triggers.mid), t: "" });
+    c3.push({ k: "复评", v: "每60秒", t: "" });
+  }
+
   return { state, bias, conf, symbol: bias === "FLAT" ? "—" : symbol, entry, invalid, target, triggers,
            maxHold: bias === "FLAT" ? "—" : "≤48小时（超时无进展离场）",
-           move, l1, l2, l3, v1, v2, v3, summary, flags, bans, advice };
+           move, l1, l2, l3, v1, v2, v3, c1, c2, c3, summary, flags, bans, advice };
 }
 function renderDecision() {
   const box = $("decisionBox"); if (!box) return;
@@ -892,15 +923,18 @@ function renderDecision() {
   const stCls = d.state === "risk-on" ? "risk-on" : d.state === "risk-off" ? "risk-off" : "neutral";
   const bar = Math.round(d.conf * 100);
   const zone = d.entry ? `${money(d.entry[0])} – ${money(d.entry[1])}` : "—";
-  const tcol = { r: "var(--red)", g: "var(--green)", y: "var(--gold2)" };
-  const tbg = { r: "rgba(234,57,67,.09)", g: "rgba(22,199,132,.09)", y: "rgba(240,185,11,.09)" };
-  // 数据项：涨跌%按符号着色、"→"后的解读弱化，扫读时先看数字
-  const decoItem = x => x
-    .replace(/([+\-]\d+\.?\d*%)/g, m => `<b style="color:${m.startsWith("-") ? "var(--red)" : "var(--green)"};font-variant-numeric:tabular-nums">${m}</b>`)
-    .replace(/→ (.+)$/, '→ <span style="color:var(--muted)">$1</span>');
-  const layer = (t, arr, v) => `<div class="dec-layer"><div class="k">${t}</div>
-    <div class="items">${arr.map(x => "· " + decoItem(x)).join("<br>") || "—"}</div>
-    ${v ? `<div class="dec-verdict" style="background:${tbg[v.tone]};border-left:3px solid ${tcol[v.tone]}"><b style="color:${tcol[v.tone]}">📌 </b>${v.t}</div>` : ""}</div>`;
+  // 传导链（方案1）：节点=层（信号灯+短结论+数据芯片+分析），箭头=层间传导状态
+  const chipH = c => `<span class="dchip"><span class="k">${c.k}</span><b class="${c.t}">${c.v}</b></span>`;
+  const nodeH = (title, v, chips) => `<div class="dnode ${v.tone === "g" ? "pass" : v.tone === "r" ? "neg" : "wait"}">
+    <div class="hd"><span class="ndot ${v.tone}"></span>${title}</div>
+    <div class="vd ${v.tone}">${v.s || ""}</div>
+    <div class="dchips">${(chips || []).map(chipH).join("") || '<span class="dchip"><b>数据加载中…</b></span>'}</div>
+    <div class="ex">📌 ${v.t}</div></div>`;
+  const linkH = L => `<div class="dlink ${L.cls}"><span class="ar">${L.ar}</span><span class="lb">${L.lb}</span></div>`;
+  const link1 = d.v1.tone === "g" ? { cls: "ok", ar: "➤", lb: "顺风传入" }
+    : d.v1.tone === "r" ? { cls: "neg", ar: "➤", lb: "逆风传入" } : { cls: "cut", ar: "⇢", lb: "信号模糊" };
+  const link2 = d.bias === "LONG" ? { cls: "ok", ar: "➤", lb: "传导成立" }
+    : d.bias === "SHORT" ? { cls: "neg", ar: "➤", lb: "传导成立" } : { cls: "cut", ar: "⇢", lb: "传导中断" };
   // 综合决策：价格白亮、方向词着色，一眼锁定关键要素
   const hiSummary = (d.summary || "")
     .replace(/\$[\d,\.]+/g, m => `<b style="color:#fff;font-variant-numeric:tabular-nums">${m}</b>`)
@@ -940,10 +974,18 @@ function renderDecision() {
       <div class="card"><div class="k">目标位（≥1.5R）</div><div class="v" style="font-size:14px">${d.target ? money(d.target) : "—"}</div></div>
       <div class="card"><div class="k">最大持仓时间</div><div class="v" style="font-size:13px">${d.maxHold}</div></div>
     </div>`}
-    <div class="dec-layers">
-      ${layer("第一层 · 领先信息｜全球资金在加还是降风险？", d.l1, d.v1)}
-      ${layer("第二层 · 加密确认｜是否真传导到币圈？", d.l2, d.v2)}
-      ${layer("第三层 · 执行条件｜值不值得下这笔单？", d.l3, d.v3)}
+    <div class="dflow-wrap">
+      <div class="dflow">
+        ${nodeH("第一层 · 领先信息｜全球资金方向", d.v1, d.c1)}
+        ${linkH(link1)}
+        ${nodeH("第二层 · 加密确认｜是否传导到币圈", d.v2, d.c2)}
+        ${linkH(link2)}
+        ${nodeH("第三层 · 执行条件｜值不值得下单", d.v3, d.c3)}
+      </div>
+      <div class="dflow-out" style="border-color:${bcol};background:linear-gradient(135deg,${bbg},transparent 60%)">
+        <span class="big" style="color:${bcol}">${d.bias === "FLAT" ? "⏸ 今日不出手 · FLAT" : (d.bias === "LONG" ? "▶ 顺势做多 " : "▶ 顺势做空 ") + d.symbol.split("（")[0]}</span>
+        <span class="sub">${d.bias === "FLAT" ? "FLAT 是主动决策不是错过——资金留给条件成立的那一笔，触发预案后行动卡自动生成。" : "按上方入场区间/失效位/目标位执行；单笔风险≤1%本金，触失效位无条件离场。"}</span>
+      </div>
     </div>
     <div class="dec-foot">
       <div class="card" style="margin:0;border-color:${d.flags.length ? 'var(--red)' : 'var(--border)'}"><div class="k">风险提示 risk flags</div>

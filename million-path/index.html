@@ -152,13 +152,41 @@
   #sec-env.mood-neutral{border-color:#33476e}
   #sec-env.mood-greed{border-color:#1f6a44;box-shadow:0 0 0 1px rgba(22,199,132,.24),0 8px 30px rgba(22,199,132,.11)}
   #sec-env.mood-exgreed{border-color:#16c784;box-shadow:0 0 0 1px rgba(22,199,132,.38),0 8px 34px rgba(22,199,132,.17)}
-  /* AI决策快照·三层布局 */
-  .dec-layers{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
-  @media(max-width:900px){.dec-layers{grid-template-columns:1fr}}
-  .dec-layer{display:flex;flex-direction:column;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin:0}
-  .dec-layer .k{font-size:11px;color:var(--muted);padding-bottom:7px;border-bottom:1px solid rgba(31,44,68,.55);margin-bottom:7px}
-  .dec-layer .items{font-size:12px;line-height:1.75;color:var(--text);flex:1}
-  .dec-verdict{margin-top:9px;padding:7px 10px;border-radius:8px;font-size:12px;line-height:1.65}
+  /* AI决策快照·三层传导链（方案1）：节点=层，箭头=层间传导状态 */
+  .dflow-wrap{margin-bottom:8px}
+  .dflow{display:grid;grid-template-columns:1fr 30px 1fr 30px 1fr;align-items:stretch}
+  .dnode{border:1px solid var(--border);border-radius:12px;background:var(--panel2);padding:11px 12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+  .dnode.pass{border-color:rgba(22,199,132,.45);background:linear-gradient(160deg,rgba(22,199,132,.10),var(--panel2) 55%)}
+  .dnode.wait{border-color:rgba(240,185,11,.45);background:linear-gradient(160deg,rgba(240,185,11,.10),var(--panel2) 55%)}
+  .dnode.neg{border-color:rgba(234,57,67,.45);background:linear-gradient(160deg,rgba(234,57,67,.10),var(--panel2) 55%)}
+  .dnode .hd{display:flex;align-items:center;gap:7px;font-size:10.5px;color:var(--muted);letter-spacing:.5px}
+  .dnode .vd{font-size:13px;font-weight:700;line-height:1.5}
+  .dnode .vd.g{color:var(--green)}.dnode .vd.r{color:var(--red)}.dnode .vd.y{color:var(--gold2)}
+  .dnode .ex{font-size:11px;color:var(--muted);line-height:1.65;border-top:1px dashed var(--border);padding-top:7px;margin-top:auto}
+  .ndot{width:9px;height:9px;border-radius:50%;flex:none}
+  .ndot.g{background:var(--green);box-shadow:0 0 7px rgba(22,199,132,.7)}
+  .ndot.y{background:var(--gold);box-shadow:0 0 7px rgba(240,185,11,.7)}
+  .ndot.r{background:var(--red);box-shadow:0 0 7px rgba(234,57,67,.7)}
+  .dchips{display:flex;flex-wrap:wrap;gap:5px}
+  .dchip{display:inline-flex;align-items:baseline;gap:5px;border:1px solid var(--border);border-radius:7px;background:rgba(8,13,26,.55);padding:2px 7px;font-size:11px;white-space:nowrap}
+  .dchip .k{color:var(--muted);font-size:10px;opacity:.8}
+  .dchip b{font-variant-numeric:tabular-nums;font-weight:600}
+  .dchip b.g{color:var(--green)}.dchip b.r{color:var(--red)}.dchip b.y{color:var(--gold2)}
+  .dlink{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+  .dlink .ar{font-size:16px;line-height:1}
+  .dlink .lb{writing-mode:vertical-rl;font-size:9.5px;letter-spacing:2px}
+  .dlink.ok .ar,.dlink.ok .lb{color:var(--green)}
+  .dlink.cut .ar,.dlink.cut .lb{color:var(--gold2)}
+  .dlink.neg .ar,.dlink.neg .lb{color:var(--red)}
+  .dflow-out{margin-top:10px;border:1px solid var(--border);border-radius:12px;padding:10px 14px;display:flex;gap:6px 14px;align-items:baseline;flex-wrap:wrap}
+  .dflow-out .big{font-size:14px;font-weight:800;white-space:nowrap}
+  .dflow-out .sub{font-size:11.5px;color:var(--muted);line-height:1.6;flex:1;min-width:220px}
+  @media(max-width:700px){
+    .dflow{grid-template-columns:1fr}
+    .dlink{flex-direction:row;height:32px;gap:8px}
+    .dlink .ar{transform:rotate(90deg)}
+    .dlink .lb{writing-mode:horizontal-tb;letter-spacing:2px}
+  }
   .dec-foot{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
   @media(max-width:720px){.dec-foot{grid-template-columns:1fr}}
   /* 交易统计日历 */
@@ -534,7 +562,7 @@
     ⚠️ 本看板为纪律与复盘工具，行情数据仅供参考、可能延迟或因网络/地区受限；<b>不构成投资建议</b>，加密交易可能损失全部本金。任何收益目标必须服从风控。
   </div>
 
-  <script src="./config.js?v=49"></script>
-  <script src="./assets/app.js?v=49"></script>
+  <script src="./config.js?v=50"></script>
+  <script src="./assets/app.js?v=50"></script>
 </body>
 </html>
