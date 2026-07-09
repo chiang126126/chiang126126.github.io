@@ -11,6 +11,10 @@ cd "$(dirname "$0")"                       # 进入 mp500-bot 目录
 echo "──────── $(date '+%F %T %Z') 开始运行 ────────"
 echo "python3: $(command -v python3 || echo '未找到!')  git: $(command -v git || echo '未找到!')"
 
+# 与分钟级守护层(run_guardian.sh)互斥：小时主循环优先级高，最多等5分钟
+source ./lock.sh
+acquire_lock 300 || { echo "[warn] 等锁超时，跳过本轮"; exit 0; }
+
 # 读 .env（MODE / LLM_API_KEY / BINANCE_TESTNET_* / DATA_REPO）
 set -a; [ -f .env ] && . ./.env; set +a
 

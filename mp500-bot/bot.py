@@ -251,27 +251,13 @@ def main():
                 print(f"[warn] {c['MODE']} 平仓失败，保留持仓下次重试: {e}")
                 still_open.append(pos)
                 continue
-        long = pos.get("side", "LONG") == "LONG"
-        gross = (exit_price - pos["entry"]) * pos["qty"] if long else (pos["entry"] - exit_price) * pos["qty"]
-        fee_out = exit_price * pos["qty"] * FEE
-        fee_total = pos.get("fee_in", 0) + fee_out
-        pnl = gross - pos.get("fee_in", 0) - fee_out
-        closed = now_iso()
-        mfe_price = pos.get("mfe_price", pos["entry"])
-        mfe_pct = max(0.0, (mfe_price / pos["entry"] - 1) * 100 if long else (pos["entry"] / mfe_price - 1) * 100)
-        hold_h = _hold_hours(pos.get("opened_at"), closed)
-        analysis = _trade_analysis(pos, reason, pnl, mfe_pct)
-        state["equity"] += pnl
-        trades.append({**pos, "exit": exit_price, "exit_reason": reason, "pnl": round(pnl, 4),
-                       "r": round(pnl / pos["risk_usdt"], 2) if pos.get("risk_usdt") else 0,
-                       "outcome": "WIN" if pnl > 0 else "LOSS" if pnl < 0 else "BE",
-                       "fee_total": round(fee_total, 4), "mfe_pct": round(mfe_pct, 2),
-                       "hold_hours": round(hold_h, 1), "analysis": analysis,
-                       "closed_at": closed})
+        trade = settle_close(pos, exit_price, reason)
+        state["equity"] += trade["pnl"]
+        trades.append(trade)
         closed_this_run.add(pos["symbol"])
         log["items"].append({"symbol": pos["symbol"], "action": f"CLOSE {reason}",
-                             "price": round(exit_price, 2), "pnl": round(pnl, 2)})
-        print(f"[exit] {pos['symbol']} {reason} @ {exit_price:.2f} pnl={pnl:.2f}")
+                             "price": round(exit_price, 2), "pnl": round(trade["pnl"], 2)})
+        print(f"[exit] {pos['symbol']} {reason} @ {exit_price:.2f} pnl={trade['pnl']:.2f}")
     state["positions"] = still_open
     open_syms = {p["symbol"] for p in state["positions"]}
 
@@ -399,6 +385,26 @@ def _hold_hours(opened_at, closed_at):
         return max(0.0, (c - o).total_seconds() / 3600)
     except Exception:
         return 0.0
+
+
+def settle_close(pos, exit_price, reason, tag=""):
+    """平仓记账（小时主循环与分钟级守护层共用同一本账）。返回完整 trade 记录。"""
+    long = pos.get("side", "LONG") == "LONG"
+    gross = (exit_price - pos["entry"]) * pos["qty"] if long else (pos["entry"] - exit_price) * pos["qty"]
+    fee_out = exit_price * pos["qty"] * FEE
+    fee_total = pos.get("fee_in", 0) + fee_out
+    pnl = gross - pos.get("fee_in", 0) - fee_out
+    closed = now_iso()
+    mfe_price = pos.get("mfe_price", pos["entry"])
+    mfe_pct = max(0.0, (mfe_price / pos["entry"] - 1) * 100 if long else (pos["entry"] / mfe_price - 1) * 100)
+    hold_h = _hold_hours(pos.get("opened_at"), closed)
+    analysis = _trade_analysis(pos, reason, pnl, mfe_pct) + (tag or "")
+    return {**pos, "exit": exit_price, "exit_reason": reason, "pnl": round(pnl, 4),
+            "r": round(pnl / pos["risk_usdt"], 2) if pos.get("risk_usdt") else 0,
+            "outcome": "WIN" if pnl > 0 else "LOSS" if pnl < 0 else "BE",
+            "fee_total": round(fee_total, 4), "mfe_pct": round(mfe_pct, 2),
+            "hold_hours": round(hold_h, 1), "analysis": analysis,
+            "closed_at": closed}
 
 
 def _trade_analysis(pos, reason, pnl, mfe_pct):
