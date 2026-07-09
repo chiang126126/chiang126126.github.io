@@ -1277,6 +1277,32 @@ function keyEvents(items, n) {
 }
 
 let _rhCache = {};   // 节奏面板的行情缓存（昨高低/量比/OI等，避免重复请求）
+// 信号灯检查单行：灯 · 项名 · 数值(等宽右对齐) · 微结论
+const chkRow = (dot, label, val, concl) =>
+  `<tr><td width="15">${sd(dot)}</td><td class="it">${label}</td><td class="n">${val}</td><td class="cc">${concl}</td></tr>`;
+// 价格标尺：昨低→昨高 三色区（破位空区/FLAT区/突破多区），标记30日线/30h线/现价+触发距离
+function renderLadder(price, prevL, prevH, ma30d, ma30h) {
+  if ([price, prevL, prevH].some(x => x == null) || prevH <= prevL) return null;
+  const pos = v => {
+    if (v <= prevL) return Math.max(2, 14 - (prevL - v) / prevL * 800);      // 压进红区
+    if (v >= prevH) return Math.min(98, 86 + (v - prevH) / prevH * 800);     // 压进绿区
+    return 14 + (v - prevL) / (prevH - prevL) * 72;
+  };
+  const dUp = (prevH / price - 1) * 100, dDn = (price / prevL - 1) * 100;
+  const sub = price > prevH ? "已突破昨高！" : price < prevL ? "已跌破昨低！"
+    : `距上破 ${dUp.toFixed(1)}%｜距下破 ${dDn.toFixed(1)}%`;
+  const mark = (v, name, top2) => (v == null || v <= prevL * 0.985 || v >= prevH * 1.015) ? "" :
+    `<div class="lad-mark" style="left:${pos(v).toFixed(1)}%"><i class="${top2 ? "t2" : "t"}">${name}</i><i class="b">${fmt(v, 0)}</i></div>`;
+  return `<div class="lad">
+    <div class="lad-zones"><div class="lz-s"></div><div class="lz-f"></div><div class="lz-l"></div></div>
+    ${mark(ma30h, "30h线")}${mark(ma30d, "30日线", true)}
+    <div class="lad-px" style="left:${pos(price).toFixed(1)}%"><i>${fmt(price, 0)}</i><s>${sub}</s></div>
+    <div class="lad-cap" style="left:0;color:var(--red)">◀ 空区·预案A</div>
+    <div class="lad-cap" style="right:0;color:var(--green)">多区·预案B ▶</div>
+    <div class="lad-end" style="left:0">${fmt(prevL, 0)}</div>
+    <div class="lad-end" style="right:0">${fmt(prevH, 0)}</div>
+  </div>`;
+}
 async function loadRhythmLive() {
   if (!$("rhythmGrid")) return;
   const set = (id, html) => { const el = $(id); if (el && html) el.innerHTML = html; };
@@ -1324,32 +1350,63 @@ async function loadRhythmLive() {
   const mstrLive = usQ("MSTR") != null;
   const btc24 = btc ? btc.chg : (xm0 ? xm0.btc_chg : null);
 
-  // ① 欧洲上午
-  set("rhLevels", levelVerdict(price, r.prevH, r.prevL, ma30d) || "数据不可用");
-  set("rhUsBg", usBgVerdict(xm0 ? xm0.nq_chg : null, mstrChg, btc24) || "等机器人跨市场快照…");
-  set("rhRel", relVerdict(r.ethbtc, r.solbtc) || "数据不可用");
-  set("rhVol", volVerdict(r.volRatio) || "数据不可用");
-  set("rhFund", fundOiVerdict(funding, r.oiChg) || "数据不可用");
+  // ① 欧洲上午 = 标尺(主视觉) + 信号灯检查单
+  const lad = renderLadder(price, r.prevL, r.prevH, ma30d, r.ma30h);
+  set("rhLadder", lad || '<div class="badge" style="margin-top:8px">标尺数据不可用</div>');
+  const rows1 = [];
+  if (r.ethbtc != null || r.solbtc != null) {
+    const strong = [r.ethbtc, r.solbtc].filter(x => x != null && x >= 0.5).length;
+    const weak = [r.ethbtc, r.solbtc].filter(x => x != null && x <= -0.5).length;
+    const [d1, c1] = strong >= 2 ? ["g", tg("下沉·risk-on确认")] : strong === 1 ? ["y", ty("局部轮动")]
+      : weak >= 1 ? ["r", tr("高β回避·防御")] : ["y", "无偏向"];
+    rows1.push(chkRow(d1, "相对强弱", `ETH${sgnT(r.ethbtc)}·SOL${sgnT(r.solbtc)}`, c1));
+  }
+  if (r.volRatio != null)
+    rows1.push(chkRow(r.volRatio >= 1.8 ? "r" : r.volRatio >= 1.3 ? "y" : "g", "夜间量能",
+      tw(r.volRatio.toFixed(1) + "×常态"),
+      r.volRatio >= 1.8 ? tr("异常放量！查事件") : r.volRatio >= 1.3 ? ty("偏高留意") : tg("正常")));
+  if (funding != null || r.oiChg != null) {
+    const crowded = funding != null && funding <= -0.05, hot = funding != null && funding >= 0.10;
+    const capit = r.oiChg != null && r.oiChg <= -8;
+    const [d3, c3] = crowded ? ["r", tr("空头拥挤！")] : hot ? ["r", tr("多头过热！")]
+      : capit ? ["r", tr("清算尾声·勿追空")]
+      : funding != null && Math.abs(funding) >= 0.03 ? ["y", ty("偏热")] : ["g", tg("结构无风险")];
+    rows1.push(chkRow(d3, "资费 · OI", `${funding != null ? (funding >= 0 ? "+" : "") + funding.toFixed(4) + "%" : "n/a"}·OI${sgnT(r.oiChg, 1)}`, c3));
+  }
+  if (xm0 || mstrChg != null) {
+    const nq = xm0 ? xm0.nq_chg : null;
+    let d4 = "y", c4 = ty("无共振信号");
+    if (nq != null && mstrChg != null && btc24 != null) {
+      if (nq <= -0.3 && mstrChg < 0 && btc24 < 0) { d4 = "r"; c4 = tr("系统性risk-off"); }
+      else if (mstrChg <= -2 && Math.abs(btc24) < 1 && nq > -0.3) { d4 = "y"; c4 = ty("仅MSTR弱·勿空BTC"); }
+      else if (nq >= 0.3 && mstrChg > 0 && btc24 > 0) { d4 = "g"; c4 = tg("三者同暖"); }
+    }
+    rows1.push(chkRow(d4, "美股背景", `纳指${sgnT(nq)}·MSTR${sgnT(mstrChg)}`, c4));
+  }
+  set("rhChk1", rows1.join("") || '<tr><td class="badge">数据不可用</td></tr>');
   const evs = keyEvents(_newsItems, 3);
   set("rhEvents", evs.length
     ? sd("y") + evs.map(x => `<a href="${x.url}" target="_blank" rel="noopener" style="display:block">· ${x.title}</a>`).join("")
     : sd("g") + tg("未捕捉到") + " 政策/黑客/ETF/宏观 类高影响关键词事件");
 
-  // ② 美股盘前（跨市场快照来自机器人，每小时更新）
+  // ② 美股盘前 = 信号灯检查单（跨市场快照来自机器人，个股实时优先）
   const xm = (_botLog && _botLog.xm) || null;
   let mstrGap = null;
+  const rows2 = [];
   if (xm) {
     const gr = _botLog.global_risk;
     const grDot = gr === "risk-on" ? "g" : gr === "risk-off" ? "r" : "y";
-    set("rhMacro", `${sd(grDot)}纳指期货 ${sgnT(xm.nq_chg)}｜10Y ${xm.tnx != null ? tw(xm.tnx + "%") : "n/a"}(${sgnT(xm.tnx_chg)})｜DXY ${sgnT(xm.dxy_chg)} → 全球 <span class="${grDot === "g" ? "g" : grDot === "r" ? "r" : "y"}">${gr || "?"}</span>`);
-    const coinChg = usQ("COIN") ?? xm.coin_chg, nvdaChg = usQ("NVDA") ?? xm.nvda_chg;
+    rows2.push(chkRow(grDot, "期指/美债/美元", `纳指${sgnT(xm.nq_chg)}·10Y${xm.tnx != null ? tw(xm.tnx + "%") : "n/a"}·DXY${sgnT(xm.dxy_chg)}`,
+      `全球 <span class="${grDot === "g" ? "g" : grDot === "r" ? "r" : "y"}">${gr || "?"}</span>`));
+    const nvdaChg = usQ("NVDA") ?? xm.nvda_chg, coinChg = usQ("COIN") ?? xm.coin_chg;
     mstrGap = (mstrChg != null && xm.btc_chg != null) ? mstrChg - xm.btc_chg : null;
-    const mstrCn = mstrGap == null ? "" : mstrGap <= -2 ? ty("（MSTR超额弱势＝降杠杆信号；若BTC稳则或为公司自身问题，勿据此空BTC）")
-      : mstrGap >= 1.5 ? tg("（MSTR率先转强＝机构风偏恢复早期信号）") : "（无显著背离）";
-    set("rhStocks", `${sd(mstrGap != null && Math.abs(mstrGap) >= 2 ? "y" : "g")}MSTR ${sgnT(mstrChg)}｜COIN ${sgnT(coinChg)}｜NVDA ${sgnT(nvdaChg)} ${mstrLive ? '<span class="badge">实时</span>' : ""} ${mstrCn}`);
+    const [d2, c2] = mstrGap == null ? ["y", "—"]
+      : mstrGap <= -2 ? ["y", ty("超额弱势·勿据此空BTC")]
+      : mstrGap >= 1.5 ? ["g", tg("率先转强·风偏恢复")] : ["g", "无显著背离"];
+    rows2.push(chkRow(d2, `加密概念股${mstrLive ? "·实时" : ""}`, `MSTR${sgnT(mstrChg)}·COIN${sgnT(coinChg)}·NVDA${sgnT(nvdaChg)}`, c2));
     const xt = $("rhXmTime"); if (xt && _botLog.ts) xt.textContent = mstrLive ? "个股实时 · 期指快照" + ago(Math.floor(Date.parse(_botLog.ts) / 1000)).replace("前", "") + "前" : `快照 ${ago(Math.floor(Date.parse(_botLog.ts) / 1000))}`;
   }
-  // 今日财报（Finnhub 免费日历，30分钟缓存；宏观数据日历免费源无覆盖 → 指向 TradingView 板块）
+  // 今日财报（Finnhub 免费日历，30分钟缓存；宏观数据免费源无覆盖 → 指向经济日历板块）
   if (hasWorker() && Date.now() - (window._earnT || 0) > 1.8e6) {
     window._earnT = Date.now();
     try {
@@ -1359,11 +1416,10 @@ async function loadRhythmLive() {
     } catch (e) { window._earnCache = null; }
   }
   const earn = fmtEarnings(window._earnCache, MEGA_EARN);
-  set("rhEvCal", (window._earnCache == null
-      ? `${sd("y")}财报日历暂不可用`
-      : earn ? `${sd("y")}今日重点财报：${tw(earn)}（财报前后波动放大，谨慎持仓过报）`
-             : `${sd("g")}${tg("今日无重点科技/加密财报")}`)
-    + ` ｜ 宏观数据：<a href="#sec-env">查经济日历</a>（重大数据前后30分钟避免开新仓）`);
+  rows2.push(chkRow(window._earnCache == null ? "y" : earn ? "y" : "g", "今日财报",
+    earn ? tw(earn) : window._earnCache == null ? "暂不可用" : "无重点",
+    earn ? ty("谨慎持仓过报") : `<a href="#sec-env">查经济日历</a>`));
+  set("rhChk2", rows2.join("") || '<tr><td class="badge">等机器人快照…</td></tr>');
 
   const plans = genPlans({ price, prevH: r.prevH, prevL: r.prevL, ma30h: r.ma30h, ma30d, funding });
   if (plans) set("rhPlans", plans.map(p => `<div class="plan ${p.cls}"><b>${p.k}</b><span>${p.v}</span></div>`).join(""));
@@ -1378,45 +1434,57 @@ async function loadRhythmLive() {
       focus.map(s => `<span class="fsep">｜</span><span class="fseg">${s}</span>`).join("");
   }
 
-  // ③ 美股盘中·确认清单
+  // ③ 美股盘中 = 五项确认检查单
+  const rows3 = [];
   if (r.h3 && r.h3.length >= 4) {
-    const dirs = [r.h3[1] - r.h3[0], r.h3[2] - r.h3[1], r.h3[3] - r.h3[2]];
-    const ups = dirs.filter(x => x > 0).length;
-    const side = price != null && r.ma30h != null ? (price >= r.ma30h ? "30h线上方" : "30h线下方") : "";
-    const persistUp = ups >= 2 && price >= r.ma30h, persistDn = ups <= 1 && price < r.ma30h;
-    set("rhTrendNow", `${sd(persistUp ? "g" : persistDn ? "r" : "y")}近3根1h ${ups >= 2 ? "多数收涨" : ups <= 1 ? "多数收跌" : "涨跌互现"}·${side} → ${persistUp ? tg("上行有持续性") : persistDn ? tr("下行有持续性") : ty("方向未确认，不追")}`);
+    const ups = [r.h3[1] - r.h3[0], r.h3[2] - r.h3[1], r.h3[3] - r.h3[2]].filter(x => x > 0).length;
+    const side = price != null && r.ma30h != null ? (price >= r.ma30h ? "30h上" : "30h下") : "";
+    const pUp = ups >= 2 && price >= r.ma30h, pDn = ups <= 1 && price < r.ma30h;
+    rows3.push(chkRow(pUp ? "g" : pDn ? "r" : "y", "方向持续性",
+      `${ups >= 2 ? "多数收涨" : ups <= 1 ? "多数收跌" : "涨跌互现"}·${side}`,
+      pUp ? tg("上行持续") : pDn ? tr("下行持续") : ty("未确认·不追")));
   }
   if (mstrChg != null && btc) {
     const same = (mstrChg >= 0) === (btc.chg >= 0);
-    set("rhResonance", `${sd(same ? "g" : "y")}MSTR ${sgnT(mstrChg, 2)}(日) vs BTC ${sgnT(btc.chg, 1)}(24h) → ${same ? tg("同向共振，信号可信度↑") : ty("背离，降低置信度观望")}${mstrLive ? ' <span class="badge">实时</span>' : ' <span class="badge">小时快照</span>'}`);
+    rows3.push(chkRow(same ? "g" : "y", `股币共振${mstrLive ? "·实时" : ""}`,
+      `MSTR${sgnT(mstrChg)} vs BTC${sgnT(btc.chg, 1)}`,
+      same ? tg("共振·可信度↑") : ty("背离·降置信观望")));
   }
   if (price != null && r.prevL != null) {
-    set("rhBreak", price < r.prevL
-      ? (r.lastClose != null && r.lastClose < r.prevL
-        ? `${sd("r")}1h${tr("收盘确认跌破")}昨低 ${tw(money(r.prevL))} → ${tr("真破位")}`
-        : `${sd("y")}现价在昨低 ${tw(money(r.prevL))} 下方但未收盘确认 → ${ty("或为插针，等收盘")}`)
-      : `${sd("g")}未破昨低 ${tw(money(r.prevL))}，${tg("支撑尚在")}`);
+    const below = price < r.prevL, confirmed = below && r.lastClose != null && r.lastClose < r.prevL;
+    rows3.push(chkRow(confirmed ? "r" : below ? "y" : "g", "破位/插针", `昨低 ${tw(fmt(r.prevL, 0))}`,
+      confirmed ? tr("收盘确认真破位！") : below ? ty("未收盘·或插针") : tg("支撑尚在")));
   }
-  set("rhOi2", oiStructVerdict(r.oiChg, btc ? btc.chg : null) || "数据不可用");
+  if (r.oiChg != null && btc && btc.chg != null) {
+    const c = btc.chg, o = r.oiChg;
+    const [d5, c5] = c < 0 && o > 2 ? ["y", ty("新空进场·或延续")] : c < 0 && o < -2 ? ["r", tr("清算主导·勿追空")]
+      : c > 0 && o > 2 ? ["g", tg("新多进场·健康")] : c > 0 && o < -2 ? ["y", ty("空头回补·质量疑")] : ["g", "无杠杆结构变化"];
+    rows3.push(chkRow(d5, "OI 结构", `价${sgnT(c, 1)}·OI${sgnT(o, 1)}`, c5));
+  }
   if (funding != null) {
-    set("rhCrowd", funding <= -0.05 ? `${sd("r")}资费 ${tw(funding.toFixed(4) + "%")} → ${tr("空头极端拥挤，禁追空")}(闸门已拦)` :
-      funding >= 0.10 ? `${sd("r")}资费 ${tw("+" + funding.toFixed(4) + "%")} → ${tr("多头过热，禁追多")}(闸门已拦)` :
-      `${sd("g")}资费 ${tw((funding >= 0 ? "+" : "") + funding.toFixed(4) + "%/8h")} → ${tg("未拥挤")}，方向闸门正常放行`);
+    const crowded = funding <= -0.05, hot = funding >= 0.10;
+    rows3.push(chkRow(crowded || hot ? "r" : "g", "资费拥挤度",
+      tw((funding >= 0 ? "+" : "") + funding.toFixed(4) + "%/8h"),
+      crowded ? tr("禁追空！闸门已拦") : hot ? tr("禁追多！闸门已拦") : tg("未拥挤·放行")));
   }
+  set("rhChk3", rows3.join("") || '<tr><td class="badge">计算中…</td></tr>');
 
-  // ④ 盘后/亚洲·机器人值守（超2小时未运行=断档红色警报）
+  // ④ 盘后/亚洲 = 机器人心跳检查单（超2小时未运行=断档红色警报）
   if (_botState) {
     const secAgo = _botState.updated_at ? (Date.now() - Date.parse(_botState.updated_at)) / 1000 : null;
     const ts = secAgo != null ? ago(Math.floor(Date.parse(_botState.updated_at) / 1000)) : "?";
     const stale = secAgo != null && secAgo > 7200;
     const n = (_botState.positions || []).length;
-    set("rhBot", stale
-      ? `${sd("r")}最近运行 ${tr(ts)}·${_botState.mode || ""} → ${tr("疑似断档！检查 Mac 的 cron 与网络")}`
-      : `${sd("g")}最近运行 ${tw(ts)}·${_botState.mode || ""}·持仓 ${tw(n)} → ${n ? tg("值守中") : "空仓观望中"}`);
-    set("rhGuard", n ? sd("g") + _botState.positions.map(p => {
+    const rows4 = [chkRow(stale ? "r" : "g", "机器人", `${ts}·${_botState.mode || ""}·持仓${n}`,
+      stale ? tr("断档！查cron") : n ? tg("值守中") : "空仓观望")];
+    if (n) _botState.positions.forEach(p => {
       const kind = p.stop_kind === "TRAIL" ? tg("跟踪止盈中") : p.stop_kind === "BE" ? tg("已保本") : ty("初始止损");
-      return `${tw(p.symbol)} ${p.side || "LONG"}·${kind}${p.max_hold_hours ? "·限时" + p.max_hold_hours + "h" : ""}`;
-    }).join("｜") : sd("g") + "无持仓需护航；保本/跟踪止盈/超时离场随开仓自动启用");
+      rows4.push(chkRow(p.stop_kind === "TRAIL" || p.stop_kind === "BE" ? "g" : "y",
+        `${p.symbol.replace("USDT", "")} ${p.side || "LONG"}`,
+        `止损 ${fmt(p.stop, 0)}${p.max_hold_hours ? "·限" + p.max_hold_hours + "h" : ""}`, kind));
+    });
+    else rows4.push(chkRow("g", "持仓护航", "—", "护航随开仓自动启用"));
+    set("rhChk4", rows4.join(""));
   }
 }
 
