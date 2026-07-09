@@ -1107,6 +1107,26 @@ function genFocus(d) {
   seg.push(`👉 ${tw(advice)}`);
   return seg;
 }
+// 欧洲上午·美股背景三方共振判定（用户矩阵：BTC+纳指+MSTR 同弱=系统性risk-off；仅MSTR弱≠空BTC）
+function usBgVerdict(nq, mstr, btc24) {
+  if (nq == null && mstr == null) return null;
+  let dot = "y", cn = ty("无明显共振信号");
+  if (nq != null && mstr != null && btc24 != null) {
+    if (nq <= -0.3 && mstr < 0 && btc24 < 0) { dot = "r"; cn = tr("三者共振走弱＝系统性risk-off倾向，顺势空更有依据"); }
+    else if (mstr <= -2 && Math.abs(btc24) < 1 && nq > -0.3) { dot = "y"; cn = ty("仅MSTR走弱＝或为公司自身问题，勿机械做空BTC"); }
+    else if (nq >= 0.3 && mstr > 0 && btc24 > 0) { dot = "g"; cn = tg("三者同暖＝机构风偏恢复倾向"); }
+  }
+  return `${sd(dot)}纳指期货 ${sgnT(nq)}｜MSTR ${sgnT(mstr)}｜BTC 24h ${sgnT(btc24)} → ${cn}`;
+}
+// 今日重点科技/加密财报（Finnhub 免费日历，经 Worker；只筛巨头与加密概念）
+const MEGA_EARN = ["AAPL","MSFT","NVDA","GOOGL","GOOG","AMZN","META","TSLA","AVGO","AMD","MRVL","MU","QCOM","INTC","NFLX","CRM","ORCL","COIN","MSTR","HOOD"];
+function fmtEarnings(list, watch) {
+  const set = new Set(watch);
+  const hits = (list || []).filter(e => set.has(e.symbol));
+  if (!hits.length) return null;
+  const h = x => x === "bmo" ? "盘前" : x === "amc" ? "盘后" : "盘中";
+  return hits.slice(0, 5).map(e => `${e.symbol}(${h(e.hour)})`).join("·");
+}
 // 新闻关键事件过滤（政策/黑客/ETF/宏观）
 const KEY_NEWS_RE = /ETF|SEC|CFTC|hack|exploit|breach|stolen|Fed|FOMC|rate|CPI|inflation|payroll|regulat|ban|lawsuit|court|bankrupt|liquidat|war|sanction|tariff|Trump|Treasury|stablecoin|listing|delist|halving|upgrade|hard fork/i;
 function keyEvents(items, n) {
@@ -1154,8 +1174,16 @@ async function loadRhythmLive() {
   const ma30d = STATE.btcRegime && STATE.btcRegime.dev != null && price ? price / (1 + STATE.btcRegime.dev / 100) : null;
   const funding = btc ? btc.funding : null;
 
+  // 美股个股涨跌：优先实时报价(Finnhub经Worker,60s刷新)，机器人小时级快照兜底
+  const xm0 = (_botLog && _botLog.xm) || null;
+  const usQ = sym => (STATE.us && STATE.us[sym] && STATE.us[sym].chg != null) ? STATE.us[sym].chg : null;
+  const mstrChg = usQ("MSTR") ?? (xm0 ? xm0.mstr_chg : null);
+  const mstrLive = usQ("MSTR") != null;
+  const btc24 = btc ? btc.chg : (xm0 ? xm0.btc_chg : null);
+
   // ① 欧洲上午
   set("rhLevels", levelVerdict(price, r.prevH, r.prevL, ma30d) || "数据不可用");
+  set("rhUsBg", usBgVerdict(xm0 ? xm0.nq_chg : null, mstrChg, btc24) || "等机器人跨市场快照…");
   set("rhRel", relVerdict(r.ethbtc, r.solbtc) || "数据不可用");
   set("rhVol", volVerdict(r.volRatio) || "数据不可用");
   set("rhFund", fundOiVerdict(funding, r.oiChg) || "数据不可用");
@@ -1166,10 +1194,6 @@ async function loadRhythmLive() {
 
   // ② 美股盘前（跨市场快照来自机器人，每小时更新）
   const xm = (_botLog && _botLog.xm) || null;
-  // 美股个股涨跌：优先实时报价(Finnhub经Worker,60s刷新)，机器人小时级快照兜底
-  const usQ = sym => (STATE.us && STATE.us[sym] && STATE.us[sym].chg != null) ? STATE.us[sym].chg : null;
-  const mstrChg = usQ("MSTR") ?? (xm ? xm.mstr_chg : null);
-  const mstrLive = usQ("MSTR") != null;
   let mstrGap = null;
   if (xm) {
     const gr = _botLog.global_risk;
@@ -1182,6 +1206,22 @@ async function loadRhythmLive() {
     set("rhStocks", `${sd(mstrGap != null && Math.abs(mstrGap) >= 2 ? "y" : "g")}MSTR ${sgnT(mstrChg)}｜COIN ${sgnT(coinChg)}｜NVDA ${sgnT(nvdaChg)} ${mstrLive ? '<span class="badge">实时</span>' : ""} ${mstrCn}`);
     const xt = $("rhXmTime"); if (xt && _botLog.ts) xt.textContent = mstrLive ? "个股实时 · 期指快照" + ago(Math.floor(Date.parse(_botLog.ts) / 1000)).replace("前", "") + "前" : `快照 ${ago(Math.floor(Date.parse(_botLog.ts) / 1000))}`;
   }
+  // 今日财报（Finnhub 免费日历，30分钟缓存；宏观数据日历免费源无覆盖 → 指向 TradingView 板块）
+  if (hasWorker() && Date.now() - (window._earnT || 0) > 1.8e6) {
+    window._earnT = Date.now();
+    try {
+      const today = new Date().toLocaleDateString("sv");
+      const d = await jget(wurl(`type=finnhub&path=calendar/earnings&qs=${encodeURIComponent(`from=${today}&to=${today}`)}`));
+      window._earnCache = (d && (d.earningsCalendar || d)) || [];
+    } catch (e) { window._earnCache = null; }
+  }
+  const earn = fmtEarnings(window._earnCache, MEGA_EARN);
+  set("rhEvCal", (window._earnCache == null
+      ? `${sd("y")}财报日历暂不可用`
+      : earn ? `${sd("y")}今日重点财报：${tw(earn)}（财报前后波动放大，谨慎持仓过报）`
+             : `${sd("g")}${tg("今日无重点科技/加密财报")}`)
+    + ` ｜ 宏观数据：<a href="#sec-env">查经济日历</a>（重大数据前后30分钟避免开新仓）`);
+
   const plans = genPlans({ price, prevH: r.prevH, prevL: r.prevL, ma30h: r.ma30h, ma30d, funding });
   if (plans) set("rhPlans", plans.map(p => `<div class="plan ${p.cls}"><b>${p.k}</b><span>${p.v}</span></div>`).join(""));
 
