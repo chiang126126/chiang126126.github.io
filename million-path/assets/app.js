@@ -883,9 +883,19 @@ function renderDecision() {
   const zone = d.entry ? `${money(d.entry[0])} – ${money(d.entry[1])}` : "—";
   const tcol = { r: "var(--red)", g: "var(--green)", y: "var(--gold2)" };
   const tbg = { r: "rgba(234,57,67,.09)", g: "rgba(22,199,132,.09)", y: "rgba(240,185,11,.09)" };
-  const layer = (t, arr, v) => `<div class="card" style="margin-bottom:8px"><div class="k">${t}</div>
-    <div style="font-size:13px;margin-top:4px;line-height:1.75">${arr.map(x => "· " + x).join("<br>") || "—"}</div>
-    ${v ? `<div style="margin-top:7px;padding:7px 10px;border-radius:8px;background:${tbg[v.tone]};border-left:3px solid ${tcol[v.tone]};font-size:12.5px;line-height:1.7"><b style="color:${tcol[v.tone]}">📌 层结论</b>　${v.t}</div>` : ""}</div>`;
+  // 数据项：涨跌%按符号着色、"→"后的解读弱化，扫读时先看数字
+  const decoItem = x => x
+    .replace(/([+\-]\d+\.?\d*%)/g, m => `<b style="color:${m.startsWith("-") ? "var(--red)" : "var(--green)"};font-variant-numeric:tabular-nums">${m}</b>`)
+    .replace(/→ (.+)$/, '→ <span style="color:var(--muted)">$1</span>');
+  const layer = (t, arr, v) => `<div class="dec-layer"><div class="k">${t}</div>
+    <div class="items">${arr.map(x => "· " + decoItem(x)).join("<br>") || "—"}</div>
+    ${v ? `<div class="dec-verdict" style="background:${tbg[v.tone]};border-left:3px solid ${tcol[v.tone]}"><b style="color:${tcol[v.tone]}">📌 </b>${v.t}</div>` : ""}</div>`;
+  // 综合决策：价格白亮、方向词着色，一眼锁定关键要素
+  const hiSummary = (d.summary || "")
+    .replace(/\$[\d,\.]+/g, m => `<b style="color:#fff;font-variant-numeric:tabular-nums">${m}</b>`)
+    .replace(/顺势做空/g, '<b style="color:var(--red)">顺势做空</b>')
+    .replace(/顺势做多/g, '<b style="color:var(--green)">顺势做多</b>')
+    .replace(/保持空仓|FLAT/g, m => `<b style="color:var(--gold2)">${m}</b>`);
   box.innerHTML = `
     <div class="grid g-auto" style="margin-bottom:8px">
       <div class="card"><div class="k">市场状态</div><div class="v"><span class="chip ${stCls}" style="font-size:13px">${d.state}</span></div></div>
@@ -900,16 +910,20 @@ function renderDecision() {
       <div class="card"><div class="k">目标位（≥1.5R）</div><div class="v" style="font-size:14px">${d.target ? money(d.target) : "—"}</div></div>
       <div class="card"><div class="k">最大持仓时间</div><div class="v" style="font-size:13px">${d.maxHold}</div></div>
     </div>
-    ${layer("第一层 · 领先信息（全球资金在加风险还是降风险？）", d.l1, d.v1)}
-    ${layer("第二层 · 加密市场确认（传统市场的变化是否传导到币圈？）", d.l2, d.v2)}
-    ${layer("第三层 · 执行条件（这笔交易值不值得承担风险？）", d.l3, d.v3)}
+    <div class="dec-layers">
+      ${layer("第一层 · 领先信息｜全球资金在加还是降风险？", d.l1, d.v1)}
+      ${layer("第二层 · 加密确认｜是否真传导到币圈？", d.l2, d.v2)}
+      ${layer("第三层 · 执行条件｜值不值得下这笔单？", d.l3, d.v3)}
+    </div>
     <div class="card" style="margin-bottom:8px;border:1px solid var(--gold);background:linear-gradient(135deg,rgba(240,185,11,.10),transparent)">
       <div class="k" style="color:var(--gold2)">📋 综合投资决策</div>
-      <div style="font-size:13px;margin-top:5px;line-height:1.8">${d.summary}</div></div>
-    <div class="card" style="margin-bottom:8px;border-color:${d.flags.length ? 'var(--red)' : 'var(--border)'}"><div class="k">风险提示 risk flags</div>
-      <div style="font-size:13px;margin-top:4px;color:${d.flags.length ? 'var(--red)' : 'var(--muted)'}">${d.flags.map(r => "⚠ " + r).join("<br>") || "暂无明显风险信号"}</div></div>
-    <div class="card" style="margin-bottom:8px;border-left:3px solid var(--red)"><div class="k">禁止交易条件（长期武装 · 实时值）</div>
-      <div style="font-size:12px;margin-top:4px;line-height:1.75;color:var(--muted)">${d.bans.map(x => "🚫 " + x).join("<br>")}</div></div>
+      <div style="font-size:13px;margin-top:5px;line-height:1.85">${hiSummary}</div></div>
+    <div class="dec-foot">
+      <div class="card" style="margin:0;border-color:${d.flags.length ? 'var(--red)' : 'var(--border)'}"><div class="k">风险提示 risk flags</div>
+        <div style="font-size:12px;margin-top:4px;line-height:1.7;color:${d.flags.length ? 'var(--red)' : 'var(--muted)'}">${d.flags.map(r => "⚠ " + r).join("<br>") || "暂无明显风险信号"}</div></div>
+      <div class="card" style="margin:0;border-left:3px solid var(--red)"><div class="k">禁止交易条件（长期武装 · 实时值）</div>
+        <div style="font-size:11.5px;margin-top:4px;line-height:1.7;color:var(--muted)">${d.bans.map(x => "🚫 " + x).join("<br>")}</div></div>
+    </div>
     <div class="badge">操作：${d.move} ｜ MP500 仓位建议：${d.advice}</div>
     <div class="badge" style="display:block;margin-top:6px">⚠ 本卡为<b>确定性规则的参谋预演</b>（与机器人闸门同源）；机器人的 DeepSeek 行动卡见「最近一次决策」。非投资建议。</div>`;
   const t = $("decTime"); if (t) t.textContent = "更新于 " + new Date().toLocaleTimeString("zh-CN");

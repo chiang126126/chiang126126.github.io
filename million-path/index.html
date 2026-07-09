@@ -152,6 +152,15 @@
   #sec-env.mood-neutral{border-color:#33476e}
   #sec-env.mood-greed{border-color:#1f6a44;box-shadow:0 0 0 1px rgba(22,199,132,.24),0 8px 30px rgba(22,199,132,.11)}
   #sec-env.mood-exgreed{border-color:#16c784;box-shadow:0 0 0 1px rgba(22,199,132,.38),0 8px 34px rgba(22,199,132,.17)}
+  /* AI决策快照·三层布局 */
+  .dec-layers{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
+  @media(max-width:900px){.dec-layers{grid-template-columns:1fr}}
+  .dec-layer{display:flex;flex-direction:column;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin:0}
+  .dec-layer .k{font-size:11px;color:var(--muted);padding-bottom:7px;border-bottom:1px solid rgba(31,44,68,.55);margin-bottom:7px}
+  .dec-layer .items{font-size:12px;line-height:1.75;color:var(--text);flex:1}
+  .dec-verdict{margin-top:9px;padding:7px 10px;border-radius:8px;font-size:12px;line-height:1.65}
+  .dec-foot{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+  @media(max-width:720px){.dec-foot{grid-template-columns:1fr}}
   /* 交易统计日历 */
   .cal-head{display:flex;align-items:center;justify-content:center;gap:14px;margin:2px 0 6px}
   .cal-head b{font-size:13px;min-width:110px;text-align:center}
@@ -519,7 +528,7 @@
     ⚠️ 本看板为纪律与复盘工具，行情数据仅供参考、可能延迟或因网络/地区受限；<b>不构成投资建议</b>，加密交易可能损失全部本金。任何收益目标必须服从风控。
   </div>
 
-  <script src="./config.js?v=43"></script>
-  <script src="./assets/app.js?v=43"></script>
+  <script src="./config.js?v=44"></script>
+  <script src="./assets/app.js?v=44"></script>
 </body>
 </html>
