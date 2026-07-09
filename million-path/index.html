@@ -187,26 +187,26 @@
   .cal-kpi .v{font-size:16px;font-weight:800;margin-top:2px;font-variant-numeric:tabular-nums}
   .cal-kpi .s{font-size:10px;color:var(--muted);margin-top:2px}
   /* 一日节奏 v2: 价格标尺 + 信号灯检查单 */
-  .lad{position:relative;height:96px;margin:26px 2px 6px}
-  .lad-zones{position:absolute;top:38px;left:0;right:0;height:13px;border-radius:7px;overflow:hidden;display:flex}
+  .lad{position:relative;height:108px;margin:6px 2px 4px;overflow:hidden}
+  .lad-zones{position:absolute;top:52px;left:0;right:0;height:13px;border-radius:7px;overflow:hidden;display:flex}
   .lz-s{width:14%;background:rgba(234,57,67,.30)} .lz-f{flex:1;background:rgba(240,185,11,.15)} .lz-l{width:14%;background:rgba(22,199,132,.30)}
-  .lad-mark{position:absolute;top:32px;width:2px;height:24px;background:var(--muted);opacity:.85}
+  .lad-mark{position:absolute;top:46px;width:2px;height:25px;background:var(--muted);opacity:.85}
   .lad-mark i{position:absolute;font-style:normal;font-size:9.5px;color:var(--muted);white-space:nowrap;left:50%;transform:translateX(-50%)}
-  .lad-mark i.t{top:-15px} .lad-mark i.t2{top:-27px} .lad-mark i.b{top:26px}
-  .lad-px{position:absolute;top:31px;width:13px;height:13px;margin-left:-6px;border-radius:50%;background:var(--gold2);border:2.5px solid #0a0e17;box-shadow:0 0 11px rgba(240,185,11,.95);z-index:2}
+  .lad-mark i.t{top:-14px} .lad-mark i.t2{top:-27px}
+  .lad-px{position:absolute;top:51px;width:13px;height:13px;margin-left:-6px;border-radius:50%;background:var(--gold2);border:2.5px solid #0a0e17;box-shadow:0 0 11px rgba(240,185,11,.95);z-index:2}
   @media(prefers-reduced-motion:no-preference){.lad-px{animation:ladpp 2s infinite}}
   @keyframes ladpp{50%{box-shadow:0 0 4px rgba(240,185,11,.45)}}
-  .lad-px i{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-style:normal;font-size:11px;font-weight:800;color:var(--gold2);white-space:nowrap;font-variant-numeric:tabular-nums}
-  .lad-px s{position:absolute;top:17px;left:50%;transform:translateX(-50%);text-decoration:none;font-size:9.5px;color:var(--muted);white-space:nowrap}
-  .lad-cap{position:absolute;top:72px;font-size:9.5px;white-space:nowrap}
-  .lad-end{position:absolute;top:54px;font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .lad-px i{position:absolute;top:-49px;left:50%;transform:translateX(-50%);font-style:normal;font-size:13px;font-weight:800;color:var(--gold2);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .lad-end{position:absolute;top:70px;font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .lad-cap{position:absolute;top:88px;font-size:9.5px;white-space:nowrap}
+  .lad-dist{position:absolute;top:88px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--gold2);white-space:nowrap;font-variant-numeric:tabular-nums}
   /* 信号灯检查单 */
-  .rhk{width:100%;border-collapse:collapse;font-size:12px;min-width:0}
-  .rhk td{padding:6.5px 3px;border-bottom:1px solid rgba(31,44,68,.55);vertical-align:middle}
+  .rhk{width:100%;table-layout:fixed;border-collapse:collapse;font-size:12px;min-width:0!important}
+  .rhk td{padding:6.5px 2px;border-bottom:1px solid rgba(31,44,68,.55);vertical-align:middle;white-space:normal;text-align:left}
   .rhk tr:last-child td{border-bottom:none}
-  .rhk .it{color:var(--muted);white-space:nowrap;padding-right:8px;font-size:11px}
-  .rhk .n{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap;padding-right:9px}
-  .rhk .cc{font-size:11px;color:var(--muted);text-align:right;white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis}
+  .rhk .it{color:var(--muted);font-size:11px;width:72px;padding-right:4px}
+  .rhk .n{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;padding-right:8px;word-break:break-all;line-height:1.5}
+  .rhk .cc{font-size:11px;color:var(--muted);text-align:right;width:86px;line-height:1.45}
   .rhk .cc .g{color:var(--green)} .rhk .cc .r{color:var(--red)} .rhk .cc .y{color:var(--gold2)}
   @media(max-width:560px){.rhk .cc{white-space:normal;max-width:none}.lad-px s{font-size:9px}}
   /* 一日节奏 */
@@ -533,7 +533,7 @@
     ⚠️ 本看板为纪律与复盘工具，行情数据仅供参考、可能延迟或因网络/地区受限；<b>不构成投资建议</b>，加密交易可能损失全部本金。任何收益目标必须服从风控。
   </div>
 
-  <script src="./config.js?v=46"></script>
-  <script src="./assets/app.js?v=46"></script>
+  <script src="./config.js?v=47"></script>
+  <script src="./assets/app.js?v=47"></script>
 </body>
 </html>

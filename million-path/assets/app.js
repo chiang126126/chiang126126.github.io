@@ -1290,17 +1290,23 @@ function renderLadder(price, prevL, prevH, ma30d, ma30h) {
   };
   const dUp = (prevH / price - 1) * 100, dDn = (price / prevL - 1) * 100;
   const sub = price > prevH ? "已突破昨高！" : price < prevL ? "已跌破昨低！"
-    : `距上破 ${dUp.toFixed(1)}%｜距下破 ${dDn.toFixed(1)}%`;
+    : `距上破 ${dUp.toFixed(1)}% ｜ 距下破 ${dDn.toFixed(1)}%`;
+  // 标记＝名+值一行；两条均线离得近时用 t/t2 两层错开，永不重叠
   const mark = (v, name, top2) => (v == null || v <= prevL * 0.985 || v >= prevH * 1.015) ? "" :
-    `<div class="lad-mark" style="left:${pos(v).toFixed(1)}%"><i class="${top2 ? "t2" : "t"}">${name}</i><i class="b">${fmt(v, 0)}</i></div>`;
+    `<div class="lad-mark" style="left:${pos(v).toFixed(1)}%" title="${name} ${fmt(v, 0)}"><i class="${top2 ? "t2" : "t"}">${name} ${fmt(v, 0)}</i></div>`;
+  // 价格大字贴边时换文字锚点方向(左边缘向右伸/右边缘向左伸)，防止溢出卡片
+  const pp = pos(price);
+  const anchor = pp > 82 ? 'style="left:auto;right:-3px;transform:none"'
+               : pp < 18 ? 'style="left:-3px;transform:none"' : "";
   return `<div class="lad">
     <div class="lad-zones"><div class="lz-s"></div><div class="lz-f"></div><div class="lz-l"></div></div>
     ${mark(ma30h, "30h线")}${mark(ma30d, "30日线", true)}
-    <div class="lad-px" style="left:${pos(price).toFixed(1)}%"><i>${fmt(price, 0)}</i><s>${sub}</s></div>
-    <div class="lad-cap" style="left:0;color:var(--red)">◀ 空区·预案A</div>
-    <div class="lad-cap" style="right:0;color:var(--green)">多区·预案B ▶</div>
+    <div class="lad-px" style="left:${pp.toFixed(1)}%"><i ${anchor}>${fmt(price, 0)}</i></div>
     <div class="lad-end" style="left:0">${fmt(prevL, 0)}</div>
     <div class="lad-end" style="right:0">${fmt(prevH, 0)}</div>
+    <div class="lad-cap" style="left:0;color:var(--red)">◀ 预案A</div>
+    <div class="lad-dist">${sub}</div>
+    <div class="lad-cap" style="right:0;color:var(--green)">预案B ▶</div>
   </div>`;
 }
 async function loadRhythmLive() {
@@ -1381,7 +1387,7 @@ async function loadRhythmLive() {
       else if (mstrChg <= -2 && Math.abs(btc24) < 1 && nq > -0.3) { d4 = "y"; c4 = ty("仅MSTR弱·勿空BTC"); }
       else if (nq >= 0.3 && mstrChg > 0 && btc24 > 0) { d4 = "g"; c4 = tg("三者同暖"); }
     }
-    rows1.push(chkRow(d4, "美股背景", `纳指${sgnT(nq)}·MSTR${sgnT(mstrChg)}`, c4));
+    rows1.push(chkRow(d4, "美股背景", `纳指${sgnT(nq)}·MSTR${sgnT(mstrChg, 1)}`, c4));
   }
   set("rhChk1", rows1.join("") || '<tr><td class="badge">数据不可用</td></tr>');
   const evs = keyEvents(_newsItems, 3);
@@ -1396,14 +1402,14 @@ async function loadRhythmLive() {
   if (xm) {
     const gr = _botLog.global_risk;
     const grDot = gr === "risk-on" ? "g" : gr === "risk-off" ? "r" : "y";
-    rows2.push(chkRow(grDot, "期指/美债/美元", `纳指${sgnT(xm.nq_chg)}·10Y${xm.tnx != null ? tw(xm.tnx + "%") : "n/a"}·DXY${sgnT(xm.dxy_chg)}`,
+    rows2.push(chkRow(grDot, "期指/美债", `纳指${sgnT(xm.nq_chg)}·10Y${xm.tnx != null ? tw(xm.tnx + "%") : "n/a"}`,
       `全球 <span class="${grDot === "g" ? "g" : grDot === "r" ? "r" : "y"}">${gr || "?"}</span>`));
     const nvdaChg = usQ("NVDA") ?? xm.nvda_chg, coinChg = usQ("COIN") ?? xm.coin_chg;
     mstrGap = (mstrChg != null && xm.btc_chg != null) ? mstrChg - xm.btc_chg : null;
     const [d2, c2] = mstrGap == null ? ["y", "—"]
       : mstrGap <= -2 ? ["y", ty("超额弱势·勿据此空BTC")]
       : mstrGap >= 1.5 ? ["g", tg("率先转强·风偏恢复")] : ["g", "无显著背离"];
-    rows2.push(chkRow(d2, `加密概念股${mstrLive ? "·实时" : ""}`, `MSTR${sgnT(mstrChg)}·COIN${sgnT(coinChg)}·NVDA${sgnT(nvdaChg)}`, c2));
+    rows2.push(chkRow(d2, `概念股${mstrLive ? "·实时" : ""}`, `MSTR${sgnT(mstrChg)}·NVDA${sgnT(nvdaChg)}`, c2));
     const xt = $("rhXmTime"); if (xt && _botLog.ts) xt.textContent = mstrLive ? "个股实时 · 期指快照" + ago(Math.floor(Date.parse(_botLog.ts) / 1000)).replace("前", "") + "前" : `快照 ${ago(Math.floor(Date.parse(_botLog.ts) / 1000))}`;
   }
   // 今日财报（Finnhub 免费日历，30分钟缓存；宏观数据免费源无覆盖 → 指向经济日历板块）
