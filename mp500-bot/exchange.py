@@ -83,6 +83,8 @@ def cross_market():
     nq, nq_chg = q("NQ=F")          # 纳指期货
     tnx, tnx_chg = q("^TNX")        # 美债10Y收益率指数(值≈收益率%×10)
     dxy, dxy_chg = q("DX=F")        # 美元指数期货
+    if dxy is None:
+        dxy, dxy_chg = q("DX-Y.NYB")  # 备用: ICE 美元指数现货
     mstr, mstr_chg = q("MSTR")
     nvda, nvda_chg = q("NVDA")
     coin, coin_chg = q("COIN")
