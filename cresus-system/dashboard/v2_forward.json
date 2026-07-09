@@ -1,45 +1,573 @@
 {
- "updated": "2026-07-07 23:41 UTC",
+ "updated": "2026-07-09 12:34 UTC",
  "w_carry": 0.7,
  "w_trend": 0.3,
  "trend": {
   "equity": 10000.0,
   "ret": 0.0,
   "mdd": 0.0,
-  "days": 1,
+  "days": 3,
   "curve": [
    [
     20641,
+    100.0
+   ],
+   [
+    20642,
+    100.0
+   ],
+   [
+    20643,
     100.0
    ]
   ],
   "positions": 0,
   "trades": 0,
-  "winrate": null
+  "winrate": null,
+  "leg": "U本位永续合约(perp)",
+  "open": [],
+  "closed": [],
+  "stats": {
+   "n": 0,
+   "wins": 0,
+   "winrate": null,
+   "pf": null,
+   "avg_win": null,
+   "avg_loss": null,
+   "expectancy": null,
+   "best": null,
+   "worst": null
+  }
  },
  "carry": {
-  "equity": 9975.42,
-  "ret": -0.25,
-  "mdd": -0.25,
-  "days": 1,
+  "equity": 9981.98,
+  "ret": -0.18,
+  "mdd": -0.27,
+  "days": 3,
   "curve": [
    [
     20641,
     99.7542
+   ],
+   [
+    20642,
+    99.7257
+   ],
+   [
+    20643,
+    99.8198
    ]
   ],
-  "basket": 59
+  "basket": 61,
+  "leg": "现货多 + 永续空 (Δ中性)",
+  "held": [
+   {
+    "sym": "1INCHUSDT",
+    "tfund_apr": 0.0582,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "AAVEUSDT",
+    "tfund_apr": 0.0288,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "ALGOUSDT",
+    "tfund_apr": 0.006,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "ARKMUSDT",
+    "tfund_apr": 0.065,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "ARUSDT",
+    "tfund_apr": 0.0642,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "BANDUSDT",
+    "tfund_apr": 0.0777,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "BATUSDT",
+    "tfund_apr": 0.0701,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "BTCUSDT",
+    "tfund_apr": 0.0372,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "C98USDT",
+    "tfund_apr": 0.0729,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "CELRUSDT",
+    "tfund_apr": 0.0716,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "CFXUSDT",
+    "tfund_apr": 0.0501,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "CHRUSDT",
+    "tfund_apr": 0.0712,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "COTIUSDT",
+    "tfund_apr": 0.0705,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "CRVUSDT",
+    "tfund_apr": 0.0561,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "CTSIUSDT",
+    "tfund_apr": 0.1003,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "DOGEUSDT",
+    "tfund_apr": 0.0291,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "DYDXUSDT",
+    "tfund_apr": 0.0241,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "EDUUSDT",
+    "tfund_apr": 0.0846,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "EGLDUSDT",
+    "tfund_apr": 0.0218,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "ENSUSDT",
+    "tfund_apr": 0.0133,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "ETCUSDT",
+    "tfund_apr": 0.045,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "ETHUSDT",
+    "tfund_apr": 0.0208,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "FILUSDT",
+    "tfund_apr": 0.035,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "GALAUSDT",
+    "tfund_apr": 0.0109,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "GMXUSDT",
+    "tfund_apr": 0.0157,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "GRTUSDT",
+    "tfund_apr": 0.0024,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "GTCUSDT",
+    "tfund_apr": 0.1779,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "HBARUSDT",
+    "tfund_apr": 0.0152,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "ICXUSDT",
+    "tfund_apr": 0.0639,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "IOTAUSDT",
+    "tfund_apr": 0.0083,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "IOTXUSDT",
+    "tfund_apr": 0.084,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "JOEUSDT",
+    "tfund_apr": 0.0736,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "LDOUSDT",
+    "tfund_apr": 0.0539,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "LINKUSDT",
+    "tfund_apr": 0.0444,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "LQTYUSDT",
+    "tfund_apr": 0.0654,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "LTCUSDT",
+    "tfund_apr": 0.02,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "MANAUSDT",
+    "tfund_apr": 0.0063,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "NEARUSDT",
+    "tfund_apr": 0.0365,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "ONEUSDT",
+    "tfund_apr": 0.0915,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "OPUSDT",
+    "tfund_apr": 0.0161,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "ORDIUSDT",
+    "tfund_apr": 0.0386,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "PENDLEUSDT",
+    "tfund_apr": 0.0342,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "PEOPLEUSDT",
+    "tfund_apr": 0.0892,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "QNTUSDT",
+    "tfund_apr": 0.0245,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "RLCUSDT",
+    "tfund_apr": 0.0336,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "ROSEUSDT",
+    "tfund_apr": 0.08,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "RSRUSDT",
+    "tfund_apr": 0.0759,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "RUNEUSDT",
+    "tfund_apr": 0.0614,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "SANDUSDT",
+    "tfund_apr": 0.0041,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "SFPUSDT",
+    "tfund_apr": 0.0999,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "SSVUSDT",
+    "tfund_apr": 0.0607,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "STXUSDT",
+    "tfund_apr": 0.0374,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "SUIUSDT",
+    "tfund_apr": 0.0331,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "SUSHIUSDT",
+    "tfund_apr": 0.0623,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "THETAUSDT",
+    "tfund_apr": 0.0634,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "TWTUSDT",
+    "tfund_apr": 0.0569,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "UNIUSDT",
+    "tfund_apr": 0.0581,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "VETUSDT",
+    "tfund_apr": 0.0291,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "WIFUSDT",
+    "tfund_apr": 0.0327,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "WOOUSDT",
+    "tfund_apr": 0.082,
+    "days_held": 2,
+    "fund_hist": []
+   },
+   {
+    "sym": "ZENUSDT",
+    "tfund_apr": 0.0667,
+    "days_held": 2,
+    "fund_hist": []
+   }
+  ],
+  "daily": [
+   {
+    "day": 20642,
+    "date": "2026-07-08",
+    "ret_pct": -0.029,
+    "n_active": 59,
+    "adds": 2,
+    "drops": 0,
+    "top": [
+     {
+      "sym": "LQTYUSDT",
+      "contrib_pct": 0.005
+     },
+     {
+      "sym": "ICXUSDT",
+      "contrib_pct": 0.005
+     },
+     {
+      "sym": "GTCUSDT",
+      "contrib_pct": 0.003
+     },
+     {
+      "sym": "BANDUSDT",
+      "contrib_pct": 0.003
+     },
+     {
+      "sym": "GRTUSDT",
+      "contrib_pct": 0.003
+     }
+    ]
+   },
+   {
+    "day": 20643,
+    "date": "2026-07-09",
+    "ret_pct": 0.094,
+    "n_active": 61,
+    "adds": 0,
+    "drops": 0,
+    "top": [
+     {
+      "sym": "ONEUSDT",
+      "contrib_pct": 0.017
+     },
+     {
+      "sym": "ICXUSDT",
+      "contrib_pct": 0.01
+     },
+     {
+      "sym": "LQTYUSDT",
+      "contrib_pct": 0.01
+     },
+     {
+      "sym": "EGLDUSDT",
+      "contrib_pct": 0.009
+     },
+     {
+      "sym": "JOEUSDT",
+      "contrib_pct": 0.009
+     }
+    ]
+   }
+  ],
+  "events": [
+   {
+    "day": 20642,
+    "date": "2026-07-08",
+    "sym": "ALGOUSDT",
+    "action": "add",
+    "tfund_apr": 0.0037
+   },
+   {
+    "day": 20642,
+    "date": "2026-07-08",
+    "sym": "IOTAUSDT",
+    "action": "add",
+    "tfund_apr": 0.0091
+   }
+  ]
  },
  "combined": {
-  "equity": 9982.79,
-  "ret": -0.17,
-  "mdd": -0.17,
-  "days": 1,
+  "equity": 9987.39,
+  "ret": -0.13,
+  "mdd": -0.19,
+  "days": 3,
   "curve": [
    [
     20641,
     99.8279
+   ],
+   [
+    20642,
+    99.808
+   ],
+   [
+    20643,
+    99.8739
    ]
   ]
+ },
+ "calendar": [
+  {
+   "date": "2026-07-07",
+   "day": 20641,
+   "comb_pct": 0.0,
+   "trend_pnl": 0.0,
+   "carry_pct": 0.0,
+   "n_trend": 0
+  },
+  {
+   "date": "2026-07-08",
+   "day": 20642,
+   "comb_pct": -0.02,
+   "trend_pnl": 0.0,
+   "carry_pct": -0.029,
+   "n_trend": 0
+  },
+  {
+   "date": "2026-07-09",
+   "day": 20643,
+   "comb_pct": 0.066,
+   "trend_pnl": 0.0,
+   "carry_pct": 0.094,
+   "n_trend": 0
+  }
+ ],
+ "risk": {
+  "dd_pct": -0.13,
+  "breaker": "正常",
+  "dd_half": -10.0,
+  "dd_stop": -15.0,
+  "eff_w_trend": 0.3004,
+  "eff_w_carry": 0.6996,
+  "last_rebalance": "2026-07-07",
+  "basket": 61,
+  "basket_min": 20,
+  "gate": {
+   "days": 3,
+   "target": 90,
+   "curve_pos": false,
+   "breaches": 0
+  }
  }
 }
