@@ -23,7 +23,7 @@
     color:var(--text);line-height:1.55;padding:18px;max-width:1180px;margin:0 auto;padding-bottom:60px}
   a{color:var(--gold2)}
   h1{font-size:20px;margin:0;letter-spacing:.5px}
-  h2{font-size:14px;margin:0 0 9px;display:flex;align-items:center;gap:8px}
+  h2{font-size:14px;margin:0 0 9px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;row-gap:4px}
   h2 .bar{width:4px;height:16px;background:linear-gradient(var(--gold),var(--gold2));border-radius:3px}
   .topbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:6px}
   .brand{display:flex;align-items:center;gap:10px}
@@ -133,7 +133,18 @@
   .elev a.active{color:var(--gold2);border-color:var(--gold);background:rgba(18,26,43,.9)}
   .totop{position:fixed;right:16px;bottom:16px;z-index:20;width:40px;height:40px;border-radius:50%;display:none;place-items:center;cursor:pointer;color:#1a1200;font-size:18px;border:none;background:linear-gradient(135deg,var(--gold2),var(--gold));box-shadow:0 4px 14px rgba(240,185,11,.45)}
   @media(max-width:1140px){.elev{display:none}}
-  @media(max-width:520px){body{padding:12px;padding-bottom:50px}.equity{font-size:28px}.hero-grid{gap:12px}.panel{padding:12px}.nav{margin-left:-2px;margin-right:-2px}.totop{right:12px;bottom:12px}}
+  @media(max-width:520px){
+    body{padding:12px;padding-bottom:calc(50px + env(safe-area-inset-bottom));
+      padding-left:calc(12px + env(safe-area-inset-left));padding-right:calc(12px + env(safe-area-inset-right))}
+    .equity{font-size:28px}.hero-grid{gap:12px}.panel{padding:12px}
+    .nav{margin-left:-2px;margin-right:-2px}
+    .totop{right:calc(12px + env(safe-area-inset-right));bottom:calc(12px + env(safe-area-inset-bottom))}
+    .cal-cell{min-height:40px;padding:2px 4px}
+    .cal-cell .p{font-size:10px}.cal-cell .n{display:none}
+    .cal-kpi .v{font-size:14px}
+    .rh-focus{font-size:12px;padding:8px 10px;gap:6px}
+    #tradeSearch{width:100%!important;max-width:none!important;margin-left:0!important}
+  }
   /* 市场环境随情绪变色 */
   #sec-env{transition:border-color .5s,box-shadow .5s}
   #sec-env.mood-exfear{border-color:#7a262c;box-shadow:0 0 0 1px rgba(234,57,67,.30),0 8px 30px rgba(234,57,67,.13)}
@@ -167,7 +178,7 @@
   .cal-kpi .v{font-size:16px;font-weight:800;margin-top:2px;font-variant-numeric:tabular-nums}
   .cal-kpi .s{font-size:10px;color:var(--muted);margin-top:2px}
   /* 一日节奏 */
-  .rhythm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+  .rhythm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
   .rh-card{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;opacity:.62;transition:.3s}
   .rh-card.active{opacity:1;border-color:var(--gold);box-shadow:0 0 0 1px rgba(240,185,11,.25),0 6px 22px rgba(240,185,11,.10)}
   .rh-card.active .rh-head b::after{content:" ◀ 现在";color:var(--gold2);font-size:11px}
@@ -278,7 +289,7 @@
   <!-- 趋势判断 -->
   <section id="sec-trend" class="panel">
     <h2><span class="bar"></span>趋势判断 · 站上/跌破 30 日线</h2>
-    <div class="tablewrap"><table>
+    <div class="tablewrap"><table class="resp">
       <thead><tr><th>标的</th><th>状态</th><th>现价</th><th>30日均线</th><th>偏离</th><th>解读</th></tr></thead>
       <tbody id="trendBody"><tr><td>计算中…</td></tr></tbody></table></div>
     <div class="badge" style="margin-top:10px">规则：价格站上 30 日 SMA 视为偏多（risk-on），跌破视为偏空（risk-off），±1% 内视为震荡。只做右交易，不接飞刀。</div>
@@ -459,12 +470,12 @@
     <div class="grid g-auto" id="paperStats" style="margin:14px 0"></div>
 
     <div class="k" style="font-size:11px;color:var(--muted);margin-bottom:6px">当前持仓（浮动盈亏实时更新）</div>
-    <div class="tablewrap"><table>
+    <div class="tablewrap"><table class="resp">
       <thead><tr><th>标的/方向</th><th>入场</th><th>现价</th><th>止损</th><th>止盈</th><th>名义</th><th>浮动盈亏</th><th>R</th><th></th></tr></thead>
       <tbody id="paperOpenBody"></tbody></table></div>
 
     <div class="k" style="font-size:11px;color:var(--muted);margin:14px 0 6px">已平仓记录（最近 30 笔）</div>
-    <div class="tablewrap"><table>
+    <div class="tablewrap"><table class="resp">
       <thead><tr><th>标的/方向</th><th>入场→出场</th><th>盈亏</th><th>R</th><th>结果</th><th>时间</th></tr></thead>
       <tbody id="paperClosedBody"></tbody></table></div>
 
@@ -480,7 +491,7 @@
     <h2><span class="bar"></span>交易情况 & 周复盘</h2>
     <div class="grid g-auto" id="reviewCards" style="margin-bottom:14px"></div>
     <div style="margin:6px 0 14px"><div class="k" style="font-size:11px;color:var(--muted);margin-bottom:6px">权益曲线</div><div id="equityChart"></div></div>
-    <div class="tablewrap"><table>
+    <div class="tablewrap"><table class="resp">
       <thead><tr><th>周</th><th>日期</th><th>阶段</th><th>行情</th><th>周收益</th><th>目标</th><th>笔数</th><th>胜率</th><th>盈亏比</th><th>回撤</th><th>费用%</th><th>违规</th></tr></thead>
       <tbody id="kpiBody"></tbody></table></div>
   </section>
@@ -497,7 +508,7 @@
       <div><label>目标美元</label><input id="cUsd" type="number" value="1000000"></div>
     </div>
     <div class="result" id="calcOut"></div>
-    <div class="tablewrap" style="margin-top:12px"><table>
+    <div class="tablewrap" style="margin-top:12px"><table class="resp">
       <thead><tr><th>周化</th><th>年化(复利)</th><th>→ 目标人民币</th><th>→ 目标美元</th></tr></thead>
       <tbody id="scenBody"></tbody></table></div>
   </section>
@@ -507,7 +518,7 @@
     ⚠️ 本看板为纪律与复盘工具，行情数据仅供参考、可能延迟或因网络/地区受限；<b>不构成投资建议</b>，加密交易可能损失全部本金。任何收益目标必须服从风控。
   </div>
 
-  <script src="./config.js?v=38"></script>
-  <script src="./assets/app.js?v=38"></script>
+  <script src="./config.js?v=39"></script>
+  <script src="./assets/app.js?v=39"></script>
 </body>
 </html>

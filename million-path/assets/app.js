@@ -138,11 +138,11 @@ async function loadMarket() {
     const closes = closesArr[i]; if (!CORE3.includes(c.name)) return null;
     const sma = closes.length >= 30 ? closes.slice(-30).reduce((a, b) => a + b, 0) / 30 : null;
     const rg = regimeOf(c.price, sma);
-    return `<tr><td><b>${c.name}</b></td>
-      <td><span class="chip ${rg.key}">${rg.label}</span></td>
-      <td>${money(c.price)}</td><td>${money(sma)}</td>
-      <td class="${cls(rg.dev)}">${rg.dev == null ? '—' : pct(rg.dev)}</td>
-      <td class="badge">${rg.key === 'risk-on' ? '偏多，可顺势' : rg.key === 'risk-off' ? '偏空，防守为主' : '方向不明，少动'}</td></tr>`;
+    return `<tr><td data-label="标的"><b>${c.name}</b></td>
+      <td data-label="状态"><span class="chip ${rg.key}">${rg.label}</span></td>
+      <td data-label="现价">${money(c.price)}</td><td data-label="30日均线">${money(sma)}</td>
+      <td data-label="偏离" class="${cls(rg.dev)}">${rg.dev == null ? '—' : pct(rg.dev)}</td>
+      <td data-label="解读" class="badge">${rg.key === 'risk-on' ? '偏多，可顺势' : rg.key === 'risk-off' ? '偏空，防守为主' : '方向不明，少动'}</td></tr>`;
   }).filter(Boolean).join("");
   $("trendBody").innerHTML = tb || `<tr><td colspan="6" class="badge">K线数据暂不可用</td></tr>`;
 
@@ -643,14 +643,14 @@ function renderLedger(d) {
   ].map(([k, v]) => `<div class="card"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
 
   $("kpiBody").innerHTML = w.map(x => `<tr>
-    <td>${x.week}</td><td>${x.start_date}</td><td>${x.stage}</td>
-    <td><span class="chip ${x.regime}">${x.regime}</span></td>
-    <td class="${cls(x._ret)}">${pct(x._ret)}</td>
-    <td>${x.target_return_pct != null ? x.target_return_pct + "%" : "—"}</td>
-    <td>${x.trades ?? "—"}</td><td>${x.win_rate_pct != null ? x.win_rate_pct + "%" : "—"}</td>
-    <td>${fmt(x.profit_factor)}</td><td>${x.max_drawdown_pct != null ? x.max_drawdown_pct + "%" : "—"}</td>
-    <td>${x.fees_funding_pct != null ? x.fees_funding_pct + "%" : "—"}</td>
-    <td class="${x.violations > 0 ? 'warn' : ''}">${x.violations ?? 0}</td></tr>`).join("");
+    <td data-label="周">${x.week}</td><td data-label="日期">${x.start_date}</td><td data-label="阶段">${x.stage}</td>
+    <td data-label="行情"><span class="chip ${x.regime}">${x.regime}</span></td>
+    <td data-label="周收益" class="${cls(x._ret)}">${pct(x._ret)}</td>
+    <td data-label="目标">${x.target_return_pct != null ? x.target_return_pct + "%" : "—"}</td>
+    <td data-label="笔数">${x.trades ?? "—"}</td><td data-label="胜率">${x.win_rate_pct != null ? x.win_rate_pct + "%" : "—"}</td>
+    <td data-label="盈亏比">${fmt(x.profit_factor)}</td><td data-label="回撤">${x.max_drawdown_pct != null ? x.max_drawdown_pct + "%" : "—"}</td>
+    <td data-label="费用%">${x.fees_funding_pct != null ? x.fees_funding_pct + "%" : "—"}</td>
+    <td data-label="违规" class="${x.violations > 0 ? 'warn' : ''}">${x.violations ?? 0}</td></tr>`).join("");
 
   equityChart(w.map(x => x.equity_end), m.initial_capital);
   return m;
@@ -673,7 +673,7 @@ function renderCalc() {
     `${fmt(usd, 0)} 美元 ≈ <b>${fmt(tU, 0)} U</b> → 需 <b>${dur(weeksTo(s, r, tU))}</b>`;
   $("scenBody").innerHTML = [0.02, 0.025, 0.03, 0.05, 0.08, 0.10].map(rr => {
     const y = (Math.pow(1 + rr, 52) - 1) * 100;
-    return `<tr><td>${(rr * 100).toFixed(1)}%</td><td>${fmt(y, 0)}%</td><td>${dur(weeksTo(s, rr, tR))}</td><td>${dur(weeksTo(s, rr, tU))}</td></tr>`;
+    return `<tr><td data-label="周化">${(rr * 100).toFixed(1)}%</td><td data-label="年化(复利)">${fmt(y, 0)}%</td><td data-label="→ 目标人民币">${dur(weeksTo(s, rr, tR))}</td><td data-label="→ 目标美元">${dur(weeksTo(s, rr, tU))}</td></tr>`;
   }).join("");
 }
 
@@ -943,23 +943,23 @@ function renderPaper() {
       upnl = gross - p.feeIn - lp * p.qty * FEE; upct = upnl / p.notional * 100; rr = p.riskUsdt ? upnl / p.riskUsdt : null;
     }
     return `<tr>
-      <td><b>${p.sym}</b> <span class="chip ${p.side === "LONG" ? "risk-on" : "risk-off"}">${p.side}</span></td>
-      <td>${fmt(p.entry, 2)}</td><td>${lp != null ? fmt(lp, 2) : "—"}</td>
-      <td>${fmt(p.stop, 2)}</td><td>${p.target ? fmt(p.target, 2) : "—"}</td>
-      <td>${fmt(p.notional, 1)}U</td>
-      <td class="${cls(upnl)}">${upnl == null ? "—" : (upnl >= 0 ? "+" : "") + fmt(upnl, 2) + "U"} ${upct != null ? "(" + pct(upct) + ")" : ""}</td>
-      <td class="${cls(rr)}">${rr == null ? "—" : (rr >= 0 ? "+" : "") + fmt(rr, 2) + "R"}</td>
-      <td><button class="btn" data-close="${p.id}">平仓</button></td></tr>`;
+      <td data-label="标的/方向"><b>${p.sym}</b> <span class="chip ${p.side === "LONG" ? "risk-on" : "risk-off"}">${p.side}</span></td>
+      <td data-label="入场">${fmt(p.entry, 2)}</td><td data-label="现价">${lp != null ? fmt(lp, 2) : "—"}</td>
+      <td data-label="止损">${fmt(p.stop, 2)}</td><td data-label="止盈">${p.target ? fmt(p.target, 2) : "—"}</td>
+      <td data-label="名义">${fmt(p.notional, 1)}U</td>
+      <td data-label="浮动盈亏" class="${cls(upnl)}">${upnl == null ? "—" : (upnl >= 0 ? "+" : "") + fmt(upnl, 2) + "U"} ${upct != null ? "(" + pct(upct) + ")" : ""}</td>
+      <td data-label="R" class="${cls(rr)}">${rr == null ? "—" : (rr >= 0 ? "+" : "") + fmt(rr, 2) + "R"}</td>
+      <td data-label="操作"><button class="btn" data-close="${p.id}">平仓</button></td></tr>`;
   }).join("") || `<tr><td colspan="9" class="badge">暂无持仓</td></tr>`;
 
   const cb = $("paperClosedBody");
   if (cb) cb.innerHTML = PAPER.data.closed.slice().reverse().slice(0, 30).map(t => `<tr>
-    <td><b>${t.sym}</b> <span class="chip ${t.side === "LONG" ? "risk-on" : "risk-off"}">${t.side}</span></td>
-    <td>${fmt(t.entry, 2)} → ${fmt(t.exit, 2)}</td>
-    <td class="${cls(t.pnl)}">${(t.pnl >= 0 ? "+" : "") + fmt(t.pnl, 2)}U</td>
-    <td class="${cls(t.r)}">${(t.r >= 0 ? "+" : "") + fmt(t.r, 2)}R</td>
-    <td><span class="chip ${t.outcome === "WIN" ? "risk-on" : t.outcome === "LOSS" ? "risk-off" : "neutral"}">${t.outcome}</span></td>
-    <td class="badge">${(t.closedAt || "").slice(5, 16).replace("T", " ")}</td></tr>`).join("") || `<tr><td colspan="6" class="badge">暂无已平仓记录</td></tr>`;
+    <td data-label="标的/方向"><b>${t.sym}</b> <span class="chip ${t.side === "LONG" ? "risk-on" : "risk-off"}">${t.side}</span></td>
+    <td data-label="入场→出场">${fmt(t.entry, 2)} → ${fmt(t.exit, 2)}</td>
+    <td data-label="盈亏" class="${cls(t.pnl)}">${(t.pnl >= 0 ? "+" : "") + fmt(t.pnl, 2)}U</td>
+    <td data-label="R" class="${cls(t.r)}">${(t.r >= 0 ? "+" : "") + fmt(t.r, 2)}R</td>
+    <td data-label="结果"><span class="chip ${t.outcome === "WIN" ? "risk-on" : t.outcome === "LOSS" ? "risk-off" : "neutral"}">${t.outcome}</span></td>
+    <td data-label="时间" class="badge">${(t.closedAt || "").slice(5, 16).replace("T", " ")}</td></tr>`).join("") || `<tr><td colspan="6" class="badge">暂无已平仓记录</td></tr>`;
 }
 function paperExport() {
   const st = paperStats();
