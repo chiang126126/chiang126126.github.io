@@ -1077,7 +1077,11 @@ function genPlans(d) {
     ? `回踩 30h线 ${ma30h ? m(ma30h) : "—"} 不破 → ${tg("顺势做多")}，入场区 ${ma30h ? m(ma30h * 0.998) + "–" + m(ma30h * 1.005) : "—"}，止损1.5%，资费≥+0.10%放弃(过热)。`
     : `站上昨高 ${m(prevH)} 且回踩不破 + MSTR/纳指共振 → ${tg("小仓试多")}(震荡市减半仓)，止损昨高下方。`;
   const C = `昨低 ${m(prevL)} – 昨高 ${m(prevH)} 区间内 → ${ty("FLAT(空仓也是决策)")}。等 1h 收盘突破任一侧再按预案A/B执行；区间中轴附近开仓盈亏比不足，机器人也会因顺势/RR闸门自动观望。`;
-  return [{ k: "A·继续 risk-off", v: A, cls: "p-a" }, { k: "B·快速反弹", v: B, cls: "p-b" }, { k: "C·震荡无方向", v: C, cls: "p-c" }];
+  // 标题随日线状态切换：三格永远=下行/上行/无方向，多空双向由A/B覆盖，无需第四预案
+  const kA = off ? "A·下行·继续 risk-off(顺势空)" : on ? "A·下行·急跌回调(防守)" : "A·下行·向下破位";
+  const kB = off ? "B·上行·快速反弹(反弹≠反转)" : on ? "B·上行·risk-on 延续(顺势多)" : "B·上行·向上突破";
+  const kC = (off || on) ? "C·震荡无方向" : "C·区间持续";
+  return [{ k: kA, v: A, cls: "p-a" }, { k: kB, v: B, cls: "p-b" }, { k: kC, v: C, cls: "p-c" }];
 }
 // 今日焦点横幅：全球风偏 + BTC位置 + 首要风险 + 一句建议
 function genFocus(d) {
