@@ -225,6 +225,7 @@ async function loadEvents() {
 
 //==================== 自动机器人（读取 bot 写入的数据）====================
 let _botState = null;   // 机器人最新状态，供顶部权益与逐秒浮动盈亏复用
+let _botLog = null;     // 机器人最近一轮日志（含跨市场快照 xm），供一日节奏面板复用
 async function loadBot() {
   if (!$("botStats")) return;
   let st;
@@ -233,6 +234,7 @@ async function loadBot() {
   let log = { items: [] }, tr = [];
   try { log = await jget("./data/bot_log.json", { cache: "no-store" }); } catch (e) {}
   try { tr = await jget("./data/bot_trades.json", { cache: "no-store" }); } catch (e) {}
+  _botLog = log;
 
   const eq0 = st.equity0 || 500, cum = (st.equity / eq0 - 1) * 100;
   const wins = tr.filter(t => t.pnl > 0), wr = tr.length ? wins.length / tr.length * 100 : null;
@@ -910,6 +912,179 @@ function setupNav() {
 }
 
 //==================== 启动 ====================
+//==================== 一日节奏 · 实时研报（每项=数据+结论；纯函数可测）====================
+// 关键位判定：现价 vs 昨高/昨低/30日线 → 突破|跌破|区间内 + 一句结论
+function levelVerdict(price, prevH, prevL, ma30d) {
+  if ([price, prevH, prevL].some(x => x == null)) return null;
+  const dev = ma30d ? (price / ma30d - 1) * 100 : null;
+  const rz = ma30d != null ? `｜30日线 ${money(ma30d)}(${dev >= 0 ? "+" : ""}${dev.toFixed(1)}%)` : "";
+  let st, cn;
+  if (price > prevH) { st = `已<b>突破昨高</b> ${money(prevH)}`; cn = dev != null && dev < 0 ? "但仍在日线下方，反弹性质待确认" : "多头结构"; }
+  else if (price < prevL) { st = `已<b>跌破昨低</b> ${money(prevL)}`; cn = "破位，反抽 " + money(prevL) + " 不收复则顺势偏空"; }
+  else { st = `区间内(昨低 ${money(prevL)}–昨高 ${money(prevH)})`; cn = dev != null ? (dev <= -1 ? "日线下方＝反弹默认逢高空视角" : dev >= 1 ? "日线上方＝回踩默认逢低多视角" : "贴近日线，方向不明") : "方向不明"; }
+  return `现价 <b>${money(price)}</b>｜${st}${rz} → ${cn}`;
+}
+// ETH/SOL 相对 BTC 强弱 → 资金是否下沉（risk-on 确认项）
+function relVerdict(ethbtc, solbtc) {
+  if (ethbtc == null && solbtc == null) return null;
+  const f = x => x == null ? "n/a" : `${x >= 0 ? "+" : ""}${x.toFixed(2)}%`;
+  const strong = [ethbtc, solbtc].filter(x => x != null && x >= 0.5).length;
+  const weak = [ethbtc, solbtc].filter(x => x != null && x <= -0.5).length;
+  const cn = strong >= 2 ? "资金下沉山寨＝risk-on确认" : strong === 1 ? "局部轮动，非全面risk-on" :
+             weak >= 1 ? "资金回避高β，偏防御" : "无明显偏向";
+  return `ETH/BTC ${f(ethbtc)}｜SOL/BTC ${f(solbtc)} → ${cn}`;
+}
+// 夜间(近10h)量能 vs 前7日常态
+function volVerdict(ratio) {
+  if (ratio == null) return null;
+  const cn = ratio >= 1.8 ? "<b>异常放量</b>——夜间有事，查新闻/破位" : ratio >= 1.3 ? "偏高，留意" : "正常";
+  return `近10h量＝常态的 <b>${ratio.toFixed(1)}×</b>(≥1.8×判异常) → ${cn}`;
+}
+// 资费+OI是否突升
+function fundOiVerdict(funding, oiChg) {
+  if (funding == null && oiChg == null) return null;
+  const f = funding == null ? "n/a" : `${funding >= 0 ? "+" : ""}${funding.toFixed(4)}%/8h`;
+  const o = oiChg == null ? "n/a" : `${oiChg >= 0 ? "+" : ""}${oiChg.toFixed(1)}%`;
+  const fw = funding != null && Math.abs(funding) >= 0.05 ? (funding > 0 ? "多头拥挤" : "<b>空头拥挤(勿追空)</b>")
+           : funding != null && Math.abs(funding) >= 0.03 ? "偏热" : "中性";
+  const ow = oiChg != null ? (oiChg >= 8 ? "<b>OI激增＝新杠杆进场</b>" : oiChg <= -8 ? "OI大降＝杠杆清理近尾声" : oiChg >= 0 ? "OI小增" : "OI小降(降杠杆)") : "";
+  return `资费 ${f}(${fw})｜OI 24h ${o} ${ow ? "→ " + ow : ""}`;
+}
+// 盘中：OI结构 × 价格方向 → 下跌是新空还是清算
+function oiStructVerdict(oiChg, chg24) {
+  if (oiChg == null || chg24 == null) return null;
+  if (chg24 < 0 && oiChg > 2) return `跌${chg24.toFixed(1)}% + OI增${oiChg.toFixed(1)}% → 新空进场，跌势或延续`;
+  if (chg24 < 0 && oiChg < -2) return `跌${chg24.toFixed(1)}% + OI降${Math.abs(oiChg).toFixed(1)}% → 多头清算主导，<b>杠杆快洗完，追空危险</b>`;
+  if (chg24 > 0 && oiChg > 2) return `涨${chg24.toFixed(1)}% + OI增${oiChg.toFixed(1)}% → 新多进场，趋势健康`;
+  if (chg24 > 0 && oiChg < -2) return `涨${chg24.toFixed(1)}% + OI降 → 空头回补推动，涨势质量存疑`;
+  return `价${chg24 >= 0 ? "+" : ""}${chg24.toFixed(1)}%/OI${oiChg >= 0 ? "+" : ""}${oiChg.toFixed(1)}% → 无明显杠杆结构变化`;
+}
+// 三套预案：基于真实价位（昨高低/30h线/30日线）+日线状态+资费 生成具体计划
+function genPlans(d) {
+  const { price, prevH, prevL, ma30h, ma30d, funding } = d;
+  if ([price, prevH, prevL].some(x => x == null)) return null;
+  const dev = ma30d ? (price / ma30d - 1) * 100 : null;
+  const off = dev != null && dev <= -1, on = dev != null && dev >= 1;
+  const m = money;
+  const crowded = funding != null && funding <= -0.05;
+  const zLo = m(prevL * 0.995), zHi = m(prevL * 1.002), stopA = m(prevL * 1.015);
+  const A = off
+    ? `跌破昨低 <b>${m(prevL)}</b> 且 1h 收盘不收复 → 顺势做空。参考区间 ${zLo}–${zHi}(破位回抽区)，止损≈${stopA}(+1.5%)，目标≥1.5R。${crowded ? "<b>⚠当前资费已极端偏空，空头拥挤——本预案暂停</b>" : "资费≤−0.05%则放弃(拥挤)。"}机器人同规则自动执行。`
+    : `若纳指/BTC转弱：跌破30日线 ${ma30d ? m(ma30d) : "—"} 先减仓观望、<b>禁抄底</b>；跌破昨低 ${m(prevL)} 再评估反手空。`;
+  const B = off
+    ? `反弹≠反转：站上30h线 <b>${ma30h ? m(ma30h) : "—"}</b> 且回踩不破，再看 MSTR 是否转强、ETH/BTC 是否回暖。日线仍偏空(${dev.toFixed(1)}%)→ <b>多单被闸门禁止</b>；反弹至昨高 ${m(prevH)} 附近＝更优做空观察区，等反抽衰竭，不追第一波。`
+    : on
+    ? `回踩 30h线 ${ma30h ? m(ma30h) : "—"} 不破 → 顺势做多，入场区 ${ma30h ? m(ma30h * 0.998) + "–" + m(ma30h * 1.005) : "—"}，止损1.5%，资费≥+0.10%放弃(过热)。`
+    : `站上昨高 ${m(prevH)} 且回踩不破 + MSTR/纳指共振 → 小仓试多(震荡市减半仓)，止损昨高下方。`;
+  const C = `昨低 <b>${m(prevL)}</b> – 昨高 <b>${m(prevH)}</b> 区间内 → <b>FLAT(空仓也是决策)</b>。等 1h 收盘突破任一侧再按预案A/B执行；区间中轴附近开仓盈亏比不足，机器人也会因顺势/RR闸门自动观望。`;
+  return [{ k: "A·继续 risk-off", v: A }, { k: "B·快速反弹", v: B }, { k: "C·震荡无方向", v: C }];
+}
+// 新闻关键事件过滤（政策/黑客/ETF/宏观）
+const KEY_NEWS_RE = /ETF|SEC|CFTC|hack|exploit|breach|stolen|Fed|FOMC|rate|CPI|inflation|payroll|regulat|ban|lawsuit|court|bankrupt|liquidat|war|sanction|tariff|Trump|Treasury|stablecoin|listing|delist|halving|upgrade|hard fork/i;
+function keyEvents(items, n) {
+  return (items || []).filter(x => KEY_NEWS_RE.test(x.title || "")).slice(0, n || 3);
+}
+
+let _rhCache = {};   // 节奏面板的行情缓存（昨高低/量比/OI等，避免重复请求）
+async function loadRhythmLive() {
+  if (!$("rhythmGrid")) return;
+  const set = (id, html) => { const el = $(id); if (el && html) el.innerHTML = html; };
+  const btc = (STATE.market || []).find(c => c.name === "BTC");
+  try {
+    const [dkl, hkl, eth, sol, oih] = await Promise.allSettled([
+      jget(`${BN_SPOT}/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=9`),
+      jget(`${BN_SPOT}/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=178`),
+      jget(`${BN_SPOT}/api/v3/ticker/24hr?symbol=ETHBTC`),
+      jget(`${BN_SPOT}/api/v3/ticker/24hr?symbol=SOLBTC`),
+      jget(`${BN_FUT}/futures/data/openInterestHist?symbol=BTCUSDT&period=1h&limit=25`)
+    ]);
+    const r = {};
+    if (dkl.status === "fulfilled" && dkl.value.length >= 2) {
+      const prev = dkl.value[dkl.value.length - 2];
+      r.prevH = +prev[2]; r.prevL = +prev[3];
+    }
+    if (hkl.status === "fulfilled" && hkl.value.length >= 40) {
+      const vols = hkl.value.map(k => +k[7]);           // quote volume
+      const last10 = vols.slice(-10).reduce((a, b) => a + b, 0);
+      const prior = vols.slice(0, -10);
+      r.volRatio = prior.length ? last10 / (prior.reduce((a, b) => a + b, 0) / prior.length * 10) : null;
+      const closes = hkl.value.map(k => +k[4]);
+      r.ma30h = closes.slice(-30).reduce((a, b) => a + b, 0) / 30;
+      r.h3 = closes.slice(-4);                          // 近4根小时收盘，判方向持续性
+      r.lastClose = closes[closes.length - 2];          // 最近一根已收盘1h的收盘价
+    }
+    if (eth.status === "fulfilled") r.ethbtc = +eth.value.priceChangePercent;
+    if (sol.status === "fulfilled") r.solbtc = +sol.value.priceChangePercent;
+    if (oih.status === "fulfilled" && oih.value.length >= 2) {
+      const a = +oih.value[0].sumOpenInterest, b = +oih.value[oih.value.length - 1].sumOpenInterest;
+      r.oiChg = a ? (b / a - 1) * 100 : null;
+    }
+    _rhCache = r;
+  } catch (e) { /* 各项独立降级 */ }
+  const r = _rhCache;
+  const price = btc ? btc.price : null;
+  const ma30d = STATE.btcRegime && STATE.btcRegime.dev != null && price ? price / (1 + STATE.btcRegime.dev / 100) : null;
+  const funding = btc ? btc.funding : null;
+
+  // ① 欧洲上午
+  set("rhLevels", levelVerdict(price, r.prevH, r.prevL, ma30d) || "数据不可用");
+  set("rhRel", relVerdict(r.ethbtc, r.solbtc) || "数据不可用");
+  set("rhVol", volVerdict(r.volRatio) || "数据不可用");
+  set("rhFund", fundOiVerdict(funding, r.oiChg) || "数据不可用");
+  const evs = keyEvents(_newsItems, 3);
+  set("rhEvents", evs.length
+    ? evs.map(x => `<a href="${x.url}" target="_blank" rel="noopener" style="display:block">· ${x.title}</a>`).join("")
+    : "未捕捉到 政策/黑客/ETF/宏观 类高影响关键词事件");
+
+  // ② 美股盘前（跨市场快照来自机器人，每小时更新）
+  const xm = (_botLog && _botLog.xm) || null;
+  if (xm) {
+    const pc = x => x == null ? "n/a" : `${x >= 0 ? "+" : ""}${x.toFixed(2)}%`;
+    set("rhMacro", `纳指期货 <b>${pc(xm.nq_chg)}</b>｜10Y ${xm.tnx != null ? xm.tnx + "%" : "n/a"}(${pc(xm.tnx_chg)})｜DXY ${pc(xm.dxy_chg)} → 全球 <b>${_botLog.global_risk || "?"}</b>`);
+    const gap = (xm.mstr_chg != null && xm.btc_chg != null) ? xm.mstr_chg - xm.btc_chg : null;
+    const mstrCn = gap == null ? "" : gap <= -2 ? "（MSTR超额弱势＝降杠杆信号；若BTC稳则或为公司自身问题，勿据此空BTC）"
+      : gap >= 1.5 ? "（MSTR率先转强＝机构风偏恢复早期信号）" : "（无显著背离）";
+    set("rhStocks", `MSTR ${pc(xm.mstr_chg)}｜COIN ${pc(xm.coin_chg)}｜NVDA ${pc(xm.nvda_chg)} ${mstrCn}`);
+    const xt = $("rhXmTime"); if (xt && _botLog.ts) xt.textContent = `快照 ${ago(Math.floor(Date.parse(_botLog.ts) / 1000))}`;
+  }
+  const plans = genPlans({ price, prevH: r.prevH, prevL: r.prevL, ma30h: r.ma30h, ma30d, funding });
+  if (plans) set("rhPlans", plans.map(p => `<div class="plan"><b>${p.k}</b>：${p.v}</div>`).join(""));
+
+  // ③ 美股盘中·确认清单
+  if (r.h3 && r.h3.length >= 4) {
+    const dirs = [r.h3[1] - r.h3[0], r.h3[2] - r.h3[1], r.h3[3] - r.h3[2]];
+    const ups = dirs.filter(x => x > 0).length;
+    const side = price != null && r.ma30h != null ? (price >= r.ma30h ? "30h线上方" : "30h线下方") : "";
+    set("rhTrendNow", `近3根1h ${ups >= 2 ? "多数收涨" : ups <= 1 ? "多数收跌" : "涨跌互现"}·${side} → ${ups >= 2 && price >= r.ma30h ? "上行有持续性" : ups <= 1 && price < r.ma30h ? "下行有持续性" : "方向未确认，不追"}`);
+  }
+  if (xm && xm.mstr_chg != null && btc) {
+    const same = (xm.mstr_chg >= 0) === (btc.chg >= 0);
+    set("rhResonance", `MSTR ${xm.mstr_chg >= 0 ? "+" : ""}${xm.mstr_chg}% vs BTC ${btc.chg >= 0 ? "+" : ""}${(btc.chg || 0).toFixed(1)}% → ${same ? "<b>同向共振</b>，信号可信度↑" : "背离，降低置信度观望"}`);
+  }
+  if (price != null && r.prevL != null) {
+    set("rhBreak", price < r.prevL
+      ? (r.lastClose != null && r.lastClose < r.prevL ? `1h<b>收盘确认</b>跌破昨低 ${money(r.prevL)} → 真破位` : `现价在昨低 ${money(r.prevL)} 下方但未收盘确认 → 或为插针，等收盘`)
+      : `未破昨低 ${money(r.prevL)}，支撑尚在`);
+  }
+  set("rhOi2", oiStructVerdict(r.oiChg, btc ? btc.chg : null) || "数据不可用");
+  if (funding != null) {
+    set("rhCrowd", funding <= -0.05 ? `资费 ${funding.toFixed(4)}% → <b>空头极端拥挤，禁追空</b>(闸门已拦)` :
+      funding >= 0.10 ? `资费 +${funding.toFixed(4)}% → <b>多头过热，禁追多</b>(闸门已拦)` :
+      `资费 ${funding >= 0 ? "+" : ""}${funding.toFixed(4)}%/8h → 未拥挤，方向闸门正常放行`);
+  }
+
+  // ④ 盘后/亚洲·机器人值守
+  if (_botState) {
+    const ts = _botState.updated_at ? ago(Math.floor(Date.parse(_botState.updated_at) / 1000)) : "?";
+    const n = (_botState.positions || []).length;
+    set("rhBot", `最近运行 ${ts}·${_botState.mode || ""}·持仓 ${n} → ${n ? "值守中" : "空仓观望中"}`);
+    set("rhGuard", n ? (_botState.positions.map(p => {
+      const kind = p.stop_kind === "TRAIL" ? "跟踪止盈中" : p.stop_kind === "BE" ? "已保本" : "初始止损";
+      return `${p.symbol} ${p.side || "LONG"}·${kind}${p.max_hold_hours ? "·限时" + p.max_hold_hours + "h" : ""}`;
+    }).join("｜")) : "无持仓需护航；保本/跟踪止盈/超时离场随开仓自动启用");
+  }
+}
+
 //==================== 一日节奏（欧洲时区，高亮当前时段）====================
 function rhythmPhase(t) {   // t = 巴黎时间的"当日分钟数"
   if (t >= 420 && t < 840) return 0;    // 07:00–14:00 欧洲上午
@@ -936,6 +1111,7 @@ async function refreshLive() {
     loadCryptoNews(), loadFred(), loadUsStocks(), loadMstr(), loadBot()
   ]);
   renderDecision();   // 规则推断的决策元组（直接可读）
+  loadRhythmLive();   // 一日节奏·实时研报（依赖上面已刷新的行情/新闻/机器人数据）
   // 给 LLM 的 Evidence 文本自动重生成：用户正在框选/编辑该文本框时跳过，避免打断复制
   if (CFG.AUTO_EVIDENCE !== false && document.activeElement !== $("evidenceOut")) {
     showEvidence();

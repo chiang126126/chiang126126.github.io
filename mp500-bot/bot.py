@@ -285,6 +285,8 @@ def main():
     xm = strategy.fetch_cross_market()          # 第一层·领先信息（纳指期指/美债/美元/MSTR…）
     if xm.get("nq_chg") is not None or xm.get("mstr_chg") is not None:
         log["global_risk"] = strategy.classify_global_risk(xm)[0]
+        log["xm"] = xm                          # 完整快照给看板「一日节奏」盘前卡复用
+    log["phase"] = strategy.session_phase()
 
     # 3) 寻找新入场
     for sym in CORE:

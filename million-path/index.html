@@ -149,7 +149,12 @@
   .rh-head{display:flex;justify-content:space-between;align-items:baseline}
   .rh-sub{font-size:11px;color:var(--muted);margin:4px 0 6px}
   .rh-card ul{margin:0;padding-left:16px;font-size:12px;line-height:1.7}
-  .rh-card li{color:var(--text)}
+  .rh-card li{color:var(--muted)}
+  .rh-val{color:var(--text)}
+  .rh-val b{color:var(--gold2)}
+  .rh-plans{margin-top:8px;font-size:12px;line-height:1.65}
+  .rh-plans .plan{background:var(--chip);border:1px solid var(--border);border-radius:8px;padding:7px 9px;margin-top:6px}
+  .rh-plans .plan b:first-child{color:var(--gold2)}
   /* 加密新闻：双列瀑布流 + 自动滚动 */
   .news-masonry{display:flex;gap:14px}
   .news-col{flex:1;min-width:0;height:360px;overflow:hidden;position:relative;-webkit-mask-image:linear-gradient(180deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(180deg,transparent,#000 6%,#000 94%,transparent)}
@@ -260,38 +265,40 @@
         <div class="rh-head"><b>① 欧洲上午</b><span class="badge">07:00–14:00</span></div>
         <div class="rh-sub">复盘隔夜/亚洲盘 · 形成初步假设 · 不急于交易</div>
         <ul>
-          <li>BTC 是否突破/跌破关键位 → <a href="#sec-market">行情</a>·<a href="#sec-trend">趋势</a></li>
-          <li>ETH/SOL 相对 BTC 走强还是走弱</li>
-          <li>夜间异常成交量 / 资金费率与 OI 是否突升 → <a href="#sec-market">行情</a></li>
-          <li>政策·黑客·ETF·项目事件 → <a href="#sec-news">加密新闻</a></li>
+          <li>BTC 关键位：<span class="rh-val" id="rhLevels">计算中…</span></li>
+          <li>ETH/SOL 相对强弱：<span class="rh-val" id="rhRel">计算中…</span></li>
+          <li>夜间成交量：<span class="rh-val" id="rhVol">计算中…</span></li>
+          <li>资金费率 & OI：<span class="rh-val" id="rhFund">计算中…</span></li>
+          <li>关键事件：<span class="rh-val" id="rhEvents">扫描新闻中…</span></li>
         </ul>
       </div>
       <div class="rh-card" data-phase="1">
         <div class="rh-head"><b>② 美股盘前</b><span class="badge">14:00–15:30</span></div>
-        <div class="rh-sub">建立当天三套情景，而不是一个预测</div>
+        <div class="rh-sub">建立当天三套情景，而不是一个预测<span class="badge" id="rhXmTime"></span></div>
         <ul>
-          <li>纳指/标普期货 · 美债收益率 · 美元 → <a href="#sec-us">美股·宏观</a></li>
-          <li>MSTR / COIN / 半导体盘前 → <a href="#sec-env">市场环境</a>·<a href="#sec-us">美股</a></li>
-          <li>当天通胀/就业/美联储数据、科技财报 → <a href="#sec-env">经济日历</a></li>
-          <li><b>预案A</b> 继续risk-off怎么办｜<b>预案B</b> 快速反弹怎么办｜<b>预案C</b> 震荡无方向怎么办</li>
+          <li>期指/美债/美元：<span class="rh-val" id="rhMacro">等机器人快照…</span></li>
+          <li>加密概念股：<span class="rh-val" id="rhStocks">等机器人快照…</span></li>
+          <li>今日数据/财报：<span class="rh-val"><a href="#sec-env">查经济日历</a>（重大数据前后 30 分钟避免开新仓）</span></li>
         </ul>
+        <div class="rh-plans" id="rhPlans">预案生成中…</div>
       </div>
       <div class="rh-card" data-phase="2">
         <div class="rh-head"><b>③ 美股盘中</b><span class="badge">15:30–22:00</span></div>
         <div class="rh-sub">只做确认 · 不追第一波（开盘噪音/止损/程序化资金多）</div>
         <ul>
-          <li>开盘方向能否<b>持续</b>，MSTR/科技股与 BTC 是否共振</li>
-          <li>BTC 真跌破支撑，还是短暂插针</li>
-          <li>下跌时 OI 在增(新空)还是在降(杠杆已清理，追空危险)</li>
-          <li>资金费率是否已极端偏空(空头拥挤勿追)</li>
+          <li>方向持续性：<span class="rh-val" id="rhTrendNow">计算中…</span></li>
+          <li>股币共振：<span class="rh-val" id="rhResonance">计算中…</span></li>
+          <li>真破位还是插针：<span class="rh-val" id="rhBreak">计算中…</span></li>
+          <li>OI 结构：<span class="rh-val" id="rhOi2">计算中…</span></li>
+          <li>资费拥挤度：<span class="rh-val" id="rhCrowd">计算中…</span></li>
         </ul>
       </div>
       <div class="rh-card" data-phase="3">
         <div class="rh-head"><b>④ 盘后/亚洲</b><span class="badge">22:00–07:00</span></div>
         <div class="rh-sub">加密独立行情时段 · 机器人值守</div>
         <ul>
-          <li>机器人每小时自动执行行动卡 → <a href="#sec-bot">机器人</a></li>
-          <li>保本/跟踪止盈/超时离场自动护航持仓</li>
+          <li>机器人状态：<span class="rh-val" id="rhBot">读取中…</span></li>
+          <li>持仓护航：<span class="rh-val" id="rhGuard">读取中…</span></li>
           <li>次日欧洲上午复盘夜间异动</li>
         </ul>
       </div>
@@ -434,7 +441,7 @@
     ⚠️ 本看板为纪律与复盘工具，行情数据仅供参考、可能延迟或因网络/地区受限；<b>不构成投资建议</b>，加密交易可能损失全部本金。任何收益目标必须服从风控。
   </div>
 
-  <script src="./config.js?v=30"></script>
-  <script src="./assets/app.js?v=30"></script>
+  <script src="./config.js?v=31"></script>
+  <script src="./assets/app.js?v=31"></script>
 </body>
 </html>
