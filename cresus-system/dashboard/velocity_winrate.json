@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-10T18:03:26.468836+00:00",
+  "generated_at": "2026-07-10T18:05:34.040458+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "NAORISUSDT|burst|LONG": {
-      "symbol": "NAORISUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 36,
-          "win_rate": 0.278,
-          "avg_outcome_pct": -0.47
-        },
-        "60m": {
-          "n": 36,
-          "win_rate": 0.194,
-          "avg_outcome_pct": -0.78
-        },
-        "240m": {
-          "n": 36,
-          "win_rate": 0.361,
-          "avg_outcome_pct": -1.32
-        }
-      }
-    },
     "CUSDT|burst|SHORT": {
       "symbol": "CUSDT",
       "alert_type": "burst",
@@ -594,6 +572,28 @@
           "n": 200,
           "win_rate": 0.5,
           "avg_outcome_pct": 0.14
+        }
+      }
+    },
+    "NAORISUSDT|burst|LONG": {
+      "symbol": "NAORISUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 35,
+          "win_rate": 0.286,
+          "avg_outcome_pct": -0.48
+        },
+        "60m": {
+          "n": 35,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -0.76
+        },
+        "240m": {
+          "n": 35,
+          "win_rate": 0.343,
+          "avg_outcome_pct": -1.43
         }
       }
     },
@@ -6741,8 +6741,8 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 102,
-          "win_rate": 0.225,
+          "n": 103,
+          "win_rate": 0.223,
           "avg_outcome_pct": -0.19
         },
         "60m": {
@@ -29543,9 +29543,9 @@
           "avg_outcome_pct": 0.82
         },
         "240m": {
-          "n": 43,
-          "win_rate": 0.465,
-          "avg_outcome_pct": 1.24
+          "n": 44,
+          "win_rate": 0.455,
+          "avg_outcome_pct": 1.14
         }
       }
     },
@@ -31455,6 +31455,18 @@
           "n": 23,
           "win_rate": 0.348,
           "avg_outcome_pct": -6.6
+        }
+      }
+    },
+    "RAREUSDT|burst|SHORT": {
+      "symbol": "RAREUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.64
         }
       }
     },
