@@ -956,23 +956,22 @@ function renderDecision() {
       <div style="font-size:13.5px;margin-top:9px;line-height:1.9">${hiSummary}</div>
       <div style="font-size:12px;margin-top:9px;padding-top:8px;border-top:1px dashed var(--border);line-height:1.7">操作：<b style="color:${bcol}">${d.move}</b> ｜ MP500 仓位建议：${d.advice}</div>
     </div>
-    <div class="grid g-auto" style="margin-bottom:8px">
-      <div class="card"><div class="k">市场状态</div><div class="v"><span class="chip ${stCls}" style="font-size:13px">${d.state}</span></div></div>
-      <div class="card"><div class="k">方向 bias</div><div class="v"><span class="chip ${biasCls}" style="font-size:15px">${d.bias}</span></div></div>
-      <div class="card"><div class="k">置信度</div><div class="v">${d.conf.toFixed(2)}</div>
-        <div style="height:6px;border-radius:4px;background:#0d1426;margin-top:6px;overflow:hidden"><div style="height:100%;width:${bar}%;background:linear-gradient(90deg,var(--gold),var(--gold2))"></div></div></div>
-      <div class="card"><div class="k">首选标的</div><div class="v" style="font-size:14px">${d.symbol}</div></div>
+    <div class="grid g-auto dec-el" style="margin-bottom:8px">
+      <div class="card"><div class="k">市场状态</div><div class="v"><span class="chip ${stCls}" style="font-size:11.5px">${d.state}</span></div></div>
+      <div class="card"><div class="k">方向 bias</div><div class="v"><span class="chip ${biasCls}" style="font-size:12px">${d.bias}</span></div></div>
+      <div class="card"><div class="k">置信度</div><div class="v">${d.conf.toFixed(2)}<span class="cbar"><i style="width:${bar}%"></i></span></div></div>
+      <div class="card"><div class="k">首选标的</div><div class="v">${d.symbol}</div></div>
     </div>
-    ${d.triggers ? `<div class="grid g-auto" style="margin-bottom:10px">
-      <div class="card" style="border-color:rgba(22,199,132,.35)"><div class="k">⏳ 上行触发（转多观察）</div><div class="v" style="font-size:13px;color:var(--green)">1h收盘 > ${money(d.triggers.up)}</div></div>
-      <div class="card" style="border-color:rgba(234,57,67,.35)"><div class="k">⏳ 下行触发（转空观察）</div><div class="v" style="font-size:13px;color:var(--red)">1h收盘 < ${money(d.triggers.down)}</div></div>
-      <div class="card"><div class="k">小时中枢 30h线</div><div class="v" style="font-size:13px">${d.triggers.mid ? money(d.triggers.mid) : "—"}</div></div>
-      <div class="card"><div class="k">状态</div><div class="v" style="font-size:13px;color:var(--gold2)">等待触发 · 每60秒复评</div></div>
-    </div>` : `<div class="grid g-auto" style="margin-bottom:10px">
-      <div class="card"><div class="k">入场区间</div><div class="v" style="font-size:14px">${zone}</div></div>
-      <div class="card"><div class="k">判断失效位</div><div class="v" style="font-size:13px">${d.invalid || "—"}</div></div>
-      <div class="card"><div class="k">目标位（≥1.5R）</div><div class="v" style="font-size:14px">${d.target ? money(d.target) : "—"}</div></div>
-      <div class="card"><div class="k">最大持仓时间</div><div class="v" style="font-size:13px">${d.maxHold}</div></div>
+    ${d.triggers ? `<div class="grid g-auto dec-el" style="margin-bottom:10px">
+      <div class="card" style="border-color:rgba(22,199,132,.35)"><div class="k">⏳ 上行触发（转多观察）</div><div class="v" style="color:var(--green)">1h收盘 > ${money(d.triggers.up)}</div></div>
+      <div class="card" style="border-color:rgba(234,57,67,.35)"><div class="k">⏳ 下行触发（转空观察）</div><div class="v" style="color:var(--red)">1h收盘 < ${money(d.triggers.down)}</div></div>
+      <div class="card"><div class="k">小时中枢 30h线</div><div class="v">${d.triggers.mid ? money(d.triggers.mid) : "—"}</div></div>
+      <div class="card"><div class="k">状态</div><div class="v" style="color:var(--gold2)">等待触发 · 每60秒复评</div></div>
+    </div>` : `<div class="grid g-auto dec-el" style="margin-bottom:10px">
+      <div class="card"><div class="k">入场区间</div><div class="v">${zone}</div></div>
+      <div class="card"><div class="k">判断失效位</div><div class="v">${d.invalid || "—"}</div></div>
+      <div class="card"><div class="k">目标位（≥1.5R）</div><div class="v">${d.target ? money(d.target) : "—"}</div></div>
+      <div class="card"><div class="k">最大持仓时间</div><div class="v">${d.maxHold}</div></div>
     </div>`}
     <div class="dflow-wrap">
       <div class="dflow">
