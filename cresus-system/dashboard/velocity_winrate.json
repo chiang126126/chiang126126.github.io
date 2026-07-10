@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-10T20:19:27.742411+00:00",
+  "generated_at": "2026-07-10T20:21:32.619141+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "SUSHIUSDT|sustained|SHORT": {
-      "symbol": "SUSHIUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 8,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 0.49
-        },
-        "60m": {
-          "n": 8,
-          "win_rate": 0.625,
-          "avg_outcome_pct": 1.62
-        },
-        "240m": {
-          "n": 8,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 0.87
-        }
-      }
-    },
     "BASUSDT|burst|SHORT": {
       "symbol": "BASUSDT",
       "alert_type": "burst",
@@ -7568,6 +7546,28 @@
           "n": 16,
           "win_rate": 0.562,
           "avg_outcome_pct": -0.77
+        }
+      }
+    },
+    "SUSHIUSDT|sustained|SHORT": {
+      "symbol": "SUSHIUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 7,
+          "win_rate": 0.429,
+          "avg_outcome_pct": 0.47
+        },
+        "60m": {
+          "n": 7,
+          "win_rate": 0.571,
+          "avg_outcome_pct": 1.76
+        },
+        "240m": {
+          "n": 7,
+          "win_rate": 0.429,
+          "avg_outcome_pct": 0.76
         }
       }
     },
@@ -16658,9 +16658,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 48,
-          "win_rate": 0.167,
-          "avg_outcome_pct": -0.21
+          "n": 49,
+          "win_rate": 0.184,
+          "avg_outcome_pct": -0.2
         },
         "60m": {
           "n": 48,
