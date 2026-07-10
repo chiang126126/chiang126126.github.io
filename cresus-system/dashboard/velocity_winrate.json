@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-10T19:47:29.019943+00:00",
+  "generated_at": "2026-07-10T19:49:39.183167+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "RAVEUSDT|burst|LONG": {
-      "symbol": "RAVEUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 100,
-          "win_rate": 0.25,
-          "avg_outcome_pct": -0.09
-        },
-        "60m": {
-          "n": 100,
-          "win_rate": 0.26,
-          "avg_outcome_pct": -0.49
-        },
-        "240m": {
-          "n": 99,
-          "win_rate": 0.222,
-          "avg_outcome_pct": -0.75
-        }
-      }
-    },
     "MEGAUSDT|sustained|SHORT": {
       "symbol": "MEGAUSDT",
       "alert_type": "sustained",
@@ -3913,9 +3891,9 @@
           "avg_outcome_pct": 0.18
         },
         "240m": {
-          "n": 249,
-          "win_rate": 0.494,
-          "avg_outcome_pct": 1.57
+          "n": 250,
+          "win_rate": 0.492,
+          "avg_outcome_pct": 1.56
         }
       }
     },
@@ -14735,6 +14713,28 @@
           "n": 13,
           "win_rate": 0.308,
           "avg_outcome_pct": -0.58
+        }
+      }
+    },
+    "RAVEUSDT|burst|LONG": {
+      "symbol": "RAVEUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 99,
+          "win_rate": 0.253,
+          "avg_outcome_pct": -0.08
+        },
+        "60m": {
+          "n": 99,
+          "win_rate": 0.263,
+          "avg_outcome_pct": -0.48
+        },
+        "240m": {
+          "n": 98,
+          "win_rate": 0.224,
+          "avg_outcome_pct": -0.74
         }
       }
     },
