@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-07-10T21:35:16.474735+00:00",
+  "generated_at": "2026-07-10T21:37:20.410342+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "NATGASUSDT|burst|LONG": {
-      "symbol": "NATGASUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 10,
-          "win_rate": 0.1,
-          "avg_outcome_pct": -0.37
-        },
-        "60m": {
-          "n": 10,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -0.16
-        },
-        "240m": {
-          "n": 10,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 0.28
-        }
-      }
-    },
-    "USELESSUSDT|sustained|SHORT": {
-      "symbol": "USELESSUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 61,
-          "win_rate": 0.246,
-          "avg_outcome_pct": -0.31
-        },
-        "60m": {
-          "n": 61,
-          "win_rate": 0.328,
-          "avg_outcome_pct": -0.56
-        },
-        "240m": {
-          "n": 61,
-          "win_rate": 0.361,
-          "avg_outcome_pct": -0.42
-        }
-      }
-    },
     "UMAUSDT|burst|SHORT": {
       "symbol": "UMAUSDT",
       "alert_type": "burst",
@@ -506,6 +462,28 @@
           "n": 41,
           "win_rate": 0.463,
           "avg_outcome_pct": -0.18
+        }
+      }
+    },
+    "USELESSUSDT|sustained|SHORT": {
+      "symbol": "USELESSUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 60,
+          "win_rate": 0.25,
+          "avg_outcome_pct": -0.29
+        },
+        "60m": {
+          "n": 60,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -0.57
+        },
+        "240m": {
+          "n": 60,
+          "win_rate": 0.367,
+          "avg_outcome_pct": -0.41
         }
       }
     },
@@ -21665,6 +21643,28 @@
           "n": 8,
           "win_rate": 0.375,
           "avg_outcome_pct": -1.01
+        }
+      }
+    },
+    "NATGASUSDT|burst|LONG": {
+      "symbol": "NATGASUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 9,
+          "win_rate": 0.111,
+          "avg_outcome_pct": -0.02
+        },
+        "60m": {
+          "n": 9,
+          "win_rate": 0.222,
+          "avg_outcome_pct": 0.19
+        },
+        "240m": {
+          "n": 9,
+          "win_rate": 0.556,
+          "avg_outcome_pct": 0.66
         }
       }
     },
