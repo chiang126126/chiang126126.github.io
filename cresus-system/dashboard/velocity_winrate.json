@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-10T18:30:54.479315+00:00",
+  "generated_at": "2026-07-10T18:33:00.140993+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "GTCUSDT|sustained|LONG": {
-      "symbol": "GTCUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 9,
-          "win_rate": 0.444,
-          "avg_outcome_pct": 0.25
-        },
-        "60m": {
-          "n": 9,
-          "win_rate": 0.222,
-          "avg_outcome_pct": -1.06
-        },
-        "240m": {
-          "n": 9,
-          "win_rate": 0.444,
-          "avg_outcome_pct": 1.62
-        }
-      }
-    },
     "KASUSDT|burst|LONG": {
       "symbol": "KASUSDT",
       "alert_type": "burst",
@@ -377,6 +355,28 @@
         }
       }
     },
+    "GTCUSDT|sustained|LONG": {
+      "symbol": "GTCUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 8,
+          "win_rate": 0.375,
+          "avg_outcome_pct": -0.03
+        },
+        "60m": {
+          "n": 8,
+          "win_rate": 0.25,
+          "avg_outcome_pct": -0.88
+        },
+        "240m": {
+          "n": 8,
+          "win_rate": 0.375,
+          "avg_outcome_pct": -0.71
+        }
+      }
+    },
     "RIVERUSDT|sustained|SHORT": {
       "symbol": "RIVERUSDT",
       "alert_type": "sustained",
@@ -569,9 +569,9 @@
           "avg_outcome_pct": 0.04
         },
         "240m": {
-          "n": 100,
-          "win_rate": 0.38,
-          "avg_outcome_pct": 0.65
+          "n": 101,
+          "win_rate": 0.376,
+          "avg_outcome_pct": 0.64
         }
       }
     },
@@ -5734,8 +5734,8 @@
           "avg_outcome_pct": -0.15
         },
         "60m": {
-          "n": 83,
-          "win_rate": 0.277,
+          "n": 84,
+          "win_rate": 0.274,
           "avg_outcome_pct": -0.24
         },
         "240m": {
@@ -31398,9 +31398,9 @@
           "avg_outcome_pct": -0.31
         },
         "60m": {
-          "n": 5,
-          "win_rate": 0.4,
-          "avg_outcome_pct": 1.43
+          "n": 6,
+          "win_rate": 0.333,
+          "avg_outcome_pct": 0.92
         }
       }
     },
@@ -31410,9 +31410,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 7,
-          "win_rate": 0.286,
-          "avg_outcome_pct": -2.57
+          "n": 8,
+          "win_rate": 0.25,
+          "avg_outcome_pct": -2.32
         },
         "60m": {
           "n": 7,
