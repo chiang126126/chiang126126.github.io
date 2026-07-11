@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-11T00:19:42.350964+00:00",
+  "generated_at": "2026-07-11T00:21:49.906228+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "MOVEUSDT|sustained|LONG": {
-      "symbol": "MOVEUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 20,
-          "win_rate": 0.3,
-          "avg_outcome_pct": 0.18
-        },
-        "60m": {
-          "n": 20,
-          "win_rate": 0.3,
-          "avg_outcome_pct": -0.39
-        },
-        "240m": {
-          "n": 20,
-          "win_rate": 0.4,
-          "avg_outcome_pct": -2.0
-        }
-      }
-    },
     "PENDLEUSDT|burst|SHORT": {
       "symbol": "PENDLEUSDT",
       "alert_type": "burst",
@@ -28424,6 +28402,28 @@
           "n": 18,
           "win_rate": 0.611,
           "avg_outcome_pct": 2.06
+        }
+      }
+    },
+    "MOVEUSDT|sustained|LONG": {
+      "symbol": "MOVEUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 19,
+          "win_rate": 0.316,
+          "avg_outcome_pct": 0.34
+        },
+        "60m": {
+          "n": 19,
+          "win_rate": 0.316,
+          "avg_outcome_pct": -0.21
+        },
+        "240m": {
+          "n": 19,
+          "win_rate": 0.421,
+          "avg_outcome_pct": -1.9
         }
       }
     },
