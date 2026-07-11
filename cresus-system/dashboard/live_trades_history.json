@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-07-11T05:37:41.281677+00:00",
+  "generated_at": "2026-07-11T05:39:45.986363+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 842,
@@ -28,7 +28,7 @@
   "risk_status": {
     "block_new_opens": true,
     "reasons": [
-      "emergency stop flag exists: 'AUTO 2026-07-11T05:37:37.092665+00:00: cumulative DD 33.36% (balance $399.86 < threshold $400.00)'",
+      "emergency stop flag exists: 'AUTO 2026-07-11T05:39:41.483071+00:00: cumulative DD 33.36% (balance $399.86 < threshold $400.00)'",
       "cumulative DD 33.36% (balance $399.86 < threshold $400.00)"
     ],
     "daily_pnl": 0.0,
@@ -69346,16 +69346,26 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "AWEUSDT|LONG|2026-07-11T05:37:33.351070+00:00",
+      "symbol": "AWEUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-07-11T05:37:45.294259+00:00",
+      "reason": "phase_6y: ATR 0.85% < 1.0% 下限 (ATR<1% 稳健亏 -$232, bootstrap CI 整段<0)",
+      "last_checked_at": "2026-07-11T05:39:44.742713+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 64198.7,
-    "btc_ma25_1h": 64085.18,
-    "pct_vs_ma25": 0.177,
-    "change_24h_pct": 0.17,
+    "btc_price": 64178.1,
+    "btc_ma25_1h": 64084.36,
+    "pct_vs_ma25": 0.146,
+    "change_24h_pct": 0.137,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-07-11T05:37:41.238808+00:00"
+    "computed_at": "2026-07-11T05:39:45.931543+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
