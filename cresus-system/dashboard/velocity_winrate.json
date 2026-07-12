@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-07-12T20:40:51.936956+00:00",
+  "generated_at": "2026-07-12T20:42:58.040206+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "QUSDT|sustained|LONG": {
-      "symbol": "QUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 20,
-          "win_rate": 0.3,
-          "avg_outcome_pct": 0.27
-        },
-        "60m": {
-          "n": 20,
-          "win_rate": 0.3,
-          "avg_outcome_pct": -0.38
-        },
-        "240m": {
-          "n": 20,
-          "win_rate": 0.25,
-          "avg_outcome_pct": -1.64
-        }
-      }
-    },
-    "USELESSUSDT|burst|SHORT": {
-      "symbol": "USELESSUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 145,
-          "win_rate": 0.221,
-          "avg_outcome_pct": -0.32
-        },
-        "60m": {
-          "n": 145,
-          "win_rate": 0.283,
-          "avg_outcome_pct": -0.43
-        },
-        "240m": {
-          "n": 145,
-          "win_rate": 0.372,
-          "avg_outcome_pct": -0.8
-        }
-      }
-    },
     "BANANAS31USDT|burst|SHORT": {
       "symbol": "BANANAS31USDT",
       "alert_type": "burst",
@@ -11729,6 +11685,28 @@
         }
       }
     },
+    "USELESSUSDT|burst|SHORT": {
+      "symbol": "USELESSUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 144,
+          "win_rate": 0.222,
+          "avg_outcome_pct": -0.32
+        },
+        "60m": {
+          "n": 144,
+          "win_rate": 0.285,
+          "avg_outcome_pct": -0.43
+        },
+        "240m": {
+          "n": 144,
+          "win_rate": 0.375,
+          "avg_outcome_pct": -0.81
+        }
+      }
+    },
     "RUNEUSDT|burst|SHORT": {
       "symbol": "RUNEUSDT",
       "alert_type": "burst",
@@ -15334,6 +15312,28 @@
           "n": 56,
           "win_rate": 0.482,
           "avg_outcome_pct": -0.85
+        }
+      }
+    },
+    "QUSDT|sustained|LONG": {
+      "symbol": "QUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 19,
+          "win_rate": 0.263,
+          "avg_outcome_pct": 0.16
+        },
+        "60m": {
+          "n": 19,
+          "win_rate": 0.316,
+          "avg_outcome_pct": -0.35
+        },
+        "240m": {
+          "n": 19,
+          "win_rate": 0.263,
+          "avg_outcome_pct": -1.55
         }
       }
     },
