@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-12T09:53:44.513861+00:00",
+  "generated_at": "2026-07-12T09:55:51.504309+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "SYSUSDT|sustained|SHORT": {
-      "symbol": "SYSUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 7,
-          "win_rate": 0.429,
-          "avg_outcome_pct": 0.04
-        },
-        "60m": {
-          "n": 7,
-          "win_rate": 0.714,
-          "avg_outcome_pct": 0.85
-        },
-        "240m": {
-          "n": 7,
-          "win_rate": 0.857,
-          "avg_outcome_pct": 4.71
-        }
-      }
-    },
     "SAPIENUSDT|burst|SHORT": {
       "symbol": "SAPIENUSDT",
       "alert_type": "burst",
@@ -1144,6 +1122,28 @@
           "n": 73,
           "win_rate": 0.438,
           "avg_outcome_pct": 0.9
+        }
+      }
+    },
+    "SYSUSDT|sustained|SHORT": {
+      "symbol": "SYSUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 6,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -0.1
+        },
+        "60m": {
+          "n": 6,
+          "win_rate": 0.667,
+          "avg_outcome_pct": 0.86
+        },
+        "240m": {
+          "n": 6,
+          "win_rate": 0.833,
+          "avg_outcome_pct": 5.2
         }
       }
     },
@@ -30819,9 +30819,9 @@
           "avg_outcome_pct": 0.67
         },
         "240m": {
-          "n": 59,
-          "win_rate": 0.559,
-          "avg_outcome_pct": 1.39
+          "n": 60,
+          "win_rate": 0.567,
+          "avg_outcome_pct": 1.4
         }
       }
     },
