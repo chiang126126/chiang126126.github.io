@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-07-12T09:57:56.389829+00:00",
+  "generated_at": "2026-07-12T10:00:00.302460+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "SAPIENUSDT|burst|SHORT": {
-      "symbol": "SAPIENUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 25,
-          "win_rate": 0.36,
-          "avg_outcome_pct": 0.01
-        },
-        "60m": {
-          "n": 25,
-          "win_rate": 0.28,
-          "avg_outcome_pct": -0.14
-        },
-        "240m": {
-          "n": 25,
-          "win_rate": 0.36,
-          "avg_outcome_pct": -0.45
-        }
-      }
-    },
-    "GENIUSUSDT|burst|LONG": {
-      "symbol": "GENIUSUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 100,
-          "win_rate": 0.22,
-          "avg_outcome_pct": -0.1
-        },
-        "60m": {
-          "n": 100,
-          "win_rate": 0.32,
-          "avg_outcome_pct": -0.15
-        },
-        "240m": {
-          "n": 100,
-          "win_rate": 0.33,
-          "avg_outcome_pct": -0.97
-        }
-      }
-    },
     "INJUSDT|sustained|LONG": {
       "symbol": "INJUSDT",
       "alert_type": "sustained",
@@ -795,6 +751,28 @@
         }
       }
     },
+    "GENIUSUSDT|burst|LONG": {
+      "symbol": "GENIUSUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 99,
+          "win_rate": 0.222,
+          "avg_outcome_pct": -0.1
+        },
+        "60m": {
+          "n": 99,
+          "win_rate": 0.323,
+          "avg_outcome_pct": -0.14
+        },
+        "240m": {
+          "n": 99,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -0.95
+        }
+      }
+    },
     "ROSEUSDT|sustained|SHORT": {
       "symbol": "ROSEUSDT",
       "alert_type": "sustained",
@@ -1224,9 +1202,9 @@
           "avg_outcome_pct": -0.42
         },
         "60m": {
-          "n": 10,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -1.07
+          "n": 11,
+          "win_rate": 0.182,
+          "avg_outcome_pct": -0.96
         },
         "240m": {
           "n": 10,
@@ -4004,6 +3982,28 @@
           "n": 15,
           "win_rate": 0.333,
           "avg_outcome_pct": -1.53
+        }
+      }
+    },
+    "SAPIENUSDT|burst|SHORT": {
+      "symbol": "SAPIENUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 24,
+          "win_rate": 0.375,
+          "avg_outcome_pct": 0.03
+        },
+        "60m": {
+          "n": 24,
+          "win_rate": 0.292,
+          "avg_outcome_pct": -0.04
+        },
+        "240m": {
+          "n": 24,
+          "win_rate": 0.375,
+          "avg_outcome_pct": -0.47
         }
       }
     },
@@ -15788,9 +15788,9 @@
           "avg_outcome_pct": 0.24
         },
         "60m": {
-          "n": 87,
-          "win_rate": 0.575,
-          "avg_outcome_pct": 1.01
+          "n": 88,
+          "win_rate": 0.568,
+          "avg_outcome_pct": 0.97
         },
         "240m": {
           "n": 87,
