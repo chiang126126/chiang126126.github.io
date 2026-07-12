@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-12T08:12:08.959322+00:00",
+  "generated_at": "2026-07-12T08:14:15.528163+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "GTCUSDT|burst|SHORT": {
-      "symbol": "GTCUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 12,
-          "win_rate": 0.25,
-          "avg_outcome_pct": 0.38
-        },
-        "60m": {
-          "n": 12,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.5
-        },
-        "240m": {
-          "n": 12,
-          "win_rate": 0.667,
-          "avg_outcome_pct": 1.17
-        }
-      }
-    },
     "HIGHUSDT|burst|SHORT": {
       "symbol": "HIGHUSDT",
       "alert_type": "burst",
@@ -1166,6 +1144,28 @@
           "n": 90,
           "win_rate": 0.389,
           "avg_outcome_pct": -0.22
+        }
+      }
+    },
+    "GTCUSDT|burst|SHORT": {
+      "symbol": "GTCUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 11,
+          "win_rate": 0.273,
+          "avg_outcome_pct": 0.52
+        },
+        "60m": {
+          "n": 11,
+          "win_rate": 0.364,
+          "avg_outcome_pct": 0.61
+        },
+        "240m": {
+          "n": 11,
+          "win_rate": 0.636,
+          "avg_outcome_pct": 0.77
         }
       }
     },
@@ -3341,9 +3341,9 @@
           "avg_outcome_pct": -0.42
         },
         "240m": {
-          "n": 93,
-          "win_rate": 0.29,
-          "avg_outcome_pct": -0.79
+          "n": 94,
+          "win_rate": 0.298,
+          "avg_outcome_pct": -0.78
         }
       }
     },
@@ -23950,9 +23950,9 @@
           "avg_outcome_pct": -0.53
         },
         "60m": {
-          "n": 35,
-          "win_rate": 0.343,
-          "avg_outcome_pct": -0.63
+          "n": 36,
+          "win_rate": 0.361,
+          "avg_outcome_pct": -0.43
         },
         "240m": {
           "n": 35,
@@ -28780,8 +28780,8 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 114,
-          "win_rate": 0.447,
+          "n": 115,
+          "win_rate": 0.443,
           "avg_outcome_pct": 0.32
         },
         "60m": {
