@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-12T09:02:45.275947+00:00",
+  "generated_at": "2026-07-12T09:04:52.164592+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "ATAUSDT|sustained|SHORT": {
-      "symbol": "ATAUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 8,
-          "win_rate": 0.625,
-          "avg_outcome_pct": 1.26
-        },
-        "60m": {
-          "n": 8,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 2.21
-        },
-        "240m": {
-          "n": 8,
-          "win_rate": 0.75,
-          "avg_outcome_pct": 3.06
-        }
-      }
-    },
     "RESOLVUSDT|burst|LONG": {
       "symbol": "RESOLVUSDT",
       "alert_type": "burst",
@@ -660,6 +638,28 @@
           "n": 21,
           "win_rate": 0.524,
           "avg_outcome_pct": -0.12
+        }
+      }
+    },
+    "ATAUSDT|sustained|SHORT": {
+      "symbol": "ATAUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 7,
+          "win_rate": 0.571,
+          "avg_outcome_pct": 0.91
+        },
+        "60m": {
+          "n": 7,
+          "win_rate": 0.429,
+          "avg_outcome_pct": 0.97
+        },
+        "240m": {
+          "n": 7,
+          "win_rate": 0.714,
+          "avg_outcome_pct": 2.45
         }
       }
     },
@@ -5509,9 +5509,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 178,
-          "win_rate": 0.354,
-          "avg_outcome_pct": 0.26
+          "n": 179,
+          "win_rate": 0.352,
+          "avg_outcome_pct": 0.25
         },
         "60m": {
           "n": 178,
@@ -9413,9 +9413,9 @@
           "avg_outcome_pct": 0.55
         },
         "240m": {
-          "n": 76,
-          "win_rate": 0.355,
-          "avg_outcome_pct": 0.94
+          "n": 77,
+          "win_rate": 0.351,
+          "avg_outcome_pct": 0.89
         }
       }
     },
