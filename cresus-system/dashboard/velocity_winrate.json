@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-13T04:55:29.660609+00:00",
+  "generated_at": "2026-07-13T04:57:34.240683+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "XNYUSDT|sustained|SHORT": {
-      "symbol": "XNYUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 11,
-          "win_rate": 0.545,
-          "avg_outcome_pct": 0.18
-        },
-        "60m": {
-          "n": 11,
-          "win_rate": 0.545,
-          "avg_outcome_pct": 0.31
-        },
-        "240m": {
-          "n": 11,
-          "win_rate": 0.727,
-          "avg_outcome_pct": 1.25
-        }
-      }
-    },
     "SWARMSUSDT|burst|LONG": {
       "symbol": "SWARMSUSDT",
       "alert_type": "burst",
@@ -1939,6 +1917,28 @@
         }
       }
     },
+    "XNYUSDT|sustained|SHORT": {
+      "symbol": "XNYUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 10,
+          "win_rate": 0.6,
+          "avg_outcome_pct": 0.74
+        },
+        "60m": {
+          "n": 10,
+          "win_rate": 0.6,
+          "avg_outcome_pct": 0.87
+        },
+        "240m": {
+          "n": 10,
+          "win_rate": 0.8,
+          "avg_outcome_pct": 2.23
+        }
+      }
+    },
     "HIGHUSDT|sustained|LONG": {
       "symbol": "HIGHUSDT",
       "alert_type": "sustained",
@@ -2835,9 +2835,9 @@
           "avg_outcome_pct": -0.48
         },
         "240m": {
-          "n": 37,
-          "win_rate": 0.243,
-          "avg_outcome_pct": -0.83
+          "n": 38,
+          "win_rate": 0.263,
+          "avg_outcome_pct": -0.77
         }
       }
     },
@@ -30611,9 +30611,9 @@
           "avg_outcome_pct": 0.4
         },
         "60m": {
-          "n": 44,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 0.67
+          "n": 45,
+          "win_rate": 0.489,
+          "avg_outcome_pct": 0.62
         },
         "240m": {
           "n": 42,
@@ -33261,6 +33261,11 @@
           "n": 5,
           "win_rate": 0.4,
           "avg_outcome_pct": 0.31
+        },
+        "240m": {
+          "n": 5,
+          "win_rate": 0.6,
+          "avg_outcome_pct": 0.12
         }
       }
     },
