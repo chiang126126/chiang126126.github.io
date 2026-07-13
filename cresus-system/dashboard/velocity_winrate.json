@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-13T19:52:41.457958+00:00",
+  "generated_at": "2026-07-13T19:54:47.912815+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "SAPIENUSDT|sustained|SHORT": {
-      "symbol": "SAPIENUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 9,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -0.02
-        },
-        "60m": {
-          "n": 9,
-          "win_rate": 0.667,
-          "avg_outcome_pct": 0.57
-        },
-        "240m": {
-          "n": 9,
-          "win_rate": 0.444,
-          "avg_outcome_pct": 0.01
-        }
-      }
-    },
     "GWEIUSDT|burst|LONG": {
       "symbol": "GWEIUSDT",
       "alert_type": "burst",
@@ -572,6 +550,28 @@
           "n": 21,
           "win_rate": 0.619,
           "avg_outcome_pct": 1.15
+        }
+      }
+    },
+    "SAPIENUSDT|sustained|SHORT": {
+      "symbol": "SAPIENUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 8,
+          "win_rate": 0.375,
+          "avg_outcome_pct": 0.11
+        },
+        "60m": {
+          "n": 8,
+          "win_rate": 0.625,
+          "avg_outcome_pct": 0.46
+        },
+        "240m": {
+          "n": 8,
+          "win_rate": 0.375,
+          "avg_outcome_pct": -0.27
         }
       }
     },
