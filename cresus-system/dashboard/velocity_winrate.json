@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-07-13T08:21:09.334538+00:00",
+  "generated_at": "2026-07-13T08:23:14.402603+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "SYSUSDT|burst|LONG": {
-      "symbol": "SYSUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 16,
-          "win_rate": 0.188,
-          "avg_outcome_pct": -0.89
-        },
-        "60m": {
-          "n": 16,
-          "win_rate": 0.188,
-          "avg_outcome_pct": -1.29
-        },
-        "240m": {
-          "n": 16,
-          "win_rate": 0.188,
-          "avg_outcome_pct": -4.05
-        }
-      }
-    },
-    "ZECUSDT|burst|SHORT": {
-      "symbol": "ZECUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 77,
-          "win_rate": 0.13,
-          "avg_outcome_pct": -0.29
-        },
-        "60m": {
-          "n": 77,
-          "win_rate": 0.234,
-          "avg_outcome_pct": -0.22
-        },
-        "240m": {
-          "n": 77,
-          "win_rate": 0.312,
-          "avg_outcome_pct": -0.33
-        }
-      }
-    },
     "FFUSDT|sustained|SHORT": {
       "symbol": "FFUSDT",
       "alert_type": "sustained",
@@ -1232,6 +1188,28 @@
           "n": 65,
           "win_rate": 0.215,
           "avg_outcome_pct": -1.1
+        }
+      }
+    },
+    "SYSUSDT|burst|LONG": {
+      "symbol": "SYSUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 15,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -0.78
+        },
+        "60m": {
+          "n": 15,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -1.17
+        },
+        "240m": {
+          "n": 15,
+          "win_rate": 0.133,
+          "avg_outcome_pct": -4.52
         }
       }
     },
@@ -5465,9 +5443,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 20,
-          "win_rate": 0.45,
-          "avg_outcome_pct": 0.71
+          "n": 21,
+          "win_rate": 0.429,
+          "avg_outcome_pct": 0.59
         },
         "60m": {
           "n": 20,
@@ -6050,6 +6028,28 @@
           "n": 61,
           "win_rate": 0.443,
           "avg_outcome_pct": 0.09
+        }
+      }
+    },
+    "ZECUSDT|burst|SHORT": {
+      "symbol": "ZECUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 76,
+          "win_rate": 0.132,
+          "avg_outcome_pct": -0.3
+        },
+        "60m": {
+          "n": 76,
+          "win_rate": 0.237,
+          "avg_outcome_pct": -0.22
+        },
+        "240m": {
+          "n": 76,
+          "win_rate": 0.303,
+          "avg_outcome_pct": -0.34
         }
       }
     },
