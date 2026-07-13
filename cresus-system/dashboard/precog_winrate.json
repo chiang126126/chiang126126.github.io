@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-13T08:23:55.352680+00:00",
+  "generated_at": "2026-07-13T08:37:44.167553+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "AEROUSDT|ignition|SHORT": {
-      "symbol": "AEROUSDT",
-      "pred_type": "ignition",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 9,
-          "win_rate": 0.111,
-          "avg_outcome_pct": 0.26
-        },
-        "60m": {
-          "n": 9,
-          "win_rate": 0.444,
-          "avg_outcome_pct": 0.52
-        },
-        "240m": {
-          "n": 9,
-          "win_rate": 0.556,
-          "avg_outcome_pct": 0.37
-        }
-      }
-    },
     "SPXUSDT|ignition|LONG": {
       "symbol": "SPXUSDT",
       "pred_type": "ignition",
@@ -6537,6 +6515,28 @@
         }
       }
     },
+    "AEROUSDT|ignition|SHORT": {
+      "symbol": "AEROUSDT",
+      "pred_type": "ignition",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 8,
+          "win_rate": 0.125,
+          "avg_outcome_pct": 0.26
+        },
+        "60m": {
+          "n": 8,
+          "win_rate": 0.375,
+          "avg_outcome_pct": 0.44
+        },
+        "240m": {
+          "n": 8,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 0.31
+        }
+      }
+    },
     "TONUSDT|ignition|LONG": {
       "symbol": "TONUSDT",
       "pred_type": "ignition",
@@ -9137,17 +9137,17 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 5434,
+        "n": 5430,
         "win_rate": 0.278,
         "avg_outcome_pct": -0.01
       },
       "60m": {
-        "n": 5434,
+        "n": 5430,
         "win_rate": 0.308,
         "avg_outcome_pct": -0.07
       },
       "240m": {
-        "n": 5434,
+        "n": 5430,
         "win_rate": 0.374,
         "avg_outcome_pct": -0.09
       }
