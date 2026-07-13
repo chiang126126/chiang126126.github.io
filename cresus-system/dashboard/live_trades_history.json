@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-07-13T20:27:19.733491+00:00",
+  "generated_at": "2026-07-13T20:29:21.361261+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 842,
@@ -28,7 +28,7 @@
   "risk_status": {
     "block_new_opens": true,
     "reasons": [
-      "emergency stop flag exists: 'AUTO 2026-07-13T20:27:14.322453+00:00: cumulative DD 33.36% (balance $399.86 < threshold $400.00)'",
+      "emergency stop flag exists: 'AUTO 2026-07-13T20:29:17.242287+00:00: cumulative DD 33.36% (balance $399.86 < threshold $400.00)'",
       "cumulative DD 33.36% (balance $399.86 < threshold $400.00)"
     ],
     "daily_pnl": 0.0,
@@ -69353,8 +69353,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-07-13T20:18:00.506780+00:00",
-      "reason": "phase_6y: ATR 0.35% < 1.0% 下限 (ATR<1% 稳健亏 -$232, bootstrap CI 整段<0)",
-      "last_checked_at": "2026-07-13T20:27:17.601295+00:00"
+      "reason": "paper trade too old (680s > 600s)",
+      "last_checked_at": "2026-07-13T20:29:20.352599+00:00"
     },
     {
       "paper_id": "1000XECUSDT|LONG|2026-07-13T20:25:28.791721+00:00",
@@ -69363,18 +69363,27 @@
       "conviction_score": 5,
       "signal_at": "2026-07-13T20:26:24.134793+00:00",
       "reason": "phase_6y: ATR 0.36% < 1.0% 下限 (ATR<1% 稳健亏 -$232, bootstrap CI 整段<0)",
-      "last_checked_at": "2026-07-13T20:27:17.601295+00:00"
+      "last_checked_at": "2026-07-13T20:29:20.352599+00:00"
+    },
+    {
+      "paper_id": "TAGUSDT|SHORT|2026-07-13T20:28:09.980460+00:00",
+      "symbol": "TAGUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-07-13T20:28:30.079497+00:00",
+      "reason": "phase_6y: ATR 0.54% < 1.0% 下限 (ATR<1% 稳健亏 -$232, bootstrap CI 整段<0)",
+      "last_checked_at": "2026-07-13T20:29:20.352599+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 62169.2,
-    "btc_ma25_1h": 62925.78,
-    "pct_vs_ma25": -1.202,
-    "change_24h_pct": -3.116,
-    "sub_regime": "down_stable",
-    "change_3h_pct": 0.472,
-    "computed_at": "2026-07-13T20:27:19.671583+00:00"
+    "btc_price": 62195.7,
+    "btc_ma25_1h": 62926.84,
+    "pct_vs_ma25": -1.162,
+    "change_24h_pct": -3.074,
+    "sub_regime": "down_rebound",
+    "change_3h_pct": 0.515,
+    "computed_at": "2026-07-13T20:29:21.298930+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
