@@ -1,96 +1,8 @@
 {
-  "generated_at": "2026-07-13T12:15:32.328221+00:00",
+  "generated_at": "2026-07-13T12:28:59.093776+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "LAYERUSDT|setup|LONG": {
-      "symbol": "LAYERUSDT",
-      "pred_type": "setup",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 10,
-          "win_rate": 0.1,
-          "avg_outcome_pct": -0.11
-        },
-        "60m": {
-          "n": 10,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -0.2
-        },
-        "240m": {
-          "n": 10,
-          "win_rate": 0.4,
-          "avg_outcome_pct": 0.08
-        }
-      }
-    },
-    "RAVEUSDT|ignition|LONG": {
-      "symbol": "RAVEUSDT",
-      "pred_type": "ignition",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 12,
-          "win_rate": 0.25,
-          "avg_outcome_pct": -0.75
-        },
-        "60m": {
-          "n": 12,
-          "win_rate": 0.083,
-          "avg_outcome_pct": -1.51
-        },
-        "240m": {
-          "n": 12,
-          "win_rate": 0.25,
-          "avg_outcome_pct": -0.74
-        }
-      }
-    },
-    "BZUSDT|ignition|SHORT": {
-      "symbol": "BZUSDT",
-      "pred_type": "ignition",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 7,
-          "win_rate": 0.143,
-          "avg_outcome_pct": -0.07
-        },
-        "60m": {
-          "n": 7,
-          "win_rate": 0.286,
-          "avg_outcome_pct": -0.2
-        },
-        "240m": {
-          "n": 7,
-          "win_rate": 0.286,
-          "avg_outcome_pct": -0.17
-        }
-      }
-    },
-    "CLUSDT|ignition|SHORT": {
-      "symbol": "CLUSDT",
-      "pred_type": "ignition",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 10,
-          "win_rate": 0.3,
-          "avg_outcome_pct": 0.21
-        },
-        "60m": {
-          "n": 10,
-          "win_rate": 0.4,
-          "avg_outcome_pct": 0.36
-        },
-        "240m": {
-          "n": 10,
-          "win_rate": 0.3,
-          "avg_outcome_pct": 0.38
-        }
-      }
-    },
     "CFXUSDT|ignition|LONG": {
       "symbol": "CFXUSDT",
       "pred_type": "ignition",
@@ -594,6 +506,28 @@
           "n": 5,
           "win_rate": 0.8,
           "avg_outcome_pct": 4.54
+        }
+      }
+    },
+    "LAYERUSDT|setup|LONG": {
+      "symbol": "LAYERUSDT",
+      "pred_type": "setup",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 9,
+          "win_rate": 0.111,
+          "avg_outcome_pct": -0.12
+        },
+        "60m": {
+          "n": 9,
+          "win_rate": 0.222,
+          "avg_outcome_pct": -0.26
+        },
+        "240m": {
+          "n": 9,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -0.04
         }
       }
     },
@@ -2225,6 +2159,28 @@
         }
       }
     },
+    "BZUSDT|ignition|SHORT": {
+      "symbol": "BZUSDT",
+      "pred_type": "ignition",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 6,
+          "win_rate": 0.167,
+          "avg_outcome_pct": 0.06
+        },
+        "60m": {
+          "n": 6,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -0.08
+        },
+        "240m": {
+          "n": 6,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -0.02
+        }
+      }
+    },
     "SPXUSDT|ignition|SHORT": {
       "symbol": "SPXUSDT",
       "pred_type": "ignition",
@@ -3564,6 +3520,28 @@
           "n": 8,
           "win_rate": 0.25,
           "avg_outcome_pct": -3.41
+        }
+      }
+    },
+    "RAVEUSDT|ignition|LONG": {
+      "symbol": "RAVEUSDT",
+      "pred_type": "ignition",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 11,
+          "win_rate": 0.273,
+          "avg_outcome_pct": -0.81
+        },
+        "60m": {
+          "n": 11,
+          "win_rate": 0.091,
+          "avg_outcome_pct": -1.62
+        },
+        "240m": {
+          "n": 11,
+          "win_rate": 0.273,
+          "avg_outcome_pct": -0.73
         }
       }
     },
@@ -5082,6 +5060,28 @@
           "n": 9,
           "win_rate": 0.222,
           "avg_outcome_pct": -2.81
+        }
+      }
+    },
+    "CLUSDT|ignition|SHORT": {
+      "symbol": "CLUSDT",
+      "pred_type": "ignition",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 9,
+          "win_rate": 0.333,
+          "avg_outcome_pct": 0.33
+        },
+        "60m": {
+          "n": 9,
+          "win_rate": 0.444,
+          "avg_outcome_pct": 0.51
+        },
+        "240m": {
+          "n": 9,
+          "win_rate": 0.333,
+          "avg_outcome_pct": 0.58
         }
       }
     },
@@ -8939,17 +8939,17 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 5354,
+        "n": 5347,
         "win_rate": 0.278,
         "avg_outcome_pct": -0.01
       },
       "60m": {
-        "n": 5354,
+        "n": 5347,
         "win_rate": 0.307,
-        "avg_outcome_pct": -0.08
+        "avg_outcome_pct": -0.07
       },
       "240m": {
-        "n": 5354,
+        "n": 5347,
         "win_rate": 0.374,
         "avg_outcome_pct": -0.1
       }
