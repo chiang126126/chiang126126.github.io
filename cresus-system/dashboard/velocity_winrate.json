@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-07-14T02:53:09.421469+00:00",
+  "generated_at": "2026-07-14T02:55:13.084879+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "SYSUSDT|burst|LONG": {
-      "symbol": "SYSUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 10,
-          "win_rate": 0.3,
-          "avg_outcome_pct": -0.59
-        },
-        "60m": {
-          "n": 10,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -1.35
-        },
-        "240m": {
-          "n": 10,
-          "win_rate": 0.1,
-          "avg_outcome_pct": -4.61
-        }
-      }
-    },
-    "XNYUSDT|burst|SHORT": {
-      "symbol": "XNYUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 22,
-          "win_rate": 0.364,
-          "avg_outcome_pct": 0.3
-        },
-        "60m": {
-          "n": 22,
-          "win_rate": 0.545,
-          "avg_outcome_pct": 0.67
-        },
-        "240m": {
-          "n": 22,
-          "win_rate": 0.727,
-          "avg_outcome_pct": 2.4
-        }
-      }
-    },
     "ATAUSDT|burst|LONG": {
       "symbol": "ATAUSDT",
       "alert_type": "burst",
@@ -531,6 +487,28 @@
         }
       }
     },
+    "SYSUSDT|burst|LONG": {
+      "symbol": "SYSUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 9,
+          "win_rate": 0.222,
+          "avg_outcome_pct": -0.9
+        },
+        "60m": {
+          "n": 9,
+          "win_rate": 0.111,
+          "avg_outcome_pct": -1.82
+        },
+        "240m": {
+          "n": 9,
+          "win_rate": 0.111,
+          "avg_outcome_pct": -4.56
+        }
+      }
+    },
     "AIOUSDT|sustained|SHORT": {
       "symbol": "AIOUSDT",
       "alert_type": "sustained",
@@ -990,6 +968,28 @@
           "n": 61,
           "win_rate": 0.41,
           "avg_outcome_pct": -0.02
+        }
+      }
+    },
+    "XNYUSDT|burst|SHORT": {
+      "symbol": "XNYUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 21,
+          "win_rate": 0.381,
+          "avg_outcome_pct": 0.51
+        },
+        "60m": {
+          "n": 21,
+          "win_rate": 0.571,
+          "avg_outcome_pct": 1.01
+        },
+        "240m": {
+          "n": 21,
+          "win_rate": 0.762,
+          "avg_outcome_pct": 2.61
         }
       }
     },
@@ -32222,9 +32222,9 @@
           "avg_outcome_pct": 0.11
         },
         "60m": {
-          "n": 30,
-          "win_rate": 0.367,
-          "avg_outcome_pct": 0.06
+          "n": 31,
+          "win_rate": 0.355,
+          "avg_outcome_pct": -0.15
         },
         "240m": {
           "n": 30,
