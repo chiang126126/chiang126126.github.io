@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-14T11:14:46.075087+00:00",
+  "generated_at": "2026-07-14T11:28:23.143951+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "PLAYUSDT|ignition|LONG": {
-      "symbol": "PLAYUSDT",
-      "pred_type": "ignition",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 25,
-          "win_rate": 0.36,
-          "avg_outcome_pct": 0.19
-        },
-        "60m": {
-          "n": 25,
-          "win_rate": 0.4,
-          "avg_outcome_pct": -0.34
-        },
-        "240m": {
-          "n": 25,
-          "win_rate": 0.48,
-          "avg_outcome_pct": 1.52
-        }
-      }
-    },
     "SEIUSDT|setup|LONG": {
       "symbol": "SEIUSDT",
       "pred_type": "setup",
@@ -4755,6 +4733,28 @@
         }
       }
     },
+    "PLAYUSDT|ignition|LONG": {
+      "symbol": "PLAYUSDT",
+      "pred_type": "ignition",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 24,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -0.25
+        },
+        "60m": {
+          "n": 24,
+          "win_rate": 0.417,
+          "avg_outcome_pct": -0.03
+        },
+        "240m": {
+          "n": 24,
+          "win_rate": 0.458,
+          "avg_outcome_pct": 1.5
+        }
+      }
+    },
     "ESPORTSUSDT|ignition|LONG": {
       "symbol": "ESPORTSUSDT",
       "pred_type": "ignition",
@@ -8345,17 +8345,17 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 4853,
+        "n": 4852,
         "win_rate": 0.276,
         "avg_outcome_pct": -0.02
       },
       "60m": {
-        "n": 4853,
+        "n": 4852,
         "win_rate": 0.304,
         "avg_outcome_pct": -0.09
       },
       "240m": {
-        "n": 4853,
+        "n": 4852,
         "win_rate": 0.375,
         "avg_outcome_pct": -0.08
       }
