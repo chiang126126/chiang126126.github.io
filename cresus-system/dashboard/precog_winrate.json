@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-14T17:37:28.374877+00:00",
+  "generated_at": "2026-07-14T17:51:04.815901+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "SIRENUSDT|ignition|LONG": {
-      "symbol": "SIRENUSDT",
-      "pred_type": "ignition",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 7,
-          "win_rate": 0.143,
-          "avg_outcome_pct": -0.23
-        },
-        "60m": {
-          "n": 7,
-          "win_rate": 0.143,
-          "avg_outcome_pct": -0.68
-        },
-        "240m": {
-          "n": 7,
-          "win_rate": 0.143,
-          "avg_outcome_pct": -1.56
-        }
-      }
-    },
     "ARUSDT|ignition|LONG": {
       "symbol": "ARUSDT",
       "pred_type": "ignition",
@@ -6537,6 +6515,28 @@
         }
       }
     },
+    "SIRENUSDT|ignition|LONG": {
+      "symbol": "SIRENUSDT",
+      "pred_type": "ignition",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 6,
+          "win_rate": 0.167,
+          "avg_outcome_pct": -0.19
+        },
+        "60m": {
+          "n": 6,
+          "win_rate": 0.167,
+          "avg_outcome_pct": -0.7
+        },
+        "240m": {
+          "n": 6,
+          "win_rate": 0.167,
+          "avg_outcome_pct": -0.98
+        }
+      }
+    },
     "JTOUSDT|setup|LONG": {
       "symbol": "JTOUSDT",
       "pred_type": "setup",
@@ -8059,17 +8059,17 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 4711,
+        "n": 4710,
         "win_rate": 0.274,
         "avg_outcome_pct": -0.02
       },
       "60m": {
-        "n": 4711,
+        "n": 4710,
         "win_rate": 0.301,
         "avg_outcome_pct": -0.08
       },
       "240m": {
-        "n": 4711,
+        "n": 4710,
         "win_rate": 0.374,
         "avg_outcome_pct": -0.08
       }
