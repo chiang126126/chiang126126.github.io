@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-07-14T00:58:47.251668+00:00",
+  "generated_at": "2026-07-14T01:00:54.639431+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "KAVAUSDT|sustained|SHORT": {
-      "symbol": "KAVAUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 5,
-          "win_rate": 0.4,
-          "avg_outcome_pct": 0.24
-        },
-        "60m": {
-          "n": 5,
-          "win_rate": 0.6,
-          "avg_outcome_pct": 1.04
-        },
-        "240m": {
-          "n": 5,
-          "win_rate": 0.6,
-          "avg_outcome_pct": 1.99
-        }
-      }
-    },
-    "TACUSDT|burst|SHORT": {
-      "symbol": "TACUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 60,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 1.4
-        },
-        "60m": {
-          "n": 60,
-          "win_rate": 0.483,
-          "avg_outcome_pct": 1.96
-        },
-        "240m": {
-          "n": 60,
-          "win_rate": 0.6,
-          "avg_outcome_pct": 3.17
-        }
-      }
-    },
     "DUSKUSDT|sustained|LONG": {
       "symbol": "DUSKUSDT",
       "alert_type": "sustained",
@@ -506,6 +462,28 @@
           "n": 9,
           "win_rate": 0.556,
           "avg_outcome_pct": 0.37
+        }
+      }
+    },
+    "TACUSDT|burst|SHORT": {
+      "symbol": "TACUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 59,
+          "win_rate": 0.322,
+          "avg_outcome_pct": 1.41
+        },
+        "60m": {
+          "n": 59,
+          "win_rate": 0.475,
+          "avg_outcome_pct": 1.9
+        },
+        "240m": {
+          "n": 59,
+          "win_rate": 0.593,
+          "avg_outcome_pct": 3.14
         }
       }
     },
