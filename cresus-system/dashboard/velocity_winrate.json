@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-14T12:25:34.909745+00:00",
+  "generated_at": "2026-07-14T12:27:45.103623+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "ARCUSDT|sustained|LONG": {
-      "symbol": "ARCUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 14,
-          "win_rate": 0.643,
-          "avg_outcome_pct": 1.57
-        },
-        "60m": {
-          "n": 14,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 0.47
-        },
-        "240m": {
-          "n": 14,
-          "win_rate": 0.643,
-          "avg_outcome_pct": 1.04
-        }
-      }
-    },
     "XANUSDT|burst|LONG": {
       "symbol": "XANUSDT",
       "alert_type": "burst",
@@ -5943,6 +5921,28 @@
         }
       }
     },
+    "ARCUSDT|sustained|LONG": {
+      "symbol": "ARCUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 13,
+          "win_rate": 0.615,
+          "avg_outcome_pct": 1.37
+        },
+        "60m": {
+          "n": 13,
+          "win_rate": 0.462,
+          "avg_outcome_pct": 0.09
+        },
+        "240m": {
+          "n": 13,
+          "win_rate": 0.615,
+          "avg_outcome_pct": 0.37
+        }
+      }
+    },
     "TRADOORUSDT|burst|SHORT": {
       "symbol": "TRADOORUSDT",
       "alert_type": "burst",
@@ -8435,9 +8435,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 17,
-          "win_rate": 0.118,
-          "avg_outcome_pct": -0.86
+          "n": 18,
+          "win_rate": 0.167,
+          "avg_outcome_pct": -0.76
         },
         "60m": {
           "n": 17,
@@ -19159,9 +19159,9 @@
           "avg_outcome_pct": -0.86
         },
         "240m": {
-          "n": 41,
-          "win_rate": 0.293,
-          "avg_outcome_pct": -0.75
+          "n": 42,
+          "win_rate": 0.31,
+          "avg_outcome_pct": -0.69
         }
       }
     },
@@ -29115,9 +29115,9 @@
           "avg_outcome_pct": 0.06
         },
         "60m": {
-          "n": 45,
-          "win_rate": 0.311,
-          "avg_outcome_pct": 0.35
+          "n": 46,
+          "win_rate": 0.326,
+          "avg_outcome_pct": 0.37
         },
         "240m": {
           "n": 45,
@@ -31320,9 +31320,9 @@
           "avg_outcome_pct": 1.28
         },
         "240m": {
-          "n": 16,
-          "win_rate": 0.312,
-          "avg_outcome_pct": 0.5
+          "n": 17,
+          "win_rate": 0.294,
+          "avg_outcome_pct": 0.46
         }
       }
     },
