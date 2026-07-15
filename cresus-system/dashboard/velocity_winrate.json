@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-15T23:10:12.199258+00:00",
+  "generated_at": "2026-07-15T23:12:17.599544+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "VICUSDT|burst|LONG": {
-      "symbol": "VICUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 55,
-          "win_rate": 0.255,
-          "avg_outcome_pct": -0.03
-        },
-        "60m": {
-          "n": 55,
-          "win_rate": 0.273,
-          "avg_outcome_pct": -0.33
-        },
-        "240m": {
-          "n": 55,
-          "win_rate": 0.255,
-          "avg_outcome_pct": -1.19
-        }
-      }
-    },
     "BILLUSDT|burst|SHORT": {
       "symbol": "BILLUSDT",
       "alert_type": "burst",
@@ -5104,6 +5082,28 @@
           "n": 117,
           "win_rate": 0.368,
           "avg_outcome_pct": -1.42
+        }
+      }
+    },
+    "VICUSDT|burst|LONG": {
+      "symbol": "VICUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 54,
+          "win_rate": 0.259,
+          "avg_outcome_pct": -0.03
+        },
+        "60m": {
+          "n": 54,
+          "win_rate": 0.259,
+          "avg_outcome_pct": -0.35
+        },
+        "240m": {
+          "n": 54,
+          "win_rate": 0.259,
+          "avg_outcome_pct": -1.2
         }
       }
     },
