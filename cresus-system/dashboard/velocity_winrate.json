@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-07-15T12:29:01.723052+00:00",
+  "generated_at": "2026-07-15T12:31:10.342279+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "RECALLUSDT|sustained|LONG": {
-      "symbol": "RECALLUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 5,
-          "win_rate": 0.4,
-          "avg_outcome_pct": 0.29
-        },
-        "60m": {
-          "n": 5,
-          "win_rate": 0.4,
-          "avg_outcome_pct": -0.13
-        },
-        "240m": {
-          "n": 5,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -1.98
-        }
-      }
-    },
-    "CCUSDT|burst|SHORT": {
-      "symbol": "CCUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 21,
-          "win_rate": 0.048,
-          "avg_outcome_pct": -0.29
-        },
-        "60m": {
-          "n": 21,
-          "win_rate": 0.19,
-          "avg_outcome_pct": -0.35
-        },
-        "240m": {
-          "n": 20,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -0.81
-        }
-      }
-    },
     "RUNEUSDT|sustained|LONG": {
       "symbol": "RUNEUSDT",
       "alert_type": "sustained",
@@ -4579,6 +4535,28 @@
         }
       }
     },
+    "CCUSDT|burst|SHORT": {
+      "symbol": "CCUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 20,
+          "win_rate": 0.05,
+          "avg_outcome_pct": -0.3
+        },
+        "60m": {
+          "n": 20,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -0.33
+        },
+        "240m": {
+          "n": 19,
+          "win_rate": 0.211,
+          "avg_outcome_pct": -0.69
+        }
+      }
+    },
     "SAGAUSDT|sustained|LONG": {
       "symbol": "SAGAUSDT",
       "alert_type": "sustained",
@@ -9007,9 +8985,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 111,
-          "win_rate": 0.306,
-          "avg_outcome_pct": -0.17
+          "n": 112,
+          "win_rate": 0.304,
+          "avg_outcome_pct": -0.16
         },
         "60m": {
           "n": 111,
@@ -11938,9 +11916,9 @@
           "avg_outcome_pct": 0.15
         },
         "60m": {
-          "n": 94,
-          "win_rate": 0.319,
-          "avg_outcome_pct": -0.45
+          "n": 95,
+          "win_rate": 0.316,
+          "avg_outcome_pct": -0.44
         },
         "240m": {
           "n": 94,
@@ -31655,9 +31633,9 @@
           "avg_outcome_pct": -0.33
         },
         "240m": {
-          "n": 47,
-          "win_rate": 0.34,
-          "avg_outcome_pct": 1.23
+          "n": 48,
+          "win_rate": 0.333,
+          "avg_outcome_pct": 1.12
         }
       }
     },
