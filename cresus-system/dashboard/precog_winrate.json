@@ -1,74 +1,8 @@
 {
-  "generated_at": "2026-07-15T08:14:33.510930+00:00",
+  "generated_at": "2026-07-15T08:28:18.231889+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "TRXUSDT|setup|LONG": {
-      "symbol": "TRXUSDT",
-      "pred_type": "setup",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 6,
-          "win_rate": 0.0,
-          "avg_outcome_pct": 0.01
-        },
-        "60m": {
-          "n": 6,
-          "win_rate": 0.0,
-          "avg_outcome_pct": 0.02
-        },
-        "240m": {
-          "n": 6,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 0.37
-        }
-      }
-    },
-    "WUSDT|setup|LONG": {
-      "symbol": "WUSDT",
-      "pred_type": "setup",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 9,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -0.42
-        },
-        "60m": {
-          "n": 9,
-          "win_rate": 0.111,
-          "avg_outcome_pct": -0.39
-        },
-        "240m": {
-          "n": 9,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -0.78
-        }
-      }
-    },
-    "BLUAIUSDT|setup|SHORT": {
-      "symbol": "BLUAIUSDT",
-      "pred_type": "setup",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 10,
-          "win_rate": 0.4,
-          "avg_outcome_pct": 0.13
-        },
-        "60m": {
-          "n": 10,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -0.84
-        },
-        "240m": {
-          "n": 10,
-          "win_rate": 0.4,
-          "avg_outcome_pct": 0.82
-        }
-      }
-    },
     "HUSDT|ignition|LONG": {
       "symbol": "HUSDT",
       "pred_type": "ignition",
@@ -685,6 +619,28 @@
         }
       }
     },
+    "TRXUSDT|setup|LONG": {
+      "symbol": "TRXUSDT",
+      "pred_type": "setup",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -0.0
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.0,
+          "avg_outcome_pct": 0.03
+        },
+        "240m": {
+          "n": 5,
+          "win_rate": 0.6,
+          "avg_outcome_pct": 0.43
+        }
+      }
+    },
     "DUSKUSDT|ignition|SHORT": {
       "symbol": "DUSKUSDT",
       "pred_type": "ignition",
@@ -839,6 +795,28 @@
         }
       }
     },
+    "WUSDT|setup|LONG": {
+      "symbol": "WUSDT",
+      "pred_type": "setup",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 8,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -0.45
+        },
+        "60m": {
+          "n": 8,
+          "win_rate": 0.125,
+          "avg_outcome_pct": -0.28
+        },
+        "240m": {
+          "n": 8,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -0.93
+        }
+      }
+    },
     "VVVUSDT|ignition|SHORT": {
       "symbol": "VVVUSDT",
       "pred_type": "ignition",
@@ -858,6 +836,28 @@
           "n": 9,
           "win_rate": 0.333,
           "avg_outcome_pct": -1.13
+        }
+      }
+    },
+    "BLUAIUSDT|setup|SHORT": {
+      "symbol": "BLUAIUSDT",
+      "pred_type": "setup",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 9,
+          "win_rate": 0.444,
+          "avg_outcome_pct": 0.22
+        },
+        "60m": {
+          "n": 9,
+          "win_rate": 0.222,
+          "avg_outcome_pct": -0.83
+        },
+        "240m": {
+          "n": 9,
+          "win_rate": 0.444,
+          "avg_outcome_pct": 0.96
         }
       }
     },
@@ -7597,18 +7597,18 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 4373,
+        "n": 4369,
         "win_rate": 0.274,
         "avg_outcome_pct": -0.02
       },
       "60m": {
-        "n": 4373,
+        "n": 4369,
         "win_rate": 0.301,
         "avg_outcome_pct": -0.08
       },
       "240m": {
-        "n": 4373,
-        "win_rate": 0.372,
+        "n": 4369,
+        "win_rate": 0.373,
         "avg_outcome_pct": -0.08
       }
     },
