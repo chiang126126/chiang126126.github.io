@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-07-15T01:52:14.405819+00:00",
+  "generated_at": "2026-07-15T01:54:25.886219+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "NAORISUSDT|burst|SHORT": {
-      "symbol": "NAORISUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 61,
-          "win_rate": 0.393,
-          "avg_outcome_pct": 0.5
-        },
-        "60m": {
-          "n": 61,
-          "win_rate": 0.426,
-          "avg_outcome_pct": 0.59
-        },
-        "240m": {
-          "n": 61,
-          "win_rate": 0.492,
-          "avg_outcome_pct": 0.75
-        }
-      }
-    },
-    "VVVUSDT|burst|SHORT": {
-      "symbol": "VVVUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 104,
-          "win_rate": 0.308,
-          "avg_outcome_pct": -0.0
-        },
-        "60m": {
-          "n": 104,
-          "win_rate": 0.337,
-          "avg_outcome_pct": -0.09
-        },
-        "240m": {
-          "n": 104,
-          "win_rate": 0.433,
-          "avg_outcome_pct": -0.11
-        }
-      }
-    },
     "GPSUSDT|burst|LONG": {
       "symbol": "GPSUSDT",
       "alert_type": "burst",
@@ -2907,6 +2863,28 @@
         }
       }
     },
+    "NAORISUSDT|burst|SHORT": {
+      "symbol": "NAORISUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 60,
+          "win_rate": 0.383,
+          "avg_outcome_pct": 0.49
+        },
+        "60m": {
+          "n": 60,
+          "win_rate": 0.417,
+          "avg_outcome_pct": 0.59
+        },
+        "240m": {
+          "n": 60,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 0.79
+        }
+      }
+    },
     "MONUSDT|sustained|SHORT": {
       "symbol": "MONUSDT",
       "alert_type": "sustained",
@@ -5170,6 +5148,28 @@
           "n": 61,
           "win_rate": 0.23,
           "avg_outcome_pct": -0.5
+        }
+      }
+    },
+    "VVVUSDT|burst|SHORT": {
+      "symbol": "VVVUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 103,
+          "win_rate": 0.311,
+          "avg_outcome_pct": 0.0
+        },
+        "60m": {
+          "n": 103,
+          "win_rate": 0.34,
+          "avg_outcome_pct": -0.08
+        },
+        "240m": {
+          "n": 103,
+          "win_rate": 0.427,
+          "avg_outcome_pct": -0.12
         }
       }
     },
@@ -19677,8 +19677,8 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 105,
-          "win_rate": 0.257,
+          "n": 106,
+          "win_rate": 0.255,
           "avg_outcome_pct": -0.67
         },
         "60m": {
