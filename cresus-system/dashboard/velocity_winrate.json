@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-15T13:42:55.549279+00:00",
+  "generated_at": "2026-07-15T13:45:07.922184+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "POLYXUSDT|burst|SHORT": {
-      "symbol": "POLYXUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 9,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.24
-        },
-        "60m": {
-          "n": 9,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.37
-        },
-        "240m": {
-          "n": 9,
-          "win_rate": 0.444,
-          "avg_outcome_pct": 0.2
-        }
-      }
-    },
     "BASUSDT|burst|SHORT": {
       "symbol": "BASUSDT",
       "alert_type": "burst",
@@ -1452,6 +1430,28 @@
           "n": 12,
           "win_rate": 0.5,
           "avg_outcome_pct": 0.39
+        }
+      }
+    },
+    "POLYXUSDT|burst|SHORT": {
+      "symbol": "POLYXUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 8,
+          "win_rate": 0.375,
+          "avg_outcome_pct": 0.27
+        },
+        "60m": {
+          "n": 8,
+          "win_rate": 0.375,
+          "avg_outcome_pct": 0.45
+        },
+        "240m": {
+          "n": 8,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 0.3
         }
       }
     },
@@ -32161,9 +32161,9 @@
           "avg_outcome_pct": 0.44
         },
         "240m": {
-          "n": 13,
-          "win_rate": 0.385,
-          "avg_outcome_pct": 1.5
+          "n": 14,
+          "win_rate": 0.357,
+          "avg_outcome_pct": 1.3
         }
       }
     },
