@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-07-15T21:26:22.669013+00:00",
+  "generated_at": "2026-07-15T21:39:49.404737+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "FHEUSDT|ignition|LONG": {
-      "symbol": "FHEUSDT",
-      "pred_type": "ignition",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 8,
-          "win_rate": 0.375,
-          "avg_outcome_pct": 1.03
-        },
-        "60m": {
-          "n": 8,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 1.99
-        },
-        "240m": {
-          "n": 8,
-          "win_rate": 0.5,
-          "avg_outcome_pct": -0.95
-        }
-      }
-    },
-    "MUUSDT|setup|SHORT": {
-      "symbol": "MUUSDT",
-      "pred_type": "setup",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 13,
-          "win_rate": 0.077,
-          "avg_outcome_pct": -0.17
-        },
-        "60m": {
-          "n": 13,
-          "win_rate": 0.154,
-          "avg_outcome_pct": -0.2
-        },
-        "240m": {
-          "n": 13,
-          "win_rate": 0.077,
-          "avg_outcome_pct": -0.72
-        }
-      }
-    },
     "WLDUSDT|setup|LONG": {
       "symbol": "WLDUSDT",
       "pred_type": "setup",
@@ -682,6 +638,28 @@
           "n": 10,
           "win_rate": 0.7,
           "avg_outcome_pct": 3.32
+        }
+      }
+    },
+    "MUUSDT|setup|SHORT": {
+      "symbol": "MUUSDT",
+      "pred_type": "setup",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 12,
+          "win_rate": 0.083,
+          "avg_outcome_pct": -0.18
+        },
+        "60m": {
+          "n": 12,
+          "win_rate": 0.083,
+          "avg_outcome_pct": -0.28
+        },
+        "240m": {
+          "n": 12,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -0.82
         }
       }
     },
@@ -2948,6 +2926,28 @@
           "n": 5,
           "win_rate": 0.6,
           "avg_outcome_pct": -0.68
+        }
+      }
+    },
+    "FHEUSDT|ignition|LONG": {
+      "symbol": "FHEUSDT",
+      "pred_type": "ignition",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 7,
+          "win_rate": 0.429,
+          "avg_outcome_pct": 1.58
+        },
+        "60m": {
+          "n": 7,
+          "win_rate": 0.571,
+          "avg_outcome_pct": 2.72
+        },
+        "240m": {
+          "n": 7,
+          "win_rate": 0.571,
+          "avg_outcome_pct": -0.27
         }
       }
     },
@@ -7289,19 +7289,19 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 4084,
+        "n": 4080,
         "win_rate": 0.275,
         "avg_outcome_pct": -0.02
       },
       "60m": {
-        "n": 4084,
+        "n": 4080,
         "win_rate": 0.302,
-        "avg_outcome_pct": -0.09
+        "avg_outcome_pct": -0.08
       },
       "240m": {
-        "n": 4084,
+        "n": 4080,
         "win_rate": 0.375,
-        "avg_outcome_pct": -0.08
+        "avg_outcome_pct": -0.07
       }
     },
     "quant_only": {}
