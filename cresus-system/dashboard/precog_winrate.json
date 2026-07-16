@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-16T11:24:20.213711+00:00",
+  "generated_at": "2026-07-16T11:37:57.800471+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "MUUSDT|setup|SHORT": {
-      "symbol": "MUUSDT",
-      "pred_type": "setup",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 11,
-          "win_rate": 0.091,
-          "avg_outcome_pct": -0.15
-        },
-        "60m": {
-          "n": 11,
-          "win_rate": 0.091,
-          "avg_outcome_pct": -0.24
-        },
-        "240m": {
-          "n": 11,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -0.82
-        }
-      }
-    },
     "BLUAIUSDT|ignition|SHORT": {
       "symbol": "BLUAIUSDT",
       "pred_type": "ignition",
@@ -6361,6 +6339,28 @@
         }
       }
     },
+    "MUUSDT|setup|SHORT": {
+      "symbol": "MUUSDT",
+      "pred_type": "setup",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 10,
+          "win_rate": 0.1,
+          "avg_outcome_pct": -0.14
+        },
+        "60m": {
+          "n": 10,
+          "win_rate": 0.1,
+          "avg_outcome_pct": -0.26
+        },
+        "240m": {
+          "n": 10,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -0.82
+        }
+      }
+    },
     "HANAUSDT|setup|SHORT": {
       "symbol": "HANAUSDT",
       "pred_type": "setup",
@@ -6563,17 +6563,17 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 3777,
+        "n": 3774,
         "win_rate": 0.281,
         "avg_outcome_pct": -0.02
       },
       "60m": {
-        "n": 3777,
-        "win_rate": 0.307,
+        "n": 3774,
+        "win_rate": 0.306,
         "avg_outcome_pct": -0.08
       },
       "240m": {
-        "n": 3777,
+        "n": 3774,
         "win_rate": 0.377,
         "avg_outcome_pct": -0.08
       }
