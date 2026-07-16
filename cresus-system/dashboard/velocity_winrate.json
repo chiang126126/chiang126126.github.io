@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-16T10:50:17.665986+00:00",
+  "generated_at": "2026-07-16T10:52:29.317039+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "KITEUSDT|burst|SHORT": {
-      "symbol": "KITEUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 64,
-          "win_rate": 0.25,
-          "avg_outcome_pct": 0.07
-        },
-        "60m": {
-          "n": 64,
-          "win_rate": 0.297,
-          "avg_outcome_pct": -0.04
-        },
-        "240m": {
-          "n": 63,
-          "win_rate": 0.413,
-          "avg_outcome_pct": 0.0
-        }
-      }
-    },
     "DOGSUSDT|burst|LONG": {
       "symbol": "DOGSUSDT",
       "alert_type": "burst",
@@ -9155,6 +9133,28 @@
         }
       }
     },
+    "KITEUSDT|burst|SHORT": {
+      "symbol": "KITEUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 63,
+          "win_rate": 0.238,
+          "avg_outcome_pct": 0.05
+        },
+        "60m": {
+          "n": 63,
+          "win_rate": 0.302,
+          "avg_outcome_pct": -0.04
+        },
+        "240m": {
+          "n": 62,
+          "win_rate": 0.403,
+          "avg_outcome_pct": -0.01
+        }
+      }
+    },
     "TRUTHUSDT|sustained|SHORT": {
       "symbol": "TRUTHUSDT",
       "alert_type": "sustained",
@@ -11041,8 +11041,8 @@
           "avg_outcome_pct": -0.16
         },
         "240m": {
-          "n": 64,
-          "win_rate": 0.344,
+          "n": 65,
+          "win_rate": 0.338,
           "avg_outcome_pct": -0.03
         }
       }
@@ -33432,9 +33432,9 @@
           "avg_outcome_pct": 0.3
         },
         "60m": {
-          "n": 23,
-          "win_rate": 0.348,
-          "avg_outcome_pct": -0.12
+          "n": 24,
+          "win_rate": 0.375,
+          "avg_outcome_pct": 0.04
         },
         "240m": {
           "n": 21,
@@ -33689,6 +33689,11 @@
           "n": 5,
           "win_rate": 0.4,
           "avg_outcome_pct": -0.46
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -1.22
         }
       }
     }
