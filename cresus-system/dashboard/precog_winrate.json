@@ -1,96 +1,8 @@
 {
-  "generated_at": "2026-07-16T15:30:16.081081+00:00",
+  "generated_at": "2026-07-16T15:43:55.688328+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "BLUAIUSDT|ignition|LONG": {
-      "symbol": "BLUAIUSDT",
-      "pred_type": "ignition",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 9,
-          "win_rate": 0.667,
-          "avg_outcome_pct": 1.52
-        },
-        "60m": {
-          "n": 9,
-          "win_rate": 0.667,
-          "avg_outcome_pct": 2.74
-        },
-        "240m": {
-          "n": 9,
-          "win_rate": 0.556,
-          "avg_outcome_pct": 1.76
-        }
-      }
-    },
-    "FHEUSDT|ignition|LONG": {
-      "symbol": "FHEUSDT",
-      "pred_type": "ignition",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 5,
-          "win_rate": 0.2,
-          "avg_outcome_pct": 0.41
-        },
-        "60m": {
-          "n": 5,
-          "win_rate": 0.4,
-          "avg_outcome_pct": 0.42
-        },
-        "240m": {
-          "n": 5,
-          "win_rate": 0.4,
-          "avg_outcome_pct": -2.0
-        }
-      }
-    },
-    "QQQUSDT|setup|SHORT": {
-      "symbol": "QQQUSDT",
-      "pred_type": "setup",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 5,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -0.06
-        },
-        "60m": {
-          "n": 5,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -0.09
-        },
-        "240m": {
-          "n": 5,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -0.11
-        }
-      }
-    },
-    "STABLEUSDT|ignition|SHORT": {
-      "symbol": "STABLEUSDT",
-      "pred_type": "ignition",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 7,
-          "win_rate": 0.286,
-          "avg_outcome_pct": 0.34
-        },
-        "60m": {
-          "n": 7,
-          "win_rate": 0.429,
-          "avg_outcome_pct": -0.3
-        },
-        "240m": {
-          "n": 7,
-          "win_rate": 0.286,
-          "avg_outcome_pct": -1.58
-        }
-      }
-    },
     "ROBOUSDT|ignition|LONG": {
       "symbol": "ROBOUSDT",
       "pred_type": "ignition",
@@ -2599,6 +2511,28 @@
         }
       }
     },
+    "BLUAIUSDT|ignition|LONG": {
+      "symbol": "BLUAIUSDT",
+      "pred_type": "ignition",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 8,
+          "win_rate": 0.75,
+          "avg_outcome_pct": 2.13
+        },
+        "60m": {
+          "n": 8,
+          "win_rate": 0.75,
+          "avg_outcome_pct": 3.59
+        },
+        "240m": {
+          "n": 8,
+          "win_rate": 0.625,
+          "avg_outcome_pct": 2.5
+        }
+      }
+    },
     "EDGEUSDT|ignition|SHORT": {
       "symbol": "EDGEUSDT",
       "pred_type": "ignition",
@@ -3960,6 +3894,28 @@
           "n": 5,
           "win_rate": 0.2,
           "avg_outcome_pct": -0.34
+        }
+      }
+    },
+    "STABLEUSDT|ignition|SHORT": {
+      "symbol": "STABLEUSDT",
+      "pred_type": "ignition",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 6,
+          "win_rate": 0.333,
+          "avg_outcome_pct": 0.46
+        },
+        "60m": {
+          "n": 6,
+          "win_rate": 0.5,
+          "avg_outcome_pct": -0.14
+        },
+        "240m": {
+          "n": 6,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -1.57
         }
       }
     },
@@ -6453,19 +6409,19 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 3688,
+        "n": 3682,
         "win_rate": 0.281,
-        "avg_outcome_pct": -0.03
+        "avg_outcome_pct": -0.02
       },
       "60m": {
-        "n": 3688,
+        "n": 3682,
         "win_rate": 0.307,
         "avg_outcome_pct": -0.09
       },
       "240m": {
-        "n": 3688,
+        "n": 3682,
         "win_rate": 0.379,
-        "avg_outcome_pct": -0.1
+        "avg_outcome_pct": -0.09
       }
     },
     "quant_only": {}
