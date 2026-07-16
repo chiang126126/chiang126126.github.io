@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-07-16T04:55:13.287406+00:00",
+  "generated_at": "2026-07-16T04:57:17.785406+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 842,
@@ -28,7 +28,7 @@
   "risk_status": {
     "block_new_opens": true,
     "reasons": [
-      "emergency stop flag exists: 'AUTO 2026-07-16T04:55:09.182889+00:00: cumulative DD 33.36% (balance $399.86 < threshold $400.00)'",
+      "emergency stop flag exists: 'AUTO 2026-07-16T04:57:13.488842+00:00: cumulative DD 33.36% (balance $399.86 < threshold $400.00)'",
       "cumulative DD 33.36% (balance $399.86 < threshold $400.00)"
     ],
     "daily_pnl": 0.0,
@@ -69346,16 +69346,26 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "SKLUSDT|LONG|2026-07-16T04:54:34.632742+00:00",
+      "symbol": "SKLUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-07-16T04:55:28.180690+00:00",
+      "reason": "phase_6y: ATR 0.61% < 1.0% 下限 (ATR<1% 稳健亏 -$232, bootstrap CI 整段<0)",
+      "last_checked_at": "2026-07-16T04:57:16.763762+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 64594.9,
-    "btc_ma25_1h": 64836.35,
-    "pct_vs_ma25": -0.372,
-    "change_24h_pct": -0.199,
+    "btc_price": 64574.9,
+    "btc_ma25_1h": 64835.55,
+    "pct_vs_ma25": -0.402,
+    "change_24h_pct": -0.23,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-07-16T04:55:13.228630+00:00"
+    "computed_at": "2026-07-16T04:57:17.720850+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
