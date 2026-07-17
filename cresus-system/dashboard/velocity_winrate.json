@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-17T22:49:20.898192+00:00",
+  "generated_at": "2026-07-17T22:51:29.606311+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "ALICEUSDT|sustained|SHORT": {
-      "symbol": "ALICEUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 25,
-          "win_rate": 0.24,
-          "avg_outcome_pct": -0.14
-        },
-        "60m": {
-          "n": 25,
-          "win_rate": 0.4,
-          "avg_outcome_pct": -0.47
-        },
-        "240m": {
-          "n": 25,
-          "win_rate": 0.48,
-          "avg_outcome_pct": 0.19
-        }
-      }
-    },
     "BCHUSDT|burst|LONG": {
       "symbol": "BCHUSDT",
       "alert_type": "burst",
@@ -24423,6 +24401,28 @@
         }
       }
     },
+    "ALICEUSDT|sustained|SHORT": {
+      "symbol": "ALICEUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 24,
+          "win_rate": 0.25,
+          "avg_outcome_pct": -0.17
+        },
+        "60m": {
+          "n": 24,
+          "win_rate": 0.375,
+          "avg_outcome_pct": -0.53
+        },
+        "240m": {
+          "n": 24,
+          "win_rate": 0.458,
+          "avg_outcome_pct": 0.05
+        }
+      }
+    },
     "WALUSDT|burst|LONG": {
       "symbol": "WALUSDT",
       "alert_type": "burst",
@@ -28675,9 +28675,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 77,
-          "win_rate": 0.532,
-          "avg_outcome_pct": 0.91
+          "n": 78,
+          "win_rate": 0.538,
+          "avg_outcome_pct": 1.02
         },
         "60m": {
           "n": 77,
