@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-17T01:20:39.758387+00:00",
+  "generated_at": "2026-07-17T01:22:47.401711+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "RECALLUSDT|burst|SHORT": {
-      "symbol": "RECALLUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 10,
-          "win_rate": 0.4,
-          "avg_outcome_pct": 0.72
-        },
-        "60m": {
-          "n": 10,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 1.19
-        },
-        "240m": {
-          "n": 10,
-          "win_rate": 0.9,
-          "avg_outcome_pct": 2.53
-        }
-      }
-    },
     "KAITOUSDT|burst|SHORT": {
       "symbol": "KAITOUSDT",
       "alert_type": "burst",
@@ -836,6 +814,28 @@
           "n": 99,
           "win_rate": 0.354,
           "avg_outcome_pct": 0.49
+        }
+      }
+    },
+    "RECALLUSDT|burst|SHORT": {
+      "symbol": "RECALLUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 9,
+          "win_rate": 0.444,
+          "avg_outcome_pct": 0.88
+        },
+        "60m": {
+          "n": 9,
+          "win_rate": 0.556,
+          "avg_outcome_pct": 1.53
+        },
+        "240m": {
+          "n": 9,
+          "win_rate": 0.889,
+          "avg_outcome_pct": 2.48
         }
       }
     },
@@ -26810,9 +26810,9 @@
           "avg_outcome_pct": 0.91
         },
         "60m": {
-          "n": 38,
-          "win_rate": 0.553,
-          "avg_outcome_pct": 1.95
+          "n": 39,
+          "win_rate": 0.538,
+          "avg_outcome_pct": 1.83
         },
         "240m": {
           "n": 37,
