@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-17T23:06:23.478821+00:00",
+  "generated_at": "2026-07-17T23:08:29.604318+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "CYSUSDT|burst|LONG": {
-      "symbol": "CYSUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 9,
-          "win_rate": 0.222,
-          "avg_outcome_pct": -0.36
-        },
-        "60m": {
-          "n": 9,
-          "win_rate": 0.111,
-          "avg_outcome_pct": -0.71
-        },
-        "240m": {
-          "n": 9,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.06
-        }
-      }
-    },
     "TOWNSUSDT|burst|SHORT": {
       "symbol": "TOWNSUSDT",
       "alert_type": "burst",
@@ -3388,6 +3366,28 @@
           "n": 66,
           "win_rate": 0.333,
           "avg_outcome_pct": -0.08
+        }
+      }
+    },
+    "CYSUSDT|burst|LONG": {
+      "symbol": "CYSUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 8,
+          "win_rate": 0.25,
+          "avg_outcome_pct": -0.15
+        },
+        "60m": {
+          "n": 8,
+          "win_rate": 0.125,
+          "avg_outcome_pct": -0.64
+        },
+        "240m": {
+          "n": 8,
+          "win_rate": 0.375,
+          "avg_outcome_pct": 0.16
         }
       }
     },
@@ -11305,9 +11305,9 @@
           "avg_outcome_pct": -0.24
         },
         "240m": {
-          "n": 42,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -0.09
+          "n": 43,
+          "win_rate": 0.326,
+          "avg_outcome_pct": -0.17
         }
       }
     },
@@ -24649,9 +24649,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 18,
-          "win_rate": 0.389,
-          "avg_outcome_pct": 0.27
+          "n": 19,
+          "win_rate": 0.368,
+          "avg_outcome_pct": 0.21
         },
         "60m": {
           "n": 18,
