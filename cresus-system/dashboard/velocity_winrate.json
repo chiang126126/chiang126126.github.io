@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-17T03:45:45.627165+00:00",
+  "generated_at": "2026-07-17T03:47:54.062939+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "MYXUSDT|sustained|LONG": {
-      "symbol": "MYXUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 65,
-          "win_rate": 0.369,
-          "avg_outcome_pct": 0.12
-        },
-        "60m": {
-          "n": 65,
-          "win_rate": 0.415,
-          "avg_outcome_pct": 0.39
-        },
-        "240m": {
-          "n": 64,
-          "win_rate": 0.422,
-          "avg_outcome_pct": 0.24
-        }
-      }
-    },
     "TAUSDT|burst|SHORT": {
       "symbol": "TAUSDT",
       "alert_type": "burst",
@@ -4761,9 +4739,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 105,
-          "win_rate": 0.343,
-          "avg_outcome_pct": 0.0
+          "n": 106,
+          "win_rate": 0.34,
+          "avg_outcome_pct": -0.01
         },
         "60m": {
           "n": 105,
@@ -16825,6 +16803,28 @@
           "n": 9,
           "win_rate": 0.667,
           "avg_outcome_pct": 3.53
+        }
+      }
+    },
+    "MYXUSDT|sustained|LONG": {
+      "symbol": "MYXUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 64,
+          "win_rate": 0.375,
+          "avg_outcome_pct": 0.15
+        },
+        "60m": {
+          "n": 64,
+          "win_rate": 0.422,
+          "avg_outcome_pct": 0.43
+        },
+        "240m": {
+          "n": 63,
+          "win_rate": 0.429,
+          "avg_outcome_pct": 0.28
         }
       }
     },
