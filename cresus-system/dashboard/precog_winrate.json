@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-07-17T00:33:52.009572+00:00",
+  "generated_at": "2026-07-17T00:47:38.817502+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "PIEVERSEUSDT|ignition|SHORT": {
-      "symbol": "PIEVERSEUSDT",
-      "pred_type": "ignition",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 8,
-          "win_rate": 0.125,
-          "avg_outcome_pct": 0.08
-        },
-        "60m": {
-          "n": 8,
-          "win_rate": 0.125,
-          "avg_outcome_pct": -0.24
-        },
-        "240m": {
-          "n": 8,
-          "win_rate": 0.75,
-          "avg_outcome_pct": 1.92
-        }
-      }
-    },
-    "IRYSUSDT|ignition|SHORT": {
-      "symbol": "IRYSUSDT",
-      "pred_type": "ignition",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 9,
-          "win_rate": 0.222,
-          "avg_outcome_pct": 0.12
-        },
-        "60m": {
-          "n": 9,
-          "win_rate": 0.111,
-          "avg_outcome_pct": -0.64
-        },
-        "240m": {
-          "n": 9,
-          "win_rate": 0.444,
-          "avg_outcome_pct": -0.09
-        }
-      }
-    },
     "SIRENUSDT|setup|LONG": {
       "symbol": "SIRENUSDT",
       "pred_type": "setup",
@@ -1851,6 +1807,28 @@
         }
       }
     },
+    "PIEVERSEUSDT|ignition|SHORT": {
+      "symbol": "PIEVERSEUSDT",
+      "pred_type": "ignition",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 7,
+          "win_rate": 0.143,
+          "avg_outcome_pct": 0.05
+        },
+        "60m": {
+          "n": 7,
+          "win_rate": 0.143,
+          "avg_outcome_pct": 0.21
+        },
+        "240m": {
+          "n": 7,
+          "win_rate": 0.857,
+          "avg_outcome_pct": 2.14
+        }
+      }
+    },
     "UNIUSDT|ignition|LONG": {
       "symbol": "UNIUSDT",
       "pred_type": "ignition",
@@ -1914,6 +1892,28 @@
           "n": 7,
           "win_rate": 0.143,
           "avg_outcome_pct": -1.57
+        }
+      }
+    },
+    "IRYSUSDT|ignition|SHORT": {
+      "symbol": "IRYSUSDT",
+      "pred_type": "ignition",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 8,
+          "win_rate": 0.125,
+          "avg_outcome_pct": -0.42
+        },
+        "60m": {
+          "n": 8,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -1.42
+        },
+        "240m": {
+          "n": 8,
+          "win_rate": 0.375,
+          "avg_outcome_pct": -0.51
         }
       }
     },
@@ -6101,17 +6101,17 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 3473,
+        "n": 3469,
         "win_rate": 0.284,
         "avg_outcome_pct": -0.02
       },
       "60m": {
-        "n": 3473,
+        "n": 3469,
         "win_rate": 0.31,
         "avg_outcome_pct": -0.08
       },
       "240m": {
-        "n": 3473,
+        "n": 3469,
         "win_rate": 0.382,
         "avg_outcome_pct": -0.09
       }
