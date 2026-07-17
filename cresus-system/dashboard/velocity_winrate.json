@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-17T00:33:46.577271+00:00",
+  "generated_at": "2026-07-17T00:35:56.400180+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "MANTRAUSDT|sustained|SHORT": {
-      "symbol": "MANTRAUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 6,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.14
-        },
-        "60m": {
-          "n": 6,
-          "win_rate": 0.667,
-          "avg_outcome_pct": 2.06
-        },
-        "240m": {
-          "n": 6,
-          "win_rate": 0.667,
-          "avg_outcome_pct": 4.25
-        }
-      }
-    },
     "USUSDT|burst|LONG": {
       "symbol": "USUSDT",
       "alert_type": "burst",
@@ -542,9 +520,9 @@
           "avg_outcome_pct": -0.36
         },
         "60m": {
-          "n": 76,
-          "win_rate": 0.329,
-          "avg_outcome_pct": -0.36
+          "n": 77,
+          "win_rate": 0.325,
+          "avg_outcome_pct": -0.35
         },
         "240m": {
           "n": 76,
@@ -27786,6 +27764,28 @@
           "n": 7,
           "win_rate": 0.286,
           "avg_outcome_pct": -1.04
+        }
+      }
+    },
+    "MANTRAUSDT|sustained|SHORT": {
+      "symbol": "MANTRAUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.28
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.8,
+          "avg_outcome_pct": 2.47
+        },
+        "240m": {
+          "n": 5,
+          "win_rate": 0.8,
+          "avg_outcome_pct": 5.16
         }
       }
     },
