@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-18T22:20:44.492959+00:00",
+  "generated_at": "2026-07-18T22:22:49.954973+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "JASMYUSDT|burst|LONG": {
-      "symbol": "JASMYUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 9,
-          "win_rate": 0.222,
-          "avg_outcome_pct": -0.15
-        },
-        "60m": {
-          "n": 9,
-          "win_rate": 0.222,
-          "avg_outcome_pct": -0.12
-        },
-        "240m": {
-          "n": 9,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -0.33
-        }
-      }
-    },
     "BIOUSDT|sustained|SHORT": {
       "symbol": "BIOUSDT",
       "alert_type": "sustained",
@@ -28581,6 +28559,28 @@
         }
       }
     },
+    "JASMYUSDT|burst|LONG": {
+      "symbol": "JASMYUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 8,
+          "win_rate": 0.25,
+          "avg_outcome_pct": -0.08
+        },
+        "60m": {
+          "n": 8,
+          "win_rate": 0.25,
+          "avg_outcome_pct": -0.03
+        },
+        "240m": {
+          "n": 8,
+          "win_rate": 0.375,
+          "avg_outcome_pct": -0.2
+        }
+      }
+    },
     "ZKCUSDT|burst|LONG": {
       "symbol": "ZKCUSDT",
       "alert_type": "burst",
@@ -29125,9 +29125,9 @@
           "avg_outcome_pct": 0.44
         },
         "240m": {
-          "n": 101,
-          "win_rate": 0.386,
-          "avg_outcome_pct": 0.7
+          "n": 102,
+          "win_rate": 0.382,
+          "avg_outcome_pct": 0.65
         }
       }
     },
