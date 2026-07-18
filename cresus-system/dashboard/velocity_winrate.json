@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-18T23:42:19.663275+00:00",
+  "generated_at": "2026-07-18T23:44:25.824869+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "FOGOUSDT|sustained|SHORT": {
-      "symbol": "FOGOUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 11,
-          "win_rate": 0.545,
-          "avg_outcome_pct": 1.66
-        },
-        "60m": {
-          "n": 11,
-          "win_rate": 0.636,
-          "avg_outcome_pct": 2.34
-        },
-        "240m": {
-          "n": 11,
-          "win_rate": 0.545,
-          "avg_outcome_pct": 5.16
-        }
-      }
-    },
     "EWYUSDT|burst|SHORT": {
       "symbol": "EWYUSDT",
       "alert_type": "burst",
@@ -440,6 +418,28 @@
           "n": 35,
           "win_rate": 0.486,
           "avg_outcome_pct": 0.39
+        }
+      }
+    },
+    "FOGOUSDT|sustained|SHORT": {
+      "symbol": "FOGOUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 10,
+          "win_rate": 0.6,
+          "avg_outcome_pct": 2.14
+        },
+        "60m": {
+          "n": 10,
+          "win_rate": 0.6,
+          "avg_outcome_pct": 2.18
+        },
+        "240m": {
+          "n": 10,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 4.76
         }
       }
     },
@@ -28905,9 +28905,9 @@
           "avg_outcome_pct": -0.72
         },
         "240m": {
-          "n": 18,
-          "win_rate": 0.111,
-          "avg_outcome_pct": -1.86
+          "n": 19,
+          "win_rate": 0.105,
+          "avg_outcome_pct": -1.83
         }
       }
     },
