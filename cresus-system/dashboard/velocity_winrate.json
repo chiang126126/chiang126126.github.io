@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-07-18T15:27:59.490045+00:00",
+  "generated_at": "2026-07-18T15:30:08.565084+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "RONINUSDT|burst|SHORT": {
-      "symbol": "RONINUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 14,
-          "win_rate": 0.357,
-          "avg_outcome_pct": 0.07
-        },
-        "60m": {
-          "n": 14,
-          "win_rate": 0.357,
-          "avg_outcome_pct": -0.16
-        },
-        "240m": {
-          "n": 14,
-          "win_rate": 0.357,
-          "avg_outcome_pct": 0.37
-        }
-      }
-    },
-    "CBRSUSDT|sustained|SHORT": {
-      "symbol": "CBRSUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 68,
-          "win_rate": 0.426,
-          "avg_outcome_pct": 0.29
-        },
-        "60m": {
-          "n": 68,
-          "win_rate": 0.529,
-          "avg_outcome_pct": 0.46
-        },
-        "240m": {
-          "n": 68,
-          "win_rate": 0.544,
-          "avg_outcome_pct": 0.53
-        }
-      }
-    },
     "HOMEUSDT|sustained|LONG": {
       "symbol": "HOMEUSDT",
       "alert_type": "sustained",
@@ -1147,6 +1103,28 @@
         }
       }
     },
+    "CBRSUSDT|sustained|SHORT": {
+      "symbol": "CBRSUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 67,
+          "win_rate": 0.433,
+          "avg_outcome_pct": 0.33
+        },
+        "60m": {
+          "n": 67,
+          "win_rate": 0.537,
+          "avg_outcome_pct": 0.5
+        },
+        "240m": {
+          "n": 67,
+          "win_rate": 0.537,
+          "avg_outcome_pct": 0.52
+        }
+      }
+    },
     "MONUSDT|burst|SHORT": {
       "symbol": "MONUSDT",
       "alert_type": "burst",
@@ -1562,6 +1540,28 @@
           "n": 64,
           "win_rate": 0.359,
           "avg_outcome_pct": -0.19
+        }
+      }
+    },
+    "RONINUSDT|burst|SHORT": {
+      "symbol": "RONINUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 13,
+          "win_rate": 0.385,
+          "avg_outcome_pct": 0.15
+        },
+        "60m": {
+          "n": 13,
+          "win_rate": 0.385,
+          "avg_outcome_pct": 0.01
+        },
+        "240m": {
+          "n": 13,
+          "win_rate": 0.308,
+          "avg_outcome_pct": 0.08
         }
       }
     },
