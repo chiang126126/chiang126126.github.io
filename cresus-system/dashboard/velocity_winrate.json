@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-18T23:20:51.802305+00:00",
+  "generated_at": "2026-07-18T23:23:07.803474+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "DUSKUSDT|burst|SHORT": {
-      "symbol": "DUSKUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 11,
-          "win_rate": 0.273,
-          "avg_outcome_pct": 0.73
-        },
-        "60m": {
-          "n": 11,
-          "win_rate": 0.364,
-          "avg_outcome_pct": 0.56
-        },
-        "240m": {
-          "n": 11,
-          "win_rate": 0.455,
-          "avg_outcome_pct": 0.2
-        }
-      }
-    },
     "LYNUSDT|burst|SHORT": {
       "symbol": "LYNUSDT",
       "alert_type": "burst",
@@ -3058,6 +3036,28 @@
           "n": 33,
           "win_rate": 0.424,
           "avg_outcome_pct": 0.36
+        }
+      }
+    },
+    "DUSKUSDT|burst|SHORT": {
+      "symbol": "DUSKUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 10,
+          "win_rate": 0.3,
+          "avg_outcome_pct": 0.77
+        },
+        "60m": {
+          "n": 10,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.57
+        },
+        "240m": {
+          "n": 10,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 0.23
         }
       }
     },
