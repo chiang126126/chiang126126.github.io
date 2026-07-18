@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-07-18T20:16:29.617475+00:00",
+  "generated_at": "2026-07-18T20:18:38.504696+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "MBOXUSDT|burst|LONG": {
-      "symbol": "MBOXUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 33,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.12
-        },
-        "60m": {
-          "n": 33,
-          "win_rate": 0.303,
-          "avg_outcome_pct": -0.43
-        },
-        "240m": {
-          "n": 33,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -1.62
-        }
-      }
-    },
-    "HYPERUSDT|burst|LONG": {
-      "symbol": "HYPERUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 25,
-          "win_rate": 0.12,
-          "avg_outcome_pct": -0.48
-        },
-        "60m": {
-          "n": 25,
-          "win_rate": 0.08,
-          "avg_outcome_pct": -0.63
-        },
-        "240m": {
-          "n": 25,
-          "win_rate": 0.08,
-          "avg_outcome_pct": -1.09
-        }
-      }
-    },
     "GENIUSUSDT|burst|SHORT": {
       "symbol": "GENIUSUSDT",
       "alert_type": "burst",
@@ -1565,6 +1521,28 @@
         }
       }
     },
+    "HYPERUSDT|burst|LONG": {
+      "symbol": "HYPERUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 24,
+          "win_rate": 0.083,
+          "avg_outcome_pct": -0.53
+        },
+        "60m": {
+          "n": 24,
+          "win_rate": 0.083,
+          "avg_outcome_pct": -0.67
+        },
+        "240m": {
+          "n": 24,
+          "win_rate": 0.083,
+          "avg_outcome_pct": -1.06
+        }
+      }
+    },
     "SAGAUSDT|sustained|SHORT": {
       "symbol": "SAGAUSDT",
       "alert_type": "sustained",
@@ -1650,6 +1628,28 @@
           "n": 100,
           "win_rate": 0.56,
           "avg_outcome_pct": 1.53
+        }
+      }
+    },
+    "MBOXUSDT|burst|LONG": {
+      "symbol": "MBOXUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 32,
+          "win_rate": 0.344,
+          "avg_outcome_pct": 0.13
+        },
+        "60m": {
+          "n": 32,
+          "win_rate": 0.312,
+          "avg_outcome_pct": -0.41
+        },
+        "240m": {
+          "n": 32,
+          "win_rate": 0.344,
+          "avg_outcome_pct": -1.6
         }
       }
     },
@@ -8731,9 +8731,9 @@
           "avg_outcome_pct": -0.54
         },
         "240m": {
-          "n": 103,
-          "win_rate": 0.301,
-          "avg_outcome_pct": -1.11
+          "n": 104,
+          "win_rate": 0.308,
+          "avg_outcome_pct": -1.09
         }
       }
     },
