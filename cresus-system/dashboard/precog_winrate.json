@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-18T11:33:26.683908+00:00",
+  "generated_at": "2026-07-18T11:47:10.254405+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "DUSKUSDT|setup|SHORT": {
-      "symbol": "DUSKUSDT",
-      "pred_type": "setup",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 8,
-          "win_rate": 0.375,
-          "avg_outcome_pct": 0.25
-        },
-        "60m": {
-          "n": 8,
-          "win_rate": 0.625,
-          "avg_outcome_pct": 0.19
-        },
-        "240m": {
-          "n": 8,
-          "win_rate": 0.375,
-          "avg_outcome_pct": 0.24
-        }
-      }
-    },
     "IRYSUSDT|setup|LONG": {
       "symbol": "IRYSUSDT",
       "pred_type": "setup",
@@ -3479,6 +3457,28 @@
         }
       }
     },
+    "DUSKUSDT|setup|SHORT": {
+      "symbol": "DUSKUSDT",
+      "pred_type": "setup",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 7,
+          "win_rate": 0.429,
+          "avg_outcome_pct": 0.27
+        },
+        "60m": {
+          "n": 7,
+          "win_rate": 0.571,
+          "avg_outcome_pct": -0.03
+        },
+        "240m": {
+          "n": 7,
+          "win_rate": 0.429,
+          "avg_outcome_pct": 0.29
+        }
+      }
+    },
     "AIGENSYNUSDT|setup|SHORT": {
       "symbol": "AIGENSYNUSDT",
       "pred_type": "setup",
@@ -5463,17 +5463,17 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 3057,
+        "n": 3054,
         "win_rate": 0.278,
         "avg_outcome_pct": -0.03
       },
       "60m": {
-        "n": 3057,
-        "win_rate": 0.31,
+        "n": 3054,
+        "win_rate": 0.309,
         "avg_outcome_pct": -0.08
       },
       "240m": {
-        "n": 3057,
+        "n": 3054,
         "win_rate": 0.383,
         "avg_outcome_pct": -0.09
       }
