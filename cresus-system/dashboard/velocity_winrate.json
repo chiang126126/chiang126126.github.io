@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-18T06:21:18.260495+00:00",
+  "generated_at": "2026-07-18T06:23:27.573181+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "BLUAIUSDT|burst|SHORT": {
-      "symbol": "BLUAIUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 106,
-          "win_rate": 0.311,
-          "avg_outcome_pct": -0.02
-        },
-        "60m": {
-          "n": 105,
-          "win_rate": 0.314,
-          "avg_outcome_pct": -0.05
-        },
-        "240m": {
-          "n": 104,
-          "win_rate": 0.462,
-          "avg_outcome_pct": 0.42
-        }
-      }
-    },
     "BLUAIUSDT|sustained|SHORT": {
       "symbol": "BLUAIUSDT",
       "alert_type": "sustained",
@@ -2489,15 +2467,37 @@
         }
       }
     },
+    "BLUAIUSDT|burst|SHORT": {
+      "symbol": "BLUAIUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 105,
+          "win_rate": 0.305,
+          "avg_outcome_pct": -0.07
+        },
+        "60m": {
+          "n": 104,
+          "win_rate": 0.308,
+          "avg_outcome_pct": -0.14
+        },
+        "240m": {
+          "n": 103,
+          "win_rate": 0.456,
+          "avg_outcome_pct": 0.37
+        }
+      }
+    },
     "EDGEUSDT|burst|SHORT": {
       "symbol": "EDGEUSDT",
       "alert_type": "burst",
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 164,
-          "win_rate": 0.293,
-          "avg_outcome_pct": 0.29
+          "n": 165,
+          "win_rate": 0.291,
+          "avg_outcome_pct": 0.28
         },
         "60m": {
           "n": 164,
@@ -29648,9 +29648,9 @@
           "avg_outcome_pct": 0.07
         },
         "60m": {
-          "n": 62,
-          "win_rate": 0.419,
-          "avg_outcome_pct": -0.05
+          "n": 63,
+          "win_rate": 0.429,
+          "avg_outcome_pct": 0.0
         },
         "240m": {
           "n": 62,
@@ -33950,9 +33950,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 6,
+          "n": 7,
           "win_rate": 0.0,
-          "avg_outcome_pct": -0.18
+          "avg_outcome_pct": -0.24
         },
         "60m": {
           "n": 6,
