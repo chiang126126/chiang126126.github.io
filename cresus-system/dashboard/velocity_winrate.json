@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-18T19:27:25.798276+00:00",
+  "generated_at": "2026-07-18T19:29:35.542124+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "PHAROSUSDT|sustained|SHORT": {
-      "symbol": "PHAROSUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 21,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.19
-        },
-        "60m": {
-          "n": 21,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -0.54
-        },
-        "240m": {
-          "n": 20,
-          "win_rate": 0.4,
-          "avg_outcome_pct": -2.15
-        }
-      }
-    },
     "BABYUSDT|burst|LONG": {
       "symbol": "BABYUSDT",
       "alert_type": "burst",
@@ -1562,6 +1540,28 @@
           "n": 26,
           "win_rate": 0.385,
           "avg_outcome_pct": -0.86
+        }
+      }
+    },
+    "PHAROSUSDT|sustained|SHORT": {
+      "symbol": "PHAROSUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 20,
+          "win_rate": 0.3,
+          "avg_outcome_pct": 0.16
+        },
+        "60m": {
+          "n": 20,
+          "win_rate": 0.35,
+          "avg_outcome_pct": -0.57
+        },
+        "240m": {
+          "n": 19,
+          "win_rate": 0.368,
+          "avg_outcome_pct": -2.31
         }
       }
     },
