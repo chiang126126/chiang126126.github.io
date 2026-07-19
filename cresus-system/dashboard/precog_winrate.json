@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-19T13:47:42.775544+00:00",
+  "generated_at": "2026-07-19T14:01:44.674780+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "SOXLUSDT|ignition|LONG": {
-      "symbol": "SOXLUSDT",
-      "pred_type": "ignition",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 10,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -0.25
-        },
-        "60m": {
-          "n": 10,
-          "win_rate": 0.3,
-          "avg_outcome_pct": -0.58
-        },
-        "240m": {
-          "n": 10,
-          "win_rate": 0.3,
-          "avg_outcome_pct": -0.42
-        }
-      }
-    },
     "HYPEUSDT|ignition|LONG": {
       "symbol": "HYPEUSDT",
       "pred_type": "ignition",
@@ -1430,6 +1408,28 @@
           "n": 5,
           "win_rate": 0.2,
           "avg_outcome_pct": -0.35
+        }
+      }
+    },
+    "SOXLUSDT|ignition|LONG": {
+      "symbol": "SOXLUSDT",
+      "pred_type": "ignition",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 9,
+          "win_rate": 0.111,
+          "avg_outcome_pct": -0.45
+        },
+        "60m": {
+          "n": 9,
+          "win_rate": 0.222,
+          "avg_outcome_pct": -0.82
+        },
+        "240m": {
+          "n": 9,
+          "win_rate": 0.222,
+          "avg_outcome_pct": -0.75
         }
       }
     },
@@ -4517,17 +4517,17 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 2501,
+        "n": 2494,
         "win_rate": 0.279,
         "avg_outcome_pct": -0.02
       },
       "60m": {
-        "n": 2501,
-        "win_rate": 0.312,
+        "n": 2494,
+        "win_rate": 0.313,
         "avg_outcome_pct": -0.07
       },
       "240m": {
-        "n": 2501,
+        "n": 2494,
         "win_rate": 0.387,
         "avg_outcome_pct": -0.07
       }
