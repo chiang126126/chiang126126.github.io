@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-19T15:37:50.485858+00:00",
+  "generated_at": "2026-07-19T15:39:58.211493+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "CYSUSDT|burst|LONG": {
-      "symbol": "CYSUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 6,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.27
-        },
-        "60m": {
-          "n": 6,
-          "win_rate": 0.167,
-          "avg_outcome_pct": 0.02
-        },
-        "240m": {
-          "n": 6,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 0.8
-        }
-      }
-    },
     "EDENUSDT|sustained|LONG": {
       "symbol": "EDENUSDT",
       "alert_type": "sustained",
@@ -1549,9 +1527,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 90,
-          "win_rate": 0.267,
-          "avg_outcome_pct": -0.11
+          "n": 91,
+          "win_rate": 0.264,
+          "avg_outcome_pct": -0.12
         },
         "60m": {
           "n": 90,
@@ -5547,6 +5525,28 @@
         }
       }
     },
+    "CYSUSDT|burst|LONG": {
+      "symbol": "CYSUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": 0.15
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -0.07
+        },
+        "240m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.65
+        }
+      }
+    },
     "ONDOUSDT|burst|LONG": {
       "symbol": "ONDOUSDT",
       "alert_type": "burst",
@@ -6939,14 +6939,14 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 86,
-          "win_rate": 0.535,
+          "n": 87,
+          "win_rate": 0.54,
           "avg_outcome_pct": 0.97
         },
         "60m": {
-          "n": 85,
-          "win_rate": 0.388,
-          "avg_outcome_pct": 0.72
+          "n": 86,
+          "win_rate": 0.395,
+          "avg_outcome_pct": 0.74
         },
         "240m": {
           "n": 85,
