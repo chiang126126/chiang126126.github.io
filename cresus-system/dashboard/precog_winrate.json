@@ -1,74 +1,8 @@
 {
-  "generated_at": "2026-07-19T09:50:39.571773+00:00",
+  "generated_at": "2026-07-19T10:04:15.317655+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "MUSDT|ignition|SHORT": {
-      "symbol": "MUSDT",
-      "pred_type": "ignition",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 15,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.09
-        },
-        "60m": {
-          "n": 15,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.25
-        },
-        "240m": {
-          "n": 15,
-          "win_rate": 0.533,
-          "avg_outcome_pct": 0.41
-        }
-      }
-    },
-    "AIAUSDT|ignition|SHORT": {
-      "symbol": "AIAUSDT",
-      "pred_type": "ignition",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 6,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -0.09
-        },
-        "60m": {
-          "n": 6,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 0.06
-        },
-        "240m": {
-          "n": 6,
-          "win_rate": 0.667,
-          "avg_outcome_pct": 0.33
-        }
-      }
-    },
-    "ADAUSDT|setup|SHORT": {
-      "symbol": "ADAUSDT",
-      "pred_type": "setup",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 5,
-          "win_rate": 0.0,
-          "avg_outcome_pct": 0.02
-        },
-        "60m": {
-          "n": 5,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -0.0
-        },
-        "240m": {
-          "n": 5,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -0.1
-        }
-      }
-    },
     "FOGOUSDT|ignition|LONG": {
       "symbol": "FOGOUSDT",
       "pred_type": "ignition",
@@ -506,6 +440,28 @@
           "n": 11,
           "win_rate": 0.273,
           "avg_outcome_pct": -0.29
+        }
+      }
+    },
+    "MUSDT|ignition|SHORT": {
+      "symbol": "MUSDT",
+      "pred_type": "ignition",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 14,
+          "win_rate": 0.357,
+          "avg_outcome_pct": 0.1
+        },
+        "60m": {
+          "n": 14,
+          "win_rate": 0.357,
+          "avg_outcome_pct": 0.26
+        },
+        "240m": {
+          "n": 14,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 0.36
         }
       }
     },
@@ -1826,6 +1782,28 @@
           "n": 6,
           "win_rate": 0.0,
           "avg_outcome_pct": -1.46
+        }
+      }
+    },
+    "AIAUSDT|ignition|SHORT": {
+      "symbol": "AIAUSDT",
+      "pred_type": "ignition",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -0.12
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": -0.06
+        },
+        "240m": {
+          "n": 5,
+          "win_rate": 0.6,
+          "avg_outcome_pct": 0.2
         }
       }
     },
@@ -4671,17 +4649,17 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 2588,
-        "win_rate": 0.279,
+        "n": 2585,
+        "win_rate": 0.28,
         "avg_outcome_pct": -0.02
       },
       "60m": {
-        "n": 2588,
+        "n": 2585,
         "win_rate": 0.312,
         "avg_outcome_pct": -0.08
       },
       "240m": {
-        "n": 2588,
+        "n": 2585,
         "win_rate": 0.385,
         "avg_outcome_pct": -0.1
       }
