@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-19T12:17:33.665744+00:00",
+  "generated_at": "2026-07-19T12:19:45.298049+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "HYPERUSDT|burst|LONG": {
-      "symbol": "HYPERUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 20,
-          "win_rate": 0.05,
-          "avg_outcome_pct": -0.46
-        },
-        "60m": {
-          "n": 20,
-          "win_rate": 0.05,
-          "avg_outcome_pct": -0.69
-        },
-        "240m": {
-          "n": 20,
-          "win_rate": 0.05,
-          "avg_outcome_pct": -1.12
-        }
-      }
-    },
     "DASHUSDT|burst|SHORT": {
       "symbol": "DASHUSDT",
       "alert_type": "burst",
@@ -4469,6 +4447,28 @@
         }
       }
     },
+    "HYPERUSDT|burst|LONG": {
+      "symbol": "HYPERUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 19,
+          "win_rate": 0.053,
+          "avg_outcome_pct": -0.48
+        },
+        "60m": {
+          "n": 19,
+          "win_rate": 0.053,
+          "avg_outcome_pct": -0.7
+        },
+        "240m": {
+          "n": 19,
+          "win_rate": 0.053,
+          "avg_outcome_pct": -1.16
+        }
+      }
+    },
     "TAGUSDT|burst|LONG": {
       "symbol": "TAGUSDT",
       "alert_type": "burst",
@@ -5971,9 +5971,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 14,
-          "win_rate": 0.357,
-          "avg_outcome_pct": 0.08
+          "n": 15,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.18
         },
         "60m": {
           "n": 14,
@@ -17707,9 +17707,9 @@
           "avg_outcome_pct": -0.77
         },
         "240m": {
-          "n": 16,
-          "win_rate": 0.188,
-          "avg_outcome_pct": -2.05
+          "n": 17,
+          "win_rate": 0.235,
+          "avg_outcome_pct": -1.8
         }
       }
     },
@@ -28526,9 +28526,9 @@
           "avg_outcome_pct": 0.29
         },
         "60m": {
-          "n": 16,
-          "win_rate": 0.438,
-          "avg_outcome_pct": 0.31
+          "n": 17,
+          "win_rate": 0.471,
+          "avg_outcome_pct": 0.47
         },
         "240m": {
           "n": 16,
