@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-19T08:23:05.560495+00:00",
+  "generated_at": "2026-07-19T08:25:14.203675+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "HANAUSDT|burst|LONG": {
-      "symbol": "HANAUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 26,
-          "win_rate": 0.115,
-          "avg_outcome_pct": -0.89
-        },
-        "60m": {
-          "n": 26,
-          "win_rate": 0.192,
-          "avg_outcome_pct": -0.91
-        },
-        "240m": {
-          "n": 26,
-          "win_rate": 0.269,
-          "avg_outcome_pct": -1.59
-        }
-      }
-    },
     "JTOUSDT|burst|SHORT": {
       "symbol": "JTOUSDT",
       "alert_type": "burst",
@@ -4931,6 +4909,28 @@
         }
       }
     },
+    "HANAUSDT|burst|LONG": {
+      "symbol": "HANAUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 25,
+          "win_rate": 0.12,
+          "avg_outcome_pct": -0.94
+        },
+        "60m": {
+          "n": 25,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -0.96
+        },
+        "240m": {
+          "n": 25,
+          "win_rate": 0.28,
+          "avg_outcome_pct": -1.58
+        }
+      }
+    },
     "APRUSDT|sustained|LONG": {
       "symbol": "APRUSDT",
       "alert_type": "sustained",
@@ -8374,9 +8374,9 @@
           "avg_outcome_pct": 0.09
         },
         "60m": {
-          "n": 28,
-          "win_rate": 0.321,
-          "avg_outcome_pct": 0.92
+          "n": 29,
+          "win_rate": 0.31,
+          "avg_outcome_pct": 0.84
         },
         "240m": {
           "n": 27,
@@ -28641,9 +28641,9 @@
           "avg_outcome_pct": -0.09
         },
         "240m": {
-          "n": 37,
-          "win_rate": 0.514,
-          "avg_outcome_pct": 0.61
+          "n": 38,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 0.58
         }
       }
     },
