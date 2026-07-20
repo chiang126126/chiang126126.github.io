@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-20T10:35:59.697991+00:00",
+  "generated_at": "2026-07-20T10:49:48.922263+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "CFXUSDT|ignition|SHORT": {
-      "symbol": "CFXUSDT",
-      "pred_type": "ignition",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 6,
-          "win_rate": 0.167,
-          "avg_outcome_pct": 0.23
-        },
-        "60m": {
-          "n": 6,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 0.31
-        },
-        "240m": {
-          "n": 6,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 0.75
-        }
-      }
-    },
     "TAOUSDT|ignition|LONG": {
       "symbol": "TAOUSDT",
       "pred_type": "ignition",
@@ -2137,6 +2115,28 @@
         }
       }
     },
+    "CFXUSDT|ignition|SHORT": {
+      "symbol": "CFXUSDT",
+      "pred_type": "ignition",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": 0.21
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.11
+        },
+        "240m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.73
+        }
+      }
+    },
     "RIFUSDT|ignition|SHORT": {
       "symbol": "RIFUSDT",
       "pred_type": "ignition",
@@ -3505,17 +3505,17 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 2047,
-        "win_rate": 0.28,
+        "n": 2041,
+        "win_rate": 0.281,
         "avg_outcome_pct": -0.01
       },
       "60m": {
-        "n": 2047,
+        "n": 2041,
         "win_rate": 0.309,
         "avg_outcome_pct": -0.06
       },
       "240m": {
-        "n": 2047,
+        "n": 2041,
         "win_rate": 0.387,
         "avg_outcome_pct": -0.06
       }
