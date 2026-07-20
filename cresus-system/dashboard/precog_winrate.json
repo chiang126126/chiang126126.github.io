@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-20T18:50:58.884020+00:00",
+  "generated_at": "2026-07-20T19:04:33.339667+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "MEGAUSDT|ignition|SHORT": {
-      "symbol": "MEGAUSDT",
-      "pred_type": "ignition",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 6,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.38
-        },
-        "60m": {
-          "n": 6,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.27
-        },
-        "240m": {
-          "n": 6,
-          "win_rate": 0.833,
-          "avg_outcome_pct": 0.64
-        }
-      }
-    },
     "GUAUSDT|ignition|LONG": {
       "symbol": "GUAUSDT",
       "pred_type": "ignition",
@@ -1873,6 +1851,28 @@
         }
       }
     },
+    "MEGAUSDT|ignition|SHORT": {
+      "symbol": "MEGAUSDT",
+      "pred_type": "ignition",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.37
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.23
+        },
+        "240m": {
+          "n": 5,
+          "win_rate": 0.8,
+          "avg_outcome_pct": 0.63
+        }
+      }
+    },
     "BOMEUSDT|ignition|LONG": {
       "symbol": "BOMEUSDT",
       "pred_type": "ignition",
@@ -3197,18 +3197,18 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 1876,
-        "win_rate": 0.273,
-        "avg_outcome_pct": -0.01
+        "n": 1869,
+        "win_rate": 0.274,
+        "avg_outcome_pct": -0.02
       },
       "60m": {
-        "n": 1876,
+        "n": 1869,
         "win_rate": 0.3,
         "avg_outcome_pct": -0.09
       },
       "240m": {
-        "n": 1876,
-        "win_rate": 0.382,
+        "n": 1869,
+        "win_rate": 0.381,
         "avg_outcome_pct": -0.09
       }
     },
