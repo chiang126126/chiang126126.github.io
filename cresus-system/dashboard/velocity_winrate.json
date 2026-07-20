@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-20T03:37:25.765408+00:00",
+  "generated_at": "2026-07-20T03:39:32.019297+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "SPKUSDT|sustained|LONG": {
-      "symbol": "SPKUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 12,
-          "win_rate": 0.083,
-          "avg_outcome_pct": -0.91
-        },
-        "60m": {
-          "n": 12,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -1.57
-        },
-        "240m": {
-          "n": 12,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -2.4
-        }
-      }
-    },
     "APRUSDT|burst|LONG": {
       "symbol": "APRUSDT",
       "alert_type": "burst",
@@ -26620,6 +26598,28 @@
           "n": 18,
           "win_rate": 0.389,
           "avg_outcome_pct": -0.47
+        }
+      }
+    },
+    "SPKUSDT|sustained|LONG": {
+      "symbol": "SPKUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 11,
+          "win_rate": 0.091,
+          "avg_outcome_pct": -0.93
+        },
+        "60m": {
+          "n": 11,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -1.68
+        },
+        "240m": {
+          "n": 11,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -2.66
         }
       }
     },
