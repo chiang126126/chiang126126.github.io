@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-20T11:05:22.906251+00:00",
+  "generated_at": "2026-07-20T11:07:29.775178+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "MITOUSDT|sustained|SHORT": {
-      "symbol": "MITOUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 21,
-          "win_rate": 0.476,
-          "avg_outcome_pct": 0.18
-        },
-        "60m": {
-          "n": 21,
-          "win_rate": 0.619,
-          "avg_outcome_pct": 1.42
-        },
-        "240m": {
-          "n": 21,
-          "win_rate": 0.762,
-          "avg_outcome_pct": 4.25
-        }
-      }
-    },
     "SUSDT|burst|LONG": {
       "symbol": "SUSDT",
       "alert_type": "burst",
@@ -685,6 +663,28 @@
         }
       }
     },
+    "MITOUSDT|sustained|SHORT": {
+      "symbol": "MITOUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 20,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 0.25
+        },
+        "60m": {
+          "n": 20,
+          "win_rate": 0.6,
+          "avg_outcome_pct": 1.3
+        },
+        "240m": {
+          "n": 20,
+          "win_rate": 0.75,
+          "avg_outcome_pct": 4.04
+        }
+      }
+    },
     "DUSKUSDT|burst|LONG": {
       "symbol": "DUSKUSDT",
       "alert_type": "burst",
@@ -1043,9 +1043,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 83,
-          "win_rate": 0.373,
-          "avg_outcome_pct": 0.2
+          "n": 84,
+          "win_rate": 0.369,
+          "avg_outcome_pct": 0.17
         },
         "60m": {
           "n": 83,
@@ -9953,9 +9953,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 40,
-          "win_rate": 0.4,
-          "avg_outcome_pct": 0.23
+          "n": 41,
+          "win_rate": 0.415,
+          "avg_outcome_pct": 0.26
         },
         "60m": {
           "n": 40,
@@ -19836,9 +19836,9 @@
           "avg_outcome_pct": 0.47
         },
         "60m": {
-          "n": 40,
-          "win_rate": 0.325,
-          "avg_outcome_pct": 0.38
+          "n": 41,
+          "win_rate": 0.341,
+          "avg_outcome_pct": 0.39
         },
         "240m": {
           "n": 40,
@@ -27101,9 +27101,9 @@
           "avg_outcome_pct": 1.05
         },
         "240m": {
-          "n": 7,
-          "win_rate": 0.571,
-          "avg_outcome_pct": 3.69
+          "n": 8,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 2.75
         }
       }
     },
@@ -29621,9 +29621,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 24,
-          "win_rate": 0.458,
-          "avg_outcome_pct": 1.17
+          "n": 25,
+          "win_rate": 0.44,
+          "avg_outcome_pct": 1.12
         },
         "60m": {
           "n": 24,
