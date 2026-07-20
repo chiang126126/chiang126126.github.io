@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-07-20T09:14:26.524187+00:00",
+  "generated_at": "2026-07-20T09:16:33.487638+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 842,
@@ -28,7 +28,7 @@
   "risk_status": {
     "block_new_opens": true,
     "reasons": [
-      "emergency stop flag exists: 'AUTO 2026-07-20T09:14:22.290564+00:00: cumulative DD 100.00% (balance $0.00 < threshold $400.00)'",
+      "emergency stop flag exists: 'AUTO 2026-07-20T09:16:29.373036+00:00: cumulative DD 100.00% (balance $0.00 < threshold $400.00)'",
       "cumulative DD 100.00% (balance $0.00 < threshold $400.00)"
     ],
     "daily_pnl": 0.0,
@@ -69346,16 +69346,26 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "HEMIUSDT|LONG|2026-07-20T09:15:04.133590+00:00",
+      "symbol": "HEMIUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-07-20T09:15:20.176150+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=+0.34% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-07-20T09:16:32.491612+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 64066.4,
-    "btc_ma25_1h": 64448.23,
-    "pct_vs_ma25": -0.592,
-    "change_24h_pct": -0.665,
+    "btc_price": 64105.6,
+    "btc_ma25_1h": 64449.8,
+    "pct_vs_ma25": -0.534,
+    "change_24h_pct": -0.604,
     "sub_regime": "down_stable",
-    "change_3h_pct": 0.276,
-    "computed_at": "2026-07-20T09:14:26.467588+00:00"
+    "change_3h_pct": 0.337,
+    "computed_at": "2026-07-20T09:16:33.422492+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
