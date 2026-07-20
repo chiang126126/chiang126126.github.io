@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-20T06:36:59.816771+00:00",
+  "generated_at": "2026-07-20T06:39:13.687227+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "PROVEUSDT|sustained|LONG": {
-      "symbol": "PROVEUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 13,
-          "win_rate": 0.462,
-          "avg_outcome_pct": 1.56
-        },
-        "60m": {
-          "n": 13,
-          "win_rate": 0.385,
-          "avg_outcome_pct": 1.07
-        },
-        "240m": {
-          "n": 13,
-          "win_rate": 0.308,
-          "avg_outcome_pct": 0.5
-        }
-      }
-    },
     "FIDAUSDT|burst|SHORT": {
       "symbol": "FIDAUSDT",
       "alert_type": "burst",
@@ -264,6 +242,28 @@
           "n": 137,
           "win_rate": 0.307,
           "avg_outcome_pct": -0.8
+        }
+      }
+    },
+    "PROVEUSDT|sustained|LONG": {
+      "symbol": "PROVEUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 12,
+          "win_rate": 0.417,
+          "avg_outcome_pct": 0.52
+        },
+        "60m": {
+          "n": 12,
+          "win_rate": 0.333,
+          "avg_outcome_pct": 0.05
+        },
+        "240m": {
+          "n": 12,
+          "win_rate": 0.25,
+          "avg_outcome_pct": -1.77
         }
       }
     },
