@@ -1,74 +1,8 @@
 {
-  "generated_at": "2026-07-20T14:03:26.427364+00:00",
+  "generated_at": "2026-07-20T14:17:08.350368+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "EDGEUSDT|ignition|LONG": {
-      "symbol": "EDGEUSDT",
-      "pred_type": "ignition",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 7,
-          "win_rate": 0.429,
-          "avg_outcome_pct": 0.48
-        },
-        "60m": {
-          "n": 7,
-          "win_rate": 0.286,
-          "avg_outcome_pct": -0.91
-        },
-        "240m": {
-          "n": 7,
-          "win_rate": 0.571,
-          "avg_outcome_pct": -0.48
-        }
-      }
-    },
-    "SKYAIUSDT|ignition|SHORT": {
-      "symbol": "SKYAIUSDT",
-      "pred_type": "ignition",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 9,
-          "win_rate": 0.222,
-          "avg_outcome_pct": -1.07
-        },
-        "60m": {
-          "n": 9,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -0.6
-        },
-        "240m": {
-          "n": 9,
-          "win_rate": 0.444,
-          "avg_outcome_pct": 0.51
-        }
-      }
-    },
-    "MUSDT|ignition|SHORT": {
-      "symbol": "MUSDT",
-      "pred_type": "ignition",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 7,
-          "win_rate": 0.286,
-          "avg_outcome_pct": 0.07
-        },
-        "60m": {
-          "n": 7,
-          "win_rate": 0.143,
-          "avg_outcome_pct": -0.15
-        },
-        "240m": {
-          "n": 7,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -1.75
-        }
-      }
-    },
     "HYPEUSDT|ignition|LONG": {
       "symbol": "HYPEUSDT",
       "pred_type": "ignition",
@@ -399,6 +333,28 @@
         }
       }
     },
+    "EDGEUSDT|ignition|LONG": {
+      "symbol": "EDGEUSDT",
+      "pred_type": "ignition",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 6,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 0.55
+        },
+        "60m": {
+          "n": 6,
+          "win_rate": 0.167,
+          "avg_outcome_pct": -1.36
+        },
+        "240m": {
+          "n": 6,
+          "win_rate": 0.5,
+          "avg_outcome_pct": -0.84
+        }
+      }
+    },
     "USELESSUSDT|ignition|SHORT": {
       "symbol": "USELESSUSDT",
       "pred_type": "ignition",
@@ -528,6 +484,28 @@
           "n": 5,
           "win_rate": 0.2,
           "avg_outcome_pct": 0.38
+        }
+      }
+    },
+    "MUSDT|ignition|SHORT": {
+      "symbol": "MUSDT",
+      "pred_type": "ignition",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 6,
+          "win_rate": 0.167,
+          "avg_outcome_pct": -0.21
+        },
+        "60m": {
+          "n": 6,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -0.47
+        },
+        "240m": {
+          "n": 6,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -2.07
         }
       }
     },
@@ -1364,6 +1342,28 @@
           "n": 8,
           "win_rate": 0.5,
           "avg_outcome_pct": 1.64
+        }
+      }
+    },
+    "SKYAIUSDT|ignition|SHORT": {
+      "symbol": "SKYAIUSDT",
+      "pred_type": "ignition",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 8,
+          "win_rate": 0.25,
+          "avg_outcome_pct": -1.0
+        },
+        "60m": {
+          "n": 8,
+          "win_rate": 0.25,
+          "avg_outcome_pct": -0.91
+        },
+        "240m": {
+          "n": 8,
+          "win_rate": 0.375,
+          "avg_outcome_pct": 0.14
         }
       }
     },
@@ -3329,19 +3329,19 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 1968,
+        "n": 1961,
         "win_rate": 0.276,
         "avg_outcome_pct": -0.02
       },
       "60m": {
-        "n": 1968,
+        "n": 1961,
         "win_rate": 0.301,
         "avg_outcome_pct": -0.08
       },
       "240m": {
-        "n": 1968,
-        "win_rate": 0.383,
-        "avg_outcome_pct": -0.08
+        "n": 1961,
+        "win_rate": 0.381,
+        "avg_outcome_pct": -0.09
       }
     },
     "quant_only": {}
