@@ -1,74 +1,8 @@
 {
-  "generated_at": "2026-07-20T10:22:06.014156+00:00",
+  "generated_at": "2026-07-20T10:35:59.697991+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "OPENUSDT|ignition|LONG": {
-      "symbol": "OPENUSDT",
-      "pred_type": "ignition",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 5,
-          "win_rate": 0.8,
-          "avg_outcome_pct": 0.77
-        },
-        "60m": {
-          "n": 5,
-          "win_rate": 0.6,
-          "avg_outcome_pct": 0.55
-        },
-        "240m": {
-          "n": 5,
-          "win_rate": 0.4,
-          "avg_outcome_pct": -3.46
-        }
-      }
-    },
-    "MITOUSDT|ignition|LONG": {
-      "symbol": "MITOUSDT",
-      "pred_type": "ignition",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 7,
-          "win_rate": 0.286,
-          "avg_outcome_pct": 0.34
-        },
-        "60m": {
-          "n": 7,
-          "win_rate": 0.143,
-          "avg_outcome_pct": -0.8
-        },
-        "240m": {
-          "n": 7,
-          "win_rate": 0.286,
-          "avg_outcome_pct": -2.24
-        }
-      }
-    },
-    "EIGENUSDT|ignition|SHORT": {
-      "symbol": "EIGENUSDT",
-      "pred_type": "ignition",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 5,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -0.72
-        },
-        "60m": {
-          "n": 5,
-          "win_rate": 0.6,
-          "avg_outcome_pct": -0.06
-        },
-        "240m": {
-          "n": 5,
-          "win_rate": 0.4,
-          "avg_outcome_pct": -0.29
-        }
-      }
-    },
     "CFXUSDT|ignition|SHORT": {
       "symbol": "CFXUSDT",
       "pred_type": "ignition",
@@ -1298,6 +1232,28 @@
           "n": 6,
           "win_rate": 0.833,
           "avg_outcome_pct": 0.64
+        }
+      }
+    },
+    "MITOUSDT|ignition|LONG": {
+      "symbol": "MITOUSDT",
+      "pred_type": "ignition",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 6,
+          "win_rate": 0.167,
+          "avg_outcome_pct": -0.4
+        },
+        "60m": {
+          "n": 6,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -1.32
+        },
+        "240m": {
+          "n": 6,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -1.05
         }
       }
     },
@@ -3549,17 +3505,17 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 2054,
-        "win_rate": 0.281,
-        "avg_outcome_pct": -0.0
+        "n": 2047,
+        "win_rate": 0.28,
+        "avg_outcome_pct": -0.01
       },
       "60m": {
-        "n": 2054,
-        "win_rate": 0.311,
+        "n": 2047,
+        "win_rate": 0.309,
         "avg_outcome_pct": -0.06
       },
       "240m": {
-        "n": 2054,
+        "n": 2047,
         "win_rate": 0.387,
         "avg_outcome_pct": -0.06
       }
