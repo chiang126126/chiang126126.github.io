@@ -1,96 +1,8 @@
 {
-  "generated_at": "2026-07-21T15:14:54.386819+00:00",
+  "generated_at": "2026-07-21T15:28:50.355464+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "ZECUSDT|ignition|LONG": {
-      "symbol": "ZECUSDT",
-      "pred_type": "ignition",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 8,
-          "win_rate": 0.125,
-          "avg_outcome_pct": -0.5
-        },
-        "60m": {
-          "n": 8,
-          "win_rate": 0.125,
-          "avg_outcome_pct": -0.32
-        },
-        "240m": {
-          "n": 8,
-          "win_rate": 0.25,
-          "avg_outcome_pct": -1.28
-        }
-      }
-    },
-    "GUAUSDT|ignition|LONG": {
-      "symbol": "GUAUSDT",
-      "pred_type": "ignition",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 12,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -0.61
-        },
-        "60m": {
-          "n": 12,
-          "win_rate": 0.25,
-          "avg_outcome_pct": -1.11
-        },
-        "240m": {
-          "n": 12,
-          "win_rate": 0.25,
-          "avg_outcome_pct": -2.3
-        }
-      }
-    },
-    "RENDERUSDT|ignition|LONG": {
-      "symbol": "RENDERUSDT",
-      "pred_type": "ignition",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 5,
-          "win_rate": 0.6,
-          "avg_outcome_pct": 0.93
-        },
-        "60m": {
-          "n": 5,
-          "win_rate": 0.6,
-          "avg_outcome_pct": 0.39
-        },
-        "240m": {
-          "n": 5,
-          "win_rate": 0.4,
-          "avg_outcome_pct": 0.27
-        }
-      }
-    },
-    "BOMEUSDT|ignition|LONG": {
-      "symbol": "BOMEUSDT",
-      "pred_type": "ignition",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 5,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -0.02
-        },
-        "60m": {
-          "n": 5,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -0.81
-        },
-        "240m": {
-          "n": 5,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -2.45
-        }
-      }
-    },
     "ICPUSDT|ignition|LONG": {
       "symbol": "ICPUSDT",
       "pred_type": "ignition",
@@ -308,6 +220,28 @@
           "n": 6,
           "win_rate": 0.667,
           "avg_outcome_pct": 2.95
+        }
+      }
+    },
+    "GUAUSDT|ignition|LONG": {
+      "symbol": "GUAUSDT",
+      "pred_type": "ignition",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 11,
+          "win_rate": 0.364,
+          "avg_outcome_pct": -0.42
+        },
+        "60m": {
+          "n": 11,
+          "win_rate": 0.273,
+          "avg_outcome_pct": -1.14
+        },
+        "240m": {
+          "n": 11,
+          "win_rate": 0.273,
+          "avg_outcome_pct": -2.44
         }
       }
     },
@@ -1257,6 +1191,28 @@
         }
       }
     },
+    "ZECUSDT|ignition|LONG": {
+      "symbol": "ZECUSDT",
+      "pred_type": "ignition",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 7,
+          "win_rate": 0.143,
+          "avg_outcome_pct": -0.63
+        },
+        "60m": {
+          "n": 7,
+          "win_rate": 0.143,
+          "avg_outcome_pct": -0.34
+        },
+        "240m": {
+          "n": 7,
+          "win_rate": 0.286,
+          "avg_outcome_pct": -0.96
+        }
+      }
+    },
     "XAGUSDT|setup|SHORT": {
       "symbol": "XAGUSDT",
       "pred_type": "setup",
@@ -2185,19 +2141,19 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 1522,
-        "win_rate": 0.26,
+        "n": 1512,
+        "win_rate": 0.261,
         "avg_outcome_pct": -0.06
       },
       "60m": {
-        "n": 1522,
-        "win_rate": 0.293,
+        "n": 1512,
+        "win_rate": 0.294,
         "avg_outcome_pct": -0.1
       },
       "240m": {
-        "n": 1522,
-        "win_rate": 0.378,
-        "avg_outcome_pct": -0.13
+        "n": 1512,
+        "win_rate": 0.379,
+        "avg_outcome_pct": -0.11
       }
     },
     "quant_only": {}
