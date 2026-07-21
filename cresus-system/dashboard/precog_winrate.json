@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-07-21T07:22:30.200555+00:00",
+  "generated_at": "2026-07-21T07:36:17.483470+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "OPGUSDT|ignition|LONG": {
-      "symbol": "OPGUSDT",
-      "pred_type": "ignition",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 10,
-          "win_rate": 0.4,
-          "avg_outcome_pct": -0.57
-        },
-        "60m": {
-          "n": 10,
-          "win_rate": 0.4,
-          "avg_outcome_pct": -0.81
-        },
-        "240m": {
-          "n": 10,
-          "win_rate": 0.1,
-          "avg_outcome_pct": -3.09
-        }
-      }
-    },
-    "HYPERUSDT|ignition|LONG": {
-      "symbol": "HYPERUSDT",
-      "pred_type": "ignition",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 6,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -0.6
-        },
-        "60m": {
-          "n": 6,
-          "win_rate": 0.167,
-          "avg_outcome_pct": -0.42
-        },
-        "240m": {
-          "n": 6,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -0.81
-        }
-      }
-    },
     "PROVEUSDT|ignition|SHORT": {
       "symbol": "PROVEUSDT",
       "pred_type": "ignition",
@@ -968,6 +924,28 @@
           "n": 5,
           "win_rate": 0.6,
           "avg_outcome_pct": 0.67
+        }
+      }
+    },
+    "OPGUSDT|ignition|LONG": {
+      "symbol": "OPGUSDT",
+      "pred_type": "ignition",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 9,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -0.89
+        },
+        "60m": {
+          "n": 9,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -1.27
+        },
+        "240m": {
+          "n": 9,
+          "win_rate": 0.111,
+          "avg_outcome_pct": -2.87
         }
       }
     },
@@ -2687,6 +2665,28 @@
         }
       }
     },
+    "HYPERUSDT|ignition|LONG": {
+      "symbol": "HYPERUSDT",
+      "pred_type": "ignition",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -0.53
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -0.28
+        },
+        "240m": {
+          "n": 5,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -0.51
+        }
+      }
+    },
     "HYPERUSDT|setup|LONG": {
       "symbol": "HYPERUSDT",
       "pred_type": "setup",
@@ -2823,17 +2823,17 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 1697,
-        "win_rate": 0.269,
+        "n": 1693,
+        "win_rate": 0.268,
         "avg_outcome_pct": -0.03
       },
       "60m": {
-        "n": 1697,
+        "n": 1693,
         "win_rate": 0.298,
         "avg_outcome_pct": -0.09
       },
       "240m": {
-        "n": 1697,
+        "n": 1693,
         "win_rate": 0.383,
         "avg_outcome_pct": -0.08
       }
