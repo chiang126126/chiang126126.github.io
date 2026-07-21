@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-21T05:33:37.061627+00:00",
+  "generated_at": "2026-07-21T05:35:46.144232+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "DODOXUSDT|sustained|SHORT": {
-      "symbol": "DODOXUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 20,
-          "win_rate": 0.55,
-          "avg_outcome_pct": 0.68
-        },
-        "60m": {
-          "n": 20,
-          "win_rate": 0.45,
-          "avg_outcome_pct": 0.02
-        },
-        "240m": {
-          "n": 19,
-          "win_rate": 0.526,
-          "avg_outcome_pct": 0.65
-        }
-      }
-    },
     "PIEVERSEUSDT|burst|LONG": {
       "symbol": "PIEVERSEUSDT",
       "alert_type": "burst",
@@ -1166,6 +1144,28 @@
           "n": 81,
           "win_rate": 0.543,
           "avg_outcome_pct": 0.76
+        }
+      }
+    },
+    "DODOXUSDT|sustained|SHORT": {
+      "symbol": "DODOXUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 19,
+          "win_rate": 0.579,
+          "avg_outcome_pct": 0.79
+        },
+        "60m": {
+          "n": 19,
+          "win_rate": 0.474,
+          "avg_outcome_pct": 0.1
+        },
+        "240m": {
+          "n": 18,
+          "win_rate": 0.5,
+          "avg_outcome_pct": -0.42
         }
       }
     },
