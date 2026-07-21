@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-07-21T21:10:00.427340+00:00",
+  "generated_at": "2026-07-21T21:12:08.188203+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "STABLEUSDT|sustained|LONG": {
-      "symbol": "STABLEUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 12,
-          "win_rate": 0.417,
-          "avg_outcome_pct": 0.31
-        },
-        "60m": {
-          "n": 12,
-          "win_rate": 0.417,
-          "avg_outcome_pct": 0.44
-        },
-        "240m": {
-          "n": 12,
-          "win_rate": 0.417,
-          "avg_outcome_pct": 0.76
-        }
-      }
-    },
-    "DYDXUSDT|burst|LONG": {
-      "symbol": "DYDXUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 86,
-          "win_rate": 0.267,
-          "avg_outcome_pct": 0.1
-        },
-        "60m": {
-          "n": 86,
-          "win_rate": 0.279,
-          "avg_outcome_pct": -0.14
-        },
-        "240m": {
-          "n": 86,
-          "win_rate": 0.36,
-          "avg_outcome_pct": -0.26
-        }
-      }
-    },
     "STABLEUSDT|burst|LONG": {
       "symbol": "STABLEUSDT",
       "alert_type": "burst",
@@ -8935,6 +8891,28 @@
         }
       }
     },
+    "DYDXUSDT|burst|LONG": {
+      "symbol": "DYDXUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 85,
+          "win_rate": 0.271,
+          "avg_outcome_pct": 0.1
+        },
+        "60m": {
+          "n": 85,
+          "win_rate": 0.282,
+          "avg_outcome_pct": -0.14
+        },
+        "240m": {
+          "n": 85,
+          "win_rate": 0.365,
+          "avg_outcome_pct": -0.25
+        }
+      }
+    },
     "WUSDT|burst|LONG": {
       "symbol": "WUSDT",
       "alert_type": "burst",
@@ -13134,6 +13112,28 @@
           "n": 19,
           "win_rate": 0.632,
           "avg_outcome_pct": 1.37
+        }
+      }
+    },
+    "STABLEUSDT|sustained|LONG": {
+      "symbol": "STABLEUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 11,
+          "win_rate": 0.455,
+          "avg_outcome_pct": 0.37
+        },
+        "60m": {
+          "n": 11,
+          "win_rate": 0.455,
+          "avg_outcome_pct": 0.58
+        },
+        "240m": {
+          "n": 11,
+          "win_rate": 0.455,
+          "avg_outcome_pct": 0.94
         }
       }
     },
@@ -26524,9 +26524,9 @@
           "avg_outcome_pct": -0.08
         },
         "60m": {
-          "n": 10,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 0.62
+          "n": 11,
+          "win_rate": 0.455,
+          "avg_outcome_pct": 0.58
         },
         "240m": {
           "n": 10,
