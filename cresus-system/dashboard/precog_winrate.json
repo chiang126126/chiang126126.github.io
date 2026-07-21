@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-07-21T10:09:23.708177+00:00",
+  "generated_at": "2026-07-21T10:23:04.313160+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "DUSKUSDT|setup|LONG": {
-      "symbol": "DUSKUSDT",
-      "pred_type": "setup",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 6,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.24
-        },
-        "60m": {
-          "n": 6,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.13
-        },
-        "240m": {
-          "n": 6,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -0.61
-        }
-      }
-    },
-    "SOXLUSDT|ignition|SHORT": {
-      "symbol": "SOXLUSDT",
-      "pred_type": "ignition",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 7,
-          "win_rate": 0.429,
-          "avg_outcome_pct": 0.11
-        },
-        "60m": {
-          "n": 7,
-          "win_rate": 0.286,
-          "avg_outcome_pct": -0.42
-        },
-        "240m": {
-          "n": 7,
-          "win_rate": 0.286,
-          "avg_outcome_pct": -2.02
-        }
-      }
-    },
     "BOMEUSDT|setup|LONG": {
       "symbol": "BOMEUSDT",
       "pred_type": "setup",
@@ -2159,6 +2115,28 @@
         }
       }
     },
+    "SOXLUSDT|ignition|SHORT": {
+      "symbol": "SOXLUSDT",
+      "pred_type": "ignition",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 6,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -0.08
+        },
+        "60m": {
+          "n": 6,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -0.51
+        },
+        "240m": {
+          "n": 6,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -1.59
+        }
+      }
+    },
     "SAGAUSDT|ignition|LONG": {
       "symbol": "SAGAUSDT",
       "pred_type": "ignition",
@@ -2555,6 +2533,28 @@
         }
       }
     },
+    "DUSKUSDT|setup|LONG": {
+      "symbol": "DUSKUSDT",
+      "pred_type": "setup",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.46
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.24
+        },
+        "240m": {
+          "n": 5,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -0.59
+        }
+      }
+    },
     "BASUSDT|ignition|SHORT": {
       "symbol": "BASUSDT",
       "pred_type": "ignition",
@@ -2625,19 +2625,19 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 1638,
-        "win_rate": 0.264,
+        "n": 1632,
+        "win_rate": 0.265,
         "avg_outcome_pct": -0.04
       },
       "60m": {
-        "n": 1638,
+        "n": 1632,
         "win_rate": 0.295,
         "avg_outcome_pct": -0.09
       },
       "240m": {
-        "n": 1638,
+        "n": 1632,
         "win_rate": 0.382,
-        "avg_outcome_pct": -0.09
+        "avg_outcome_pct": -0.08
       }
     },
     "quant_only": {}
