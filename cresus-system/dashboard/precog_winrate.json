@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-21T06:40:54.324030+00:00",
+  "generated_at": "2026-07-21T06:54:43.398232+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "FIDAUSDT|ignition|LONG": {
-      "symbol": "FIDAUSDT",
-      "pred_type": "ignition",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 10,
-          "win_rate": 0.6,
-          "avg_outcome_pct": 1.18
-        },
-        "60m": {
-          "n": 10,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 0.48
-        },
-        "240m": {
-          "n": 10,
-          "win_rate": 0.4,
-          "avg_outcome_pct": 0.75
-        }
-      }
-    },
     "ICPUSDT|ignition|LONG": {
       "symbol": "ICPUSDT",
       "pred_type": "ignition",
@@ -1719,6 +1697,28 @@
         }
       }
     },
+    "FIDAUSDT|ignition|LONG": {
+      "symbol": "FIDAUSDT",
+      "pred_type": "ignition",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 9,
+          "win_rate": 0.556,
+          "avg_outcome_pct": 1.08
+        },
+        "60m": {
+          "n": 9,
+          "win_rate": 0.556,
+          "avg_outcome_pct": 0.76
+        },
+        "240m": {
+          "n": 9,
+          "win_rate": 0.444,
+          "avg_outcome_pct": 1.38
+        }
+      }
+    },
     "EDGEUSDT|ignition|SHORT": {
       "symbol": "EDGEUSDT",
       "pred_type": "ignition",
@@ -2823,17 +2823,17 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 1703,
-        "win_rate": 0.27,
-        "avg_outcome_pct": -0.02
+        "n": 1700,
+        "win_rate": 0.269,
+        "avg_outcome_pct": -0.03
       },
       "60m": {
-        "n": 1703,
+        "n": 1700,
         "win_rate": 0.298,
         "avg_outcome_pct": -0.09
       },
       "240m": {
-        "n": 1703,
+        "n": 1700,
         "win_rate": 0.382,
         "avg_outcome_pct": -0.08
       }
