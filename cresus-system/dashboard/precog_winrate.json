@@ -1,74 +1,8 @@
 {
-  "generated_at": "2026-07-22T11:24:08.629634+00:00",
+  "generated_at": "2026-07-22T11:37:26.390284+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "BANUSDT|ignition|LONG": {
-      "symbol": "BANUSDT",
-      "pred_type": "ignition",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 5,
-          "win_rate": 0.6,
-          "avg_outcome_pct": 0.77
-        },
-        "60m": {
-          "n": 5,
-          "win_rate": 0.4,
-          "avg_outcome_pct": 0.45
-        },
-        "240m": {
-          "n": 5,
-          "win_rate": 0.6,
-          "avg_outcome_pct": 1.21
-        }
-      }
-    },
-    "OPGUSDT|ignition|LONG": {
-      "symbol": "OPGUSDT",
-      "pred_type": "ignition",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 5,
-          "win_rate": 0.4,
-          "avg_outcome_pct": -0.99
-        },
-        "60m": {
-          "n": 5,
-          "win_rate": 0.4,
-          "avg_outcome_pct": -0.7
-        },
-        "240m": {
-          "n": 5,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -2.35
-        }
-      }
-    },
-    "GUAUSDT|ignition|LONG": {
-      "symbol": "GUAUSDT",
-      "pred_type": "ignition",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 7,
-          "win_rate": 0.571,
-          "avg_outcome_pct": 1.01
-        },
-        "60m": {
-          "n": 7,
-          "win_rate": 0.429,
-          "avg_outcome_pct": -0.24
-        },
-        "240m": {
-          "n": 7,
-          "win_rate": 0.429,
-          "avg_outcome_pct": -1.53
-        }
-      }
-    },
     "INUSDT|ignition|LONG": {
       "symbol": "INUSDT",
       "pred_type": "ignition",
@@ -905,6 +839,28 @@
         }
       }
     },
+    "GUAUSDT|ignition|LONG": {
+      "symbol": "GUAUSDT",
+      "pred_type": "ignition",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 6,
+          "win_rate": 0.667,
+          "avg_outcome_pct": 1.21
+        },
+        "60m": {
+          "n": 6,
+          "win_rate": 0.5,
+          "avg_outcome_pct": -0.1
+        },
+        "240m": {
+          "n": 6,
+          "win_rate": 0.5,
+          "avg_outcome_pct": -1.57
+        }
+      }
+    },
     "BICOUSDT|ignition|SHORT": {
       "symbol": "BICOUSDT",
       "pred_type": "ignition",
@@ -1217,19 +1173,19 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 1073,
+        "n": 1067,
         "win_rate": 0.257,
         "avg_outcome_pct": -0.06
       },
       "60m": {
-        "n": 1073,
-        "win_rate": 0.281,
+        "n": 1067,
+        "win_rate": 0.28,
         "avg_outcome_pct": -0.11
       },
       "240m": {
-        "n": 1073,
-        "win_rate": 0.377,
-        "avg_outcome_pct": 0.02
+        "n": 1067,
+        "win_rate": 0.376,
+        "avg_outcome_pct": 0.01
       }
     },
     "quant_only": {}
