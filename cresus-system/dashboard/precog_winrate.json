@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-22T19:52:08.291583+00:00",
+  "generated_at": "2026-07-22T20:05:50.052105+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "INUSDT|ignition|SHORT": {
-      "symbol": "INUSDT",
-      "pred_type": "ignition",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 8,
-          "win_rate": 0.25,
-          "avg_outcome_pct": -0.07
-        },
-        "60m": {
-          "n": 8,
-          "win_rate": 0.25,
-          "avg_outcome_pct": -1.2
-        },
-        "240m": {
-          "n": 8,
-          "win_rate": 0.625,
-          "avg_outcome_pct": 1.26
-        }
-      }
-    },
     "NILUSDT|ignition|LONG": {
       "symbol": "NILUSDT",
       "pred_type": "ignition",
@@ -399,6 +377,28 @@
         }
       }
     },
+    "INUSDT|ignition|SHORT": {
+      "symbol": "INUSDT",
+      "pred_type": "ignition",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 7,
+          "win_rate": 0.286,
+          "avg_outcome_pct": -0.07
+        },
+        "60m": {
+          "n": 7,
+          "win_rate": 0.286,
+          "avg_outcome_pct": -1.13
+        },
+        "240m": {
+          "n": 7,
+          "win_rate": 0.571,
+          "avg_outcome_pct": 1.32
+        }
+      }
+    },
     "BICOUSDT|ignition|SHORT": {
       "symbol": "BICOUSDT",
       "pred_type": "ignition",
@@ -755,19 +755,19 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 894,
-        "win_rate": 0.26,
-        "avg_outcome_pct": -0.1
+        "n": 890,
+        "win_rate": 0.261,
+        "avg_outcome_pct": -0.09
       },
       "60m": {
-        "n": 894,
+        "n": 890,
         "win_rate": 0.273,
         "avg_outcome_pct": -0.17
       },
       "240m": {
-        "n": 894,
-        "win_rate": 0.359,
-        "avg_outcome_pct": 0.01
+        "n": 890,
+        "win_rate": 0.358,
+        "avg_outcome_pct": 0.0
       }
     },
     "quant_only": {}
