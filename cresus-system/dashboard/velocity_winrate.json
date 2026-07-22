@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-07-22T13:38:24.996806+00:00",
+  "generated_at": "2026-07-22T13:40:58.450510+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "BANUSDT|sustained|LONG": {
-      "symbol": "BANUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 9,
-          "win_rate": 0.667,
-          "avg_outcome_pct": 0.36
-        },
-        "60m": {
-          "n": 9,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -0.26
-        },
-        "240m": {
-          "n": 9,
-          "win_rate": 0.222,
-          "avg_outcome_pct": -1.41
-        }
-      }
-    },
-    "HANAUSDT|burst|LONG": {
-      "symbol": "HANAUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 32,
-          "win_rate": 0.156,
-          "avg_outcome_pct": -1.53
-        },
-        "60m": {
-          "n": 32,
-          "win_rate": 0.219,
-          "avg_outcome_pct": -2.04
-        },
-        "240m": {
-          "n": 32,
-          "win_rate": 0.188,
-          "avg_outcome_pct": -3.11
-        }
-      }
-    },
     "RAVEUSDT|burst|LONG": {
       "symbol": "RAVEUSDT",
       "alert_type": "burst",
@@ -2335,6 +2291,28 @@
         }
       }
     },
+    "BANUSDT|sustained|LONG": {
+      "symbol": "BANUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 8,
+          "win_rate": 0.625,
+          "avg_outcome_pct": 0.22
+        },
+        "60m": {
+          "n": 8,
+          "win_rate": 0.25,
+          "avg_outcome_pct": -0.69
+        },
+        "240m": {
+          "n": 8,
+          "win_rate": 0.125,
+          "avg_outcome_pct": -2.2
+        }
+      }
+    },
     "IPUSDT|sustained|SHORT": {
       "symbol": "IPUSDT",
       "alert_type": "sustained",
@@ -3850,6 +3828,28 @@
           "n": 27,
           "win_rate": 0.296,
           "avg_outcome_pct": -0.49
+        }
+      }
+    },
+    "HANAUSDT|burst|LONG": {
+      "symbol": "HANAUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 31,
+          "win_rate": 0.129,
+          "avg_outcome_pct": -1.71
+        },
+        "60m": {
+          "n": 31,
+          "win_rate": 0.194,
+          "avg_outcome_pct": -2.24
+        },
+        "240m": {
+          "n": 31,
+          "win_rate": 0.161,
+          "avg_outcome_pct": -3.41
         }
       }
     },
@@ -11811,9 +11811,9 @@
           "avg_outcome_pct": 0.06
         },
         "240m": {
-          "n": 35,
-          "win_rate": 0.343,
-          "avg_outcome_pct": -0.09
+          "n": 36,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -0.33
         }
       }
     },
@@ -29340,9 +29340,9 @@
           "avg_outcome_pct": 2.92
         },
         "60m": {
-          "n": 31,
-          "win_rate": 0.419,
-          "avg_outcome_pct": 5.5
+          "n": 32,
+          "win_rate": 0.406,
+          "avg_outcome_pct": 5.3
         },
         "240m": {
           "n": 31,
