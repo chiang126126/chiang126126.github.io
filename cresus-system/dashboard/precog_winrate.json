@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-22T06:02:03.840206+00:00",
+  "generated_at": "2026-07-22T06:15:25.738643+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "PAXGUSDT|setup|SHORT": {
-      "symbol": "PAXGUSDT",
-      "pred_type": "setup",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 6,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -0.02
-        },
-        "60m": {
-          "n": 6,
-          "win_rate": 0.0,
-          "avg_outcome_pct": 0.04
-        },
-        "240m": {
-          "n": 6,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -0.02
-        }
-      }
-    },
     "SKYAIUSDT|ignition|LONG": {
       "symbol": "SKYAIUSDT",
       "pred_type": "ignition",
@@ -154,6 +132,28 @@
           "n": 11,
           "win_rate": 0.455,
           "avg_outcome_pct": -1.71
+        }
+      }
+    },
+    "PAXGUSDT|setup|SHORT": {
+      "symbol": "PAXGUSDT",
+      "pred_type": "setup",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -0.01
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.0,
+          "avg_outcome_pct": 0.04
+        },
+        "240m": {
+          "n": 5,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -0.05
         }
       }
     },
@@ -1415,19 +1415,19 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 1213,
+        "n": 1208,
         "win_rate": 0.26,
         "avg_outcome_pct": -0.05
       },
       "60m": {
-        "n": 1213,
+        "n": 1208,
         "win_rate": 0.289,
         "avg_outcome_pct": -0.09
       },
       "240m": {
-        "n": 1213,
+        "n": 1208,
         "win_rate": 0.374,
-        "avg_outcome_pct": -0.0
+        "avg_outcome_pct": 0.0
       }
     },
     "quant_only": {}
