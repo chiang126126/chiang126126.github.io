@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-22T05:35:29.152075+00:00",
+  "generated_at": "2026-07-22T05:37:35.695186+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "CUSDT|burst|SHORT": {
-      "symbol": "CUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 32,
-          "win_rate": 0.375,
-          "avg_outcome_pct": 0.44
-        },
-        "60m": {
-          "n": 32,
-          "win_rate": 0.312,
-          "avg_outcome_pct": 0.11
-        },
-        "240m": {
-          "n": 32,
-          "win_rate": 0.312,
-          "avg_outcome_pct": -0.65
-        }
-      }
-    },
     "KAITOUSDT|burst|LONG": {
       "symbol": "KAITOUSDT",
       "alert_type": "burst",
@@ -1257,6 +1235,28 @@
         }
       }
     },
+    "CUSDT|burst|SHORT": {
+      "symbol": "CUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 31,
+          "win_rate": 0.387,
+          "avg_outcome_pct": 0.5
+        },
+        "60m": {
+          "n": 31,
+          "win_rate": 0.323,
+          "avg_outcome_pct": 0.18
+        },
+        "240m": {
+          "n": 31,
+          "win_rate": 0.323,
+          "avg_outcome_pct": -0.6
+        }
+      }
+    },
     "BERAUSDT|burst|SHORT": {
       "symbol": "BERAUSDT",
       "alert_type": "burst",
@@ -1691,9 +1691,9 @@
           "avg_outcome_pct": 0.26
         },
         "240m": {
-          "n": 35,
-          "win_rate": 0.371,
-          "avg_outcome_pct": -0.05
+          "n": 36,
+          "win_rate": 0.361,
+          "avg_outcome_pct": -0.08
         }
       }
     },
@@ -9100,9 +9100,9 @@
           "avg_outcome_pct": -1.38
         },
         "240m": {
-          "n": 197,
-          "win_rate": 0.391,
-          "avg_outcome_pct": -2.91
+          "n": 198,
+          "win_rate": 0.389,
+          "avg_outcome_pct": -2.9
         }
       }
     },
@@ -29000,9 +29000,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 45,
-          "win_rate": 0.378,
-          "avg_outcome_pct": 1.52
+          "n": 46,
+          "win_rate": 0.391,
+          "avg_outcome_pct": 1.5
         },
         "60m": {
           "n": 45,
@@ -33982,9 +33982,9 @@
           "avg_outcome_pct": -1.2
         },
         "240m": {
-          "n": 21,
-          "win_rate": 0.286,
-          "avg_outcome_pct": -0.26
+          "n": 22,
+          "win_rate": 0.273,
+          "avg_outcome_pct": -0.53
         }
       }
     },
