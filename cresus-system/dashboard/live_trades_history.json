@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-07-22T13:44:22.095333+00:00",
+  "generated_at": "2026-07-22T13:46:27.510361+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 842,
@@ -28,7 +28,7 @@
   "risk_status": {
     "block_new_opens": true,
     "reasons": [
-      "emergency stop flag exists: 'AUTO 2026-07-22T13:44:17.960561+00:00: cumulative DD 100.00% (balance $0.00 < threshold $400.00)'",
+      "emergency stop flag exists: 'AUTO 2026-07-22T13:46:22.267117+00:00: cumulative DD 100.00% (balance $0.00 < threshold $400.00)'",
       "cumulative DD 100.00% (balance $0.00 < threshold $400.00)"
     ],
     "daily_pnl": 0.0,
@@ -69348,22 +69348,13 @@
   ],
   "missed_signals": [
     {
-      "paper_id": "RIFUSDT|LONG|2026-07-22T13:11:52.876730+00:00",
-      "symbol": "RIFUSDT",
-      "direction": "LONG",
-      "conviction_score": 7,
-      "signal_at": "2026-07-22T13:12:49.550713+00:00",
-      "reason": "paper trade too old (1892s > 600s)",
-      "last_checked_at": "2026-07-22T13:44:21.079293+00:00"
-    },
-    {
       "paper_id": "REUSDT|LONG|2026-07-22T13:31:18.971929+00:00",
       "symbol": "REUSDT",
       "direction": "LONG",
       "conviction_score": 6,
       "signal_at": "2026-07-22T13:33:18.634688+00:00",
-      "reason": "paper trade too old (662s > 600s)",
-      "last_checked_at": "2026-07-22T13:44:21.079293+00:00"
+      "reason": "paper trade too old (787s > 600s)",
+      "last_checked_at": "2026-07-22T13:46:25.968150+00:00"
     },
     {
       "paper_id": "SOXSUSDT|SHORT|2026-07-22T13:34:53.806209+00:00",
@@ -69371,8 +69362,8 @@
       "direction": "SHORT",
       "conviction_score": 5,
       "signal_at": "2026-07-22T13:35:53.610483+00:00",
-      "reason": "phase_6y: ATR 0.70% < 1.0% 下限 (ATR<1% 稳健亏 -$232, bootstrap CI 整段<0)",
-      "last_checked_at": "2026-07-22T13:44:21.079293+00:00"
+      "reason": "paper trade too old (632s > 600s)",
+      "last_checked_at": "2026-07-22T13:46:25.968150+00:00"
     },
     {
       "paper_id": "INTCUSDT|LONG|2026-07-22T13:39:44.595942+00:00",
@@ -69381,16 +69372,7 @@
       "conviction_score": 5,
       "signal_at": "2026-07-22T13:41:07.479521+00:00",
       "reason": "phase_6y: ATR 0.55% < 1.0% 下限 (ATR<1% 稳健亏 -$232, bootstrap CI 整段<0)",
-      "last_checked_at": "2026-07-22T13:44:21.079293+00:00"
-    },
-    {
-      "paper_id": "CBRSUSDT|LONG|2026-07-22T13:39:56.844999+00:00",
-      "symbol": "CBRSUSDT",
-      "direction": "LONG",
-      "conviction_score": 5,
-      "signal_at": "2026-07-22T13:41:07.479521+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.22% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-07-22T13:44:21.079293+00:00"
+      "last_checked_at": "2026-07-22T13:46:25.968150+00:00"
     },
     {
       "paper_id": "SNXXUSDT|LONG|2026-07-22T13:42:26.407015+00:00",
@@ -69398,8 +69380,8 @@
       "direction": "LONG",
       "conviction_score": 5,
       "signal_at": "2026-07-22T13:43:36.528830+00:00",
-      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.22% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
-      "last_checked_at": "2026-07-22T13:44:21.079293+00:00"
+      "reason": "phase_6t_strict: SNXXUSDT insufficient kline history (<30d), 无右侧锚 — 拒做新币 (不接飞刀)",
+      "last_checked_at": "2026-07-22T13:46:25.968150+00:00"
     },
     {
       "paper_id": "QCOMUSDT|LONG|2026-07-22T13:43:26.915705+00:00",
@@ -69408,18 +69390,36 @@
       "conviction_score": 5,
       "signal_at": "2026-07-22T13:43:36.528830+00:00",
       "reason": "phase_6y: ATR 0.50% < 1.0% 下限 (ATR<1% 稳健亏 -$232, bootstrap CI 整段<0)",
-      "last_checked_at": "2026-07-22T13:44:21.079293+00:00"
+      "last_checked_at": "2026-07-22T13:46:25.968150+00:00"
+    },
+    {
+      "paper_id": "SNDKUSDT|LONG|2026-07-22T13:44:41.158848+00:00",
+      "symbol": "SNDKUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-07-22T13:45:51.768169+00:00",
+      "reason": "phase_6y: ATR 0.83% < 1.0% 下限 (ATR<1% 稳健亏 -$232, bootstrap CI 整段<0)",
+      "last_checked_at": "2026-07-22T13:46:25.968150+00:00"
+    },
+    {
+      "paper_id": "CBRSUSDT|LONG|2026-07-22T13:39:56.844999+00:00",
+      "symbol": "CBRSUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-07-22T13:41:07.479521+00:00",
+      "reason": "risk_gate: emergency stop flag exists: 'AUTO 2026-07-22T13:46:22.267117+00:00: cumulative DD 100.00% (balance $0.00 < threshold $400.00)', cumulative DD 100.00% (balance $0.00 < threshold $400.00)",
+      "last_checked_at": "2026-07-22T13:46:25.968150+00:00"
     }
   ],
   "btc_regime_now": {
-    "regime": "down",
-    "btc_price": 65872.9,
-    "btc_ma25_1h": 66236.27,
-    "pct_vs_ma25": -0.549,
-    "change_24h_pct": -1.312,
-    "sub_regime": "down_stable",
-    "change_3h_pct": -0.217,
-    "computed_at": "2026-07-22T13:44:22.031181+00:00"
+    "regime": "chop",
+    "btc_price": 65918.0,
+    "btc_ma25_1h": 66238.07,
+    "pct_vs_ma25": -0.483,
+    "change_24h_pct": -1.245,
+    "sub_regime": null,
+    "change_3h_pct": null,
+    "computed_at": "2026-07-22T13:46:26.894745+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
