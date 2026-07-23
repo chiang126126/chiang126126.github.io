@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-07-23T01:38:46.480329+00:00",
+  "generated_at": "2026-07-23T01:41:12.743149+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "OPENUSDT|burst|LONG": {
-      "symbol": "OPENUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 65,
-          "win_rate": 0.338,
-          "avg_outcome_pct": -0.12
-        },
-        "60m": {
-          "n": 65,
-          "win_rate": 0.231,
-          "avg_outcome_pct": -0.38
-        },
-        "240m": {
-          "n": 65,
-          "win_rate": 0.369,
-          "avg_outcome_pct": -0.37
-        }
-      }
-    },
-    "BICOUSDT|sustained|SHORT": {
-      "symbol": "BICOUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 20,
-          "win_rate": 0.6,
-          "avg_outcome_pct": 1.43
-        },
-        "60m": {
-          "n": 20,
-          "win_rate": 0.65,
-          "avg_outcome_pct": 2.34
-        },
-        "240m": {
-          "n": 20,
-          "win_rate": 0.6,
-          "avg_outcome_pct": 1.02
-        }
-      }
-    },
     "INUSDT|sustained|LONG": {
       "symbol": "INUSDT",
       "alert_type": "sustained",
@@ -6427,6 +6383,28 @@
         }
       }
     },
+    "OPENUSDT|burst|LONG": {
+      "symbol": "OPENUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 64,
+          "win_rate": 0.328,
+          "avg_outcome_pct": -0.14
+        },
+        "60m": {
+          "n": 64,
+          "win_rate": 0.234,
+          "avg_outcome_pct": -0.38
+        },
+        "240m": {
+          "n": 64,
+          "win_rate": 0.375,
+          "avg_outcome_pct": -0.34
+        }
+      }
+    },
     "MITOUSDT|sustained|SHORT": {
       "symbol": "MITOUSDT",
       "alert_type": "sustained",
@@ -7824,9 +7802,9 @@
           "avg_outcome_pct": -0.38
         },
         "60m": {
-          "n": 17,
-          "win_rate": 0.353,
-          "avg_outcome_pct": -0.05
+          "n": 18,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -0.29
         },
         "240m": {
           "n": 17,
@@ -24857,9 +24835,9 @@
           "avg_outcome_pct": 0.72
         },
         "240m": {
-          "n": 9,
-          "win_rate": 0.667,
-          "avg_outcome_pct": 1.55
+          "n": 10,
+          "win_rate": 0.6,
+          "avg_outcome_pct": 1.29
         }
       }
     },
@@ -28952,6 +28930,28 @@
           "n": 19,
           "win_rate": 0.421,
           "avg_outcome_pct": -0.85
+        }
+      }
+    },
+    "BICOUSDT|sustained|SHORT": {
+      "symbol": "BICOUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 19,
+          "win_rate": 0.579,
+          "avg_outcome_pct": 1.2
+        },
+        "60m": {
+          "n": 19,
+          "win_rate": 0.632,
+          "avg_outcome_pct": 2.16
+        },
+        "240m": {
+          "n": 19,
+          "win_rate": 0.579,
+          "avg_outcome_pct": 0.78
         }
       }
     },
