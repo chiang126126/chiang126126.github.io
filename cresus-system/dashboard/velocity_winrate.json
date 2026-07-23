@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-23T21:39:11.731052+00:00",
+  "generated_at": "2026-07-23T21:41:22.357683+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "XMRUSDT|sustained|SHORT": {
-      "symbol": "XMRUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 13,
-          "win_rate": 0.308,
-          "avg_outcome_pct": 0.41
-        },
-        "60m": {
-          "n": 13,
-          "win_rate": 0.308,
-          "avg_outcome_pct": -0.08
-        },
-        "240m": {
-          "n": 13,
-          "win_rate": 0.385,
-          "avg_outcome_pct": -0.06
-        }
-      }
-    },
     "MITOUSDT|sustained|LONG": {
       "symbol": "MITOUSDT",
       "alert_type": "sustained",
@@ -18725,6 +18703,28 @@
         }
       }
     },
+    "XMRUSDT|sustained|SHORT": {
+      "symbol": "XMRUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 12,
+          "win_rate": 0.333,
+          "avg_outcome_pct": 0.53
+        },
+        "60m": {
+          "n": 12,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -0.05
+        },
+        "240m": {
+          "n": 12,
+          "win_rate": 0.417,
+          "avg_outcome_pct": 0.17
+        }
+      }
+    },
     "MEMEUSDT|burst|LONG": {
       "symbol": "MEMEUSDT",
       "alert_type": "burst",
@@ -21953,9 +21953,9 @@
           "avg_outcome_pct": 0.11
         },
         "240m": {
-          "n": 7,
-          "win_rate": 0.429,
-          "avg_outcome_pct": -1.1
+          "n": 8,
+          "win_rate": 0.375,
+          "avg_outcome_pct": -1.04
         }
       }
     },
