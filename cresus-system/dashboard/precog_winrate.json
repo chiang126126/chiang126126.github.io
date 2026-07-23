@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-23T06:37:02.732466+00:00",
+  "generated_at": "2026-07-23T06:50:50.693186+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "HANAUSDT|ignition|SHORT": {
-      "symbol": "HANAUSDT",
-      "pred_type": "ignition",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 7,
-          "win_rate": 0.714,
-          "avg_outcome_pct": 3.45
-        },
-        "60m": {
-          "n": 7,
-          "win_rate": 0.571,
-          "avg_outcome_pct": 2.07
-        },
-        "240m": {
-          "n": 7,
-          "win_rate": 0.714,
-          "avg_outcome_pct": 2.56
-        }
-      }
-    },
     "BILLUSDT|ignition|SHORT": {
       "symbol": "BILLUSDT",
       "pred_type": "ignition",
@@ -377,6 +355,28 @@
         }
       }
     },
+    "HANAUSDT|ignition|SHORT": {
+      "symbol": "HANAUSDT",
+      "pred_type": "ignition",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 6,
+          "win_rate": 0.667,
+          "avg_outcome_pct": 3.76
+        },
+        "60m": {
+          "n": 6,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 2.0
+        },
+        "240m": {
+          "n": 6,
+          "win_rate": 0.833,
+          "avg_outcome_pct": 3.03
+        }
+      }
+    },
     "INUSDT|ignition|LONG": {
       "symbol": "INUSDT",
       "pred_type": "ignition",
@@ -447,18 +447,18 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 644,
-        "win_rate": 0.278,
+        "n": 637,
+        "win_rate": 0.273,
         "avg_outcome_pct": -0.05
       },
       "60m": {
-        "n": 644,
-        "win_rate": 0.287,
-        "avg_outcome_pct": -0.15
+        "n": 637,
+        "win_rate": 0.283,
+        "avg_outcome_pct": -0.16
       },
       "240m": {
-        "n": 644,
-        "win_rate": 0.373,
+        "n": 637,
+        "win_rate": 0.374,
         "avg_outcome_pct": 0.05
       }
     },
