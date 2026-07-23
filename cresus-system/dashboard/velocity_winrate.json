@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-07-23T09:40:28.534700+00:00",
+  "generated_at": "2026-07-23T09:42:36.687935+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "JTOUSDT|sustained|SHORT": {
-      "symbol": "JTOUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 51,
-          "win_rate": 0.431,
-          "avg_outcome_pct": 0.05
-        },
-        "60m": {
-          "n": 51,
-          "win_rate": 0.471,
-          "avg_outcome_pct": 0.16
-        },
-        "240m": {
-          "n": 51,
-          "win_rate": 0.471,
-          "avg_outcome_pct": 0.01
-        }
-      }
-    },
-    "HEIUSDT|burst|SHORT": {
-      "symbol": "HEIUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 130,
-          "win_rate": 0.438,
-          "avg_outcome_pct": 0.13
-        },
-        "60m": {
-          "n": 129,
-          "win_rate": 0.45,
-          "avg_outcome_pct": 0.16
-        },
-        "240m": {
-          "n": 129,
-          "win_rate": 0.519,
-          "avg_outcome_pct": 0.35
-        }
-      }
-    },
     "PLAYUSDT|burst|LONG": {
       "symbol": "PLAYUSDT",
       "alert_type": "burst",
@@ -7483,6 +7439,28 @@
         }
       }
     },
+    "JTOUSDT|sustained|SHORT": {
+      "symbol": "JTOUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 50,
+          "win_rate": 0.42,
+          "avg_outcome_pct": 0.03
+        },
+        "60m": {
+          "n": 50,
+          "win_rate": 0.48,
+          "avg_outcome_pct": 0.17
+        },
+        "240m": {
+          "n": 50,
+          "win_rate": 0.46,
+          "avg_outcome_pct": -0.1
+        }
+      }
+    },
     "MEGAUSDT|burst|LONG": {
       "symbol": "MEGAUSDT",
       "alert_type": "burst",
@@ -12163,9 +12141,9 @@
           "avg_outcome_pct": -0.69
         },
         "240m": {
-          "n": 143,
-          "win_rate": 0.343,
-          "avg_outcome_pct": -0.95
+          "n": 144,
+          "win_rate": 0.347,
+          "avg_outcome_pct": -0.94
         }
       }
     },
@@ -18942,6 +18920,28 @@
           "n": 14,
           "win_rate": 0.071,
           "avg_outcome_pct": -0.67
+        }
+      }
+    },
+    "HEIUSDT|burst|SHORT": {
+      "symbol": "HEIUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 129,
+          "win_rate": 0.442,
+          "avg_outcome_pct": 0.14
+        },
+        "60m": {
+          "n": 128,
+          "win_rate": 0.453,
+          "avg_outcome_pct": 0.17
+        },
+        "240m": {
+          "n": 128,
+          "win_rate": 0.516,
+          "avg_outcome_pct": 0.34
         }
       }
     },
