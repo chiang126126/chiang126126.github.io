@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-23T07:31:05.307699+00:00",
+  "generated_at": "2026-07-23T07:44:28.435165+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "EDENUSDT|setup|SHORT": {
-      "symbol": "EDENUSDT",
-      "pred_type": "setup",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 6,
-          "win_rate": 0.5,
-          "avg_outcome_pct": -2.57
-        },
-        "60m": {
-          "n": 6,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -1.92
-        },
-        "240m": {
-          "n": 6,
-          "win_rate": 0.667,
-          "avg_outcome_pct": 0.29
-        }
-      }
-    },
     "INUSDT|ignition|SHORT": {
       "symbol": "INUSDT",
       "pred_type": "ignition",
@@ -110,6 +88,28 @@
           "n": 7,
           "win_rate": 0.429,
           "avg_outcome_pct": 2.4
+        }
+      }
+    },
+    "EDENUSDT|setup|SHORT": {
+      "symbol": "EDENUSDT",
+      "pred_type": "setup",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": -3.3
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": -2.15
+        },
+        "240m": {
+          "n": 5,
+          "win_rate": 0.8,
+          "avg_outcome_pct": 0.99
         }
       }
     },
@@ -425,19 +425,19 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 631,
-        "win_rate": 0.273,
+        "n": 624,
+        "win_rate": 0.274,
         "avg_outcome_pct": -0.04
       },
       "60m": {
-        "n": 631,
-        "win_rate": 0.285,
+        "n": 624,
+        "win_rate": 0.288,
         "avg_outcome_pct": -0.14
       },
       "240m": {
-        "n": 631,
-        "win_rate": 0.376,
-        "avg_outcome_pct": 0.07
+        "n": 624,
+        "win_rate": 0.377,
+        "avg_outcome_pct": 0.09
       }
     },
     "quant_only": {}
