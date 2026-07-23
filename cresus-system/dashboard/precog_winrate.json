@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-23T15:53:44.860508+00:00",
+  "generated_at": "2026-07-23T16:07:07.674034+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "EDENUSDT|setup|LONG": {
-      "symbol": "EDENUSDT",
-      "pred_type": "setup",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 6,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -0.57
-        },
-        "60m": {
-          "n": 6,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.04
-        },
-        "240m": {
-          "n": 6,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -3.7
-        }
-      }
-    },
     "ZECUSDT|ignition|LONG": {
       "symbol": "ZECUSDT",
       "pred_type": "ignition",
@@ -245,6 +223,28 @@
         }
       }
     },
+    "EDENUSDT|setup|LONG": {
+      "symbol": "EDENUSDT",
+      "pred_type": "setup",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -0.69
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -0.26
+        },
+        "240m": {
+          "n": 5,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -2.85
+        }
+      }
+    },
     "HUSDT|ignition|SHORT": {
       "symbol": "HUSDT",
       "pred_type": "ignition",
@@ -293,19 +293,19 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 500,
-        "win_rate": 0.264,
+        "n": 497,
+        "win_rate": 0.266,
         "avg_outcome_pct": -0.14
       },
       "60m": {
-        "n": 500,
-        "win_rate": 0.28,
-        "avg_outcome_pct": -0.16
+        "n": 497,
+        "win_rate": 0.278,
+        "avg_outcome_pct": -0.17
       },
       "240m": {
-        "n": 500,
+        "n": 497,
         "win_rate": 0.358,
-        "avg_outcome_pct": 0.05
+        "avg_outcome_pct": 0.07
       }
     },
     "quant_only": {}
