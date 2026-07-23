@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-07-23T14:45:06.150028+00:00",
+  "generated_at": "2026-07-23T14:59:07.495610+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "ALGOUSDT|setup|LONG": {
-      "symbol": "ALGOUSDT",
-      "pred_type": "setup",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 7,
-          "win_rate": 0.143,
-          "avg_outcome_pct": 0.12
-        },
-        "60m": {
-          "n": 7,
-          "win_rate": 0.143,
-          "avg_outcome_pct": 0.06
-        },
-        "240m": {
-          "n": 7,
-          "win_rate": 0.571,
-          "avg_outcome_pct": 1.22
-        }
-      }
-    },
-    "SWARMSUSDT|setup|SHORT": {
-      "symbol": "SWARMSUSDT",
-      "pred_type": "setup",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 10,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 0.29
-        },
-        "60m": {
-          "n": 10,
-          "win_rate": 0.2,
-          "avg_outcome_pct": 0.12
-        },
-        "240m": {
-          "n": 10,
-          "win_rate": 0.6,
-          "avg_outcome_pct": 0.72
-        }
-      }
-    },
     "NILUSDT|ignition|LONG": {
       "symbol": "NILUSDT",
       "pred_type": "ignition",
@@ -201,6 +157,50 @@
         }
       }
     },
+    "SWARMSUSDT|setup|SHORT": {
+      "symbol": "SWARMSUSDT",
+      "pred_type": "setup",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 9,
+          "win_rate": 0.556,
+          "avg_outcome_pct": 0.42
+        },
+        "60m": {
+          "n": 9,
+          "win_rate": 0.222,
+          "avg_outcome_pct": 0.25
+        },
+        "240m": {
+          "n": 9,
+          "win_rate": 0.556,
+          "avg_outcome_pct": 0.74
+        }
+      }
+    },
+    "ALGOUSDT|setup|LONG": {
+      "symbol": "ALGOUSDT",
+      "pred_type": "setup",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 6,
+          "win_rate": 0.167,
+          "avg_outcome_pct": 0.16
+        },
+        "60m": {
+          "n": 6,
+          "win_rate": 0.167,
+          "avg_outcome_pct": 0.1
+        },
+        "240m": {
+          "n": 6,
+          "win_rate": 0.667,
+          "avg_outcome_pct": 1.52
+        }
+      }
+    },
     "HANAUSDT|ignition|SHORT": {
       "symbol": "HANAUSDT",
       "pred_type": "ignition",
@@ -315,19 +315,19 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 532,
-        "win_rate": 0.261,
-        "avg_outcome_pct": -0.14
+        "n": 522,
+        "win_rate": 0.264,
+        "avg_outcome_pct": -0.13
       },
       "60m": {
-        "n": 532,
-        "win_rate": 0.28,
+        "n": 522,
+        "win_rate": 0.278,
         "avg_outcome_pct": -0.18
       },
       "240m": {
-        "n": 532,
-        "win_rate": 0.357,
-        "avg_outcome_pct": 0.08
+        "n": 522,
+        "win_rate": 0.356,
+        "avg_outcome_pct": 0.07
       }
     },
     "quant_only": {}
