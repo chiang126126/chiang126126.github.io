@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-07-23T00:25:02.654036+00:00",
+  "generated_at": "2026-07-23T00:27:11.948672+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "HIVEUSDT|sustained|LONG": {
-      "symbol": "HIVEUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 12,
-          "win_rate": 0.417,
-          "avg_outcome_pct": 1.03
-        },
-        "60m": {
-          "n": 12,
-          "win_rate": 0.583,
-          "avg_outcome_pct": 2.69
-        },
-        "240m": {
-          "n": 12,
-          "win_rate": 0.25,
-          "avg_outcome_pct": -2.2
-        }
-      }
-    },
-    "PROVEUSDT|burst|LONG": {
-      "symbol": "PROVEUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 9,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.19
-        },
-        "60m": {
-          "n": 9,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.36
-        },
-        "240m": {
-          "n": 9,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.22
-        }
-      }
-    },
     "PROVEUSDT|sustained|LONG": {
       "symbol": "PROVEUSDT",
       "alert_type": "sustained",
@@ -5877,6 +5833,28 @@
         }
       }
     },
+    "PROVEUSDT|burst|LONG": {
+      "symbol": "PROVEUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 8,
+          "win_rate": 0.25,
+          "avg_outcome_pct": 0.09
+        },
+        "60m": {
+          "n": 8,
+          "win_rate": 0.375,
+          "avg_outcome_pct": 0.53
+        },
+        "240m": {
+          "n": 8,
+          "win_rate": 0.375,
+          "avg_outcome_pct": 0.78
+        }
+      }
+    },
     "STABLEUSDT|burst|LONG": {
       "symbol": "STABLEUSDT",
       "alert_type": "burst",
@@ -6380,6 +6358,28 @@
           "n": 43,
           "win_rate": 0.326,
           "avg_outcome_pct": 0.6
+        }
+      }
+    },
+    "HIVEUSDT|sustained|LONG": {
+      "symbol": "HIVEUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 11,
+          "win_rate": 0.455,
+          "avg_outcome_pct": 1.24
+        },
+        "60m": {
+          "n": 11,
+          "win_rate": 0.636,
+          "avg_outcome_pct": 3.08
+        },
+        "240m": {
+          "n": 11,
+          "win_rate": 0.273,
+          "avg_outcome_pct": -2.23
         }
       }
     },
