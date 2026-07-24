@@ -1,32 +1,32 @@
 {
-  "ts": "2026-07-24T09:03:05.655520+00:00",
-  "regime": "RISK_OFF",
-  "regime_zh": "风险释放",
+  "ts": "2026-07-24T10:03:06.737079+00:00",
+  "regime": "RANGE_BORING",
+  "regime_zh": "盘整死水",
   "confidence": 50,
-  "judgment": "Alpha 池上涨币占比 27.8%，中位涨跌 -1.04%。 跌幅超过 3% 的币数 (128) 明显多于涨幅 (58)，市场偏空。 BTC 24h -0.55%，funding 0.0045%。 判定: 风险释放。",
+  "judgment": "Alpha 池上涨币占比 33.2%，中位涨跌 -0.82%。 涨跌力度均衡（涨>3% 的 65 vs 跌>3% 的 115）。 BTC 24h -0.78%，funding 0.0056%。 判定: 盘整死水。",
   "support": [
-    "Alpha 池 673 币样本中，上涨 187 个 (27.8%)，中位涨跌 -1.04%，平均涨跌 -0.74%",
-    "涨幅 >3% 的币 58 个，跌幅 >3% 的币 128 个；暴涨 >10% 有 16 个，暴跌 >10% 有 15 个",
-    "Binance BTCUSDT 当前约 65,266，24h 涨幅 -0.55%，24h 区间 64,636.00 - 65,780.00",
-    "BTCUSDT 永续 funding rate 为 0.000045 (~0.0045%)；Fear & Greed Index 为 28 (Fear)"
+    "Alpha 池 672 币样本中，上涨 223 个 (33.2%)，中位涨跌 -0.82%，平均涨跌 -0.42%",
+    "涨幅 >3% 的币 65 个，跌幅 >3% 的币 115 个；暴涨 >10% 有 17 个，暴跌 >10% 有 10 个",
+    "Binance BTCUSDT 当前约 65,064，24h 涨幅 -0.78%，24h 区间 64,636.00 - 65,780.00",
+    "BTCUSDT 永续 funding rate 为 0.000056 (~0.0056%)；Fear & Greed Index 为 28 (Fear)"
   ],
   "challenge": [
-    "funding 0.0045% 仍为正，并未出现极端做多拥挤后的爆仓，可能只是暂时回调而非系统性风险释放"
+    "广度 33%、中位 -0.82% 都偏中性，缺乏明确方向。这种状态通常先于波动率扩张，警惕假突破"
   ],
   "metrics": {
-    "alpha_pool_size": 673,
-    "rising_count": 187,
-    "rising_pct": 0.2779,
-    "median_change_pct": -1.04,
-    "average_change_pct": -0.74,
-    "pump_3pct_count": 58,
-    "dump_3pct_count": 128,
-    "extreme_pump_10pct_count": 16,
-    "extreme_dump_10pct_count": 15,
-    "btc_price": 65266.1,
-    "btc_change_24h_pct": -0.55,
+    "alpha_pool_size": 672,
+    "rising_count": 223,
+    "rising_pct": 0.3318,
+    "median_change_pct": -0.82,
+    "average_change_pct": -0.42,
+    "pump_3pct_count": 65,
+    "dump_3pct_count": 115,
+    "extreme_pump_10pct_count": 17,
+    "extreme_dump_10pct_count": 10,
+    "btc_price": 65064.0,
+    "btc_change_24h_pct": -0.781,
     "btc_24h_range": "64,636.00 - 65,780.00",
-    "btc_funding_rate": 4.463e-05,
+    "btc_funding_rate": 5.644e-05,
     "fear_greed": 28,
     "fear_greed_classification": "Fear"
   },
