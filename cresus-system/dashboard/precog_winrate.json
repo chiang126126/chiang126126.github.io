@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-24T00:11:48.942654+00:00",
+  "generated_at": "2026-07-24T00:25:53.247706+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "INUSDT|ignition|LONG": {
-      "symbol": "INUSDT",
-      "pred_type": "ignition",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 6,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -0.61
-        },
-        "60m": {
-          "n": 6,
-          "win_rate": 0.5,
-          "avg_outcome_pct": -0.25
-        },
-        "240m": {
-          "n": 6,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 3.56
-        }
-      }
-    },
     "EDENUSDT|setup|LONG": {
       "symbol": "EDENUSDT",
       "pred_type": "setup",
@@ -113,6 +91,28 @@
         }
       }
     },
+    "INUSDT|ignition|LONG": {
+      "symbol": "INUSDT",
+      "pred_type": "ignition",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": -0.14
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.6,
+          "avg_outcome_pct": 0.3
+        },
+        "240m": {
+          "n": 5,
+          "win_rate": 0.6,
+          "avg_outcome_pct": 4.72
+        }
+      }
+    },
     "SWARMSUSDT|setup|SHORT": {
       "symbol": "SWARMSUSDT",
       "pred_type": "setup",
@@ -139,19 +139,19 @@
   "overall": {
     "with_ai": {
       "30m": {
-        "n": 332,
-        "win_rate": 0.301,
-        "avg_outcome_pct": -0.13
+        "n": 325,
+        "win_rate": 0.308,
+        "avg_outcome_pct": -0.1
       },
       "60m": {
-        "n": 332,
-        "win_rate": 0.295,
-        "avg_outcome_pct": -0.18
+        "n": 325,
+        "win_rate": 0.302,
+        "avg_outcome_pct": -0.15
       },
       "240m": {
-        "n": 332,
-        "win_rate": 0.377,
-        "avg_outcome_pct": 0.19
+        "n": 325,
+        "win_rate": 0.382,
+        "avg_outcome_pct": 0.22
       }
     },
     "quant_only": {}
