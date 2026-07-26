@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-26T19:43:08.085425+00:00",
+  "generated_at": "2026-07-26T19:45:42.029168+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "HIGHUSDT|sustained|SHORT": {
-      "symbol": "HIGHUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 10,
-          "win_rate": 0.4,
-          "avg_outcome_pct": 0.83
-        },
-        "60m": {
-          "n": 10,
-          "win_rate": 0.7,
-          "avg_outcome_pct": 1.81
-        },
-        "240m": {
-          "n": 10,
-          "win_rate": 0.7,
-          "avg_outcome_pct": 2.22
-        }
-      }
-    },
     "CBRSUSDT|burst|LONG": {
       "symbol": "CBRSUSDT",
       "alert_type": "burst",
@@ -352,6 +330,28 @@
           "n": 167,
           "win_rate": 0.443,
           "avg_outcome_pct": -0.58
+        }
+      }
+    },
+    "HIGHUSDT|sustained|SHORT": {
+      "symbol": "HIGHUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 9,
+          "win_rate": 0.333,
+          "avg_outcome_pct": 0.62
+        },
+        "60m": {
+          "n": 9,
+          "win_rate": 0.667,
+          "avg_outcome_pct": 1.53
+        },
+        "240m": {
+          "n": 9,
+          "win_rate": 0.667,
+          "avg_outcome_pct": 1.66
         }
       }
     },
