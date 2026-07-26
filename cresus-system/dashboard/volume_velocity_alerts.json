@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-26T17:49:41.439116+00:00",
+  "updated_at": "2026-07-26T17:52:17.805168+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,6 +8,40 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 0,
-  "alerts": []
+  "alerts_count": 1,
+  "alerts": [
+    {
+      "symbol": "SIRENUSDT",
+      "base": "SIREN",
+      "direction": "LONG",
+      "alert_type": "burst",
+      "price": 0.02999,
+      "price_change_pct": 1.249,
+      "metric_window_min": 1,
+      "volume_1m_usdt": 484409.0,
+      "volume_baseline_usdt": 2410.0,
+      "volume_ratio": 200.98,
+      "detected_at": "2026-07-26T17:51:44.868018+00:00",
+      "intensity": 3,
+      "change_5m_pct": 0.709,
+      "change_15m_pct": 0.404,
+      "change_1h_pct": 0.101,
+      "change_4h_pct": -0.134,
+      "taker_buy_ratio_1m": 0.802,
+      "taker_buy_ratio_5m": 0.801,
+      "oi_delta_5m_pct": -0.003,
+      "top_trader_position_ratio": 1.5203,
+      "top_trader_account_ratio": 6.7101,
+      "global_account_ratio": 6.1124,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.322,
+      "range_4h_pct": 2.6,
+      "vol_mult_used": 1.0,
+      "suggested_sl": 0.02989357,
+      "suggested_tp1": 0.03013464,
+      "suggested_tp2": 0.03027929,
+      "conviction_score": 1,
+      "conviction_tier": "regular"
+    }
+  ]
 }
