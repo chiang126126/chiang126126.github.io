@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-28T11:39:18.923413+00:00",
+  "generated_at": "2026-07-28T11:41:26.673355+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "RAVEUSDT|burst|SHORT": {
-      "symbol": "RAVEUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 121,
-          "win_rate": 0.273,
-          "avg_outcome_pct": 0.08
-        },
-        "60m": {
-          "n": 121,
-          "win_rate": 0.289,
-          "avg_outcome_pct": -0.04
-        },
-        "240m": {
-          "n": 121,
-          "win_rate": 0.455,
-          "avg_outcome_pct": -0.1
-        }
-      }
-    },
     "RAVEUSDT|sustained|SHORT": {
       "symbol": "RAVEUSDT",
       "alert_type": "sustained",
@@ -8822,6 +8800,28 @@
           "n": 65,
           "win_rate": 0.415,
           "avg_outcome_pct": -0.44
+        }
+      }
+    },
+    "RAVEUSDT|burst|SHORT": {
+      "symbol": "RAVEUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 120,
+          "win_rate": 0.267,
+          "avg_outcome_pct": 0.07
+        },
+        "60m": {
+          "n": 120,
+          "win_rate": 0.283,
+          "avg_outcome_pct": -0.05
+        },
+        "240m": {
+          "n": 120,
+          "win_rate": 0.458,
+          "avg_outcome_pct": -0.08
         }
       }
     },
