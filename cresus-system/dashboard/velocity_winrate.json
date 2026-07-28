@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-07-28T17:04:41.411627+00:00",
+  "generated_at": "2026-07-28T17:06:46.518999+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "KOMAUSDT|burst|LONG": {
-      "symbol": "KOMAUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 10,
-          "win_rate": 0.3,
-          "avg_outcome_pct": -0.01
-        },
-        "60m": {
-          "n": 10,
-          "win_rate": 0.4,
-          "avg_outcome_pct": -0.28
-        },
-        "240m": {
-          "n": 10,
-          "win_rate": 0.3,
-          "avg_outcome_pct": -0.48
-        }
-      }
-    },
-    "EPICUSDT|sustained|SHORT": {
-      "symbol": "EPICUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 56,
-          "win_rate": 0.464,
-          "avg_outcome_pct": 0.72
-        },
-        "60m": {
-          "n": 56,
-          "win_rate": 0.429,
-          "avg_outcome_pct": 0.19
-        },
-        "240m": {
-          "n": 56,
-          "win_rate": 0.339,
-          "avg_outcome_pct": -2.57
-        }
-      }
-    },
     "BIOUSDT|burst|LONG": {
       "symbol": "BIOUSDT",
       "alert_type": "burst",
@@ -1078,6 +1034,28 @@
           "n": 156,
           "win_rate": 0.333,
           "avg_outcome_pct": 0.01
+        }
+      }
+    },
+    "KOMAUSDT|burst|LONG": {
+      "symbol": "KOMAUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 9,
+          "win_rate": 0.333,
+          "avg_outcome_pct": 0.06
+        },
+        "60m": {
+          "n": 9,
+          "win_rate": 0.444,
+          "avg_outcome_pct": -0.2
+        },
+        "240m": {
+          "n": 9,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -0.47
         }
       }
     },
@@ -5566,6 +5544,28 @@
           "n": 65,
           "win_rate": 0.262,
           "avg_outcome_pct": -0.28
+        }
+      }
+    },
+    "EPICUSDT|sustained|SHORT": {
+      "symbol": "EPICUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 55,
+          "win_rate": 0.455,
+          "avg_outcome_pct": 0.67
+        },
+        "60m": {
+          "n": 55,
+          "win_rate": 0.418,
+          "avg_outcome_pct": 0.14
+        },
+        "240m": {
+          "n": 55,
+          "win_rate": 0.327,
+          "avg_outcome_pct": -2.74
         }
       }
     },
@@ -17282,6 +17282,11 @@
           "n": 5,
           "win_rate": 0.2,
           "avg_outcome_pct": -0.37
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -0.91
         }
       }
     },
