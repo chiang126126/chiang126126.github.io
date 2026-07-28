@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-07-28T14:20:18.786592+00:00",
+  "generated_at": "2026-07-28T14:22:30.228292+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "HYPEUSDT|sustained|LONG": {
-      "symbol": "HYPEUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 20,
-          "win_rate": 0.35,
-          "avg_outcome_pct": 0.31
-        },
-        "60m": {
-          "n": 20,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 0.61
-        },
-        "240m": {
-          "n": 20,
-          "win_rate": 0.4,
-          "avg_outcome_pct": 0.48
-        }
-      }
-    },
-    "AZTECUSDT|burst|SHORT": {
-      "symbol": "AZTECUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 5,
-          "win_rate": 0.0,
-          "avg_outcome_pct": 0.17
-        },
-        "60m": {
-          "n": 5,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -0.56
-        },
-        "240m": {
-          "n": 5,
-          "win_rate": 0.4,
-          "avg_outcome_pct": -1.7
-        }
-      }
-    },
     "XMRUSDT|burst|SHORT": {
       "symbol": "XMRUSDT",
       "alert_type": "burst",
@@ -1650,6 +1606,28 @@
           "n": 64,
           "win_rate": 0.406,
           "avg_outcome_pct": -1.28
+        }
+      }
+    },
+    "HYPEUSDT|sustained|LONG": {
+      "symbol": "HYPEUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 19,
+          "win_rate": 0.368,
+          "avg_outcome_pct": 0.41
+        },
+        "60m": {
+          "n": 19,
+          "win_rate": 0.474,
+          "avg_outcome_pct": 0.49
+        },
+        "240m": {
+          "n": 19,
+          "win_rate": 0.368,
+          "avg_outcome_pct": 0.32
         }
       }
     },
