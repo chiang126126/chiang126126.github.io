@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-07-28T20:04:04.765733+00:00",
+  "generated_at": "2026-07-28T20:06:13.903138+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 842,
@@ -28,7 +28,7 @@
   "risk_status": {
     "block_new_opens": true,
     "reasons": [
-      "emergency stop flag exists: 'AUTO 2026-07-28T20:04:00.651636+00:00: cumulative DD 100.00% (balance $0.00 < threshold $400.00)'",
+      "emergency stop flag exists: 'AUTO 2026-07-28T20:06:06.947255+00:00: cumulative DD 100.00% (balance $0.00 < threshold $400.00)'",
       "cumulative DD 100.00% (balance $0.00 < threshold $400.00)"
     ],
     "daily_pnl": 0.0,
@@ -69346,16 +69346,26 @@
       "close_fees_usdt": 0.06008
     }
   ],
-  "missed_signals": [],
+  "missed_signals": [
+    {
+      "paper_id": "CAPUSDT|LONG|2026-07-28T20:05:05.059020+00:00",
+      "symbol": "CAPUSDT",
+      "direction": "LONG",
+      "conviction_score": 5,
+      "signal_at": "2026-07-28T20:05:34.549277+00:00",
+      "reason": "phase_6y: ATR 0.42% < 1.0% 下限 (ATR<1% 稳健亏 -$232, bootstrap CI 整段<0)",
+      "last_checked_at": "2026-07-28T20:06:10.066088+00:00"
+    }
+  ],
   "btc_regime_now": {
     "regime": "chop",
-    "btc_price": 63894.8,
-    "btc_ma25_1h": 63633.5,
-    "pct_vs_ma25": 0.411,
-    "change_24h_pct": -1.61,
+    "btc_price": 63892.3,
+    "btc_ma25_1h": 63633.4,
+    "pct_vs_ma25": 0.407,
+    "change_24h_pct": -1.614,
     "sub_regime": null,
     "change_3h_pct": null,
-    "computed_at": "2026-07-28T20:04:04.707339+00:00"
+    "computed_at": "2026-07-28T20:06:13.838359+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
