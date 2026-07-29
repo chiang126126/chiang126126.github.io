@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-29T06:08:22.865531+00:00",
+  "generated_at": "2026-07-29T06:10:30.628175+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "XMRUSDT|burst|SHORT": {
-      "symbol": "XMRUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 65,
-          "win_rate": 0.262,
-          "avg_outcome_pct": 0.08
-        },
-        "60m": {
-          "n": 65,
-          "win_rate": 0.231,
-          "avg_outcome_pct": -0.18
-        },
-        "240m": {
-          "n": 65,
-          "win_rate": 0.262,
-          "avg_outcome_pct": -0.28
-        }
-      }
-    },
     "EPICUSDT|sustained|SHORT": {
       "symbol": "EPICUSDT",
       "alert_type": "sustained",
@@ -3036,6 +3014,28 @@
           "n": 14,
           "win_rate": 0.286,
           "avg_outcome_pct": 0.41
+        }
+      }
+    },
+    "XMRUSDT|burst|SHORT": {
+      "symbol": "XMRUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 64,
+          "win_rate": 0.266,
+          "avg_outcome_pct": 0.07
+        },
+        "60m": {
+          "n": 64,
+          "win_rate": 0.219,
+          "avg_outcome_pct": -0.21
+        },
+        "240m": {
+          "n": 64,
+          "win_rate": 0.25,
+          "avg_outcome_pct": -0.3
         }
       }
     },
