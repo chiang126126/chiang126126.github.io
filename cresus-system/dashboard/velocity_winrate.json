@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-29T03:08:12.811580+00:00",
+  "generated_at": "2026-07-29T03:10:24.797879+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "INUSDT|burst|LONG": {
-      "symbol": "INUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 63,
-          "win_rate": 0.206,
-          "avg_outcome_pct": -0.3
-        },
-        "60m": {
-          "n": 63,
-          "win_rate": 0.286,
-          "avg_outcome_pct": -0.41
-        },
-        "240m": {
-          "n": 63,
-          "win_rate": 0.27,
-          "avg_outcome_pct": -1.06
-        }
-      }
-    },
     "DEXEUSDT|burst|LONG": {
       "symbol": "DEXEUSDT",
       "alert_type": "burst",
@@ -1518,6 +1496,28 @@
           "n": 33,
           "win_rate": 0.424,
           "avg_outcome_pct": -0.2
+        }
+      }
+    },
+    "INUSDT|burst|LONG": {
+      "symbol": "INUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 62,
+          "win_rate": 0.21,
+          "avg_outcome_pct": -0.3
+        },
+        "60m": {
+          "n": 62,
+          "win_rate": 0.274,
+          "avg_outcome_pct": -0.45
+        },
+        "240m": {
+          "n": 62,
+          "win_rate": 0.258,
+          "avg_outcome_pct": -1.12
         }
       }
     },
@@ -33141,9 +33141,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 14,
-          "win_rate": 0.357,
-          "avg_outcome_pct": -0.07
+          "n": 15,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.25
         },
         "60m": {
           "n": 14,
