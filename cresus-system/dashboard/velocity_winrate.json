@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-29T21:49:44.641045+00:00",
+  "generated_at": "2026-07-29T21:51:50.830951+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "CTRUSDT|burst|SHORT": {
-      "symbol": "CTRUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 32,
-          "win_rate": 0.281,
-          "avg_outcome_pct": 0.18
-        },
-        "60m": {
-          "n": 32,
-          "win_rate": 0.438,
-          "avg_outcome_pct": -0.22
-        },
-        "240m": {
-          "n": 32,
-          "win_rate": 0.469,
-          "avg_outcome_pct": 0.53
-        }
-      }
-    },
     "XMRUSDT|burst|SHORT": {
       "symbol": "XMRUSDT",
       "alert_type": "burst",
@@ -5217,6 +5195,28 @@
         }
       }
     },
+    "CTRUSDT|burst|SHORT": {
+      "symbol": "CTRUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 31,
+          "win_rate": 0.258,
+          "avg_outcome_pct": 0.14
+        },
+        "60m": {
+          "n": 31,
+          "win_rate": 0.419,
+          "avg_outcome_pct": -0.3
+        },
+        "240m": {
+          "n": 31,
+          "win_rate": 0.484,
+          "avg_outcome_pct": 0.58
+        }
+      }
+    },
     "DEXEUSDT|burst|SHORT": {
       "symbol": "DEXEUSDT",
       "alert_type": "burst",
@@ -8875,8 +8875,8 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 22,
-          "win_rate": 0.409,
+          "n": 23,
+          "win_rate": 0.391,
           "avg_outcome_pct": 0.44
         },
         "60m": {
