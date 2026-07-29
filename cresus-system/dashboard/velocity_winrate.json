@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-29T13:05:19.841695+00:00",
+  "generated_at": "2026-07-29T13:07:28.453096+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "GUNUSDT|burst|SHORT": {
-      "symbol": "GUNUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 21,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -0.08
-        },
-        "60m": {
-          "n": 21,
-          "win_rate": 0.476,
-          "avg_outcome_pct": -0.28
-        },
-        "240m": {
-          "n": 21,
-          "win_rate": 0.429,
-          "avg_outcome_pct": -0.17
-        }
-      }
-    },
     "APRUSDT|sustained|SHORT": {
       "symbol": "APRUSDT",
       "alert_type": "sustained",
@@ -2376,6 +2354,28 @@
           "n": 58,
           "win_rate": 0.5,
           "avg_outcome_pct": 0.43
+        }
+      }
+    },
+    "GUNUSDT|burst|SHORT": {
+      "symbol": "GUNUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 20,
+          "win_rate": 0.35,
+          "avg_outcome_pct": -0.04
+        },
+        "60m": {
+          "n": 20,
+          "win_rate": 0.5,
+          "avg_outcome_pct": -0.21
+        },
+        "240m": {
+          "n": 20,
+          "win_rate": 0.45,
+          "avg_outcome_pct": -0.13
         }
       }
     },
@@ -23538,6 +23538,18 @@
         }
       }
     },
+    "IRYSUSDT|burst|LONG": {
+      "symbol": "IRYSUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -0.35
+        }
+      }
+    },
     "CRDOUSDT|burst|LONG": {
       "symbol": "CRDOUSDT",
       "alert_type": "burst",
@@ -30858,8 +30870,8 @@
           "avg_outcome_pct": -0.43
         },
         "240m": {
-          "n": 28,
-          "win_rate": 0.429,
+          "n": 29,
+          "win_rate": 0.414,
           "avg_outcome_pct": -1.59
         }
       }
