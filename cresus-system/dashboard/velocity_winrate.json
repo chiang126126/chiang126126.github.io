@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-30T22:29:16.478785+00:00",
+  "generated_at": "2026-07-30T22:31:28.719915+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "MBOXUSDT|sustained|SHORT": {
-      "symbol": "MBOXUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 7,
-          "win_rate": 0.429,
-          "avg_outcome_pct": 1.0
-        },
-        "60m": {
-          "n": 7,
-          "win_rate": 0.429,
-          "avg_outcome_pct": 2.63
-        },
-        "240m": {
-          "n": 7,
-          "win_rate": 0.571,
-          "avg_outcome_pct": 2.19
-        }
-      }
-    },
     "DYDXUSDT|burst|LONG": {
       "symbol": "DYDXUSDT",
       "alert_type": "burst",
@@ -858,6 +836,28 @@
           "n": 74,
           "win_rate": 0.459,
           "avg_outcome_pct": 0.03
+        }
+      }
+    },
+    "MBOXUSDT|sustained|SHORT": {
+      "symbol": "MBOXUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 6,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 1.63
+        },
+        "60m": {
+          "n": 6,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 3.35
+        },
+        "240m": {
+          "n": 6,
+          "win_rate": 0.667,
+          "avg_outcome_pct": 4.17
         }
       }
     },
@@ -7533,9 +7533,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 35,
-          "win_rate": 0.257,
-          "avg_outcome_pct": -0.01
+          "n": 36,
+          "win_rate": 0.278,
+          "avg_outcome_pct": 0.03
         },
         "60m": {
           "n": 35,
