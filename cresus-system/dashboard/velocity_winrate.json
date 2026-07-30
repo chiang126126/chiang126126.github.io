@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-30T04:34:51.064288+00:00",
+  "generated_at": "2026-07-30T04:36:58.762512+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "PUNDIXUSDT|burst|LONG": {
-      "symbol": "PUNDIXUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 13,
-          "win_rate": 0.308,
-          "avg_outcome_pct": 1.19
-        },
-        "60m": {
-          "n": 13,
-          "win_rate": 0.231,
-          "avg_outcome_pct": 0.8
-        },
-        "240m": {
-          "n": 13,
-          "win_rate": 0.385,
-          "avg_outcome_pct": 2.27
-        }
-      }
-    },
     "HIVEUSDT|sustained|LONG": {
       "symbol": "HIVEUSDT",
       "alert_type": "sustained",
@@ -2552,6 +2530,28 @@
           "n": 60,
           "win_rate": 0.45,
           "avg_outcome_pct": 2.17
+        }
+      }
+    },
+    "PUNDIXUSDT|burst|LONG": {
+      "symbol": "PUNDIXUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 12,
+          "win_rate": 0.333,
+          "avg_outcome_pct": 1.29
+        },
+        "60m": {
+          "n": 12,
+          "win_rate": 0.25,
+          "avg_outcome_pct": 1.02
+        },
+        "240m": {
+          "n": 12,
+          "win_rate": 0.417,
+          "avg_outcome_pct": 3.69
         }
       }
     },
