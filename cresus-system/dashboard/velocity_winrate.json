@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-07-31T09:13:00.499779+00:00",
+  "generated_at": "2026-07-31T09:15:10.112265+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "INTCUSDT|burst|SHORT": {
-      "symbol": "INTCUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 37,
-          "win_rate": 0.27,
-          "avg_outcome_pct": -0.4
-        },
-        "60m": {
-          "n": 37,
-          "win_rate": 0.27,
-          "avg_outcome_pct": -0.61
-        },
-        "240m": {
-          "n": 37,
-          "win_rate": 0.297,
-          "avg_outcome_pct": -0.8
-        }
-      }
-    },
     "SLXUSDT|sustained|LONG": {
       "symbol": "SLXUSDT",
       "alert_type": "sustained",
@@ -1587,6 +1565,28 @@
         }
       }
     },
+    "INTCUSDT|burst|SHORT": {
+      "symbol": "INTCUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 36,
+          "win_rate": 0.278,
+          "avg_outcome_pct": -0.4
+        },
+        "60m": {
+          "n": 36,
+          "win_rate": 0.25,
+          "avg_outcome_pct": -0.64
+        },
+        "240m": {
+          "n": 36,
+          "win_rate": 0.278,
+          "avg_outcome_pct": -0.86
+        }
+      }
+    },
     "ESPORTSUSDT|sustained|LONG": {
       "symbol": "ESPORTSUSDT",
       "alert_type": "sustained",
@@ -2522,9 +2522,9 @@
           "avg_outcome_pct": 0.1
         },
         "60m": {
-          "n": 62,
-          "win_rate": 0.435,
-          "avg_outcome_pct": 0.2
+          "n": 63,
+          "win_rate": 0.444,
+          "avg_outcome_pct": 0.22
         },
         "240m": {
           "n": 62,
