@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-01T06:45:43.296416+00:00",
+  "generated_at": "2026-08-01T06:47:49.968347+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "USUSDT|sustained|LONG": {
-      "symbol": "USUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 90,
-          "win_rate": 0.389,
-          "avg_outcome_pct": 0.16
-        },
-        "60m": {
-          "n": 90,
-          "win_rate": 0.478,
-          "avg_outcome_pct": 0.02
-        },
-        "240m": {
-          "n": 89,
-          "win_rate": 0.416,
-          "avg_outcome_pct": -0.22
-        }
-      }
-    },
     "WALUSDT|burst|LONG": {
       "symbol": "WALUSDT",
       "alert_type": "burst",
@@ -418,6 +396,28 @@
           "n": 75,
           "win_rate": 0.507,
           "avg_outcome_pct": 2.34
+        }
+      }
+    },
+    "USUSDT|sustained|LONG": {
+      "symbol": "USUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 89,
+          "win_rate": 0.382,
+          "avg_outcome_pct": 0.12
+        },
+        "60m": {
+          "n": 89,
+          "win_rate": 0.472,
+          "avg_outcome_pct": -0.01
+        },
+        "240m": {
+          "n": 88,
+          "win_rate": 0.42,
+          "avg_outcome_pct": -0.22
         }
       }
     },
