@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-02T03:30:24.217739+00:00",
+  "generated_at": "2026-08-02T03:32:34.618463+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "AIAUSDT|burst|LONG": {
-      "symbol": "AIAUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 25,
-          "win_rate": 0.32,
-          "avg_outcome_pct": -0.18
-        },
-        "60m": {
-          "n": 25,
-          "win_rate": 0.28,
-          "avg_outcome_pct": -0.27
-        },
-        "240m": {
-          "n": 25,
-          "win_rate": 0.36,
-          "avg_outcome_pct": -1.85
-        }
-      }
-    },
     "BCHUSDT|burst|SHORT": {
       "symbol": "BCHUSDT",
       "alert_type": "burst",
@@ -2665,6 +2643,28 @@
         }
       }
     },
+    "AIAUSDT|burst|LONG": {
+      "symbol": "AIAUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 24,
+          "win_rate": 0.292,
+          "avg_outcome_pct": -0.29
+        },
+        "60m": {
+          "n": 24,
+          "win_rate": 0.292,
+          "avg_outcome_pct": -0.26
+        },
+        "240m": {
+          "n": 24,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -3.05
+        }
+      }
+    },
     "BIOUSDT|burst|LONG": {
       "symbol": "BIOUSDT",
       "alert_type": "burst",
@@ -4585,9 +4585,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 75,
-          "win_rate": 0.427,
-          "avg_outcome_pct": -0.23
+          "n": 76,
+          "win_rate": 0.421,
+          "avg_outcome_pct": -0.26
         },
         "60m": {
           "n": 75,
@@ -18203,9 +18203,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 15,
-          "win_rate": 0.4,
-          "avg_outcome_pct": 0.5
+          "n": 16,
+          "win_rate": 0.375,
+          "avg_outcome_pct": 0.37
         },
         "60m": {
           "n": 15,
@@ -30885,9 +30885,9 @@
           "avg_outcome_pct": -0.39
         },
         "240m": {
-          "n": 24,
-          "win_rate": 0.208,
-          "avg_outcome_pct": -1.37
+          "n": 25,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -1.39
         }
       }
     },
