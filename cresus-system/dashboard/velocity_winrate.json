@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-02T18:53:35.683858+00:00",
+  "generated_at": "2026-08-02T18:55:42.758597+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "STOUSDT|sustained|SHORT": {
-      "symbol": "STOUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 7,
-          "win_rate": 0.286,
-          "avg_outcome_pct": -1.15
-        },
-        "60m": {
-          "n": 7,
-          "win_rate": 0.429,
-          "avg_outcome_pct": -1.43
-        },
-        "240m": {
-          "n": 7,
-          "win_rate": 0.857,
-          "avg_outcome_pct": 3.63
-        }
-      }
-    },
     "ZECUSDT|burst|LONG": {
       "symbol": "ZECUSDT",
       "alert_type": "burst",
@@ -770,6 +748,28 @@
           "n": 57,
           "win_rate": 0.439,
           "avg_outcome_pct": 0.12
+        }
+      }
+    },
+    "STOUSDT|sustained|SHORT": {
+      "symbol": "STOUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 6,
+          "win_rate": 0.333,
+          "avg_outcome_pct": 0.07
+        },
+        "60m": {
+          "n": 6,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 0.74
+        },
+        "240m": {
+          "n": 6,
+          "win_rate": 0.833,
+          "avg_outcome_pct": 3.34
         }
       }
     },
@@ -18907,9 +18907,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 12,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 0.31
+          "n": 13,
+          "win_rate": 0.462,
+          "avg_outcome_pct": 0.08
         },
         "60m": {
           "n": 12,
