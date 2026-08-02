@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-02T06:24:45.039217+00:00",
+  "generated_at": "2026-08-02T06:26:56.183109+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "DEEPUSDT|burst|LONG": {
-      "symbol": "DEEPUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 6,
-          "win_rate": 0.167,
-          "avg_outcome_pct": -0.47
-        },
-        "60m": {
-          "n": 6,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -1.73
-        },
-        "240m": {
-          "n": 6,
-          "win_rate": 0.167,
-          "avg_outcome_pct": -1.79
-        }
-      }
-    },
     "MYXUSDT|burst|SHORT": {
       "symbol": "MYXUSDT",
       "alert_type": "burst",
@@ -1719,6 +1697,28 @@
         }
       }
     },
+    "DEEPUSDT|burst|LONG": {
+      "symbol": "DEEPUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -0.42
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -1.95
+        },
+        "240m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -1.79
+        }
+      }
+    },
     "ZKUSDT|burst|LONG": {
       "symbol": "ZKUSDT",
       "alert_type": "burst",
@@ -2461,9 +2461,9 @@
           "avg_outcome_pct": -0.19
         },
         "240m": {
-          "n": 74,
-          "win_rate": 0.419,
-          "avg_outcome_pct": -0.08
+          "n": 75,
+          "win_rate": 0.427,
+          "avg_outcome_pct": 0.04
         }
       }
     },
@@ -17785,9 +17785,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 23,
-          "win_rate": 0.304,
-          "avg_outcome_pct": -0.27
+          "n": 24,
+          "win_rate": 0.292,
+          "avg_outcome_pct": -0.29
         },
         "60m": {
           "n": 23,
