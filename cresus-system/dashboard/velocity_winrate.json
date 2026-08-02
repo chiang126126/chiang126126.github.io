@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-08-02T13:39:48.067701+00:00",
+  "generated_at": "2026-08-02T13:41:55.759579+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "GPSUSDT|burst|LONG": {
-      "symbol": "GPSUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 25,
-          "win_rate": 0.24,
-          "avg_outcome_pct": -0.1
-        },
-        "60m": {
-          "n": 25,
-          "win_rate": 0.32,
-          "avg_outcome_pct": -0.21
-        },
-        "240m": {
-          "n": 25,
-          "win_rate": 0.4,
-          "avg_outcome_pct": -0.97
-        }
-      }
-    },
-    "NOKUSDT|sustained|SHORT": {
-      "symbol": "NOKUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 33,
-          "win_rate": 0.394,
-          "avg_outcome_pct": 0.0
-        },
-        "60m": {
-          "n": 33,
-          "win_rate": 0.424,
-          "avg_outcome_pct": -0.07
-        },
-        "240m": {
-          "n": 33,
-          "win_rate": 0.485,
-          "avg_outcome_pct": 0.24
-        }
-      }
-    },
     "XAGUSDT|burst|SHORT": {
       "symbol": "XAGUSDT",
       "alert_type": "burst",
@@ -9771,6 +9727,28 @@
         }
       }
     },
+    "GPSUSDT|burst|LONG": {
+      "symbol": "GPSUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 24,
+          "win_rate": 0.208,
+          "avg_outcome_pct": -0.19
+        },
+        "60m": {
+          "n": 24,
+          "win_rate": 0.292,
+          "avg_outcome_pct": -0.26
+        },
+        "240m": {
+          "n": 24,
+          "win_rate": 0.417,
+          "avg_outcome_pct": -0.16
+        }
+      }
+    },
     "MUUSDT|sustained|SHORT": {
       "symbol": "MUUSDT",
       "alert_type": "sustained",
@@ -11198,6 +11176,28 @@
           "n": 30,
           "win_rate": 0.567,
           "avg_outcome_pct": 0.5
+        }
+      }
+    },
+    "NOKUSDT|sustained|SHORT": {
+      "symbol": "NOKUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 32,
+          "win_rate": 0.406,
+          "avg_outcome_pct": 0.09
+        },
+        "60m": {
+          "n": 32,
+          "win_rate": 0.438,
+          "avg_outcome_pct": 0.03
+        },
+        "240m": {
+          "n": 32,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 0.28
         }
       }
     },
@@ -25781,9 +25781,9 @@
           "avg_outcome_pct": 0.03
         },
         "240m": {
-          "n": 79,
-          "win_rate": 0.456,
-          "avg_outcome_pct": 0.23
+          "n": 80,
+          "win_rate": 0.45,
+          "avg_outcome_pct": 0.22
         }
       }
     },
@@ -28443,9 +28443,9 @@
           "avg_outcome_pct": -0.07
         },
         "240m": {
-          "n": 34,
-          "win_rate": 0.471,
-          "avg_outcome_pct": 0.34
+          "n": 35,
+          "win_rate": 0.486,
+          "avg_outcome_pct": 0.38
         }
       }
     },
