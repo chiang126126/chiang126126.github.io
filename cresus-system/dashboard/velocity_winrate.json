@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-03T13:24:17.927386+00:00",
+  "generated_at": "2026-08-03T13:26:27.572580+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "FORMUSDT|sustained|LONG": {
-      "symbol": "FORMUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 7,
-          "win_rate": 0.429,
-          "avg_outcome_pct": -0.01
-        },
-        "60m": {
-          "n": 7,
-          "win_rate": 0.286,
-          "avg_outcome_pct": -0.69
-        },
-        "240m": {
-          "n": 7,
-          "win_rate": 0.143,
-          "avg_outcome_pct": -1.5
-        }
-      }
-    },
     "SNDKUSDT|burst|SHORT": {
       "symbol": "SNDKUSDT",
       "alert_type": "burst",
@@ -3083,6 +3061,28 @@
         }
       }
     },
+    "FORMUSDT|sustained|LONG": {
+      "symbol": "FORMUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 6,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -0.36
+        },
+        "60m": {
+          "n": 6,
+          "win_rate": 0.167,
+          "avg_outcome_pct": -1.01
+        },
+        "240m": {
+          "n": 6,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -2.25
+        }
+      }
+    },
     "GUAUSDT|burst|SHORT": {
       "symbol": "GUAUSDT",
       "alert_type": "burst",
@@ -3891,9 +3891,9 @@
           "avg_outcome_pct": 0.6
         },
         "240m": {
-          "n": 100,
-          "win_rate": 0.48,
-          "avg_outcome_pct": 0.98
+          "n": 101,
+          "win_rate": 0.475,
+          "avg_outcome_pct": 0.94
         }
       }
     },
@@ -13219,9 +13219,9 @@
           "avg_outcome_pct": -0.18
         },
         "240m": {
-          "n": 53,
-          "win_rate": 0.396,
-          "avg_outcome_pct": 0.31
+          "n": 54,
+          "win_rate": 0.389,
+          "avg_outcome_pct": 0.29
         }
       }
     },
@@ -20381,9 +20381,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 147,
-          "win_rate": 0.354,
-          "avg_outcome_pct": 0.33
+          "n": 148,
+          "win_rate": 0.351,
+          "avg_outcome_pct": 0.32
         },
         "60m": {
           "n": 147,
@@ -25737,9 +25737,9 @@
           "avg_outcome_pct": 1.05
         },
         "240m": {
-          "n": 36,
-          "win_rate": 0.361,
-          "avg_outcome_pct": 1.38
+          "n": 37,
+          "win_rate": 0.378,
+          "avg_outcome_pct": 1.87
         }
       }
     },
