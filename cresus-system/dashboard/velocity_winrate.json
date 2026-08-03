@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-03T23:18:42.994709+00:00",
+  "generated_at": "2026-08-03T23:20:50.030273+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "ENSUSDT|burst|SHORT": {
-      "symbol": "ENSUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 8,
-          "win_rate": 0.25,
-          "avg_outcome_pct": 0.29
-        },
-        "60m": {
-          "n": 8,
-          "win_rate": 0.25,
-          "avg_outcome_pct": 0.25
-        },
-        "240m": {
-          "n": 8,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 1.11
-        }
-      }
-    },
     "STOUSDT|burst|LONG": {
       "symbol": "STOUSDT",
       "alert_type": "burst",
@@ -1455,6 +1433,28 @@
         }
       }
     },
+    "ENSUSDT|burst|SHORT": {
+      "symbol": "ENSUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 7,
+          "win_rate": 0.286,
+          "avg_outcome_pct": 0.5
+        },
+        "60m": {
+          "n": 7,
+          "win_rate": 0.286,
+          "avg_outcome_pct": 0.42
+        },
+        "240m": {
+          "n": 7,
+          "win_rate": 0.429,
+          "avg_outcome_pct": 0.95
+        }
+      }
+    },
     "HIVEUSDT|burst|SHORT": {
       "symbol": "HIVEUSDT",
       "alert_type": "burst",
@@ -2654,8 +2654,8 @@
           "avg_outcome_pct": -0.42
         },
         "60m": {
-          "n": 145,
-          "win_rate": 0.297,
+          "n": 146,
+          "win_rate": 0.295,
           "avg_outcome_pct": -0.59
         },
         "240m": {
@@ -8748,9 +8748,9 @@
           "avg_outcome_pct": -0.12
         },
         "60m": {
-          "n": 66,
-          "win_rate": 0.288,
-          "avg_outcome_pct": -0.23
+          "n": 67,
+          "win_rate": 0.284,
+          "avg_outcome_pct": -0.32
         },
         "240m": {
           "n": 65,
