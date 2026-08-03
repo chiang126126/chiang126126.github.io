@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-03T18:42:21.817021+00:00",
+  "generated_at": "2026-08-03T18:44:35.171004+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "STOUSDT|burst|LONG": {
-      "symbol": "STOUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 9,
-          "win_rate": 0.111,
-          "avg_outcome_pct": 0.88
-        },
-        "60m": {
-          "n": 9,
-          "win_rate": 0.111,
-          "avg_outcome_pct": -0.4
-        },
-        "240m": {
-          "n": 9,
-          "win_rate": 0.111,
-          "avg_outcome_pct": -1.9
-        }
-      }
-    },
     "NOMUSDT|burst|LONG": {
       "symbol": "NOMUSDT",
       "alert_type": "burst",
@@ -2156,6 +2134,28 @@
           "n": 8,
           "win_rate": 0.5,
           "avg_outcome_pct": 1.11
+        }
+      }
+    },
+    "STOUSDT|burst|LONG": {
+      "symbol": "STOUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 8,
+          "win_rate": 0.125,
+          "avg_outcome_pct": 0.95
+        },
+        "60m": {
+          "n": 8,
+          "win_rate": 0.125,
+          "avg_outcome_pct": -0.5
+        },
+        "240m": {
+          "n": 8,
+          "win_rate": 0.125,
+          "avg_outcome_pct": -1.7
         }
       }
     },
@@ -8633,8 +8633,8 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 87,
-          "win_rate": 0.299,
+          "n": 88,
+          "win_rate": 0.295,
           "avg_outcome_pct": -0.01
         },
         "60m": {
