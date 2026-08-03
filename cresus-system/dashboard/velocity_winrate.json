@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-03T23:22:55.746058+00:00",
+  "generated_at": "2026-08-03T23:25:02.063565+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "STOUSDT|burst|LONG": {
-      "symbol": "STOUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 8,
-          "win_rate": 0.125,
-          "avg_outcome_pct": 0.95
-        },
-        "60m": {
-          "n": 8,
-          "win_rate": 0.125,
-          "avg_outcome_pct": -0.5
-        },
-        "240m": {
-          "n": 8,
-          "win_rate": 0.125,
-          "avg_outcome_pct": -1.7
-        }
-      }
-    },
     "SAHARAUSDT|burst|LONG": {
       "symbol": "SAHARAUSDT",
       "alert_type": "burst",
@@ -10349,9 +10327,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 22,
-          "win_rate": 0.409,
-          "avg_outcome_pct": 0.63
+          "n": 23,
+          "win_rate": 0.391,
+          "avg_outcome_pct": 0.58
         },
         "60m": {
           "n": 22,
@@ -12914,6 +12892,28 @@
           "n": 32,
           "win_rate": 0.438,
           "avg_outcome_pct": 0.94
+        }
+      }
+    },
+    "STOUSDT|burst|LONG": {
+      "symbol": "STOUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 7,
+          "win_rate": 0.143,
+          "avg_outcome_pct": 1.13
+        },
+        "60m": {
+          "n": 7,
+          "win_rate": 0.143,
+          "avg_outcome_pct": -0.53
+        },
+        "240m": {
+          "n": 7,
+          "win_rate": 0.143,
+          "avg_outcome_pct": -1.72
         }
       }
     },
