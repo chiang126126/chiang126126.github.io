@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-05T22:48:15.201057+00:00",
+  "generated_at": "2026-08-05T22:50:23.459611+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "KASUSDT|burst|SHORT": {
-      "symbol": "KASUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 7,
-          "win_rate": 0.286,
-          "avg_outcome_pct": 0.09
-        },
-        "60m": {
-          "n": 7,
-          "win_rate": 0.286,
-          "avg_outcome_pct": -0.02
-        },
-        "240m": {
-          "n": 7,
-          "win_rate": 0.429,
-          "avg_outcome_pct": 0.18
-        }
-      }
-    },
     "STGUSDT|burst|SHORT": {
       "symbol": "STGUSDT",
       "alert_type": "burst",
@@ -17666,6 +17644,28 @@
           "n": 133,
           "win_rate": 0.293,
           "avg_outcome_pct": -2.21
+        }
+      }
+    },
+    "KASUSDT|burst|SHORT": {
+      "symbol": "KASUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 6,
+          "win_rate": 0.167,
+          "avg_outcome_pct": -0.0
+        },
+        "60m": {
+          "n": 6,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -0.1
+        },
+        "240m": {
+          "n": 6,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 0.24
         }
       }
     },
