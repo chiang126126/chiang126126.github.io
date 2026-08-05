@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-05T10:48:45.513425+00:00",
+  "generated_at": "2026-08-05T10:50:55.525286+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "OPGUSDT|burst|SHORT": {
-      "symbol": "OPGUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 76,
-          "win_rate": 0.303,
-          "avg_outcome_pct": -0.28
-        },
-        "60m": {
-          "n": 76,
-          "win_rate": 0.276,
-          "avg_outcome_pct": -0.59
-        },
-        "240m": {
-          "n": 76,
-          "win_rate": 0.421,
-          "avg_outcome_pct": 0.52
-        }
-      }
-    },
     "BANKUSDT|sustained|LONG": {
       "symbol": "BANKUSDT",
       "alert_type": "sustained",
@@ -7964,6 +7942,28 @@
           "n": 38,
           "win_rate": 0.342,
           "avg_outcome_pct": -0.34
+        }
+      }
+    },
+    "OPGUSDT|burst|SHORT": {
+      "symbol": "OPGUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 75,
+          "win_rate": 0.307,
+          "avg_outcome_pct": -0.25
+        },
+        "60m": {
+          "n": 75,
+          "win_rate": 0.28,
+          "avg_outcome_pct": -0.52
+        },
+        "240m": {
+          "n": 75,
+          "win_rate": 0.427,
+          "avg_outcome_pct": 0.62
         }
       }
     },
