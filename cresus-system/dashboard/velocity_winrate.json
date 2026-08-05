@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-05T22:28:46.739887+00:00",
+  "generated_at": "2026-08-05T22:30:56.974265+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "PARTIUSDT|burst|SHORT": {
-      "symbol": "PARTIUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 52,
-          "win_rate": 0.269,
-          "avg_outcome_pct": 0.02
-        },
-        "60m": {
-          "n": 52,
-          "win_rate": 0.327,
-          "avg_outcome_pct": 0.09
-        },
-        "240m": {
-          "n": 52,
-          "win_rate": 0.385,
-          "avg_outcome_pct": 0.66
-        }
-      }
-    },
     "DEXEUSDT|burst|SHORT": {
       "symbol": "DEXEUSDT",
       "alert_type": "burst",
@@ -2684,6 +2662,28 @@
           "n": 13,
           "win_rate": 0.385,
           "avg_outcome_pct": 0.8
+        }
+      }
+    },
+    "PARTIUSDT|burst|SHORT": {
+      "symbol": "PARTIUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 51,
+          "win_rate": 0.275,
+          "avg_outcome_pct": 0.07
+        },
+        "60m": {
+          "n": 51,
+          "win_rate": 0.333,
+          "avg_outcome_pct": 0.11
+        },
+        "240m": {
+          "n": 51,
+          "win_rate": 0.373,
+          "avg_outcome_pct": 0.65
         }
       }
     },
