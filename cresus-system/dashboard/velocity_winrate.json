@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-05T12:58:43.471801+00:00",
+  "generated_at": "2026-08-05T13:00:53.522976+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "DRAMUSDT|burst|LONG": {
-      "symbol": "DRAMUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 25,
-          "win_rate": 0.24,
-          "avg_outcome_pct": -0.21
-        },
-        "60m": {
-          "n": 25,
-          "win_rate": 0.4,
-          "avg_outcome_pct": 0.06
-        },
-        "240m": {
-          "n": 25,
-          "win_rate": 0.28,
-          "avg_outcome_pct": -0.78
-        }
-      }
-    },
     "HOMEUSDT|burst|LONG": {
       "symbol": "HOMEUSDT",
       "alert_type": "burst",
@@ -3226,9 +3204,9 @@
           "avg_outcome_pct": -0.24
         },
         "60m": {
-          "n": 100,
-          "win_rate": 0.43,
-          "avg_outcome_pct": -0.04
+          "n": 101,
+          "win_rate": 0.426,
+          "avg_outcome_pct": -0.06
         },
         "240m": {
           "n": 100,
@@ -8668,6 +8646,28 @@
           "n": 35,
           "win_rate": 0.429,
           "avg_outcome_pct": 0.2
+        }
+      }
+    },
+    "DRAMUSDT|burst|LONG": {
+      "symbol": "DRAMUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 24,
+          "win_rate": 0.25,
+          "avg_outcome_pct": -0.16
+        },
+        "60m": {
+          "n": 24,
+          "win_rate": 0.417,
+          "avg_outcome_pct": 0.12
+        },
+        "240m": {
+          "n": 24,
+          "win_rate": 0.292,
+          "avg_outcome_pct": -0.71
         }
       }
     },
