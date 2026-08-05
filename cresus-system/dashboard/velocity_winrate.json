@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-08-05T11:19:24.341160+00:00",
+  "generated_at": "2026-08-05T11:21:33.054165+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "MEMEUSDT|burst|LONG": {
-      "symbol": "MEMEUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 52,
-          "win_rate": 0.135,
-          "avg_outcome_pct": -0.28
-        },
-        "60m": {
-          "n": 52,
-          "win_rate": 0.212,
-          "avg_outcome_pct": -0.3
-        },
-        "240m": {
-          "n": 52,
-          "win_rate": 0.288,
-          "avg_outcome_pct": -0.27
-        }
-      }
-    },
-    "VICUSDT|burst|SHORT": {
-      "symbol": "VICUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 31,
-          "win_rate": 0.419,
-          "avg_outcome_pct": 0.53
-        },
-        "60m": {
-          "n": 30,
-          "win_rate": 0.633,
-          "avg_outcome_pct": 0.91
-        },
-        "240m": {
-          "n": 30,
-          "win_rate": 0.6,
-          "avg_outcome_pct": -0.61
-        }
-      }
-    },
     "ALLOUSDT|sustained|LONG": {
       "symbol": "ALLOUSDT",
       "alert_type": "sustained",
@@ -1235,6 +1191,28 @@
         }
       }
     },
+    "VICUSDT|burst|SHORT": {
+      "symbol": "VICUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 30,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.48
+        },
+        "60m": {
+          "n": 29,
+          "win_rate": 0.621,
+          "avg_outcome_pct": 0.86
+        },
+        "240m": {
+          "n": 29,
+          "win_rate": 0.621,
+          "avg_outcome_pct": -0.63
+        }
+      }
+    },
     "DUSDT|burst|LONG": {
       "symbol": "DUSDT",
       "alert_type": "burst",
@@ -1870,6 +1848,28 @@
           "n": 134,
           "win_rate": 0.47,
           "avg_outcome_pct": -0.25
+        }
+      }
+    },
+    "MEMEUSDT|burst|LONG": {
+      "symbol": "MEMEUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 51,
+          "win_rate": 0.118,
+          "avg_outcome_pct": -0.34
+        },
+        "60m": {
+          "n": 51,
+          "win_rate": 0.196,
+          "avg_outcome_pct": -0.37
+        },
+        "240m": {
+          "n": 51,
+          "win_rate": 0.275,
+          "avg_outcome_pct": -0.32
         }
       }
     },
