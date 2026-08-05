@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-05T16:55:57.980496+00:00",
+  "generated_at": "2026-08-05T16:58:08.320054+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "PORTALUSDT|sustained|SHORT": {
-      "symbol": "PORTALUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 16,
-          "win_rate": 0.312,
-          "avg_outcome_pct": -1.14
-        },
-        "60m": {
-          "n": 16,
-          "win_rate": 0.375,
-          "avg_outcome_pct": -1.07
-        },
-        "240m": {
-          "n": 16,
-          "win_rate": 0.5,
-          "avg_outcome_pct": -0.18
-        }
-      }
-    },
     "SPXUSDT|burst|SHORT": {
       "symbol": "SPXUSDT",
       "alert_type": "burst",
@@ -16437,6 +16415,28 @@
         }
       }
     },
+    "PORTALUSDT|sustained|SHORT": {
+      "symbol": "PORTALUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 15,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -1.19
+        },
+        "60m": {
+          "n": 15,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -1.27
+        },
+        "240m": {
+          "n": 15,
+          "win_rate": 0.533,
+          "avg_outcome_pct": -0.12
+        }
+      }
+    },
     "AVGOUSDT|sustained|SHORT": {
       "symbol": "AVGOUSDT",
       "alert_type": "sustained",
@@ -23901,9 +23901,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 11,
-          "win_rate": 0.364,
-          "avg_outcome_pct": 0.4
+          "n": 12,
+          "win_rate": 0.333,
+          "avg_outcome_pct": 0.35
         },
         "60m": {
           "n": 11,
@@ -25803,8 +25803,8 @@
           "avg_outcome_pct": -0.48
         },
         "240m": {
-          "n": 79,
-          "win_rate": 0.443,
+          "n": 80,
+          "win_rate": 0.438,
           "avg_outcome_pct": -0.01
         }
       }
@@ -27541,9 +27541,9 @@
           "avg_outcome_pct": 0.47
         },
         "240m": {
-          "n": 60,
-          "win_rate": 0.417,
-          "avg_outcome_pct": -0.35
+          "n": 61,
+          "win_rate": 0.426,
+          "avg_outcome_pct": 0.11
         }
       }
     },
@@ -33173,9 +33173,9 @@
           "avg_outcome_pct": -0.19
         },
         "240m": {
-          "n": 18,
-          "win_rate": 0.056,
-          "avg_outcome_pct": -0.85
+          "n": 19,
+          "win_rate": 0.105,
+          "avg_outcome_pct": -0.77
         }
       }
     },
