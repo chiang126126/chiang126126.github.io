@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-05T07:49:43.539003+00:00",
+  "generated_at": "2026-08-05T07:51:57.062234+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "FFUSDT|sustained|SHORT": {
-      "symbol": "FFUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 18,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.27
-        },
-        "60m": {
-          "n": 18,
-          "win_rate": 0.389,
-          "avg_outcome_pct": 0.5
-        },
-        "240m": {
-          "n": 18,
-          "win_rate": 0.389,
-          "avg_outcome_pct": -0.09
-        }
-      }
-    },
     "OPNUSDT|burst|LONG": {
       "symbol": "OPNUSDT",
       "alert_type": "burst",
@@ -15777,6 +15755,28 @@
         }
       }
     },
+    "FFUSDT|sustained|SHORT": {
+      "symbol": "FFUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 17,
+          "win_rate": 0.353,
+          "avg_outcome_pct": 0.41
+        },
+        "60m": {
+          "n": 17,
+          "win_rate": 0.412,
+          "avg_outcome_pct": 0.67
+        },
+        "240m": {
+          "n": 17,
+          "win_rate": 0.412,
+          "avg_outcome_pct": 0.16
+        }
+      }
+    },
     "CTRUSDT|sustained|SHORT": {
       "symbol": "CTRUSDT",
       "alert_type": "sustained",
@@ -25099,9 +25099,9 @@
           "avg_outcome_pct": 0.65
         },
         "240m": {
-          "n": 46,
-          "win_rate": 0.304,
-          "avg_outcome_pct": -0.01
+          "n": 47,
+          "win_rate": 0.319,
+          "avg_outcome_pct": 0.22
         }
       }
     },
