@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-05T16:40:42.425382+00:00",
+  "generated_at": "2026-08-05T16:42:51.766953+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "GUNUSDT|sustained|LONG": {
-      "symbol": "GUNUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 10,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -1.43
-        },
-        "60m": {
-          "n": 10,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -2.47
-        },
-        "240m": {
-          "n": 10,
-          "win_rate": 0.3,
-          "avg_outcome_pct": -3.85
-        }
-      }
-    },
     "EDENUSDT|sustained|LONG": {
       "symbol": "EDENUSDT",
       "alert_type": "sustained",
@@ -12103,6 +12081,28 @@
         }
       }
     },
+    "GUNUSDT|sustained|LONG": {
+      "symbol": "GUNUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 9,
+          "win_rate": 0.111,
+          "avg_outcome_pct": -2.0
+        },
+        "60m": {
+          "n": 9,
+          "win_rate": 0.222,
+          "avg_outcome_pct": -2.73
+        },
+        "240m": {
+          "n": 9,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -4.05
+        }
+      }
+    },
     "BCHUSDT|sustained|SHORT": {
       "symbol": "BCHUSDT",
       "alert_type": "sustained",
@@ -17553,9 +17553,9 @@
           "avg_outcome_pct": -1.82
         },
         "240m": {
-          "n": 10,
-          "win_rate": 0.5,
-          "avg_outcome_pct": -7.39
+          "n": 11,
+          "win_rate": 0.545,
+          "avg_outcome_pct": -6.61
         }
       }
     },
