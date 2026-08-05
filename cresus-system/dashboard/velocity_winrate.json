@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-05T05:37:11.649717+00:00",
+  "generated_at": "2026-08-05T05:39:20.516180+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "EDGEUSDT|sustained|LONG": {
-      "symbol": "EDGEUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 60,
-          "win_rate": 0.383,
-          "avg_outcome_pct": 0.27
-        },
-        "60m": {
-          "n": 60,
-          "win_rate": 0.367,
-          "avg_outcome_pct": -0.45
-        },
-        "240m": {
-          "n": 60,
-          "win_rate": 0.383,
-          "avg_outcome_pct": -0.78
-        }
-      }
-    },
     "NOKUSDT|burst|SHORT": {
       "symbol": "NOKUSDT",
       "alert_type": "burst",
@@ -6394,8 +6372,8 @@
           "avg_outcome_pct": -0.17
         },
         "60m": {
-          "n": 118,
-          "win_rate": 0.331,
+          "n": 119,
+          "win_rate": 0.328,
           "avg_outcome_pct": -0.11
         },
         "240m": {
@@ -12169,6 +12147,28 @@
         }
       }
     },
+    "EDGEUSDT|sustained|LONG": {
+      "symbol": "EDGEUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 59,
+          "win_rate": 0.373,
+          "avg_outcome_pct": 0.26
+        },
+        "60m": {
+          "n": 59,
+          "win_rate": 0.373,
+          "avg_outcome_pct": -0.46
+        },
+        "240m": {
+          "n": 59,
+          "win_rate": 0.39,
+          "avg_outcome_pct": -0.8
+        }
+      }
+    },
     "GALAUSDT|sustained|LONG": {
       "symbol": "GALAUSDT",
       "alert_type": "sustained",
@@ -13373,9 +13373,9 @@
           "avg_outcome_pct": -0.25
         },
         "240m": {
-          "n": 27,
-          "win_rate": 0.63,
-          "avg_outcome_pct": 1.62
+          "n": 28,
+          "win_rate": 0.607,
+          "avg_outcome_pct": 1.55
         }
       }
     },
@@ -18915,6 +18915,11 @@
           "n": 8,
           "win_rate": 0.5,
           "avg_outcome_pct": 3.32
+        },
+        "240m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 3.68
         }
       }
     },
