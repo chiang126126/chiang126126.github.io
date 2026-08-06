@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-06T20:20:21.698185+00:00",
+  "generated_at": "2026-08-06T20:22:29.710505+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "HIGHUSDT|burst|LONG": {
-      "symbol": "HIGHUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 6,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 0.01
-        },
-        "60m": {
-          "n": 6,
-          "win_rate": 0.667,
-          "avg_outcome_pct": 0.55
-        },
-        "240m": {
-          "n": 6,
-          "win_rate": 0.167,
-          "avg_outcome_pct": -1.64
-        }
-      }
-    },
     "DYDXUSDT|sustained|LONG": {
       "symbol": "DYDXUSDT",
       "alert_type": "sustained",
@@ -264,6 +242,28 @@
           "n": 11,
           "win_rate": 0.455,
           "avg_outcome_pct": 1.68
+        }
+      }
+    },
+    "HIGHUSDT|burst|LONG": {
+      "symbol": "HIGHUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": -0.1
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.6,
+          "avg_outcome_pct": -0.02
+        },
+        "240m": {
+          "n": 5,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -2.24
         }
       }
     },
@@ -7384,9 +7384,9 @@
           "avg_outcome_pct": 0.11
         },
         "60m": {
-          "n": 16,
-          "win_rate": 0.312,
-          "avg_outcome_pct": 0.02
+          "n": 17,
+          "win_rate": 0.294,
+          "avg_outcome_pct": -0.02
         },
         "240m": {
           "n": 16,
@@ -19836,9 +19836,9 @@
           "avg_outcome_pct": -0.31
         },
         "60m": {
-          "n": 129,
-          "win_rate": 0.364,
-          "avg_outcome_pct": -0.35
+          "n": 130,
+          "win_rate": 0.362,
+          "avg_outcome_pct": -0.36
         },
         "240m": {
           "n": 128,
