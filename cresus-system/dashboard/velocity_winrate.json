@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-08-06T08:49:05.447945+00:00",
+  "generated_at": "2026-08-06T08:51:19.634014+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "FIDAUSDT|sustained|SHORT": {
-      "symbol": "FIDAUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 14,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 0.26
-        },
-        "60m": {
-          "n": 14,
-          "win_rate": 0.429,
-          "avg_outcome_pct": -0.21
-        },
-        "240m": {
-          "n": 14,
-          "win_rate": 0.643,
-          "avg_outcome_pct": 0.9
-        }
-      }
-    },
-    "CUSDT|burst|SHORT": {
-      "symbol": "CUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 11,
-          "win_rate": 0.455,
-          "avg_outcome_pct": 0.58
-        },
-        "60m": {
-          "n": 11,
-          "win_rate": 0.455,
-          "avg_outcome_pct": 0.6
-        },
-        "240m": {
-          "n": 11,
-          "win_rate": 0.364,
-          "avg_outcome_pct": 0.37
-        }
-      }
-    },
     "CUSDT|sustained|SHORT": {
       "symbol": "CUSDT",
       "alert_type": "sustained",
@@ -3545,6 +3501,28 @@
         }
       }
     },
+    "FIDAUSDT|sustained|SHORT": {
+      "symbol": "FIDAUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 13,
+          "win_rate": 0.538,
+          "avg_outcome_pct": 0.5
+        },
+        "60m": {
+          "n": 13,
+          "win_rate": 0.462,
+          "avg_outcome_pct": -0.12
+        },
+        "240m": {
+          "n": 13,
+          "win_rate": 0.692,
+          "avg_outcome_pct": 1.19
+        }
+      }
+    },
     "PORTALUSDT|burst|LONG": {
       "symbol": "PORTALUSDT",
       "alert_type": "burst",
@@ -6534,6 +6512,28 @@
           "n": 44,
           "win_rate": 0.455,
           "avg_outcome_pct": 0.92
+        }
+      }
+    },
+    "CUSDT|burst|SHORT": {
+      "symbol": "CUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 10,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.52
+        },
+        "60m": {
+          "n": 10,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.52
+        },
+        "240m": {
+          "n": 10,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.43
         }
       }
     },
