@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-07T11:40:09.673434+00:00",
+  "generated_at": "2026-08-07T11:42:23.214936+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "POWERUSDT|sustained|LONG": {
-      "symbol": "POWERUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 35,
-          "win_rate": 0.4,
-          "avg_outcome_pct": -0.03
-        },
-        "60m": {
-          "n": 35,
-          "win_rate": 0.571,
-          "avg_outcome_pct": 0.53
-        },
-        "240m": {
-          "n": 35,
-          "win_rate": 0.429,
-          "avg_outcome_pct": -0.83
-        }
-      }
-    },
     "ALLOUSDT|burst|SHORT": {
       "symbol": "ALLOUSDT",
       "alert_type": "burst",
@@ -550,6 +528,28 @@
           "n": 52,
           "win_rate": 0.308,
           "avg_outcome_pct": -0.42
+        }
+      }
+    },
+    "POWERUSDT|sustained|LONG": {
+      "symbol": "POWERUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 34,
+          "win_rate": 0.412,
+          "avg_outcome_pct": -0.01
+        },
+        "60m": {
+          "n": 34,
+          "win_rate": 0.588,
+          "avg_outcome_pct": 0.56
+        },
+        "240m": {
+          "n": 34,
+          "win_rate": 0.412,
+          "avg_outcome_pct": -1.14
         }
       }
     },
