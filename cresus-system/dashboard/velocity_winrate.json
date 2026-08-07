@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-08-07T13:27:34.529466+00:00",
+  "generated_at": "2026-08-07T13:29:44.498973+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "METAUSDT|burst|SHORT": {
-      "symbol": "METAUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 10,
-          "win_rate": 0.3,
-          "avg_outcome_pct": -0.29
-        },
-        "60m": {
-          "n": 10,
-          "win_rate": 0.3,
-          "avg_outcome_pct": -0.43
-        },
-        "240m": {
-          "n": 10,
-          "win_rate": 0.4,
-          "avg_outcome_pct": -0.5
-        }
-      }
-    },
-    "VVVUSDT|sustained|LONG": {
-      "symbol": "VVVUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 55,
-          "win_rate": 0.218,
-          "avg_outcome_pct": -0.04
-        },
-        "60m": {
-          "n": 55,
-          "win_rate": 0.236,
-          "avg_outcome_pct": 0.03
-        },
-        "240m": {
-          "n": 55,
-          "win_rate": 0.418,
-          "avg_outcome_pct": -0.1
-        }
-      }
-    },
     "ARMUSDT|burst|LONG": {
       "symbol": "ARMUSDT",
       "alert_type": "burst",
@@ -7433,9 +7389,9 @@
           "avg_outcome_pct": -0.29
         },
         "240m": {
-          "n": 15,
-          "win_rate": 0.133,
-          "avg_outcome_pct": -0.16
+          "n": 16,
+          "win_rate": 0.125,
+          "avg_outcome_pct": -0.12
         }
       }
     },
@@ -10560,6 +10516,28 @@
           "n": 32,
           "win_rate": 0.562,
           "avg_outcome_pct": 0.34
+        }
+      }
+    },
+    "METAUSDT|burst|SHORT": {
+      "symbol": "METAUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 9,
+          "win_rate": 0.222,
+          "avg_outcome_pct": -0.4
+        },
+        "60m": {
+          "n": 9,
+          "win_rate": 0.222,
+          "avg_outcome_pct": -0.57
+        },
+        "240m": {
+          "n": 9,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -0.67
         }
       }
     },
@@ -13872,6 +13850,28 @@
           "n": 31,
           "win_rate": 0.355,
           "avg_outcome_pct": -0.09
+        }
+      }
+    },
+    "VVVUSDT|sustained|LONG": {
+      "symbol": "VVVUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 54,
+          "win_rate": 0.222,
+          "avg_outcome_pct": -0.01
+        },
+        "60m": {
+          "n": 54,
+          "win_rate": 0.241,
+          "avg_outcome_pct": 0.05
+        },
+        "240m": {
+          "n": 54,
+          "win_rate": 0.426,
+          "avg_outcome_pct": -0.06
         }
       }
     },
