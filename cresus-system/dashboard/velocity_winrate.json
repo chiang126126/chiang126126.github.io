@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-07T04:00:39.701202+00:00",
+  "generated_at": "2026-08-07T04:02:50.327512+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "VICUSDT|burst|SHORT": {
-      "symbol": "VICUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 31,
-          "win_rate": 0.387,
-          "avg_outcome_pct": 0.61
-        },
-        "60m": {
-          "n": 31,
-          "win_rate": 0.613,
-          "avg_outcome_pct": 1.0
-        },
-        "240m": {
-          "n": 30,
-          "win_rate": 0.633,
-          "avg_outcome_pct": -0.63
-        }
-      }
-    },
     "BIOUSDT|sustained|LONG": {
       "symbol": "BIOUSDT",
       "alert_type": "sustained",
@@ -7106,6 +7084,28 @@
           "n": 38,
           "win_rate": 0.395,
           "avg_outcome_pct": 0.56
+        }
+      }
+    },
+    "VICUSDT|burst|SHORT": {
+      "symbol": "VICUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 30,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.62
+        },
+        "60m": {
+          "n": 30,
+          "win_rate": 0.6,
+          "avg_outcome_pct": 0.99
+        },
+        "240m": {
+          "n": 29,
+          "win_rate": 0.621,
+          "avg_outcome_pct": -0.7
         }
       }
     },
