@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-08T09:02:41.012090+00:00",
+  "generated_at": "2026-08-08T09:04:50.972749+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "BABYUSDT|sustained|LONG": {
-      "symbol": "BABYUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 13,
-          "win_rate": 0.077,
-          "avg_outcome_pct": -0.64
-        },
-        "60m": {
-          "n": 13,
-          "win_rate": 0.077,
-          "avg_outcome_pct": -0.38
-        },
-        "240m": {
-          "n": 13,
-          "win_rate": 0.385,
-          "avg_outcome_pct": 0.38
-        }
-      }
-    },
     "SPCXUSDT|burst|SHORT": {
       "symbol": "SPCXUSDT",
       "alert_type": "burst",
@@ -8869,6 +8847,28 @@
         }
       }
     },
+    "BABYUSDT|sustained|LONG": {
+      "symbol": "BABYUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 12,
+          "win_rate": 0.083,
+          "avg_outcome_pct": -0.51
+        },
+        "60m": {
+          "n": 12,
+          "win_rate": 0.083,
+          "avg_outcome_pct": -0.32
+        },
+        "240m": {
+          "n": 12,
+          "win_rate": 0.417,
+          "avg_outcome_pct": 0.41
+        }
+      }
+    },
     "PLAYUSDT|sustained|SHORT": {
       "symbol": "PLAYUSDT",
       "alert_type": "sustained",
@@ -14869,9 +14869,9 @@
           "avg_outcome_pct": -0.56
         },
         "240m": {
-          "n": 60,
-          "win_rate": 0.533,
-          "avg_outcome_pct": -0.3
+          "n": 61,
+          "win_rate": 0.525,
+          "avg_outcome_pct": -0.35
         }
       }
     },
@@ -33681,9 +33681,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 5,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -3.23
+          "n": 6,
+          "win_rate": 0.167,
+          "avg_outcome_pct": -3.02
         },
         "60m": {
           "n": 5,
