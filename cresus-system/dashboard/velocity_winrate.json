@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-08T09:35:38.687924+00:00",
+  "generated_at": "2026-08-08T09:37:47.824244+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "XLMUSDT|sustained|SHORT": {
-      "symbol": "XLMUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 8,
-          "win_rate": 0.375,
-          "avg_outcome_pct": 0.05
-        },
-        "60m": {
-          "n": 8,
-          "win_rate": 0.375,
-          "avg_outcome_pct": 0.4
-        },
-        "240m": {
-          "n": 8,
-          "win_rate": 0.625,
-          "avg_outcome_pct": 0.55
-        }
-      }
-    },
     "GWEIUSDT|burst|SHORT": {
       "symbol": "GWEIUSDT",
       "alert_type": "burst",
@@ -3391,6 +3369,28 @@
         }
       }
     },
+    "XLMUSDT|sustained|SHORT": {
+      "symbol": "XLMUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 7,
+          "win_rate": 0.429,
+          "avg_outcome_pct": 0.08
+        },
+        "60m": {
+          "n": 7,
+          "win_rate": 0.429,
+          "avg_outcome_pct": 0.48
+        },
+        "240m": {
+          "n": 7,
+          "win_rate": 0.714,
+          "avg_outcome_pct": 0.76
+        }
+      }
+    },
     "SNDKUSDT|sustained|SHORT": {
       "symbol": "SNDKUSDT",
       "alert_type": "sustained",
@@ -4353,9 +4353,9 @@
           "avg_outcome_pct": 0.48
         },
         "240m": {
-          "n": 140,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 1.92
+          "n": 141,
+          "win_rate": 0.504,
+          "avg_outcome_pct": 1.96
         }
       }
     },
