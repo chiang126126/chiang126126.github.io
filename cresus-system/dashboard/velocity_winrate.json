@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-08T09:44:17.232826+00:00",
+  "generated_at": "2026-08-08T09:46:28.015272+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "STGUSDT|burst|SHORT": {
-      "symbol": "STGUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 61,
-          "win_rate": 0.279,
-          "avg_outcome_pct": -0.41
-        },
-        "60m": {
-          "n": 61,
-          "win_rate": 0.328,
-          "avg_outcome_pct": -0.64
-        },
-        "240m": {
-          "n": 61,
-          "win_rate": 0.459,
-          "avg_outcome_pct": -0.33
-        }
-      }
-    },
     "HUSDT|burst|LONG": {
       "symbol": "HUSDT",
       "alert_type": "burst",
@@ -12631,6 +12609,28 @@
         }
       }
     },
+    "STGUSDT|burst|SHORT": {
+      "symbol": "STGUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 60,
+          "win_rate": 0.283,
+          "avg_outcome_pct": -0.4
+        },
+        "60m": {
+          "n": 60,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -0.63
+        },
+        "240m": {
+          "n": 60,
+          "win_rate": 0.467,
+          "avg_outcome_pct": -0.06
+        }
+      }
+    },
     "AXTIUSDT|burst|SHORT": {
       "symbol": "AXTIUSDT",
       "alert_type": "burst",
@@ -13351,9 +13351,9 @@
           "avg_outcome_pct": 0.28
         },
         "240m": {
-          "n": 45,
-          "win_rate": 0.578,
-          "avg_outcome_pct": 1.9
+          "n": 46,
+          "win_rate": 0.587,
+          "avg_outcome_pct": 1.98
         }
       }
     },
