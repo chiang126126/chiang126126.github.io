@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-08T04:56:54.408591+00:00",
+  "generated_at": "2026-08-08T04:59:03.279951+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "ARIAUSDT|burst|SHORT": {
-      "symbol": "ARIAUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 19,
-          "win_rate": 0.368,
-          "avg_outcome_pct": 0.2
-        },
-        "60m": {
-          "n": 19,
-          "win_rate": 0.368,
-          "avg_outcome_pct": -0.01
-        },
-        "240m": {
-          "n": 19,
-          "win_rate": 0.263,
-          "avg_outcome_pct": 0.21
-        }
-      }
-    },
     "IOUSDT|sustained|LONG": {
       "symbol": "IOUSDT",
       "alert_type": "sustained",
@@ -726,6 +704,28 @@
           "n": 148,
           "win_rate": 0.459,
           "avg_outcome_pct": 0.23
+        }
+      }
+    },
+    "ARIAUSDT|burst|SHORT": {
+      "symbol": "ARIAUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 18,
+          "win_rate": 0.389,
+          "avg_outcome_pct": 0.28
+        },
+        "60m": {
+          "n": 18,
+          "win_rate": 0.389,
+          "avg_outcome_pct": 0.01
+        },
+        "240m": {
+          "n": 18,
+          "win_rate": 0.278,
+          "avg_outcome_pct": 0.28
         }
       }
     },
