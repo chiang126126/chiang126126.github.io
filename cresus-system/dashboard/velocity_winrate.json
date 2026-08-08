@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-08T17:44:13.839007+00:00",
+  "generated_at": "2026-08-08T17:46:27.946188+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "HAEDALUSDT|burst|SHORT": {
-      "symbol": "HAEDALUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 10,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -0.07
-        },
-        "60m": {
-          "n": 10,
-          "win_rate": 0.4,
-          "avg_outcome_pct": 0.48
-        },
-        "240m": {
-          "n": 10,
-          "win_rate": 0.4,
-          "avg_outcome_pct": 0.62
-        }
-      }
-    },
     "PARTIUSDT|sustained|SHORT": {
       "symbol": "PARTIUSDT",
       "alert_type": "sustained",
@@ -3193,6 +3171,28 @@
         }
       }
     },
+    "HAEDALUSDT|burst|SHORT": {
+      "symbol": "HAEDALUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 9,
+          "win_rate": 0.222,
+          "avg_outcome_pct": -0.1
+        },
+        "60m": {
+          "n": 9,
+          "win_rate": 0.444,
+          "avg_outcome_pct": 0.51
+        },
+        "240m": {
+          "n": 9,
+          "win_rate": 0.444,
+          "avg_outcome_pct": 0.82
+        }
+      }
+    },
     "QCOMUSDT|burst|SHORT": {
       "symbol": "QCOMUSDT",
       "alert_type": "burst",
@@ -4595,9 +4595,9 @@
           "avg_outcome_pct": -0.47
         },
         "240m": {
-          "n": 12,
-          "win_rate": 0.417,
-          "avg_outcome_pct": 0.41
+          "n": 13,
+          "win_rate": 0.385,
+          "avg_outcome_pct": 0.27
         }
       }
     },
@@ -25111,9 +25111,9 @@
           "avg_outcome_pct": -0.15
         },
         "240m": {
-          "n": 88,
-          "win_rate": 0.455,
-          "avg_outcome_pct": -0.68
+          "n": 89,
+          "win_rate": 0.449,
+          "avg_outcome_pct": -0.71
         }
       }
     },
