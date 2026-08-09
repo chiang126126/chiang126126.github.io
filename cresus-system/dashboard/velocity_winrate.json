@@ -1,74 +1,8 @@
 {
-  "generated_at": "2026-08-09T08:52:30.496919+00:00",
+  "generated_at": "2026-08-09T08:54:39.208797+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "CRDOUSDT|burst|LONG": {
-      "symbol": "CRDOUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 10,
-          "win_rate": 0.4,
-          "avg_outcome_pct": 0.41
-        },
-        "60m": {
-          "n": 10,
-          "win_rate": 0.6,
-          "avg_outcome_pct": 1.53
-        },
-        "240m": {
-          "n": 10,
-          "win_rate": 0.8,
-          "avg_outcome_pct": 1.11
-        }
-      }
-    },
-    "PLAYUSDT|burst|LONG": {
-      "symbol": "PLAYUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 70,
-          "win_rate": 0.371,
-          "avg_outcome_pct": 0.24
-        },
-        "60m": {
-          "n": 70,
-          "win_rate": 0.329,
-          "avg_outcome_pct": -0.41
-        },
-        "240m": {
-          "n": 70,
-          "win_rate": 0.371,
-          "avg_outcome_pct": -0.51
-        }
-      }
-    },
-    "MAGMAUSDT|sustained|LONG": {
-      "symbol": "MAGMAUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 75,
-          "win_rate": 0.4,
-          "avg_outcome_pct": 0.11
-        },
-        "60m": {
-          "n": 75,
-          "win_rate": 0.52,
-          "avg_outcome_pct": 0.36
-        },
-        "240m": {
-          "n": 75,
-          "win_rate": 0.493,
-          "avg_outcome_pct": 0.48
-        }
-      }
-    },
     "VVVUSDT|burst|SHORT": {
       "symbol": "VVVUSDT",
       "alert_type": "burst",
@@ -553,6 +487,28 @@
         }
       }
     },
+    "CRDOUSDT|burst|LONG": {
+      "symbol": "CRDOUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 9,
+          "win_rate": 0.444,
+          "avg_outcome_pct": 0.57
+        },
+        "60m": {
+          "n": 9,
+          "win_rate": 0.556,
+          "avg_outcome_pct": 1.57
+        },
+        "240m": {
+          "n": 9,
+          "win_rate": 0.778,
+          "avg_outcome_pct": 0.91
+        }
+      }
+    },
     "MANTRAUSDT|burst|SHORT": {
       "symbol": "MANTRAUSDT",
       "alert_type": "burst",
@@ -858,6 +814,28 @@
           "n": 17,
           "win_rate": 0.412,
           "avg_outcome_pct": 0.38
+        }
+      }
+    },
+    "MAGMAUSDT|sustained|LONG": {
+      "symbol": "MAGMAUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 74,
+          "win_rate": 0.405,
+          "avg_outcome_pct": 0.12
+        },
+        "60m": {
+          "n": 74,
+          "win_rate": 0.514,
+          "avg_outcome_pct": 0.35
+        },
+        "240m": {
+          "n": 74,
+          "win_rate": 0.486,
+          "avg_outcome_pct": 0.35
         }
       }
     },
@@ -5795,9 +5773,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 50,
-          "win_rate": 0.32,
-          "avg_outcome_pct": 0.43
+          "n": 51,
+          "win_rate": 0.314,
+          "avg_outcome_pct": 0.42
         },
         "60m": {
           "n": 50,
@@ -8825,6 +8803,28 @@
         }
       }
     },
+    "PLAYUSDT|burst|LONG": {
+      "symbol": "PLAYUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 69,
+          "win_rate": 0.377,
+          "avg_outcome_pct": 0.28
+        },
+        "60m": {
+          "n": 69,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -0.41
+        },
+        "240m": {
+          "n": 69,
+          "win_rate": 0.377,
+          "avg_outcome_pct": -0.47
+        }
+      }
+    },
     "FOLKSUSDT|burst|SHORT": {
       "symbol": "FOLKSUSDT",
       "alert_type": "burst",
@@ -10530,9 +10530,9 @@
           "avg_outcome_pct": -0.56
         },
         "60m": {
-          "n": 7,
-          "win_rate": 0.143,
-          "avg_outcome_pct": -0.18
+          "n": 8,
+          "win_rate": 0.125,
+          "avg_outcome_pct": -0.31
         },
         "240m": {
           "n": 6,
@@ -12603,9 +12603,9 @@
           "avg_outcome_pct": -0.19
         },
         "240m": {
-          "n": 31,
-          "win_rate": 0.419,
-          "avg_outcome_pct": -0.73
+          "n": 32,
+          "win_rate": 0.406,
+          "avg_outcome_pct": -0.75
         }
       }
     },
@@ -13869,9 +13869,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 5,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -4.69
+          "n": 6,
+          "win_rate": 0.167,
+          "avg_outcome_pct": -4.12
         },
         "60m": {
           "n": 5,
@@ -21493,8 +21493,8 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 12,
-          "win_rate": 0.417,
+          "n": 13,
+          "win_rate": 0.385,
           "avg_outcome_pct": 0.26
         },
         "60m": {
@@ -24974,9 +24974,9 @@
           "avg_outcome_pct": -0.72
         },
         "60m": {
-          "n": 21,
-          "win_rate": 0.286,
-          "avg_outcome_pct": -1.11
+          "n": 22,
+          "win_rate": 0.273,
+          "avg_outcome_pct": -1.15
         },
         "240m": {
           "n": 19,
@@ -27174,9 +27174,9 @@
           "avg_outcome_pct": -0.14
         },
         "60m": {
-          "n": 6,
-          "win_rate": 0.667,
-          "avg_outcome_pct": 1.2
+          "n": 7,
+          "win_rate": 0.571,
+          "avg_outcome_pct": 0.78
         },
         "240m": {
           "n": 6,
@@ -33351,9 +33351,9 @@
           "avg_outcome_pct": 0.15
         },
         "60m": {
-          "n": 15,
-          "win_rate": 0.267,
-          "avg_outcome_pct": -0.36
+          "n": 16,
+          "win_rate": 0.312,
+          "avg_outcome_pct": -0.23
         },
         "240m": {
           "n": 15,
