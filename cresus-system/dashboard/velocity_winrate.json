@@ -1,39 +1,17 @@
 {
-  "generated_at": "2026-08-09T06:38:17.825408+00:00",
+  "generated_at": "2026-08-09T06:40:30.845592+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "KASUSDT|burst|LONG": {
-      "symbol": "KASUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 8,
-          "win_rate": 0.125,
-          "avg_outcome_pct": -0.16
-        },
-        "60m": {
-          "n": 8,
-          "win_rate": 0.125,
-          "avg_outcome_pct": -0.18
-        },
-        "240m": {
-          "n": 8,
-          "win_rate": 0.125,
-          "avg_outcome_pct": -1.07
-        }
-      }
-    },
     "USUSDT|sustained|SHORT": {
       "symbol": "USUSDT",
       "alert_type": "sustained",
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 63,
-          "win_rate": 0.381,
-          "avg_outcome_pct": -0.26
+          "n": 64,
+          "win_rate": 0.375,
+          "avg_outcome_pct": -0.52
         },
         "60m": {
           "n": 63,
@@ -330,6 +308,28 @@
           "n": 65,
           "win_rate": 0.323,
           "avg_outcome_pct": -0.27
+        }
+      }
+    },
+    "KASUSDT|burst|LONG": {
+      "symbol": "KASUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 7,
+          "win_rate": 0.143,
+          "avg_outcome_pct": -0.16
+        },
+        "60m": {
+          "n": 7,
+          "win_rate": 0.143,
+          "avg_outcome_pct": -0.24
+        },
+        "240m": {
+          "n": 7,
+          "win_rate": 0.143,
+          "avg_outcome_pct": -1.0
         }
       }
     },
@@ -16294,9 +16294,9 @@
           "avg_outcome_pct": -0.26
         },
         "60m": {
-          "n": 9,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -0.05
+          "n": 10,
+          "win_rate": 0.3,
+          "avg_outcome_pct": -0.1
         },
         "240m": {
           "n": 9,
@@ -30078,9 +30078,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 52,
-          "win_rate": 0.346,
-          "avg_outcome_pct": -0.4
+          "n": 53,
+          "win_rate": 0.358,
+          "avg_outcome_pct": -0.37
         },
         "60m": {
           "n": 52,
@@ -30298,9 +30298,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 7,
+          "n": 8,
           "win_rate": 0.0,
-          "avg_outcome_pct": -0.27
+          "avg_outcome_pct": -0.42
         },
         "60m": {
           "n": 7,
