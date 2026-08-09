@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-09T07:32:00.744902+00:00",
+  "generated_at": "2026-08-09T07:34:07.682916+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "CRDOUSDT|burst|SHORT": {
-      "symbol": "CRDOUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 8,
-          "win_rate": 0.125,
-          "avg_outcome_pct": 0.04
-        },
-        "60m": {
-          "n": 8,
-          "win_rate": 0.125,
-          "avg_outcome_pct": -0.41
-        },
-        "240m": {
-          "n": 8,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 0.83
-        }
-      }
-    },
     "SKRUSDT|burst|LONG": {
       "symbol": "SKRUSDT",
       "alert_type": "burst",
@@ -8033,6 +8011,28 @@
         }
       }
     },
+    "CRDOUSDT|burst|SHORT": {
+      "symbol": "CRDOUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 7,
+          "win_rate": 0.143,
+          "avg_outcome_pct": 0.04
+        },
+        "60m": {
+          "n": 7,
+          "win_rate": 0.143,
+          "avg_outcome_pct": -0.51
+        },
+        "240m": {
+          "n": 7,
+          "win_rate": 0.429,
+          "avg_outcome_pct": 0.49
+        }
+      }
+    },
     "FORMUSDT|burst|LONG": {
       "symbol": "FORMUSDT",
       "alert_type": "burst",
@@ -12466,9 +12466,9 @@
           "avg_outcome_pct": 1.67
         },
         "60m": {
-          "n": 9,
-          "win_rate": 0.444,
-          "avg_outcome_pct": 2.92
+          "n": 10,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 3.54
         },
         "240m": {
           "n": 9,
@@ -29939,9 +29939,9 @@
           "avg_outcome_pct": -3.58
         },
         "240m": {
-          "n": 7,
-          "win_rate": 0.143,
-          "avg_outcome_pct": -4.82
+          "n": 8,
+          "win_rate": 0.25,
+          "avg_outcome_pct": -3.88
         }
       }
     },
