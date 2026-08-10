@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "system_version": "V3",
-  "generated_at": "2026-08-10T13:40:02.697347+00:00",
+  "generated_at": "2026-08-10T13:45:42.788166+00:00",
   "session_started_at": "2026-06-03T16:39:35.998116+00:00",
   "stats": {
     "total_trades": 842,
@@ -69347,42 +69347,69 @@
   ],
   "missed_signals": [
     {
-      "paper_id": "LISTAUSDT|LONG|2026-08-10T12:09:52.671312+00:00",
-      "symbol": "LISTAUSDT",
+      "paper_id": "SNXXUSDT|LONG|2026-08-10T13:37:55.252173+00:00",
+      "symbol": "SNXXUSDT",
       "direction": "LONG",
       "conviction_score": 5,
-      "signal_at": "2026-08-10T12:11:20.433964+00:00",
-      "reason": "paper trade too old (5321s > 600s)",
-      "last_checked_at": "2026-08-10T13:40:01.771543+00:00"
+      "signal_at": "2026-08-10T13:43:23.953746+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.51% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-08-10T13:45:40.338473+00:00"
     },
     {
-      "paper_id": "SQDUSDT|LONG|2026-08-10T13:07:30.087040+00:00",
-      "symbol": "SQDUSDT",
+      "paper_id": "SOXSUSDT|LONG|2026-08-10T13:38:00.472060+00:00",
+      "symbol": "SOXSUSDT",
       "direction": "LONG",
       "conviction_score": 5,
-      "signal_at": "2026-08-10T13:09:22.749163+00:00",
-      "reason": "paper trade too old (1839s > 600s)",
-      "last_checked_at": "2026-08-10T13:40:01.771543+00:00"
+      "signal_at": "2026-08-10T13:43:23.953746+00:00",
+      "reason": "regime gate (always): down regime + LONG 被拒 sub=down_stable 3h=-0.51% (数据驱动: down+LONG 历史 0/10 胜 p=0.042)",
+      "last_checked_at": "2026-08-10T13:45:40.338473+00:00"
     },
     {
-      "paper_id": "MVLLUSDT|LONG|2026-08-10T13:07:42.080864+00:00",
-      "symbol": "MVLLUSDT",
+      "paper_id": "MRVLUSDT|SHORT|2026-08-10T13:39:19.113310+00:00",
+      "symbol": "MRVLUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-08-10T13:43:23.953746+00:00",
+      "reason": "phase_6t: SHORT entry $219.190000 > MA30 $201.913333 — 不接飞刀 (右侧才做)",
+      "last_checked_at": "2026-08-10T13:45:40.338473+00:00"
+    },
+    {
+      "paper_id": "PLTRUSDT|LONG|2026-08-10T13:39:38.583818+00:00",
+      "symbol": "PLTRUSDT",
       "direction": "LONG",
       "conviction_score": 5,
-      "signal_at": "2026-08-10T13:09:22.749163+00:00",
-      "reason": "paper trade too old (1839s > 600s)",
-      "last_checked_at": "2026-08-10T13:40:01.771543+00:00"
+      "signal_at": "2026-08-10T13:43:23.953746+00:00",
+      "reason": "phase_6y: ATR 0.83% < 1.0% 下限 (ATR<1% 稳健亏 -$232, bootstrap CI 整段<0)",
+      "last_checked_at": "2026-08-10T13:45:40.338473+00:00"
+    },
+    {
+      "paper_id": "ARMUSDT|SHORT|2026-08-10T13:41:51.425265+00:00",
+      "symbol": "ARMUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-08-10T13:43:23.953746+00:00",
+      "reason": "phase_6y: ATR 0.87% < 1.0% 下限 (ATR<1% 稳健亏 -$232, bootstrap CI 整段<0)",
+      "last_checked_at": "2026-08-10T13:45:40.338473+00:00"
+    },
+    {
+      "paper_id": "SOXLUSDT|SHORT|2026-08-10T13:37:48.504765+00:00",
+      "symbol": "SOXLUSDT",
+      "direction": "SHORT",
+      "conviction_score": 5,
+      "signal_at": "2026-08-10T13:43:23.953746+00:00",
+      "reason": "risk_gate: emergency stop flag exists: 'AUTO 2026-07-29T23:32:29.336608+00:00: cumulative DD 100.00% (balance $0.00 < threshold $400.00)'",
+      "last_checked_at": "2026-08-10T13:45:40.338473+00:00"
     }
   ],
   "btc_regime_now": {
     "regime": "down",
-    "btc_price": 64664.5,
-    "btc_ma25_1h": 65079.0,
-    "pct_vs_ma25": -0.637,
-    "change_24h_pct": -0.814,
+    "btc_price": 64659.9,
+    "btc_ma25_1h": 65078.82,
+    "pct_vs_ma25": -0.644,
+    "change_24h_pct": -0.821,
     "sub_regime": "down_stable",
-    "change_3h_pct": -0.499,
-    "computed_at": "2026-08-10T13:40:02.637734+00:00"
+    "change_3h_pct": -0.506,
+    "computed_at": "2026-08-10T13:45:41.811364+00:00"
   },
   "config": {
     "starting_capital_usdt": 600.0,
