@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-11T15:08:55.594409+00:00",
+  "generated_at": "2026-08-11T15:11:06.010287+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "WLFIUSDT|sustained|SHORT": {
-      "symbol": "WLFIUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 13,
-          "win_rate": 0.462,
-          "avg_outcome_pct": 1.17
-        },
-        "60m": {
-          "n": 13,
-          "win_rate": 0.385,
-          "avg_outcome_pct": 1.21
-        },
-        "240m": {
-          "n": 13,
-          "win_rate": 0.308,
-          "avg_outcome_pct": 0.33
-        }
-      }
-    },
     "HEIUSDT|sustained|SHORT": {
       "symbol": "HEIUSDT",
       "alert_type": "sustained",
@@ -16239,6 +16217,28 @@
         }
       }
     },
+    "WLFIUSDT|sustained|SHORT": {
+      "symbol": "WLFIUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 12,
+          "win_rate": 0.417,
+          "avg_outcome_pct": 1.21
+        },
+        "60m": {
+          "n": 12,
+          "win_rate": 0.333,
+          "avg_outcome_pct": 1.15
+        },
+        "240m": {
+          "n": 12,
+          "win_rate": 0.25,
+          "avg_outcome_pct": 0.07
+        }
+      }
+    },
     "TIAUSDT|burst|SHORT": {
       "symbol": "TIAUSDT",
       "alert_type": "burst",
@@ -25001,9 +25001,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 7,
-          "win_rate": 0.429,
-          "avg_outcome_pct": -0.17
+          "n": 8,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 0.25
         },
         "60m": {
           "n": 7,
@@ -31535,9 +31535,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 24,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -1.27
+          "n": 25,
+          "win_rate": 0.32,
+          "avg_outcome_pct": -1.26
         },
         "60m": {
           "n": 24,
