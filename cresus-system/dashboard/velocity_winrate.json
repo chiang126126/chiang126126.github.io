@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-08-12T04:32:54.409832+00:00",
+  "generated_at": "2026-08-12T04:38:48.831143+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "AXLUSDT|sustained|SHORT": {
-      "symbol": "AXLUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 5,
-          "win_rate": 0.4,
-          "avg_outcome_pct": -0.35
-        },
-        "60m": {
-          "n": 5,
-          "win_rate": 0.8,
-          "avg_outcome_pct": 1.33
-        },
-        "240m": {
-          "n": 5,
-          "win_rate": 1.0,
-          "avg_outcome_pct": 4.05
-        }
-      }
-    },
-    "EPICUSDT|sustained|LONG": {
-      "symbol": "EPICUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 100,
-          "win_rate": 0.35,
-          "avg_outcome_pct": -1.43
-        },
-        "60m": {
-          "n": 100,
-          "win_rate": 0.32,
-          "avg_outcome_pct": -1.81
-        },
-        "240m": {
-          "n": 100,
-          "win_rate": 0.44,
-          "avg_outcome_pct": -2.08
-        }
-      }
-    },
     "AINUSDT|burst|SHORT": {
       "symbol": "AINUSDT",
       "alert_type": "burst",
@@ -5170,6 +5126,28 @@
           "n": 10,
           "win_rate": 0.4,
           "avg_outcome_pct": -1.8
+        }
+      }
+    },
+    "EPICUSDT|sustained|LONG": {
+      "symbol": "EPICUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 99,
+          "win_rate": 0.343,
+          "avg_outcome_pct": -1.47
+        },
+        "60m": {
+          "n": 99,
+          "win_rate": 0.313,
+          "avg_outcome_pct": -1.87
+        },
+        "240m": {
+          "n": 99,
+          "win_rate": 0.434,
+          "avg_outcome_pct": -2.16
         }
       }
     },
