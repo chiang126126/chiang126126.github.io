@@ -1,404 +1,8 @@
 {
-  "generated_at": "2026-08-12T14:58:44.392724+00:00",
+  "generated_at": "2026-08-12T15:15:03.846165+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "ICPUSDT|burst|LONG": {
-      "symbol": "ICPUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 25,
-          "win_rate": 0.16,
-          "avg_outcome_pct": -0.43
-        },
-        "60m": {
-          "n": 25,
-          "win_rate": 0.16,
-          "avg_outcome_pct": -0.52
-        },
-        "240m": {
-          "n": 25,
-          "win_rate": 0.24,
-          "avg_outcome_pct": -0.49
-        }
-      }
-    },
-    "OPENUSDT|sustained|SHORT": {
-      "symbol": "OPENUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 12,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.38
-        },
-        "60m": {
-          "n": 12,
-          "win_rate": 0.417,
-          "avg_outcome_pct": 0.84
-        },
-        "240m": {
-          "n": 12,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 1.11
-        }
-      }
-    },
-    "0GUSDT|burst|LONG": {
-      "symbol": "0GUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 45,
-          "win_rate": 0.156,
-          "avg_outcome_pct": -0.31
-        },
-        "60m": {
-          "n": 45,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -0.29
-        },
-        "240m": {
-          "n": 45,
-          "win_rate": 0.244,
-          "avg_outcome_pct": -1.22
-        }
-      }
-    },
-    "DEXEUSDT|burst|LONG": {
-      "symbol": "DEXEUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 136,
-          "win_rate": 0.257,
-          "avg_outcome_pct": -0.01
-        },
-        "60m": {
-          "n": 136,
-          "win_rate": 0.25,
-          "avg_outcome_pct": 0.02
-        },
-        "240m": {
-          "n": 136,
-          "win_rate": 0.346,
-          "avg_outcome_pct": -0.03
-        }
-      }
-    },
-    "HEMIUSDT|burst|LONG": {
-      "symbol": "HEMIUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 35,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -0.63
-        },
-        "60m": {
-          "n": 35,
-          "win_rate": 0.314,
-          "avg_outcome_pct": -0.96
-        },
-        "240m": {
-          "n": 35,
-          "win_rate": 0.371,
-          "avg_outcome_pct": -0.94
-        }
-      }
-    },
-    "LDOUSDT|burst|SHORT": {
-      "symbol": "LDOUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 52,
-          "win_rate": 0.192,
-          "avg_outcome_pct": -0.37
-        },
-        "60m": {
-          "n": 52,
-          "win_rate": 0.25,
-          "avg_outcome_pct": -0.31
-        },
-        "240m": {
-          "n": 52,
-          "win_rate": 0.288,
-          "avg_outcome_pct": -0.6
-        }
-      }
-    },
-    "EPICUSDT|burst|LONG": {
-      "symbol": "EPICUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 112,
-          "win_rate": 0.312,
-          "avg_outcome_pct": 0.13
-        },
-        "60m": {
-          "n": 112,
-          "win_rate": 0.393,
-          "avg_outcome_pct": -0.16
-        },
-        "240m": {
-          "n": 112,
-          "win_rate": 0.438,
-          "avg_outcome_pct": -1.14
-        }
-      }
-    },
-    "OPGUSDT|sustained|SHORT": {
-      "symbol": "OPGUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 35,
-          "win_rate": 0.257,
-          "avg_outcome_pct": -0.08
-        },
-        "60m": {
-          "n": 35,
-          "win_rate": 0.4,
-          "avg_outcome_pct": -0.18
-        },
-        "240m": {
-          "n": 35,
-          "win_rate": 0.486,
-          "avg_outcome_pct": 3.36
-        }
-      }
-    },
-    "SKYAIUSDT|burst|LONG": {
-      "symbol": "SKYAIUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 145,
-          "win_rate": 0.303,
-          "avg_outcome_pct": -0.07
-        },
-        "60m": {
-          "n": 145,
-          "win_rate": 0.379,
-          "avg_outcome_pct": -0.06
-        },
-        "240m": {
-          "n": 145,
-          "win_rate": 0.462,
-          "avg_outcome_pct": 0.17
-        }
-      }
-    },
-    "NILUSDT|burst|LONG": {
-      "symbol": "NILUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 42,
-          "win_rate": 0.31,
-          "avg_outcome_pct": -0.34
-        },
-        "60m": {
-          "n": 42,
-          "win_rate": 0.405,
-          "avg_outcome_pct": -0.06
-        },
-        "240m": {
-          "n": 42,
-          "win_rate": 0.452,
-          "avg_outcome_pct": 0.07
-        }
-      }
-    },
-    "HAEDALUSDT|burst|LONG": {
-      "symbol": "HAEDALUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 10,
-          "win_rate": 0.3,
-          "avg_outcome_pct": -1.83
-        },
-        "60m": {
-          "n": 10,
-          "win_rate": 0.3,
-          "avg_outcome_pct": -1.81
-        },
-        "240m": {
-          "n": 10,
-          "win_rate": 0.4,
-          "avg_outcome_pct": -1.8
-        }
-      }
-    },
-    "EPICUSDT|sustained|LONG": {
-      "symbol": "EPICUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 99,
-          "win_rate": 0.343,
-          "avg_outcome_pct": -1.47
-        },
-        "60m": {
-          "n": 99,
-          "win_rate": 0.313,
-          "avg_outcome_pct": -1.87
-        },
-        "240m": {
-          "n": 99,
-          "win_rate": 0.434,
-          "avg_outcome_pct": -2.16
-        }
-      }
-    },
-    "TIAUSDT|sustained|LONG": {
-      "symbol": "TIAUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 20,
-          "win_rate": 0.1,
-          "avg_outcome_pct": -0.69
-        },
-        "60m": {
-          "n": 20,
-          "win_rate": 0.05,
-          "avg_outcome_pct": -0.82
-        },
-        "240m": {
-          "n": 20,
-          "win_rate": 0.15,
-          "avg_outcome_pct": -1.37
-        }
-      }
-    },
-    "FIDAUSDT|burst|LONG": {
-      "symbol": "FIDAUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 27,
-          "win_rate": 0.148,
-          "avg_outcome_pct": -0.29
-        },
-        "60m": {
-          "n": 27,
-          "win_rate": 0.296,
-          "avg_outcome_pct": -0.11
-        },
-        "240m": {
-          "n": 27,
-          "win_rate": 0.259,
-          "avg_outcome_pct": -1.04
-        }
-      }
-    },
-    "KITEUSDT|burst|SHORT": {
-      "symbol": "KITEUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 55,
-          "win_rate": 0.309,
-          "avg_outcome_pct": 0.12
-        },
-        "60m": {
-          "n": 55,
-          "win_rate": 0.345,
-          "avg_outcome_pct": 0.1
-        },
-        "240m": {
-          "n": 55,
-          "win_rate": 0.491,
-          "avg_outcome_pct": 0.52
-        }
-      }
-    },
-    "EDENUSDT|burst|LONG": {
-      "symbol": "EDENUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 73,
-          "win_rate": 0.288,
-          "avg_outcome_pct": -0.14
-        },
-        "60m": {
-          "n": 73,
-          "win_rate": 0.452,
-          "avg_outcome_pct": 0.08
-        },
-        "240m": {
-          "n": 73,
-          "win_rate": 0.425,
-          "avg_outcome_pct": 0.06
-        }
-      }
-    },
-    "HEMIUSDT|sustained|LONG": {
-      "symbol": "HEMIUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 26,
-          "win_rate": 0.462,
-          "avg_outcome_pct": 0.87
-        },
-        "60m": {
-          "n": 26,
-          "win_rate": 0.385,
-          "avg_outcome_pct": 0.94
-        },
-        "240m": {
-          "n": 26,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 1.04
-        }
-      }
-    },
-    "COAIUSDT|sustained|LONG": {
-      "symbol": "COAIUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 18,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -0.42
-        },
-        "60m": {
-          "n": 18,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -0.1
-        },
-        "240m": {
-          "n": 18,
-          "win_rate": 0.222,
-          "avg_outcome_pct": -3.9
-        }
-      }
-    },
     "NILUSDT|sustained|LONG": {
       "symbol": "NILUSDT",
       "alert_type": "sustained",
@@ -993,6 +597,28 @@
         }
       }
     },
+    "HEMIUSDT|burst|LONG": {
+      "symbol": "HEMIUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 34,
+          "win_rate": 0.206,
+          "avg_outcome_pct": -0.66
+        },
+        "60m": {
+          "n": 34,
+          "win_rate": 0.294,
+          "avg_outcome_pct": -1.04
+        },
+        "240m": {
+          "n": 34,
+          "win_rate": 0.382,
+          "avg_outcome_pct": -0.9
+        }
+      }
+    },
     "NEARUSDT|sustained|LONG": {
       "symbol": "NEARUSDT",
       "alert_type": "sustained",
@@ -1015,15 +641,37 @@
         }
       }
     },
+    "COAIUSDT|sustained|LONG": {
+      "symbol": "COAIUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 17,
+          "win_rate": 0.294,
+          "avg_outcome_pct": -0.8
+        },
+        "60m": {
+          "n": 17,
+          "win_rate": 0.294,
+          "avg_outcome_pct": -0.8
+        },
+        "240m": {
+          "n": 17,
+          "win_rate": 0.176,
+          "avg_outcome_pct": -4.96
+        }
+      }
+    },
     "ROBOUSDT|burst|SHORT": {
       "symbol": "ROBOUSDT",
       "alert_type": "burst",
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 55,
-          "win_rate": 0.255,
-          "avg_outcome_pct": 0.07
+          "n": 56,
+          "win_rate": 0.25,
+          "avg_outcome_pct": 0.06
         },
         "60m": {
           "n": 55,
@@ -1763,6 +1411,28 @@
         }
       }
     },
+    "EDENUSDT|burst|LONG": {
+      "symbol": "EDENUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 72,
+          "win_rate": 0.292,
+          "avg_outcome_pct": -0.14
+        },
+        "60m": {
+          "n": 72,
+          "win_rate": 0.458,
+          "avg_outcome_pct": 0.08
+        },
+        "240m": {
+          "n": 72,
+          "win_rate": 0.431,
+          "avg_outcome_pct": 0.07
+        }
+      }
+    },
     "MYXUSDT|burst|SHORT": {
       "symbol": "MYXUSDT",
       "alert_type": "burst",
@@ -2112,6 +1782,28 @@
           "n": 32,
           "win_rate": 0.5,
           "avg_outcome_pct": -0.07
+        }
+      }
+    },
+    "HEMIUSDT|sustained|LONG": {
+      "symbol": "HEMIUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 25,
+          "win_rate": 0.48,
+          "avg_outcome_pct": 0.97
+        },
+        "60m": {
+          "n": 25,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 1.0
+        },
+        "240m": {
+          "n": 25,
+          "win_rate": 0.52,
+          "avg_outcome_pct": 1.24
         }
       }
     },
@@ -2555,6 +2247,28 @@
         }
       }
     },
+    "DEXEUSDT|burst|LONG": {
+      "symbol": "DEXEUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 135,
+          "win_rate": 0.259,
+          "avg_outcome_pct": 0.0
+        },
+        "60m": {
+          "n": 135,
+          "win_rate": 0.252,
+          "avg_outcome_pct": 0.04
+        },
+        "240m": {
+          "n": 135,
+          "win_rate": 0.348,
+          "avg_outcome_pct": 0.01
+        }
+      }
+    },
     "BLUAIUSDT|burst|SHORT": {
       "symbol": "BLUAIUSDT",
       "alert_type": "burst",
@@ -2992,6 +2706,28 @@
           "n": 79,
           "win_rate": 0.316,
           "avg_outcome_pct": -0.44
+        }
+      }
+    },
+    "ICPUSDT|burst|LONG": {
+      "symbol": "ICPUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 24,
+          "win_rate": 0.125,
+          "avg_outcome_pct": -0.53
+        },
+        "60m": {
+          "n": 24,
+          "win_rate": 0.125,
+          "avg_outcome_pct": -0.61
+        },
+        "240m": {
+          "n": 24,
+          "win_rate": 0.208,
+          "avg_outcome_pct": -0.68
         }
       }
     },
@@ -4095,6 +3831,28 @@
         }
       }
     },
+    "NILUSDT|burst|LONG": {
+      "symbol": "NILUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 41,
+          "win_rate": 0.317,
+          "avg_outcome_pct": -0.36
+        },
+        "60m": {
+          "n": 41,
+          "win_rate": 0.39,
+          "avg_outcome_pct": -0.1
+        },
+        "240m": {
+          "n": 41,
+          "win_rate": 0.463,
+          "avg_outcome_pct": 0.16
+        }
+      }
+    },
     "IPUSDT|burst|LONG": {
       "symbol": "IPUSDT",
       "alert_type": "burst",
@@ -4114,6 +3872,28 @@
           "n": 34,
           "win_rate": 0.265,
           "avg_outcome_pct": -0.74
+        }
+      }
+    },
+    "0GUSDT|burst|LONG": {
+      "symbol": "0GUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 44,
+          "win_rate": 0.159,
+          "avg_outcome_pct": -0.32
+        },
+        "60m": {
+          "n": 44,
+          "win_rate": 0.205,
+          "avg_outcome_pct": -0.28
+        },
+        "240m": {
+          "n": 44,
+          "win_rate": 0.25,
+          "avg_outcome_pct": -1.24
         }
       }
     },
@@ -4623,6 +4403,28 @@
         }
       }
     },
+    "EPICUSDT|burst|LONG": {
+      "symbol": "EPICUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 111,
+          "win_rate": 0.315,
+          "avg_outcome_pct": 0.19
+        },
+        "60m": {
+          "n": 111,
+          "win_rate": 0.396,
+          "avg_outcome_pct": -0.09
+        },
+        "240m": {
+          "n": 111,
+          "win_rate": 0.441,
+          "avg_outcome_pct": -1.06
+        }
+      }
+    },
     "SYNUSDT|burst|LONG": {
       "symbol": "SYNUSDT",
       "alert_type": "burst",
@@ -4950,6 +4752,50 @@
           "n": 19,
           "win_rate": 0.526,
           "avg_outcome_pct": 0.79
+        }
+      }
+    },
+    "FIDAUSDT|burst|LONG": {
+      "symbol": "FIDAUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 26,
+          "win_rate": 0.154,
+          "avg_outcome_pct": -0.31
+        },
+        "60m": {
+          "n": 26,
+          "win_rate": 0.269,
+          "avg_outcome_pct": -0.15
+        },
+        "240m": {
+          "n": 26,
+          "win_rate": 0.231,
+          "avg_outcome_pct": -1.16
+        }
+      }
+    },
+    "LDOUSDT|burst|SHORT": {
+      "symbol": "LDOUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 51,
+          "win_rate": 0.196,
+          "avg_outcome_pct": -0.36
+        },
+        "60m": {
+          "n": 51,
+          "win_rate": 0.255,
+          "avg_outcome_pct": -0.3
+        },
+        "240m": {
+          "n": 51,
+          "win_rate": 0.294,
+          "avg_outcome_pct": -0.61
         }
       }
     },
@@ -6977,6 +6823,28 @@
         }
       }
     },
+    "SKYAIUSDT|burst|LONG": {
+      "symbol": "SKYAIUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 144,
+          "win_rate": 0.306,
+          "avg_outcome_pct": -0.05
+        },
+        "60m": {
+          "n": 144,
+          "win_rate": 0.382,
+          "avg_outcome_pct": -0.05
+        },
+        "240m": {
+          "n": 144,
+          "win_rate": 0.458,
+          "avg_outcome_pct": 0.15
+        }
+      }
+    },
     "MITOUSDT|sustained|SHORT": {
       "symbol": "MITOUSDT",
       "alert_type": "sustained",
@@ -7964,6 +7832,28 @@
           "n": 37,
           "win_rate": 0.514,
           "avg_outcome_pct": 0.58
+        }
+      }
+    },
+    "OPGUSDT|sustained|SHORT": {
+      "symbol": "OPGUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 34,
+          "win_rate": 0.235,
+          "avg_outcome_pct": -0.12
+        },
+        "60m": {
+          "n": 34,
+          "win_rate": 0.382,
+          "avg_outcome_pct": -0.24
+        },
+        "240m": {
+          "n": 34,
+          "win_rate": 0.471,
+          "avg_outcome_pct": 3.43
         }
       }
     },
@@ -9064,6 +8954,28 @@
           "n": 12,
           "win_rate": 0.25,
           "avg_outcome_pct": -0.73
+        }
+      }
+    },
+    "EPICUSDT|sustained|LONG": {
+      "symbol": "EPICUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 98,
+          "win_rate": 0.347,
+          "avg_outcome_pct": -1.41
+        },
+        "60m": {
+          "n": 98,
+          "win_rate": 0.316,
+          "avg_outcome_pct": -1.81
+        },
+        "240m": {
+          "n": 98,
+          "win_rate": 0.439,
+          "avg_outcome_pct": -2.07
         }
       }
     },
@@ -13489,6 +13401,28 @@
         }
       }
     },
+    "TIAUSDT|sustained|LONG": {
+      "symbol": "TIAUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 19,
+          "win_rate": 0.053,
+          "avg_outcome_pct": -0.83
+        },
+        "60m": {
+          "n": 19,
+          "win_rate": 0.053,
+          "avg_outcome_pct": -0.82
+        },
+        "240m": {
+          "n": 19,
+          "win_rate": 0.158,
+          "avg_outcome_pct": -1.36
+        }
+      }
+    },
     "PIEVERSEUSDT|sustained|SHORT": {
       "symbol": "PIEVERSEUSDT",
       "alert_type": "sustained",
@@ -14721,6 +14655,28 @@
         }
       }
     },
+    "KITEUSDT|burst|SHORT": {
+      "symbol": "KITEUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 54,
+          "win_rate": 0.315,
+          "avg_outcome_pct": 0.12
+        },
+        "60m": {
+          "n": 54,
+          "win_rate": 0.352,
+          "avg_outcome_pct": 0.1
+        },
+        "240m": {
+          "n": 54,
+          "win_rate": 0.481,
+          "avg_outcome_pct": 0.52
+        }
+      }
+    },
     "CRWVUSDT|burst|LONG": {
       "symbol": "CRWVUSDT",
       "alert_type": "burst",
@@ -14925,8 +14881,8 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 32,
-          "win_rate": 0.188,
+          "n": 33,
+          "win_rate": 0.182,
           "avg_outcome_pct": -0.19
         },
         "60m": {
@@ -14969,9 +14925,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 31,
-          "win_rate": 0.226,
-          "avg_outcome_pct": -0.11
+          "n": 32,
+          "win_rate": 0.219,
+          "avg_outcome_pct": -0.12
         },
         "60m": {
           "n": 31,
@@ -17930,6 +17886,28 @@
           "n": 21,
           "win_rate": 0.381,
           "avg_outcome_pct": -1.25
+        }
+      }
+    },
+    "OPENUSDT|sustained|SHORT": {
+      "symbol": "OPENUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 11,
+          "win_rate": 0.364,
+          "avg_outcome_pct": 0.44
+        },
+        "60m": {
+          "n": 11,
+          "win_rate": 0.455,
+          "avg_outcome_pct": 0.93
+        },
+        "240m": {
+          "n": 11,
+          "win_rate": 0.545,
+          "avg_outcome_pct": 1.21
         }
       }
     },
@@ -21618,9 +21596,9 @@
           "avg_outcome_pct": 0.54
         },
         "240m": {
-          "n": 8,
-          "win_rate": 0.75,
-          "avg_outcome_pct": 3.83
+          "n": 9,
+          "win_rate": 0.778,
+          "avg_outcome_pct": 4.53
         }
       }
     },
@@ -27988,9 +27966,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 16,
-          "win_rate": 0.375,
-          "avg_outcome_pct": 1.34
+          "n": 17,
+          "win_rate": 0.353,
+          "avg_outcome_pct": 0.85
         },
         "60m": {
           "n": 16,
@@ -28639,6 +28617,28 @@
           "n": 21,
           "win_rate": 0.524,
           "avg_outcome_pct": 0.64
+        }
+      }
+    },
+    "HAEDALUSDT|burst|LONG": {
+      "symbol": "HAEDALUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 9,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -1.99
+        },
+        "60m": {
+          "n": 9,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -2.0
+        },
+        "240m": {
+          "n": 9,
+          "win_rate": 0.444,
+          "avg_outcome_pct": -1.79
         }
       }
     },
@@ -29780,9 +29780,9 @@
           "avg_outcome_pct": -0.45
         },
         "240m": {
-          "n": 50,
-          "win_rate": 0.48,
-          "avg_outcome_pct": 0.19
+          "n": 51,
+          "win_rate": 0.471,
+          "avg_outcome_pct": 0.1
         }
       }
     },
@@ -33454,9 +33454,9 @@
           "avg_outcome_pct": 2.7
         },
         "240m": {
-          "n": 8,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 3.73
+          "n": 9,
+          "win_rate": 0.444,
+          "avg_outcome_pct": 2.65
         }
       }
     },
