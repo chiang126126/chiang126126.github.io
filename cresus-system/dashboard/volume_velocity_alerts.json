@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-13T21:24:04.214720+00:00",
+  "updated_at": "2026-08-13T21:51:56.405866+00:00",
   "scan_universe": 200,
   "thresholds": {
     "volume_burst_ratio": 5.0,
@@ -8,6 +8,40 @@
     "sustained_price_10m_pct": 1.5,
     "dedup_window_min": 30
   },
-  "alerts_count": 0,
-  "alerts": []
+  "alerts_count": 1,
+  "alerts": [
+    {
+      "symbol": "ETHFIUSDT",
+      "base": "ETHFI",
+      "direction": "LONG",
+      "alert_type": "sustained",
+      "price": 0.4449,
+      "price_change_pct": 3.273,
+      "metric_window_min": 10,
+      "volume_1m_usdt": 153336.0,
+      "volume_baseline_usdt": 18450.0,
+      "volume_ratio": 8.31,
+      "detected_at": "2026-08-13T21:45:52.059425+00:00",
+      "intensity": 2,
+      "change_5m_pct": 0.889,
+      "change_15m_pct": 2.006,
+      "change_1h_pct": 3.267,
+      "change_4h_pct": 7.743,
+      "taker_buy_ratio_1m": 0.444,
+      "taker_buy_ratio_5m": 0.486,
+      "oi_delta_5m_pct": 1.356,
+      "top_trader_position_ratio": 2.5224,
+      "top_trader_account_ratio": 1.3105,
+      "global_account_ratio": 1.1119,
+      "funding_rate_pct": 0.005,
+      "atr_pct": 0.8,
+      "range_4h_pct": 9.28,
+      "vol_mult_used": 1.5,
+      "suggested_sl": 0.43956429,
+      "suggested_tp1": 0.45290357,
+      "suggested_tp2": 0.46090714,
+      "conviction_score": 5,
+      "conviction_tier": "diamond"
+    }
+  ]
 }
