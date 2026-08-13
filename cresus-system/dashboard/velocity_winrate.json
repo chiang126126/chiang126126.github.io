@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-13T00:49:50.582286+00:00",
+  "generated_at": "2026-08-13T00:51:58.498515+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "NAORISUSDT|burst|LONG": {
-      "symbol": "NAORISUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 22,
-          "win_rate": 0.227,
-          "avg_outcome_pct": -0.23
-        },
-        "60m": {
-          "n": 22,
-          "win_rate": 0.318,
-          "avg_outcome_pct": -0.25
-        },
-        "240m": {
-          "n": 22,
-          "win_rate": 0.364,
-          "avg_outcome_pct": -0.76
-        }
-      }
-    },
     "COAIUSDT|burst|SHORT": {
       "symbol": "COAIUSDT",
       "alert_type": "burst",
@@ -3476,6 +3454,28 @@
           "n": 40,
           "win_rate": 0.25,
           "avg_outcome_pct": -0.87
+        }
+      }
+    },
+    "NAORISUSDT|burst|LONG": {
+      "symbol": "NAORISUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 21,
+          "win_rate": 0.238,
+          "avg_outcome_pct": -0.19
+        },
+        "60m": {
+          "n": 21,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -0.21
+        },
+        "240m": {
+          "n": 21,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -0.84
         }
       }
     },
