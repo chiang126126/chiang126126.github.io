@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-08-13T10:48:20.694595+00:00",
+  "generated_at": "2026-08-13T10:50:40.394482+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "PIEVERSEUSDT|burst|SHORT": {
-      "symbol": "PIEVERSEUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 32,
-          "win_rate": 0.25,
-          "avg_outcome_pct": -0.05
-        },
-        "60m": {
-          "n": 32,
-          "win_rate": 0.375,
-          "avg_outcome_pct": -0.01
-        },
-        "240m": {
-          "n": 32,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 0.4
-        }
-      }
-    },
-    "NAORISUSDT|burst|SHORT": {
-      "symbol": "NAORISUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 21,
-          "win_rate": 0.381,
-          "avg_outcome_pct": 0.22
-        },
-        "60m": {
-          "n": 21,
-          "win_rate": 0.381,
-          "avg_outcome_pct": 0.3
-        },
-        "240m": {
-          "n": 21,
-          "win_rate": 0.524,
-          "avg_outcome_pct": 0.21
-        }
-      }
-    },
     "SIRENUSDT|sustained|SHORT": {
       "symbol": "SIRENUSDT",
       "alert_type": "sustained",
@@ -883,6 +839,28 @@
         }
       }
     },
+    "NAORISUSDT|burst|SHORT": {
+      "symbol": "NAORISUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 20,
+          "win_rate": 0.35,
+          "avg_outcome_pct": 0.03
+        },
+        "60m": {
+          "n": 20,
+          "win_rate": 0.35,
+          "avg_outcome_pct": 0.14
+        },
+        "240m": {
+          "n": 20,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 0.1
+        }
+      }
+    },
     "ESPORTSUSDT|burst|LONG": {
       "symbol": "ESPORTSUSDT",
       "alert_type": "burst",
@@ -955,9 +933,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 66,
-          "win_rate": 0.318,
-          "avg_outcome_pct": 0.56
+          "n": 67,
+          "win_rate": 0.328,
+          "avg_outcome_pct": 0.64
         },
         "60m": {
           "n": 66,
@@ -13156,6 +13134,28 @@
           "n": 16,
           "win_rate": 0.375,
           "avg_outcome_pct": -0.45
+        }
+      }
+    },
+    "PIEVERSEUSDT|burst|SHORT": {
+      "symbol": "PIEVERSEUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 31,
+          "win_rate": 0.226,
+          "avg_outcome_pct": -0.08
+        },
+        "60m": {
+          "n": 31,
+          "win_rate": 0.387,
+          "avg_outcome_pct": -0.01
+        },
+        "240m": {
+          "n": 31,
+          "win_rate": 0.484,
+          "avg_outcome_pct": 0.39
         }
       }
     },
