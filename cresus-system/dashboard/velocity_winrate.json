@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-13T03:32:23.279965+00:00",
+  "generated_at": "2026-08-13T03:34:29.234225+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "TRADOORUSDT|sustained|LONG": {
-      "symbol": "TRADOORUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 20,
-          "win_rate": 0.45,
-          "avg_outcome_pct": 0.26
-        },
-        "60m": {
-          "n": 20,
-          "win_rate": 0.45,
-          "avg_outcome_pct": 0.45
-        },
-        "240m": {
-          "n": 20,
-          "win_rate": 0.35,
-          "avg_outcome_pct": -3.26
-        }
-      }
-    },
     "WUSDT|burst|SHORT": {
       "symbol": "WUSDT",
       "alert_type": "burst",
@@ -528,6 +506,28 @@
           "n": 166,
           "win_rate": 0.494,
           "avg_outcome_pct": 1.89
+        }
+      }
+    },
+    "TRADOORUSDT|sustained|LONG": {
+      "symbol": "TRADOORUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 19,
+          "win_rate": 0.474,
+          "avg_outcome_pct": 0.38
+        },
+        "60m": {
+          "n": 19,
+          "win_rate": 0.421,
+          "avg_outcome_pct": 0.19
+        },
+        "240m": {
+          "n": 19,
+          "win_rate": 0.368,
+          "avg_outcome_pct": -3.32
         }
       }
     },
