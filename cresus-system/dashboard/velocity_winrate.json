@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-13T04:49:37.146688+00:00",
+  "generated_at": "2026-08-13T04:51:45.589198+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "DEXEUSDT|burst|LONG": {
-      "symbol": "DEXEUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 130,
-          "win_rate": 0.254,
-          "avg_outcome_pct": 0.02
-        },
-        "60m": {
-          "n": 130,
-          "win_rate": 0.254,
-          "avg_outcome_pct": 0.05
-        },
-        "240m": {
-          "n": 130,
-          "win_rate": 0.354,
-          "avg_outcome_pct": 0.04
-        }
-      }
-    },
     "TRADOORUSDT|sustained|SHORT": {
       "symbol": "TRADOORUSDT",
       "alert_type": "sustained",
@@ -1430,6 +1408,28 @@
           "n": 57,
           "win_rate": 0.439,
           "avg_outcome_pct": 1.67
+        }
+      }
+    },
+    "DEXEUSDT|burst|LONG": {
+      "symbol": "DEXEUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 129,
+          "win_rate": 0.256,
+          "avg_outcome_pct": 0.02
+        },
+        "60m": {
+          "n": 129,
+          "win_rate": 0.256,
+          "avg_outcome_pct": 0.08
+        },
+        "240m": {
+          "n": 129,
+          "win_rate": 0.357,
+          "avg_outcome_pct": 0.06
         }
       }
     },
@@ -17868,9 +17868,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 52,
-          "win_rate": 0.346,
-          "avg_outcome_pct": 0.26
+          "n": 53,
+          "win_rate": 0.34,
+          "avg_outcome_pct": 0.23
         },
         "60m": {
           "n": 52,
