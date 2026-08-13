@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-13T10:55:13.931147+00:00",
+  "generated_at": "2026-08-13T10:57:29.248079+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "COAIUSDT|burst|SHORT": {
-      "symbol": "COAIUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 48,
-          "win_rate": 0.25,
-          "avg_outcome_pct": -0.11
-        },
-        "60m": {
-          "n": 48,
-          "win_rate": 0.354,
-          "avg_outcome_pct": -0.18
-        },
-        "240m": {
-          "n": 48,
-          "win_rate": 0.438,
-          "avg_outcome_pct": 0.78
-        }
-      }
-    },
     "KAITOUSDT|burst|LONG": {
       "symbol": "KAITOUSDT",
       "alert_type": "burst",
@@ -2376,6 +2354,28 @@
           "n": 20,
           "win_rate": 0.3,
           "avg_outcome_pct": -0.47
+        }
+      }
+    },
+    "COAIUSDT|burst|SHORT": {
+      "symbol": "COAIUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 47,
+          "win_rate": 0.255,
+          "avg_outcome_pct": -0.1
+        },
+        "60m": {
+          "n": 47,
+          "win_rate": 0.34,
+          "avg_outcome_pct": -0.24
+        },
+        "240m": {
+          "n": 47,
+          "win_rate": 0.426,
+          "avg_outcome_pct": 0.58
         }
       }
     },
