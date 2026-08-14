@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-14T15:14:49.638911+00:00",
+  "generated_at": "2026-08-14T15:17:04.615391+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "XLMUSDT|sustained|LONG": {
-      "symbol": "XLMUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 12,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -0.31
-        },
-        "60m": {
-          "n": 12,
-          "win_rate": 0.417,
-          "avg_outcome_pct": 0.36
-        },
-        "240m": {
-          "n": 12,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -1.33
-        }
-      }
-    },
     "COAIUSDT|burst|SHORT": {
       "symbol": "COAIUSDT",
       "alert_type": "burst",
@@ -572,6 +550,28 @@
           "n": 40,
           "win_rate": 0.475,
           "avg_outcome_pct": 0.78
+        }
+      }
+    },
+    "XLMUSDT|sustained|LONG": {
+      "symbol": "XLMUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 11,
+          "win_rate": 0.273,
+          "avg_outcome_pct": -0.58
+        },
+        "60m": {
+          "n": 11,
+          "win_rate": 0.364,
+          "avg_outcome_pct": 0.21
+        },
+        "240m": {
+          "n": 11,
+          "win_rate": 0.273,
+          "avg_outcome_pct": -1.65
         }
       }
     },
@@ -21591,9 +21591,9 @@
           "avg_outcome_pct": -0.47
         },
         "60m": {
-          "n": 10,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -0.1
+          "n": 11,
+          "win_rate": 0.273,
+          "avg_outcome_pct": -0.03
         },
         "240m": {
           "n": 9,
@@ -33586,6 +33586,18 @@
           "n": 5,
           "win_rate": 0.8,
           "avg_outcome_pct": 2.04
+        }
+      }
+    },
+    "CROSSUSDT|sustained|LONG": {
+      "symbol": "CROSSUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.8,
+          "avg_outcome_pct": 2.34
         }
       }
     }
