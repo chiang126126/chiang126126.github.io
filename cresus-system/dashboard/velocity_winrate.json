@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-14T22:34:00.831016+00:00",
+  "generated_at": "2026-08-14T22:36:07.641257+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "NEIROUSDT|sustained|SHORT": {
-      "symbol": "NEIROUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 6,
-          "win_rate": 0.167,
-          "avg_outcome_pct": 0.3
-        },
-        "60m": {
-          "n": 6,
-          "win_rate": 0.667,
-          "avg_outcome_pct": 0.89
-        },
-        "240m": {
-          "n": 6,
-          "win_rate": 0.667,
-          "avg_outcome_pct": 0.63
-        }
-      }
-    },
     "PYTHUSDT|burst|SHORT": {
       "symbol": "PYTHUSDT",
       "alert_type": "burst",
@@ -8743,9 +8721,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 108,
-          "win_rate": 0.324,
-          "avg_outcome_pct": 0.23
+          "n": 109,
+          "win_rate": 0.321,
+          "avg_outcome_pct": 0.19
         },
         "60m": {
           "n": 108,
@@ -20216,6 +20194,28 @@
         }
       }
     },
+    "NEIROUSDT|sustained|SHORT": {
+      "symbol": "NEIROUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": 0.45
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.8,
+          "avg_outcome_pct": 1.08
+        },
+        "240m": {
+          "n": 5,
+          "win_rate": 0.6,
+          "avg_outcome_pct": 0.41
+        }
+      }
+    },
     "WUSDT|burst|SHORT": {
       "symbol": "WUSDT",
       "alert_type": "burst",
@@ -25336,9 +25336,9 @@
           "avg_outcome_pct": 0.23
         },
         "240m": {
-          "n": 71,
-          "win_rate": 0.394,
-          "avg_outcome_pct": 0.19
+          "n": 72,
+          "win_rate": 0.389,
+          "avg_outcome_pct": -0.09
         }
       }
     },
