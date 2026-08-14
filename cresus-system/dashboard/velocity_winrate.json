@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-14T20:18:41.567891+00:00",
+  "generated_at": "2026-08-14T20:20:51.253736+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "XMRUSDT|sustained|LONG": {
-      "symbol": "XMRUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 6,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.19
-        },
-        "60m": {
-          "n": 6,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 0.31
-        },
-        "240m": {
-          "n": 6,
-          "win_rate": 0.167,
-          "avg_outcome_pct": -2.99
-        }
-      }
-    },
     "JELLYJELLYUSDT|burst|SHORT": {
       "symbol": "JELLYJELLYUSDT",
       "alert_type": "burst",
@@ -286,6 +264,28 @@
           "n": 112,
           "win_rate": 0.562,
           "avg_outcome_pct": 1.1
+        }
+      }
+    },
+    "XMRUSDT|sustained|LONG": {
+      "symbol": "XMRUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": 0.12
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": 0.04
+        },
+        "240m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -2.63
         }
       }
     },
@@ -2913,9 +2913,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 43,
-          "win_rate": 0.349,
-          "avg_outcome_pct": 0.51
+          "n": 44,
+          "win_rate": 0.364,
+          "avg_outcome_pct": 0.62
         },
         "60m": {
           "n": 43,
@@ -3732,9 +3732,9 @@
           "avg_outcome_pct": -0.12
         },
         "60m": {
-          "n": 120,
-          "win_rate": 0.292,
-          "avg_outcome_pct": -0.81
+          "n": 121,
+          "win_rate": 0.298,
+          "avg_outcome_pct": -0.79
         },
         "240m": {
           "n": 120,
@@ -17169,9 +17169,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 72,
-          "win_rate": 0.347,
-          "avg_outcome_pct": 0.28
+          "n": 73,
+          "win_rate": 0.342,
+          "avg_outcome_pct": 0.24
         },
         "60m": {
           "n": 72,
@@ -25385,8 +25385,8 @@
           "avg_outcome_pct": -0.13
         },
         "240m": {
-          "n": 79,
-          "win_rate": 0.494,
+          "n": 80,
+          "win_rate": 0.5,
           "avg_outcome_pct": 0.51
         }
       }
