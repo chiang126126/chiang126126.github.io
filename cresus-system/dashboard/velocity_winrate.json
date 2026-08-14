@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-14T20:31:34.483873+00:00",
+  "generated_at": "2026-08-14T20:33:40.181852+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "IOUSDT|burst|LONG": {
-      "symbol": "IOUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 24,
-          "win_rate": 0.167,
-          "avg_outcome_pct": -0.56
-        },
-        "60m": {
-          "n": 24,
-          "win_rate": 0.25,
-          "avg_outcome_pct": -0.66
-        },
-        "240m": {
-          "n": 24,
-          "win_rate": 0.208,
-          "avg_outcome_pct": -0.91
-        }
-      }
-    },
     "IOUSDT|sustained|LONG": {
       "symbol": "IOUSDT",
       "alert_type": "sustained",
@@ -5019,6 +4997,28 @@
         }
       }
     },
+    "IOUSDT|burst|LONG": {
+      "symbol": "IOUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 23,
+          "win_rate": 0.174,
+          "avg_outcome_pct": -0.5
+        },
+        "60m": {
+          "n": 23,
+          "win_rate": 0.261,
+          "avg_outcome_pct": -0.59
+        },
+        "240m": {
+          "n": 23,
+          "win_rate": 0.217,
+          "avg_outcome_pct": -0.79
+        }
+      }
+    },
     "WLDUSDT|sustained|LONG": {
       "symbol": "WLDUSDT",
       "alert_type": "sustained",
@@ -5113,9 +5113,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 23,
-          "win_rate": 0.217,
-          "avg_outcome_pct": -0.15
+          "n": 24,
+          "win_rate": 0.25,
+          "avg_outcome_pct": 0.08
         },
         "60m": {
           "n": 23,
@@ -31244,9 +31244,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 22,
-          "win_rate": 0.091,
-          "avg_outcome_pct": -0.76
+          "n": 23,
+          "win_rate": 0.087,
+          "avg_outcome_pct": -0.73
         },
         "60m": {
           "n": 22,
