@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-15T15:27:18.586576+00:00",
+  "generated_at": "2026-08-15T15:29:28.678959+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "SNDKUSDT|sustained|SHORT": {
-      "symbol": "SNDKUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 51,
-          "win_rate": 0.412,
-          "avg_outcome_pct": 0.24
-        },
-        "60m": {
-          "n": 51,
-          "win_rate": 0.314,
-          "avg_outcome_pct": 0.16
-        },
-        "240m": {
-          "n": 51,
-          "win_rate": 0.392,
-          "avg_outcome_pct": -0.03
-        }
-      }
-    },
     "TRADOORUSDT|burst|SHORT": {
       "symbol": "TRADOORUSDT",
       "alert_type": "burst",
@@ -8602,6 +8580,28 @@
           "n": 10,
           "win_rate": 0.5,
           "avg_outcome_pct": 0.78
+        }
+      }
+    },
+    "SNDKUSDT|sustained|SHORT": {
+      "symbol": "SNDKUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 50,
+          "win_rate": 0.42,
+          "avg_outcome_pct": 0.25
+        },
+        "60m": {
+          "n": 50,
+          "win_rate": 0.32,
+          "avg_outcome_pct": 0.19
+        },
+        "240m": {
+          "n": 50,
+          "win_rate": 0.4,
+          "avg_outcome_pct": -0.03
         }
       }
     },
