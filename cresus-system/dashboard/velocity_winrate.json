@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-08-16T03:45:58.688986+00:00",
+  "generated_at": "2026-08-16T03:48:12.030109+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "SPXUSDT|sustained|LONG": {
-      "symbol": "SPXUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 25,
-          "win_rate": 0.36,
-          "avg_outcome_pct": -0.13
-        },
-        "60m": {
-          "n": 25,
-          "win_rate": 0.28,
-          "avg_outcome_pct": -0.32
-        },
-        "240m": {
-          "n": 25,
-          "win_rate": 0.4,
-          "avg_outcome_pct": -0.6
-        }
-      }
-    },
-    "VIRTUALUSDT|burst|SHORT": {
-      "symbol": "VIRTUALUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 19,
-          "win_rate": 0.053,
-          "avg_outcome_pct": -0.51
-        },
-        "60m": {
-          "n": 19,
-          "win_rate": 0.158,
-          "avg_outcome_pct": -0.68
-        },
-        "240m": {
-          "n": 19,
-          "win_rate": 0.368,
-          "avg_outcome_pct": -0.88
-        }
-      }
-    },
     "ROSEUSDT|burst|LONG": {
       "symbol": "ROSEUSDT",
       "alert_type": "burst",
@@ -487,6 +443,28 @@
         }
       }
     },
+    "SPXUSDT|sustained|LONG": {
+      "symbol": "SPXUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 24,
+          "win_rate": 0.375,
+          "avg_outcome_pct": -0.05
+        },
+        "60m": {
+          "n": 24,
+          "win_rate": 0.292,
+          "avg_outcome_pct": -0.22
+        },
+        "240m": {
+          "n": 24,
+          "win_rate": 0.417,
+          "avg_outcome_pct": -0.53
+        }
+      }
+    },
     "OPNUSDT|burst|SHORT": {
       "symbol": "OPNUSDT",
       "alert_type": "burst",
@@ -872,9 +850,9 @@
           "avg_outcome_pct": -0.45
         },
         "60m": {
-          "n": 50,
-          "win_rate": 0.22,
-          "avg_outcome_pct": -0.75
+          "n": 51,
+          "win_rate": 0.235,
+          "avg_outcome_pct": -0.72
         },
         "240m": {
           "n": 50,
@@ -8624,6 +8602,28 @@
           "n": 55,
           "win_rate": 0.327,
           "avg_outcome_pct": -0.2
+        }
+      }
+    },
+    "VIRTUALUSDT|burst|SHORT": {
+      "symbol": "VIRTUALUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 18,
+          "win_rate": 0.056,
+          "avg_outcome_pct": -0.52
+        },
+        "60m": {
+          "n": 18,
+          "win_rate": 0.167,
+          "avg_outcome_pct": -0.66
+        },
+        "240m": {
+          "n": 18,
+          "win_rate": 0.389,
+          "avg_outcome_pct": -0.94
         }
       }
     },
@@ -26216,9 +26216,9 @@
           "avg_outcome_pct": -1.77
         },
         "60m": {
-          "n": 11,
+          "n": 12,
           "win_rate": 0.0,
-          "avg_outcome_pct": -2.66
+          "avg_outcome_pct": -2.51
         },
         "240m": {
           "n": 9,
