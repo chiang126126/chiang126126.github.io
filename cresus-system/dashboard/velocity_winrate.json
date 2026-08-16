@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-16T01:55:42.087582+00:00",
+  "generated_at": "2026-08-16T01:57:55.909768+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "TAOUSDT|burst|LONG": {
-      "symbol": "TAOUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 16,
-          "win_rate": 0.25,
-          "avg_outcome_pct": -0.04
-        },
-        "60m": {
-          "n": 16,
-          "win_rate": 0.312,
-          "avg_outcome_pct": -0.01
-        },
-        "240m": {
-          "n": 16,
-          "win_rate": 0.188,
-          "avg_outcome_pct": -0.64
-        }
-      }
-    },
     "2ZUSDT|burst|LONG": {
       "symbol": "2ZUSDT",
       "alert_type": "burst",
@@ -17141,6 +17119,28 @@
         }
       }
     },
+    "TAOUSDT|burst|LONG": {
+      "symbol": "TAOUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 15,
+          "win_rate": 0.267,
+          "avg_outcome_pct": -0.06
+        },
+        "60m": {
+          "n": 15,
+          "win_rate": 0.333,
+          "avg_outcome_pct": 0.05
+        },
+        "240m": {
+          "n": 15,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -0.58
+        }
+      }
+    },
     "SPORTFUNUSDT|sustained|LONG": {
       "symbol": "SPORTFUNUSDT",
       "alert_type": "sustained",
@@ -21777,9 +21777,9 @@
           "avg_outcome_pct": 0.84
         },
         "240m": {
-          "n": 19,
-          "win_rate": 0.421,
-          "avg_outcome_pct": 1.09
+          "n": 20,
+          "win_rate": 0.45,
+          "avg_outcome_pct": 1.26
         }
       }
     },
