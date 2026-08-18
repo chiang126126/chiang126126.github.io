@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-18T10:09:36.141377+00:00",
+  "generated_at": "2026-08-18T10:11:43.809719+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "EDENUSDT|burst|LONG": {
-      "symbol": "EDENUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 51,
-          "win_rate": 0.353,
-          "avg_outcome_pct": 0.24
-        },
-        "60m": {
-          "n": 51,
-          "win_rate": 0.51,
-          "avg_outcome_pct": 0.88
-        },
-        "240m": {
-          "n": 51,
-          "win_rate": 0.471,
-          "avg_outcome_pct": 1.2
-        }
-      }
-    },
     "REUSDT|sustained|LONG": {
       "symbol": "REUSDT",
       "alert_type": "sustained",
@@ -880,6 +858,28 @@
           "n": 30,
           "win_rate": 0.533,
           "avg_outcome_pct": 4.2
+        }
+      }
+    },
+    "EDENUSDT|burst|LONG": {
+      "symbol": "EDENUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 50,
+          "win_rate": 0.34,
+          "avg_outcome_pct": 0.24
+        },
+        "60m": {
+          "n": 50,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 0.86
+        },
+        "240m": {
+          "n": 50,
+          "win_rate": 0.46,
+          "avg_outcome_pct": 1.15
         }
       }
     },
