@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-18T15:23:39.152378+00:00",
+  "generated_at": "2026-08-18T15:25:48.717455+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "KMNOUSDT|burst|SHORT": {
-      "symbol": "KMNOUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 6,
-          "win_rate": 0.167,
-          "avg_outcome_pct": -0.15
-        },
-        "60m": {
-          "n": 6,
-          "win_rate": 0.167,
-          "avg_outcome_pct": -0.11
-        },
-        "240m": {
-          "n": 6,
-          "win_rate": 0.167,
-          "avg_outcome_pct": -0.33
-        }
-      }
-    },
     "LUMIAUSDT|burst|SHORT": {
       "symbol": "LUMIAUSDT",
       "alert_type": "burst",
@@ -20029,9 +20007,9 @@
           "avg_outcome_pct": -0.1
         },
         "60m": {
-          "n": 32,
-          "win_rate": 0.469,
-          "avg_outcome_pct": 0.29
+          "n": 33,
+          "win_rate": 0.455,
+          "avg_outcome_pct": 0.26
         },
         "240m": {
           "n": 32,
@@ -28246,6 +28224,28 @@
         }
       }
     },
+    "KMNOUSDT|burst|SHORT": {
+      "symbol": "KMNOUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -0.15
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -0.36
+        },
+        "240m": {
+          "n": 5,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -0.34
+        }
+      }
+    },
     "TAGUSDT|sustained|LONG": {
       "symbol": "TAGUSDT",
       "alert_type": "sustained",
@@ -30958,9 +30958,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 14,
-          "win_rate": 0.571,
-          "avg_outcome_pct": 0.8
+          "n": 15,
+          "win_rate": 0.533,
+          "avg_outcome_pct": 0.72
         },
         "60m": {
           "n": 14,
