@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-18T01:41:11.098472+00:00",
+  "generated_at": "2026-08-18T01:43:22.891704+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "GENIUSUSDT|sustained|LONG": {
-      "symbol": "GENIUSUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 6,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -1.08
-        },
-        "60m": {
-          "n": 6,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -1.75
-        },
-        "240m": {
-          "n": 6,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -3.21
-        }
-      }
-    },
     "MRVLUSDT|burst|SHORT": {
       "symbol": "MRVLUSDT",
       "alert_type": "burst",
@@ -6248,6 +6226,28 @@
           "n": 83,
           "win_rate": 0.349,
           "avg_outcome_pct": -0.3
+        }
+      }
+    },
+    "GENIUSUSDT|sustained|LONG": {
+      "symbol": "GENIUSUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": -0.82
+        },
+        "60m": {
+          "n": 5,
+          "win_rate": 0.4,
+          "avg_outcome_pct": -1.69
+        },
+        "240m": {
+          "n": 5,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -3.3
         }
       }
     },
