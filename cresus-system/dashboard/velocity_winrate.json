@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-18T21:27:58.214600+00:00",
+  "generated_at": "2026-08-18T21:30:08.979458+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "REUSDT|burst|LONG": {
-      "symbol": "REUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 80,
-          "win_rate": 0.362,
-          "avg_outcome_pct": -0.11
-        },
-        "60m": {
-          "n": 80,
-          "win_rate": 0.425,
-          "avg_outcome_pct": 0.05
-        },
-        "240m": {
-          "n": 80,
-          "win_rate": 0.375,
-          "avg_outcome_pct": -0.34
-        }
-      }
-    },
     "LUMIAUSDT|sustained|SHORT": {
       "symbol": "LUMIAUSDT",
       "alert_type": "sustained",
@@ -2090,6 +2068,28 @@
           "n": 25,
           "win_rate": 0.32,
           "avg_outcome_pct": -0.34
+        }
+      }
+    },
+    "REUSDT|burst|LONG": {
+      "symbol": "REUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 79,
+          "win_rate": 0.367,
+          "avg_outcome_pct": -0.05
+        },
+        "60m": {
+          "n": 79,
+          "win_rate": 0.43,
+          "avg_outcome_pct": 0.06
+        },
+        "240m": {
+          "n": 79,
+          "win_rate": 0.367,
+          "avg_outcome_pct": -0.44
         }
       }
     },
