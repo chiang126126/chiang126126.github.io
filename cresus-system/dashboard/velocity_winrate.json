@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-18T05:48:27.573959+00:00",
+  "generated_at": "2026-08-18T05:50:38.462291+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "HEIUSDT|sustained|SHORT": {
-      "symbol": "HEIUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 70,
-          "win_rate": 0.357,
-          "avg_outcome_pct": 0.07
-        },
-        "60m": {
-          "n": 70,
-          "win_rate": 0.443,
-          "avg_outcome_pct": 0.93
-        },
-        "240m": {
-          "n": 70,
-          "win_rate": 0.429,
-          "avg_outcome_pct": -1.18
-        }
-      }
-    },
     "ALLOUSDT|burst|LONG": {
       "symbol": "ALLOUSDT",
       "alert_type": "burst",
@@ -990,6 +968,28 @@
           "n": 29,
           "win_rate": 0.276,
           "avg_outcome_pct": -0.54
+        }
+      }
+    },
+    "HEIUSDT|sustained|SHORT": {
+      "symbol": "HEIUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 69,
+          "win_rate": 0.362,
+          "avg_outcome_pct": 0.25
+        },
+        "60m": {
+          "n": 69,
+          "win_rate": 0.449,
+          "avg_outcome_pct": 1.22
+        },
+        "240m": {
+          "n": 69,
+          "win_rate": 0.435,
+          "avg_outcome_pct": -0.67
         }
       }
     },
