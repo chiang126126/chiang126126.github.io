@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-08-19T08:46:48.273795+00:00",
+  "generated_at": "2026-08-19T08:48:54.711579+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "YGGUSDT|sustained|LONG": {
-      "symbol": "YGGUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 10,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -1.02
-        },
-        "60m": {
-          "n": 10,
-          "win_rate": 0.1,
-          "avg_outcome_pct": -1.73
-        },
-        "240m": {
-          "n": 10,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -3.65
-        }
-      }
-    },
-    "CLOUSDT|burst|LONG": {
-      "symbol": "CLOUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 112,
-          "win_rate": 0.321,
-          "avg_outcome_pct": -0.25
-        },
-        "60m": {
-          "n": 112,
-          "win_rate": 0.33,
-          "avg_outcome_pct": -0.13
-        },
-        "240m": {
-          "n": 112,
-          "win_rate": 0.321,
-          "avg_outcome_pct": -0.68
-        }
-      }
-    },
     "BASEDUSDT|burst|SHORT": {
       "symbol": "BASEDUSDT",
       "alert_type": "burst",
@@ -6713,6 +6669,28 @@
         }
       }
     },
+    "CLOUSDT|burst|LONG": {
+      "symbol": "CLOUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 111,
+          "win_rate": 0.324,
+          "avg_outcome_pct": -0.24
+        },
+        "60m": {
+          "n": 111,
+          "win_rate": 0.333,
+          "avg_outcome_pct": -0.12
+        },
+        "240m": {
+          "n": 111,
+          "win_rate": 0.315,
+          "avg_outcome_pct": -0.7
+        }
+      }
+    },
     "AXSUSDT|burst|SHORT": {
       "symbol": "AXSUSDT",
       "alert_type": "burst",
@@ -7106,6 +7084,28 @@
           "n": 149,
           "win_rate": 0.389,
           "avg_outcome_pct": -0.41
+        }
+      }
+    },
+    "YGGUSDT|sustained|LONG": {
+      "symbol": "YGGUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 9,
+          "win_rate": 0.222,
+          "avg_outcome_pct": -1.05
+        },
+        "60m": {
+          "n": 9,
+          "win_rate": 0.111,
+          "avg_outcome_pct": -1.96
+        },
+        "240m": {
+          "n": 9,
+          "win_rate": 0.222,
+          "avg_outcome_pct": -3.98
         }
       }
     },
