@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-19T18:43:13.943236+00:00",
+  "generated_at": "2026-08-19T18:45:23.979593+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "SWARMSUSDT|burst|LONG": {
-      "symbol": "SWARMSUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 11,
-          "win_rate": 0.091,
-          "avg_outcome_pct": -0.48
-        },
-        "60m": {
-          "n": 11,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -1.03
-        },
-        "240m": {
-          "n": 11,
-          "win_rate": 0.273,
-          "avg_outcome_pct": -0.27
-        }
-      }
-    },
     "PLAYUSDT|burst|SHORT": {
       "symbol": "PLAYUSDT",
       "alert_type": "burst",
@@ -1298,6 +1276,28 @@
           "n": 7,
           "win_rate": 0.571,
           "avg_outcome_pct": 0.14
+        }
+      }
+    },
+    "SWARMSUSDT|burst|LONG": {
+      "symbol": "SWARMSUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 10,
+          "win_rate": 0.1,
+          "avg_outcome_pct": -0.52
+        },
+        "60m": {
+          "n": 10,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -1.1
+        },
+        "240m": {
+          "n": 10,
+          "win_rate": 0.2,
+          "avg_outcome_pct": -0.46
         }
       }
     },
