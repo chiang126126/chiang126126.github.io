@@ -102,10 +102,13 @@ def load_json(path, default):
         return default
 
 
-def save_json(path, obj):
+def save_json(path, obj, compact=False):
     tmp = path + ".tmp"
     with open(tmp, "w") as f:
-        json.dump(obj, f, ensure_ascii=False, indent=1)
+        if compact:
+            json.dump(obj, f, ensure_ascii=False, separators=(",", ":"))
+        else:
+            json.dump(obj, f, ensure_ascii=False, indent=1)
     os.replace(tmp, path)
 
 
@@ -455,7 +458,12 @@ def main_forward():
             except Exception:
                 funding = None
             run_book(book, sym, kl, day_map_from(dkl), trades, funding)
-            save_json(fpath("klines_1d_" + sym), dkl[-400:])   # 存档日线供复盘
+            save_json(fpath("klines_1d_" + sym), dkl[-400:], compact=True)   # 日线存档供复盘
+            # 1h K线增量合并存档(回测写的95天大档只增不缩, 滚动上限≈104天)
+            arch = load_json(fpath("klines_1h_" + sym), [])
+            last_arch_t = arch[-1]["t"] if arch else 0
+            arch += [x for x in kl if x["t"] > last_arch_t]
+            save_json(fpath("klines_1h_" + sym), arch[-2500:], compact=True)
         except Exception as e:
             book["signal"] = {"at": now_iso(), "text": f"⚠ 数据获取失败：{e}", "regime": None}
         print(f"[sim] {sym}: 权益 {book['equity']:.2f}  {book['signal']['text'] if book['signal'] else ''}")
@@ -478,6 +486,9 @@ def main_backfill(days):
     for sym in BOOKS:
         kl = closed_only(klines_range(sym, "1h", start_ms))
         dkl = klines_range(sym, "1d", start_ms - 40 * 86400_000)
+        # 原始K线存档：让无行情网络的云端环境也能独立回放/调参(证据化优化的前提)
+        save_json(fpath("klines_1h_" + sym), kl, compact=True)
+        save_json(fpath("klines_1d_" + sym), dkl, compact=True)
         book, trades = new_book(), []
         book["last_t"] = kl[40]["t"]              # 留出指标窗口
         run_book(book, sym, kl, day_map_from(dkl), trades, funding=None)

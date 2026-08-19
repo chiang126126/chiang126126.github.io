@@ -61,8 +61,12 @@
   当日亏≥3%当日停机；距峰值回撤≥25%整册停机待人工检视；离场后至少隔一根K线才可再进场。
 - **册**：BTC/ETH 各1000U独立核算，单笔风险1.5%，名义≤3×册权益(杠杆帽3x)，taker 0.05%/边。
 - **口径**：入场=信号蜡烛收盘价；同一根K线双触先算止损(悲观)；回测不含资金费(已知略偏乐观)。
-- 运行：`run_local.sh` 每小时自动带起(失败不影响主循环)；`python3 sim.py --backfill 95` 生成
-  近95天规则回测(sim_backtest.json，看板展示)；`python3 sim.py --reset` 双册清零重来。
+- 运行：`run_local.sh` 每小时自动带起(失败不影响主循环)。手动回测**必须带 .env 环境**
+  (否则报告落在源码目录不进看板)：
+  `cd ~/mp500/mp500-bot && set -a && . ./.env && set +a && DATA_DIR="$DATA_REPO/data" python3 sim.py --backfill 95`
+  然后 `git -C "$DATA_REPO" add data/ && git -C "$DATA_REPO" commit -m "sim backtest" && git -C "$DATA_REPO" push`。
+  回测同时把95天原始1h/1d K线写入 klines_1h_*/klines_1d_*(供云端独立回放调参)。
+  `python3 sim.py --reset` 双册清零重来。
 - 绝不下真实订单：不接任何交易所私有接口，只读公开K线。
 
 ## 出场管理(S0 首轮复盘后加入)
