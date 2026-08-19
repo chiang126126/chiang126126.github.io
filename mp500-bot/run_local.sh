@@ -25,6 +25,7 @@ if [ -n "$DATA_REPO" ]; then
   export DATA_DIR="$DATA_REPO/data"
   mkdir -p "$DATA_DIR"
   python3 bot.py
+  python3 sim.py || echo "[sim] 模拟舱本轮失败（不影响主循环）"
   git -C "$DATA_REPO" add data/
   if git -C "$DATA_REPO" commit -q -m "local bot run $(date -u +%FT%TZ)"; then
     git -C "$DATA_REPO" push -q && echo "✅ 已推送数据，看板将更新"
@@ -36,5 +37,6 @@ else
   export DATA_DIR="${DATA_DIR:-./data}"
   mkdir -p "$DATA_DIR"
   python3 bot.py
+  python3 sim.py || echo "[sim] 模拟舱本轮失败（不影响主循环）"
   echo "✅ 本地完成，数据在 $DATA_DIR（未推送看板）"
 fi

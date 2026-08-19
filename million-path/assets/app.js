@@ -1567,11 +1567,72 @@ function updateRhythm() {
   const now = $("rhythmNow"); if (now) now.textContent = `巴黎时间 ${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 }
 
+//==================== 模拟舱（BTC/ETH 双册·纯模拟·非实盘）====================
+async function loadSim() {
+  const box = $("simBooks"); if (!box) return;
+  let log = null, st = null, trades = [], bt = null;
+  try { log = await jget("./data/sim_log.json", { cache: "no-store" }); } catch (e) { }
+  try { st = await jget("./data/sim_state.json", { cache: "no-store" }); } catch (e) { }
+  try { trades = await jget("./data/sim_trades.json", { cache: "no-store" }); } catch (e) { }
+  try { bt = await jget("./data/sim_backtest.json", { cache: "no-store" }); } catch (e) { }
+  if (bt) renderSimBacktest(bt);
+  if (!log || !st) return;                      // 尚未运行：保留占位说明
+  const u = $("simUpd"); if (u) u.textContent = "更新于 " + String(log.updated_at || "").replace("T", " ").replace("Z", " UTC");
+  const regB = r => r === "trend_up" ? '<span class="chip risk-on">📈 趋势↑</span>'
+    : r === "trend_down" ? '<span class="chip risk-off">📉 趋势↓</span>'
+      : r === "range" ? '<span class="chip neutral">↔ 震荡</span>' : "";
+  box.innerHTML = ["BTCUSDT", "ETHUSDT"].map(sym => {
+    const b = (st.books || {})[sym]; if (!b) return "";
+    const stats = ((log.books || {})[sym] || {}).stats || {};
+    const ret = (b.equity / 1000 - 1) * 100;
+    const sig = b.signal || {}, pos = b.pos;
+    const posLine = pos
+      ? `<div style="font-size:12px;margin-top:6px">持仓 <b class="${pos.side === "LONG" ? "g" : "r"}">${pos.side === "LONG" ? "多" : "空"}</b> @${money(pos.entry)} · 止损 ${money(pos.stop)}(${pos.stop_kind}) · 目标 ${money(pos.target)} · ${pos.tag}</div>`
+      : '<div style="font-size:12px;margin-top:6px;color:var(--muted)">空仓</div>';
+    return `<div class="card"${b.halted ? ' style="border-color:var(--red)"' : ""}>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <b style="font-size:14px">${sym.replace("USDT", "")} 册</b>${regB(sig.regime)}
+        ${b.halted ? '<span class="chip risk-off">⛔ 已停机</span>' : ""}
+        <span style="margin-left:auto;font-size:16px;font-weight:800" class="${ret >= 0 ? "g" : "r"}">${money(b.equity)} U</span>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:3px">收益 <b class="${ret >= 0 ? "g" : "r"}">${ret >= 0 ? "+" : "−"}${Math.abs(ret).toFixed(2)}%</b>
+        · ${stats.n || 0}笔 · 胜率 ${stats.wr != null ? stats.wr + "%" : "—"} · PF ${stats.pf != null ? stats.pf : "—"}</div>
+      ${posLine}
+      <div style="font-size:11.5px;margin-top:7px;padding-top:7px;border-top:1px dashed var(--border);line-height:1.6">${sig.text || "—"}<span style="color:var(--muted);opacity:.7"> · ${String(sig.at || "").slice(11, 16)} UTC</span></div>
+    </div>`;
+  }).join("");
+  const tb = $("simTradesBody");
+  if (tb) {
+    if (!trades.length) tb.innerHTML = '<tr><td colspan="9" class="badge">暂无成交</td></tr>';
+    else tb.innerHTML = trades.slice(-8).reverse().map(t => `<tr>
+      <td><b>${t.symbol.replace("USDT", "")}</b> <span class="${t.side === "LONG" ? "g" : "r"}">${t.side === "LONG" ? "多" : "空"}</span></td>
+      <td style="font-size:11px">${t.tag || ""}</td>
+      <td>${money(t.entry)}→${money(t.exit)}</td>
+      <td class="${t.pnl >= 0 ? "g" : "r"}"><b>${t.pnl >= 0 ? "+" : "−"}${Math.abs(t.pnl).toFixed(2)}</b></td>
+      <td>${t.r}</td><td>${t.mfe_pct}%</td><td>${t.hold_hours}h</td>
+      <td>${t.exit_reason}</td><td style="font-size:11px">${String(t.closed_at || "").slice(5, 16).replace("T", " ")}</td></tr>`).join("");
+  }
+}
+function renderSimBacktest(bt) {
+  const el = $("simBacktest"); if (!el) return;
+  const b = bt.books || {};
+  el.className = "";
+  el.innerHTML = '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px">' +
+    ["BTCUSDT", "ETHUSDT"].map(sym => {
+      const s = (b[sym] || {}).stats || {};
+      const net = s.net || 0;
+      return `<div class="card"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b>${sym.replace("USDT", "")}</b>
+        <span style="font-size:10.5px;color:var(--muted)">${s.period || ""}</span>
+        <b class="${net >= 0 ? "g" : "r"}" style="margin-left:auto">${net >= 0 ? "+" : "−"}${Math.abs(net).toFixed(0)}U</b></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">${s.n || 0}笔 · 胜率${s.wr ?? "—"}% · PF ${s.pf ?? "—"} · 最大回撤${s.max_dd ?? "—"}% · 期末 ${money(s.equity || 0)}U · 手续费${s.fees ?? "—"}U</div></div>`;
+    }).join("") + `</div><div class="badge" style="margin-top:6px">${bt.note || ""}（生成于 ${String(bt.generated_at || "").slice(0, 16).replace("T", " ")}Z）</div>`;
+}
+
 async function refreshLive() {
   // 并行刷新所有信息面板，等全部结束后再（可选）自动重建 Evidence
   await Promise.allSettled([
     loadMarket(), loadSentiment(), loadCryptoMacro(), loadDefi(),
-    loadCryptoNews(), loadFred(), loadUsStocks(), loadMstr(), loadBot()
+    loadCryptoNews(), loadFred(), loadUsStocks(), loadMstr(), loadBot(), loadSim()
   ]);
   await loadRhythmLive();   // 一日节奏·实时研报（先算，行动卡要用它的关键位/OI/相对强弱缓存）
   renderDecision();         // AI 决策快照 = 完整行动卡（确定性规则版）

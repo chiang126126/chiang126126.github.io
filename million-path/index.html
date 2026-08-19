@@ -309,14 +309,14 @@
 
   <nav class="nav">
     <a href="#sec-overview">概览</a><a href="#sec-market">行情</a><a href="#sec-rhythm">📅节奏</a>
-    <a href="#sec-ai">AI决策</a><a href="#sec-bot">🤖机器人</a><a href="#sec-env">市场环境</a><a href="#sec-news">加密新闻</a>
+    <a href="#sec-ai">AI决策</a><a href="#sec-bot">🤖机器人</a><a href="#sec-sim">🎮模拟舱</a><a href="#sec-env">市场环境</a><a href="#sec-news">加密新闻</a>
     <a href="#sec-us">美股·宏观</a><a href="#sec-trades">复盘</a><a href="#sec-stats">测算</a>
   </nav>
 
   <!-- 右侧悬浮电梯层（桌面） + 回顶 -->
   <nav class="elev" id="elev">
     <a href="#sec-overview">概览</a><a href="#sec-market">行情</a><a href="#sec-rhythm">节奏</a>
-    <a href="#sec-ai">AI决策</a><a href="#sec-bot">机器人</a><a href="#sec-env">环境</a><a href="#sec-news">新闻</a>
+    <a href="#sec-ai">AI决策</a><a href="#sec-bot">机器人</a><a href="#sec-sim">模拟舱</a><a href="#sec-env">环境</a><a href="#sec-news">新闻</a>
     <a href="#sec-us">美股</a><a href="#sec-trades">复盘</a><a href="#sec-stats">测算</a>
   </nav>
   <button class="totop" id="toTop" title="回到顶部">↑</button>
@@ -448,6 +448,19 @@
     <div style="text-align:center;margin-top:8px"><button class="btn" id="tradesMoreBtn" style="display:none"></button></div>
   </section>
 
+  <!-- 模拟舱：BTC/ETH 专注双册（纯模拟，与主机器人并行对照） -->
+  <section id="sec-sim" class="panel">
+    <h2><span class="bar"></span>🎮 模拟舱 · BTC/ETH 专注双册<span class="chip neutral" style="font-size:10px">纯模拟·非实盘</span><span class="badge" id="simUpd" style="margin-left:auto;font-weight:400"></span></h2>
+    <div class="badge" style="margin-bottom:12px">与主机器人并行的第二套策略（对照实验）：<b>先判市场形态、再选打法</b>——趋势市顺势回踩30h线进场、追踪止盈吃趋势；震荡市只在昨高/昨低边缘反手、小目标快进快出。管制：连续2次止损冷静12h · 每日最多进场2次 · 当日亏3%停机 · 回撤25%整册停机。各 <b>1000U</b> 起步 · 杠杆帽 3× · 单笔风险 1.5% · 每小时给出买卖信号或明确的"不出手"原因。</div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-bottom:12px" id="simBooks"><div class="badge">等待模拟舱第一次运行…（在 Mac 上 git pull 后，每小时任务会自动带起）</div></div>
+    <div class="k" style="font-size:11px;color:var(--muted);margin:8px 0 6px">📡 规则回测 · 同一套规则回放近95天真实K线（检验用，与前向模拟分开计账）</div>
+    <div id="simBacktest" class="badge">尚未生成回测报告——在 Mac 上运行一次：cd ~/mp500/mp500-bot && python3 sim.py --backfill 95</div>
+    <div class="k" style="font-size:11px;color:var(--muted);margin:14px 0 6px">模拟舱已平仓（最近 8 笔）</div>
+    <div class="tablewrap"><table class="resp">
+      <thead><tr><th>标的/方向</th><th>打法</th><th>入场→出场</th><th>盈亏</th><th>R</th><th>最佳浮盈</th><th>持仓</th><th>出场</th><th>时间</th></tr></thead>
+      <tbody id="simTradesBody"><tr><td colspan="9" class="badge">暂无成交</td></tr></tbody></table></div>
+  </section>
+
 
   <!-- ⑤ 市场环境（宏观 / 链上 / 情绪 / 事件 融合） -->
   <section id="sec-env" class="panel">
@@ -569,7 +582,7 @@
     ⚠️ 本看板为纪律与复盘工具，行情数据仅供参考、可能延迟或因网络/地区受限；<b>不构成投资建议</b>，加密交易可能损失全部本金。任何收益目标必须服从风控。
   </div>
 
-  <script src="./config.js?v=51"></script>
-  <script src="./assets/app.js?v=51"></script>
+  <script src="./config.js?v=52"></script>
+  <script src="./assets/app.js?v=52"></script>
 </body>
 </html>
