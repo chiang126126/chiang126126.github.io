@@ -40,7 +40,9 @@ check("数据不足=range", r == "range", r)
 
 # ═══ ② 进场信号 ═══
 print("── entry_signal")
-CTX = {"ma30h": 100.0, "rsi": 55.0, "atr_pct": 0.010, "vol_ratio": 1.0}
+#（v2 质量闸字段: hh24/ll24=近24h极值证明趋势延伸; lo_prevN/hi_prevN=此前8h极值判定第一次回踩）
+CTX = {"ma30h": 100.0, "rsi": 55.0, "atr_pct": 0.010, "vol_ratio": 1.0,
+       "hh24": 102.0, "ll24": 98.5, "lo_prevN": 100.5, "hi_prevN": 99.5}
 PD = {"h": 104.0, "l": 96.0, "c": 100.0}
 # 趋势多：下探触及30h线后收复
 k = mk(0, 100.6, 100.8, 99.9, 100.5)
@@ -58,7 +60,16 @@ check("趋势RSI>70不追多", sig is None)
 # 趋势空：反抽受阻
 sig, why = sim.entry_signal("trend_down", mk(0, 99.5, 100.1, 99.2, 99.6), dict(CTX, rsi=45.0), PD)
 check("趋势·反抽受阻→SHORT", sig and sig[0] == "SHORT", why)
-# 震荡：摸昨高受阻做空(RSI≥58)
+# v2 质量闸
+sig, why = sim.entry_signal("trend_up", k, dict(CTX, hh24=100.5), PD)
+check("v2·近24h无延伸=贴线磨不进场", sig is None and "贴线磨" in why, why)
+sig, why = sim.entry_signal("trend_up", k, dict(CTX, lo_prevN=100.0), PD)
+check("v2·8h内已触线=非首踩不进场", sig is None and "已被触过" in why, why)
+sig, why = sim.entry_signal("range", mk(0, 103, 104.1, 102.8, 103.5), dict(CTX, rsi=65.0), PD, dev=0.5)
+check("v2·漂移向上不空昨高", sig is None and "漂移" in why, why)
+sig, why = sim.entry_signal("range", mk(0, 96.5, 97.0, 95.9, 96.4), dict(CTX, rsi=35.0), PD, dev=-0.5)
+check("v2·漂移向下不接昨低", sig is None and "漂移" in why, why)
+# 震荡：摸昨高受阻做空(RSI≥62)
 sig, why = sim.entry_signal("range", mk(0, 103, 104.1, 102.8, 103.5), dict(CTX, rsi=62.0), PD)
 check("震荡·摸昨高→SHORT", sig and sig[0] == "SHORT", why)
 check("震荡止损=0.7×ATR", sig and abs(sig[1] - 0.007) < 1e-9)
@@ -135,13 +146,16 @@ real_entry_signal = sim.entry_signal
 fire_at = set()
 
 
-def stub_signal(regime, k, ctx, prev_day, funding=None):
+def stub_signal(regime, k, ctx, prev_day, funding=None, dev=None):
     if k["t"] in fire_at:
         return ("LONG", 0.01, 2.0, 48, "桩·多"), None
     return None, "桩·等待"
 
 
 sim.entry_signal = stub_signal
+# 集成场景只测册级机制本身(冷静期/上限/记账)，管制参数固定为宽松口径以免与 v2 默认值耦合
+sim.REENTRY_GAP_H = 1
+sim.MAX_ENTRIES_PER_DAY = 2
 # 70根平稳历史(喂指标窗口) + 信号烛 + 止损烛
 base = [mk(i * H, 100, 100.3, 99.7, 100 + (i % 3 - 1) * 0.05) for i in range(70)]
 DAYMAP = {utc_date: {"h": 104.0, "l": 96.0, "c": 100.0} for utc_date in
@@ -223,7 +237,7 @@ fire_at.update({72 * H, 75 * H})
 # 手动放大单笔亏损: 用2%止损桩
 
 
-def stub2(regime, k, ctx, prev_day, funding=None):
+def stub2(regime, k, ctx, prev_day, funding=None, dev=None):
     if k["t"] in fire_at:
         return ("LONG", 0.02, 2.0, 48, "桩·多"), None
     return None, "桩·等待"

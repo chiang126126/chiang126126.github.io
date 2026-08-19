@@ -31,6 +31,7 @@ jobs:
           # （如缓存版本号 v48→v49）会被 rsync 快速校验误判为"未变化"而漏同步
           rsync -a --delete --checksum \
             --exclude '.git' --exclude 'reviews/' \
+            --exclude 'data/sim_*' --exclude 'data/klines_*' \
             $(for f in $PRESERVE; do echo --exclude "$f"; done) \
             million-path/ dest/
 

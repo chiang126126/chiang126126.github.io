@@ -59,8 +59,8 @@ R_STOP_MIN = 0.004
 R_STOP_MAX = 0.010
 R_RR = 1.8
 R_MAX_HOLD = 24
-R_RSI_HI = 58             # 摸昨高做空需 RSI≥58(确有过热)
-R_RSI_LO = 42             # 探昨低做多需 RSI≤42
+R_RSI_HI = 62             # 摸昨高做空需 RSI≥62(确有过热; v2 自 58 收紧)
+R_RSI_LO = 38             # 探昨低做多需 RSI≤38(v2 自 42 收紧)
 EDGE_TOUCH = 0.002        # 触及边缘容差 0.2%
 
 # ── 形态判定（日线）──
@@ -71,11 +71,20 @@ REGIME_SLOPE_D = 5        # 且30日线相对5天前同向
 FUNDING_BLOCK_SHORT = -0.05   # 资费≤-0.05% 空头拥挤 → 禁开空
 FUNDING_BLOCK_LONG = 0.10     # 资费≥+0.10% 多头过热 → 禁开多
 VOL_SPIKE_SKIP = 2.5          # 量能≥2.5×常态 → 事件行情不开新仓
-MAX_ENTRIES_PER_DAY = 2       # 每册每UTC日最多进场2次
+MAX_ENTRIES_PER_DAY = 1       # 每册每UTC日最多进场N次(v2 自 2 收紧)
 COOLDOWN_STOPS = 2            # 连续2笔裸止损 → 冷静
 COOLDOWN_HOURS = 12
 DAY_LOSS_HALT = 3.0           # 当日册亏损≥3% → 当日停机
 BOOK_DD_HALT = 25.0           # 距册峰值回撤≥25% → 整册停机待人工检视
+
+# ── v2 信号质量闸（95天回测证据: v1 病根=频率×手续费347U+假趋势回踩+逆漂移边缘反手。
+#    v2 在同段回放: 17笔 +117U, BTC PF 1.26 / ETH PF 6.62(小样本), 最大回撤<5%;
+#    且参数平台宽阔(TOUCH 8-12h × GAP 4-8h × RSI 60-66 全为正), 非尖峰拟合。
+#    警示: 以上为样本内结果, 真正的检验是前向模拟——PF 连续8周>1.3 才谈实盘。）──
+REENTRY_GAP_H = 6             # 任意离场后至少隔N小时才可再进场（设1=仅隔一根K线，即v1行为）
+TREND_EXT = 0.012             # 趋势打法要求近24h价格曾离30h线≥1.2%（证明真趋势回踩，0=关闭）
+TOUCH_FRESH_H = 8             # 30h线此前8小时内未被触碰过才算"第一次回踩"（0=关闭）
+RANGE_DRIFT_FILTER = True     # 震荡边缘只做顺日线漂移方向：价在30日线上只接昨低多、线下只空昨高
 
 H1 = 3600_000
 
@@ -144,11 +153,17 @@ def candle_ctx(kl, i):
     window = kl[max(0, i - 60):i + 1]
     closes = [k["c"] for k in window]
     a = atr(window, 14)
+    prevN = window[-(TOUCH_FRESH_H + 1):-1] if TOUCH_FRESH_H > 0 else []
+    last24 = window[-24:]
     return {
         "ma30h": sma(closes, 30),
         "rsi": rsi(closes, 14),
         "atr_pct": (a / closes[-1]) if a else None,
         "vol_ratio": _vol_ratio(window),
+        "hh24": max(k["h"] for k in last24),      # 近24h最高（趋势延伸证明）
+        "ll24": min(k["l"] for k in last24),
+        "lo_prevN": min((k["l"] for k in prevN), default=None),   # 此前N小时最低（第一次回踩判定）
+        "hi_prevN": max((k["h"] for k in prevN), default=None),
     }
 
 
@@ -160,7 +175,7 @@ def _vol_ratio(window):
     return round(sum(vols[-10:]) / base, 2) if base else None
 
 
-def entry_signal(regime, k, ctx, prev_day, funding=None):
+def entry_signal(regime, k, ctx, prev_day, funding=None, dev=None):
     """在已收盘蜡烛 k 上找进场信号。返回 (side, stop_pct, rr, max_hold, tag) 或 (None, 原因)。
     进场价一律取该蜡烛收盘价(下一小时初成交的诚实近似)。"""
     price, ma30h, r14 = k["c"], ctx["ma30h"], ctx["rsi"]
@@ -172,6 +187,10 @@ def entry_signal(regime, k, ctx, prev_day, funding=None):
     if regime == "trend_up":
         # 顺势回踩：本蜡烛下探触及30h线(容差0.2%)且收盘收复其上，RSI 处45–70
         if k["l"] <= ma30h * (1 + EDGE_TOUCH) and price > ma30h and T_RSI_LONG[0] <= r14 <= T_RSI_LONG[1]:
+            if TREND_EXT > 0 and ctx["hh24"] < ma30h * (1 + TREND_EXT):
+                return None, f"趋势↑但近24h未离30h线≥{TREND_EXT*100:.1f}%——贴线磨不算真趋势回踩"
+            if TOUCH_FRESH_H > 0 and ctx["lo_prevN"] is not None and ctx["lo_prevN"] <= ma30h * (1 + EDGE_TOUCH):
+                return None, f"30h线{TOUCH_FRESH_H}h内已被触过——非第一次回踩，不重复进场"
             if funding is not None and funding >= FUNDING_BLOCK_LONG:
                 return None, f"资费 {funding:+.3f}% 多头过热——趋势多信号作废"
             stop_pct = min(max(T_STOP_ATR * ctx["atr_pct"], T_STOP_MIN), T_STOP_MAX)
@@ -179,6 +198,10 @@ def entry_signal(regime, k, ctx, prev_day, funding=None):
         return None, "趋势↑待回踩：等价格回踩30h线收复(不追第一波)"
     if regime == "trend_down":
         if k["h"] >= ma30h * (1 - EDGE_TOUCH) and price < ma30h and T_RSI_SHORT[0] <= r14 <= T_RSI_SHORT[1]:
+            if TREND_EXT > 0 and ctx["ll24"] > ma30h * (1 - TREND_EXT):
+                return None, f"趋势↓但近24h未离30h线≥{TREND_EXT*100:.1f}%——贴线磨不算真趋势反抽"
+            if TOUCH_FRESH_H > 0 and ctx["hi_prevN"] is not None and ctx["hi_prevN"] >= ma30h * (1 - EDGE_TOUCH):
+                return None, f"30h线{TOUCH_FRESH_H}h内已被触过——非第一次反抽，不重复进场"
             if funding is not None and funding <= FUNDING_BLOCK_SHORT:
                 return None, f"资费 {funding:+.3f}% 空头拥挤——趋势空信号作废"
             stop_pct = min(max(T_STOP_ATR * ctx["atr_pct"], T_STOP_MIN), T_STOP_MAX)
@@ -190,11 +213,18 @@ def entry_signal(regime, k, ctx, prev_day, funding=None):
     if ph is None or pl is None:
         return None, "缺昨高/昨低数据"
     stop_pct = min(max(R_STOP_ATR * ctx["atr_pct"], R_STOP_MIN), R_STOP_MAX)
+    # 顺漂移过滤（回测证据: 逆日线漂移的边缘反手是主要亏损源——修复期空昨高/下跌期接昨低都是螳臂当车）
+    allow_short = not (RANGE_DRIFT_FILTER and dev is not None and dev >= 0)
+    allow_long = not (RANGE_DRIFT_FILTER and dev is not None and dev < 0)
     if k["h"] >= ph * (1 - EDGE_TOUCH) and price < ph and r14 >= R_RSI_HI:
+        if not allow_short:
+            return None, "摸昨高但价在30日线上方(漂移向上)——不逆漂移做空"
         if funding is not None and funding <= FUNDING_BLOCK_SHORT:
             return None, f"资费 {funding:+.3f}% 空头拥挤——边缘空信号作废"
         return ("SHORT", stop_pct, R_RR, R_MAX_HOLD, "震荡·摸昨高受阻空"), None
     if k["l"] <= pl * (1 + EDGE_TOUCH) and price > pl and r14 <= R_RSI_LO:
+        if not allow_long:
+            return None, "探昨低但价在30日线下方(漂移向下)——不逆漂移接多"
         if funding is not None and funding >= FUNDING_BLOCK_LONG:
             return None, f"资费 {funding:+.3f}% 多头过热——边缘多信号作废"
         return ("LONG", stop_pct, R_RR, R_MAX_HOLD, "震荡·探昨低承接多"), None
@@ -359,13 +389,14 @@ def run_book(book, sym, kl_closed, day_map, trades, funding=None):
         sig_text = None
         if book["pos"] is None:
             block = governor(book, k["t"])
-            if block is None and book.get("last_exit_t") == k["t"]:
-                block = "本K线刚离场——至少隔一根K线再评估(防报复性进场)"
+            if block is None and book.get("last_exit_t") is not None \
+                    and k["t"] < book["last_exit_t"] + REENTRY_GAP_H * H1:
+                block = f"离场后{REENTRY_GAP_H}h再进场冷却中(防报复性进场)"
             if block:
                 sig_text = f"🚫 {block}"
             else:
                 ctx = candle_ctx(kl_closed, i)
-                sig, why = entry_signal(regime, k, ctx, prev_day, funding)
+                sig, why = entry_signal(regime, k, ctx, prev_day, funding, dev)
                 if sig:
                     side, stop_pct, rr, max_hold, tag = sig
                     open_position(book, sym, side, k, stop_pct, rr, max_hold, tag)
