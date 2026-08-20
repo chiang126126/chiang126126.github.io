@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-20T11:56:36.675870+00:00",
+  "generated_at": "2026-08-20T11:58:47.480742+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "WUSDT|burst|LONG": {
-      "symbol": "WUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 30,
-          "win_rate": 0.267,
-          "avg_outcome_pct": -0.41
-        },
-        "60m": {
-          "n": 30,
-          "win_rate": 0.167,
-          "avg_outcome_pct": -0.36
-        },
-        "240m": {
-          "n": 30,
-          "win_rate": 0.233,
-          "avg_outcome_pct": -1.14
-        }
-      }
-    },
     "CLUSDT|sustained|LONG": {
       "symbol": "CLUSDT",
       "alert_type": "sustained",
@@ -2511,14 +2489,36 @@
         }
       }
     },
+    "WUSDT|burst|LONG": {
+      "symbol": "WUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 29,
+          "win_rate": 0.276,
+          "avg_outcome_pct": -0.3
+        },
+        "60m": {
+          "n": 29,
+          "win_rate": 0.172,
+          "avg_outcome_pct": -0.27
+        },
+        "240m": {
+          "n": 29,
+          "win_rate": 0.241,
+          "avg_outcome_pct": -1.12
+        }
+      }
+    },
     "FARTCOINUSDT|burst|LONG": {
       "symbol": "FARTCOINUSDT",
       "alert_type": "burst",
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 72,
-          "win_rate": 0.292,
+          "n": 73,
+          "win_rate": 0.288,
           "avg_outcome_pct": -0.16
         },
         "60m": {
