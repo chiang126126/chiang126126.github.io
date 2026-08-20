@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-20T07:28:11.991289+00:00",
+  "generated_at": "2026-08-20T07:30:26.468696+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "YGGUSDT|burst|SHORT": {
-      "symbol": "YGGUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 9,
-          "win_rate": 0.111,
-          "avg_outcome_pct": -0.2
-        },
-        "60m": {
-          "n": 9,
-          "win_rate": 0.222,
-          "avg_outcome_pct": 0.04
-        },
-        "240m": {
-          "n": 9,
-          "win_rate": 0.444,
-          "avg_outcome_pct": 0.12
-        }
-      }
-    },
     "PUMPUSDT|burst|LONG": {
       "symbol": "PUMPUSDT",
       "alert_type": "burst",
@@ -30289,6 +30267,28 @@
           "n": 5,
           "win_rate": 0.4,
           "avg_outcome_pct": 1.05
+        }
+      }
+    },
+    "YGGUSDT|burst|SHORT": {
+      "symbol": "YGGUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 8,
+          "win_rate": 0.125,
+          "avg_outcome_pct": -0.14
+        },
+        "60m": {
+          "n": 8,
+          "win_rate": 0.25,
+          "avg_outcome_pct": 0.11
+        },
+        "240m": {
+          "n": 8,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 0.22
         }
       }
     },
