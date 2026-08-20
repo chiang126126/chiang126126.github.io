@@ -85,6 +85,8 @@ REENTRY_GAP_H = 6             # 任意离场后至少隔N小时才可再进场�
 TREND_EXT = 0.012             # 趋势打法要求近24h价格曾离30h线≥1.2%（证明真趋势回踩，0=关闭）
 TOUCH_FRESH_H = 8             # 30h线此前8小时内未被触碰过才算"第一次回踩"（0=关闭）
 RANGE_DRIFT_FILTER = True     # 震荡边缘只做顺日线漂移方向：价在30日线上只接昨低多、线下只空昨高
+ENTRY_MODE = "close"          # "close"=信号蜡烛收盘价进场 | "limit"=信号后在被触水平挂限价等回落
+LIMIT_TTL_H = 6               # 挂单有效期(小时)，超时未成交撤单
 
 H1 = 3600_000
 
@@ -176,8 +178,9 @@ def _vol_ratio(window):
 
 
 def entry_signal(regime, k, ctx, prev_day, funding=None, dev=None):
-    """在已收盘蜡烛 k 上找进场信号。返回 (side, stop_pct, rr, max_hold, tag) 或 (None, 原因)。
-    进场价一律取该蜡烛收盘价(下一小时初成交的诚实近似)。"""
+    """在已收盘蜡烛 k 上找进场信号。返回 (side, stop_pct, rr, max_hold, tag, level) 或 (None, 原因)。
+    level=信号被触发的关键水平(30h线/昨高/昨低)，ENTRY_MODE=limit 时在此挂限价单；
+    ENTRY_MODE=close 时进场价取信号蜡烛收盘价(下一小时初成交的诚实近似)。"""
     price, ma30h, r14 = k["c"], ctx["ma30h"], ctx["rsi"]
     if ma30h is None or r14 is None or ctx["atr_pct"] is None:
         return None, "指标窗口未满(数据不足)"
@@ -194,7 +197,7 @@ def entry_signal(regime, k, ctx, prev_day, funding=None, dev=None):
             if funding is not None and funding >= FUNDING_BLOCK_LONG:
                 return None, f"资费 {funding:+.3f}% 多头过热——趋势多信号作废"
             stop_pct = min(max(T_STOP_ATR * ctx["atr_pct"], T_STOP_MIN), T_STOP_MAX)
-            return ("LONG", stop_pct, T_RR, T_MAX_HOLD, "趋势·回踩30h线多"), None
+            return ("LONG", stop_pct, T_RR, T_MAX_HOLD, "趋势·回踩30h线多", ma30h), None
         return None, "趋势↑待回踩：等价格回踩30h线收复(不追第一波)"
     if regime == "trend_down":
         if k["h"] >= ma30h * (1 - EDGE_TOUCH) and price < ma30h and T_RSI_SHORT[0] <= r14 <= T_RSI_SHORT[1]:
@@ -205,7 +208,7 @@ def entry_signal(regime, k, ctx, prev_day, funding=None, dev=None):
             if funding is not None and funding <= FUNDING_BLOCK_SHORT:
                 return None, f"资费 {funding:+.3f}% 空头拥挤——趋势空信号作废"
             stop_pct = min(max(T_STOP_ATR * ctx["atr_pct"], T_STOP_MIN), T_STOP_MAX)
-            return ("SHORT", stop_pct, T_RR, T_MAX_HOLD, "趋势·反抽30h线空"), None
+            return ("SHORT", stop_pct, T_RR, T_MAX_HOLD, "趋势·反抽30h线空", ma30h), None
         return None, "趋势↓待反抽：等价格反抽30h线受阻(不追第一波)"
 
     # 震荡：只在边缘做反向
@@ -221,13 +224,13 @@ def entry_signal(regime, k, ctx, prev_day, funding=None, dev=None):
             return None, "摸昨高但价在30日线上方(漂移向上)——不逆漂移做空"
         if funding is not None and funding <= FUNDING_BLOCK_SHORT:
             return None, f"资费 {funding:+.3f}% 空头拥挤——边缘空信号作废"
-        return ("SHORT", stop_pct, R_RR, R_MAX_HOLD, "震荡·摸昨高受阻空"), None
+        return ("SHORT", stop_pct, R_RR, R_MAX_HOLD, "震荡·摸昨高受阻空", ph), None
     if k["l"] <= pl * (1 + EDGE_TOUCH) and price > pl and r14 <= R_RSI_LO:
         if not allow_long:
             return None, "探昨低但价在30日线下方(漂移向下)——不逆漂移接多"
         if funding is not None and funding >= FUNDING_BLOCK_LONG:
             return None, f"资费 {funding:+.3f}% 多头过热——边缘多信号作废"
-        return ("LONG", stop_pct, R_RR, R_MAX_HOLD, "震荡·探昨低承接多"), None
+        return ("LONG", stop_pct, R_RR, R_MAX_HOLD, "震荡·探昨低承接多", pl), None
     return None, f"震荡·区间中部无边缘信号(昨高{ph:.0f}/昨低{pl:.0f}内等待)"
 
 
@@ -317,8 +320,8 @@ def governor(book, t_ms):
     return None
 
 
-def open_position(book, sym, side, k, stop_pct, rr, max_hold, tag):
-    entry = k["c"]
+def open_position(book, sym, side, k, stop_pct, rr, max_hold, tag, entry=None):
+    entry = entry if entry is not None else k["c"]
     qty, notional, risk = size_position(book["equity"], entry, stop_pct)
     long = side == "LONG"
     stop = entry * (1 - stop_pct) if long else entry * (1 + stop_pct)
@@ -385,9 +388,35 @@ def run_book(book, sym, kl_closed, day_map, trades, funding=None):
             exit_price, reason = manage_candle(book["pos"], k)
             if reason:
                 close_position(book, k["t"], exit_price, reason, trades)
-        # ② 再找进场
+        # ①b 挂单生命周期（ENTRY_MODE=limit）：成交/超时/管制复核，同烛悲观止损
         sig_text = None
-        if book["pos"] is None:
+        if book.get("pending") and book["pos"] is None:
+            pd_ = book["pending"]
+            long = pd_["side"] == "LONG"
+            touched = (k["l"] <= pd_["limit"]) if long else (k["h"] >= pd_["limit"])
+            if k["t"] >= pd_["expires_t"]:
+                book["pending"] = None
+                sig_text = f"⏳ 挂单{LIMIT_TTL_H}h未成交，撤单(价格没回来，让它去)"
+            elif touched:
+                block = governor(book, k["t"])
+                if block:
+                    book["pending"] = None
+                    sig_text = f"🚫 挂单触及但被管制拦截({block})，撤单"
+                else:
+                    # 开盘已越过限价则按更优的开盘价成交
+                    fill = min(k["o"], pd_["limit"]) if long else max(k["o"], pd_["limit"])
+                    open_position(book, sym, pd_["side"], k, pd_["stop_pct"], pd_["rr"],
+                                  pd_["max_hold"], pd_["tag"], entry=fill)
+                    book["pending"] = None
+                    pos = book["pos"]
+                    # 悲观口径：成交同蜡烛若也触到止损，直接按止损离场
+                    if (long and k["l"] <= pos["stop"]) or (not long and k["h"] >= pos["stop"]):
+                        close_position(book, k["t"], pos["stop"], "STOP", trades)
+                        sig_text = f"{'🟢' if long else '🔴'} 挂单成交@{fill:.2f}后同K线触止损离场(悲观计)"
+                    else:
+                        sig_text = f"{'🟢 限价开多' if long else '🔴 限价开空'} @{fill:.2f}｜{pd_['tag']}｜止损{pd_['stop_pct']*100:.2f}% 目标{pd_['rr']}R"
+        # ② 再找进场（无持仓且无挂单时）
+        if sig_text is None and book["pos"] is None and not book.get("pending"):
             block = governor(book, k["t"])
             if block is None and book.get("last_exit_t") is not None \
                     and k["t"] < book["last_exit_t"] + REENTRY_GAP_H * H1:
@@ -398,16 +427,77 @@ def run_book(book, sym, kl_closed, day_map, trades, funding=None):
                 ctx = candle_ctx(kl_closed, i)
                 sig, why = entry_signal(regime, k, ctx, prev_day, funding, dev)
                 if sig:
-                    side, stop_pct, rr, max_hold, tag = sig
-                    open_position(book, sym, side, k, stop_pct, rr, max_hold, tag)
-                    sig_text = f"{'🟢 买入开多' if side == 'LONG' else '🔴 卖出开空'} @{k['c']:.2f}｜{tag}｜止损{stop_pct*100:.2f}% 目标{rr}R"
+                    side, stop_pct, rr, max_hold, tag, level = sig
+                    if ENTRY_MODE == "limit":
+                        book["pending"] = {"side": side, "limit": round(level, 2), "stop_pct": stop_pct,
+                                           "rr": rr, "max_hold": max_hold, "tag": tag,
+                                           "placed_t": k["t"], "expires_t": k["t"] + LIMIT_TTL_H * H1}
+                        sig_text = f"📌 信号确认，挂限价单等回落: {side} @{level:.2f}｜{tag}｜{LIMIT_TTL_H}h内有效"
+                    else:
+                        open_position(book, sym, side, k, stop_pct, rr, max_hold, tag)
+                        sig_text = f"{'🟢 买入开多' if side == 'LONG' else '🔴 卖出开空'} @{k['c']:.2f}｜{tag}｜止损{stop_pct*100:.2f}% 目标{rr}R"
                 else:
                     sig_text = f"⏳ {why}"
-        else:
+        elif sig_text is None and book["pos"]:
             p = book["pos"]
             sig_text = f"持仓管理中：{p['side']} @{p['entry']:.2f}，止损 {p['stop']:.2f}({p['stop_kind']})"
+        elif sig_text is None:
+            pd_ = book.get("pending") or {}
+            sig_text = f"📌 挂单等待回落: {pd_.get('side')} @{pd_.get('limit')}（{pd_.get('tag')}）"
         book["signal"] = {"at": iso(k["t"] + H1), "text": sig_text, "regime": regime, "dev": dev}
         book["last_t"] = k["t"]
+
+
+def guardian_tick(state, trades, prices, now_ms=None):
+    """分钟级守护钩子(由 guardian.py 每3分钟调用)：只管已有模拟持仓——
+    实时价更新MFE→上移保本/追踪(只紧不松)→触及止损/止盈/超时立即离场。
+    绝不开新仓、不碰挂单(挂单按小时蜡烛成交口径,与回测一致)。返回是否有变化。
+    成交口径：止损触发按实时价成交(不优于止损价,诚实计滑)；目标触发按目标价成交(限价语义)。"""
+    if now_ms is None:
+        now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
+    changed = False
+    for sym, book in (state.get("books") or {}).items():
+        pos, px = book.get("pos"), prices.get(sym)
+        if not pos or not px:
+            continue
+        long = pos["side"] == "LONG"
+        pos["mfe_price"] = max(pos.get("mfe_price", pos["entry"]), px) if long \
+            else min(pos.get("mfe_price", pos["entry"]), px)
+        old = (pos["stop"], pos.get("stop_kind"))
+        _upgrade_stop(pos)
+        if (pos["stop"], pos.get("stop_kind")) != old:
+            changed = True
+            print(f"[guardian][sim] {sym} 锁盈上移 {old[0]} → {pos['stop']} ({pos['stop_kind']})")
+        exit_price = reason = None
+        if long and px <= pos["stop"]:
+            exit_price, reason = px, pos.get("stop_kind", "STOP")
+        elif not long and px >= pos["stop"]:
+            exit_price, reason = px, pos.get("stop_kind", "STOP")
+        elif long and px >= pos["target"]:
+            exit_price, reason = pos["target"], "TARGET"
+        elif not long and px <= pos["target"]:
+            exit_price, reason = pos["target"], "TARGET"
+        elif (now_ms - pos["opened_t"]) / H1 >= pos["max_hold"]:
+            exit_price, reason = px, "TIME"
+        if reason:
+            # 守护层的 STOP_BE/STOP_TRAIL 不算裸止损: close_position 只对 "STOP" 计连败
+            close_position(book, now_ms - H1, exit_price, reason, trades)
+            trades[-1]["via"] = "guardian"
+            book["signal"] = {"at": now_iso(), "text": f"🛡 守护层分钟级离场: {reason} @{exit_price:.2f}",
+                              "regime": (book.get("signal") or {}).get("regime")}
+            changed = True
+            print(f"[guardian][sim][exit] {sym} {reason} @ {exit_price:.2f} pnl={trades[-1]['pnl']:.2f}")
+    return changed
+
+
+def write_log(state, trades):
+    """写 sim_log.json(看板信号台数据源)。前向与守护层共用同一口径。"""
+    save_json(fpath("sim_log"), {"updated_at": now_iso(),
+                                 "books": {s: {"equity": round(state["books"][s]["equity"], 2),
+                                               "signal": state["books"][s]["signal"],
+                                               "stats": book_stats([t for t in trades if t["symbol"] == s],
+                                                                   state["books"][s]["equity"])}
+                                           for s in state.get("books", {})}})
 
 
 # ═══════════════ 数据获取 ═══════════════
@@ -501,12 +591,7 @@ def main_forward():
     state["updated_at"] = now_iso()
     save_json(fpath("sim_state"), state)
     save_json(fpath("sim_trades"), trades)
-    save_json(fpath("sim_log"), {"updated_at": state["updated_at"],
-                                 "books": {s: {"equity": round(state["books"][s]["equity"], 2),
-                                               "signal": state["books"][s]["signal"],
-                                               "stats": book_stats([t for t in trades if t["symbol"] == s],
-                                                                   state["books"][s]["equity"])}
-                                           for s in BOOKS}})
+    write_log(state, trades)
 
 
 def main_backfill(days):

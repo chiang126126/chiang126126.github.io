@@ -4,6 +4,7 @@
   1. 用实时价更新 MFE 并上移保本/跟踪止损（分钟级锁盈，只紧不松）；
   2. 实时价触及 止损/止盈/超时 → 立即市价平仓（把止损延迟从 ≤59分钟 压到 ≤3分钟）；
   3. 绝不开新仓、绝不调 LLM、无持仓时秒退——开仓决策永远属于小时级战略层(bot.py)。
+覆盖两套系统：主机器人持仓(bot_state) + 模拟舱双册持仓(sim_state, 经 sim.guardian_tick)。
 
 退出码：0=无实质变化；10=状态有变(平仓/移损)，外层脚本据此提交推送。
 与 bot.py 通过 run_*.sh 的 mkdir 原子锁互斥，绝不并发写同一份数据。
@@ -13,22 +14,59 @@ import sys
 
 import bot
 import exchange
+import sim
 
 
 def run():
     c = bot.cfg()
     if c["MODE"] == "dry":
         return 0
+    changed_bot = _bot_positions(c)
+    try:
+        changed_sim = _sim_books()
+    except Exception as e:          # 模拟舱任何异常都不能影响主机器人守护
+        print(f"[guardian][warn] 模拟舱守护出错(跳过): {e}")
+        changed_sim = False
+    return 10 if (changed_bot or changed_sim) else 0
+
+
+def _sim_books():
+    """模拟舱持仓的分钟级守护：只对已有持仓做锁盈上移/触线离场，逻辑在 sim.guardian_tick。"""
+    state = sim.load_json(sim.fpath("sim_state"), None)
+    if not state:
+        return False
+    holding = [s for s, b in (state.get("books") or {}).items() if b.get("pos")]
+    if not holding:
+        return False
+    prices = {}
+    for s in holding:
+        try:
+            prices[s] = exchange.last_price(s)
+        except Exception as e:
+            print(f"[guardian][warn] sim {s} 取实时价失败: {e}")
+    if not prices:
+        return False
+    trades = sim.load_json(sim.fpath("sim_trades"), [])
+    if not sim.guardian_tick(state, trades, prices):
+        return False
+    state["guardian_at"] = sim.now_iso()    # 独立心跳，不动 updated_at(小时层断档检测锚)
+    sim.save_json(sim.fpath("sim_state"), state)
+    sim.save_json(sim.fpath("sim_trades"), trades)
+    sim.write_log(state, trades)
+    return True
+
+
+def _bot_positions(c):
     sfx = "_live" if c["MODE"] == "live" else ""
     fpath = lambda name: os.path.join(c["DATA_DIR"], f"{name}{sfx}.json")
     state = bot.load_json(fpath("bot_state"), None)
     if not state or not state.get("positions"):
-        return 0
+        return False
 
     tn, fatal = bot.make_client(c)
     if fatal:                       # live 配置不全：宁可不动，也绝不带病碰真钱
         print(f"[guardian][fatal] {fatal}")
-        return 0
+        return False
 
     trades = bot.load_json(fpath("bot_trades"), [])
     changed = False
@@ -94,13 +132,13 @@ def run():
         print(f"[guardian][exit] {pos['symbol']} {reason} @ {exit_price:.2f} pnl={trade['pnl']:.2f}")
 
     if not changed:
-        return 0
+        return False
     state["positions"] = still
     state["peak_equity"] = max(state.get("peak_equity", state["equity"]), state["equity"])
     state["guardian_at"] = bot.now_iso()     # 守护层独立心跳；不动 updated_at（那是小时层的断档检测锚）
     bot.save_json(fpath("bot_state"), state)
     bot.save_json(fpath("bot_trades"), trades[-500:])
-    return 10
+    return True
 
 
 if __name__ == "__main__":

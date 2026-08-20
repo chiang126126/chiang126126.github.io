@@ -148,7 +148,7 @@ fire_at = set()
 
 def stub_signal(regime, k, ctx, prev_day, funding=None, dev=None):
     if k["t"] in fire_at:
-        return ("LONG", 0.01, 2.0, 48, "桩·多"), None
+        return ("LONG", 0.01, 2.0, 48, "桩·多", k["c"]), None
     return None, "桩·等待"
 
 
@@ -239,7 +239,7 @@ fire_at.update({72 * H, 75 * H})
 
 def stub2(regime, k, ctx, prev_day, funding=None, dev=None):
     if k["t"] in fire_at:
-        return ("LONG", 0.02, 2.0, 48, "桩·多"), None
+        return ("LONG", 0.02, 2.0, 48, "桩·多", k["c"]), None
     return None, "桩·等待"
 
 
@@ -273,6 +273,70 @@ check("平仓后回撤达标→halted", b6["halted"] is True, f"eq={b6['equity']
 blk = sim.governor(b6, 101 * H)
 check("halted 后 governor 拦截", blk is not None and "停机" in blk, blk)
 
+
+# ═══ ⑥ 挂单入场模式(ENTRY_MODE=limit) ═══
+print("── 挂单入场(limit)")
+sim.ENTRY_MODE = "limit"
+fire_at.clear(); fire_at.add(70 * H)
+
+
+def stub3(regime, k, ctx, prev_day, funding=None, dev=None):
+    if k["t"] in fire_at:
+        return ("LONG", 0.01, 2.0, 48, "桩·多", 99.5), None
+    return None, "桩·等待"
+
+
+sim.entry_signal = stub3
+trades6, b6 = [], fresh()
+seq6 = base + [
+    mk(70 * H, 100, 100.4, 99.8, 100.0),   # 信号→挂单@99.5(不立即进场)
+    mk(71 * H, 100, 100.2, 99.8, 100.1),   # 未触及限价
+    mk(72 * H, 100.1, 100.3, 99.4, 99.9),  # low≤99.5→成交@99.5; 同烛low 99.4>止损98.505 不触
+    mk(73 * H, 99.9, 101.6, 99.8, 101.5),  # 触目标 99.5×1.02=101.49
+]
+sim.run_book(b6, "BTCUSDT", seq6, DAYMAP, trades6)
+check("信号→挂单→回落成交@限价99.5", len(trades6) == 1 and abs(trades6[0]["entry"] - 99.5) < 1e-9, str(trades6))
+check("止损/目标按成交价重算(TARGET@101.49)", trades6[0]["exit_reason"] == "TARGET" and abs(trades6[0]["exit"] - 101.49) < 0.011, str(trades6[0]["exit"]))
+
+trades7, b7 = [], fresh()
+fire_at.clear(); fire_at.add(70 * H)
+seq7 = base + [mk(70 * H, 100, 100.4, 99.8, 100.0)] + [mk((71 + j) * H, 100, 100.4, 99.8, 100.1) for j in range(6)]
+sim.run_book(b7, "BTCUSDT", seq7, DAYMAP, trades7)
+check("TTL超时撤单且未成交", len(trades7) == 0 and not b7.get("pending") and "撤单" in b7["signal"]["text"], b7["signal"]["text"])
+
+trades8, b8 = [], fresh()
+fire_at.clear(); fire_at.add(70 * H)
+seq8 = base + [
+    mk(70 * H, 100, 100.4, 99.8, 100.0),   # 挂99.5
+    mk(71 * H, 100, 100.1, 98.0, 98.2),    # 成交@99.5后同烛low<止损98.505→悲观即刻止损
+]
+sim.run_book(b8, "BTCUSDT", seq8, DAYMAP, trades8)
+check("同烛成交+破止损→悲观计STOP", len(trades8) == 1 and trades8[0]["exit_reason"] == "STOP" and abs(trades8[0]["exit"] - 98.51) < 0.011, str(trades8))
+sim.ENTRY_MODE = "close"
+
+# ═══ ⑦ 守护层钩子 guardian_tick ═══
+print("── guardian_tick")
+bkA = sim.new_book(); bkA["pos"] = pos_(); bkA["pos"]["symbol"] = "BTCUSDT"; bkA["pos"]["opened_t"] = 0
+trA = []
+ch = sim.guardian_tick({"books": {"BTCUSDT": bkA}}, trA, {"BTCUSDT": 98.9}, now_ms=2 * H)
+check("实时价破止损→按实时价离场(不优于止损)", ch and trA and trA[-1]["exit_reason"] == "STOP" and abs(trA[-1]["exit"] - 98.9) < 1e-9 and bkA["pos"] is None)
+check("守护层成交打标 via=guardian", trA[-1].get("via") == "guardian")
+bkB = sim.new_book(); bkB["pos"] = pos_(); bkB["pos"]["symbol"] = "BTCUSDT"; bkB["pos"]["opened_t"] = 0
+trB = []
+ch = sim.guardian_tick({"books": {"BTCUSDT": bkB}}, trB, {"BTCUSDT": 102.5}, now_ms=2 * H)
+check("穿越目标按目标价成交(限价语义102.2)", ch and trB and trB[-1]["exit_reason"] == "TARGET" and abs(trB[-1]["exit"] - 102.2) < 1e-9)
+bkC = sim.new_book(); bkC["pos"] = pos_(); bkC["pos"]["symbol"] = "BTCUSDT"; bkC["pos"]["opened_t"] = 0
+trC = []
+ch = sim.guardian_tick({"books": {"BTCUSDT": bkC}}, trC, {"BTCUSDT": 101.06}, now_ms=2 * H)
+check("实时价新高→BE上移但不离场", ch and bkC["pos"] is not None and bkC["pos"]["stop_kind"] == "STOP_BE" and not trC)
+ch = sim.guardian_tick({"books": {"BTCUSDT": sim.new_book()}}, [], {"BTCUSDT": 100}, now_ms=H)
+check("无持仓不动作", ch is False)
+bkD = sim.new_book(); bkD["pos"] = pos_(); bkD["pos"]["symbol"] = "BTCUSDT"; bkD["pos"]["opened_t"] = 0; bkD["pos"]["max_hold"] = 1
+trD = []
+ch = sim.guardian_tick({"books": {"BTCUSDT": bkD}}, trD, {"BTCUSDT": 100.3}, now_ms=2 * H)
+check("超时以实时价离场", ch and trD and trD[-1]["exit_reason"] == "TIME" and abs(trD[-1]["exit"] - 100.3) < 1e-9)
+
+sim.entry_signal = real_entry_signal
 sim.entry_signal = real_entry_signal
 print()
 print(f"❌ {len(FAILS)} 项失败: {FAILS}" if FAILS else "✅ 全部通过")
