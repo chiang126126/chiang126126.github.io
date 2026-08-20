@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-08-20T17:20:55.545256+00:00",
+  "generated_at": "2026-08-20T17:23:04.675751+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "DYMUSDT|burst|SHORT": {
-      "symbol": "DYMUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 12,
-          "win_rate": 0.583,
-          "avg_outcome_pct": 0.17
-        },
-        "60m": {
-          "n": 12,
-          "win_rate": 0.5,
-          "avg_outcome_pct": -0.14
-        },
-        "240m": {
-          "n": 12,
-          "win_rate": 0.5,
-          "avg_outcome_pct": -0.77
-        }
-      }
-    },
-    "BANANAS31USDT|sustained|LONG": {
-      "symbol": "BANANAS31USDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 15,
-          "win_rate": 0.467,
-          "avg_outcome_pct": 1.28
-        },
-        "60m": {
-          "n": 15,
-          "win_rate": 0.533,
-          "avg_outcome_pct": 0.74
-        },
-        "240m": {
-          "n": 15,
-          "win_rate": 0.6,
-          "avg_outcome_pct": 3.44
-        }
-      }
-    },
     "ALLOUSDT|burst|SHORT": {
       "symbol": "ALLOUSDT",
       "alert_type": "burst",
@@ -355,6 +311,28 @@
         }
       }
     },
+    "DYMUSDT|burst|SHORT": {
+      "symbol": "DYMUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 11,
+          "win_rate": 0.636,
+          "avg_outcome_pct": 0.26
+        },
+        "60m": {
+          "n": 11,
+          "win_rate": 0.545,
+          "avg_outcome_pct": -0.1
+        },
+        "240m": {
+          "n": 11,
+          "win_rate": 0.545,
+          "avg_outcome_pct": -0.84
+        }
+      }
+    },
     "ORDIUSDT|burst|SHORT": {
       "symbol": "ORDIUSDT",
       "alert_type": "burst",
@@ -396,6 +374,28 @@
           "n": 12,
           "win_rate": 0.417,
           "avg_outcome_pct": -0.16
+        }
+      }
+    },
+    "BANANAS31USDT|sustained|LONG": {
+      "symbol": "BANANAS31USDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 14,
+          "win_rate": 0.429,
+          "avg_outcome_pct": 1.18
+        },
+        "60m": {
+          "n": 14,
+          "win_rate": 0.5,
+          "avg_outcome_pct": 0.6
+        },
+        "240m": {
+          "n": 14,
+          "win_rate": 0.643,
+          "avg_outcome_pct": 3.81
         }
       }
     },
@@ -4299,8 +4299,8 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 46,
-          "win_rate": 0.348,
+          "n": 47,
+          "win_rate": 0.362,
           "avg_outcome_pct": 0.14
         },
         "60m": {
