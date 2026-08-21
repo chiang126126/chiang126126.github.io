@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-21T01:32:13.509182+00:00",
+  "generated_at": "2026-08-21T01:34:27.575692+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "TAIKOUSDT|burst|SHORT": {
-      "symbol": "TAIKOUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 32,
-          "win_rate": 0.25,
-          "avg_outcome_pct": -0.26
-        },
-        "60m": {
-          "n": 32,
-          "win_rate": 0.312,
-          "avg_outcome_pct": -0.19
-        },
-        "240m": {
-          "n": 32,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 1.07
-        }
-      }
-    },
     "AEROUSDT|sustained|LONG": {
       "symbol": "AEROUSDT",
       "alert_type": "sustained",
@@ -2291,6 +2269,28 @@
         }
       }
     },
+    "TAIKOUSDT|burst|SHORT": {
+      "symbol": "TAIKOUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 31,
+          "win_rate": 0.226,
+          "avg_outcome_pct": -0.29
+        },
+        "60m": {
+          "n": 31,
+          "win_rate": 0.29,
+          "avg_outcome_pct": -0.29
+        },
+        "240m": {
+          "n": 31,
+          "win_rate": 0.484,
+          "avg_outcome_pct": 0.77
+        }
+      }
+    },
     "TRUTHUSDT|burst|SHORT": {
       "symbol": "TRUTHUSDT",
       "alert_type": "burst",
@@ -2759,9 +2759,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 107,
-          "win_rate": 0.252,
-          "avg_outcome_pct": -0.35
+          "n": 108,
+          "win_rate": 0.259,
+          "avg_outcome_pct": -0.33
         },
         "60m": {
           "n": 107,
@@ -16013,9 +16013,9 @@
           "avg_outcome_pct": 1.9
         },
         "240m": {
-          "n": 23,
-          "win_rate": 0.522,
-          "avg_outcome_pct": 0.17
+          "n": 24,
+          "win_rate": 0.5,
+          "avg_outcome_pct": -1.35
         }
       }
     },
@@ -20782,9 +20782,9 @@
           "avg_outcome_pct": -0.34
         },
         "60m": {
-          "n": 15,
-          "win_rate": 0.067,
-          "avg_outcome_pct": -0.77
+          "n": 16,
+          "win_rate": 0.125,
+          "avg_outcome_pct": -0.67
         },
         "240m": {
           "n": 15,
@@ -20953,8 +20953,8 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 157,
-          "win_rate": 0.344,
+          "n": 158,
+          "win_rate": 0.342,
           "avg_outcome_pct": -0.23
         },
         "60m": {
