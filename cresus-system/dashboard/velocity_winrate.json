@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-22T18:30:25.072298+00:00",
+  "generated_at": "2026-08-22T18:32:35.787849+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "XMRUSDT|burst|LONG": {
-      "symbol": "XMRUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 20,
-          "win_rate": 0.0,
-          "avg_outcome_pct": -0.41
-        },
-        "60m": {
-          "n": 20,
-          "win_rate": 0.05,
-          "avg_outcome_pct": -0.66
-        },
-        "240m": {
-          "n": 20,
-          "win_rate": 0.15,
-          "avg_outcome_pct": -1.04
-        }
-      }
-    },
     "ALICEUSDT|sustained|LONG": {
       "symbol": "ALICEUSDT",
       "alert_type": "sustained",
@@ -1320,6 +1298,28 @@
           "n": 39,
           "win_rate": 0.615,
           "avg_outcome_pct": 1.19
+        }
+      }
+    },
+    "XMRUSDT|burst|LONG": {
+      "symbol": "XMRUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 19,
+          "win_rate": 0.0,
+          "avg_outcome_pct": -0.33
+        },
+        "60m": {
+          "n": 19,
+          "win_rate": 0.053,
+          "avg_outcome_pct": -0.62
+        },
+        "240m": {
+          "n": 19,
+          "win_rate": 0.158,
+          "avg_outcome_pct": -1.05
         }
       }
     },
@@ -3177,9 +3177,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 46,
-          "win_rate": 0.174,
-          "avg_outcome_pct": -0.34
+          "n": 47,
+          "win_rate": 0.17,
+          "avg_outcome_pct": -0.33
         },
         "60m": {
           "n": 46,
