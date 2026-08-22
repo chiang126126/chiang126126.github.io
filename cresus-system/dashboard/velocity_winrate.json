@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-08-22T14:25:46.089230+00:00",
+  "generated_at": "2026-08-22T14:28:04.033764+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "ARXUSDT|sustained|SHORT": {
-      "symbol": "ARXUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 30,
-          "win_rate": 0.267,
-          "avg_outcome_pct": -0.25
-        },
-        "60m": {
-          "n": 30,
-          "win_rate": 0.3,
-          "avg_outcome_pct": -0.16
-        },
-        "240m": {
-          "n": 30,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -0.0
-        }
-      }
-    },
-    "SAGAUSDT|burst|SHORT": {
-      "symbol": "SAGAUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 12,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.14
-        },
-        "60m": {
-          "n": 12,
-          "win_rate": 0.25,
-          "avg_outcome_pct": 0.12
-        },
-        "240m": {
-          "n": 12,
-          "win_rate": 0.5,
-          "avg_outcome_pct": -0.04
-        }
-      }
-    },
     "GUAUSDT|burst|SHORT": {
       "symbol": "GUAUSDT",
       "alert_type": "burst",
@@ -817,6 +773,28 @@
         }
       }
     },
+    "SAGAUSDT|burst|SHORT": {
+      "symbol": "SAGAUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 11,
+          "win_rate": 0.273,
+          "avg_outcome_pct": 0.1
+        },
+        "60m": {
+          "n": 11,
+          "win_rate": 0.273,
+          "avg_outcome_pct": 0.1
+        },
+        "240m": {
+          "n": 11,
+          "win_rate": 0.455,
+          "avg_outcome_pct": -0.14
+        }
+      }
+    },
     "HYPEUSDT|burst|SHORT": {
       "symbol": "HYPEUSDT",
       "alert_type": "burst",
@@ -833,9 +811,31 @@
           "avg_outcome_pct": -0.73
         },
         "240m": {
-          "n": 10,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -0.62
+          "n": 11,
+          "win_rate": 0.182,
+          "avg_outcome_pct": -0.8
+        }
+      }
+    },
+    "ARXUSDT|sustained|SHORT": {
+      "symbol": "ARXUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 29,
+          "win_rate": 0.276,
+          "avg_outcome_pct": -0.25
+        },
+        "60m": {
+          "n": 29,
+          "win_rate": 0.31,
+          "avg_outcome_pct": -0.14
+        },
+        "240m": {
+          "n": 29,
+          "win_rate": 0.31,
+          "avg_outcome_pct": -0.36
         }
       }
     },
