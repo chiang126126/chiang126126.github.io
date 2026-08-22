@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-22T09:37:54.966257+00:00",
+  "generated_at": "2026-08-22T09:40:09.408307+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "IDUSDT|burst|SHORT": {
-      "symbol": "IDUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 48,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -0.07
-        },
-        "60m": {
-          "n": 48,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.19
-        },
-        "240m": {
-          "n": 48,
-          "win_rate": 0.583,
-          "avg_outcome_pct": 0.78
-        }
-      }
-    },
     "BTWUSDT|burst|LONG": {
       "symbol": "BTWUSDT",
       "alert_type": "burst",
@@ -902,6 +880,28 @@
           "n": 16,
           "win_rate": 0.375,
           "avg_outcome_pct": -0.48
+        }
+      }
+    },
+    "IDUSDT|burst|SHORT": {
+      "symbol": "IDUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 47,
+          "win_rate": 0.319,
+          "avg_outcome_pct": -0.15
+        },
+        "60m": {
+          "n": 47,
+          "win_rate": 0.319,
+          "avg_outcome_pct": 0.09
+        },
+        "240m": {
+          "n": 47,
+          "win_rate": 0.574,
+          "avg_outcome_pct": 0.56
         }
       }
     },
