@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-24T10:56:01.747666+00:00",
+  "generated_at": "2026-08-24T10:58:11.839897+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "SEIUSDT|burst|SHORT": {
-      "symbol": "SEIUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 21,
-          "win_rate": 0.143,
-          "avg_outcome_pct": -0.11
-        },
-        "60m": {
-          "n": 21,
-          "win_rate": 0.286,
-          "avg_outcome_pct": 0.17
-        },
-        "240m": {
-          "n": 21,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.01
-        }
-      }
-    },
     "IDOLUSDT|sustained|SHORT": {
       "symbol": "IDOLUSDT",
       "alert_type": "sustained",
@@ -8451,6 +8429,28 @@
         }
       }
     },
+    "SEIUSDT|burst|SHORT": {
+      "symbol": "SEIUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 20,
+          "win_rate": 0.1,
+          "avg_outcome_pct": -0.15
+        },
+        "60m": {
+          "n": 20,
+          "win_rate": 0.3,
+          "avg_outcome_pct": 0.21
+        },
+        "240m": {
+          "n": 20,
+          "win_rate": 0.3,
+          "avg_outcome_pct": -0.07
+        }
+      }
+    },
     "ICPUSDT|burst|SHORT": {
       "symbol": "ICPUSDT",
       "alert_type": "burst",
@@ -11735,9 +11735,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 33,
-          "win_rate": 0.333,
-          "avg_outcome_pct": -0.8
+          "n": 34,
+          "win_rate": 0.324,
+          "avg_outcome_pct": -0.78
         },
         "60m": {
           "n": 33,
@@ -13962,9 +13962,9 @@
           "avg_outcome_pct": 0.12
         },
         "60m": {
-          "n": 32,
-          "win_rate": 0.219,
-          "avg_outcome_pct": -0.38
+          "n": 33,
+          "win_rate": 0.242,
+          "avg_outcome_pct": -0.27
         },
         "240m": {
           "n": 32,
@@ -19083,9 +19083,9 @@
       "direction": "LONG",
       "stages": {
         "30m": {
-          "n": 28,
-          "win_rate": 0.286,
-          "avg_outcome_pct": 0.05
+          "n": 29,
+          "win_rate": 0.276,
+          "avg_outcome_pct": 0.02
         },
         "60m": {
           "n": 28,
