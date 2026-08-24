@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-24T08:40:38.402126+00:00",
+  "generated_at": "2026-08-24T08:42:48.575983+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "MUSDT|sustained|LONG": {
-      "symbol": "MUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 43,
-          "win_rate": 0.419,
-          "avg_outcome_pct": 1.05
-        },
-        "60m": {
-          "n": 43,
-          "win_rate": 0.535,
-          "avg_outcome_pct": 0.96
-        },
-        "240m": {
-          "n": 43,
-          "win_rate": 0.442,
-          "avg_outcome_pct": -0.53
-        }
-      }
-    },
     "BIOUSDT|burst|LONG": {
       "symbol": "BIOUSDT",
       "alert_type": "burst",
@@ -7282,6 +7260,28 @@
           "n": 86,
           "win_rate": 0.453,
           "avg_outcome_pct": -1.98
+        }
+      }
+    },
+    "MUSDT|sustained|LONG": {
+      "symbol": "MUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 42,
+          "win_rate": 0.429,
+          "avg_outcome_pct": 1.19
+        },
+        "60m": {
+          "n": 42,
+          "win_rate": 0.548,
+          "avg_outcome_pct": 1.08
+        },
+        "240m": {
+          "n": 42,
+          "win_rate": 0.429,
+          "avg_outcome_pct": -0.55
         }
       }
     },
