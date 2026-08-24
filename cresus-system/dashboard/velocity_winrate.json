@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-08-24T21:56:31.311017+00:00",
+  "generated_at": "2026-08-24T21:58:39.616508+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "TNSRUSDT|burst|SHORT": {
-      "symbol": "TNSRUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 9,
-          "win_rate": 0.111,
-          "avg_outcome_pct": -0.09
-        },
-        "60m": {
-          "n": 9,
-          "win_rate": 0.333,
-          "avg_outcome_pct": 0.11
-        },
-        "240m": {
-          "n": 9,
-          "win_rate": 0.556,
-          "avg_outcome_pct": 0.15
-        }
-      }
-    },
-    "ETHFIUSDT|burst|LONG": {
-      "symbol": "ETHFIUSDT",
-      "alert_type": "burst",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 81,
-          "win_rate": 0.284,
-          "avg_outcome_pct": 0.01
-        },
-        "60m": {
-          "n": 81,
-          "win_rate": 0.272,
-          "avg_outcome_pct": 0.0
-        },
-        "240m": {
-          "n": 81,
-          "win_rate": 0.383,
-          "avg_outcome_pct": 0.1
-        }
-      }
-    },
     "SKYAIUSDT|burst|LONG": {
       "symbol": "SKYAIUSDT",
       "alert_type": "burst",
@@ -3435,6 +3391,28 @@
         }
       }
     },
+    "TNSRUSDT|burst|SHORT": {
+      "symbol": "TNSRUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 8,
+          "win_rate": 0.125,
+          "avg_outcome_pct": -0.02
+        },
+        "60m": {
+          "n": 8,
+          "win_rate": 0.375,
+          "avg_outcome_pct": 0.1
+        },
+        "240m": {
+          "n": 8,
+          "win_rate": 0.625,
+          "avg_outcome_pct": 0.18
+        }
+      }
+    },
     "RPLUSDT|sustained|LONG": {
       "symbol": "RPLUSDT",
       "alert_type": "sustained",
@@ -5544,6 +5522,28 @@
           "n": 5,
           "win_rate": 0.2,
           "avg_outcome_pct": -0.95
+        }
+      }
+    },
+    "ETHFIUSDT|burst|LONG": {
+      "symbol": "ETHFIUSDT",
+      "alert_type": "burst",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 80,
+          "win_rate": 0.275,
+          "avg_outcome_pct": -0.0
+        },
+        "60m": {
+          "n": 80,
+          "win_rate": 0.263,
+          "avg_outcome_pct": -0.02
+        },
+        "240m": {
+          "n": 80,
+          "win_rate": 0.375,
+          "avg_outcome_pct": 0.07
         }
       }
     },
@@ -23493,9 +23493,9 @@
           "avg_outcome_pct": -0.37
         },
         "240m": {
-          "n": 13,
-          "win_rate": 0.154,
-          "avg_outcome_pct": -0.9
+          "n": 14,
+          "win_rate": 0.143,
+          "avg_outcome_pct": -1.0
         }
       }
     },
