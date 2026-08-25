@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-25T17:56:27.212583+00:00",
+  "generated_at": "2026-08-25T17:58:35.065742+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "AAVEUSDT|sustained|SHORT": {
-      "symbol": "AAVEUSDT",
-      "alert_type": "sustained",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 8,
-          "win_rate": 0.25,
-          "avg_outcome_pct": 0.08
-        },
-        "60m": {
-          "n": 8,
-          "win_rate": 0.375,
-          "avg_outcome_pct": 0.01
-        },
-        "240m": {
-          "n": 8,
-          "win_rate": 0.5,
-          "avg_outcome_pct": 0.28
-        }
-      }
-    },
     "KAITOUSDT|burst|SHORT": {
       "symbol": "KAITOUSDT",
       "alert_type": "burst",
@@ -9001,6 +8979,28 @@
         }
       }
     },
+    "AAVEUSDT|sustained|SHORT": {
+      "symbol": "AAVEUSDT",
+      "alert_type": "sustained",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 7,
+          "win_rate": 0.143,
+          "avg_outcome_pct": -0.01
+        },
+        "60m": {
+          "n": 7,
+          "win_rate": 0.286,
+          "avg_outcome_pct": -0.07
+        },
+        "240m": {
+          "n": 7,
+          "win_rate": 0.429,
+          "avg_outcome_pct": -0.14
+        }
+      }
+    },
     "USUSDT|sustained|SHORT": {
       "symbol": "USUSDT",
       "alert_type": "sustained",
@@ -10723,9 +10723,9 @@
       "direction": "SHORT",
       "stages": {
         "30m": {
-          "n": 125,
-          "win_rate": 0.328,
-          "avg_outcome_pct": -0.12
+          "n": 126,
+          "win_rate": 0.325,
+          "avg_outcome_pct": -0.13
         },
         "60m": {
           "n": 125,
