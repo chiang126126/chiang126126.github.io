@@ -1,52 +1,8 @@
 {
-  "generated_at": "2026-08-25T03:00:44.156522+00:00",
+  "generated_at": "2026-08-25T03:02:54.281821+00:00",
   "win_threshold_pct": 0.5,
   "min_samples": 5,
   "by_key": {
-    "ALLOUSDT|sustained|LONG": {
-      "symbol": "ALLOUSDT",
-      "alert_type": "sustained",
-      "direction": "LONG",
-      "stages": {
-        "30m": {
-          "n": 81,
-          "win_rate": 0.519,
-          "avg_outcome_pct": 0.2
-        },
-        "60m": {
-          "n": 81,
-          "win_rate": 0.469,
-          "avg_outcome_pct": 0.42
-        },
-        "240m": {
-          "n": 81,
-          "win_rate": 0.37,
-          "avg_outcome_pct": -0.15
-        }
-      }
-    },
-    "TAOUSDT|burst|SHORT": {
-      "symbol": "TAOUSDT",
-      "alert_type": "burst",
-      "direction": "SHORT",
-      "stages": {
-        "30m": {
-          "n": 20,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -0.25
-        },
-        "60m": {
-          "n": 20,
-          "win_rate": 0.25,
-          "avg_outcome_pct": -0.32
-        },
-        "240m": {
-          "n": 20,
-          "win_rate": 0.2,
-          "avg_outcome_pct": -0.64
-        }
-      }
-    },
     "UNIUSDT|burst|SHORT": {
       "symbol": "UNIUSDT",
       "alert_type": "burst",
@@ -767,8 +723,8 @@
           "avg_outcome_pct": -0.44
         },
         "240m": {
-          "n": 32,
-          "win_rate": 0.531,
+          "n": 33,
+          "win_rate": 0.515,
           "avg_outcome_pct": -0.18
         }
       }
@@ -10179,6 +10135,28 @@
         }
       }
     },
+    "ALLOUSDT|sustained|LONG": {
+      "symbol": "ALLOUSDT",
+      "alert_type": "sustained",
+      "direction": "LONG",
+      "stages": {
+        "30m": {
+          "n": 80,
+          "win_rate": 0.525,
+          "avg_outcome_pct": 0.21
+        },
+        "60m": {
+          "n": 80,
+          "win_rate": 0.475,
+          "avg_outcome_pct": 0.42
+        },
+        "240m": {
+          "n": 80,
+          "win_rate": 0.375,
+          "avg_outcome_pct": -0.13
+        }
+      }
+    },
     "BSVUSDT|burst|SHORT": {
       "symbol": "BSVUSDT",
       "alert_type": "burst",
@@ -10990,6 +10968,28 @@
           "n": 38,
           "win_rate": 0.184,
           "avg_outcome_pct": -1.59
+        }
+      }
+    },
+    "TAOUSDT|burst|SHORT": {
+      "symbol": "TAOUSDT",
+      "alert_type": "burst",
+      "direction": "SHORT",
+      "stages": {
+        "30m": {
+          "n": 19,
+          "win_rate": 0.211,
+          "avg_outcome_pct": -0.18
+        },
+        "60m": {
+          "n": 19,
+          "win_rate": 0.263,
+          "avg_outcome_pct": -0.18
+        },
+        "240m": {
+          "n": 19,
+          "win_rate": 0.211,
+          "avg_outcome_pct": -0.39
         }
       }
     },
@@ -28677,9 +28677,9 @@
           "avg_outcome_pct": -0.68
         },
         "240m": {
-          "n": 66,
-          "win_rate": 0.515,
-          "avg_outcome_pct": 1.14
+          "n": 67,
+          "win_rate": 0.507,
+          "avg_outcome_pct": 0.9
         }
       }
     },
