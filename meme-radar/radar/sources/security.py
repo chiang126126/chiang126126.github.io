@@ -35,6 +35,9 @@ class Security:
             return None
         res = (payload.get("result") or {}).get(norm_addr(token)) or (payload.get("result") or {}).get(token)
         if not res:
+            self._empty = getattr(self, "_empty", 0) + 1
+            if self._empty >= 3 and self.goplus_supported is None:
+                self.goplus_supported = False      # 连续空结果：本链大概率未被 GoPlus 索引，不再浪费调用
             return None
         self.goplus_supported = True
         return res

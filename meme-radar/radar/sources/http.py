@@ -45,7 +45,7 @@ class HttpClient:
         self.headers = {"User-Agent": UA, "Accept": "application/json"}
         if headers:
             self.headers.update(headers)
-        self.timeout = timeout or float(os.environ.get("RADAR_HTTP_TIMEOUT", "20"))
+        self.timeout = timeout or float(os.environ.get("RADAR_HTTP_TIMEOUT", "15"))
         self.retries = retries
         self.cache_dir = (cache_dir or CACHE_DIR) / "http" / name
         self.offline = os.environ.get("RADAR_OFFLINE", "") == "1"
@@ -53,7 +53,7 @@ class HttpClient:
         self.stats = {"calls": 0, "cache_hits": 0, "errors": 0, "tripped": False}
         self._mem: Dict[str, Any] = {}
         self.consecutive_errors = 0
-        self.trip_after = int(os.environ.get("RADAR_HTTP_TRIP_AFTER", "12"))   # 连续 N 次失败后熔断本源
+        self.trip_after = int(os.environ.get("RADAR_HTTP_TRIP_AFTER", "6"))    # 连续 N 次失败尝试（含重试）后熔断本源
 
     # ---------------------------------------------------------------- helpers
     @staticmethod
@@ -135,7 +135,10 @@ class HttpClient:
                     pass
                 last_err = HttpError(f"[{self.name}] HTTP {e.code} {url}", e.code, text)
                 if e.code in (400, 401, 403, 404, 422):
-                    break  # 不会因为重试而好转
+                    break  # 不会因为重试而好转（404 不计入熔断）
+                self.consecutive_errors += 1
+                if self.trip_after > 0 and self.consecutive_errors >= self.trip_after:
+                    break
                 retry_after = e.headers.get("Retry-After") if e.headers else None
                 delay = min(10.0, float(retry_after)) if retry_after and retry_after.isdigit() else min(6.0, 1.5 * (2 ** attempt))
                 if attempt >= 1 and e.code == 429:
@@ -144,9 +147,13 @@ class HttpClient:
                 time.sleep(delay)
             except (urllib.error.URLError, TimeoutError, ConnectionError, OSError, ValueError) as e:
                 last_err = HttpError(f"[{self.name}] {type(e).__name__}: {e} {url}")
-                time.sleep(1.5 * (2 ** attempt))
+                self.consecutive_errors += 1
+                if self.trip_after > 0 and self.consecutive_errors >= self.trip_after:
+                    break
+                time.sleep(min(4.0, 1.0 * (2 ** attempt)))
         self.stats["errors"] += 1
-        self.consecutive_errors += 1
+        if last_err is not None and getattr(last_err, "status", 0) == 404:
+            self.consecutive_errors = 0      # 404 是正常的“没有这个东西”
         raise last_err or HttpError(f"[{self.name}] unknown error {url}")
 
 
