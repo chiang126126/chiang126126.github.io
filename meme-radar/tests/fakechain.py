@@ -244,6 +244,8 @@ def build_fake_http(tokens: List[Token]) -> FakeHttp:
         f.route(f"https://api.dexscreener.com/token-pairs/v1/robinhood/{t.token}", lambda t=t: [ds_pair(t)])
         f.route(f"https://api.dexscreener.com/latest/dex/pairs/robinhood/{t.pool}", lambda t=t: {"pairs": [ds_pair(t)]})
     f.routes["https://api.dexscreener.com/tokens/v1/robinhood/"] = lambda: [ds_pair(t) for t in listed]
+    f.route("https://api.dexscreener.com/token-profiles/latest/v1", [])
+    f.route("https://api.dexscreener.com/token-boosts/latest/v1", [])
     # 市场数据
     closes = [60000 + i * 90 for i in range(300)]          # 稳步上涨：站上全部均线
     okx_btc = {"code": "0", "data": [[str((NOW - i * 86400) * 1000), str(c), str(c * 1.02), str(c * 0.98), str(c), "1", "1", "1", "1"]

@@ -57,6 +57,8 @@ class HttpClient:
         self.consecutive_errors = 0
         self.trip_after = int(os.environ.get("RADAR_HTTP_TRIP_AFTER", "6"))    # 连续 N 次失败尝试（含重试）后熔断本源
         self.max_calls = int(max_calls or 0)                                      # 每轮网络调用预算（0 = 不限）
+        self.rate_limit_sleep_budget = float(os.environ.get("RADAR_HTTP_429_SLEEP_BUDGET", "180"))   # 每轮为 429 等待的总秒数
+        self.rate_limit_slept = 0.0
 
     # ---------------------------------------------------------------- helpers
     @staticmethod
@@ -144,10 +146,17 @@ class HttpClient:
                     break  # 不会因为重试而好转（404 不计入熔断）
                 retry_after = e.headers.get("Retry-After") if e.headers else None
                 if e.code == 429:
-                    # 限流不是故障：不计入熔断，按 Retry-After 或 12s×(attempt+1) 等待后重试
+                    # 限流不是故障：不计入熔断，按 Retry-After 或 12s×(attempt+1) 等待后重试；
+                    # 但每轮为 429 等待的总时间有上限，超过后立刻失败（把时间留给别的数据源）
                     self.stats["rate_limited"] = self.stats.get("rate_limited", 0) + 1
                     delay = float(retry_after) if retry_after and retry_after.isdigit() else 12.0 * (attempt + 1)
-                    time.sleep(min(45.0, max(3.0, delay)))
+                    delay = min(45.0, max(3.0, delay))
+                    if self.rate_limit_slept + delay > self.rate_limit_sleep_budget:
+                        self.stats["rate_limit_budget_exhausted"] = True
+                        last_err = HttpError(f"[{self.name}] HTTP 429 (sleep budget exhausted) {url}", 429, text)
+                        break
+                    self.rate_limit_slept += delay
+                    time.sleep(delay)
                     continue
                 self.consecutive_errors += 1
                 if self.trip_after > 0 and self.consecutive_errors >= self.trip_after:

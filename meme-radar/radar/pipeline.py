@@ -134,15 +134,41 @@ class Pipeline:
         return regime
 
     # ---------------------------------------------------------------- 第二层：发现 + 初筛
+    def _gt_ok(self) -> bool:
+        st = getattr(self.h["geckoterminal"], "stats", {}) or {}
+        return not (st.get("rate_limit_budget_exhausted") or st.get("budget_exhausted") or st.get("tripped"))
+
+    def _within_budget(self) -> bool:
+        return (time.time() - self.t_start) < self.time_budget
+
     def discover(self) -> List[PoolSnapshot]:
-        """新池（最多 N 页，直到超出年龄窗口）+ 趋势池（5m/1h/6h/24h）+ 最活跃池（按 24h 笔数）。
-        只保留年龄 ≤ max_age_hours（或未知年龄）的池，让候选与随机基线来自同一个『早期宇宙』。"""
+        """三路发现，全部 best-effort：
+          1) GeckoTerminal：趋势池（24h/1h）→ 新池（≤N 页）→ 最活跃池；GitHub 共享出口 IP 上限流很严，按价值排序、随时可停
+          2) DexScreener：最新代币档案 / 付费推广（本链）→ 批量交易对
+          3) 滚动宇宙：上一轮见过、仍在年龄窗口内的代币，用 DexScreener 批量刷新（30 个/次，不限流）——
+             这样 6 分钟前太新的代币，会在 2h/4h/… 后被重新评估
+        只保留年龄 ≤ max_age_hours（或未知）的池，让候选与随机基线来自同一个『早期宇宙』。"""
         uni = self.rules.get("universe") or {}
         max_age = float(uni.get("max_age_hours", 72))
         seen: Dict[str, PoolSnapshot] = {}
         n_raw = 0
         newest_ts, oldest_ts, n_new = None, None, 0
-        for page in range(1, int(uni.get("new_pools_pages", 5)) + 1):
+        src_counts = {"gt_trending": 0, "gt_new": 0, "gt_active": 0, "ds_promoted": 0, "ds_rolling": 0}
+
+        # 1) GeckoTerminal
+        for d in uni.get("trending_durations") or ["24h", "1h"]:
+            if not self._gt_ok() or not self._within_budget():
+                break
+            try:
+                for p in self.gt.trending_pools(d):
+                    n_raw += 1
+                    if self._consider(seen, p, max_age):
+                        src_counts["gt_trending"] += 1
+            except Exception as e:
+                self.fail(f"trending {d}", e)
+        for page in range(1, int(uni.get("new_pools_pages", 4)) + 1):
+            if not self._gt_ok() or not self._within_budget():
+                break
             try:
                 pools = self.gt.new_pools(page)
             except Exception as e:
@@ -157,17 +183,13 @@ class Pipeline:
                 if ts:
                     newest_ts = max(newest_ts, ts) if newest_ts else ts
                     oldest_ts = min(oldest_ts, ts) if oldest_ts else ts
-                self._consider(seen, p, max_age)
+                if self._consider(seen, p, max_age):
+                    src_counts["gt_new"] += 1
             if pools[-1].age_hours is not None and pools[-1].age_hours > max_age:
                 break
-        for d in uni.get("trending_durations") or ["1h"]:
-            try:
-                for p in self.gt.trending_pools(d):
-                    n_raw += 1
-                    self._consider(seen, p, max_age)
-            except Exception as e:
-                self.fail(f"trending {d}", e)
-        for page in range(1, int(uni.get("active_pools_pages", 2)) + 1):
+        for page in range(1, int(uni.get("active_pools_pages", 1)) + 1):
+            if not self._gt_ok() or not self._within_budget():
+                break
             try:
                 pools = self.gt.top_pools(page, sort="h24_tx_count_desc")
             except Exception as e:
@@ -177,8 +199,44 @@ class Pipeline:
                 break
             n_raw += len(pools)
             for p in pools:
-                self._consider(seen, p, max_age)
+                if self._consider(seen, p, max_age):
+                    src_counts["gt_active"] += 1
+
+        # 2) DexScreener 推广/档案（本链）
+        promoted: List[str] = []
+        for fn in (self.ds.latest_profiles, self.ds.latest_boosts):
+            try:
+                for it in fn():
+                    a = (it.get("tokenAddress") or "").lower()
+                    if a and a not in seen and a not in promoted:
+                        promoted.append(a)
+            except Exception as e:
+                self.fail("dexscreener promoted", e)
+        # 3) 滚动宇宙：上轮见过、仍在窗口内、这轮没被 GT 发现的
+        now = now_utc()
+        rolling: List[str] = []
+        for tok, v in self.prev.items():
+            if tok in seen or tok in promoted or not v.get("pool"):
+                continue
+            created = parse_iso(v.get("pool_created_at")) or parse_iso(v.get("first_seen"))
+            if created and (now - created).total_seconds() / 3600.0 <= max_age:
+                rolling.append(tok)
+        rolling = rolling[: int(uni.get("rolling_refresh_max", 150))]
+        for label, addrs in (("ds_promoted", promoted[:60]), ("ds_rolling", rolling)):
+            if not addrs:
+                continue
+            try:
+                pairs = self.ds.tokens(addrs)
+            except Exception as e:
+                self.fail(f"dexscreener {label}", e)
+                continue
+            for p in pairs:
+                n_raw += 1
+                if self._consider(seen, p, max_age):
+                    src_counts[label] += 1
+
         self.universe_raw = n_raw
+        self.universe_sources = src_counts
         if newest_ts and oldest_ts and n_new >= 10 and newest_ts > oldest_ts:
             span_h = (newest_ts - oldest_ts).total_seconds() / 3600.0
             self.new_pools_per_hour = round(n_new / span_h, 1) if span_h > 0 else None
@@ -186,18 +244,24 @@ class Pipeline:
             self.new_pools_per_hour = None
         return list(seen.values())
 
-    def _consider(self, seen: Dict[str, PoolSnapshot], p: PoolSnapshot, max_age: Optional[float] = None):
+    def _consider(self, seen: Dict[str, PoolSnapshot], p: PoolSnapshot, max_age: Optional[float] = None) -> bool:
         if not p.base_token or not p.pool_address:
-            return
+            return False
         if max_age is not None and p.age_hours is not None and p.age_hours > max_age:
-            return
+            return False
         if p.base_symbol.upper() in self.quotes or p.base_symbol.upper() in ("WETH", "USDC", "USDT", "ETH", "DAI"):
-            return
+            return False
         if self.quotes and p.quote_symbol and p.quote_symbol.upper() not in self.quotes:
-            return
+            return False
         cur = seen.get(p.base_token)
-        if cur is None or (p.liquidity_usd or 0) > (cur.liquidity_usd or 0):
+        if cur is None:
             seen[p.base_token] = p
+            return True
+        # 同一代币：GeckoTerminal 快照（有独立买家数）优先；否则取流动性更大的
+        if cur.source != "geckoterminal" and (p.source == "geckoterminal" or (p.liquidity_usd or 0) > (cur.liquidity_usd or 0)):
+            seen[p.base_token] = p
+            return False
+        return False
 
     def _enrich_with_dexscreener(self, snaps: List[PoolSnapshot]) -> int:
         """DexScreener 一次 30 个代币：补社交链接 / 付费推广 / 图片，并记录其流动性作交叉参考。300 次/分钟，很便宜。"""
@@ -380,13 +444,16 @@ class Pipeline:
         self.forensics.cache.save()
         self.registry.save()
         for s in snaps:
-            self.prev[s.base_token] = {"liquidity_usd": s.liquidity_usd, "price_usd": s.price_usd, "observed_at": s.observed_at}
+            self.prev[s.base_token] = {"liquidity_usd": s.liquidity_usd, "price_usd": s.price_usd, "observed_at": s.observed_at,
+                                       "pool": s.pool_address, "symbol": s.base_symbol, "name": s.base_name, "dex": s.dex,
+                                       "quote": s.quote_symbol, "pool_created_at": s.pool_created_at,
+                                       "first_seen": (self.prev.get(s.base_token) or {}).get("first_seen") or s.observed_at}
         cutoff = now_utc().timestamp() - 7 * 86400
         self.prev = {k: v for k, v in self.prev.items() if (parse_iso(v.get("observed_at")) or now_utc()).timestamp() >= cutoff}
         save_json(self.prev_path, {"updated": iso(), "tokens": self.prev})
 
         universe = {"discovered": len(snaps), "raw_rows": getattr(self, "universe_raw", 0), "prefiltered": len(passed),
-                    "new_pools_per_hour": self.new_pools_per_hour,
+                    "new_pools_per_hour": self.new_pools_per_hour, "sources": getattr(self, "universe_sources", {}),
                     "forensics_done": sum(1 for c in candidates if c.forensics and c.forensics.quality != "none"),
                     "skipped": len(failed), "new_samples": n_new, "new_baseline": n_base,
                     "degraded_to_shallow": degraded, "seconds": round(time.time() - t0, 1)}
@@ -404,7 +471,7 @@ class Pipeline:
                 out["price_now"], out["liq_now"], out["pool_alive"] = pair.price_usd, pair.liquidity_usd, True
         except Exception:
             pass
-        if self._ohlcv_calls < self._ohlcv_max:
+        if self._ohlcv_calls < self._ohlcv_max and self._gt_ok():
             self._ohlcv_calls += 1
             try:
                 out["candles"] = self.gt.ohlcv(pool, "hour", 1, min(1000, max(hours, 2)), before_timestamp=until + 3600)
@@ -478,14 +545,14 @@ class Pipeline:
         stages = stages or {"regime", "outcomes", "scan", "evaluate", "report"}
         t0 = time.time()
         regime = self.run_regime() if "regime" in stages else (load_json(DATA_DIR / "regime.json", {}) or {"regime": "BTC_ONLY", "risk_budget": 0.0, "max_new_positions": 0})
-        if "outcomes" in stages:
-            self.run_outcomes()
         scan = {"candidates": [], "skip_candidates": [], "baseline": [], "universe": {}}
         if "scan" in stages:
             try:
                 scan = self.run_scan(regime)
             except Exception as e:
                 self.fail("scan", e)
+        if "outcomes" in stages:          # 放在 scan 之后：GeckoTerminal 的配额先给发现层
+            self.run_outcomes()
         evaluation = self.run_evaluate() if "evaluate" in stages else (load_json(DATA_DIR / "evaluation.json", {}) or {})
         summary = {}
         if "report" in stages:
