@@ -126,7 +126,7 @@
       <span>买家 1h <b>${b.buyers_h1 ?? '—'}</b></span><span>sybil <b class="${f && f.sybil_score >= 0.5 ? 'neg' : f && f.sybil_score <= 0.2 ? 'pos' : ''}">${f ? f.sybil_score : '—'}</b></span><span>聪明钱 <b>${sm.count ?? 0}</b></span>`;
     const detail = `
       <div class="blk"><h4>七维评分 · ${b.score}</h4>${scoreBars(b.score_breakdown)}
-        <h4 style="margin-top:12px">持有人星图 · 前 ${f ? f.inspected : 0} 个 EOA</h4>${constellation(f)}
+        <h4 style="margin-top:12px">持有人星图 · 前 ${f ? f.inspected : 0} 个 EOA${f && f.profiled != null ? ' · 画像 ' + f.profiled + '/' + f.inspected : ''}</h4>${constellation(f)}
         ${f && f.clusters && f.clusters.length ? `<ul class="notes">${f.clusters.slice(0, 4).map((c, i) => `<li>簇#${i + 1}：${c.size} 个钱包持 ${c.pct}% · ${c.reasons.join(', ')} · ${c.wallets.slice(0, 3).map(short).join(' ')}</li>`).join('')}</ul>` : ''}
         ${f && f.notes && f.notes.length ? `<ul class="notes">${f.notes.map(n => `<li>${esc(n)}</li>`).join('')}</ul>` : ''}
       </div>

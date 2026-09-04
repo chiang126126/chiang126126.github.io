@@ -52,7 +52,7 @@ class Pipeline:
         bs_key = env.blockscout_api_key
         self.h = {
             "geckoterminal": H("geckoterminal", 0.2, retries=3, max_calls=int(env_get("RADAR_GT_MAX_CALLS", "60"))), "dexscreener": H("dexscreener", 4.0, retries=1),
-            "blockscout": H("blockscout", 4.5 if bs_key else 1.0, retries=2, headers={"User-Agent": BROWSER_UA}), "rpc": H("rpc", 5.0, retries=1, timeout=12),
+            "blockscout": H("blockscout", 4.5 if bs_key else 0.6, retries=2, headers={"User-Agent": BROWSER_UA}), "rpc": H("rpc", 5.0, retries=1, timeout=12),
             "okx": H("okx", 2.0, retries=2), "coinbase": H("coinbase", 2.0, retries=1), "coingecko": H("coingecko", 0.4, retries=2),
             "fng": H("fng", 1.0, retries=1), "goplus": H("goplus", 1.0, retries=0, timeout=10),
             "llm": H("llm", 1.0, timeout=90, retries=1), "gmgn": H("gmgn", 1.0, retries=1),

@@ -86,6 +86,7 @@ class ForensicsResult:
     quality: str = "none"                # full / partial / none
     holders_total: Optional[int] = None
     inspected: int = 0
+    profiled: int = 0                    # 拿到完整画像（年龄+打款方+计数）的钱包数
     contract_held_pct: float = 0.0
     burn_pct: float = 0.0
     creator_pct: float = 0.0

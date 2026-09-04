@@ -197,6 +197,7 @@ class Forensics:
         res.inspected = len(inspect)
         res.inspected_pct = round(sum(h.pct_supply for h in inspect), 3)
         full = sum(1 for p in profiles.values() if p.quality == "full")
+        res.profiled = full
         res.quality = "full" if inspect and full >= 0.7 * len(inspect) else "partial"
 
         # ---- 早期买家（创建区块起 ≤1000 条 Transfer）
@@ -295,6 +296,8 @@ class Forensics:
         if res.quality != "full":
             score *= 0.8   # 数据不全时不要过度定罪
         res.sybil_score = round(clamp(score, 0, 1), 3)
+        if res.inspected and res.profiled < res.inspected:
+            res.notes.append(f"钱包画像覆盖 {res.profiled}/{res.inspected}（浏览器 API 限流），sybil 分只反映已画像部分")
 
         cluster_of: Dict[str, int] = {}
         for ci, cl in enumerate(clusters):
@@ -350,6 +353,7 @@ class Forensics:
             hm.append({"a": w, "p": round(usd / total * 100, 3), "c": None, "f": is_fresh, "age": None, "tx": nonce, "k": "buyer"})
         res.holder_map = hm
         res.inspected = checked
+        res.profiled = sum(1 for h in hm if h.get("tx") is not None)
         res.inspected_pct = round(sum(v for _, v in top) / total * 100, 3)
         res.fresh_wallet_count = fresh_n
         res.fresh_wallet_pct = round(fresh_usd / total * 100, 3)

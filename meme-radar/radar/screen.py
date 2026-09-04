@@ -121,9 +121,10 @@ def score(snap: PoolSnapshot, security: Optional[SecurityInfo], forensics: Optio
 
     # 4 钱包独立性（取证）
     if forensics and forensics.quality != "none":
-        s = 1.0 - forensics.sybil_score
-        if forensics.quality in ("partial", "lite"):
-            s = 0.5 * s + 0.25
+        cov = (forensics.profiled / forensics.inspected) if forensics.inspected else 0.0
+        if forensics.quality == "lite":
+            cov *= 0.6      # lite 只有 nonce，证据力度打折
+        s = cov * (1.0 - forensics.sybil_score) + (1.0 - cov) * 0.5     # 未画像部分按中性
     else:
         s = 0.5
     b["sybil_integrity"] = clamp(s, 0.0, 1.0)

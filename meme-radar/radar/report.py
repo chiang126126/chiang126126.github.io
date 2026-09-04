@@ -24,7 +24,7 @@ def _cand_brief(c: Candidate) -> Dict[str, Any]:
                       "clusters": fo.clusters[:5], "fresh_wallet_pct": fo.fresh_wallet_pct, "fresh_wallet_count": fo.fresh_wallet_count,
                       "creator_pct": fo.creator_pct, "sybil_score": fo.sybil_score, "launchpad": fo.launchpad,
                       "curve_status": fo.curve_status, "early_buyers_holding_pct": fo.early_buyers_holding_pct,
-                      "notes": fo.notes, "holder_map": fo.holder_map, "inspected": fo.inspected,
+                      "notes": fo.notes, "holder_map": fo.holder_map, "inspected": fo.inspected, "profiled": fo.profiled,
                       "inspected_pct": fo.inspected_pct, "contract_held_pct": fo.contract_held_pct, "burn_pct": fo.burn_pct} if fo else None,
         "security": c.security.to_dict() if c.security else None,
         "smart_money": {"count": sm.count, "weighted": sm.weighted, "net_buy_usd": sm.net_buy_usd,
