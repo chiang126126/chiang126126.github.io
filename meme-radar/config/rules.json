@@ -1,5 +1,5 @@
 {
-  "version": "0.1.1",
+  "version": "0.1.2",
   "_doc": "所有阈值与权重集中在这里；每次改动请 bump version，评估层会按 rules_version 分组统计，避免把不同规则下的样本混在一起。",
   "universe": {
     "max_age_hours": 72,
@@ -22,7 +22,8 @@
     "active_pools_pages": 1,
     "baseline_min_buyers_24h": 10,
     "_doc_gt_budget": "GeckoTerminal 公共 API 在 GitHub 共享出口 IP 上限流很严：发现层 ≈ 7 次调用，成交只为深挖候选拉取，OHLCV 每轮 ≤ 20 次，总预算 RADAR_GT_MAX_CALLS（默认 60）。",
-    "rolling_refresh_max": 150
+    "rolling_refresh_max": 150,
+    "public_instance_max_forensics": 10
   },
   "hard_filters": {
     "min_liquidity_usd": 15000,
@@ -37,7 +38,8 @@
     "max_buy_tax_pct": 10,
     "kill_if_honeypot": true,
     "kill_if_sybil_score_above": 0.75,
-    "kill_if_h24_change_pct_above": 3000
+    "kill_if_h24_change_pct_above": 3000,
+    "wash_exempt_min_buyers_24h": 300
   },
   "score_weights": {
     "liquidity_health": 10,
@@ -109,7 +111,8 @@
     "batch_creation_window_minutes": 15,
     "min_batch_size": 3,
     "early_buyers_count": 30,
-    "wallet_cache_max_entries": 6000
+    "wallet_cache_max_entries": 6000,
+    "public_instance_top_holders": 15
   },
   "smart_money": {
     "min_wins": 2,

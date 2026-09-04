@@ -100,6 +100,13 @@ meme-radar/
 
 ## 5. 已知边界与下一步
 
+**真实运行观察（2026-09-04，GitHub Actions）**：
+- GeckoTerminal 公共 API 在 GitHub 共享出口 IP 上的有效配额远低于名义的 30 次/分钟（首轮 19 次调用被限流 11 次）。系统按 429 的 Retry-After 等待、每轮总调用 ≤ 60 次、429 累计等待 ≤ 180s，发现层压缩到约 7 次调用，并用 DexScreener（300 次/分钟、30 个代币一次）做滚动刷新与补充。
+- Blockscout 公共实例需要浏览器 User-Agent 才放行，且约 1 次/秒就开始 429；无 PRO key 时每轮只深挖 ≤ 10 个代币、每个查前 15 个持有人（quality 多为 partial）。**配置免费的 `BLOCKSCOUT_API_KEY`（5 rps / 10 万次每天）后自动切到 PRO 端点并恢复全量取证。**
+- GoPlus 对 Chain 4663 可用（返回 honeypot / 税率 / owner / closed_source）。
+- GeckoTerminal 把 Pons 曲线阶段索引为 dex `pons-v2`、毕业池为 `pons-v2-dex`（另有 `bankr` 等发射台）；本链新池速率约 1200 个/小时（≈2.9 万/天），`new_pools` 单页只覆盖约 1 分钟，因此滚动宇宙（上一轮见过的 72h 内代币下一轮再评估）是发现层的关键。
+- 首个真实候选 PONSERS（Pons 毕业池，$48k 流动性，313 持有人）：取证 partial、sybil 0.043、1 个同一打款方的 2 钱包簇、前 5 买家占买入额 78% → 评分 74.5 达到买入线但被红旗 `BUYS_CONCENTRATED` 拦为 WATCH。这正是"评分高不等于可以买"的设计意图。
+
 - **Pons 曲线阶段**（未毕业到 Uniswap V4 的代币）目前只在 GeckoTerminal 收录时可见；直接解析 Pons 工厂事件（`TokenLaunched / PoolGraduated`）的 RPC 适配器已留接口（`sources/evm_rpc.py`、`sources/pons.py`），需要补 ABI。
 - **GoPlus** 对 4663 的支持未确认：不支持时用链上兜底（Pons 模板代币视为无税无 owner；非 Pons 代币查 `owner()` 与验证状态）。
 - **X/Twitter 讨论**没有免费接口，叙事/社交维度只用 DexScreener/GeckoTerminal 的社交链接与付费推广标记（付费推广是减分项）。

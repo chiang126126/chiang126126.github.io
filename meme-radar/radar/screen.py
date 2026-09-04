@@ -36,8 +36,9 @@ def hard_filter(snap: PoolSnapshot, security: Optional[SecurityInfo], forensics:
     vol24 = snap.vol("h24")
     if liq > 0:
         r = vol24 / liq
-        if r > float(hf.get("max_vol_to_liq_24h", 60)):
-            kills.append("vol/liq_too_high(wash?)")
+        many_buyers = buyers24 >= int(hf.get("wash_exempt_min_buyers_24h", 300))
+        if r > float(hf.get("max_vol_to_liq_24h", 60)) and not many_buyers:
+            kills.append("vol/liq_too_high(wash?)")   # 成交额相对池子过大且买家很少：更像洗量；买家很多的爆款不杀
         if r < float(hf.get("min_vol_to_liq_24h", 0.2)):
             kills.append("vol/liq_too_low(dead)")
     chg24 = snap.chg("h24")

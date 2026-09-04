@@ -52,7 +52,7 @@ class Pipeline:
         bs_key = env.blockscout_api_key
         self.h = {
             "geckoterminal": H("geckoterminal", 0.2, retries=3, max_calls=int(env_get("RADAR_GT_MAX_CALLS", "60"))), "dexscreener": H("dexscreener", 4.0, retries=1),
-            "blockscout": H("blockscout", 4.5 if bs_key else 1.5, retries=2, headers={"User-Agent": BROWSER_UA}), "rpc": H("rpc", 5.0, retries=1, timeout=12),
+            "blockscout": H("blockscout", 4.5 if bs_key else 1.0, retries=2, headers={"User-Agent": BROWSER_UA}), "rpc": H("rpc", 5.0, retries=1, timeout=12),
             "okx": H("okx", 2.0, retries=2), "coinbase": H("coinbase", 2.0, retries=1), "coingecko": H("coingecko", 0.4, retries=2),
             "fng": H("fng", 1.0, retries=1), "goplus": H("goplus", 1.0, retries=0, timeout=10),
             "llm": H("llm", 1.0, timeout=90, retries=1), "gmgn": H("gmgn", 1.0, retries=1),
@@ -73,6 +73,12 @@ class Pipeline:
         self.ai = AiJudge(env, self.h["llm"], int((self.rules.get("decision") or {}).get("max_ai_judgements_per_run", 8)))
         self.gmgn = Gmgn(self.h["gmgn"], env.gmgn_api_key, env.gmgn_base_url, sc.get("geckoterminal_network", "robinhood"))
         self.max_forensics = max_forensics if max_forensics is not None else int((self.rules.get("universe") or {}).get("max_candidates_for_forensics", 30))
+        if not bs_key:
+            # 公共 Blockscout 实例限流严（≈1 req/s，频繁 429）：少查几个持有人、少深挖几个代币，把时间留给广度
+            fcfg = self.rules.setdefault("forensics", {})
+            fcfg["top_holders_to_inspect"] = min(int(fcfg.get("top_holders_to_inspect", 25)), int(fcfg.get("public_instance_top_holders", 15)))
+            self.max_forensics = min(self.max_forensics, int((self.rules.get("universe") or {}).get("public_instance_max_forensics", 10)))
+            self.forensics.cfg = fcfg
         self.quotes = {q.upper() for q in ((self.rules.get("universe") or {}).get("quote_tokens_allowed") or [])}
         self.time_budget = float(env_get("RADAR_TIME_BUDGET_SEC", "1500"))   # 单轮扫描时间预算（秒）
         self._bs_reported = False
