@@ -46,7 +46,7 @@ class TestPipelineOffline(unittest.TestCase):
         self.assertNotIn("DEADCOIN", symbols)
         self.assertNotIn("OLDIE", symbols)
         self.assertIn("GOODCAT", symbols)
-        self.assertGreaterEqual(u["discovered"], 8)
+        self.assertEqual(u["discovered"], 7)          # OLDIE（100h）在发现阶段就被年龄窗口排除
         skipped = {c.symbol for c in self.result["scan"]["skip_candidates"]}
         self.assertIn("NEWBORN", skipped)      # 太新但流动性够 → 记录为 SKIP 样本
         self.assertNotIn("DEADCOIN", skipped)  # 流动性 < 3000 不进样本

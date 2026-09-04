@@ -42,16 +42,11 @@ class Security:
         self.goplus_supported = True
         return res
 
-    def check(self, token: str, address_info: Optional[Dict[str, Any]] = None) -> SecurityInfo:
+    def check(self, token: str, address_info: Optional[Dict[str, Any]] = None, launchpad_hint: str = "") -> SecurityInfo:
         token = norm_addr(token)
         info = SecurityInfo(token=token)
         addr = address_info or {}
-        if not addr and self.bs is not None:
-            try:
-                addr = self.bs.address(token)
-            except Exception:
-                addr = {}
-        launchpad = self.pons.detect(addr.get("creator", ""), addr.get("name", "")) if self.pons else ""
+        launchpad = (self.pons.detect(addr.get("creator", ""), addr.get("name", "")) if self.pons else "") or launchpad_hint
         info.launchpad = launchpad
         info.is_verified = addr.get("is_verified")
         if addr.get("is_scam"):

@@ -53,7 +53,7 @@ def hard_filter(snap: PoolSnapshot, security: Optional[SecurityInfo], forensics:
         for f in ("cannot_sell_all", "is_blacklisted", "transfer_pausable", "explorer_scam_tag"):
             if f in security.flags:
                 kills.append(f)
-    if forensics and forensics.quality != "none":
+    if forensics and forensics.quality in ("full", "partial"):
         if forensics.top10_eoa_pct > float(hf.get("max_top10_holder_pct", 50)):
             kills.append("top10_too_concentrated")
         if forensics.creator_pct > float(hf.get("max_creator_pct", 10)):
@@ -121,7 +121,7 @@ def score(snap: PoolSnapshot, security: Optional[SecurityInfo], forensics: Optio
     # 4 钱包独立性（取证）
     if forensics and forensics.quality != "none":
         s = 1.0 - forensics.sybil_score
-        if forensics.quality == "partial":
+        if forensics.quality in ("partial", "lite"):
             s = 0.5 * s + 0.25
     else:
         s = 0.5

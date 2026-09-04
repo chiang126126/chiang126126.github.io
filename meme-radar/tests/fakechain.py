@@ -201,12 +201,13 @@ def build_fake_http(tokens: List[Token]) -> FakeHttp:
     for p in range(2, 8):
         f.route(f"{GT}/networks/robinhood/new_pools?page={p}&{include}", {"data": [], "included": []})
     trending = [t for t in listed if t.symbol in ("GOODCAT", "FAKEPUMP")]
-    for d in ("1h", "6h", "24h"):
+    for d in ("5m", "1h", "6h", "24h"):
         f.route(f"{GT}/networks/robinhood/trending_pools?page=1&duration={d}&{include}",
                 {"data": [t.gt_pool() for t in trending], "included": sum((t.gt_included() for t in trending), [])})
     for p in (1, 2, 3):
-        f.route(f"{GT}/networks/robinhood/pools?page={p}&sort=h24_volume_usd_desc&{include}",
-                {"data": [t.gt_pool() for t in listed] if p == 1 else [], "included": sum((t.gt_included() for t in listed), []) if p == 1 else []})
+        for sort in ("h24_volume_usd_desc", "h24_tx_count_desc"):
+            f.route(f"{GT}/networks/robinhood/pools?page={p}&sort={sort}&{include}",
+                    {"data": [t.gt_pool() for t in listed] if p == 1 else [], "included": sum((t.gt_included() for t in listed), []) if p == 1 else []})
     for t in listed:
         f.route(f"{GT}/networks/robinhood/pools/{t.pool}?{include}", lambda t=t: {"data": t.gt_pool(), "included": t.gt_included()})
         f.route(f"{GT}/networks/robinhood/pools/{t.pool}/trades?trade_volume_in_usd_greater_than=0", lambda t=t: t.trades())

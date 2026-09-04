@@ -1,13 +1,15 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.1",
   "_doc": "所有阈值与权重集中在这里；每次改动请 bump version，评估层会按 rules_version 分组统计，避免把不同规则下的样本混在一起。",
   "universe": {
     "max_age_hours": 72,
     "min_age_minutes": 20,
-    "new_pools_pages": 5,
+    "new_pools_pages": 8,
     "trending_durations": [
+      "5m",
       "1h",
-      "6h"
+      "6h",
+      "24h"
     ],
     "quote_tokens_allowed": [
       "ETH",
@@ -17,8 +19,10 @@
     ],
     "max_candidates_for_forensics": 30,
     "baseline_sample_per_run": 4,
-    "baseline_min_liquidity_usd": 3000,
-    "skip_samples_per_run": 8
+    "baseline_min_liquidity_usd": 8000,
+    "skip_samples_per_run": 8,
+    "active_pools_pages": 2,
+    "baseline_min_buyers_24h": 10
   },
   "hard_filters": {
     "min_liquidity_usd": 15000,

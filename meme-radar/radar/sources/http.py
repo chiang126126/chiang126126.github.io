@@ -24,6 +24,7 @@ from typing import Any, Dict, Optional
 from ..util import CACHE_DIR, load_json, save_json
 
 UA = "meme-radar/0.1 (+https://github.com/chiang126126/chiang126126.github.io)"
+BROWSER_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36"
 
 
 class HttpError(Exception):
@@ -157,6 +158,7 @@ class HttpClient:
         self.stats["errors"] += 1
         if last_err is not None and getattr(last_err, "status", 0) == 404:
             self.consecutive_errors = 0      # 404 是正常的“没有这个东西”
+        self.stats["last_error"] = str(last_err)[:160] if last_err else "unknown"
         raise last_err or HttpError(f"[{self.name}] unknown error {url}")
 
 

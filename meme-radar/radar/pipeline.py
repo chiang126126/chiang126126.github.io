@@ -28,7 +28,7 @@ from .sources.dexscreener import DexScreener
 from .sources.evm_rpc import EvmRpc
 from .sources.geckoterminal import GeckoTerminal
 from .sources.gmgn import Gmgn, import_manual
-from .sources.http import HttpClient, HttpError
+from .sources.http import BROWSER_UA, HttpClient, HttpError
 from .sources.market import MarketData
 from .sources.pons import Pons
 from .sources.security import Security
@@ -52,7 +52,7 @@ class Pipeline:
         bs_key = env.blockscout_api_key
         self.h = {
             "geckoterminal": H("geckoterminal", 0.25, retries=3), "dexscreener": H("dexscreener", 4.0, retries=1),
-            "blockscout": H("blockscout", 4.5 if bs_key else 1.5, retries=2), "rpc": H("rpc", 5.0, retries=1, timeout=12),
+            "blockscout": H("blockscout", 4.5 if bs_key else 1.5, retries=2, headers={"User-Agent": BROWSER_UA}), "rpc": H("rpc", 5.0, retries=1, timeout=12),
             "okx": H("okx", 2.0, retries=2), "coinbase": H("coinbase", 2.0, retries=1), "coingecko": H("coingecko", 0.4, retries=2),
             "fng": H("fng", 1.0, retries=1), "goplus": H("goplus", 1.0, retries=0, timeout=10),
             "llm": H("llm", 1.0, timeout=90, retries=1), "gmgn": H("gmgn", 1.0, retries=1),
@@ -75,6 +75,8 @@ class Pipeline:
         self.max_forensics = max_forensics if max_forensics is not None else int((self.rules.get("universe") or {}).get("max_candidates_for_forensics", 30))
         self.quotes = {q.upper() for q in ((self.rules.get("universe") or {}).get("quote_tokens_allowed") or [])}
         self.time_budget = float(env_get("RADAR_TIME_BUDGET_SEC", "1500"))   # 单轮扫描时间预算（秒）
+        self._bs_reported = False
+        self.new_pools_per_hour = None
         self.t_start = time.time()
         self.prev_path = DATA_DIR / "prev_snapshots.json"
         self.prev: Dict[str, dict] = (load_json(self.prev_path, {}) or {}).get("tokens", {})
@@ -105,12 +107,7 @@ class Pipeline:
                 break
             vol += sum(p.vol("h24") for p in pools)
             n += len(pools)
-        new24 = None
-        try:
-            new24 = sum(1 for p in self.gt.new_pools(1) if p.age_hours is not None and p.age_hours <= 24)
-        except Exception:
-            pass
-        return {"top_pools_vol_24h": round(vol, 0) if n else None, "top_pools_counted": n, "new_pools_24h_est": new24}
+        return {"top_pools_vol_24h": round(vol, 0) if n else None, "top_pools_counted": n}
 
     def run_regime(self) -> Dict[str, Any]:
         hist_path = DATA_DIR / "regime_history.jsonl"
@@ -136,9 +133,13 @@ class Pipeline:
 
     # ---------------------------------------------------------------- 第二层：发现 + 初筛
     def discover(self) -> List[PoolSnapshot]:
+        """新池（最多 N 页，直到超出年龄窗口）+ 趋势池（5m/1h/6h/24h）+ 最活跃池（按 24h 笔数）。
+        只保留年龄 ≤ max_age_hours（或未知年龄）的池，让候选与随机基线来自同一个『早期宇宙』。"""
         uni = self.rules.get("universe") or {}
+        max_age = float(uni.get("max_age_hours", 72))
         seen: Dict[str, PoolSnapshot] = {}
         n_raw = 0
+        newest_ts, oldest_ts, n_new = None, None, 0
         for page in range(1, int(uni.get("new_pools_pages", 5)) + 1):
             try:
                 pools = self.gt.new_pools(page)
@@ -149,21 +150,44 @@ class Pipeline:
                 break
             n_raw += len(pools)
             for p in pools:
-                self._consider(seen, p)
-            if pools[-1].age_hours is not None and pools[-1].age_hours > float(uni.get("max_age_hours", 72)):
+                n_new += 1
+                ts = parse_iso(p.pool_created_at)
+                if ts:
+                    newest_ts = max(newest_ts, ts) if newest_ts else ts
+                    oldest_ts = min(oldest_ts, ts) if oldest_ts else ts
+                self._consider(seen, p, max_age)
+            if pools[-1].age_hours is not None and pools[-1].age_hours > max_age:
                 break
         for d in uni.get("trending_durations") or ["1h"]:
             try:
                 for p in self.gt.trending_pools(d):
                     n_raw += 1
-                    self._consider(seen, p)
+                    self._consider(seen, p, max_age)
             except Exception as e:
                 self.fail(f"trending {d}", e)
+        for page in range(1, int(uni.get("active_pools_pages", 2)) + 1):
+            try:
+                pools = self.gt.top_pools(page, sort="h24_tx_count_desc")
+            except Exception as e:
+                self.fail(f"active_pools p{page}", e)
+                break
+            if not pools:
+                break
+            n_raw += len(pools)
+            for p in pools:
+                self._consider(seen, p, max_age)
         self.universe_raw = n_raw
+        if newest_ts and oldest_ts and n_new >= 10 and newest_ts > oldest_ts:
+            span_h = (newest_ts - oldest_ts).total_seconds() / 3600.0
+            self.new_pools_per_hour = round(n_new / span_h, 1) if span_h > 0 else None
+        else:
+            self.new_pools_per_hour = None
         return list(seen.values())
 
-    def _consider(self, seen: Dict[str, PoolSnapshot], p: PoolSnapshot):
+    def _consider(self, seen: Dict[str, PoolSnapshot], p: PoolSnapshot, max_age: Optional[float] = None):
         if not p.base_token or not p.pool_address:
+            return
+        if max_age is not None and p.age_hours is not None and p.age_hours > max_age:
             return
         if p.base_symbol.upper() in self.quotes or p.base_symbol.upper() in ("WETH", "USDC", "USDT", "ETH", "DAI"):
             return
@@ -177,27 +201,41 @@ class Pipeline:
     def enrich(self, snap: PoolSnapshot, regime: Dict[str, Any], do_forensics: bool) -> Candidate:
         token, pool = snap.base_token, snap.pool_address
         cand = Candidate(token=token, symbol=snap.base_symbol, name=snap.base_name, pool=pool, snapshot=snap)
+        dex = (snap.dex or "").lower()
+        launchpad_hint = "pons_v2" if dex.startswith("pons") else ("pools_trade" if "pools" in dex and "trade" in dex else "")
+        curve_hint = ("on_curve" if dex in ("pons-v2", "pons", "pons-v1") else "graduated") if launchpad_hint.startswith("pons") else ""
         addr_info = {}
         try:
             addr_info = self.bs.address(token)
-        except Exception:
-            pass
+        except Exception as e:
+            if not self._bs_reported:
+                self._bs_reported = True
+                self.fail("blockscout", e)
         try:
-            cand.security = self.security.check(token, addr_info or None)
+            cand.security = self.security.check(token, addr_info or None, launchpad_hint=launchpad_hint)
         except Exception as e:
             self.fail(f"security {snap.base_symbol}", e)
         holders = None
+        trades: List[dict] = []
+        try:
+            trades = self.gt.trades(pool)
+        except Exception:
+            pass
         if do_forensics:
             try:
                 cand.forensics = self.forensics.analyze(token, {pool}, creator_hint=addr_info.get("creator", ""))
                 holders = self.forensics.last_holders
             except Exception as e:
                 self.fail(f"forensics {snap.base_symbol}", e)
-        trades: List[dict] = []
-        try:
-            trades = self.gt.trades(pool)
-        except Exception:
-            pass
+            if cand.forensics is not None and cand.forensics.quality == "none" and trades:
+                # Blockscout 不可用：用成交买家 + RPC nonce 做轻量取证
+                try:
+                    cand.forensics = self.forensics.analyze_lite(token, trades, base=cand.forensics)
+                except Exception as e:
+                    self.fail(f"forensics-lite {snap.base_symbol}", e)
+            if cand.forensics is not None:
+                cand.forensics.launchpad = cand.forensics.launchpad or launchpad_hint
+                cand.forensics.curve_status = cand.forensics.curve_status or curve_hint
         try:
             cand.smart_money = self.registry.signal(trades, holders)
         except Exception as e:
@@ -281,10 +319,16 @@ class Pipeline:
             except Exception as e:
                 self.fail(f"enrich-shallow {s.base_symbol}", e)
         # 被剔除但仍值得跟踪结果的样本（检验有没有错杀）
-        min_liq = float(uni.get("baseline_min_liquidity_usd", 3000))
+        min_liq = float(uni.get("baseline_min_liquidity_usd", 8000))
+        min_buyers = int(uni.get("baseline_min_buyers_24h", 10))
+
+        def eligible(s: PoolSnapshot) -> bool:
+            buyers = s.txns.get("h24", {}).get("buyers")
+            return bool(s.price_usd) and (s.liquidity_usd or 0) >= min_liq and (buyers is None or buyers >= min_buyers)
+
         skip_cands = []
         for s, kills in failed:
-            if (s.liquidity_usd or 0) >= min_liq and s.price_usd and len(skip_cands) < int(uni.get("skip_samples_per_run", 8)):
+            if eligible(s) and len(skip_cands) < int(uni.get("skip_samples_per_run", 8)):
                 c = Candidate(token=s.base_token, symbol=s.base_symbol, name=s.base_name, pool=s.pool_address, snapshot=s)
                 c.killed_by = kills
                 c.decision, c.decision_reasons = "SKIP", [f"硬过滤: {', '.join(kills)}"]
@@ -292,7 +336,7 @@ class Pipeline:
                 c.features["regime"] = regime.get("regime")
                 skip_cands.append(c)
         # 随机基线：对整个宇宙无偏随机抽样（含被选中的代币），代表『随机选』会得到什么
-        pool_for_baseline = [s for s in snaps if (s.liquidity_usd or 0) >= min_liq and s.price_usd]
+        pool_for_baseline = [s for s in snaps if eligible(s)]
         rnd = random.Random(day_key())
         baseline = rnd.sample(pool_for_baseline, min(len(pool_for_baseline), int(uni.get("baseline_sample_per_run", 4))))
 
@@ -308,6 +352,7 @@ class Pipeline:
         save_json(self.prev_path, {"updated": iso(), "tokens": self.prev})
 
         universe = {"discovered": len(snaps), "raw_rows": getattr(self, "universe_raw", 0), "prefiltered": len(passed),
+                    "new_pools_per_hour": self.new_pools_per_hour,
                     "forensics_done": sum(1 for c in candidates if c.forensics and c.forensics.quality != "none"),
                     "skipped": len(failed), "new_samples": n_new, "new_baseline": n_base,
                     "degraded_to_shallow": degraded, "seconds": round(time.time() - t0, 1)}

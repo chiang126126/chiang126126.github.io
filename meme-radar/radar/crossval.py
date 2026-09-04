@@ -76,7 +76,7 @@ def cross_validate(snap: PoolSnapshot, trades: List[dict], forensics: Optional[F
         red.append("BUYS_CONCENTRATED")
     if prev and safe_float(prev.get("liquidity_usd")) and liq and liq < 0.6 * float(prev["liquidity_usd"]):
         red.append("LIQUIDITY_DRAINING")
-    if forensics and forensics.quality != "none" and forensics.largest_cluster_pct >= 20:
+    if forensics and forensics.quality in ("full", "partial") and forensics.largest_cluster_pct >= 20:
         red.append("CLUSTER_CONTROLS_SUPPLY")
 
     # ---- 黄
@@ -97,6 +97,8 @@ def cross_validate(snap: PoolSnapshot, trades: List[dict], forensics: Optional[F
             yellow.append("SNIPERS_STILL_HOLDING")
     elif forensics is None or forensics.quality == "none":
         yellow.append("FORENSICS_UNAVAILABLE")
+    if forensics and forensics.quality == "lite":
+        yellow.append("FORENSICS_LITE")
 
     # ---- 绿：吸筹 / 广泛参与 / 买卖健康 / 有社交
     if tm["net_flow_1h_to_liq"] is not None and tm["net_flow_1h_to_liq"] >= 0.05 and chg1 is not None and -10 <= chg1 <= 15:

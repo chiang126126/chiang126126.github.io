@@ -140,7 +140,7 @@ class Forensics:
         try:
             tinfo = self.bs.token(token)
         except Exception as e:  # noqa: BLE001
-            res.notes.append(f"token 信息获取失败: {type(e).__name__}")
+            res.notes.append(f"token 信息获取失败: {str(e)[:120]}")
             res.quality = "none"
             return res
         supply = tinfo.get("total_supply") or 0
@@ -158,7 +158,7 @@ class Forensics:
         try:
             holders = self.bs.token_holders(token, limit=50, total_supply=supply or None)
         except Exception as e:  # noqa: BLE001
-            res.notes.append(f"持有人列表获取失败: {type(e).__name__}")
+            res.notes.append(f"持有人列表获取失败: {str(e)[:120]}")
             res.quality = "none"
             return res
         if not holders:
@@ -314,4 +314,50 @@ class Forensics:
             res.notes.append(f"最早 {len(early)} 个买家仍持有前排筹码 {res.early_buyers_holding_pct:.1f}%")
         res.calls_used = int(getattr(self.bs.http, "stats", {}).get("calls", 0)) - calls0
         self.cache.save()
+        return res
+
+
+    # ---------------------------------------------------------------- lite（无浏览器 API 时）
+    def analyze_lite(self, token: str, trades: List[dict], base: Optional[ForensicsResult] = None) -> ForensicsResult:
+        """Blockscout 不可用时的降级取证：按成交买家（GeckoTerminal 最近 300 笔）统计买入集中度，
+        并用 RPC eth_getTransactionCount（nonce）识别几乎没有历史的新钱包。quality = lite。"""
+        res = base or ForensicsResult(token=norm_addr(token))
+        buys: Dict[str, float] = {}
+        for t in trades or []:
+            if t.get("kind") == "buy" and t.get("wallet"):
+                buys[t["wallet"]] = buys.get(t["wallet"], 0.0) + float(t.get("volume_usd") or 0.0)
+        if not buys:
+            res.notes.append("lite：没有可用成交买家")
+            return res
+        total = sum(buys.values()) or 1.0
+        top = sorted(buys.items(), key=lambda kv: -kv[1])[:int(self.cfg.get("top_holders_to_inspect", 25))]
+        fresh_tx = int(self.cfg.get("fresh_wallet_max_txs", 10))
+        fresh_usd, checked, fresh_n = 0.0, 0, 0
+        hm = []
+        for w, usd in top:
+            nonce = None
+            if self.rpc is not None:
+                try:
+                    nonce = self.rpc.call("eth_getTransactionCount", [w, "latest"], ttl=600)
+                    nonce = int(nonce, 16) if isinstance(nonce, str) else None
+                except Exception:
+                    nonce = None
+            checked += 1
+            is_fresh = nonce is not None and nonce <= fresh_tx
+            if is_fresh:
+                fresh_usd += usd
+                fresh_n += 1
+            hm.append({"a": w, "p": round(usd / total * 100, 3), "c": None, "f": is_fresh, "age": None, "tx": nonce, "k": "buyer"})
+        res.holder_map = hm
+        res.inspected = checked
+        res.inspected_pct = round(sum(v for _, v in top) / total * 100, 3)
+        res.fresh_wallet_count = fresh_n
+        res.fresh_wallet_pct = round(fresh_usd / total * 100, 3)
+        res.top1_eoa_pct = round(top[0][1] / total * 100, 3)
+        res.top10_eoa_pct = round(sum(v for _, v in top[:10]) / total * 100, 3)
+        res.quality = "lite"
+        share_fresh = fresh_usd / total
+        res.sybil_score = round(clamp(0.5 * share_fresh + (0.3 if top[0][1] / total >= 0.4 else 0.0), 0, 1), 3)
+        res.notes.append(f"lite 取证：{checked} 个买家钱包（占买入额 {res.inspected_pct:.0f}%），nonce≤{fresh_tx} 的新钱包 {fresh_n} 个占买入额 {res.fresh_wallet_pct:.0f}%；"
+                         f"注意：这里的占比是买入额占比而非持仓占比")
         return res
