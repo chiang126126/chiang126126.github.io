@@ -13,7 +13,7 @@ import traceback
 from typing import Any, Dict, List, Optional, Set
 
 from .ai import AiJudge, evidence_document
-from .config import ENV, load_chain, load_rules
+from .config import ENV, env as env_get, load_chain, load_rules
 from .crossval import cross_validate
 from .evaluate import evaluate
 from .forensics import Forensics, WalletCache
@@ -73,6 +73,8 @@ class Pipeline:
         self.gmgn = Gmgn(self.h["gmgn"], env.gmgn_api_key, env.gmgn_base_url, sc.get("geckoterminal_network", "robinhood"))
         self.max_forensics = max_forensics if max_forensics is not None else int((self.rules.get("universe") or {}).get("max_candidates_for_forensics", 30))
         self.quotes = {q.upper() for q in ((self.rules.get("universe") or {}).get("quote_tokens_allowed") or [])}
+        self.time_budget = float(env_get("RADAR_TIME_BUDGET_SEC", "1500"))   # 单轮扫描时间预算（秒）
+        self.t_start = time.time()
         self.prev_path = DATA_DIR / "prev_snapshots.json"
         self.prev: Dict[str, dict] = (load_json(self.prev_path, {}) or {}).get("tokens", {})
 
@@ -254,9 +256,13 @@ class Pipeline:
         self.log(f"prefilter: 通过 {len(passed)}（深挖 {len(deep)}，浅扫 {len(shallow)}），剔除 {len(failed)}")
 
         candidates: List[Candidate] = []
+        degraded = 0
         for s in deep:
+            over = (time.time() - self.t_start) > self.time_budget
+            if over:
+                degraded += 1
             try:
-                c = self.enrich(s, regime, True)
+                c = self.enrich(s, regime, not over)
                 self._decide(c, regime)
                 candidates.append(c)
                 if self.verbose:
@@ -264,6 +270,9 @@ class Pipeline:
             except Exception as e:
                 self.fail(f"enrich {s.base_symbol}", e)
         for s in shallow:
+            if (time.time() - self.t_start) > self.time_budget:
+                self.log("时间预算用尽，跳过剩余浅扫")
+                break
             try:
                 c = self.enrich(s, regime, False)
                 self._decide(c, regime)
@@ -300,7 +309,7 @@ class Pipeline:
         universe = {"discovered": len(snaps), "raw_rows": getattr(self, "universe_raw", 0), "prefiltered": len(passed),
                     "forensics_done": sum(1 for c in candidates if c.forensics and c.forensics.quality != "none"),
                     "skipped": len(failed), "new_samples": n_new, "new_baseline": n_base,
-                    "seconds": round(time.time() - t0, 1)}
+                    "degraded_to_shallow": degraded, "seconds": round(time.time() - t0, 1)}
         self.log(f"scan 完成: {universe}")
         return {"candidates": candidates, "skip_candidates": skip_cands, "baseline": baseline, "universe": universe}
 

@@ -50,8 +50,10 @@ class HttpClient:
         self.cache_dir = (cache_dir or CACHE_DIR) / "http" / name
         self.offline = os.environ.get("RADAR_OFFLINE", "") == "1"
         self._last = 0.0
-        self.stats = {"calls": 0, "cache_hits": 0, "errors": 0}
+        self.stats = {"calls": 0, "cache_hits": 0, "errors": 0, "tripped": False}
         self._mem: Dict[str, Any] = {}
+        self.consecutive_errors = 0
+        self.trip_after = int(os.environ.get("RADAR_HTTP_TRIP_AFTER", "12"))   # 连续 N 次失败后熔断本源
 
     # ---------------------------------------------------------------- helpers
     @staticmethod
@@ -98,6 +100,9 @@ class HttpClient:
                 return cached["body"]
         if self.offline:
             raise Offline(f"[{self.name}] offline & no cache for {url}")
+        if self.trip_after > 0 and self.consecutive_errors >= self.trip_after:
+            self.stats["tripped"] = True
+            raise HttpError(f"[{self.name}] circuit tripped after {self.consecutive_errors} consecutive errors", 599)
 
         hdrs = dict(self.headers)
         if headers:
@@ -120,6 +125,7 @@ class HttpClient:
                     except OSError:
                         pass
                 self._mem[key] = body
+                self.consecutive_errors = 0
                 return body
             except urllib.error.HTTPError as e:
                 text = ""
@@ -131,12 +137,16 @@ class HttpClient:
                 if e.code in (400, 401, 403, 404, 422):
                     break  # 不会因为重试而好转
                 retry_after = e.headers.get("Retry-After") if e.headers else None
-                delay = min(30.0, float(retry_after)) if retry_after and retry_after.isdigit() else 1.5 * (2 ** attempt)
+                delay = min(10.0, float(retry_after)) if retry_after and retry_after.isdigit() else min(6.0, 1.5 * (2 ** attempt))
+                if attempt >= 1 and e.code == 429:
+                    last_err = HttpError(f"[{self.name}] HTTP 429 rate-limited {url}", 429, text)
+                    break
                 time.sleep(delay)
             except (urllib.error.URLError, TimeoutError, ConnectionError, OSError, ValueError) as e:
                 last_err = HttpError(f"[{self.name}] {type(e).__name__}: {e} {url}")
                 time.sleep(1.5 * (2 ** attempt))
         self.stats["errors"] += 1
+        self.consecutive_errors += 1
         raise last_err or HttpError(f"[{self.name}] unknown error {url}")
 
 
