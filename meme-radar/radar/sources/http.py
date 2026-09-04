@@ -136,14 +136,17 @@ class HttpClient:
                 last_err = HttpError(f"[{self.name}] HTTP {e.code} {url}", e.code, text)
                 if e.code in (400, 401, 403, 404, 422):
                     break  # 不会因为重试而好转（404 不计入熔断）
+                retry_after = e.headers.get("Retry-After") if e.headers else None
+                if e.code == 429:
+                    # 限流不是故障：不计入熔断，按 Retry-After 或 12s×(attempt+1) 等待后重试
+                    self.stats["rate_limited"] = self.stats.get("rate_limited", 0) + 1
+                    delay = float(retry_after) if retry_after and retry_after.isdigit() else 12.0 * (attempt + 1)
+                    time.sleep(min(45.0, max(3.0, delay)))
+                    continue
                 self.consecutive_errors += 1
                 if self.trip_after > 0 and self.consecutive_errors >= self.trip_after:
                     break
-                retry_after = e.headers.get("Retry-After") if e.headers else None
                 delay = min(10.0, float(retry_after)) if retry_after and retry_after.isdigit() else min(6.0, 1.5 * (2 ** attempt))
-                if attempt >= 1 and e.code == 429:
-                    last_err = HttpError(f"[{self.name}] HTTP 429 rate-limited {url}", 429, text)
-                    break
                 time.sleep(delay)
             except (urllib.error.URLError, TimeoutError, ConnectionError, OSError, ValueError) as e:
                 last_err = HttpError(f"[{self.name}] {type(e).__name__}: {e} {url}")

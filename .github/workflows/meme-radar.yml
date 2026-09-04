@@ -25,7 +25,7 @@ permissions:
 
 concurrency:
   group: meme-radar
-  cancel-in-progress: false
+  cancel-in-progress: true   # 卡住的旧运行由新运行取消（单轮有 40 分钟上限，定时 2 小时一轮不会互相打断）
 
 jobs:
   radar:
@@ -57,17 +57,25 @@ jobs:
             --max-forensics "${{ github.event.inputs.max_forensics || '25' }}" --verbose
 
       - name: Commit snapshot if changed
+        env:
+          GIT_TERMINAL_PROMPT: "0"
+          BR: ${{ github.ref_name }}
         run: |
           git add meme-radar/data
           if git diff --staged --quiet; then
-            echo "无变化，跳过提交"
-          else
-            git config user.name "meme-radar"
-            git config user.email "mangzi141800@gmail.com"
-            git commit -m "data(meme-radar): refresh $(date -u +%FT%TZ)"
-            for i in 1 2 3 4; do
-              git pull --rebase --autostash && git push && break
-              echo "push 失败，重试 $i"; sleep $((i * 5))
-            done
-            echo "✅ 已提交雷达快照"
+            echo "无变化，跳过提交"; exit 0
           fi
+          git config user.name "meme-radar"
+          git config user.email "mangzi141800@gmail.com"
+          git commit -q -m "data(meme-radar): refresh $(date -u +%FT%TZ)"
+          for i in 1 2 3 4; do
+            if timeout 120 git push origin "HEAD:$BR"; then echo "✅ 已提交雷达快照"; exit 0; fi
+            echo "push 被拒或超时（远端有新提交），把本轮 data 叠到远端最新提交上后重试 $i"
+            timeout 120 git fetch --depth=1 origin "$BR" || true
+            # 浅克隆不做 rebase：索引重置到远端最新树，只把本轮 data/ 重新提交
+            git reset -q --mixed "origin/$BR"
+            git add meme-radar/data
+            git commit -q -m "data(meme-radar): refresh $(date -u +%FT%TZ)" || true
+            sleep $((i * 5))
+          done
+          echo "::warning::数据提交失败（多次重试后放弃），下轮会重新生成"
