@@ -5,7 +5,10 @@ name: meme-radar (Robinhood Chain 早期 MEME 资金雷达)
 # 采集器 best-effort、绝不非零退出；仅在数据有变化时提交。所有密钥都是可选的（缺失只降级功能）。
 on:
   schedule:
-    - cron: "23 */2 * * *"   # 每 2 小时（错峰第 23 分钟）
+    - cron: "23 */2 * * *"   # 每 2 小时（错峰第 23 分钟；定时只在默认分支生效）
+  push:                      # 开发分支上推送代码即跑一轮做真实数据验证（data/ 变更不触发；GITHUB_TOKEN 的提交也不会触发）
+    branches: [claude/robinhood-meme-coin-research-yol2mc]
+    paths: ["meme-radar/**", "!meme-radar/data/**", ".github/workflows/meme-radar.yml"]
   workflow_dispatch:
     inputs:
       cmd:

@@ -55,8 +55,7 @@ class EvmRpc:
         self._id = 0
 
     def call(self, method: str, params: list, ttl: int = 0) -> Any:
-        self._id += 1
-        payload = {"jsonrpc": "2.0", "id": self._id, "method": method, "params": params}
+        payload = {"jsonrpc": "2.0", "id": 1, "method": method, "params": params}   # 固定 id，便于按请求体缓存
         resp = self.http.post_json(self.url, payload, ttl=ttl)
         if isinstance(resp, dict) and resp.get("error"):
             raise RuntimeError(f"rpc {method}: {resp['error']}")
