@@ -51,7 +51,7 @@ class Pipeline:
 
         bs_key = env.blockscout_api_key
         self.h = {
-            "geckoterminal": H("geckoterminal", 0.25, retries=3), "dexscreener": H("dexscreener", 4.0, retries=1),
+            "geckoterminal": H("geckoterminal", 0.2, retries=3, max_calls=int(env_get("RADAR_GT_MAX_CALLS", "60"))), "dexscreener": H("dexscreener", 4.0, retries=1),
             "blockscout": H("blockscout", 4.5 if bs_key else 1.5, retries=2, headers={"User-Agent": BROWSER_UA}), "rpc": H("rpc", 5.0, retries=1, timeout=12),
             "okx": H("okx", 2.0, retries=2), "coinbase": H("coinbase", 2.0, retries=1), "coingecko": H("coingecko", 0.4, retries=2),
             "fng": H("fng", 1.0, retries=1), "goplus": H("goplus", 1.0, retries=0, timeout=10),
@@ -77,6 +77,8 @@ class Pipeline:
         self.time_budget = float(env_get("RADAR_TIME_BUDGET_SEC", "1500"))   # 单轮扫描时间预算（秒）
         self._bs_reported = False
         self.new_pools_per_hour = None
+        self._ohlcv_calls = 0
+        self._ohlcv_max = int(env_get("RADAR_GT_OHLCV_MAX", "20"))
         self.t_start = time.time()
         self.prev_path = DATA_DIR / "prev_snapshots.json"
         self.prev: Dict[str, dict] = (load_json(self.prev_path, {}) or {}).get("tokens", {})
@@ -98,7 +100,7 @@ class Pipeline:
     def chain_activity(self) -> Dict[str, Any]:
         vol = 0.0
         n = 0
-        for page in (1, 2, 3):
+        for page in (1,):
             try:
                 pools = self.gt.top_pools(page)
             except Exception:
@@ -197,6 +199,36 @@ class Pipeline:
         if cur is None or (p.liquidity_usd or 0) > (cur.liquidity_usd or 0):
             seen[p.base_token] = p
 
+    def _enrich_with_dexscreener(self, snaps: List[PoolSnapshot]) -> int:
+        """DexScreener 一次 30 个代币：补社交链接 / 付费推广 / 图片，并记录其流动性作交叉参考。300 次/分钟，很便宜。"""
+        if not snaps:
+            return 0
+        n = 0
+        try:
+            pairs = self.ds.tokens([s.base_token for s in snaps])
+        except Exception as e:
+            self.fail("dexscreener batch", e)
+            return 0
+        best: Dict[str, PoolSnapshot] = {}
+        for p in pairs:
+            cur = best.get(p.base_token)
+            if cur is None or (p.liquidity_usd or 0) > (cur.liquidity_usd or 0):
+                best[p.base_token] = p
+        for s in snaps:
+            p = best.get(s.base_token)
+            if not p:
+                continue
+            info = dict(s.info or {})
+            for k in ("websites", "socials", "image", "boosts_active", "labels"):
+                if p.info.get(k):
+                    info[k] = p.info[k]
+            info["ds_liquidity_usd"] = p.liquidity_usd
+            info["ds_pair"] = p.pool_address
+            info["ds_url"] = p.url
+            s.info = info
+            n += 1
+        return n
+
     # ---------------------------------------------------------------- 第三/四层：单币深挖
     def enrich(self, snap: PoolSnapshot, regime: Dict[str, Any], do_forensics: bool) -> Candidate:
         token, pool = snap.base_token, snap.pool_address
@@ -217,10 +249,11 @@ class Pipeline:
             self.fail(f"security {snap.base_symbol}", e)
         holders = None
         trades: List[dict] = []
-        try:
-            trades = self.gt.trades(pool)
-        except Exception:
-            pass
+        if do_forensics:
+            try:
+                trades = self.gt.trades(pool)
+            except Exception:
+                pass
         if do_forensics:
             try:
                 cand.forensics = self.forensics.analyze(token, {pool}, creator_hint=addr_info.get("creator", ""))
@@ -289,6 +322,7 @@ class Pipeline:
         pre = [(s, hard_filter(s, None, None, self.rules)) for s in snaps]
         passed = [s for s, k in pre if not k]
         failed = [(s, k) for s, k in pre if k]
+        self._enrich_with_dexscreener(passed)
         # 便宜的排序启发：流动性 × log(24h 独立买家)
         passed.sort(key=lambda s: -(s.liquidity_usd or 0) * math.log1p(s.tx("h24", "buyers") or s.tx("h24", "buys")))
         deep, shallow = passed[:self.max_forensics], passed[self.max_forensics:]
@@ -361,29 +395,32 @@ class Pipeline:
 
     # ---------------------------------------------------------------- 第五层：结果回填
     def price_fetcher(self, pool: str, token: str, since: int, until: int) -> Dict[str, Any]:
+        """现价/流动性：DexScreener 优先（便宜）；K 线：GeckoTerminal OHLCV，受每轮上限（RADAR_GT_OHLCV_MAX，默认 20）。"""
         hours = int(math.ceil((until - since) / 3600.0)) + 2
         out: Dict[str, Any] = {"candles": [], "price_now": None, "liq_now": None, "pool_alive": None}
         try:
-            out["candles"] = self.gt.ohlcv(pool, "hour", 1, min(1000, max(hours, 2)), before_timestamp=until + 3600)
-        except HttpError as e:
-            if e.status == 404:
-                out["pool_alive"] = False
+            pair = self.ds.best_pair_for_token(token)
+            if pair:
+                out["price_now"], out["liq_now"], out["pool_alive"] = pair.price_usd, pair.liquidity_usd, True
         except Exception:
             pass
-        try:
-            snap = self.gt.pool(pool)
-            if snap:
-                out["price_now"], out["liq_now"], out["pool_alive"] = snap.price_usd, snap.liquidity_usd, True
-        except HttpError as e:
-            if e.status == 404:
-                out["pool_alive"] = False
-        except Exception:
-            pass
-        if out["pool_alive"] is None and not out["candles"]:
+        if self._ohlcv_calls < self._ohlcv_max:
+            self._ohlcv_calls += 1
             try:
-                pair = self.ds.pair(pool)
-                if pair:
-                    out["price_now"], out["liq_now"], out["pool_alive"] = pair.price_usd, pair.liquidity_usd, True
+                out["candles"] = self.gt.ohlcv(pool, "hour", 1, min(1000, max(hours, 2)), before_timestamp=until + 3600)
+            except HttpError as e:
+                if e.status == 404 and out["pool_alive"] is None:
+                    out["pool_alive"] = False
+            except Exception:
+                pass
+        if out["price_now"] is None and not out["candles"]:
+            try:
+                snap = self.gt.pool(pool)
+                if snap:
+                    out["price_now"], out["liq_now"], out["pool_alive"] = snap.price_usd, snap.liquidity_usd, True
+            except HttpError as e:
+                if e.status == 404:
+                    out["pool_alive"] = False
             except Exception:
                 pass
         if out["pool_alive"] is None and not out["candles"] and out["price_now"] is None:

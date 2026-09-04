@@ -227,6 +227,23 @@ def build_fake_http(tokens: List[Token]) -> FakeHttp:
                     {"status": "1", "result": [{"hash": addr("ftx:" + w), "timeStamp": str(prof["first_ts"]), "from": prof["funder"], "to": w,
                                                 "value": "100000000000000000", "blockNumber": "900000"}]})
             f.route(f"{BS_REST}/addresses/{w}/counters", {"transactions_count": str(prof["txs"]), "token_transfers_count": str(prof["txs"] * 2)})
+    # DexScreener：批量代币 → 交易对；单交易对
+    def ds_pair(t: Token) -> Dict[str, Any]:
+        return {"chainId": "robinhood", "dexId": "uniswap", "url": f"https://dexscreener.com/robinhood/{t.pool}", "pairAddress": t.pool,
+                "baseToken": {"address": t.token, "name": t.name, "symbol": t.symbol}, "quoteToken": {"address": addr("weth"), "symbol": "WETH"},
+                "priceUsd": str(t.price), "txns": {w: {"buys": t.buys.get(w, 0), "sells": t.sells.get(w, 0)} for w in ("m5", "h1", "h6", "h24")},
+                "volume": {k: v for k, v in t.vol.items()}, "priceChange": {k: v for k, v in t.chg.items()},
+                "liquidity": {"usd": t.liq}, "fdv": t.price * 1e9, "pairCreatedAt": (NOW - int(t.age_h * 3600)) * 1000,
+                "info": {"websites": [{"url": "https://example.com"}], "socials": [{"type": "twitter", "url": "https://x.com/x"}]} if t.kind == "healthy" else {},
+                "boosts": {"active": 0}}
+
+    def ds_tokens(url_tail: str):
+        addrs = url_tail.split(",")
+        return [ds_pair(t) for t in listed if t.token in addrs]
+    for t in listed:
+        f.route(f"https://api.dexscreener.com/token-pairs/v1/robinhood/{t.token}", lambda t=t: [ds_pair(t)])
+        f.route(f"https://api.dexscreener.com/latest/dex/pairs/robinhood/{t.pool}", lambda t=t: {"pairs": [ds_pair(t)]})
+    f.routes["https://api.dexscreener.com/tokens/v1/robinhood/"] = lambda: [ds_pair(t) for t in listed]
     # 市场数据
     closes = [60000 + i * 90 for i in range(300)]          # 稳步上涨：站上全部均线
     okx_btc = {"code": "0", "data": [[str((NOW - i * 86400) * 1000), str(c), str(c * 1.02), str(c * 0.98), str(c), "1", "1", "1", "1"]

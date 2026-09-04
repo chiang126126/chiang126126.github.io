@@ -40,7 +40,8 @@ class Offline(HttpError):
 
 class HttpClient:
     def __init__(self, name: str, rps: float = 2.0, headers: Optional[Dict[str, str]] = None,
-                 timeout: Optional[float] = None, retries: int = 3, cache_dir: Optional[Path] = None):
+                 timeout: Optional[float] = None, retries: int = 3, cache_dir: Optional[Path] = None,
+                 max_calls: int = 0):
         self.name = name
         self.min_interval = 1.0 / rps if rps and rps > 0 else 0.0
         self.headers = {"User-Agent": UA, "Accept": "application/json"}
@@ -55,6 +56,7 @@ class HttpClient:
         self._mem: Dict[str, Any] = {}
         self.consecutive_errors = 0
         self.trip_after = int(os.environ.get("RADAR_HTTP_TRIP_AFTER", "6"))    # 连续 N 次失败尝试（含重试）后熔断本源
+        self.max_calls = int(max_calls or 0)                                      # 每轮网络调用预算（0 = 不限）
 
     # ---------------------------------------------------------------- helpers
     @staticmethod
@@ -104,6 +106,9 @@ class HttpClient:
         if self.trip_after > 0 and self.consecutive_errors >= self.trip_after:
             self.stats["tripped"] = True
             raise HttpError(f"[{self.name}] circuit tripped after {self.consecutive_errors} consecutive errors", 599)
+        if self.max_calls and self.stats["calls"] >= self.max_calls:
+            self.stats["budget_exhausted"] = True
+            raise HttpError(f"[{self.name}] call budget {self.max_calls} exhausted", 597)
 
         hdrs = dict(self.headers)
         if headers:
