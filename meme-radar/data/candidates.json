@@ -1,7 +1,7 @@
 {
   "items": [
     {
-      "age_hours": 36.79,
+      "age_hours": 36.99,
       "ai": {
         "confidence": 0.65,
         "key_evidence": [
@@ -17,15 +17,15 @@
         "verdict": "REAL_MARKET",
         "what_would_change_mind": "取证质量为 full 且无关联簇、独立买家持续增加，或出现流动性抽走/买盘集中。"
       },
-      "buyers_h1": 529,
-      "buyers_h24": 6043,
-      "buys_h24": 25896,
-      "chg_h1": -2.795,
-      "chg_h24": -52.007,
-      "chg_h6": -17.555,
-      "decision": "PAPER_BUY",
+      "buyers_h1": 536,
+      "buyers_h24": 6061,
+      "buys_h24": 25928,
+      "chg_h1": -5.984,
+      "chg_h24": 0.545,
+      "chg_h6": -18.196,
+      "decision": "WATCH",
       "dex": "uniswap-v4",
-      "fdv_usd": 501863.108553226,
+      "fdv_usd": 490625.569330948,
       "flags": {
         "green": [
           "BROAD_PARTICIPATION",
@@ -39,9 +39,32 @@
       },
       "forensics": {
         "burn_pct": 0.0,
-        "clustered_pct": 0,
-        "clusters": [],
-        "contract_held_pct": 85.82,
+        "clustered_pct": 0.626,
+        "clusters": [
+          {
+            "pct": 0.481,
+            "reasons": [
+              "same_funder"
+            ],
+            "size": 2,
+            "wallets": [
+              "0x6666666faa76152567e128525a81651a1dfb74ff",
+              "0x6dddf81d5b04877959ff79a0f77698e16ab79707"
+            ]
+          },
+          {
+            "pct": 0.145,
+            "reasons": [
+              "same_funder"
+            ],
+            "size": 2,
+            "wallets": [
+              "0xd953a39aedfde23ece9a75b32ff0c7d880b4a8de",
+              "0x7a9b554e78ba007df3fa5bc141010b1d53bebd5f"
+            ]
+          }
+        ],
+        "contract_held_pct": 85.831,
         "creator_pct": 0.488,
         "curve_status": "",
         "early_buyers_holding_pct": null,
@@ -54,7 +77,7 @@
             "c": null,
             "f": false,
             "k": "eoa",
-            "p": 9.501,
+            "p": 9.53,
             "tx": 648
           },
           {
@@ -78,7 +101,7 @@
           {
             "a": "0x6666666faa76152567e128525a81651a1dfb74ff",
             "age": 16.86,
-            "c": null,
+            "c": 0,
             "f": true,
             "k": "eoa",
             "p": 0.383,
@@ -121,13 +144,13 @@
             "tx": 738
           },
           {
-            "a": "0xf23c507316f062f36f1279dafce151c854f30044",
-            "age": 1394.72,
-            "c": null,
+            "a": "0x6dddf81d5b04877959ff79a0f77698e16ab79707",
+            "age": 68.52,
+            "c": 0,
             "f": false,
             "k": "eoa",
-            "p": 0.117,
-            "tx": 3061
+            "p": 0.098,
+            "tx": 0
           },
           {
             "a": "0x06d75a697f57e5d76880055a155fb985272df8bf",
@@ -139,76 +162,77 @@
             "tx": 190
           },
           {
-            "a": "0x6dddf81d5b04877959ff79a0f77698e16ab79707",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 0.081,
-            "tx": null
-          },
-          {
             "a": "0x227a641506de34fc818ebc88cf9690dca857a393",
-            "age": null,
+            "age": 1078.09,
             "c": null,
             "f": false,
             "k": "eoa",
             "p": 0.076,
-            "tx": null
+            "tx": 232
           },
           {
             "a": "0xd953a39aedfde23ece9a75b32ff0c7d880b4a8de",
-            "age": null,
-            "c": null,
+            "age": 95.11,
+            "c": 1,
             "f": false,
             "k": "eoa",
             "p": 0.076,
-            "tx": null
+            "tx": 0
           },
           {
-            "a": "0x7a9b554e78ba007df3fa5bc141010b1d53bebd5f",
-            "age": null,
+            "a": "0xf23c507316f062f36f1279dafce151c854f30044",
+            "age": 1394.72,
             "c": null,
             "f": false,
             "k": "eoa",
+            "p": 0.071,
+            "tx": 3061
+          },
+          {
+            "a": "0x7a9b554e78ba007df3fa5bc141010b1d53bebd5f",
+            "age": 1235.03,
+            "c": 1,
+            "f": false,
+            "k": "eoa",
             "p": 0.069,
-            "tx": null
+            "tx": 3137
           },
           {
             "a": "0xb7293fad10bfc1becfd0d1798f4df3d9da1f83d6",
-            "age": null,
+            "age": 1002.34,
             "c": null,
             "f": false,
             "k": "eoa",
             "p": 0.053,
-            "tx": null
+            "tx": 218
           }
         ],
-        "holders": 359,
+        "holders": 357,
         "inspected": 15,
         "inspected_pct": 13.329,
-        "largest_cluster_pct": 0.0,
+        "largest_cluster_pct": 0.481,
         "launchpad": "",
         "notes": [
           "早期转账日志不可用",
+          "发现 2 个关联簇，合计持仓 0.6%，最大簇 0.5%",
           "1 个前排钱包为 <24h 新钱包（合计 0.4%）"
         ],
-        "quality": "partial",
-        "sybil_score": 0.009,
-        "top10_eoa_pct": 12.973
+        "profiled": 15,
+        "quality": "full",
+        "sybil_score": 0.04,
+        "top10_eoa_pct": 12.983
       },
       "killed_by": [],
-      "liquidity_usd": 201782.5021,
+      "liquidity_usd": 200696.0526,
       "name": "ANTHROPIC • Pre IPO Token",
       "pool": "0xca5e2b2046cfffb4fc8d5c7a57e33c9e855d33c982a35f248d560470fd6df768",
-      "position_size_usd": 3.5,
-      "price_usd": 1926.58279773474,
+      "position_size_usd": 0.0,
+      "price_usd": 1877.41782026885,
       "reasons": [
-        "评分 77 ≥ 观察线",
-        "评分 ≥ 买入线，体制预算 0.35 → 模拟仓 $3.50",
-        "已开模拟仓 #2026-09-04:0x4eb576e9c8a24b5fb11dd8eee5e5e2554ade1cf4"
+        "评分 82 ≥ 观察线",
+        "达到买入线但被拦: 今日新仓额度已用完"
       ],
-      "score": 77.1,
+      "score": 82.5,
       "score_breakdown": {
         "distribution": 20.0,
         "liquidity_health": 5.0,
@@ -216,7 +240,7 @@
         "organic_growth": 15.0,
         "price_structure": 10.0,
         "smart_money": 6.0,
-        "sybil_integrity": 18.6
+        "sybil_integrity": 24.0
       },
       "security": {
         "buy_tax_pct": 0.0,
@@ -234,7 +258,7 @@
         "source": "goplus",
         "token": "0x4eb576e9c8a24b5fb11dd8eee5e5e2554ade1cf4"
       },
-      "sells_h24": 24272,
+      "sells_h24": 24278,
       "smart_money": {
         "count": 0,
         "net_buy_usd": 0.0,
@@ -245,23 +269,281 @@
       "symbol": "ANTHROPIC",
       "token": "0x4eb576e9c8a24b5fb11dd8eee5e5e2554ade1cf4",
       "url": "https://www.geckoterminal.com/robinhood/pools/0xca5e2b2046cfffb4fc8d5c7a57e33c9e855d33c982a35f248d560470fd6df768",
-      "vol_h1": 518866.74499771,
-      "vol_h24": 9798934.37009029,
+      "vol_h1": 507713.899222866,
+      "vol_h24": 9811784.25028942,
       "x": {
-        "x_buy_usd_all": 19946.26,
-        "x_median_trade_usd": 67.84,
-        "x_net_flow_1h_to_liq": -0.0448,
-        "x_net_flow_1h_usd": -9035.24,
-        "x_net_flow_all_usd": -9035.24,
-        "x_sell_usd_all": 28981.49,
-        "x_top5_buyer_share": 0.265,
+        "x_buy_usd_all": 21421.76,
+        "x_median_trade_usd": 80.13,
+        "x_net_flow_1h_to_liq": 0.0029,
+        "x_net_flow_1h_usd": 582.45,
+        "x_net_flow_all_usd": 582.45,
+        "x_sell_usd_all": 20839.31,
+        "x_top5_buyer_share": 0.256,
         "x_trades_n": 300,
-        "x_unique_buyers_1h": 110,
-        "x_unique_buyers_trades": 110
+        "x_unique_buyers_1h": 128,
+        "x_unique_buyers_trades": 128
       }
     },
     {
-      "age_hours": 23.536,
+      "age_hours": 3.177,
+      "ai": {
+        "confidence": 0.65,
+        "key_evidence": [
+          "HEALTHY_BUY_SELL",
+          "HAS_SOCIALS",
+          "GRADUATED_LOCKED_LP"
+        ],
+        "model": "",
+        "provider": "rules",
+        "red_flags": [
+          "PAID_PROMOTION"
+        ],
+        "verdict": "REAL_MARKET",
+        "what_would_change_mind": "取证质量为 full 且无关联簇、独立买家持续增加，或出现流动性抽走/买盘集中。"
+      },
+      "buyers_h1": 249,
+      "buyers_h24": 967,
+      "buys_h24": 5847,
+      "chg_h1": 23.26,
+      "chg_h24": 174.835,
+      "chg_h6": 174.835,
+      "decision": "WATCH",
+      "dex": "pons-v2-dex",
+      "fdv_usd": 566471.6195,
+      "flags": {
+        "green": [
+          "HEALTHY_BUY_SELL",
+          "HAS_SOCIALS",
+          "GRADUATED_LOCKED_LP"
+        ],
+        "red": [],
+        "yellow": [
+          "PAID_PROMOTION"
+        ]
+      },
+      "forensics": {
+        "burn_pct": 1.268,
+        "clustered_pct": 0,
+        "clusters": [],
+        "contract_held_pct": 17.524,
+        "creator_pct": 0.0,
+        "curve_status": "graduated",
+        "early_buyers_holding_pct": null,
+        "fresh_wallet_count": 0,
+        "fresh_wallet_pct": 0,
+        "holder_map": [
+          {
+            "a": "0xd5b200873f08178c226be85dd85aff552185a6ff",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.918,
+            "tx": null
+          },
+          {
+            "a": "0x3aea6fa72c5d27c54b9018ea0193b88e048e5e8a",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.364,
+            "tx": null
+          },
+          {
+            "a": "0xbceb2b49d9d25d67691c01dd8d9ef2e141a4df1c",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.964,
+            "tx": null
+          },
+          {
+            "a": "0xbc31510e863a30d4fd07d6946294cb60760ca5b9",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.567,
+            "tx": null
+          },
+          {
+            "a": "0xecae600d694b9ba7a4497bd488e6b8a08b25ce55",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.53,
+            "tx": null
+          },
+          {
+            "a": "0xc15f6f8119e799c55f2f83c32eb72898fa6f542e",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.473,
+            "tx": null
+          },
+          {
+            "a": "0x1c5d9b119d2d45b4c8f42f2329ac452fa1a8bcde",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.452,
+            "tx": null
+          },
+          {
+            "a": "0xdb85a997f1d9801edaa41bcab2dd883a302c5b10",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.418,
+            "tx": null
+          },
+          {
+            "a": "0x82d51f82c8072f1fdb253f9b187d6c225bd5e907",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.418,
+            "tx": null
+          },
+          {
+            "a": "0x09240de3a548b0c0e5111df33adc8e23eae90dcb",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.417,
+            "tx": null
+          },
+          {
+            "a": "0x8cfaa6f0c87686af2498d561652dd7782ad29283",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.417,
+            "tx": null
+          },
+          {
+            "a": "0x799c0516697d2395691e36805e60e888fb3cec25",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.417,
+            "tx": null
+          },
+          {
+            "a": "0x60655d5d6e9fb90e5e7d3d8945d80fc52d079301",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.416,
+            "tx": null
+          },
+          {
+            "a": "0x2842ba91a4b9ec1d1b996f1874949475f52abc9a",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.416,
+            "tx": null
+          },
+          {
+            "a": "0x6b7323edf4d92d9762ddf5e5cdcb1120ff755b46",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.416,
+            "tx": null
+          }
+        ],
+        "holders": 2750,
+        "inspected": 15,
+        "inspected_pct": 9.602,
+        "largest_cluster_pct": 0.0,
+        "launchpad": "pons_v2",
+        "notes": [
+          "早期转账日志不可用",
+          "钱包画像覆盖 0/15（浏览器 API 限流），sybil 分只反映已画像部分"
+        ],
+        "profiled": 0,
+        "quality": "partial",
+        "sybil_score": 0,
+        "top10_eoa_pct": 7.52
+      },
+      "killed_by": [],
+      "liquidity_usd": 68005.0743,
+      "name": "Stocker",
+      "pool": "0xffb2d85e80750168707bc6a0f32fbe5be166baeb93726673b716cef7f9d905d7",
+      "position_size_usd": 0.0,
+      "price_usd": 0.000564786094732958,
+      "reasons": [
+        "评分 74 ≥ 观察线",
+        "达到买入线但被拦: 今日新仓额度已用完"
+      ],
+      "score": 74.0,
+      "score_breakdown": {
+        "distribution": 20.0,
+        "liquidity_health": 8.0,
+        "narrative_social": 2.5,
+        "organic_growth": 15.0,
+        "price_structure": 10.0,
+        "smart_money": 6.0,
+        "sybil_integrity": 12.5
+      },
+      "security": {
+        "buy_tax_pct": 0.0,
+        "flags": [],
+        "has_owner": false,
+        "is_honeypot": false,
+        "is_mintable": false,
+        "is_proxy": false,
+        "is_verified": true,
+        "launchpad": "pons_v2",
+        "owner": "",
+        "sell_tax_pct": 0.0,
+        "source": "goplus",
+        "token": "0x1f20837daf4f566ba0db16ceb25f879fb411ab1c"
+      },
+      "sells_h24": 5500,
+      "smart_money": {
+        "count": 0,
+        "net_buy_usd": 0.0,
+        "registry_size": 0,
+        "wallets": [],
+        "weighted": 0.0
+      },
+      "symbol": "Stocker",
+      "token": "0x1f20837daf4f566ba0db16ceb25f879fb411ab1c",
+      "url": "https://www.geckoterminal.com/robinhood/pools/0xffb2d85e80750168707bc6a0f32fbe5be166baeb93726673b716cef7f9d905d7",
+      "vol_h1": 207494.435876874,
+      "vol_h24": 1794113.76041395,
+      "x": {
+        "x_buy_usd_all": 11376.25,
+        "x_median_trade_usd": 40.57,
+        "x_net_flow_1h_to_liq": 0.0168,
+        "x_net_flow_1h_usd": 1145.2,
+        "x_net_flow_all_usd": 1145.2,
+        "x_sell_usd_all": 10231.05,
+        "x_top5_buyer_share": 0.426,
+        "x_trades_n": 300,
+        "x_unique_buyers_1h": 60,
+        "x_unique_buyers_trades": 60
+      }
+    },
+    {
+      "age_hours": 23.738,
       "ai": {
         "confidence": 0.65,
         "key_evidence": [
@@ -278,15 +560,15 @@
         "verdict": "REAL_MARKET",
         "what_would_change_mind": "取证质量为 full 且无关联簇、独立买家持续增加，或出现流动性抽走/买盘集中。"
       },
-      "buyers_h1": 204,
-      "buyers_h24": 6661,
-      "buys_h24": 24928,
-      "chg_h1": 76.273,
-      "chg_h24": 1342.652,
-      "chg_h6": 163.899,
-      "decision": "PAPER_BUY",
+      "buyers_h1": 196,
+      "buyers_h24": 6666,
+      "buys_h24": 25002,
+      "chg_h1": 21.941,
+      "chg_h24": 969.917,
+      "chg_h6": 82.927,
+      "decision": "WATCH",
       "dex": "pons-v2-dex",
-      "fdv_usd": 2450175.51977927,
+      "fdv_usd": 1817129.11201935,
       "flags": {
         "green": [
           "BROAD_PARTICIPATION",
@@ -303,7 +585,7 @@
         "burn_pct": 3.357,
         "clustered_pct": 0,
         "clusters": [],
-        "contract_held_pct": 21.949,
+        "contract_held_pct": 22.524,
         "creator_pct": 0.0,
         "curve_status": "graduated",
         "early_buyers_holding_pct": null,
@@ -312,21 +594,21 @@
         "holder_map": [
           {
             "a": "0x73f432da307525b6590c858bf458116322d50d16",
-            "age": null,
+            "age": 1515.03,
             "c": null,
             "f": false,
             "k": "eoa",
             "p": 1.712,
-            "tx": null
+            "tx": 43
           },
           {
             "a": "0x813ab764fd2a34eaff4713a89b6087ff5d6ccc08",
-            "age": null,
+            "age": 654.41,
             "c": null,
             "f": false,
             "k": "eoa",
             "p": 0.973,
-            "tx": null
+            "tx": 188
           },
           {
             "a": "0x7e28f0a7d71e567966c992bdf59b0400e88ab154",
@@ -446,38 +728,39 @@
             "tx": null
           }
         ],
-        "holders": 7080,
+        "holders": 7063,
         "inspected": 15,
         "inspected_pct": 9.414,
         "largest_cluster_pct": 0.0,
         "launchpad": "pons_v2",
         "notes": [
-          "早期转账日志不可用"
+          "早期转账日志不可用",
+          "钱包画像覆盖 2/15（浏览器 API 限流），sybil 分只反映已画像部分"
         ],
+        "profiled": 2,
         "quality": "partial",
         "sybil_score": 0,
         "top10_eoa_pct": 7.54
       },
       "killed_by": [],
-      "liquidity_usd": 144135.5583,
+      "liquidity_usd": 124153.4098,
       "name": "legs.fun",
       "pool": "0x1a812059207d57de177f7dd3669ffa0d5b0e18543a935167ce49b48903b5aef0",
-      "position_size_usd": 3.5,
-      "price_usd": 0.00253529693204558,
+      "position_size_usd": 0.0,
+      "price_usd": 0.00186566066201011,
       "reasons": [
         "评分 73 ≥ 观察线",
-        "评分 ≥ 买入线，体制预算 0.35 → 模拟仓 $3.50",
-        "已开模拟仓 #2026-09-04:0x8fcf98e1348d3ddee46cdd15a5c7d9a8d423077d"
+        "达到买入线但被拦: 今日新仓额度已用完"
       ],
-      "score": 73.2,
+      "score": 72.7,
       "score_breakdown": {
         "distribution": 20.0,
         "liquidity_health": 5.0,
         "narrative_social": 2.5,
         "organic_growth": 15.0,
-        "price_structure": 6.0,
+        "price_structure": 10.0,
         "smart_money": 6.0,
-        "sybil_integrity": 18.8
+        "sybil_integrity": 14.2
       },
       "security": {
         "buy_tax_pct": 0.0,
@@ -493,7 +776,7 @@
         "source": "goplus",
         "token": "0x8fcf98e1348d3ddee46cdd15a5c7d9a8d423077d"
       },
-      "sells_h24": 13806,
+      "sells_h24": 13881,
       "smart_money": {
         "count": 0,
         "net_buy_usd": 0.0,
@@ -504,279 +787,23 @@
       "symbol": "LEGS",
       "token": "0x8fcf98e1348d3ddee46cdd15a5c7d9a8d423077d",
       "url": "https://www.geckoterminal.com/robinhood/pools/0x1a812059207d57de177f7dd3669ffa0d5b0e18543a935167ce49b48903b5aef0",
-      "vol_h1": 190114.324573699,
-      "vol_h24": 13732630.2770836,
+      "vol_h1": 187152.429979267,
+      "vol_h24": 13764188.2752531,
       "x": {
-        "x_buy_usd_all": 41055.44,
-        "x_median_trade_usd": 78.76,
-        "x_net_flow_1h_to_liq": 0.0064,
-        "x_net_flow_1h_usd": 928.36,
-        "x_net_flow_all_usd": 928.36,
-        "x_sell_usd_all": 40127.08,
-        "x_top5_buyer_share": 0.353,
+        "x_buy_usd_all": 29726.4,
+        "x_median_trade_usd": 65.27,
+        "x_net_flow_1h_to_liq": -0.0687,
+        "x_net_flow_1h_usd": -8523.47,
+        "x_net_flow_all_usd": -8523.47,
+        "x_sell_usd_all": 38249.88,
+        "x_top5_buyer_share": 0.272,
         "x_trades_n": 300,
-        "x_unique_buyers_1h": 92,
-        "x_unique_buyers_trades": 92
+        "x_unique_buyers_1h": 90,
+        "x_unique_buyers_trades": 90
       }
     },
     {
-      "age_hours": 2.975,
-      "ai": {
-        "confidence": 0.65,
-        "key_evidence": [
-          "HEALTHY_BUY_SELL",
-          "HAS_SOCIALS",
-          "GRADUATED_LOCKED_LP"
-        ],
-        "model": "",
-        "provider": "rules",
-        "red_flags": [
-          "PAID_PROMOTION"
-        ],
-        "verdict": "REAL_MARKET",
-        "what_would_change_mind": "取证质量为 full 且无关联簇、独立买家持续增加，或出现流动性抽走/买盘集中。"
-      },
-      "buyers_h1": 279,
-      "buyers_h24": 951,
-      "buys_h24": 5609,
-      "chg_h1": 19.7,
-      "chg_h24": 150.562,
-      "chg_h6": 150.562,
-      "decision": "WATCH",
-      "dex": "pons-v2-dex",
-      "fdv_usd": 516441.3342,
-      "flags": {
-        "green": [
-          "HEALTHY_BUY_SELL",
-          "HAS_SOCIALS",
-          "GRADUATED_LOCKED_LP"
-        ],
-        "red": [],
-        "yellow": [
-          "PAID_PROMOTION"
-        ]
-      },
-      "forensics": {
-        "burn_pct": 1.268,
-        "clustered_pct": 0,
-        "clusters": [],
-        "contract_held_pct": 17.058,
-        "creator_pct": 0.0,
-        "curve_status": "graduated",
-        "early_buyers_holding_pct": null,
-        "fresh_wallet_count": 0,
-        "fresh_wallet_pct": 0,
-        "holder_map": [
-          {
-            "a": "0xd5b200873f08178c226be85dd85aff552185a6ff",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 2.018,
-            "tx": null
-          },
-          {
-            "a": "0x3aea6fa72c5d27c54b9018ea0193b88e048e5e8a",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 1.364,
-            "tx": null
-          },
-          {
-            "a": "0xbceb2b49d9d25d67691c01dd8d9ef2e141a4df1c",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 0.964,
-            "tx": null
-          },
-          {
-            "a": "0xbc31510e863a30d4fd07d6946294cb60760ca5b9",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 0.567,
-            "tx": null
-          },
-          {
-            "a": "0xecae600d694b9ba7a4497bd488e6b8a08b25ce55",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 0.53,
-            "tx": null
-          },
-          {
-            "a": "0x3e5ada6f84e53716563459495a3fdf4d06c9f517",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 0.481,
-            "tx": null
-          },
-          {
-            "a": "0x799c0516697d2395691e36805e60e888fb3cec25",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 0.481,
-            "tx": null
-          },
-          {
-            "a": "0x36dd7c6ecdaee38a75ae1e4c4c6691ecc89f20cd",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 0.478,
-            "tx": null
-          },
-          {
-            "a": "0xf89b2a8842a9ba8980234a01b661ab917259051b",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 0.473,
-            "tx": null
-          },
-          {
-            "a": "0xc15f6f8119e799c55f2f83c32eb72898fa6f542e",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 0.473,
-            "tx": null
-          },
-          {
-            "a": "0x4f975f98260fd6851a4ea0516f3a8cb8a31d6ef2",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 0.473,
-            "tx": null
-          },
-          {
-            "a": "0x6b7323edf4d92d9762ddf5e5cdcb1120ff755b46",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 0.472,
-            "tx": null
-          },
-          {
-            "a": "0x965ba512da763693b64828a8593c44f154f8ea9a",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 0.472,
-            "tx": null
-          },
-          {
-            "a": "0x469506b7acf89580753f016fa3690629904b66ed",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 0.466,
-            "tx": null
-          },
-          {
-            "a": "0x0cdc1c2752c37dfcd1153caa83b582a0e118d3f9",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 0.465,
-            "tx": null
-          }
-        ],
-        "holders": 2654,
-        "inspected": 15,
-        "inspected_pct": 10.177,
-        "largest_cluster_pct": 0.0,
-        "launchpad": "pons_v2",
-        "notes": [
-          "早期转账日志不可用"
-        ],
-        "quality": "partial",
-        "sybil_score": 0,
-        "top10_eoa_pct": 7.829
-      },
-      "killed_by": [],
-      "liquidity_usd": 65710.2402,
-      "name": "Stocker",
-      "pool": "0xffb2d85e80750168707bc6a0f32fbe5be166baeb93726673b716cef7f9d905d7",
-      "position_size_usd": 0.0,
-      "price_usd": 0.000516441334193069,
-      "reasons": [
-        "评分 80 ≥ 观察线",
-        "达到买入线但被拦: 今日新仓额度已用完"
-      ],
-      "score": 80.2,
-      "score_breakdown": {
-        "distribution": 20.0,
-        "liquidity_health": 8.0,
-        "narrative_social": 2.5,
-        "organic_growth": 15.0,
-        "price_structure": 10.0,
-        "smart_money": 6.0,
-        "sybil_integrity": 18.8
-      },
-      "security": {
-        "buy_tax_pct": 0.0,
-        "flags": [],
-        "has_owner": false,
-        "is_honeypot": false,
-        "is_mintable": false,
-        "is_proxy": false,
-        "is_verified": true,
-        "launchpad": "pons_v2",
-        "owner": "",
-        "sell_tax_pct": 0.0,
-        "source": "goplus",
-        "token": "0x1f20837daf4f566ba0db16ceb25f879fb411ab1c"
-      },
-      "sells_h24": 5184,
-      "smart_money": {
-        "count": 0,
-        "net_buy_usd": 0.0,
-        "registry_size": 0,
-        "wallets": [],
-        "weighted": 0.0
-      },
-      "symbol": "Stocker",
-      "token": "0x1f20837daf4f566ba0db16ceb25f879fb411ab1c",
-      "url": "https://www.geckoterminal.com/robinhood/pools/0xffb2d85e80750168707bc6a0f32fbe5be166baeb93726673b716cef7f9d905d7",
-      "vol_h1": 190930.702874773,
-      "vol_h24": 1740070.6269943,
-      "x": {
-        "x_buy_usd_all": 14971.1,
-        "x_median_trade_usd": 48.16,
-        "x_net_flow_1h_to_liq": 0.0181,
-        "x_net_flow_1h_usd": 1186.97,
-        "x_net_flow_all_usd": 1186.97,
-        "x_sell_usd_all": 13784.13,
-        "x_top5_buyer_share": 0.517,
-        "x_trades_n": 300,
-        "x_unique_buyers_1h": 64,
-        "x_unique_buyers_trades": 64
-      }
-    },
-    {
-      "age_hours": 3.29,
+      "age_hours": 3.489,
       "ai": {
         "confidence": 0.65,
         "key_evidence": [
@@ -794,13 +821,13 @@
       },
       "buyers_h1": null,
       "buyers_h24": null,
-      "buys_h24": 1315,
-      "chg_h1": 51.73,
-      "chg_h24": 209.0,
-      "chg_h6": 209.0,
+      "buys_h24": 1327,
+      "chg_h1": 45.6,
+      "chg_h24": 165.0,
+      "chg_h6": 165.0,
       "decision": "WATCH",
       "dex": "uniswap",
-      "fdv_usd": 158123.0,
+      "fdv_usd": 135410.0,
       "flags": {
         "green": [
           "HEALTHY_BUY_SELL",
@@ -816,22 +843,13 @@
         "burn_pct": 0.0,
         "clustered_pct": 0,
         "clusters": [],
-        "contract_held_pct": 37.892,
+        "contract_held_pct": 39.12,
         "creator_pct": 0.0,
         "curve_status": "graduated",
         "early_buyers_holding_pct": null,
         "fresh_wallet_count": 0,
         "fresh_wallet_pct": 0,
         "holder_map": [
-          {
-            "a": "0x8b6cfe5f11160e62fa9c574a8147565c04ec1fda",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 2.858,
-            "tx": null
-          },
           {
             "a": "0xe569c83caa521ff88ce9f802fc7596c599912343",
             "age": null,
@@ -842,21 +860,21 @@
             "tx": null
           },
           {
+            "a": "0x8b6cfe5f11160e62fa9c574a8147565c04ec1fda",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 2.286,
+            "tx": null
+          },
+          {
             "a": "0x9dfecc02c64f5ee7246b263c5be632f164d5e97a",
             "age": null,
             "c": null,
             "f": false,
             "k": "eoa",
             "p": 2.222,
-            "tx": null
-          },
-          {
-            "a": "0x60842b4d999bd6695453b3fef4bbfd6ff3308698",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 2.082,
             "tx": null
           },
           {
@@ -957,31 +975,41 @@
             "k": "eoa",
             "p": 0.989,
             "tx": null
+          },
+          {
+            "a": "0xb9c22eeb13f9dbb05bf0d7d1da514f3d6a6200e3",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.953,
+            "tx": null
           }
         ],
-        "holders": 341,
+        "holders": 347,
         "inspected": 15,
-        "inspected_pct": 23.145,
+        "inspected_pct": 21.444,
         "largest_cluster_pct": 0.0,
         "launchpad": "pons_v2",
         "notes": [
-          "早期转账日志不可用"
+          "早期转账日志不可用",
+          "钱包画像覆盖 0/15（浏览器 API 限流），sybil 分只反映已画像部分"
         ],
+        "profiled": 0,
         "quality": "partial",
         "sybil_score": 0,
-        "top10_eoa_pct": 17.578
+        "top10_eoa_pct": 16.105
       },
       "killed_by": [],
-      "liquidity_usd": 36464.02,
+      "liquidity_usd": 33745.25,
       "name": "Luna Nine",
       "pool": "0x5e4f5601d249b42b1d4aff3d45639a41593b3878b4a7cc3bf2d9bb6a3151dc26",
       "position_size_usd": 0.0,
-      "price_usd": 0.0001581,
+      "price_usd": 0.0001354,
       "reasons": [
-        "评分 75 ≥ 观察线",
-        "达到买入线但被拦: 今日新仓额度已用完"
+        "评分 69 ≥ 观察线"
       ],
-      "score": 75.2,
+      "score": 69.0,
       "score_breakdown": {
         "distribution": 20.0,
         "liquidity_health": 6.0,
@@ -989,7 +1017,7 @@
         "organic_growth": 12.0,
         "price_structure": 10.0,
         "smart_money": 6.0,
-        "sybil_integrity": 18.8
+        "sybil_integrity": 12.5
       },
       "security": {
         "buy_tax_pct": 0.0,
@@ -1007,7 +1035,7 @@
         "source": "goplus",
         "token": "0x9663985492af1b339d959a800592ed131090f264"
       },
-      "sells_h24": 828,
+      "sells_h24": 845,
       "smart_money": {
         "count": 0,
         "net_buy_usd": 0.0,
@@ -1018,23 +1046,23 @@
       "symbol": "LUNA9",
       "token": "0x9663985492af1b339d959a800592ed131090f264",
       "url": "https://dexscreener.com/robinhood/0x5e4f5601d249b42b1d4aff3d45639a41593b3878b4a7cc3bf2d9bb6a3151dc26",
-      "vol_h1": 36649.02,
-      "vol_h24": 243710.53,
+      "vol_h1": 30797.41,
+      "vol_h24": 246369.43,
       "x": {
-        "x_buy_usd_all": 22791.26,
-        "x_median_trade_usd": 72.89,
-        "x_net_flow_1h_to_liq": 0.1261,
-        "x_net_flow_1h_usd": 4599.26,
-        "x_net_flow_all_usd": 285.57,
-        "x_sell_usd_all": 22505.69,
-        "x_top5_buyer_share": 0.33,
+        "x_buy_usd_all": 24027.12,
+        "x_median_trade_usd": 95.0,
+        "x_net_flow_1h_to_liq": 0.0432,
+        "x_net_flow_1h_usd": 1458.09,
+        "x_net_flow_all_usd": -590.81,
+        "x_sell_usd_all": 24617.93,
+        "x_top5_buyer_share": 0.314,
         "x_trades_n": 300,
-        "x_unique_buyers_1h": 70,
-        "x_unique_buyers_trades": 89
+        "x_unique_buyers_1h": 77,
+        "x_unique_buyers_trades": 95
       }
     },
     {
-      "age_hours": 51.301,
+      "age_hours": 51.501,
       "ai": {
         "confidence": 0.65,
         "key_evidence": [
@@ -1052,13 +1080,13 @@
       },
       "buyers_h1": null,
       "buyers_h24": null,
-      "buys_h24": 363,
-      "chg_h1": 5.68,
-      "chg_h24": 139.0,
-      "chg_h6": 72.05,
+      "buys_h24": 368,
+      "chg_h1": 12.19,
+      "chg_h24": 154.0,
+      "chg_h6": 94.54,
       "decision": "WATCH",
       "dex": "uniswap",
-      "fdv_usd": 271360.0,
+      "fdv_usd": 289319.0,
       "flags": {
         "green": [
           "HEALTHY_BUY_SELL",
@@ -1074,7 +1102,7 @@
         "burn_pct": 0.0,
         "clustered_pct": 0,
         "clusters": [],
-        "contract_held_pct": 25.433,
+        "contract_held_pct": 25.27,
         "creator_pct": 0.0,
         "curve_status": "graduated",
         "early_buyers_holding_pct": null,
@@ -1217,34 +1245,37 @@
             "tx": null
           }
         ],
-        "holders": 388,
+        "holders": 392,
         "inspected": 15,
         "inspected_pct": 17.765,
         "largest_cluster_pct": 0.0,
         "launchpad": "pons_v2",
-        "notes": [],
+        "notes": [
+          "钱包画像覆盖 0/15（浏览器 API 限流），sybil 分只反映已画像部分"
+        ],
+        "profiled": 0,
         "quality": "partial",
         "sybil_score": 0,
         "top10_eoa_pct": 12.695
       },
       "killed_by": [],
-      "liquidity_usd": 47768.31,
+      "liquidity_usd": 49326.04,
       "name": "Money Dog",
       "pool": "0xe3f3c6089196b72ccf7e1e1db41dc158513545078d9bd15288a16463fdf17a2a",
       "position_size_usd": 0.0,
-      "price_usd": 0.0002713,
+      "price_usd": 0.0002893,
       "reasons": [
-        "评分 69 ≥ 观察线"
+        "评分 66 ≥ 观察线"
       ],
-      "score": 69.0,
+      "score": 65.8,
       "score_breakdown": {
         "distribution": 20.0,
         "liquidity_health": 6.0,
         "narrative_social": 2.5,
-        "organic_growth": 5.7,
+        "organic_growth": 8.8,
         "price_structure": 10.0,
         "smart_money": 6.0,
-        "sybil_integrity": 18.8
+        "sybil_integrity": 12.5
       },
       "security": {
         "buy_tax_pct": 0.0,
@@ -1260,7 +1291,7 @@
         "source": "goplus",
         "token": "0x8d8f709357203b4933af3ac410cc521c5680611f"
       },
-      "sells_h24": 275,
+      "sells_h24": 278,
       "smart_money": {
         "count": 0,
         "net_buy_usd": 0.0,
@@ -1271,52 +1302,287 @@
       "symbol": "MONEYDOG",
       "token": "0x8d8f709357203b4933af3ac410cc521c5680611f",
       "url": "https://dexscreener.com/robinhood/0xe3f3c6089196b72ccf7e1e1db41dc158513545078d9bd15288a16463fdf17a2a",
-      "vol_h1": 6395.15,
-      "vol_h24": 93189.03,
+      "vol_h1": 8281.37,
+      "vol_h24": 93576.3,
       "x": {
-        "x_buy_usd_all": 26613.33,
-        "x_median_trade_usd": 61.59,
-        "x_net_flow_1h_to_liq": 0.0305,
-        "x_net_flow_1h_usd": 1458.9,
-        "x_net_flow_all_usd": 4009.91,
-        "x_sell_usd_all": 22603.41,
-        "x_top5_buyer_share": 0.301,
+        "x_buy_usd_all": 26850.96,
+        "x_median_trade_usd": 59.24,
+        "x_net_flow_1h_to_liq": 0.0443,
+        "x_net_flow_1h_usd": 2185.33,
+        "x_net_flow_all_usd": 5246.4,
+        "x_sell_usd_all": 21604.57,
+        "x_top5_buyer_share": 0.298,
         "x_trades_n": 300,
-        "x_unique_buyers_1h": 18,
+        "x_unique_buyers_1h": 20,
         "x_unique_buyers_trades": 93
       }
     },
     {
-      "age_hours": 1.536,
-      "ai": {
-        "confidence": 0.5,
-        "key_evidence": [
-          "HAS_SOCIALS"
-        ],
-        "model": "",
-        "provider": "rules",
-        "red_flags": [
-          "CHASING_RISK",
-          "PAID_PROMOTION",
-          "CLOSED_SOURCE"
-        ],
-        "verdict": "MIXED",
-        "what_would_change_mind": "取证质量为 full 且无关联簇、独立买家持续增加，或出现流动性抽走/买盘集中。"
-      },
+      "age_hours": 0.955,
+      "ai": null,
       "buyers_h1": null,
       "buyers_h24": null,
-      "buys_h24": 394,
-      "chg_h1": 1478.0,
-      "chg_h24": 1479.0,
-      "chg_h6": 1479.0,
-      "decision": "WATCH",
+      "buys_h24": 749,
+      "chg_h1": 95.04,
+      "chg_h24": 95.04,
+      "chg_h6": 95.04,
+      "decision": "SKIP",
       "dex": "uniswap",
-      "fdv_usd": 97803.0,
+      "fdv_usd": 100491.0,
+      "flags": {
+        "green": [
+          "HEALTHY_BUY_SELL",
+          "HAS_SOCIALS"
+        ],
+        "red": [
+          "PRICE_UP_NO_INFLOW"
+        ],
+        "yellow": [
+          "PAID_PROMOTION",
+          "CLOSED_SOURCE"
+        ]
+      },
+      "forensics": {
+        "burn_pct": 0.0,
+        "clustered_pct": 0,
+        "clusters": [],
+        "contract_held_pct": 49.025,
+        "creator_pct": 0.0,
+        "curve_status": "graduated",
+        "early_buyers_holding_pct": null,
+        "fresh_wallet_count": 0,
+        "fresh_wallet_pct": 0,
+        "holder_map": [
+          {
+            "a": "0x3ba714fe11d7afebf4d67b6fc2a87fa687bbd477",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 20.0,
+            "tx": null
+          },
+          {
+            "a": "0x872b6bcff51fa5d87ccf7d387ce19be23951346c",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.583,
+            "tx": null
+          },
+          {
+            "a": "0xea51d2b6340ae412e81fcd5f64326ac459b8464c",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.427,
+            "tx": null
+          },
+          {
+            "a": "0x2bc1fc1a1009a1f26ace95e7a7d3d8b0be57bc39",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.41,
+            "tx": null
+          },
+          {
+            "a": "0x9b9f19ad08293d037c3f608899dadc38844bb29c",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.171,
+            "tx": null
+          },
+          {
+            "a": "0xede73dd3ebb5ab837ac3e792b65290352646c35c",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.101,
+            "tx": null
+          },
+          {
+            "a": "0x5a87a5e0815280cb0edb9c26d168d1812145d7ad",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.004,
+            "tx": null
+          },
+          {
+            "a": "0xdbca7db72e9e757d139f0ac4b31c2c42c8f7b360",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.0,
+            "tx": null
+          },
+          {
+            "a": "0x8f3800673e058005e41d7b0304184dd5605c62e6",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.667,
+            "tx": null
+          },
+          {
+            "a": "0x3471e3f1d6fb368ce026a959666dd1c98fa1c4e9",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.657,
+            "tx": null
+          },
+          {
+            "a": "0xcf0ecfcad61b8c9be901fde3e99459be6503eda1",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.637,
+            "tx": null
+          },
+          {
+            "a": "0xd86f5bb7dec48d631fa6344bf53a5856d76bc61b",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.576,
+            "tx": null
+          },
+          {
+            "a": "0x1883c237f2efd9fbded2658c9025d921e47a83e0",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.534,
+            "tx": null
+          },
+          {
+            "a": "0x627d5c398e0c3bba50f61e9b08f5a723b00e81ad",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.481,
+            "tx": null
+          },
+          {
+            "a": "0xd81c110a7749d217f82678a718548d32c8f4b7e8",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.429,
+            "tx": null
+          }
+        ],
+        "holders": 277,
+        "inspected": 15,
+        "inspected_pct": 32.677,
+        "largest_cluster_pct": 0.0,
+        "launchpad": "",
+        "notes": [
+          "早期转账日志不可用",
+          "钱包画像覆盖 0/15（浏览器 API 限流），sybil 分只反映已画像部分"
+        ],
+        "profiled": 0,
+        "quality": "partial",
+        "sybil_score": 0,
+        "top10_eoa_pct": 30.019
+      },
+      "killed_by": [],
+      "liquidity_usd": 29070.46,
+      "name": "Takara",
+      "pool": "0x5b351cf8478c890cd2a50295e98e3bf912ec53c5097dc40fceead2b4da8bac70",
+      "position_size_usd": 0.0,
+      "price_usd": 0.0001004,
+      "reasons": [
+        "评分 56 低于观察线 60"
+      ],
+      "score": 56.3,
+      "score_breakdown": {
+        "distribution": 11.3,
+        "liquidity_health": 6.0,
+        "narrative_social": 2.5,
+        "organic_growth": 12.0,
+        "price_structure": 6.0,
+        "smart_money": 6.0,
+        "sybil_integrity": 12.5
+      },
+      "security": {
+        "buy_tax_pct": 0.0,
+        "flags": [
+          "closed_source"
+        ],
+        "has_owner": false,
+        "is_honeypot": false,
+        "is_mintable": false,
+        "is_proxy": false,
+        "is_verified": false,
+        "launchpad": "",
+        "owner": "",
+        "sell_tax_pct": 0.0,
+        "source": "goplus",
+        "token": "0xe0db3996bd775c82dffa3497aec97044588e7e91"
+      },
+      "sells_h24": 629,
+      "smart_money": {
+        "count": 0,
+        "net_buy_usd": 0.0,
+        "registry_size": 0,
+        "wallets": [],
+        "weighted": 0.0
+      },
+      "symbol": "Takara",
+      "token": "0xe0db3996bd775c82dffa3497aec97044588e7e91",
+      "url": "https://dexscreener.com/robinhood/0x5b351cf8478c890cd2a50295e98e3bf912ec53c5097dc40fceead2b4da8bac70",
+      "vol_h1": 165934.91,
+      "vol_h24": 165934.91,
+      "x": {
+        "x_buy_usd_all": 16958.01,
+        "x_median_trade_usd": 49.09,
+        "x_net_flow_1h_to_liq": -0.0928,
+        "x_net_flow_1h_usd": -2697.24,
+        "x_net_flow_all_usd": -2697.24,
+        "x_sell_usd_all": 19655.25,
+        "x_top5_buyer_share": 0.326,
+        "x_trades_n": 300,
+        "x_unique_buyers_1h": 97,
+        "x_unique_buyers_trades": 97
+      }
+    },
+    {
+      "age_hours": 1.736,
+      "ai": null,
+      "buyers_h1": null,
+      "buyers_h24": null,
+      "buys_h24": 554,
+      "chg_h1": 1644.0,
+      "chg_h24": 1645.0,
+      "chg_h6": 1645.0,
+      "decision": "SKIP",
+      "dex": "uniswap",
+      "fdv_usd": 108098.0,
       "flags": {
         "green": [
           "HAS_SOCIALS"
         ],
-        "red": [],
+        "red": [
+          "BUYS_CONCENTRATED"
+        ],
         "yellow": [
           "CHASING_RISK",
           "PAID_PROMOTION",
@@ -1327,7 +1593,7 @@
         "burn_pct": 0.0,
         "clustered_pct": 0,
         "clusters": [],
-        "contract_held_pct": 24.135,
+        "contract_held_pct": 23.93,
         "creator_pct": 0.0,
         "curve_status": "",
         "early_buyers_holding_pct": null,
@@ -1470,28 +1736,30 @@
             "tx": null
           }
         ],
-        "holders": 364,
+        "holders": 469,
         "inspected": 15,
         "inspected_pct": 29.733,
         "largest_cluster_pct": 0.0,
         "launchpad": "",
         "notes": [
-          "早期转账日志不可用"
+          "早期转账日志不可用",
+          "钱包画像覆盖 0/15（浏览器 API 限流），sybil 分只反映已画像部分"
         ],
+        "profiled": 0,
         "quality": "partial",
         "sybil_score": 0,
         "top10_eoa_pct": 22.021
       },
       "killed_by": [],
-      "liquidity_usd": 43070.77,
+      "liquidity_usd": 45599.72,
       "name": "GPU MINT",
       "pool": "0x2fdbf7806763c29d30e028fd96a91ebe2a06c63607f398e999a04e5f432f2d26",
       "position_size_usd": 0.0,
-      "price_usd": 9.78e-05,
+      "price_usd": 0.000108,
       "reasons": [
-        "评分 62 ≥ 观察线"
+        "评分 56 低于观察线 60"
       ],
-      "score": 62.1,
+      "score": 55.9,
       "score_breakdown": {
         "distribution": 17.9,
         "liquidity_health": 6.0,
@@ -1499,7 +1767,7 @@
         "organic_growth": 9.0,
         "price_structure": 2.0,
         "smart_money": 6.0,
-        "sybil_integrity": 18.8
+        "sybil_integrity": 12.5
       },
       "security": {
         "buy_tax_pct": 0.0,
@@ -1517,7 +1785,7 @@
         "source": "goplus",
         "token": "0xc19201fb50a944c69accdaf5be9377987b256d59"
       },
-      "sells_h24": 99,
+      "sells_h24": 100,
       "smart_money": {
         "count": 0,
         "net_buy_usd": 0.0,
@@ -1528,33 +1796,75 @@
       "symbol": "GPU MINT",
       "token": "0xc19201fb50a944c69accdaf5be9377987b256d59",
       "url": "https://dexscreener.com/robinhood/0x2fdbf7806763c29d30e028fd96a91ebe2a06c63607f398e999a04e5f432f2d26",
-      "vol_h1": 28024.0,
-      "vol_h24": 45998.91,
+      "vol_h1": 30065.83,
+      "vol_h24": 48040.75,
       "x": {
-        "x_buy_usd_all": 6597.98,
+        "x_buy_usd_all": 2798.05,
         "x_median_trade_usd": 0.01,
-        "x_net_flow_1h_to_liq": 0.048,
-        "x_net_flow_1h_usd": 2069.14,
-        "x_net_flow_all_usd": 2069.14,
-        "x_sell_usd_all": 4528.84,
-        "x_top5_buyer_share": 0.438,
+        "x_net_flow_1h_to_liq": 0.017,
+        "x_net_flow_1h_usd": 775.16,
+        "x_net_flow_all_usd": 775.16,
+        "x_sell_usd_all": 2022.88,
+        "x_top5_buyer_share": 0.707,
         "x_trades_n": 300,
-        "x_unique_buyers_1h": 266,
-        "x_unique_buyers_trades": 266
+        "x_unique_buyers_1h": 289,
+        "x_unique_buyers_trades": 289
       }
     },
     {
-      "age_hours": 0.537,
+      "age_hours": 0.251,
       "ai": null,
       "buyers_h1": null,
       "buyers_h24": null,
-      "buys_h24": 871,
-      "chg_h1": 3293.0,
-      "chg_h24": 3293.0,
-      "chg_h6": 3293.0,
+      "buys_h24": 620,
+      "chg_h1": -56.92,
+      "chg_h24": -56.92,
+      "chg_h6": -56.92,
       "decision": "SKIP",
       "dex": "uniswap",
-      "fdv_usd": 114597.0,
+      "fdv_usd": 296646.0,
+      "flags": {
+        "green": [],
+        "red": [],
+        "yellow": []
+      },
+      "forensics": null,
+      "killed_by": [
+        "liquidity<15000",
+        "too_new"
+      ],
+      "liquidity_usd": 14791.48,
+      "name": "KPOP",
+      "pool": "0x91cfc970eb3a438873cedbee06c46ccfeb6f4613d0d447bf276cce547dcba84a",
+      "position_size_usd": 0.0,
+      "price_usd": 0.0002966,
+      "reasons": [
+        "硬过滤: liquidity<15000, too_new"
+      ],
+      "score": 0.0,
+      "score_breakdown": {},
+      "security": null,
+      "sells_h24": 596,
+      "smart_money": null,
+      "symbol": "KPOP",
+      "token": "0xca3ce24fb1a6e7db0003f9c785405a851e3f1e18",
+      "url": "https://dexscreener.com/robinhood/0x91cfc970eb3a438873cedbee06c46ccfeb6f4613d0d447bf276cce547dcba84a",
+      "vol_h1": 75474.13,
+      "vol_h24": 75474.13,
+      "x": {}
+    },
+    {
+      "age_hours": 0.736,
+      "ai": null,
+      "buyers_h1": null,
+      "buyers_h24": null,
+      "buys_h24": 1255,
+      "chg_h1": 8683.0,
+      "chg_h24": 8683.0,
+      "chg_h6": 8683.0,
+      "decision": "SKIP",
+      "dex": "uniswap",
+      "fdv_usd": 295707.0,
       "flags": {
         "green": [],
         "red": [],
@@ -1564,46 +1874,130 @@
       "killed_by": [
         "already_pumped_24h"
       ],
-      "liquidity_usd": 35991.73,
+      "liquidity_usd": 59684.88,
       "name": "par",
       "pool": "0x78c5655cf64d5dcc13d3db21d0d72b460b4b360251618efcd21ab32a14c5fab4",
       "position_size_usd": 0.0,
-      "price_usd": 0.0001152,
+      "price_usd": 0.0002983,
       "reasons": [
         "硬过滤: already_pumped_24h"
       ],
       "score": 0.0,
       "score_breakdown": {},
       "security": null,
-      "sells_h24": 630,
+      "sells_h24": 1115,
       "smart_money": null,
       "symbol": "par",
       "token": "0x507b6f349a80114097a67b8b4677367acc15b220",
       "url": "https://dexscreener.com/robinhood/0x78c5655cf64d5dcc13d3db21d0d72b460b4b360251618efcd21ab32a14c5fab4",
-      "vol_h1": 174037.99,
-      "vol_h24": 174037.99,
+      "vol_h1": 306816.18,
+      "vol_h24": 306816.18,
+      "x": {}
+    },
+    {
+      "age_hours": 0.364,
+      "ai": null,
+      "buyers_h1": null,
+      "buyers_h24": null,
+      "buys_h24": 3,
+      "chg_h1": -0.24,
+      "chg_h24": -0.24,
+      "chg_h6": -0.24,
+      "decision": "SKIP",
+      "dex": "uniswap",
+      "fdv_usd": 20001.0,
+      "flags": {
+        "green": [],
+        "red": [],
+        "yellow": []
+      },
+      "forensics": null,
+      "killed_by": [
+        "txns24<50",
+        "vol/liq_too_low(dead)"
+      ],
+      "liquidity_usd": 20001.35,
+      "name": "No Sleep Season",
+      "pool": "0x1da56cce038b3e6357fc98758c347bdff7d1fe833d418bd4ba1ffc57eacec4a5",
+      "position_size_usd": 0.0,
+      "price_usd": 2e-05,
+      "reasons": [
+        "硬过滤: txns24<50, vol/liq_too_low(dead)"
+      ],
+      "score": 0.0,
+      "score_breakdown": {},
+      "security": null,
+      "sells_h24": 3,
+      "smart_money": null,
+      "symbol": "NOZZZZZZZZZZDOG",
+      "token": "0x3419d7bc998f53e63e978c041ab42c6ea9291e18",
+      "url": "https://dexscreener.com/robinhood/0x1da56cce038b3e6357fc98758c347bdff7d1fe833d418bd4ba1ffc57eacec4a5",
+      "vol_h1": 49.04,
+      "vol_h24": 49.04,
+      "x": {}
+    },
+    {
+      "age_hours": 0.346,
+      "ai": null,
+      "buyers_h1": null,
+      "buyers_h24": null,
+      "buys_h24": 5,
+      "chg_h1": -0.84,
+      "chg_h24": -0.84,
+      "chg_h6": -0.84,
+      "decision": "SKIP",
+      "dex": "uniswap",
+      "fdv_usd": 30536.0,
+      "flags": {
+        "green": [],
+        "red": [],
+        "yellow": []
+      },
+      "forensics": null,
+      "killed_by": [
+        "txns24<50",
+        "vol/liq_too_low(dead)"
+      ],
+      "liquidity_usd": 30536.23,
+      "name": "Happy Robot",
+      "pool": "0xcce027205ad498d643d6bea0f3925899c957208d",
+      "position_size_usd": 0.0,
+      "price_usd": 0.0003053,
+      "reasons": [
+        "硬过滤: txns24<50, vol/liq_too_low(dead)"
+      ],
+      "score": 0.0,
+      "score_breakdown": {},
+      "security": null,
+      "sells_h24": 6,
+      "smart_money": null,
+      "symbol": "HR",
+      "token": "0xc1a0fb82972596485ff7a440a59aed89277597f6",
+      "url": "https://dexscreener.com/robinhood/0xcce027205ad498d643d6bea0f3925899c957208d",
+      "vol_h1": 1207.74,
+      "vol_h24": 1207.74,
       "x": {}
     }
   ],
   "regime": "BTC_ONLY",
   "universe": {
     "degraded_to_shallow": 0,
-    "discovered": 49,
-    "forensics_done": 6,
-    "new_baseline": 4,
-    "new_pools_per_hour": 1148.9,
-    "new_samples": 6,
-    "prefiltered": 6,
-    "raw_rows": 147,
-    "seconds": 429.8,
-    "skipped": 43,
+    "discovered": 41,
+    "forensics_done": 7,
+    "new_baseline": 3,
+    "new_pools_per_hour": 716.4,
+    "new_samples": 4,
+    "prefiltered": 7,
+    "raw_rows": 137,
+    "seconds": 523.2,
+    "skipped": 34,
     "sources": {
-      "ds_promoted": 7,
-      "ds_rolling": 0,
+      "ds_promoted": 9,
+      "ds_rolling": 7,
       "gt_active": 1,
-      "gt_new": 39,
+      "gt_new": 22,
       "gt_trending": 2
     }
   },
-  "updated": "2026-09-04T20:45:53Z"
+  "updated": "2026-09-04T20:57:00Z"
 }
