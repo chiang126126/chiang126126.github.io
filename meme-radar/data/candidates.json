@@ -1,325 +1,222 @@
 {
   "items": [
     {
-      "age_hours": 70.445,
+      "age_hours": 36.79,
       "ai": {
-        "confidence": 0.5,
+        "confidence": 0.65,
         "key_evidence": [
+          "BROAD_PARTICIPATION",
           "HEALTHY_BUY_SELL",
-          "HAS_SOCIALS",
-          "GRADUATED_LOCKED_LP"
+          "HAS_SOCIALS"
         ],
         "model": "",
         "provider": "rules",
         "red_flags": [
-          "BUYS_CONCENTRATED",
           "CLOSED_SOURCE"
         ],
-        "verdict": "MIXED",
+        "verdict": "REAL_MARKET",
         "what_would_change_mind": "取证质量为 full 且无关联簇、独立买家持续增加，或出现流动性抽走/买盘集中。"
       },
-      "buyers_h1": 28,
-      "buyers_h24": 167,
-      "buys_h24": 368,
-      "chg_h1": 1.904,
-      "chg_h24": 51.559,
-      "chg_h6": 44.116,
-      "decision": "WATCH",
-      "dex": "pons-v2-dex",
-      "fdv_usd": 308064.6497,
+      "buyers_h1": 529,
+      "buyers_h24": 6043,
+      "buys_h24": 25896,
+      "chg_h1": -2.795,
+      "chg_h24": -52.007,
+      "chg_h6": -17.555,
+      "decision": "PAPER_BUY",
+      "dex": "uniswap-v4",
+      "fdv_usd": 501863.108553226,
       "flags": {
         "green": [
+          "BROAD_PARTICIPATION",
           "HEALTHY_BUY_SELL",
-          "HAS_SOCIALS",
-          "GRADUATED_LOCKED_LP"
+          "HAS_SOCIALS"
         ],
-        "red": [
-          "BUYS_CONCENTRATED"
-        ],
+        "red": [],
         "yellow": [
           "CLOSED_SOURCE"
         ]
       },
       "forensics": {
-        "burn_pct": 4.983,
-        "clustered_pct": 4.665,
-        "clusters": [
-          {
-            "pct": 4.665,
-            "reasons": [
-              "same_funder"
-            ],
-            "size": 2,
-            "wallets": [
-              "0x838f1ee818bbef981fff4406b3beac272b2c9090",
-              "0xe5ebe86b9a03e8971698d4c8a1d4821fb70aaef0"
-            ]
-          }
-        ],
-        "contract_held_pct": 17.804,
-        "creator_pct": 0.0,
-        "curve_status": "graduated",
+        "burn_pct": 0.0,
+        "clustered_pct": 0,
+        "clusters": [],
+        "contract_held_pct": 85.82,
+        "creator_pct": 0.488,
+        "curve_status": "",
         "early_buyers_holding_pct": null,
-        "fresh_wallet_count": 0,
-        "fresh_wallet_pct": 0,
+        "fresh_wallet_count": 1,
+        "fresh_wallet_pct": 0.383,
         "holder_map": [
           {
-            "a": "0x23af1ecd3bbcc1f44bedcaf0e8c3c73874b347b5",
-            "age": 31.5,
+            "a": "0x92d435c96e63c43e12d6d0ab28f6b0b04072f765",
+            "age": 1233.46,
             "c": null,
             "f": false,
             "k": "eoa",
-            "p": 2.572,
+            "p": 9.501,
+            "tx": 648
+          },
+          {
+            "a": "0x0c0eab314cf707f8eba0ac14ef150109071a719c",
+            "age": 151.06,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.572,
+            "tx": 145
+          },
+          {
+            "a": "0xdf769057eb42b27bd7dd4c8643779f0dfe49a6a2",
+            "age": 1403.38,
+            "c": null,
+            "f": false,
+            "k": "creator",
+            "p": 0.488,
+            "tx": 181
+          },
+          {
+            "a": "0x6666666faa76152567e128525a81651a1dfb74ff",
+            "age": 16.86,
+            "c": null,
+            "f": true,
+            "k": "eoa",
+            "p": 0.383,
             "tx": 0
           },
           {
-            "a": "0x838f1ee818bbef981fff4406b3beac272b2c9090",
-            "age": 50.58,
-            "c": 0,
-            "f": false,
-            "k": "eoa",
-            "p": 2.477,
-            "tx": 0
-          },
-          {
-            "a": "0x66c15e5fc755bf28aff03c1592ba0ac40c32a29f",
-            "age": 53.34,
+            "a": "0x7262d8130107692d94b59054a48b721d60c3d06c",
+            "age": 1334.27,
             "c": null,
             "f": false,
             "k": "eoa",
-            "p": 2.472,
-            "tx": 0
+            "p": 0.253,
+            "tx": 977
           },
           {
-            "a": "0x41ba9a0458682bd9b7f83573401870e0af340ef3",
-            "age": 53.94,
+            "a": "0xb51ff2f65b935142aab32abefa1c0e29a4161d31",
+            "age": 1436.39,
             "c": null,
             "f": false,
             "k": "eoa",
-            "p": 2.401,
-            "tx": 0
+            "p": 0.219,
+            "tx": 2021
           },
           {
-            "a": "0x7a8401fbaf1668b3d176c2f6aeeba5f1ce3d7208",
-            "age": 54.5,
+            "a": "0xa89a98340ab3d56a076f65cf9da7f5fe21e09a04",
+            "age": 793.89,
             "c": null,
             "f": false,
             "k": "eoa",
-            "p": 2.367,
-            "tx": 0
+            "p": 0.191,
+            "tx": 568
           },
           {
-            "a": "0xb194f86460373f606df02b42b07824be85b8f95d",
-            "age": 27.02,
+            "a": "0xa1c7ecfd7b1adcb8329c4168631d4e9943b3755c",
+            "age": 544.58,
             "c": null,
             "f": false,
             "k": "eoa",
-            "p": 2.313,
-            "tx": 0
+            "p": 0.166,
+            "tx": 738
           },
           {
-            "a": "0xcc4a670913c0ad994ba609f498ef90fad40ceec2",
-            "age": 50.01,
+            "a": "0xf23c507316f062f36f1279dafce151c854f30044",
+            "age": 1394.72,
             "c": null,
             "f": false,
             "k": "eoa",
-            "p": 2.239,
-            "tx": 0
+            "p": 0.117,
+            "tx": 3061
           },
           {
-            "a": "0x855d8cc86cdfcf51819bf138a93e60eaf3c804dc",
-            "age": 67.21,
+            "a": "0x06d75a697f57e5d76880055a155fb985272df8bf",
+            "age": 1322.74,
             "c": null,
             "f": false,
             "k": "eoa",
-            "p": 2.23,
-            "tx": 0
+            "p": 0.084,
+            "tx": 190
           },
           {
-            "a": "0xe5ebe86b9a03e8971698d4c8a1d4821fb70aaef0",
-            "age": 48.89,
-            "c": 0,
-            "f": false,
-            "k": "eoa",
-            "p": 2.188,
-            "tx": 0
-          },
-          {
-            "a": "0xbfe754f9806582678acc69d5a3bf4c35ad0c511f",
-            "age": 55.61,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 2.175,
-            "tx": 0
-          },
-          {
-            "a": "0x6cc3bb8a72c4606a409118bbcd1e5aefab19ef17",
+            "a": "0x6dddf81d5b04877959ff79a0f77698e16ab79707",
             "age": null,
             "c": null,
             "f": false,
             "k": "eoa",
-            "p": 2.17,
+            "p": 0.081,
             "tx": null
           },
           {
-            "a": "0xd5b9dd9682b6e1ec3be8a9732c58ec439b6b02d9",
+            "a": "0x227a641506de34fc818ebc88cf9690dca857a393",
             "age": null,
             "c": null,
             "f": false,
             "k": "eoa",
-            "p": 2.112,
+            "p": 0.076,
             "tx": null
           },
           {
-            "a": "0x37d4ecd0119323ea12b549451794c999ac671eda",
+            "a": "0xd953a39aedfde23ece9a75b32ff0c7d880b4a8de",
             "age": null,
             "c": null,
             "f": false,
             "k": "eoa",
-            "p": 2.103,
+            "p": 0.076,
             "tx": null
           },
           {
-            "a": "0xf8f834c1c2ad6473180447a26a0222ebe02a34d8",
+            "a": "0x7a9b554e78ba007df3fa5bc141010b1d53bebd5f",
             "age": null,
             "c": null,
             "f": false,
             "k": "eoa",
-            "p": 2.103,
+            "p": 0.069,
             "tx": null
           },
           {
-            "a": "0x6afa69838f20f5bb5481ab593b4d98fbaf651ff6",
+            "a": "0xb7293fad10bfc1becfd0d1798f4df3d9da1f83d6",
             "age": null,
             "c": null,
             "f": false,
             "k": "eoa",
-            "p": 2.047,
-            "tx": null
-          },
-          {
-            "a": "0x029951b1637edbe72042762f594ef8ebbf16e442",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 2.01,
-            "tx": null
-          },
-          {
-            "a": "0xe6918fd375cfd675c57744431dee10c09a447c78",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 1.974,
-            "tx": null
-          },
-          {
-            "a": "0xee9cb7386a5a587f63fd248e8cb74af6f9e774ea",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 1.971,
-            "tx": null
-          },
-          {
-            "a": "0x20d96e0b5f18369570a34f4caa5d0f16f2699d34",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 1.859,
-            "tx": null
-          },
-          {
-            "a": "0xdaea3a812648ac6fff01e7e03d313f7c24649821",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 1.849,
-            "tx": null
-          },
-          {
-            "a": "0x4c55d621f0fee53c6c8ed416c21c32b06945b4ae",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 1.814,
-            "tx": null
-          },
-          {
-            "a": "0x1270d027f2e2f7b5ef906a2dccbd34bd7d13a611",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 1.758,
-            "tx": null
-          },
-          {
-            "a": "0x93a09c78a97d698589f99dd92a544dc87b5087fc",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 1.727,
-            "tx": null
-          },
-          {
-            "a": "0x6e8b0a651b92bfe3f560431f36142df8ebe05545",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 1.702,
-            "tx": null
-          },
-          {
-            "a": "0xa4062f68ed2d84304834621db3539a945966d6e2",
-            "age": null,
-            "c": null,
-            "f": false,
-            "k": "eoa",
-            "p": 1.625,
+            "p": 0.053,
             "tx": null
           }
         ],
-        "holders": 313,
-        "inspected": 25,
-        "inspected_pct": 52.257,
-        "largest_cluster_pct": 4.665,
-        "launchpad": "pons_v2",
+        "holders": 359,
+        "inspected": 15,
+        "inspected_pct": 13.329,
+        "largest_cluster_pct": 0.0,
+        "launchpad": "",
         "notes": [
-          "发现 1 个关联簇，合计持仓 4.7%，最大簇 4.7%"
+          "早期转账日志不可用",
+          "1 个前排钱包为 <24h 新钱包（合计 0.4%）"
         ],
         "quality": "partial",
-        "sybil_score": 0.043,
-        "top10_eoa_pct": 23.435
+        "sybil_score": 0.009,
+        "top10_eoa_pct": 12.973
       },
       "killed_by": [],
-      "liquidity_usd": 47984.9427,
-      "name": "Ponsers",
-      "pool": "0x2993b198be37bd7f53c64dc1c13ebf1330c9d61e65a1abe058c3b4d7a2643016",
-      "position_size_usd": 0.0,
-      "price_usd": 0.00030568829658912,
+      "liquidity_usd": 201782.5021,
+      "name": "ANTHROPIC • Pre IPO Token",
+      "pool": "0xca5e2b2046cfffb4fc8d5c7a57e33c9e855d33c982a35f248d560470fd6df768",
+      "position_size_usd": 3.5,
+      "price_usd": 1926.58279773474,
       "reasons": [
-        "评分 74 ≥ 观察线",
-        "达到买入线但被拦: 红旗 BUYS_CONCENTRATED"
+        "评分 77 ≥ 观察线",
+        "评分 ≥ 买入线，体制预算 0.35 → 模拟仓 $3.50",
+        "已开模拟仓 #2026-09-04:0x4eb576e9c8a24b5fb11dd8eee5e5e2554ade1cf4"
       ],
-      "score": 74.5,
+      "score": 77.1,
       "score_breakdown": {
-        "distribution": 18.2,
-        "liquidity_health": 6.0,
-        "narrative_social": 4.0,
-        "organic_growth": 12.0,
+        "distribution": 20.0,
+        "liquidity_health": 5.0,
+        "narrative_social": 2.5,
+        "organic_growth": 15.0,
         "price_structure": 10.0,
         "smart_money": 6.0,
-        "sybil_integrity": 18.2
+        "sybil_integrity": 18.6
       },
       "security": {
         "buy_tax_pct": 0.0,
@@ -331,13 +228,13 @@
         "is_mintable": false,
         "is_proxy": false,
         "is_verified": false,
-        "launchpad": "pons_v2",
+        "launchpad": "",
         "owner": "",
         "sell_tax_pct": 0.0,
         "source": "goplus",
-        "token": "0xb9e75a12de07c55c1496b36dcdac55764440b8c8"
+        "token": "0x4eb576e9c8a24b5fb11dd8eee5e5e2554ade1cf4"
       },
-      "sells_h24": 187,
+      "sells_h24": 24272,
       "smart_money": {
         "count": 0,
         "net_buy_usd": 0.0,
@@ -345,120 +242,1368 @@
         "wallets": [],
         "weighted": 0.0
       },
-      "symbol": "PONSERS",
-      "token": "0xb9e75a12de07c55c1496b36dcdac55764440b8c8",
-      "url": "https://www.geckoterminal.com/robinhood/pools/0x2993b198be37bd7f53c64dc1c13ebf1330c9d61e65a1abe058c3b4d7a2643016",
-      "vol_h1": 17470.4548527736,
-      "vol_h24": 66197.230683523,
+      "symbol": "ANTHROPIC",
+      "token": "0x4eb576e9c8a24b5fb11dd8eee5e5e2554ade1cf4",
+      "url": "https://www.geckoterminal.com/robinhood/pools/0xca5e2b2046cfffb4fc8d5c7a57e33c9e855d33c982a35f248d560470fd6df768",
+      "vol_h1": 518866.74499771,
+      "vol_h24": 9798934.37009029,
       "x": {
-        "x_buy_usd_all": 16266.04,
-        "x_median_trade_usd": 80.78,
-        "x_net_flow_1h_to_liq": 0.0048,
-        "x_net_flow_1h_usd": 228.78,
-        "x_net_flow_all_usd": -2480.01,
-        "x_sell_usd_all": 18746.04,
-        "x_top5_buyer_share": 0.78,
+        "x_buy_usd_all": 19946.26,
+        "x_median_trade_usd": 67.84,
+        "x_net_flow_1h_to_liq": -0.0448,
+        "x_net_flow_1h_usd": -9035.24,
+        "x_net_flow_all_usd": -9035.24,
+        "x_sell_usd_all": 28981.49,
+        "x_top5_buyer_share": 0.265,
         "x_trades_n": 300,
-        "x_unique_buyers_1h": 20,
-        "x_unique_buyers_trades": 58
+        "x_unique_buyers_1h": 110,
+        "x_unique_buyers_trades": 110
       }
     },
     {
-      "age_hours": 0.071,
-      "ai": null,
-      "buyers_h1": 28,
-      "buyers_h24": 28,
-      "buys_h24": 48,
-      "chg_h1": -14.688,
-      "chg_h24": -14.688,
-      "chg_h6": -14.688,
-      "decision": "SKIP",
-      "dex": "bankr",
-      "fdv_usd": 17203.4222,
-      "flags": {
-        "green": [],
-        "red": [],
-        "yellow": []
+      "age_hours": 23.536,
+      "ai": {
+        "confidence": 0.65,
+        "key_evidence": [
+          "BROAD_PARTICIPATION",
+          "HEALTHY_BUY_SELL",
+          "HAS_SOCIALS",
+          "GRADUATED_LOCKED_LP"
+        ],
+        "model": "",
+        "provider": "rules",
+        "red_flags": [
+          "PAID_PROMOTION"
+        ],
+        "verdict": "REAL_MARKET",
+        "what_would_change_mind": "取证质量为 full 且无关联簇、独立买家持续增加，或出现流动性抽走/买盘集中。"
       },
-      "forensics": null,
-      "killed_by": [
-        "too_new",
-        "buyers24<30"
-      ],
-      "liquidity_usd": 20941.0329,
-      "name": "stocknode",
-      "pool": "0xb8538d15999d1ecb03a8b0d4050b815ae3314b2ea7cec96d14afae4ae60f3eb9",
-      "position_size_usd": 0.0,
-      "price_usd": 1.71227916519181e-07,
-      "reasons": [
-        "硬过滤: too_new, buyers24<30"
-      ],
-      "score": 0.0,
-      "score_breakdown": {},
-      "security": null,
-      "sells_h24": 74,
-      "smart_money": null,
-      "symbol": "stocknode",
-      "token": "0x7eff8e18ef0a721e8092c97235c6ba881e970ba3",
-      "url": "https://www.geckoterminal.com/robinhood/pools/0xb8538d15999d1ecb03a8b0d4050b815ae3314b2ea7cec96d14afae4ae60f3eb9",
-      "vol_h1": 12854.8650387825,
-      "vol_h24": 12854.8650387825,
-      "x": {}
-    },
-    {
-      "age_hours": 21.502,
-      "ai": null,
-      "buyers_h1": 111,
-      "buyers_h24": 6542,
-      "buys_h24": 24338,
-      "chg_h1": 28.206,
-      "chg_h24": 646.089,
-      "chg_h6": 60.817,
-      "decision": "SKIP",
+      "buyers_h1": 204,
+      "buyers_h24": 6661,
+      "buys_h24": 24928,
+      "chg_h1": 76.273,
+      "chg_h24": 1342.652,
+      "chg_h6": 163.899,
+      "decision": "PAPER_BUY",
       "dex": "pons-v2-dex",
-      "fdv_usd": 1267145.14557946,
+      "fdv_usd": 2450175.51977927,
       "flags": {
-        "green": [],
+        "green": [
+          "BROAD_PARTICIPATION",
+          "HEALTHY_BUY_SELL",
+          "HAS_SOCIALS",
+          "GRADUATED_LOCKED_LP"
+        ],
         "red": [],
-        "yellow": []
+        "yellow": [
+          "PAID_PROMOTION"
+        ]
       },
-      "forensics": null,
-      "killed_by": [
-        "vol/liq_too_high(wash?)"
-      ],
-      "liquidity_usd": 99034.7172,
+      "forensics": {
+        "burn_pct": 3.357,
+        "clustered_pct": 0,
+        "clusters": [],
+        "contract_held_pct": 21.949,
+        "creator_pct": 0.0,
+        "curve_status": "graduated",
+        "early_buyers_holding_pct": null,
+        "fresh_wallet_count": 0,
+        "fresh_wallet_pct": 0,
+        "holder_map": [
+          {
+            "a": "0x73f432da307525b6590c858bf458116322d50d16",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.712,
+            "tx": null
+          },
+          {
+            "a": "0x813ab764fd2a34eaff4713a89b6087ff5d6ccc08",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.973,
+            "tx": null
+          },
+          {
+            "a": "0x7e28f0a7d71e567966c992bdf59b0400e88ab154",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.838,
+            "tx": null
+          },
+          {
+            "a": "0x5dc6e629416ed0cca18603406ffa65335ff74f34",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.787,
+            "tx": null
+          },
+          {
+            "a": "0x7755024e208fb4f5cc6ca0224bb7978382bdb383",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.701,
+            "tx": null
+          },
+          {
+            "a": "0x1c5c046e9dca9b2476b3adc435db51170d90f302",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.629,
+            "tx": null
+          },
+          {
+            "a": "0xd67b04d03d1d0bb91ca5e5b494cb0922f2212f1d",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.531,
+            "tx": null
+          },
+          {
+            "a": "0x24e6f833bea743d511b342c9c75b9a03762d03e9",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.501,
+            "tx": null
+          },
+          {
+            "a": "0xae5d6ae2c9a3904cae0f9981dfecb0710388e792",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.449,
+            "tx": null
+          },
+          {
+            "a": "0xe60dcdf2648394b6082452707210a23017607738",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.42,
+            "tx": null
+          },
+          {
+            "a": "0x00627e2718e41dba12f2dd3539c45de14dec0cf6",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.383,
+            "tx": null
+          },
+          {
+            "a": "0xdb7986694ee8f03a15234841312853196bcf6710",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.382,
+            "tx": null
+          },
+          {
+            "a": "0x0037c2bfab0969b235aa0fa09d9c331d92b09dce",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.374,
+            "tx": null
+          },
+          {
+            "a": "0x67f36f08003fc3659e36b4636a0fb7d793809029",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.372,
+            "tx": null
+          },
+          {
+            "a": "0xab7457b08483a7c2e128da25b480dc05825ebd11",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.362,
+            "tx": null
+          }
+        ],
+        "holders": 7080,
+        "inspected": 15,
+        "inspected_pct": 9.414,
+        "largest_cluster_pct": 0.0,
+        "launchpad": "pons_v2",
+        "notes": [
+          "早期转账日志不可用"
+        ],
+        "quality": "partial",
+        "sybil_score": 0,
+        "top10_eoa_pct": 7.54
+      },
+      "killed_by": [],
+      "liquidity_usd": 144135.5583,
       "name": "legs.fun",
       "pool": "0x1a812059207d57de177f7dd3669ffa0d5b0e18543a935167ce49b48903b5aef0",
-      "position_size_usd": 0.0,
-      "price_usd": 0.00131116696518461,
+      "position_size_usd": 3.5,
+      "price_usd": 0.00253529693204558,
       "reasons": [
-        "硬过滤: vol/liq_too_high(wash?)"
+        "评分 73 ≥ 观察线",
+        "评分 ≥ 买入线，体制预算 0.35 → 模拟仓 $3.50",
+        "已开模拟仓 #2026-09-04:0x8fcf98e1348d3ddee46cdd15a5c7d9a8d423077d"
       ],
-      "score": 0.0,
-      "score_breakdown": {},
-      "security": null,
-      "sells_h24": 13365,
-      "smart_money": null,
+      "score": 73.2,
+      "score_breakdown": {
+        "distribution": 20.0,
+        "liquidity_health": 5.0,
+        "narrative_social": 2.5,
+        "organic_growth": 15.0,
+        "price_structure": 6.0,
+        "smart_money": 6.0,
+        "sybil_integrity": 18.8
+      },
+      "security": {
+        "buy_tax_pct": 0.0,
+        "flags": [],
+        "has_owner": false,
+        "is_honeypot": false,
+        "is_mintable": false,
+        "is_proxy": false,
+        "is_verified": true,
+        "launchpad": "pons_v2",
+        "owner": "",
+        "sell_tax_pct": 0.0,
+        "source": "goplus",
+        "token": "0x8fcf98e1348d3ddee46cdd15a5c7d9a8d423077d"
+      },
+      "sells_h24": 13806,
+      "smart_money": {
+        "count": 0,
+        "net_buy_usd": 0.0,
+        "registry_size": 0,
+        "wallets": [],
+        "weighted": 0.0
+      },
       "symbol": "LEGS",
       "token": "0x8fcf98e1348d3ddee46cdd15a5c7d9a8d423077d",
       "url": "https://www.geckoterminal.com/robinhood/pools/0x1a812059207d57de177f7dd3669ffa0d5b0e18543a935167ce49b48903b5aef0",
-      "vol_h1": 65873.6932368415,
-      "vol_h24": 13485354.744978,
+      "vol_h1": 190114.324573699,
+      "vol_h24": 13732630.2770836,
+      "x": {
+        "x_buy_usd_all": 41055.44,
+        "x_median_trade_usd": 78.76,
+        "x_net_flow_1h_to_liq": 0.0064,
+        "x_net_flow_1h_usd": 928.36,
+        "x_net_flow_all_usd": 928.36,
+        "x_sell_usd_all": 40127.08,
+        "x_top5_buyer_share": 0.353,
+        "x_trades_n": 300,
+        "x_unique_buyers_1h": 92,
+        "x_unique_buyers_trades": 92
+      }
+    },
+    {
+      "age_hours": 2.975,
+      "ai": {
+        "confidence": 0.65,
+        "key_evidence": [
+          "HEALTHY_BUY_SELL",
+          "HAS_SOCIALS",
+          "GRADUATED_LOCKED_LP"
+        ],
+        "model": "",
+        "provider": "rules",
+        "red_flags": [
+          "PAID_PROMOTION"
+        ],
+        "verdict": "REAL_MARKET",
+        "what_would_change_mind": "取证质量为 full 且无关联簇、独立买家持续增加，或出现流动性抽走/买盘集中。"
+      },
+      "buyers_h1": 279,
+      "buyers_h24": 951,
+      "buys_h24": 5609,
+      "chg_h1": 19.7,
+      "chg_h24": 150.562,
+      "chg_h6": 150.562,
+      "decision": "WATCH",
+      "dex": "pons-v2-dex",
+      "fdv_usd": 516441.3342,
+      "flags": {
+        "green": [
+          "HEALTHY_BUY_SELL",
+          "HAS_SOCIALS",
+          "GRADUATED_LOCKED_LP"
+        ],
+        "red": [],
+        "yellow": [
+          "PAID_PROMOTION"
+        ]
+      },
+      "forensics": {
+        "burn_pct": 1.268,
+        "clustered_pct": 0,
+        "clusters": [],
+        "contract_held_pct": 17.058,
+        "creator_pct": 0.0,
+        "curve_status": "graduated",
+        "early_buyers_holding_pct": null,
+        "fresh_wallet_count": 0,
+        "fresh_wallet_pct": 0,
+        "holder_map": [
+          {
+            "a": "0xd5b200873f08178c226be85dd85aff552185a6ff",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 2.018,
+            "tx": null
+          },
+          {
+            "a": "0x3aea6fa72c5d27c54b9018ea0193b88e048e5e8a",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.364,
+            "tx": null
+          },
+          {
+            "a": "0xbceb2b49d9d25d67691c01dd8d9ef2e141a4df1c",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.964,
+            "tx": null
+          },
+          {
+            "a": "0xbc31510e863a30d4fd07d6946294cb60760ca5b9",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.567,
+            "tx": null
+          },
+          {
+            "a": "0xecae600d694b9ba7a4497bd488e6b8a08b25ce55",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.53,
+            "tx": null
+          },
+          {
+            "a": "0x3e5ada6f84e53716563459495a3fdf4d06c9f517",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.481,
+            "tx": null
+          },
+          {
+            "a": "0x799c0516697d2395691e36805e60e888fb3cec25",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.481,
+            "tx": null
+          },
+          {
+            "a": "0x36dd7c6ecdaee38a75ae1e4c4c6691ecc89f20cd",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.478,
+            "tx": null
+          },
+          {
+            "a": "0xf89b2a8842a9ba8980234a01b661ab917259051b",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.473,
+            "tx": null
+          },
+          {
+            "a": "0xc15f6f8119e799c55f2f83c32eb72898fa6f542e",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.473,
+            "tx": null
+          },
+          {
+            "a": "0x4f975f98260fd6851a4ea0516f3a8cb8a31d6ef2",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.473,
+            "tx": null
+          },
+          {
+            "a": "0x6b7323edf4d92d9762ddf5e5cdcb1120ff755b46",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.472,
+            "tx": null
+          },
+          {
+            "a": "0x965ba512da763693b64828a8593c44f154f8ea9a",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.472,
+            "tx": null
+          },
+          {
+            "a": "0x469506b7acf89580753f016fa3690629904b66ed",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.466,
+            "tx": null
+          },
+          {
+            "a": "0x0cdc1c2752c37dfcd1153caa83b582a0e118d3f9",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.465,
+            "tx": null
+          }
+        ],
+        "holders": 2654,
+        "inspected": 15,
+        "inspected_pct": 10.177,
+        "largest_cluster_pct": 0.0,
+        "launchpad": "pons_v2",
+        "notes": [
+          "早期转账日志不可用"
+        ],
+        "quality": "partial",
+        "sybil_score": 0,
+        "top10_eoa_pct": 7.829
+      },
+      "killed_by": [],
+      "liquidity_usd": 65710.2402,
+      "name": "Stocker",
+      "pool": "0xffb2d85e80750168707bc6a0f32fbe5be166baeb93726673b716cef7f9d905d7",
+      "position_size_usd": 0.0,
+      "price_usd": 0.000516441334193069,
+      "reasons": [
+        "评分 80 ≥ 观察线",
+        "达到买入线但被拦: 今日新仓额度已用完"
+      ],
+      "score": 80.2,
+      "score_breakdown": {
+        "distribution": 20.0,
+        "liquidity_health": 8.0,
+        "narrative_social": 2.5,
+        "organic_growth": 15.0,
+        "price_structure": 10.0,
+        "smart_money": 6.0,
+        "sybil_integrity": 18.8
+      },
+      "security": {
+        "buy_tax_pct": 0.0,
+        "flags": [],
+        "has_owner": false,
+        "is_honeypot": false,
+        "is_mintable": false,
+        "is_proxy": false,
+        "is_verified": true,
+        "launchpad": "pons_v2",
+        "owner": "",
+        "sell_tax_pct": 0.0,
+        "source": "goplus",
+        "token": "0x1f20837daf4f566ba0db16ceb25f879fb411ab1c"
+      },
+      "sells_h24": 5184,
+      "smart_money": {
+        "count": 0,
+        "net_buy_usd": 0.0,
+        "registry_size": 0,
+        "wallets": [],
+        "weighted": 0.0
+      },
+      "symbol": "Stocker",
+      "token": "0x1f20837daf4f566ba0db16ceb25f879fb411ab1c",
+      "url": "https://www.geckoterminal.com/robinhood/pools/0xffb2d85e80750168707bc6a0f32fbe5be166baeb93726673b716cef7f9d905d7",
+      "vol_h1": 190930.702874773,
+      "vol_h24": 1740070.6269943,
+      "x": {
+        "x_buy_usd_all": 14971.1,
+        "x_median_trade_usd": 48.16,
+        "x_net_flow_1h_to_liq": 0.0181,
+        "x_net_flow_1h_usd": 1186.97,
+        "x_net_flow_all_usd": 1186.97,
+        "x_sell_usd_all": 13784.13,
+        "x_top5_buyer_share": 0.517,
+        "x_trades_n": 300,
+        "x_unique_buyers_1h": 64,
+        "x_unique_buyers_trades": 64
+      }
+    },
+    {
+      "age_hours": 3.29,
+      "ai": {
+        "confidence": 0.65,
+        "key_evidence": [
+          "HEALTHY_BUY_SELL",
+          "HAS_SOCIALS",
+          "GRADUATED_LOCKED_LP"
+        ],
+        "model": "",
+        "provider": "rules",
+        "red_flags": [
+          "CLOSED_SOURCE"
+        ],
+        "verdict": "REAL_MARKET",
+        "what_would_change_mind": "取证质量为 full 且无关联簇、独立买家持续增加，或出现流动性抽走/买盘集中。"
+      },
+      "buyers_h1": null,
+      "buyers_h24": null,
+      "buys_h24": 1315,
+      "chg_h1": 51.73,
+      "chg_h24": 209.0,
+      "chg_h6": 209.0,
+      "decision": "WATCH",
+      "dex": "uniswap",
+      "fdv_usd": 158123.0,
+      "flags": {
+        "green": [
+          "HEALTHY_BUY_SELL",
+          "HAS_SOCIALS",
+          "GRADUATED_LOCKED_LP"
+        ],
+        "red": [],
+        "yellow": [
+          "CLOSED_SOURCE"
+        ]
+      },
+      "forensics": {
+        "burn_pct": 0.0,
+        "clustered_pct": 0,
+        "clusters": [],
+        "contract_held_pct": 37.892,
+        "creator_pct": 0.0,
+        "curve_status": "graduated",
+        "early_buyers_holding_pct": null,
+        "fresh_wallet_count": 0,
+        "fresh_wallet_pct": 0,
+        "holder_map": [
+          {
+            "a": "0x8b6cfe5f11160e62fa9c574a8147565c04ec1fda",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 2.858,
+            "tx": null
+          },
+          {
+            "a": "0xe569c83caa521ff88ce9f802fc7596c599912343",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 2.299,
+            "tx": null
+          },
+          {
+            "a": "0x9dfecc02c64f5ee7246b263c5be632f164d5e97a",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 2.222,
+            "tx": null
+          },
+          {
+            "a": "0x60842b4d999bd6695453b3fef4bbfd6ff3308698",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 2.082,
+            "tx": null
+          },
+          {
+            "a": "0xba486ab1c348390bcf16adda2f66b9b41be84af5",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.68,
+            "tx": null
+          },
+          {
+            "a": "0xa0d03cb51985802e6d672a84290cee9b388c6367",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.562,
+            "tx": null
+          },
+          {
+            "a": "0x42feeb72d0e7670f26c733e7175925d0e050cd00",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.254,
+            "tx": null
+          },
+          {
+            "a": "0x5cea528fb45c7760cc91cae194667c50eb475b87",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.212,
+            "tx": null
+          },
+          {
+            "a": "0xf66263c00d682cb1200858ee2b2f2c1589c9be64",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.208,
+            "tx": null
+          },
+          {
+            "a": "0x5678c23be6989cde5d0fe68d921584b4404a3180",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.203,
+            "tx": null
+          },
+          {
+            "a": "0x9a4f02c1bfbc0be356fb916c565a851f494ba605",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.18,
+            "tx": null
+          },
+          {
+            "a": "0x1ce2380555063a7755d2499fe8cfb595e93f8869",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.156,
+            "tx": null
+          },
+          {
+            "a": "0x7f92346214da47c90b366975c6ff7a73b3a16ada",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.133,
+            "tx": null
+          },
+          {
+            "a": "0x66e50ff8327c6dc20ee57737fd4fe123d1892802",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.109,
+            "tx": null
+          },
+          {
+            "a": "0x51c1f3cc5c8ba0c548fd2be6c118f4dd45482a8b",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.989,
+            "tx": null
+          }
+        ],
+        "holders": 341,
+        "inspected": 15,
+        "inspected_pct": 23.145,
+        "largest_cluster_pct": 0.0,
+        "launchpad": "pons_v2",
+        "notes": [
+          "早期转账日志不可用"
+        ],
+        "quality": "partial",
+        "sybil_score": 0,
+        "top10_eoa_pct": 17.578
+      },
+      "killed_by": [],
+      "liquidity_usd": 36464.02,
+      "name": "Luna Nine",
+      "pool": "0x5e4f5601d249b42b1d4aff3d45639a41593b3878b4a7cc3bf2d9bb6a3151dc26",
+      "position_size_usd": 0.0,
+      "price_usd": 0.0001581,
+      "reasons": [
+        "评分 75 ≥ 观察线",
+        "达到买入线但被拦: 今日新仓额度已用完"
+      ],
+      "score": 75.2,
+      "score_breakdown": {
+        "distribution": 20.0,
+        "liquidity_health": 6.0,
+        "narrative_social": 2.5,
+        "organic_growth": 12.0,
+        "price_structure": 10.0,
+        "smart_money": 6.0,
+        "sybil_integrity": 18.8
+      },
+      "security": {
+        "buy_tax_pct": 0.0,
+        "flags": [
+          "closed_source"
+        ],
+        "has_owner": false,
+        "is_honeypot": false,
+        "is_mintable": false,
+        "is_proxy": false,
+        "is_verified": true,
+        "launchpad": "pons_v2",
+        "owner": "",
+        "sell_tax_pct": 0.0,
+        "source": "goplus",
+        "token": "0x9663985492af1b339d959a800592ed131090f264"
+      },
+      "sells_h24": 828,
+      "smart_money": {
+        "count": 0,
+        "net_buy_usd": 0.0,
+        "registry_size": 0,
+        "wallets": [],
+        "weighted": 0.0
+      },
+      "symbol": "LUNA9",
+      "token": "0x9663985492af1b339d959a800592ed131090f264",
+      "url": "https://dexscreener.com/robinhood/0x5e4f5601d249b42b1d4aff3d45639a41593b3878b4a7cc3bf2d9bb6a3151dc26",
+      "vol_h1": 36649.02,
+      "vol_h24": 243710.53,
+      "x": {
+        "x_buy_usd_all": 22791.26,
+        "x_median_trade_usd": 72.89,
+        "x_net_flow_1h_to_liq": 0.1261,
+        "x_net_flow_1h_usd": 4599.26,
+        "x_net_flow_all_usd": 285.57,
+        "x_sell_usd_all": 22505.69,
+        "x_top5_buyer_share": 0.33,
+        "x_trades_n": 300,
+        "x_unique_buyers_1h": 70,
+        "x_unique_buyers_trades": 89
+      }
+    },
+    {
+      "age_hours": 51.301,
+      "ai": {
+        "confidence": 0.65,
+        "key_evidence": [
+          "HEALTHY_BUY_SELL",
+          "HAS_SOCIALS",
+          "GRADUATED_LOCKED_LP"
+        ],
+        "model": "",
+        "provider": "rules",
+        "red_flags": [
+          "PAID_PROMOTION"
+        ],
+        "verdict": "REAL_MARKET",
+        "what_would_change_mind": "取证质量为 full 且无关联簇、独立买家持续增加，或出现流动性抽走/买盘集中。"
+      },
+      "buyers_h1": null,
+      "buyers_h24": null,
+      "buys_h24": 363,
+      "chg_h1": 5.68,
+      "chg_h24": 139.0,
+      "chg_h6": 72.05,
+      "decision": "WATCH",
+      "dex": "uniswap",
+      "fdv_usd": 271360.0,
+      "flags": {
+        "green": [
+          "HEALTHY_BUY_SELL",
+          "HAS_SOCIALS",
+          "GRADUATED_LOCKED_LP"
+        ],
+        "red": [],
+        "yellow": [
+          "PAID_PROMOTION"
+        ]
+      },
+      "forensics": {
+        "burn_pct": 0.0,
+        "clustered_pct": 0,
+        "clusters": [],
+        "contract_held_pct": 25.433,
+        "creator_pct": 0.0,
+        "curve_status": "graduated",
+        "early_buyers_holding_pct": null,
+        "fresh_wallet_count": 0,
+        "fresh_wallet_pct": 0,
+        "holder_map": [
+          {
+            "a": "0xd4a1137a85648fe516e7b07231e59d85e1ba11b0",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.639,
+            "tx": null
+          },
+          {
+            "a": "0xf41e3186861afb9840ea3c87f00366440a648320",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.514,
+            "tx": null
+          },
+          {
+            "a": "0x7be38346a6edf664da9e79c8a64a155b6763f730",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.319,
+            "tx": null
+          },
+          {
+            "a": "0x3315b82dcf446b914134bde2fa2f676dc08f22ae",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.261,
+            "tx": null
+          },
+          {
+            "a": "0xc3bf54b1e74859e8af235e360fd698d2d10faef5",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.221,
+            "tx": null
+          },
+          {
+            "a": "0x0bf8ae54d7c7d8638aadbc1f6ed2f30e27e06198",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.212,
+            "tx": null
+          },
+          {
+            "a": "0xd2f23fe62e9daa24ac68862e2b8c2ba2b06ccf9a",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.212,
+            "tx": null
+          },
+          {
+            "a": "0x3748bd97c6d7595da0df244fd14dadf0db8fa707",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.168,
+            "tx": null
+          },
+          {
+            "a": "0xb1b14678fb3cf83dc682fa89b8f328a4d55ddabb",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.097,
+            "tx": null
+          },
+          {
+            "a": "0xe6f474b35d8f9df742db814af5706c9b6675fc78",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.051,
+            "tx": null
+          },
+          {
+            "a": "0x703ab1d5ac947604d7454bc4216ed1b18ca083e1",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.05,
+            "tx": null
+          },
+          {
+            "a": "0x5edaefe7b0b541576c4b5a7b72140dc805d77ad9",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.021,
+            "tx": null
+          },
+          {
+            "a": "0xf180c3b2f52d1424e62b688336b8ca5a1474af66",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.0,
+            "tx": null
+          },
+          {
+            "a": "0x0c07134b894c35be5bb001e541529b7581efc64d",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.0,
+            "tx": null
+          },
+          {
+            "a": "0x674e757aec3ecc5bfb7a729c71a3cd207ae7ecfe",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 0.999,
+            "tx": null
+          }
+        ],
+        "holders": 388,
+        "inspected": 15,
+        "inspected_pct": 17.765,
+        "largest_cluster_pct": 0.0,
+        "launchpad": "pons_v2",
+        "notes": [],
+        "quality": "partial",
+        "sybil_score": 0,
+        "top10_eoa_pct": 12.695
+      },
+      "killed_by": [],
+      "liquidity_usd": 47768.31,
+      "name": "Money Dog",
+      "pool": "0xe3f3c6089196b72ccf7e1e1db41dc158513545078d9bd15288a16463fdf17a2a",
+      "position_size_usd": 0.0,
+      "price_usd": 0.0002713,
+      "reasons": [
+        "评分 69 ≥ 观察线"
+      ],
+      "score": 69.0,
+      "score_breakdown": {
+        "distribution": 20.0,
+        "liquidity_health": 6.0,
+        "narrative_social": 2.5,
+        "organic_growth": 5.7,
+        "price_structure": 10.0,
+        "smart_money": 6.0,
+        "sybil_integrity": 18.8
+      },
+      "security": {
+        "buy_tax_pct": 0.0,
+        "flags": [],
+        "has_owner": false,
+        "is_honeypot": false,
+        "is_mintable": false,
+        "is_proxy": false,
+        "is_verified": true,
+        "launchpad": "pons_v2",
+        "owner": "",
+        "sell_tax_pct": 0.0,
+        "source": "goplus",
+        "token": "0x8d8f709357203b4933af3ac410cc521c5680611f"
+      },
+      "sells_h24": 275,
+      "smart_money": {
+        "count": 0,
+        "net_buy_usd": 0.0,
+        "registry_size": 0,
+        "wallets": [],
+        "weighted": 0.0
+      },
+      "symbol": "MONEYDOG",
+      "token": "0x8d8f709357203b4933af3ac410cc521c5680611f",
+      "url": "https://dexscreener.com/robinhood/0xe3f3c6089196b72ccf7e1e1db41dc158513545078d9bd15288a16463fdf17a2a",
+      "vol_h1": 6395.15,
+      "vol_h24": 93189.03,
+      "x": {
+        "x_buy_usd_all": 26613.33,
+        "x_median_trade_usd": 61.59,
+        "x_net_flow_1h_to_liq": 0.0305,
+        "x_net_flow_1h_usd": 1458.9,
+        "x_net_flow_all_usd": 4009.91,
+        "x_sell_usd_all": 22603.41,
+        "x_top5_buyer_share": 0.301,
+        "x_trades_n": 300,
+        "x_unique_buyers_1h": 18,
+        "x_unique_buyers_trades": 93
+      }
+    },
+    {
+      "age_hours": 1.536,
+      "ai": {
+        "confidence": 0.5,
+        "key_evidence": [
+          "HAS_SOCIALS"
+        ],
+        "model": "",
+        "provider": "rules",
+        "red_flags": [
+          "CHASING_RISK",
+          "PAID_PROMOTION",
+          "CLOSED_SOURCE"
+        ],
+        "verdict": "MIXED",
+        "what_would_change_mind": "取证质量为 full 且无关联簇、独立买家持续增加，或出现流动性抽走/买盘集中。"
+      },
+      "buyers_h1": null,
+      "buyers_h24": null,
+      "buys_h24": 394,
+      "chg_h1": 1478.0,
+      "chg_h24": 1479.0,
+      "chg_h6": 1479.0,
+      "decision": "WATCH",
+      "dex": "uniswap",
+      "fdv_usd": 97803.0,
+      "flags": {
+        "green": [
+          "HAS_SOCIALS"
+        ],
+        "red": [],
+        "yellow": [
+          "CHASING_RISK",
+          "PAID_PROMOTION",
+          "CLOSED_SOURCE"
+        ]
+      },
+      "forensics": {
+        "burn_pct": 0.0,
+        "clustered_pct": 0,
+        "clusters": [],
+        "contract_held_pct": 24.135,
+        "creator_pct": 0.0,
+        "curve_status": "",
+        "early_buyers_holding_pct": null,
+        "fresh_wallet_count": 0,
+        "fresh_wallet_pct": 0,
+        "holder_map": [
+          {
+            "a": "0x2e0ac2a67b771200e7c37844b8f25021ee9511c1",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 2.845,
+            "tx": null
+          },
+          {
+            "a": "0x57c45f62c506438c44fe75a09927d5d0a897bed5",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 2.555,
+            "tx": null
+          },
+          {
+            "a": "0xb8b4899aa4c6e2aeba19da2a83e308b8c68dcdf1",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 2.479,
+            "tx": null
+          },
+          {
+            "a": "0x98d1a96d84309b7967571ddae77a702c8e54929b",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 2.393,
+            "tx": null
+          },
+          {
+            "a": "0xdae1cf8b755930069578a3f5b98994c9d84bc825",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 2.195,
+            "tx": null
+          },
+          {
+            "a": "0x7f3c22539d32bf265851c25272b2eacc7aa8f3bc",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 2.163,
+            "tx": null
+          },
+          {
+            "a": "0xc2d949df527babd0e4ea37e4218fb63d165079cc",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 2.007,
+            "tx": null
+          },
+          {
+            "a": "0x324c6517915477f1d7c3a5ee762109bcec2846b8",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.866,
+            "tx": null
+          },
+          {
+            "a": "0x4eb983511e2fe846f19d9d26b2fa1c89cf539074",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.788,
+            "tx": null
+          },
+          {
+            "a": "0xa200c5beecf0cfe91a7d51b9a9c095302357d344",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.73,
+            "tx": null
+          },
+          {
+            "a": "0xfd5f366d62f3cde274e32863d9ca2c369b333de0",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.65,
+            "tx": null
+          },
+          {
+            "a": "0x9b5b90d0eb4620341d4dbc928ab9d17846042e11",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.59,
+            "tx": null
+          },
+          {
+            "a": "0x7706fa24e218f4dd7358efeb92179d2d2f981008",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.548,
+            "tx": null
+          },
+          {
+            "a": "0x16a0b8f88d8c6ad2869632cd680ca502826db17f",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.463,
+            "tx": null
+          },
+          {
+            "a": "0xee8878a05b5dafd61c186f6a47882e4e277a173b",
+            "age": null,
+            "c": null,
+            "f": false,
+            "k": "eoa",
+            "p": 1.462,
+            "tx": null
+          }
+        ],
+        "holders": 364,
+        "inspected": 15,
+        "inspected_pct": 29.733,
+        "largest_cluster_pct": 0.0,
+        "launchpad": "",
+        "notes": [
+          "早期转账日志不可用"
+        ],
+        "quality": "partial",
+        "sybil_score": 0,
+        "top10_eoa_pct": 22.021
+      },
+      "killed_by": [],
+      "liquidity_usd": 43070.77,
+      "name": "GPU MINT",
+      "pool": "0x2fdbf7806763c29d30e028fd96a91ebe2a06c63607f398e999a04e5f432f2d26",
+      "position_size_usd": 0.0,
+      "price_usd": 9.78e-05,
+      "reasons": [
+        "评分 62 ≥ 观察线"
+      ],
+      "score": 62.1,
+      "score_breakdown": {
+        "distribution": 17.9,
+        "liquidity_health": 6.0,
+        "narrative_social": 2.5,
+        "organic_growth": 9.0,
+        "price_structure": 2.0,
+        "smart_money": 6.0,
+        "sybil_integrity": 18.8
+      },
+      "security": {
+        "buy_tax_pct": 0.0,
+        "flags": [
+          "closed_source"
+        ],
+        "has_owner": false,
+        "is_honeypot": false,
+        "is_mintable": false,
+        "is_proxy": false,
+        "is_verified": true,
+        "launchpad": "",
+        "owner": "",
+        "sell_tax_pct": 0.0,
+        "source": "goplus",
+        "token": "0xc19201fb50a944c69accdaf5be9377987b256d59"
+      },
+      "sells_h24": 99,
+      "smart_money": {
+        "count": 0,
+        "net_buy_usd": 0.0,
+        "registry_size": 0,
+        "wallets": [],
+        "weighted": 0.0
+      },
+      "symbol": "GPU MINT",
+      "token": "0xc19201fb50a944c69accdaf5be9377987b256d59",
+      "url": "https://dexscreener.com/robinhood/0x2fdbf7806763c29d30e028fd96a91ebe2a06c63607f398e999a04e5f432f2d26",
+      "vol_h1": 28024.0,
+      "vol_h24": 45998.91,
+      "x": {
+        "x_buy_usd_all": 6597.98,
+        "x_median_trade_usd": 0.01,
+        "x_net_flow_1h_to_liq": 0.048,
+        "x_net_flow_1h_usd": 2069.14,
+        "x_net_flow_all_usd": 2069.14,
+        "x_sell_usd_all": 4528.84,
+        "x_top5_buyer_share": 0.438,
+        "x_trades_n": 300,
+        "x_unique_buyers_1h": 266,
+        "x_unique_buyers_trades": 266
+      }
+    },
+    {
+      "age_hours": 0.537,
+      "ai": null,
+      "buyers_h1": null,
+      "buyers_h24": null,
+      "buys_h24": 871,
+      "chg_h1": 3293.0,
+      "chg_h24": 3293.0,
+      "chg_h6": 3293.0,
+      "decision": "SKIP",
+      "dex": "uniswap",
+      "fdv_usd": 114597.0,
+      "flags": {
+        "green": [],
+        "red": [],
+        "yellow": []
+      },
+      "forensics": null,
+      "killed_by": [
+        "already_pumped_24h"
+      ],
+      "liquidity_usd": 35991.73,
+      "name": "par",
+      "pool": "0x78c5655cf64d5dcc13d3db21d0d72b460b4b360251618efcd21ab32a14c5fab4",
+      "position_size_usd": 0.0,
+      "price_usd": 0.0001152,
+      "reasons": [
+        "硬过滤: already_pumped_24h"
+      ],
+      "score": 0.0,
+      "score_breakdown": {},
+      "security": null,
+      "sells_h24": 630,
+      "smart_money": null,
+      "symbol": "par",
+      "token": "0x507b6f349a80114097a67b8b4677367acc15b220",
+      "url": "https://dexscreener.com/robinhood/0x78c5655cf64d5dcc13d3db21d0d72b460b4b360251618efcd21ab32a14c5fab4",
+      "vol_h1": 174037.99,
+      "vol_h24": 174037.99,
       "x": {}
     }
   ],
   "regime": "BTC_ONLY",
   "universe": {
     "degraded_to_shallow": 0,
-    "discovered": 27,
-    "forensics_done": 1,
-    "new_baseline": 3,
-    "new_pools_per_hour": 1225.5,
-    "new_samples": 2,
-    "prefiltered": 1,
-    "raw_rows": 140,
-    "seconds": 1166.8,
-    "skipped": 26
+    "discovered": 49,
+    "forensics_done": 6,
+    "new_baseline": 4,
+    "new_pools_per_hour": 1148.9,
+    "new_samples": 6,
+    "prefiltered": 6,
+    "raw_rows": 147,
+    "seconds": 429.8,
+    "skipped": 43,
+    "sources": {
+      "ds_promoted": 7,
+      "ds_rolling": 0,
+      "gt_active": 1,
+      "gt_new": 39,
+      "gt_trending": 2
+    }
   },
-  "updated": "2026-09-04T18:53:08Z"
+  "updated": "2026-09-04T20:45:53Z"
 }
