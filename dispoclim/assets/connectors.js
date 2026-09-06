@@ -75,34 +75,39 @@
     },
     {
       retailer: "manomano",
-      method: "affiliate-api",
-      status: "planned",
-      auth: "API marchand / affiliation",
-      notes: "Marketplace : suivre vendeur + délai d'expédition.",
+      method: "awin-feed",
+      status: "ready",
+      auth: "Flux produits Awin (merchant ID 17547)",
+      notes: "Première source réelle : prix + dispo en ligne via flux affilié Awin (cf. backend/CONNECTORS.md).",
       respectRobots: true,
     },
     {
       retailer: "amazon-fr",
-      method: "pa-api",
-      status: "planned",
-      auth: "Amazon Product Advertising API (associé)",
+      method: "creators-api",
+      status: "research",
+      auth: "Amazon Creators API (associé éligible)",
       notes:
-        "Utiliser l'API officielle (PA-API) + liens affiliés ; ne pas scraper Amazon.",
+        "PA-API 5.0 retirée le 15/05/2026 → migrer vers la Creators API ; accès conditionné aux ventes. Ne pas scraper Amazon.",
       respectRobots: true,
     },
   ];
 
-  // Ingestion : remplace les données démo par un flux réel.
-  // En production, on chargera /api/inventory.json (généré côté serveur).
-  async function loadInventory() {
-    try {
-      const res = await fetch("api/inventory.json", { cache: "no-store" });
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data.records) && data.records.length) return data.records;
+  // Ingestion : remplace les données démo par l'API backend réelle.
+  // Définir window.DISPOCLIM_API_BASE = "https://api.dispoclim.fr" pour activer.
+  // Voir backend/ (Express + Postgres) — endpoint GET /api/inventory.
+  async function loadInventory(params) {
+    const base = window.DISPOCLIM_API_BASE;
+    if (base) {
+      try {
+        const qs = new URLSearchParams(params || {}).toString();
+        const res = await fetch(`${base}/api/inventory${qs ? "?" + qs : ""}`, { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.records)) return data.records;
+        }
+      } catch (_) {
+        /* API injoignable : on retombe sur la démo ci-dessous */
       }
-    } catch (_) {
-      /* pas de flux réel disponible : on retombe sur la démo */
     }
     return window.DISPOCLIM ? window.DISPOCLIM.INVENTORY : [];
   }

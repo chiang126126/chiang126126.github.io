@@ -1,0 +1,130 @@
+# DispoClim — Render Blueprint (déploiement « un clic »)
+# ─────────────────────────────────────────────────────────────────────────────
+# Render lit ce fichier à la RACINE du dépôt. Comme le backend est dans un
+# sous-dossier, chaque service fixe `rootDir: dispoclim/backend`.
+#   ▸ Option A : copier ce fichier à la racine du dépôt, puis « New + → Blueprint ».
+#   ▸ Option B : créer les services à la main en pointant le Root Directory
+#     sur dispoclim/backend.
+#
+# Crée : 1 base Postgres (UE/Francfort) + 1 API web + 3 cron (hot/warm/cold).
+# Secrets (Stripe, Brevo, PUBLIC_BASE_URL) : à saisir dans le dashboard (sync:false).
+
+databases:
+  - name: dispoclim-db
+    region: frankfurt
+    plan: free            # ⚠️ la base gratuite Render expire après 90 j — passer en payant pour la prod
+    postgresMajorVersion: "16"
+
+services:
+  # ---------- API ----------
+  - type: web
+    name: dispoclim-api
+    runtime: node
+    region: frankfurt
+    plan: free            # le plan gratuit se met en veille ; passer en payant pour la prod
+    rootDir: dispoclim/backend
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: DATABASE_URL
+        fromDatabase: { name: dispoclim-db, property: connectionString }
+      - key: FRONT_ORIGIN
+        value: https://chiang126126.github.io
+      - key: ENABLED_CONNECTORS
+        value: demo                 # passer au connecteur réel une fois les clés en place
+      - key: PUBLIC_BASE_URL
+        sync: false                 # ex. https://dispoclim-api.onrender.com
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: PASS_PRICE_CENTS
+        value: "199"
+      - key: BREVO_API_KEY
+        sync: false
+      - key: BREVO_SENDER_EMAIL
+        sync: false
+      - key: BREVO_SENDER_NAME
+        value: DispoClim
+      - key: BREVO_SMS_SENDER
+        value: DispoClim
+      - key: COLLECTOR_USER_AGENT
+        value: "DispoClimBot/0.1 (+https://dispoclim.fr/bot)"
+
+  # ---------- Collecteur — palier HOT (~chaque minute) ----------
+  - type: cron
+    name: dispoclim-collector-hot
+    runtime: node
+    region: frankfurt
+    plan: free
+    rootDir: dispoclim/backend
+    schedule: "* * * * *"          # min. granularité cron = 1 min (sous-minute = worker dédié)
+    buildCommand: npm ci && npm run build
+    startCommand: node dist/collector/run.js hot
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: DATABASE_URL
+        fromDatabase: { name: dispoclim-db, property: connectionString }
+      - key: ENABLED_CONNECTORS
+        value: demo
+      - key: BREVO_API_KEY
+        sync: false
+      - key: BREVO_SENDER_EMAIL
+        sync: false
+      - key: PUBLIC_BASE_URL
+        sync: false
+
+  # ---------- Collecteur — palier WARM (~5 min) ----------
+  - type: cron
+    name: dispoclim-collector-warm
+    runtime: node
+    region: frankfurt
+    plan: free
+    rootDir: dispoclim/backend
+    schedule: "*/5 * * * *"
+    buildCommand: npm ci && npm run build
+    startCommand: node dist/collector/run.js warm
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: DATABASE_URL
+        fromDatabase: { name: dispoclim-db, property: connectionString }
+      - key: ENABLED_CONNECTORS
+        value: demo
+      - key: BREVO_API_KEY
+        sync: false
+      - key: PUBLIC_BASE_URL
+        sync: false
+
+  # ---------- Collecteur — palier COLD (~20 min) ----------
+  # Idéal pour le connecteur Awin (flux ~quotidien) : mettre ENABLED_CONNECTORS=awin
+  # ici et renseigner les AWIN_*/EAN_* ci-dessous, en gardant 'demo' sur hot/warm.
+  - type: cron
+    name: dispoclim-collector-cold
+    runtime: node
+    region: frankfurt
+    plan: free
+    rootDir: dispoclim/backend
+    schedule: "*/20 * * * *"
+    buildCommand: npm ci && npm run build
+    startCommand: node dist/collector/run.js cold
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: DATABASE_URL
+        fromDatabase: { name: dispoclim-db, property: connectionString }
+      - key: ENABLED_CONNECTORS
+        value: demo                 # passer à 'awin' une fois les clés en place
+      - key: AWIN_API_KEY
+        sync: false
+      - key: AWIN_FEED_MANOMANO
+        sync: false
+      - key: EAN_PORTASPLIT_12000
+        sync: false
+      - key: EAN_COMFEE_9000
+        sync: false
