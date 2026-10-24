@@ -1,0 +1,587 @@
+# -*- coding: utf-8 -*-
+"""pipeline.py — 把五层串起来：regime → outcomes → scan → evaluate → report。
+
+设计原则（与仓库里其它数据管道一致）：逐源 try/except、任何失败保留旧值、绝不非零退出、
+确定性输出（sort_keys）。所有外部依赖都可通过 http_overrides 注入 FakeHttp 做离线测试。
+"""
+from __future__ import annotations
+
+import math
+import random
+import time
+import traceback
+from typing import Any, Dict, List, Optional, Set
+
+from .ai import AiJudge, evidence_document
+from .config import ENV, env as env_get, load_chain, load_rules
+from .crossval import cross_validate
+from .evaluate import evaluate
+from .forensics import Forensics, WalletCache
+from .ledger import Ledger
+from .models import Candidate, PoolSnapshot
+from .regime import compact_history_entry, compute_regime
+from .report import write_daily_report, write_outputs
+from .screen import build_features, decide, hard_filter, score
+from .smartmoney import SmartMoneyRegistry
+from .sources.blockscout import Blockscout
+from .sources.dexscreener import DexScreener
+from .sources.evm_rpc import EvmRpc
+from .sources.geckoterminal import GeckoTerminal
+from .sources.gmgn import Gmgn, import_manual
+from .sources.http import BROWSER_UA, HttpClient, HttpError
+from .sources.market import MarketData
+from .sources.pons import Pons
+from .sources.security import Security
+from .util import (DATA_DIR, day_key, iso, load_json, now_utc, parse_iso, read_jsonl, save_json, write_jsonl)
+
+
+class Pipeline:
+    def __init__(self, rules: Optional[Dict[str, Any]] = None, chain: str = "robinhood", env=ENV,
+                 http_overrides: Optional[Dict[str, Any]] = None, verbose: bool = False,
+                 max_forensics: Optional[int] = None):
+        self.rules = rules or load_rules()
+        self.chain_cfg = load_chain(chain)
+        self.env = env
+        self.verbose = verbose
+        self.errors: List[str] = []
+        ov = http_overrides or {}
+
+        def H(name: str, rps: float, **kw):
+            return ov.get(name) or HttpClient(name, rps=rps, **kw)
+
+        bs_key = env.blockscout_api_key
+        self.h = {
+            "geckoterminal": H("geckoterminal", 0.2, retries=3, max_calls=int(env_get("RADAR_GT_MAX_CALLS", "60"))), "dexscreener": H("dexscreener", 4.0, retries=1),
+            "blockscout": H("blockscout", 4.5 if bs_key else 0.6, retries=2, headers={"User-Agent": BROWSER_UA}), "rpc": H("rpc", 5.0, retries=1, timeout=12),
+            "okx": H("okx", 2.0, retries=2), "coinbase": H("coinbase", 2.0, retries=1), "coingecko": H("coingecko", 0.4, retries=2),
+            "fng": H("fng", 1.0, retries=1), "goplus": H("goplus", 1.0, retries=0, timeout=10),
+            "llm": H("llm", 1.0, timeout=90, retries=1), "gmgn": H("gmgn", 1.0, retries=1),
+        }
+        sc = self.chain_cfg.get("screeners") or {}
+        self.gt = GeckoTerminal(self.h["geckoterminal"], sc.get("geckoterminal_network", "robinhood"))
+        self.ds = DexScreener(self.h["dexscreener"], sc.get("dexscreener_chain", "robinhood"))
+        self.bs = Blockscout(self.h["blockscout"], self.chain_cfg, bs_key)
+        self.rpc = EvmRpc(self.h["rpc"], env.rpc_url or (self.chain_cfg.get("rpc") or {}).get("http", ""))
+        self.pons = Pons(self.chain_cfg)
+        self.security = Security(self.h["goplus"], self.bs, self.rpc, int(self.chain_cfg.get("chain_id", 0)), self.pons)
+        self.market = MarketData(self.h["okx"], self.h["coinbase"], self.h["coingecko"], self.h["fng"], env.coingecko_api_key)
+        self.forensics = Forensics(self.bs, self.pons, self.chain_cfg, self.rules,
+                                   WalletCache(max_entries=int((self.rules.get("forensics") or {}).get("wallet_cache_max_entries", 6000))),
+                                   self.rpc)
+        self.registry = SmartMoneyRegistry(self.rules)
+        self.ledger = Ledger(self.rules)
+        self.ai = AiJudge(env, self.h["llm"], int((self.rules.get("decision") or {}).get("max_ai_judgements_per_run", 8)))
+        self.gmgn = Gmgn(self.h["gmgn"], env.gmgn_api_key, env.gmgn_base_url, sc.get("geckoterminal_network", "robinhood"))
+        self.max_forensics = max_forensics if max_forensics is not None else int((self.rules.get("universe") or {}).get("max_candidates_for_forensics", 30))
+        if not bs_key:
+            # 公共 Blockscout 实例限流严（≈1 req/s，频繁 429）：少查几个持有人、少深挖几个代币，把时间留给广度
+            fcfg = self.rules.setdefault("forensics", {})
+            fcfg["top_holders_to_inspect"] = min(int(fcfg.get("top_holders_to_inspect", 25)), int(fcfg.get("public_instance_top_holders", 15)))
+            self.max_forensics = min(self.max_forensics, int((self.rules.get("universe") or {}).get("public_instance_max_forensics", 10)))
+            self.forensics.cfg = fcfg
+        self.quotes = {q.upper() for q in ((self.rules.get("universe") or {}).get("quote_tokens_allowed") or [])}
+        self.time_budget = float(env_get("RADAR_TIME_BUDGET_SEC", "1500"))   # 单轮扫描时间预算（秒）
+        self._bs_reported = False
+        self.new_pools_per_hour = None
+        self._ohlcv_calls = 0
+        self._ohlcv_max = int(env_get("RADAR_GT_OHLCV_MAX", "20"))
+        self.t_start = time.time()
+        self.prev_path = DATA_DIR / "prev_snapshots.json"
+        self.prev: Dict[str, dict] = (load_json(self.prev_path, {}) or {}).get("tokens", {})
+
+    # ---------------------------------------------------------------- utils
+    def log(self, msg: str):
+        print(f"[{iso()}] {msg}", flush=True)
+
+    def fail(self, stage: str, e: Exception):
+        self.errors.append(f"{stage}: {type(e).__name__}: {str(e)[:200]}")
+        self.log(f"!! {stage} 失败: {type(e).__name__}: {str(e)[:200]}")
+        if self.verbose:
+            traceback.print_exc()
+
+    def http_stats(self) -> Dict[str, Any]:
+        return {k: dict(getattr(v, "stats", {}) or {}) for k, v in self.h.items()}
+
+    # ---------------------------------------------------------------- 第一层：体制
+    def chain_activity(self) -> Dict[str, Any]:
+        vol = 0.0
+        n = 0
+        for page in (1,):
+            try:
+                pools = self.gt.top_pools(page)
+            except Exception:
+                break
+            if not pools:
+                break
+            vol += sum(p.vol("h24") for p in pools)
+            n += len(pools)
+        return {"top_pools_vol_24h": round(vol, 0) if n else None, "top_pools_counted": n}
+
+    def run_regime(self) -> Dict[str, Any]:
+        hist_path = DATA_DIR / "regime_history.jsonl"
+        history = list(read_jsonl(hist_path))
+        try:
+            activity = self.chain_activity()
+        except Exception as e:
+            self.fail("chain_activity", e)
+            activity = {}
+        try:
+            regime = compute_regime(self.market, self.rules, history, activity)
+        except Exception as e:
+            self.fail("regime", e)
+            regime = load_json(DATA_DIR / "regime.json", {}) or {"regime": "BTC_ONLY", "risk_budget": 0.0,
+                                                                   "max_new_positions": 0, "judgment": "regime 计算失败，保守处理"}
+            regime["stale"] = True
+            return regime
+        save_json(DATA_DIR / "regime.json", regime)
+        history.append(compact_history_entry(regime))
+        write_jsonl(hist_path, history[-3000:])
+        self.log(f"regime: {regime['judgment']}")
+        return regime
+
+    # ---------------------------------------------------------------- 第二层：发现 + 初筛
+    def _gt_ok(self) -> bool:
+        st = getattr(self.h["geckoterminal"], "stats", {}) or {}
+        return not (st.get("rate_limit_budget_exhausted") or st.get("budget_exhausted") or st.get("tripped"))
+
+    def _within_budget(self) -> bool:
+        return (time.time() - self.t_start) < self.time_budget
+
+    def discover(self) -> List[PoolSnapshot]:
+        """三路发现，全部 best-effort：
+          1) GeckoTerminal：趋势池（24h/1h）→ 新池（≤N 页）→ 最活跃池；GitHub 共享出口 IP 上限流很严，按价值排序、随时可停
+          2) DexScreener：最新代币档案 / 付费推广（本链）→ 批量交易对
+          3) 滚动宇宙：上一轮见过、仍在年龄窗口内的代币，用 DexScreener 批量刷新（30 个/次，不限流）——
+             这样 6 分钟前太新的代币，会在 2h/4h/… 后被重新评估
+        只保留年龄 ≤ max_age_hours（或未知）的池，让候选与随机基线来自同一个『早期宇宙』。"""
+        uni = self.rules.get("universe") or {}
+        max_age = float(uni.get("max_age_hours", 72))
+        seen: Dict[str, PoolSnapshot] = {}
+        n_raw = 0
+        newest_ts, oldest_ts, n_new = None, None, 0
+        src_counts = {"gt_trending": 0, "gt_new": 0, "gt_active": 0, "ds_promoted": 0, "ds_rolling": 0}
+
+        # 1) GeckoTerminal
+        for d in uni.get("trending_durations") or ["24h", "1h"]:
+            if not self._gt_ok() or not self._within_budget():
+                break
+            try:
+                for p in self.gt.trending_pools(d):
+                    n_raw += 1
+                    if self._consider(seen, p, max_age):
+                        src_counts["gt_trending"] += 1
+            except Exception as e:
+                self.fail(f"trending {d}", e)
+        for page in range(1, int(uni.get("new_pools_pages", 4)) + 1):
+            if not self._gt_ok() or not self._within_budget():
+                break
+            try:
+                pools = self.gt.new_pools(page)
+            except Exception as e:
+                self.fail(f"new_pools p{page}", e)
+                break
+            if not pools:
+                break
+            n_raw += len(pools)
+            for p in pools:
+                n_new += 1
+                ts = parse_iso(p.pool_created_at)
+                if ts:
+                    newest_ts = max(newest_ts, ts) if newest_ts else ts
+                    oldest_ts = min(oldest_ts, ts) if oldest_ts else ts
+                if self._consider(seen, p, max_age):
+                    src_counts["gt_new"] += 1
+            if pools[-1].age_hours is not None and pools[-1].age_hours > max_age:
+                break
+        for page in range(1, int(uni.get("active_pools_pages", 1)) + 1):
+            if not self._gt_ok() or not self._within_budget():
+                break
+            try:
+                pools = self.gt.top_pools(page, sort="h24_tx_count_desc")
+            except Exception as e:
+                self.fail(f"active_pools p{page}", e)
+                break
+            if not pools:
+                break
+            n_raw += len(pools)
+            for p in pools:
+                if self._consider(seen, p, max_age):
+                    src_counts["gt_active"] += 1
+
+        # 2) DexScreener 推广/档案（本链）
+        promoted: List[str] = []
+        for fn in (self.ds.latest_profiles, self.ds.latest_boosts):
+            try:
+                for it in fn():
+                    a = (it.get("tokenAddress") or "").lower()
+                    if a and a not in seen and a not in promoted:
+                        promoted.append(a)
+            except Exception as e:
+                self.fail("dexscreener promoted", e)
+        # 3) 滚动宇宙：上轮见过、仍在窗口内、这轮没被 GT 发现的
+        now = now_utc()
+        rolling: List[str] = []
+        for tok, v in self.prev.items():
+            if tok in seen or tok in promoted or not v.get("pool"):
+                continue
+            created = parse_iso(v.get("pool_created_at")) or parse_iso(v.get("first_seen"))
+            if created and (now - created).total_seconds() / 3600.0 <= max_age:
+                rolling.append(tok)
+        rolling = rolling[: int(uni.get("rolling_refresh_max", 150))]
+        for label, addrs in (("ds_promoted", promoted[:60]), ("ds_rolling", rolling)):
+            if not addrs:
+                continue
+            try:
+                pairs = self.ds.tokens(addrs)
+            except Exception as e:
+                self.fail(f"dexscreener {label}", e)
+                continue
+            for p in pairs:
+                n_raw += 1
+                if self._consider(seen, p, max_age):
+                    src_counts[label] += 1
+
+        self.universe_raw = n_raw
+        self.universe_sources = src_counts
+        if newest_ts and oldest_ts and n_new >= 10 and newest_ts > oldest_ts:
+            span_h = (newest_ts - oldest_ts).total_seconds() / 3600.0
+            self.new_pools_per_hour = round(n_new / span_h, 1) if span_h > 0 else None
+        else:
+            self.new_pools_per_hour = None
+        return list(seen.values())
+
+    def _consider(self, seen: Dict[str, PoolSnapshot], p: PoolSnapshot, max_age: Optional[float] = None) -> bool:
+        if not p.base_token or not p.pool_address:
+            return False
+        if max_age is not None and p.age_hours is not None and p.age_hours > max_age:
+            return False
+        if p.base_symbol.upper() in self.quotes or p.base_symbol.upper() in ("WETH", "USDC", "USDT", "ETH", "DAI"):
+            return False
+        if self.quotes and p.quote_symbol and p.quote_symbol.upper() not in self.quotes:
+            return False
+        cur = seen.get(p.base_token)
+        if cur is None:
+            seen[p.base_token] = p
+            return True
+        # 同一代币：GeckoTerminal 快照（有独立买家数）优先；否则取流动性更大的
+        if cur.source != "geckoterminal" and (p.source == "geckoterminal" or (p.liquidity_usd or 0) > (cur.liquidity_usd or 0)):
+            seen[p.base_token] = p
+            return False
+        return False
+
+    def _enrich_with_dexscreener(self, snaps: List[PoolSnapshot]) -> int:
+        """DexScreener 一次 30 个代币：补社交链接 / 付费推广 / 图片，并记录其流动性作交叉参考。300 次/分钟，很便宜。"""
+        if not snaps:
+            return 0
+        n = 0
+        try:
+            pairs = self.ds.tokens([s.base_token for s in snaps])
+        except Exception as e:
+            self.fail("dexscreener batch", e)
+            return 0
+        best: Dict[str, PoolSnapshot] = {}
+        for p in pairs:
+            cur = best.get(p.base_token)
+            if cur is None or (p.liquidity_usd or 0) > (cur.liquidity_usd or 0):
+                best[p.base_token] = p
+        for s in snaps:
+            p = best.get(s.base_token)
+            if not p:
+                continue
+            info = dict(s.info or {})
+            for k in ("websites", "socials", "image", "boosts_active", "labels"):
+                if p.info.get(k):
+                    info[k] = p.info[k]
+            info["ds_liquidity_usd"] = p.liquidity_usd
+            info["ds_pair"] = p.pool_address
+            info["ds_url"] = p.url
+            s.info = info
+            n += 1
+        return n
+
+    # ---------------------------------------------------------------- 第三/四层：单币深挖
+    def enrich(self, snap: PoolSnapshot, regime: Dict[str, Any], do_forensics: bool) -> Candidate:
+        token, pool = snap.base_token, snap.pool_address
+        cand = Candidate(token=token, symbol=snap.base_symbol, name=snap.base_name, pool=pool, snapshot=snap)
+        dex = (snap.dex or "").lower()
+        launchpad_hint = "pons_v2" if dex.startswith("pons") else ("pools_trade" if "pools" in dex and "trade" in dex else "")
+        curve_hint = ("on_curve" if dex in ("pons-v2", "pons", "pons-v1") else "graduated") if launchpad_hint.startswith("pons") else ""
+        addr_info = {}
+        try:
+            addr_info = self.bs.address(token)
+        except Exception as e:
+            if not self._bs_reported:
+                self._bs_reported = True
+                self.fail("blockscout", e)
+        try:
+            cand.security = self.security.check(token, addr_info or None, launchpad_hint=launchpad_hint)
+        except Exception as e:
+            self.fail(f"security {snap.base_symbol}", e)
+        holders = None
+        trades: List[dict] = []
+        if do_forensics:
+            try:
+                trades = self.gt.trades(pool)
+            except Exception:
+                pass
+        if do_forensics:
+            try:
+                cand.forensics = self.forensics.analyze(token, {pool}, creator_hint=addr_info.get("creator", ""))
+                holders = self.forensics.last_holders
+            except Exception as e:
+                self.fail(f"forensics {snap.base_symbol}", e)
+            if cand.forensics is not None and cand.forensics.quality == "none" and trades:
+                # Blockscout 不可用：用成交买家 + RPC nonce 做轻量取证
+                try:
+                    cand.forensics = self.forensics.analyze_lite(token, trades, base=cand.forensics)
+                except Exception as e:
+                    self.fail(f"forensics-lite {snap.base_symbol}", e)
+            if cand.forensics is not None:
+                cand.forensics.launchpad = cand.forensics.launchpad or launchpad_hint
+                cand.forensics.curve_status = cand.forensics.curve_status or curve_hint
+        try:
+            cand.smart_money = self.registry.signal(trades, holders)
+        except Exception as e:
+            self.fail(f"smartmoney {snap.base_symbol}", e)
+        cross = cross_validate(snap, trades, cand.forensics, self.prev.get(token))
+        cand.flags = cross["flags"]
+        if cand.security:
+            if cand.security.is_honeypot:
+                cand.flags["red"].append("HONEYPOT")
+            for f in ("has_owner", "unverified_contract", "mintable", "closed_source", "hidden_owner"):
+                if f in cand.security.flags:
+                    cand.flags["yellow"].append(f.upper())
+            if "pons_template" in cand.security.flags:
+                cand.flags["green"].append("PONS_TEMPLATE")
+        cand.killed_by = hard_filter(snap, cand.security, cand.forensics, self.rules)
+        cand.score_total, cand.score_breakdown = score(snap, cand.security, cand.forensics, cand.smart_money, cross, self.rules)
+        cand.features = build_features(cand, cross)
+        cand.features["regime"] = regime.get("regime")
+        cand.features["risk_budget"] = regime.get("risk_budget")
+        cand.features["forensics_done"] = bool(do_forensics)
+        cand._cross_metrics = cross.get("metrics")  # type: ignore[attr-defined]
+        return cand
+
+    def _decide(self, cand: Candidate, regime: Dict[str, Any]):
+        dc = self.rules.get("decision") or {}
+        cand.decision, cand.decision_reasons, cand.position_size_usd = decide(
+            cand, regime, self.rules, self.ledger.new_positions_today(), self.ledger.open_count())
+        if cand.decision in ("WATCH", "PAPER_BUY") and cand.score_total >= float(dc.get("watch_threshold", 60)):
+            try:
+                cand.ai = self.ai.judge(cand, regime, getattr(cand, "_cross_metrics", None))
+            except Exception as e:
+                self.fail(f"ai {cand.symbol}", e)
+            if cand.ai:
+                cand.features["ai_verdict"], cand.features["ai_confidence"], cand.features["ai_provider"] = cand.ai.verdict, cand.ai.confidence, cand.ai.provider
+                if cand.decision == "PAPER_BUY":
+                    cand.decision, cand.decision_reasons, cand.position_size_usd = decide(
+                        cand, regime, self.rules, self.ledger.new_positions_today(), self.ledger.open_count())
+        if cand.decision == "PAPER_BUY":
+            pos = self.ledger.open_position(cand)
+            if pos:
+                cand.decision_reasons.append(f"已开模拟仓 #{pos['id']}")
+            else:
+                cand.decision = "WATCH"
+                cand.decision_reasons.append("已有同币持仓/价格缺失，转 WATCH")
+
+    def run_scan(self, regime: Dict[str, Any]) -> Dict[str, Any]:
+        uni = self.rules.get("universe") or {}
+        t0 = time.time()
+        snaps = self.discover()
+        self.log(f"discover: 原始 {getattr(self, 'universe_raw', 0)} 条 → 去重 {len(snaps)} 个代币")
+        pre = [(s, hard_filter(s, None, None, self.rules)) for s in snaps]
+        passed = [s for s, k in pre if not k]
+        failed = [(s, k) for s, k in pre if k]
+        self._enrich_with_dexscreener(passed)
+        # 便宜的排序启发：流动性 × log(24h 独立买家)
+        passed.sort(key=lambda s: -(s.liquidity_usd or 0) * math.log1p(s.tx("h24", "buyers") or s.tx("h24", "buys")))
+        deep, shallow = passed[:self.max_forensics], passed[self.max_forensics:]
+        self.log(f"prefilter: 通过 {len(passed)}（深挖 {len(deep)}，浅扫 {len(shallow)}），剔除 {len(failed)}")
+
+        candidates: List[Candidate] = []
+        degraded = 0
+        for s in deep:
+            over = (time.time() - self.t_start) > self.time_budget
+            if over:
+                degraded += 1
+            try:
+                c = self.enrich(s, regime, not over)
+                self._decide(c, regime)
+                candidates.append(c)
+                if self.verbose:
+                    self.log(f"  {c.decision:9s} {c.symbol:12s} score {c.score_total:5.1f} liq ${(s.liquidity_usd or 0):,.0f} sybil {c.forensics.sybil_score if c.forensics else '-'} kill {c.killed_by}")
+            except Exception as e:
+                self.fail(f"enrich {s.base_symbol}", e)
+        for s in shallow:
+            if (time.time() - self.t_start) > self.time_budget:
+                self.log("时间预算用尽，跳过剩余浅扫")
+                break
+            try:
+                c = self.enrich(s, regime, False)
+                self._decide(c, regime)
+                candidates.append(c)
+            except Exception as e:
+                self.fail(f"enrich-shallow {s.base_symbol}", e)
+        # 被剔除但仍值得跟踪结果的样本（检验有没有错杀）
+        min_liq = float(uni.get("baseline_min_liquidity_usd", 8000))
+        min_buyers = int(uni.get("baseline_min_buyers_24h", 10))
+
+        def eligible(s: PoolSnapshot) -> bool:
+            buyers = s.txns.get("h24", {}).get("buyers")
+            return bool(s.price_usd) and (s.liquidity_usd or 0) >= min_liq and (buyers is None or buyers >= min_buyers)
+
+        skip_cands = []
+        for s, kills in failed:
+            if eligible(s) and len(skip_cands) < int(uni.get("skip_samples_per_run", 8)):
+                c = Candidate(token=s.base_token, symbol=s.base_symbol, name=s.base_name, pool=s.pool_address, snapshot=s)
+                c.killed_by = kills
+                c.decision, c.decision_reasons = "SKIP", [f"硬过滤: {', '.join(kills)}"]
+                c.features = build_features(c, {})
+                c.features["regime"] = regime.get("regime")
+                skip_cands.append(c)
+        # 随机基线：对整个宇宙无偏随机抽样（含被选中的代币），代表『随机选』会得到什么
+        pool_for_baseline = [s for s in snaps if eligible(s)]
+        rnd = random.Random(day_key())
+        baseline = rnd.sample(pool_for_baseline, min(len(pool_for_baseline), int(uni.get("baseline_sample_per_run", 4))))
+
+        n_new = self.ledger.add_samples(candidates + skip_cands, regime)
+        n_base = self.ledger.add_baseline(baseline, regime)
+        self.ledger.save()
+        self.forensics.cache.save()
+        self.registry.save()
+        for s in snaps:
+            self.prev[s.base_token] = {"liquidity_usd": s.liquidity_usd, "price_usd": s.price_usd, "observed_at": s.observed_at,
+                                       "pool": s.pool_address, "symbol": s.base_symbol, "name": s.base_name, "dex": s.dex,
+                                       "quote": s.quote_symbol, "pool_created_at": s.pool_created_at,
+                                       "first_seen": (self.prev.get(s.base_token) or {}).get("first_seen") or s.observed_at}
+        cutoff = now_utc().timestamp() - 7 * 86400
+        self.prev = {k: v for k, v in self.prev.items() if (parse_iso(v.get("observed_at")) or now_utc()).timestamp() >= cutoff}
+        save_json(self.prev_path, {"updated": iso(), "tokens": self.prev})
+
+        universe = {"discovered": len(snaps), "raw_rows": getattr(self, "universe_raw", 0), "prefiltered": len(passed),
+                    "new_pools_per_hour": self.new_pools_per_hour, "sources": getattr(self, "universe_sources", {}),
+                    "forensics_done": sum(1 for c in candidates if c.forensics and c.forensics.quality != "none"),
+                    "skipped": len(failed), "new_samples": n_new, "new_baseline": n_base,
+                    "degraded_to_shallow": degraded, "seconds": round(time.time() - t0, 1)}
+        self.log(f"scan 完成: {universe}")
+        return {"candidates": candidates, "skip_candidates": skip_cands, "baseline": baseline, "universe": universe}
+
+    # ---------------------------------------------------------------- 第五层：结果回填
+    def price_fetcher(self, pool: str, token: str, since: int, until: int) -> Dict[str, Any]:
+        """现价/流动性：DexScreener 优先（便宜）；K 线：GeckoTerminal OHLCV，受每轮上限（RADAR_GT_OHLCV_MAX，默认 20）。"""
+        hours = int(math.ceil((until - since) / 3600.0)) + 2
+        out: Dict[str, Any] = {"candles": [], "price_now": None, "liq_now": None, "pool_alive": None}
+        try:
+            pair = self.ds.best_pair_for_token(token)
+            if pair:
+                out["price_now"], out["liq_now"], out["pool_alive"] = pair.price_usd, pair.liquidity_usd, True
+        except Exception:
+            pass
+        if self._ohlcv_calls < self._ohlcv_max and self._gt_ok():
+            self._ohlcv_calls += 1
+            try:
+                out["candles"] = self.gt.ohlcv(pool, "hour", 1, min(1000, max(hours, 2)), before_timestamp=until + 3600)
+            except HttpError as e:
+                if e.status == 404 and out["pool_alive"] is None:
+                    out["pool_alive"] = False
+            except Exception:
+                pass
+        if out["price_now"] is None and not out["candles"]:
+            try:
+                snap = self.gt.pool(pool)
+                if snap:
+                    out["price_now"], out["liq_now"], out["pool_alive"] = snap.price_usd, snap.liquidity_usd, True
+            except HttpError as e:
+                if e.status == 404:
+                    out["pool_alive"] = False
+            except Exception:
+                pass
+        if out["pool_alive"] is None and not out["candles"] and out["price_now"] is None:
+            raise RuntimeError("no price data")
+        return out
+
+    def run_outcomes(self) -> Dict[str, Any]:
+        sm = self.rules.get("smart_money") or {}
+        stats = {"positions": {}, "outcomes": {}, "smart_money_updates": 0}
+        try:
+            stats["positions"] = self.ledger.manage_positions(self.price_fetcher)
+        except Exception as e:
+            self.fail("positions", e)
+        try:
+            stats["outcomes"] = self.ledger.update_outcomes(self.price_fetcher)
+        except Exception as e:
+            self.fail("outcomes", e)
+        # 赢家/输家的最早买家 → 聪明钱库
+        for s in self.ledger.samples:
+            if s.get("sm_recorded") or s.get("status") not in ("complete", "rug") or not s.get("early_buyers"):
+                continue
+            o = s.get("outcomes") or {}
+            r24 = (o.get("h24") or {}).get("ret_pct")
+            r168 = (o.get("h168") or {}).get("ret_pct")
+            result = None
+            if (r24 is not None and r24 >= float(sm.get("winner_24h_return_pct", 100))) or (r168 is not None and r168 >= float(sm.get("winner_7d_return_pct", 200))):
+                result = "win"
+            elif s.get("status") == "rug" or (r24 is not None and r24 <= float(sm.get("loser_24h_return_pct", -70))):
+                result = "loss"
+            if result:
+                stats["smart_money_updates"] += self.registry.record_outcome(s["early_buyers"], s["token"], s.get("symbol", ""), result)
+            s["sm_recorded"] = True
+        self.registry.save()
+        self.ledger.save()
+        self.log(f"outcomes: {stats}")
+        return stats
+
+    def run_evaluate(self) -> Dict[str, Any]:
+        ev = evaluate(self.ledger.samples, self.rules)
+        ev["updated"] = iso()
+        save_json(DATA_DIR / "evaluation.json", ev)
+        self.log(f"evaluate: verdict={ev.get('verdict')} progress={ev.get('progress')}")
+        return ev
+
+    def import_wallets(self, path) -> int:
+        rows = import_manual(path)
+        n = self.registry.merge_external(rows, "manual")
+        if self.gmgn.enabled:
+            n += self.registry.merge_external(self.gmgn.smart_wallets(), "gmgn")
+        self.registry.save()
+        return n
+
+    # ---------------------------------------------------------------- 全流程
+    def cycle(self, stages: Optional[Set[str]] = None) -> Dict[str, Any]:
+        stages = stages or {"regime", "outcomes", "scan", "evaluate", "report"}
+        t0 = time.time()
+        regime = self.run_regime() if "regime" in stages else (load_json(DATA_DIR / "regime.json", {}) or {"regime": "BTC_ONLY", "risk_budget": 0.0, "max_new_positions": 0})
+        scan = {"candidates": [], "skip_candidates": [], "baseline": [], "universe": {}}
+        if "scan" in stages:
+            try:
+                scan = self.run_scan(regime)
+            except Exception as e:
+                self.fail("scan", e)
+        if "outcomes" in stages:          # 放在 scan 之后：GeckoTerminal 的配额先给发现层
+            self.run_outcomes()
+        evaluation = self.run_evaluate() if "evaluate" in stages else (load_json(DATA_DIR / "evaluation.json", {}) or {})
+        summary = {}
+        if "report" in stages:
+            run_meta = {"at": iso(), "seconds": round(time.time() - t0, 1), "errors": self.errors, "http": self.http_stats(),
+                        "ai_enabled": self.ai.enabled, "ai_calls": self.ai.calls, "blockscout_pro": bool(self.env.blockscout_api_key),
+                        "rules_version": self.rules.get("version"), "smart_wallets": len(self.registry),
+                        "stages": sorted(stages)}
+            try:
+                cands = (scan["candidates"] + scan["skip_candidates"]) if "scan" in stages else None
+                summary = write_outputs(regime, cands, scan["universe"], self.ledger, evaluation, run_meta,
+                                        [b.base_symbol for b in scan["baseline"]])
+                path = write_daily_report(summary)
+                self.log(f"report: {path}")
+            except Exception as e:
+                self.fail("report", e)
+        self.log(f"cycle 完成，用时 {time.time() - t0:.1f}s，错误 {len(self.errors)}")
+        return {"regime": regime, "scan": scan, "evaluation": evaluation, "summary": summary, "errors": self.errors}
+
+    def evidence_for(self, token: str) -> str:
+        data = load_json(DATA_DIR / "candidates.json", {}) or {}
+        regime = load_json(DATA_DIR / "regime.json", {}) or {}
+        for it in data.get("items") or []:
+            if it.get("token") == token.lower():
+                import json as _json
+                return "# Evidence（来自 candidates.json 快照）\n" + _json.dumps({"regime": regime.get("judgment"), **it}, ensure_ascii=False, indent=2)
+        return "未在最近一轮 candidates.json 里找到该代币。"

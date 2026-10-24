@@ -1,0 +1,136 @@
+{
+  "version": "0.1.2",
+  "_doc": "所有阈值与权重集中在这里；每次改动请 bump version，评估层会按 rules_version 分组统计，避免把不同规则下的样本混在一起。",
+  "universe": {
+    "max_age_hours": 72,
+    "min_age_minutes": 20,
+    "new_pools_pages": 4,
+    "trending_durations": [
+      "24h",
+      "1h"
+    ],
+    "quote_tokens_allowed": [
+      "ETH",
+      "WETH",
+      "USDC",
+      "USDT"
+    ],
+    "max_candidates_for_forensics": 30,
+    "baseline_sample_per_run": 4,
+    "baseline_min_liquidity_usd": 8000,
+    "skip_samples_per_run": 8,
+    "active_pools_pages": 1,
+    "baseline_min_buyers_24h": 10,
+    "_doc_gt_budget": "GeckoTerminal 公共 API 在 GitHub 共享出口 IP 上限流很严：发现层 ≈ 7 次调用，成交只为深挖候选拉取，OHLCV 每轮 ≤ 20 次，总预算 RADAR_GT_MAX_CALLS（默认 60）。",
+    "rolling_refresh_max": 150,
+    "public_instance_max_forensics": 10
+  },
+  "hard_filters": {
+    "min_liquidity_usd": 15000,
+    "min_txns_24h": 50,
+    "min_unique_buyers_24h": 30,
+    "max_vol_to_liq_24h": 60,
+    "min_vol_to_liq_24h": 0.2,
+    "max_top10_holder_pct": 50,
+    "max_creator_pct": 10,
+    "max_single_holder_pct": 25,
+    "max_sell_tax_pct": 10,
+    "max_buy_tax_pct": 10,
+    "kill_if_honeypot": true,
+    "kill_if_sybil_score_above": 0.75,
+    "kill_if_h24_change_pct_above": 3000,
+    "wash_exempt_min_buyers_24h": 300
+  },
+  "score_weights": {
+    "liquidity_health": 10,
+    "distribution": 20,
+    "organic_growth": 15,
+    "sybil_integrity": 25,
+    "smart_money": 15,
+    "price_structure": 10,
+    "narrative_social": 5
+  },
+  "decision": {
+    "watch_threshold": 60,
+    "paper_buy_threshold": 72,
+    "max_red_flags_for_buy": 0,
+    "ai_veto_min_confidence": 0.7,
+    "max_new_positions_per_day": 5,
+    "max_open_positions": 15,
+    "max_ai_judgements_per_run": 8
+  },
+  "experiment_account": {
+    "_doc": "高风险实验账户与主流币账户完全隔离。金额只影响模拟仓记账，不会下单。",
+    "capital_usd": 500,
+    "base_position_pct": 2.0,
+    "min_position_usd": 2,
+    "take_profit_ladder": [
+      {
+        "at_multiple": 2.0,
+        "sell_fraction": 0.5,
+        "note": "翻倍先收回本金"
+      },
+      {
+        "at_multiple": 4.0,
+        "sell_fraction": 0.25,
+        "note": "再拿走一部分利润"
+      }
+    ],
+    "trailing_stop_from_peak_pct": 40,
+    "stop_loss_pct": 50,
+    "time_stop_hours": 72,
+    "time_stop_min_gain_pct": 30,
+    "rug_liquidity_drop_pct": 70,
+    "assumed_roundtrip_cost_pct": 6
+  },
+  "regime": {
+    "_doc": "市场环境 → 风险预算。BTC 是水库：BTC 稳 → ETH/大市值 → 小市值/MEME。",
+    "risk_budget": {
+      "RISK_OFF": 0.0,
+      "BTC_ONLY": 0.35,
+      "ROTATION": 0.7,
+      "ALT_SEASON": 1.0
+    },
+    "blow_off_multiplier": 0.5,
+    "alt_breadth_rotation": 0.5,
+    "alt_breadth_alt_season": 0.75,
+    "btc_7d_drop_risk_off_pct": -10,
+    "fear_greed_blow_off": 85,
+    "btc_7d_gain_blow_off_pct": 20,
+    "max_new_positions_by_regime": {
+      "RISK_OFF": 0,
+      "BTC_ONLY": 2,
+      "ROTATION": 4,
+      "ALT_SEASON": 5
+    }
+  },
+  "forensics": {
+    "top_holders_to_inspect": 25,
+    "fresh_wallet_hours": 24,
+    "fresh_wallet_max_txs": 10,
+    "batch_creation_window_minutes": 15,
+    "min_batch_size": 3,
+    "early_buyers_count": 30,
+    "wallet_cache_max_entries": 6000,
+    "public_instance_top_holders": 15
+  },
+  "smart_money": {
+    "min_wins": 2,
+    "min_score": 0.6,
+    "winner_24h_return_pct": 100,
+    "winner_7d_return_pct": 200,
+    "loser_24h_return_pct": -70
+  },
+  "outcomes": {
+    "horizons_hours": [
+      1,
+      6,
+      24,
+      168
+    ],
+    "hit_return_pct": 50,
+    "rug_return_pct": -80,
+    "min_samples_for_verdict": 50,
+    "bootstrap_resamples": 1000
+  }
+}
