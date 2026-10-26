@@ -1,0 +1,81 @@
+name: meme-radar (Robinhood Chain 早期 MEME 资金雷达)
+
+# 每 2 小时在 GitHub runner 上跑一轮：市场体制 → 回填结果/管理模拟仓 → 扫新币（初筛/取证/聪明钱/交叉验证）
+# → 评估（筛选 vs 随机）→ 写 meme-radar/data/*.json + 日报。前端只读快照。
+# 采集器 best-effort、绝不非零退出；仅在数据有变化时提交。所有密钥都是可选的（缺失只降级功能）。
+on:
+  schedule:
+    - cron: "23 */2 * * *"   # 每 2 小时（错峰第 23 分钟；定时只在默认分支生效）
+  push:                      # 开发分支上推送代码即跑一轮做真实数据验证（data/ 变更不触发；GITHUB_TOKEN 的提交也不会触发）
+    branches: [claude/robinhood-meme-coin-research-yol2mc]
+    paths: ["meme-radar/**", "!meme-radar/data/**", ".github/workflows/meme-radar.yml"]
+  workflow_dispatch:
+    inputs:
+      cmd:
+        description: "cycle / regime / scan / outcomes / evaluate / report"
+        default: "cycle"
+        required: false
+      max_forensics:
+        description: "本轮最多深挖多少个代币（Blockscout 调用量 ≈ 55 次/代币）"
+        default: "25"
+        required: false
+
+permissions:
+  contents: write            # 内置 GITHUB_TOKEN 提交回本仓库，无需额外 secret
+
+concurrency:
+  group: meme-radar
+  cancel-in-progress: true   # 卡住的旧运行由新运行取消（单轮有 40 分钟上限，定时 2 小时一轮不会互相打断）
+
+jobs:
+  radar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run radar (纯 stdlib，无需安装依赖)
+        continue-on-error: true
+        env:
+          # 全部可选：
+          BLOCKSCOUT_API_KEY: ${{ secrets.BLOCKSCOUT_API_KEY }}   # dev.blockscout.com 免费档，取证层调用量更稳
+          COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}     # CoinGecko demo key，限流更宽
+          LLM_PROVIDER: ${{ vars.MEME_RADAR_LLM_PROVIDER || 'none' }}   # deepseek / openai / anthropic / none
+          LLM_MODEL: ${{ vars.MEME_RADAR_LLM_MODEL }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}                 # 与 mp500-bot 共用
+          GMGN_API_KEY: ${{ secrets.GMGN_API_KEY }}
+          GMGN_BASE_URL: ${{ vars.GMGN_BASE_URL }}
+          RADAR_HTTP_TIMEOUT: "25"
+        run: |
+          python meme-radar/run.py "${{ github.event.inputs.cmd || 'cycle' }}" \
+            --max-forensics "${{ github.event.inputs.max_forensics || '25' }}" --verbose
+
+      - name: Commit snapshot if changed
+        env:
+          GIT_TERMINAL_PROMPT: "0"
+          BR: ${{ github.ref_name }}
+        run: |
+          git add meme-radar/data
+          if git diff --staged --quiet; then
+            echo "无变化，跳过提交"; exit 0
+          fi
+          git config user.name "meme-radar"
+          git config user.email "mangzi141800@gmail.com"
+          git commit -q -m "data(meme-radar): refresh $(date -u +%FT%TZ)"
+          for i in 1 2 3 4; do
+            if timeout 120 git push origin "HEAD:$BR"; then echo "✅ 已提交雷达快照"; exit 0; fi
+            echo "push 被拒或超时（远端有新提交），把本轮 data 叠到远端最新提交上后重试 $i"
+            timeout 120 git fetch --depth=1 origin "$BR" || true
+            # 浅克隆不做 rebase：索引重置到远端最新树，只把本轮 data/ 重新提交
+            git reset -q --mixed "origin/$BR"
+            git add meme-radar/data
+            git commit -q -m "data(meme-radar): refresh $(date -u +%FT%TZ)" || true
+            sleep $((i * 5))
+          done
+          echo "::warning::数据提交失败（多次重试后放弃），下轮会重新生成"
