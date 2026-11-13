@@ -1,0 +1,53 @@
+{
+  "id": "robinhood",
+  "name": "Robinhood Chain",
+  "chain_id": 4663,
+  "stack": "Arbitrum Orbit (Ethereum L2)",
+  "mainnet_launch": "2026-07-01",
+  "native_symbol": "ETH",
+  "rpc": {
+    "http": "https://rpc.mainnet.chain.robinhood.com",
+    "fallbacks": []
+  },
+  "explorer": {
+    "kind": "blockscout",
+    "web": "https://robinhoodchain.blockscout.com",
+    "instance_api": "https://robinhoodchain.blockscout.com/api",
+    "pro_api_base": "https://api.blockscout.com",
+    "_note": "有 BLOCKSCOUT_API_KEY 时走 PRO API（免费档 5 rps / 10 万次每天），否则走公共实例（限流更严、best-effort）。txlistinternal 与 eth_getLogs 在本链每次最多 1000 条。"
+  },
+  "screeners": {
+    "geckoterminal_network": "robinhood",
+    "dexscreener_chain": "robinhood"
+  },
+  "launchpads": {
+    "pons": {
+      "name": "Pons",
+      "v1_factory": "0xa5aab3f0c6eeadf30ef1d3eb997108e976351feb",
+      "v2_factory": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+      "v2_router": "0xe33e9e479df8802cb0866d5d05258bec4cf62948",
+      "v2_meme_hook": "0xe5e702641ea86f4ae6cc3cdaed2b886f976be044",
+      "graduation_quote_eth": 4.2,
+      "fixed_supply": 1000000000,
+      "events": ["TokenLaunched", "LaunchSwept", "GraduationTokensPermanentlyLocked", "PoolGraduated"],
+      "_note": "V2（2026-08-04 起）：ETH 定价 bonding curve，毕业后进入 Uniswap V4 全区间永久锁定池。代币创建者地址 = 工厂/部署器 视为 Pons 发行。"
+    },
+    "pools_trade": {
+      "name": "Pools.trade (Uniswap launchpad)",
+      "factory": "",
+      "_note": "Uniswap 官方在 Robinhood Chain 的发射台，地址待补。"
+    }
+  },
+  "neutral_funders": {
+    "_note": "这些地址给成千上万钱包打过款（桥、CEX 热钱包、路由），不能作为『同一上游』的关联证据。可按需追加。",
+    "addresses": [
+      "0x0000000000000000000000000000000000000000",
+      "0x000000000000000000000000000000000000dead",
+      "0xe33e9e479df8802cb0866d5d05258bec4cf62948"
+    ]
+  },
+  "burn_addresses": [
+    "0x0000000000000000000000000000000000000000",
+    "0x000000000000000000000000000000000000dead"
+  ]
+}
