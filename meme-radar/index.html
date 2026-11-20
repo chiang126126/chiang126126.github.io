@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0B0D12" />
+  <title>meme-radar · Robinhood Chain 早期资金雷达</title>
+  <meta name="description" content="Robinhood Chain 早期 MEME / 小市值代币的 AI 辅助研究与验证系统：市场体制 → 新币初筛 → 钱包关联取证 → 聪明钱共振 → 交叉验证 → 模拟仓与随机基线对照。不自动下单，只产出证据与决策记录。" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>📡</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/app.css" />
+</head>
+<body>
+  <header class="mast">
+    <div class="wrap">
+      <div class="mast-in">
+        <div class="brand">
+          <h1><small>Robinhood Chain · chain 4663</small>meme-radar 早期资金雷达</h1>
+          <p>不是猜哪个币会涨，而是每两小时回答三个问题：现在允许冒多大风险？新币里哪些是真实市场、哪些是一人多号？我们的筛选到底有没有优于随机？</p>
+        </div>
+        <div class="status" id="status">
+          <span class="chip"><span class="dot"></span>加载中…</span>
+        </div>
+      </div>
+      <nav class="pipe" aria-label="流水线五层">
+        <a href="#regime"><span class="n">L1</span><b>市场环境</b>BTC 水库 → 风险预算</a>
+        <a href="#cands"><span class="n">L2</span><b>新币初筛</b>硬过滤 + 七维评分</a>
+        <a href="#cands"><span class="n">L3</span><b>钱包取证</b>关联簇 · 新钱包 · 聪明钱</a>
+        <a href="#cands"><span class="n">L4</span><b>交叉验证</b>价格 vs 真实资金 vs 参与者</a>
+        <a href="#valid"><span class="n">L5</span><b>复盘验证</b>模拟仓 · 随机基线对照</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- L1 -->
+    <section id="regime">
+      <div class="sec-h"><h2><span class="n">L1</span>市场环境 · 风险预算</h2><span class="sub" id="regime-sub"></span></div>
+      <div class="panel regime" id="regime-panel">
+        <div>
+          <div class="regime-name"><span class="tag" id="rg-tag">—</span><span class="zh" id="rg-zh"></span><span class="chip" id="rg-conf"></span></div>
+          <p class="judg" id="rg-judg">等待首次运行。</p>
+          <ul class="evid" id="rg-evid"></ul>
+          <div class="reservoir">
+            <div class="lab"><span>风险预算 · 实验账户新仓额度</span><span id="rg-max"></span></div>
+            <div class="tank" id="tank">
+              <div class="water" id="water"></div>
+              <span class="mark" style="left:35%"></span>
+              <span class="mark" style="left:70%"></span>
+              <span class="val" id="rg-budget">—</span>
+            </div>
+            <div class="ruler" aria-hidden="true">
+              <span style="left:0%">RISK_OFF 0</span><span style="left:35%">BTC_ONLY .35</span><span style="left:70%">ROTATION .7</span><span style="right:0">ALT_SEASON 1.0</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="metrics" id="rg-metrics"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- L2-L4 -->
+    <section id="cands">
+      <div class="sec-h"><h2><span class="n">L2–L4</span>本轮候选 · 初筛 → 取证 → 交叉验证</h2><span class="sub" id="cands-sub"></span></div>
+      <div class="funnel" id="funnel"></div>
+      <div class="grid-2" style="margin-top:14px">
+        <div class="stack">
+          <div class="filters" id="filters">
+            <button data-f="ALL" class="on">全部</button>
+            <button data-f="PAPER_BUY">PAPER_BUY 模拟买入</button>
+            <button data-f="WATCH">WATCH 观察</button>
+            <button data-f="SKIP">SKIP 剔除</button>
+          </div>
+          <div class="cands" id="cand-list"></div>
+        </div>
+        <div class="stack">
+          <div class="panel">
+            <div class="panel-h"><span>观察名单 · 96h</span><span class="dim" id="wl-n"></span></div>
+            <div class="panel-b wl" id="watchlist"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-h"><span>运行健康</span><span class="dim" id="run-at"></span></div>
+            <div class="panel-b">
+              <div class="health" id="health"></div>
+              <div id="errs"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- L5 -->
+    <section id="valid">
+      <div class="sec-h"><h2><span class="n">L5</span>复盘验证 · 筛选是否优于随机</h2><span class="sub">每个样本在发现后 1h / 6h / 24h / 7d 回填结果；随机基线来自同一宇宙的无偏抽样</span></div>
+      <div class="grid-2">
+        <div class="stack">
+          <div class="panel">
+            <div class="panel-h"><span>筛选 vs 随机（24h）</span><span class="dim" id="ev-rules"></span></div>
+            <div class="panel-b">
+              <div id="verdict" class="verdict insufficient"><span class="big">—</span><span class="muted" id="verdict-txt"></span></div>
+              <div class="prog" id="prog"></div>
+              <div class="tbl-wrap"><table id="ev-table"></table></div>
+              <p class="dim" style="margin:10px 0 0;font-size:12px">命中 = 24h 收益 ≥ +50%；归零 = ≤ −80% 或流动性抽走。两组各满 50 个样本前，任何"看起来有效"都不作数。</p>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-h"><span>哪些指标真的有效 · 24h 按特征分桶</span></div>
+            <div class="panel-b tbl-wrap"><table id="bucket-table"></table></div>
+          </div>
+          <div class="panel">
+            <div class="panel-h"><span>最近样本</span><span class="dim" id="samples-n"></span></div>
+            <div class="panel-b tbl-wrap"><table id="samples-table"></table></div>
+          </div>
+        </div>
+        <div class="stack">
+          <div class="panel">
+            <div class="panel-h"><span>实验账户 · 模拟组合</span><span class="dim" id="pf-cap"></span></div>
+            <div class="panel-b">
+              <div class="tiles" id="pf-tiles"></div>
+              <div class="tbl-wrap"><table id="pos-table"></table></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="method">
+      <div class="sec-h"><h2>方法 · 五层各做一件事</h2><span class="sub">规则全部在 <span class="mono">config/rules.json</span>，改动请 bump version，评估层按版本分组</span></div>
+      <div class="method">
+        <div><b><span class="n">L1</span>市场环境</b>BTC 日线均线结构、7d/30d、BTC 占比及 7 日变化、前 100 币跑赢 BTC 的比例、ETH/BTC、恐惧贪婪、本链成交。输出体制与风险预算。BTC 破位时预算为 0。</div>
+        <div><b><span class="n">L2</span>新币初筛</b>GeckoTerminal 新池 + 趋势池。硬过滤：流动性、年龄、成交笔数、独立买家、量/池比（洗量/死池）、税率与蜜罐、前十集中度。再做七维评分。</div>
+        <div><b><span class="n">L3</span>钱包取证</b>Blockscout 拉前排持有人，逐个查钱包年龄、首个打款方、交易计数；并查集聚类：同一打款方、互相转账、同批创建的新钱包。给出 sybil 分与关联簇。</div>
+        <div><b><span class="n">L4</span>交叉验证</b>价涨无钱（红）、买盘集中（红）、流动性抽走（红）、追高/洗量/付费推广（黄）、吸筹未启动（绿）、广泛参与（绿）。AI 只做"是否真实市场"审查并有否决权。</div>
+        <div><b><span class="n">L5</span>复盘验证</b>每个候选（含被剔除的和随机基线）都记录全部特征，回填 1h/6h/24h/7d。模拟仓：翻倍收回半仓本金，−50% 止损，72h 时间止损，抽池即出。</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p>数据源：GeckoTerminal / DexScreener 公共 API、Robinhood Chain Blockscout、OKX/Coinbase 日线、CoinGecko、alternative.me。链参数：Chain ID 4663，RPC rpc.mainnet.chain.robinhood.com，Pons V2 工厂 0x7ed5…ec7e。</p>
+      <p>本页面是研究与验证工具，所有仓位均为模拟；不构成投资建议。小市值代币多数归零，请只用能承受全损的实验资金，并在验证期结束前不要把它当作收入来源。</p>
+      <p class="mono" id="foot-ver"></p>
+    </div>
+  </footer>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
